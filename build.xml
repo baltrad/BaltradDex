@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="BaltradNode" default="deliverable" basedir=".">
+  <description>Builds BaltradDex, also supports testing and deployment</description>
+  <property name="lib.dir" value="lib"/>
+  <property name="extralib.dir" value="extralib"/>
+  <property name="src.dir" value="src"/>
+  <property name="web.dir" value="web"/>
+  <property name="build.dir" value="build"/>
+  <property name="build.web.dir" value="${build.dir}/web"/>
+  <property name="build.metainf.dir" value="${build.web.dir}/META-INF" />
+  <property name="build.webinf.dir" value="${build.web.dir}/WEB-INF" />
+  <property name="build.jsp.dir" value="${build.webinf.dir}/jsp"/>
+  <property name="build.classes.dir" value="${build.webinf.dir}/classes"/>
+  <property name="build.lib.dir" value="${build.webinf.dir}/lib"/>
+
+  <path id="lib.path">
+    <fileset dir="${lib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+    <fileset dir="${extralib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+
+  <target name="prepare">
+    <delete dir="${build.dir}" />
+    <mkdir dir="${build.web.dir}" />
+    <mkdir dir="${build.metainf.dir}" />
+    <mkdir dir="${build.webinf.dir}" />
+    <mkdir dir="${build.jsp.dir}" />
+    <mkdir dir="${build.classes.dir}" />
+    <mkdir dir="${build.lib.dir}" />
+
+    <copy todir="${build.lib.dir}">
+      <fileset dir="lib" />
+    </copy>
+
+    <copy todir="${build.web.dir}">
+      <fileset dir="web">
+        <include name="redirect.jsp"/>
+        <include name="includes/**/*.jsp" />
+        <include name="BaltradData/**" />
+      </fileset>
+    </copy>
+
+    <copy todir="${build.metainf.dir}">
+      <fileset dir="${src.dir}/conf">
+        <include name="MANIFEST.MF"/>
+      </fileset>
+      <fileset dir="${web.dir}/META-INF">
+        <include name="context.xml"/>
+      </fileset>
+    </copy>
+
+    <copy todir="${build.webinf.dir}">
+      <fileset dir="web/WEB-INF">
+        <include name="applicationContext.xml" />
+        <include name="baltraddex-servlet.xml" />
+        <include name="web.xml" />
+        <include name="jsp/**/*.jsp" />
+      </fileset>
+    </copy>
+
+    <copy todir="${build.classes.dir}">
+      <fileset dir="${src.dir}/java">
+        <include name="**/*.xml"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="compile" depends="prepare">
+    <javac encoding="8859_1" srcdir="${src.dir}" deprecation="on"
+           destdir="${build.classes.dir}">
+      <include name="**/*.java"/>
+      <classpath refid="lib.path"/>
+    </javac>
+  </target>
+
+  <target name="deliverable" depends="compile">
+    <jar destfile="${build.dir}/BaltradDex.war" basedir="${build.dir}/web">
+      <include name="**"/>
+    </jar>
+  </target>  
+
+  <target name="clean">
+    <delete dir="build"/>
+    <delete>
+      <fileset dir=".">
+        <include name="**/*.bak"/>
+        <include name="**/*~"/>
+      </fileset>
+    </delete>
+  </target>
+</project>
+

@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See commented blocks below for -->
+<!-- some examples of how to customize the build. -->
+<!-- (If you delete it and reopen the project it will be recreated.) -->
+<!-- By default, only the Clean and Build commands use this build script. -->
+<!-- Commands such as Run, Debug, and Test only use this build script if -->
+<!-- the Compile on Save feature is turned off for the project. -->
+<!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
+<!-- in the project's Project Properties dialog box.-->
+<project name="BaltradNode" default="default" basedir=".">
+    <description>Builds, tests, and runs the project BaltradDex.</description>
+    <import file="nbproject/build-impl.xml"/>
+    <!--
+
+    There exist several targets which are by default empty and which can be 
+    used for execution of your tasks. These targets are usually executed 
+    before and after some main targets. They are: 
+
+      -pre-init:                 called before initialization of project properties 
+      -post-init:                called after initialization of project properties 
+      -pre-compile:              called before javac compilation 
+      -post-compile:             called after javac compilation 
+      -pre-compile-single:       called before javac compilation of single file
+      -post-compile-single:      called after javac compilation of single file
+      -pre-compile-test:         called before javac compilation of JUnit tests
+      -post-compile-test:        called after javac compilation of JUnit tests
+      -pre-compile-test-single:  called before javac compilation of single JUnit test
+      -post-compile-test-single: called after javac compilation of single JUunit test
+      -pre-dist:                 called before archive building 
+      -post-dist:                called after archive building 
+      -post-clean:               called after cleaning build products 
+      -pre-run-deploy:           called before deploying
+      -post-run-deploy:          called after deploying
+
+    Example of pluging an obfuscator after the compilation could look like 
+
+        <target name="-post-compile">
+            <obfuscate>
+                <fileset dir="${build.classes.dir}"/>
+            </obfuscate>
+        </target>
+
+    For list of available properties check the imported 
+    nbproject/build-impl.xml file. 
+
+
+    Other way how to customize the build is by overriding existing main targets.
+    The target of interest are: 
+
+      init-macrodef-javac:    defines macro for javac compilation
+      init-macrodef-junit:   defines macro for junit execution
+      init-macrodef-debug:    defines macro for class debugging
+      do-dist:                archive building
+      run:                    execution of project 
+      javadoc-build:          javadoc generation 
+
+    Example of overriding the target for project execution could look like 
+
+        <target name="run" depends="<PROJNAME>-impl.jar">
+            <exec dir="bin" executable="launcher.exe">
+                <arg file="${dist.jar}"/>
+            </exec>
+        </target>
+
+    Notice that overridden target depends on jar target and not only on 
+    compile target as regular run target does. Again, for list of available 
+    properties which you can use check the target you are overriding in 
+    nbproject/build-impl.xml file. 
+
+    -->
+
+    <!--
+    General properties
+    -->
+    <property name="lib.dir" value="lib"/>
+    <!-- 
+    Set classpath
+    -->
+    <path id="classpath.path" description="CLASSPATH for build script">
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <!--
+    Set database connection properties
+    -->
+    <property name="mysqljar" value="mysql-connector-java-5.1.6-bin.jar"/>
+    <property name="mysqldriver" value="com.mysql.jdbc.Driver"/>
+    <property name="mysqlport" value="3306"/>
+    <property name="mysqlalias" value="baltrad_db"/>
+    <property name="mysqluser" value="baltrad"/>
+    <property name="mysqlpasswd" value="baltrad"/>
+
+    <!--
+    Execute DDL commands
+    -->
+    <target name="-pre-init">
+      <sql classpath="${lib.dir}/${mysqljar}"
+         driver="${mysqldriver}"
+         url="jdbc:mysql://localhost:${mysqlport}/${mysqlalias}"
+         userid="${mysqluser}" password="${mysqlpasswd}"
+         print="yes">
+
+        -- SQL script for Baltrad
+        -- Step 1: Drop tables if exist
+
+        USE baltrad_db;
+        DROP TABLE IF EXISTS baltrad_data;
+        DROP TABLE IF EXISTS baltrad_data_channels;
+        DROP TABLE IF EXISTS baltrad_users;
+        DROP TABLE IF EXISTS baltrad_groups;
+        DROP TABLE IF EXISTS baltrad_subscriptions;
+        DROP TABLE IF EXISTS baltrad_roles;
+        DROP TABLE IF EXISTS baltrad_delivery_register;
+        DROP TABLE IF EXISTS baltrad_logs;
+        
+        -- Step 2: Create tables
+
+        CREATE TABLE baltrad_data
+        (
+           data_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+           node VARCHAR(64) NOT NULL,
+           station VARCHAR(32) NOT NULL,
+           absolute_path VARCHAR(255) NOT NULL,
+           file_name VARCHAR(64) NOT NULL,
+           date DATE NOT NULL,
+           time TIME NOT NULL,
+           datasets INT NOT NULL
+        );
+
+        CREATE TABLE baltrad_data_channels
+        (
+            data_channel_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(32) NOT NULL,
+            wmo_number INT,
+            checked VARCHAR(8) DEFAULT ''
+
+        );
+
+        CREATE TABLE baltrad_users
+        (
+            user_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            user_name VARCHAR(64) NOT NULL,
+            password VARCHAR(64) NOT NULL,
+            role VARCHAR(32) NOT NULL,
+            factory VARCHAR(256) NOT NULL,
+            country VARCHAR(64) NOT NULL,
+            city VARCHAR(64) NOT NULL,
+            zip_code VARCHAR(12) NOT NULL,
+            street VARCHAR(64) NOT NULL,
+            number VARCHAR(12) NOT NULL,
+            phone VARCHAR(32) NOT NULL,
+            email VARCHAR(64) NOT NULL,
+            node_address VARCHAR(64) NOT NULL,
+            local_directory VARCHAR(128) NOT NULL
+        );
+
+        CREATE TABLE baltrad_groups
+        (
+            group_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(64) NOT NULL
+        );
+
+        CREATE TABLE baltrad_roles
+        (
+            role_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            group_id INT NOT NULL,
+            CONSTRAINT FOREIGN KEY (user_id)
+                    REFERENCES baltrad_users (user_id)
+                    ON DELETE CASCADE ON UPDATE CASCADE,
+            CONSTRAINT FOREIGN KEY (group_id)
+                    REFERENCES baltrad_groups (group_id)
+                    ON DELETE CASCADE ON UPDATE CASCADE
+        );
+
+        CREATE TABLE baltrad_subscriptions
+        (
+            subscription_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            data_channel_id INT NOT NULL,
+            CONSTRAINT FOREIGN KEY (user_id)
+                    REFERENCES baltrad_users (user_id)
+                    ON DELETE CASCADE ON UPDATE CASCADE,
+            CONSTRAINT FOREIGN KEY (data_channel_id)
+                    REFERENCES baltrad_data_channels (data_channel_id)
+                   ON DELETE CASCADE ON UPDATE CASCADE
+        );
+
+        CREATE TABLE baltrad_delivery_register
+        (
+            register_entry_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            data_id INT NOT NULL,
+            CONSTRAINT FOREIGN KEY (user_id) REFERENCES baltrad_users (user_id),
+            CONSTRAINT FOREIGN KEY (data_id) REFERENCES baltrad_data (data_id)
+        );
+
+        CREATE TABLE baltrad_logs
+        (
+            log_entry_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+            log_entry_rank VARCHAR(16) NOT NULL,
+            log_entry_date DATE NOT NULL,
+            log_entry_time TIME NOT NULL,
+            log_entry_text TEXT NOT NULL
+        );
+
+        -- Step 3: Create indices
+
+        --CREATE UNIQUE INDEX product_id_index ON baltrad_data (product_id);
+
+        -- Step 4: Insert test data
+        -- baltrad_data
+
+        -- Brzuchania
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'brzuchania',
+            'BaltradData/IMGW/Brzuchania/2007100214008408.h5', '2007100214008408.h5',
+            '2007-10-02', '21:40:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'brzuchania',
+            'BaltradData/IMGW/Brzuchania/2007100200002857.h5', '2007100200002857.h5',
+            '2007-10-02', '00:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'brzuchania',
+            'BaltradData/IMGW/Brzuchania/2008061615002914.h5', '2008061615002914.h5',
+            '2008-06-16', '15:00:29', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'brzuchania',
+            'BaltradData/IMGW/Brzuchania/2008061615002971.h5', '2008061615002971.h5',
+            '2008-06-16', '15:00:00', '1');
+        
+        -- Gdansk
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'gdansk',
+            'BaltradData/IMGW/Gdansk/2008061615003322.h5', '2008061615003322.h5',
+            '2008-06-16', '15:00:33', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'gdansk',
+            'BaltradData/IMGW/Gdansk/2007100214001176.h5', '2007100214001176.h5',
+            '2007-10-02', '14:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'gdansk',
+            'BaltradData/IMGW/Gdansk/2008061615003387.h5', '2008061615003387.h5',
+            '2008-06-16', '15:00:00', '1');
+
+        -- Legionowo
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'legionowo',
+            'BaltradData/IMGW/Legionowo/2007100214006547.h5', '2007100214006547.h5',
+            '2007-10-02', '14:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'legionowo',
+            'BaltradData/IMGW/Legionowo/2007100201102822.h5', '2007100201102822.h5',
+            '2007-10-02', '01:10:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'legionowo',
+            'BaltradData/IMGW/Legionowo/2008061615002517.h5', '2008061615002517.h5',
+            '2008-06-16', '15:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'legionowo',
+            'BaltradData/IMGW/Legionowo/2008061615002584.h5', '2008061615002584.h5',
+            '2008-06-16', '15:00:00', '1');
+
+        -- Poznan
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'poznan',
+            'BaltradData/IMGW/Poznan/2007100214006032.h5', '2007100214006032.h5',
+            '2007-10-02', '14:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'poznan',
+            'BaltradData/IMGW/Poznan/2008061615003243.h5', '2008061615003243.h5',
+            '2008-06-16', '15:00:00', '1');
+
+        -- Pastewnik
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'pastewnik',
+            'BaltradData/IMGW/Pastewnik/2008061615002736.h5', '2008061615002736.h5',
+            '2008-06-16', '15:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'pastewnik',
+            'BaltradData/IMGW/Pastewnik/2008061615002764.h5', '2008061615002764.h5',
+            '2008-06-16', '15:00:00', '1');
+
+        -- Ramza
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'ramza',
+            'BaltradData/IMGW/Ramza/2007100214006843.h5', '2007100214006843.h5',
+            '2007-10-02', '14:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'ramza',
+            'BaltradData/IMGW/Ramza/2008061615002508.h5', '2008061615002508.h5',
+            '2008-06-16', '15:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'ramza',
+            'BaltradData/IMGW/Ramza/2008061615002522.h5', '2008061615002522.h5',
+            '2008-06-16', '15:00:00', '1');
+
+        -- Rzeszow
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'rzeszow',
+            'BaltradData/IMGW/Rzeszow/2007100214008656.h5', '2007100214008656.h5',
+            '2007-10-02', '14:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'rzeszow',
+            'BaltradData/IMGW/Rzeszow/2008061615002645.h5','2008061615002645.h5',
+            '2008-06-16', '15:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'rzeszow',
+            'BaltradData/IMGW/Rzeszow/2008061615002676.h5', '2008061615002676.h5',
+            '2008-06-16', '15:00:00', '1');
+
+        -- Swidwin
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'swidwin',
+            'BaltradData/IMGW/Swidwin/2007100214008261.h5', '2007100214008261.h5',
+            '2007-10-02', '14:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'swidwin',
+            'BaltradData/IMGW/Swidwin/2008061615002401.h5', '2008061615002401.h5',
+            '2008-06-16', '15:00:00', '1');
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.imgw.pl', 'swidwin',
+            'BaltradData/IMGW/Swidwin/2008061615002411.h5', '2008061615002411.h5',
+            '2008-06-16', '15:00:00', '1');
+            
+        -- Arlanda
+        INSERT INTO baltrad_data (node, station, absolute_path, file_name, date, time, datasets)
+            VALUES ('baltrad.smhi.se', 'arlanda', 
+            'BaltradData/SMHI/Arlanda/2007111212000032.h5', '2007111212000032.h5',
+                    '2007-11-12', '12:00:00', '1');
+
+        -- baltrad_data_channels
+
+        INSERT INTO baltrad_data_channels (name, wmo_number)
+                                                VALUES ('legionowo', '12374');
+        INSERT INTO baltrad_data_channels (name, wmo_number)
+                                                VALUES ('swidwin', '12220');
+        INSERT INTO baltrad_data_channels (name, wmo_number)
+                                                VALUES ('brzuchania', '12568');
+        INSERT INTO baltrad_data_channels (name, wmo_number)
+                                                VALUES ('pastewnik', '12544');
+        INSERT INTO baltrad_data_channels (name, wmo_number)
+                                                VALUES ('rzeszow', '12579');
+        INSERT INTO baltrad_data_channels (name, wmo_number)
+                                                VALUES ('ramza', '12514');
+        INSERT INTO baltrad_data_channels (name, wmo_number)
+                                                VALUES ('poznan', '12331');
+        INSERT INTO baltrad_data_channels (name, wmo_number)
+                                                VALUES ('gdansk', '12151');
+        INSERT INTO baltrad_data_channels (name, wmo_number)
+                                                VALUES ('arlanda', '2451');
+
+        -- baltrad_users
+
+        INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
+                    street, number, phone, email, node_address, local_directory)
+                    VALUES ('imgw', MD5('baltrad'), 'operator',
+                             'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+                             '01-673', 'Podlesna', '61', '+48 22 569 44 91',
+                             'baltrad.admin@imgw.pl', 'baltrad.imgw.pl', 'incoming');
+        INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
+                    street, number, phone, email, node_address, local_directory)
+                    VALUES ('admin', MD5('admin'), 'administrator',
+                             'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+                             '01-673', 'Podlesna', '61', '+48 22 569 44 91',
+                             'baltrad.admin@imgw.pl', 
+                             'http://localhost:8080/BaltradDex/receiver.htm', 'incoming');
+        INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
+                    street, number, phone, email, node_address, local_directory)
+                    VALUES ('laptok', MD5('baltrad'), 'user',
+                             'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+                             '01-673', 'Podlesna', '61', '+48 22 569 44 91',
+                             'baltrad.admin@imgw.pl',
+                             'http://172.30.9.171:8080/BaltradDex/receiver.htm', 'incoming');
+        INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
+                    street, number, phone, email, node_address, local_directory)
+                    VALUES ('rand', MD5('randomize'), 'user',
+                             'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+                             '01-673', 'Podlesna', '61', '+48 22 569 44 91',
+                             'baltrad.admin@imgw.pl',
+                             'http://172.30.9.34:8080/BaltradDex/receiver.htm', 'incoming');
+
+        -- Step 5: Validate data structure
+
+        SELECT * FROM baltrad_data;
+        SELECT * FROM baltrad_data_channels;
+        SELECT * FROM baltrad_users;
+        SELECT * FROM baltrad_subscriptions;
+        SELECT * FROM baltrad_delivery_register;
+
+      </sql>
+    </target>
+</project>

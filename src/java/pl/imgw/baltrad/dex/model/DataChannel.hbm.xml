@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class name="pl.imgw.baltrad.dex.model.DataChannel" table="baltrad_data_channels">
+    <id column="data_channel_id" name="dataChannelID">
+      <generator class="increment"/>
+    </id>
+    <property column="name" name="name"/>
+    <property column="wmo_number" name="wmoNumber"/>
+    <property column="checked" name="checked"/>
+  </class>
+</hibernate-mapping>

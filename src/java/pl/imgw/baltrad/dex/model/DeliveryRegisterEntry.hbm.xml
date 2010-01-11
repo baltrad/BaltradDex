@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" 
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<!--
+    Hibernate mapping file for delivery register entry object.
+-->
+
+<hibernate-mapping>
+  <class name="pl.imgw.baltrad.dex.model.DeliveryRegisterEntry" table="baltrad_delivery_register">
+    <id column="register_entry_id" name="registerEntryID">
+      <generator class="increment"/>
+    </id>
+    <property column="user_id" name="userID"/>
+    <property column="data_id" name="dataID"/>
+  </class>
+</hibernate-mapping>

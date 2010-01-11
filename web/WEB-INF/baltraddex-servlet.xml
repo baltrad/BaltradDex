@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+    
+    <!--
+        URL to controller mapping. Bean references http request interceptor which is used
+        to control user authentication process.
+    -->
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <ref bean="httpRequestInterceptor"/>
+            </list>
+        </property>
+        <property name="mappings">
+            <props>
+                <prop key="welcome.htm">urlFilenameController</prop>
+                <prop key="channels.htm">dataChannelsController</prop>
+                <prop key="channeldata.htm">channelDataController</prop>
+                <prop key="download.htm">downloadController</prop>
+                <prop key="admin.htm">urlFilenameController</prop>
+                <prop key="transmitter_on.htm">transmitterController</prop>
+                <prop key="transmitter_off.htm">transmitterController</prop>
+                <prop key="subscriptions.htm">subscriptionsController</prop>
+                <prop key="submit.htm">submitSubscriptionsController</prop>
+                <prop key="status.htm">subscriptionStatusController</prop>
+                <prop key="log.htm">urlFilenameController</prop>
+                <prop key="logtable.htm">logTableController</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--
+        URL to controller mapping. These URLs are not intercepted by the http request interceptor
+        class.
+    -->
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+            <props>
+                <prop key="signin.htm">signInController</prop>
+                <prop key="signout.htm">signOutController</prop>
+                <prop key="receiver.htm">receiver</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--
+        View resolver.
+    -->
+    <bean id="viewResolver"
+          class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+          p:prefix="/WEB-INF/jsp/"
+          p:suffix=".jsp" />
+
+    <!--
+        URL filename view controller.
+    -->
+    <bean id="urlFilenameController"
+          class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+
+    <!--
+        The signin controller.
+    -->
+    <bean name="signInController"
+        class="pl.imgw.baltrad.dex.controller.SignInController">
+        <property name="sessionForm">
+			<value>true</value>
+		</property>
+		<property name="formView">
+			<value>signin</value>
+		</property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+        <property name="successView">
+            <value>redirect:welcome.htm</value>
+        </property>
+        <property name="commandClass">
+            <value>pl.imgw.baltrad.dex.model.User</value>
+        </property>
+        <property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager"/>
+        </property>
+    </bean>
+
+    <!--
+        The signout controller.
+    -->
+    <bean name="signOutController"
+        class="pl.imgw.baltrad.dex.controller.SignOutController">
+        <property name="successView">
+			<value>redirect:signin.htm</value>
+		</property>
+        <property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager"/>
+        </property>
+     </bean>
+
+    <!--
+    The index controller.
+    -->
+    <!--bean name="indexController"
+        class="org.springframework.web.servlet.mvc.ParameterizableViewController">
+        <property name="viewName">
+            <value>hello</value>
+        </property>
+    </bean -->
+
+    <!--
+        Data channels list controller.
+    -->
+    <bean name="dataChannelsController"
+        class="pl.imgw.baltrad.dex.controller.DataChannelsController">
+        <property name="dataChannelManager">
+			<ref bean="dataChannelManager" />
+		</property>
+		<property name="successView">
+			<value>channels</value>
+		</property>
+        <property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager"/>
+        </property>
+        <property name="subscriptionManager">
+            <ref bean="subscriptionManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Data from data channel controller.
+    -->
+    <bean name="channelDataController"
+        class="pl.imgw.baltrad.dex.controller.ChannelDataController">
+        <property name="dataManager">
+			<ref bean="dataManager" />
+		</property>
+		<property name="successView">
+			<value>channeldata</value>
+		</property>
+    </bean>
+
+    <!--
+        Subscriptions controller
+    -->
+    <bean name="subscriptionsController"
+                                class="pl.imgw.baltrad.dex.controller.SubscriptionsController">
+        <property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager"/>
+        </property>
+        <property name="subscriptionManager">
+            <ref bean="subscriptionManager"/>
+        </property>
+        <property name="dataChannelManager">
+			<ref bean="dataChannelManager" />
+		</property>
+		<property name="successView">
+			<value>subscriptions</value>
+		</property>
+    </bean>
+
+    <!--
+        Submit subscriptions controller
+    -->
+    <bean name="submitSubscriptionsController"
+                            class="pl.imgw.baltrad.dex.controller.SubmitSubscriptionsController">
+        <property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager"/>
+        </property>
+        <property name="subscriptionManager">
+            <ref bean="subscriptionManager"/>
+        </property>
+        <property name="dataChannelManager">
+			<ref bean="dataChannelManager" />
+		</property>
+		<property name="successView">
+			<value>submit</value>
+		</property>
+    </bean>
+
+    <!--
+        Subscription status controller
+    -->
+    <bean name="subscriptionStatusController"
+                            class="pl.imgw.baltrad.dex.controller.SubscriptionStatusController">
+        <property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager"/>
+        </property>
+        <property name="subscriptionManager">
+            <ref bean="subscriptionManager"/>
+        </property>
+        <property name="dataChannelManager">
+			<ref bean="dataChannelManager"/>
+		</property>
+        <property name="successView">
+			<value>status</value>
+		</property>
+    </bean>
+
+    <!--
+        Log messages controller
+    -->
+    <bean name="logTableController" class="pl.imgw.baltrad.dex.controller.LogTableController">
+        <property name="successView">
+            <value>logtable</value>
+        </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Data download controller.
+    -->
+    <bean name="downloadController" class="pl.imgw.baltrad.dex.controller.DownloadController">
+        <property name="successView">
+            <value>channeldata</value>
+        </property>
+        <property name="logManager">
+			<ref bean="logManager"/>
+		</property>
+    </bean>
+    
+    <!--
+        Data channel manager.
+    -->
+    <bean name="dataChannelManager" class="pl.imgw.baltrad.dex.model.DataChannelManager"/>
+
+    <!--
+        Data manager.
+    -->
+    <bean name="dataManager" class="pl.imgw.baltrad.dex.model.DataManager"/>
+
+    <!--
+        Subscription manager.
+    -->
+    <bean name="subscriptionManager" class="pl.imgw.baltrad.dex.model.SubscriptionManager"/>
+
+    <!--
+        Log manager
+    -->
+    <bean name="logManager" class="pl.imgw.baltrad.dex.model.LogManager"/>
+
+    <!--
+        Data transmitter module.
+    -->
+    <bean name="transmitter" class="pl.imgw.baltrad.dex.model.Transmitter"/>
+
+    <!--
+        Data receiver module.
+    -->
+    <bean name="receiver" class="pl.imgw.baltrad.dex.model.Receiver"/>
+
+    <!--
+        Data transmitter controller.
+    -->
+    <bean name="transmitterController" class="pl.imgw.baltrad.dex.controller.TransmitterController"/>
+
+    <!--
+        Sign in validator.
+    -->
+    <bean name="signInValidator" class="pl.imgw.baltrad.dex.util.SignInValidator"/>
+
+    <!--
+        User manager.
+    -->
+    <bean name="userManager" class="pl.imgw.baltrad.dex.model.UserManager"/>
+
+    <!--
+        Http request interceptor.
+    -->
+    <bean id="httpRequestInterceptor"
+		class="pl.imgw.baltrad.dex.util.HttpRequestInterceptor">
+        <property name="signInPage">
+			<value>signin.htm</value>
+		</property>
+		<property name="applicationSecurityManager">
+			<ref bean="applicationSecurityManager" />
+		</property>
+	</bean>
+
+    <!--
+        Message digest utility.
+    -->
+    <bean name="messageDigestUtil" 
+            class="pl.imgw.baltrad.dex.util.MessageDigestUtil">
+    </bean>
+
+    <!--
+        Application security manager.
+    -->
+    <bean name="applicationSecurityManager"
+            class="pl.imgw.baltrad.dex.util.ApplicationSecurityManager">
+        <property name="messageDigestUtil">
+			<ref bean="messageDigestUtil"/>
+		</property>
+    </bean>
+
+    <!--
+        Message resources.
+    -->
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>messages</value>
+			</list>
+		</property>
+	</bean>
+
+</beans>
