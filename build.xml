@@ -6,6 +6,7 @@
   <property name="extralib.dir" value="extralib"/>
   <property name="src.dir" value="src"/>
   <property name="web.dir" value="web"/>
+  <property name="etc.dir" value="etc"/>
   <property name="build.dir" value="build"/>
   <property name="build.web.dir" value="${build.dir}/web"/>
   <property name="build.metainf.dir" value="${build.web.dir}/META-INF" />
@@ -14,6 +15,19 @@
   <property name="build.classes.dir" value="${build.webinf.dir}/classes"/>
   <property name="build.lib.dir" value="${build.webinf.dir}/lib"/>
 
+  <property file="${etc.dir}/testdb.properties"/>
+  <property file="${etc.dir}/appserver.properties"/>
+  <!-- Configure ant tasks for tomcat deployment -->
+  <taskdef name="deploy"    classname="org.apache.catalina.ant.DeployTask"/>
+  <taskdef name="list"      classname="org.apache.catalina.ant.ListTask"/>
+  <taskdef name="reload"    classname="org.apache.catalina.ant.ReloadTask"/>
+  <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask"/>
+  <taskdef name="roles"     classname="org.apache.catalina.ant.RolesTask"/>
+  <taskdef name="start"     classname="org.apache.catalina.ant.StartTask"/>
+  <taskdef name="stop"      classname="org.apache.catalina.ant.StopTask"/>
+  <taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/>
+
+  
   <path id="lib.path">
     <fileset dir="${lib.dir}">
       <include name="**/*.jar"/>
@@ -33,7 +47,24 @@
     <mkdir dir="${build.lib.dir}" />
 
     <copy todir="${build.lib.dir}">
-      <fileset dir="lib" />
+      <fileset dir="lib/dom4j">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/hibernate">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/httpclient">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/jakarta-commons">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/jcip">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/spring">
+        <include name="*.jar"/>
+      </fileset>
     </copy>
 
     <copy todir="${build.web.dir}">
@@ -92,5 +123,72 @@
       </fileset>
     </delete>
   </target>
+	
+  <target name="create-testdb">
+    <sql classpath="${lib.dir}/${db.jar}"
+      	 driver="${db.driver}"
+    	 url="${db.url}"
+    	 userid="${db.user}" 
+         password="${db.pwd}" >
+      <transaction src="${etc.dir}/create_db.sql"/>
+    </sql>
+  </target>
+  
+  <target name="test.deploy"
+    depends="deliverable, create-testdb, context.status"
+    if="context.deployable">
+    <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
+    <deploy url="${mgr.url}"
+      username="${mgr.username}"
+      password="${mgr.password}"
+      path="${mgr.path}"
+      update="${mgr.update}"
+      war="file:${build.dir}/BaltradDex.war"/>
+  </target>
+ 
+  <!-- From apache-tomcats user manual for using the ant-manager task -->
+  <target name="context.status">
+    <property name="running" value="${mgr.path}:running"/>
+	<property name="stopped" value="${mgr.path}:stopped"/>
+	
+    <list url="${mgr.url}"
+      outputproperty="ctx.status"
+      username="${mgr.username}"
+      password="${mgr.password}">
+    </list>
+		
+    <condition property="context.running">
+      <contains string="${ctx.status}" substring="${running}"/>
+    </condition>
+    <condition property="context.stopped">
+      <contains string="${ctx.status}" substring="${stopped}"/>
+    </condition>
+    <condition property="context.notInstalled">
+      <and>
+        <isfalse value="${context.running}"/>
+        <isfalse value="${context.stopped}"/>
+      </and>
+    </condition>
+    <condition property="context.deployable">
+      <or>
+        <istrue value="${context.notInstalled}"/>
+        <and>
+          <istrue value="${context.running}"/>
+          <istrue value="${mgr.update}"/>
+        </and>
+        <and>
+          <istrue value="${context.stopped}"/>
+          <istrue value="${mgr.update}"/>
+        </and>
+      </or>
+    </condition>
+    <condition property="context.undeployable">
+      <or>
+        <istrue value="${context.running}"/>
+        <istrue value="${context.stopped}"/>
+      </or>
+    </condition>
+  </target>
+  
 </project>
 
