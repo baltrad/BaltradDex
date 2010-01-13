@@ -66,6 +66,10 @@
       <fileset dir="lib/spring">
         <include name="*.jar"/>
       </fileset>
+      <fileset dir="lib">
+      	<include name="mysql-connector-java-5.1.6-bin.jar"/>
+        <include name="apache-mime4j-0.6.jar"/>
+      </fileset>
     </copy>
 
     <copy todir="${build.web.dir}">
