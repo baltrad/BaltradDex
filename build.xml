@@ -17,6 +17,7 @@
 
   <property file="${etc.dir}/testdb.properties"/>
   <property file="${etc.dir}/appserver.properties"/>
+  
   <!-- Configure ant tasks for tomcat deployment -->
   <taskdef name="deploy"    classname="org.apache.catalina.ant.DeployTask"/>
   <taskdef name="list"      classname="org.apache.catalina.ant.ListTask"/>
