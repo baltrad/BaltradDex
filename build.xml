@@ -66,9 +66,24 @@
       <fileset dir="lib/spring">
         <include name="*.jar"/>
       </fileset>
+      <fileset dir="lib/log4j">
+      	<include name="*.jar"/>
+      </fileset>      
       <fileset dir="lib/slf4j">
       	<include name="*.jar"/>
       </fileset>
+      <fileset dir="lib/j2ee">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/displaytag">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/jakarta-taglibs">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/javassist">
+        <include name="*.jar"/>
+      </fileset>      
       <fileset dir="lib">
       	<include name="mysql-connector-java-5.1.6-bin.jar"/>
         <include name="apache-mime4j-0.6.jar"/>
@@ -79,6 +94,10 @@
       <fileset dir="web">
         <include name="redirect.jsp"/>
         <include name="includes/**/*.jsp" />
+        <include name="includes/**/*.css" />
+        <include name="includes/**/*.png" />
+        <include name="includes/**/*.gif" />
+        <include name="includes/**/*.jpg" />
         <include name="BaltradData/**" />
       </fileset>
     </copy>
