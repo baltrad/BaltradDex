@@ -139,29 +139,43 @@ INSERT INTO baltrad_data_channels (name, wmo_number)
 
 -- baltrad_users
 INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
-                    	   street, number, phone, email, node_address, local_directory)
-	VALUES ('imgw', MD5('baltrad'), 'operator',
-			'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
-			'01-673', 'Podlesna', '61', '+48 22 569 44 91',
-			'baltrad.admin@imgw.pl', 'baltrad.imgw.pl', 'incoming');
+                     	   street, number, phone, email, node_address, local_directory)
+ 	VALUES ('operator', MD5('raDar170'), 'operator',
+ 			'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+ 			'01-673', 'Podlesna', '61', '+48 22 569 44 91',
+ 			'nobody@localhost', 'baltrad.imgw.pl', 'incoming');
 INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
-                    	   street, number, phone, email, node_address, local_directory)
-	VALUES ('admin', MD5('admin'), 'administrator',
-			'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
-			'01-673', 'Podlesna', '61', '+48 22 569 44 91',
-			'baltrad.admin@imgw.pl', 
+                     	   street, number, phone, email, node_address, local_directory)
+ 	VALUES ('admin', MD5('raDar170'), 'administrator',
+ 			'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+ 			'01-673', 'Podlesna', '61', '+48 22 569 44 91',
+			'nobody@localhost', 
 			'http://localhost:8080/BaltradDex/receiver.htm', 'incoming');
-INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
-                    	   street, number, phone, email, node_address, local_directory)
-	VALUES ('laptok', MD5('baltrad'), 'user',
-			'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
-			'01-673', 'Podlesna', '61', '+48 22 569 44 91',
-			'baltrad.admin@imgw.pl',
-			'http://172.30.9.171:8080/BaltradDex/receiver.htm', 'incoming');
-INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
-						   street, number, phone, email, node_address, local_directory)
-	VALUES ('rand', MD5('randomize'), 'user',
-    		'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
-			'01-673', 'Podlesna', '61', '+48 22 569 44 91',
-			'baltrad.admin@imgw.pl',
-			'http://172.30.9.34:8080/BaltradDex/receiver.htm', 'incoming');
+
+--INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
+--                     	   street, number, phone, email, node_address, local_directory)
+-- 	VALUES ('imgw', MD5('baltrad'), 'operator',
+-- 			'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+-- 			'01-673', 'Podlesna', '61', '+48 22 569 44 91',
+-- 			'baltrad.admin@imgw.pl', 'baltrad.imgw.pl', 'incoming');
+--INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
+--                     	   street, number, phone, email, node_address, local_directory)
+-- 	VALUES ('admin', MD5('admin'), 'administrator',
+-- 			'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+-- 			'01-673', 'Podlesna', '61', '+48 22 569 44 91',
+--			'baltrad.admin@imgw.pl', 
+--			'http://localhost:8080/BaltradDex/receiver.htm', 'incoming');
+--INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
+--                    	   street, number, phone, email, node_address, local_directory)
+--	VALUES ('laptok', MD5('baltrad'), 'user',
+--			'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+--			'01-673', 'Podlesna', '61', '+48 22 569 44 91',
+--			'baltrad.admin@imgw.pl',
+--			'http://172.30.9.171:8080/BaltradDex/receiver.htm', 'incoming');
+--INSERT INTO baltrad_users (user_name, password, role, factory, country, city, zip_code,
+--						   street, number, phone, email, node_address, local_directory)
+--	VALUES ('rand', MD5('randomize'), 'user',
+--    		'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+--			'01-673', 'Podlesna', '61', '+48 22 569 44 91',
+--			'baltrad.admin@imgw.pl',
+--			'http://172.30.9.34:8080/BaltradDex/receiver.htm', 'incoming');
