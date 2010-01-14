@@ -7,6 +7,7 @@
   <property name="src.dir" value="src"/>
   <property name="web.dir" value="web"/>
   <property name="etc.dir" value="etc"/>
+  <property name="testdata.dir" value="TestData"/>
   <property name="build.dir" value="build"/>
   <property name="build.web.dir" value="${build.dir}/web"/>
   <property name="build.metainf.dir" value="${build.web.dir}/META-INF" />
@@ -83,7 +84,10 @@
       </fileset>
       <fileset dir="lib/javassist">
         <include name="*.jar"/>
-      </fileset>      
+      </fileset>
+      <fileset dir="lib/antlr">
+        <include name="*.jar"/>
+      </fileset>          
       <fileset dir="lib">
       	<include name="mysql-connector-java-5.1.6-bin.jar"/>
         <include name="apache-mime4j-0.6.jar"/>
@@ -160,9 +164,19 @@
       <transaction src="${etc.dir}/create_db.sql"/>
     </sql>
   </target>
+
+  <target name="insert-testdata" depends="create-testdb">
+    <sql classpath="${lib.dir}/${db.jar}"
+      	 driver="${db.driver}"
+    	 url="${db.url}"
+    	 userid="${db.user}" 
+         password="${db.pwd}" >
+      <transaction src="${testdata.dir}/testdata.sql"/>
+    </sql>
+  </target>
   
   <target name="test.deploy"
-    depends="deliverable, create-testdb, context.status"
+    depends="deliverable, insert-testdata, context.status"
     if="context.deployable">
     <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
     <deploy url="${mgr.url}"
