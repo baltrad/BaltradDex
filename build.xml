@@ -127,6 +127,7 @@
     <copy todir="${build.classes.dir}">
       <fileset dir="${src.dir}/java">
         <include name="**/*.xml"/>
+        <include name="**/*.properties"/>
       </fileset>
     </copy>
   </target>
