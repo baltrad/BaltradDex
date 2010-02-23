@@ -14,6 +14,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
+import org.hibernate.Query;
+import org.hibernate.criterion.Projections;
+import org.hibernate.Criteria;
 
 import java.util.List;
 import java.util.Date;
@@ -28,7 +31,11 @@ import java.text.SimpleDateFormat;
  * @since 1.0
  */
 public class LogManager {
-
+//---------------------------------------------------------------------------------------- Constants
+    // Message type strings
+    public final String MSG_INFO = "INFO";
+    public final String MSG_WRN = "WARNING";
+    public final String MSG_ERR = "ERROR";
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Method gets all available log entries.
@@ -36,24 +43,19 @@ public class LogManager {
      * @return List object containing all available log entries 
      */
     public List getLogEntries() {
-
         List logEntries = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
-        try
-        {
+        try {
             logEntries = session.createQuery( "from LogEntry" ).list();
             session.getTransaction().commit();
-        }
-        catch ( HibernateException e )
-        {
+        } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
         }
         return logEntries;
     }
-
     /**
      * Method gets log entries with a given rank.
      *
@@ -61,7 +63,6 @@ public class LogManager {
      * @return List object containing log entries with a given rank
      */
     public List getLogEntriesByRank( String rank ) {
-        
         List logEntries = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
@@ -70,13 +71,12 @@ public class LogManager {
             logEntries = session.createQuery( "from LogEntry where id = ?" ).setString(
                                                                                 0, rank ).list();
             session.getTransaction().commit();
-        } catch ( HibernateException e ) {
+        } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
         }
         return logEntries;
     }
-
     /**
      * Method gets last log entries.
      *
@@ -84,29 +84,34 @@ public class LogManager {
      * @return List object containing a given number of last log entries.
      */
     public List getLastLogEntries( int numberOfEntries ) {
-
         List logEntries = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         try {
-            logEntries = session.createQuery( "from LogEntry logEntry " +
-                                "order by logEntry.id desc limit " + numberOfEntries ).list();
+            Query query = session.createQuery( "from LogEntry logEntry" );
+            Criteria criteria = session.createCriteria( LogEntry.class );
+            criteria.setProjection( Projections.rowCount() );
+            List list = criteria.list();
+            int rows = ( Integer )list.get( 0 );
+            if( rows > numberOfEntries ) {
+                query.setMaxResults( numberOfEntries );
+                query.setFirstResult( rows - numberOfEntries );
+            }
+            logEntries = query.list();
             session.getTransaction().commit();
-        } catch ( HibernateException e ) {
+        } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
         }
         return logEntries;
     }
-
     /**
      * Method adds log entry to the log entry list.
      *
      * @param logEntry Log entry
      */
     public void addLogEntry( LogEntry logEntry ) {
-
         SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -118,20 +123,19 @@ public class LogManager {
             throw e;
         }
     }
-
     /**
      * Method adds log entry to the log entry list.
      *
      * @param date Log entry date
-     * @param rank Log entry rank
-     * @param text Log entry text
+     * @param type Log entry type
+     * @param message Log entry message
      */
-    public void addLogEntry( Date date, String rank, String text ) {
+    public void addLogEntry( Date date, String type, String message ) {
 
         DateFormat dfDate = new SimpleDateFormat( "yyyy/MM/dd" );
         DateFormat dfTime = new SimpleDateFormat( "HH:mm:ss" );
-        LogEntry logEntry = new LogEntry( rank, dfDate.format( date ), dfTime.format( date ), text );
-
+        LogEntry logEntry = new LogEntry( dfDate.format( date ), dfTime.format( date ),
+                                                                                type, message );
         SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -143,14 +147,12 @@ public class LogManager {
             throw e;
         }
     }
-
     /**
      * Method deletes single entry from log entry list.
      *
      * @param id Log entry ID
      */
     public void deleteLogEntry( int id ) {
-
         SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
         Session session = sessionFactory.openSession();
 	    session.beginTransaction();
@@ -163,7 +165,6 @@ public class LogManager {
             throw e;
         }
     }
-
     /**
      * Method deletes last entry from the log entry list.
      */
@@ -193,7 +194,5 @@ public class LogManager {
             throw e;
         }
     }
-
 }
-
 //--------------------------------------------------------------------------------------------------

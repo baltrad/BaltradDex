@@ -2,16 +2,18 @@
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
   <session-factory>
-    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
-    <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/baltrad_testdb</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+    <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+    <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/baltrad_db</property>
     <property name="hibernate.connection.username">baltrad</property>
     <property name="hibernate.connection.password">baltrad</property>
+    <property name="hibernate.connection.release_mode">after_transaction</property>
     <mapping resource="pl/imgw/baltrad/dex/model/Data.hbm.xml"/>
-    <mapping resource="pl/imgw/baltrad/dex/model/DataChannel.hbm.xml"/>
+    <mapping resource="pl/imgw/baltrad/dex/model/Channel.hbm.xml"/>
     <mapping resource="pl/imgw/baltrad/dex/model/User.hbm.xml"/>
     <mapping resource="pl/imgw/baltrad/dex/model/Subscription.hbm.xml"/>
     <mapping resource="pl/imgw/baltrad/dex/model/DeliveryRegisterEntry.hbm.xml"/>
     <mapping resource="pl/imgw/baltrad/dex/model/LogEntry.hbm.xml"/>
+    <mapping resource="pl/imgw/baltrad/dex/model/AuxSubscription.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

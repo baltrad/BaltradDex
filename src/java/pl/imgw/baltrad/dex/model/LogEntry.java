@@ -8,6 +8,10 @@
 
 package pl.imgw.baltrad.dex.model;
 
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 /**
  * Class implements log message object.
  *
@@ -16,71 +20,64 @@ package pl.imgw.baltrad.dex.model;
  * @since 1.0
  */
 public class LogEntry {
-
 //------------------------------------------------------------------------------------------- Fields
     private int id;
-    private String rank;
     private String date;
     private String time;
-    private String text;
-
+    private String type;
+    private String message;
 //------------------------------------------------------------------------------------------ Methods
-
     /**
-     * Default constructor.
+     * Default constructor
      */
     public LogEntry() {}
-
     /**
      * Constructor.
-     * 
-     * @param rank Log entry rank
+     *
      * @param date Log entry date
      * @param time Log entry time
-     * @param text Log entry text
+     * @param type Log entry type
+     * @param message Log entry message
      */
-    public LogEntry( String rank, String date, String time, String text ) {
-        this.rank = rank;
+    public LogEntry( String date, String time, String type, String message ) {
         this.date = date;
         this.time = time;
-        this.text = text;
+        this.type = type;
+        this.message = message;
     }
-
+    /**
+     * Constructor.
+     *
+     * @param date Date object
+     * @param type Log entry type
+     * @param message Log entry message
+     */
+    public LogEntry( Date date, String type, String message ) {
+        DateFormat dfDate = new SimpleDateFormat( "yyyy/MM/dd" );
+        DateFormat dfTime = new SimpleDateFormat( "HH:mm:ss" );
+        this.date = dfDate.format( date );
+        this.time = dfTime.format( date );
+        this.type = type;
+        this.message = message;
+    }
     /**
      * Method gets log entry ID.
      *
      * @return Log entry ID
      */
     public int getId() { return id; }
-
     /**
      * Method sets log entry ID.
      *
      * @param id Log entry ID
      */
     public void setId( int id ) { this.id = id; }
-
-    /**
-     * Method gets log entry rank.
-     *
-     * @return Log entry rank
-     */
-    public String getRank() { return rank; }
-
-    /**
-     * Method sets log entry rank.
-     *
-     * @param rank Log entry rank
-     */
-    public void setRank( String rank ) { this.rank = rank; }
-
     /**
      * Method gets log entry date.
      *
      * @return Log entry date
      */
     public String getDate() { return date; }
-
     /**
      * Method sets log entry date.
      *
@@ -101,20 +98,29 @@ public class LogEntry {
      * @param time Log entry time
      */
     public void setTime( String time ) { this.time = time; }
-
     /**
-     * Method gets log entry text.
+     * Method gets the type of log entry.
      *
-     * @return Log entry text
+     * @return Log entry type
      */
-    public String getText() { return text; }
-
+    public String getType() { return type; }
     /**
-     * Method sets log entry text.
+     * Method sets the type of log entry.
      *
-     * @param text Log entry text
+     * @param type Log entry type
      */
-    public void setText( String text ) { this.text = text; }
-    
+    public void setType( String type ) { this.type = type; }
+    /**
+     * Method gets log entry message.
+     *
+     * @return Log entry message
+     */
+    public String getMessage() { return message; }
+    /**
+     * Method sets log entry message.
+     *
+     * @param message Log entry message
+     */
+    public void setMessage( String message ) { this.message = message; }
 }
 //--------------------------------------------------------------------------------------------------

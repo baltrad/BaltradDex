@@ -22,6 +22,8 @@ a:visited {
 a:hover {
     color:#99CC66;
     text-decoration:underline;
+}
+div#leftcol a:hoover {
     background:white;
 }
 
@@ -37,15 +39,21 @@ div#footer {
 	float:left;
     margin-top:8px;
     color:#FFFFFF;
-    background-image:url("images/baltrad_footer.png");
+    background-image:url("images/baltrad_footer_2.png");
 }
 div#footer .leftcol {
-    padding:10px;
+    padding:16px;
     float:left;
 }
-div#footer .rightcol {
-    padding:10px;
+div#footer .midcol {
+    padding:16px;
     float:right;
+}
+div#footer .rightcol {
+    padding:2px;
+    float:right;
+    margin-right:8px;
+    margin-top:2px;
 }
 
 /* Column containers */
@@ -56,11 +64,10 @@ div#container1 {
 	overflow:hidden;
 	background:#D3E4EC;
 }
-
 div#container2 {
 	float:left;
 	width:100%;
-	position:relative;
+    position:relative;
     right:76%;
 	background:#B9D1EC;
 }
@@ -147,20 +154,17 @@ div#operator-elem {
     padding:4px;
     font-size:13px;
 }
-
-/* Operator's logo */
-div#operator-logo {
-    display:block;
-    position:relative;
-    float:right;
-    margin-top:44px;
-    margin-bottom:24px;
-}
 .even {
     background-color:#D3E4EC;
 }
 .odd {
     background-color:#FFFFFF;
+}
+
+/* Scrollable logtable*/
+div#logtable tbody {
+    /*height:360px;
+    overflow:scroll;*/
 }
 
 /* Signin screen */
@@ -235,8 +239,9 @@ div#signin-submit {
 div#table-info {
     display:block;
     padding:10px;
-    font-size:12px;
     color:#003399;
+    font-size:13px;
+    font-weight:bold;
 }
 div#table-content {
     display:block;
@@ -246,12 +251,15 @@ div#table-content {
     border:4px solid #FFFFFF;
     font-size:12px;
     margin-top:12px;
+    margin-bottom:12px;
 }
 div#table-footer {
     display:block;
     clear:both;
     text-align:right;
-    margin-top:24px;
+    padding:16px;
+    font-size:13px;
+    font-weight:bold;
 }
 div#table-footer-leftcol {
     display:block;
@@ -294,8 +302,12 @@ div#admin-rightcol {
     float:right;
 }
 .admin-elem {
+    height:20px;
     display:block;
-    padding:12px;
+    padding:8px;
+}
+.admin-elem a {
+    margin-right:12px;
 }
 
 

@@ -23,15 +23,15 @@ import org.hibernate.Session;
  * @since 1.0
  */
 public class DeliveryRegisterManager {
-
+//------------------------------------------------------------------------------------------ Methods
     /**
      * Method retrieves single entry from data delivery register.
      * 
-     * @param userID User ID
-     * @param dataID Data ID
-     * @return Single entry data delivery register
+     * @param userId User id
+     * @param dataId Data id
+     * @return Single entry from data delivery register
      */
-    public DeliveryRegisterEntry getEntry( int userID, int dataID ) {
+    public DeliveryRegisterEntry getEntry( int userId, int dataId ) {
 
         DeliveryRegisterEntry deliveryRegisterEntry = null;
 
@@ -40,9 +40,9 @@ public class DeliveryRegisterManager {
         session.beginTransaction();
         try {
             deliveryRegisterEntry = ( DeliveryRegisterEntry )session.createQuery(
-                    "from DeliveryRegisterEntry" + " where userID = ?" +
-                    " and dataID = ?" ).setInteger( 0, userID ).setInteger(
-                    1, dataID ).uniqueResult();
+                    "from DeliveryRegisterEntry" + " where userId = ?" +
+                    " and dataId = ?" ).setInteger( 0, userId ).setInteger(
+                    1, dataId ).uniqueResult();
             session.getTransaction().commit();
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
@@ -50,7 +50,6 @@ public class DeliveryRegisterManager {
         }
         return deliveryRegisterEntry;
     }
-
     /**
      * Method adds an entry to data delivery register.
      *
@@ -68,18 +67,17 @@ public class DeliveryRegisterManager {
             throw e;
         }
     }
-
     /**
-     * Method deletes given entry from data delivery register
+     * Method deletes given entry from data delivery register.
      *
-     * @param registerEntryID Register entry ID
+     * @param id Register entry ID
      */
-    public void deleteEntry( int registerEntryID ) {
+    public void deleteEntry( int id ) {
         SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
         Session session = sessionFactory.openSession();
 	    session.beginTransaction();
         try {
-            session.delete( session.load( Subscription.class, new Integer( registerEntryID ) ) );
+            session.delete( session.load( Subscription.class, new Integer( id ) ) );
             session.flush();
             session.getTransaction().commit();
         } catch( HibernateException e ) {
@@ -87,5 +85,5 @@ public class DeliveryRegisterManager {
             throw e;
         }
     }
-
 }
+//--------------------------------------------------------------------------------------------------

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!--
+    Hibernate mapping file for data object.
+-->
 <hibernate-mapping>
-  <class name="pl.imgw.baltrad.dex.model.Data" table="baltrad_data">
-    <id column="data_id" name="id">
-      <generator class="increment"/>
+  <class name="pl.imgw.baltrad.dex.model.Data" table="dex_data">
+    <id column="id" name="id">
+      <generator class="native"/>
     </id>
-    <property column="node" name="nodeName"/>
-    <property column="station" name="stationName"/>
-    <property column="absolute_path" name="absolutePath"/>
-    <property column="file_name" name="fileName"/>
+    <property column="channel_name" name="channelName"/>
+    <property column="path" name="path"/>
     <property column="date" name="date"/>
     <property column="time" name="time"/>
-    <property column="datasets" name="numberOfDatasets"/>
   </class>
 </hibernate-mapping>

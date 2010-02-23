@@ -17,69 +17,56 @@ import org.hibernate.Session;
 import java.util.List;
 
 /**
- * Data manager class implementing product handling functionality.
+ * Data manager class implementing data handling functionality.
  *
  * @author szewczenko
  * @version 1.0
  * @since 1.0
  */
 public class DataManager {
-
+//------------------------------------------------------------------------------------------ Methods
     /**
-     * Method creates list of all available products.
+     * Method creates list of all available data.
      *
-     * @return List of all available products.
+     * @return List of all available data.
      */
-    public List getProductList() {
-        List productList = null;
-
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try
-        {
-            productList = session.createQuery( "from Data" ).list();
-            session.getTransaction().commit();
-        }
-        catch ( HibernateException e )
-        {
-            session.getTransaction().rollback();
-            throw e;
-        }
-
-        return productList;
-    }
-
-    /**
-     * Method creates list of products available for a given data channel.
-     *
-     * @param dataChannelName Name of the data channel.
-     * @return List of products available for a given data channel.
-     */
-    public List getProductsFromDataChannel( String dataChannelName ) {
+    public List getData() {
         List dataList = null;
-
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
-        try
-        {
-            dataList = session.createQuery(
-                    "from Data" + " where stationName = ?" ).setString(
-                        0, dataChannelName ).list();
+        try {
+            dataList = session.createQuery( "from Data" ).list();
             session.getTransaction().commit();
-        }
-        catch ( HibernateException e )
-        {
+        } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
         }
         return dataList;
     }
-    
-
-    public void storeProduct( Data product ) {}
-
-    public void deleteProduct( int productID ) {}
-
+    /**
+     * Method creates list of data available from a given data channel.
+     *
+     * @param channelName Name of the data channel.
+     * @return List of data available from a given data channel.
+     */
+    public List getDataFromChannel( String channelName ) {
+        List dataList = null;
+        channelName = channelName.toLowerCase();
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        try {
+            dataList = session.createQuery( "from Data where channelName = ?" ).setString(
+                                                                        0, channelName ).list();
+            session.getTransaction().commit();
+        } catch ( HibernateException e ) {
+            session.getTransaction().rollback();
+            throw e;
+        }
+        return dataList;
+    }
+    public void storeData( Data data ) {}
+    public void deleteData( int dataId ) {}
 }
+//--------------------------------------------------------------------------------------------------

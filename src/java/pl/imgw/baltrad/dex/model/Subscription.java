@@ -16,11 +16,11 @@ package pl.imgw.baltrad.dex.model;
  * @since 1.0
  */
 public class Subscription {
-
-    private int subscriptionID;
-    private int userID;
-    private int dataChannelID;
-
+//---------------------------------------------------------------------------------------- Variables
+    private int id;
+    private int userId;
+    private int channelId;
+//------------------------------------------------------------------------------------------ Methods
     /**
      * Default constructor.
      */
@@ -29,54 +29,49 @@ public class Subscription {
     /**
      * Constructor creating new subscription object with given field values.
      *
-     * @param userID User ID
-     * @param dataChannelID Data channel ID
+     * @param userId User ID
+     * @param channelId Data channel ID
      */
-    public Subscription( int userID, int dataChannelID ) {
-        this.userID = userID;
-        this.dataChannelID = dataChannelID;
+    public Subscription( int userId, int channelId ) {
+        this.userId = userId;
+        this.channelId = channelId;
     }
-
     /**
-     * @return the subscriptionID
+     * Method gets subscription id.
+     *
+     * @return Subscription id
      */
-    public int getSubscriptionID() {
-        return subscriptionID;
-    }
-
+    public int getId() { return id; }
     /**
-     * @param subscriptionID the subscriptionID to set
+     * Method sets subscription id.
+     *
+     * @param id Dubscription id
      */
-    public void setSubscriptionID(int subscriptionID) {
-        this.subscriptionID = subscriptionID;
-    }
-
+    public void setId( int id ) { this.id = id; }
     /**
-     * @return the userID
+     * Method gets user id.
+     *
+     * @return User id
      */
-    public int getUserID() {
-        return userID;
-    }
-
+    public int getUserId() { return userId; }
     /**
-     * @param userID the userID to set
+     * Method sets user id.
+     *
+     * @param userId User id
      */
-    public void setUserID(int userID) {
-        this.userID = userID;
-    }
-
+    public void setUserId( int userId ) { this.userId = userId; }
     /**
-     * @return the dataChannelID
+     * Method gets channel id.
+     *
+     * @return Channel id
      */
-    public int getDataChannelID() {
-        return dataChannelID;
-    }
-
+    public int getChannelId() { return channelId; }
     /**
-     * @param dataChannelID the dataChannelID to set
+     * Method sets channel id.
+     *
+     * @param channelId Channel id
      */
-    public void setDataChannelID(int dataChannelID) {
-        this.dataChannelID = dataChannelID;
-    }
+    public void setChannelId( int channelId ) { this.channelId = channelId; }
 
 }
+//--------------------------------------------------------------------------------------------------

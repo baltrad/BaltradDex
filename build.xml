@@ -1,236 +1,316 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- You may freely edit this file. See commented blocks below for -->
+<!-- some examples of how to customize the build. -->
+<!-- (If you delete it and reopen the project it will be recreated.) -->
+<!-- By default, only the Clean and Build commands use this build script. -->
+<!-- Commands such as Run, Debug, and Test only use this build script if -->
+<!-- the Compile on Save feature is turned off for the project. -->
+<!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
+<!-- in the project's Project Properties dialog box.-->
+<project name="BaltradNode" default="default" basedir=".">
+    <description>Builds, tests, and runs the project BaltradDex.</description>
+    <import file="nbproject/build-impl.xml"/>
+    <!--
 
-<project name="BaltradNode" default="deliverable" basedir=".">
-  <description>Builds BaltradDex, also supports testing and deployment</description>
-  <property name="lib.dir" value="lib"/>
-  <property name="extralib.dir" value="extralib"/>
-  <property name="src.dir" value="src"/>
-  <property name="web.dir" value="web"/>
-  <property name="etc.dir" value="etc"/>
-  <property name="testdata.dir" value="TestData"/>
-  <property name="build.dir" value="build"/>
-  <property name="build.web.dir" value="${build.dir}/web"/>
-  <property name="build.metainf.dir" value="${build.web.dir}/META-INF" />
-  <property name="build.webinf.dir" value="${build.web.dir}/WEB-INF" />
-  <property name="build.jsp.dir" value="${build.webinf.dir}/jsp"/>
-  <property name="build.classes.dir" value="${build.webinf.dir}/classes"/>
-  <property name="build.lib.dir" value="${build.webinf.dir}/lib"/>
+    There exist several targets which are by default empty and which can be 
+    used for execution of your tasks. These targets are usually executed 
+    before and after some main targets. They are: 
 
-  <property file="${etc.dir}/testdb.properties"/>
-  <property file="${etc.dir}/appserver.properties"/>
-  
-  <!-- Configure ant tasks for tomcat deployment -->
-  <taskdef name="deploy"    classname="org.apache.catalina.ant.DeployTask"/>
-  <taskdef name="list"      classname="org.apache.catalina.ant.ListTask"/>
-  <taskdef name="reload"    classname="org.apache.catalina.ant.ReloadTask"/>
-  <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask"/>
-  <taskdef name="roles"     classname="org.apache.catalina.ant.RolesTask"/>
-  <taskdef name="start"     classname="org.apache.catalina.ant.StartTask"/>
-  <taskdef name="stop"      classname="org.apache.catalina.ant.StopTask"/>
-  <taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask"/>
+      -pre-init:                 called before initialization of project properties 
+      -post-init:                called after initialization of project properties 
+      -pre-compile:              called before javac compilation 
+      -post-compile:             called after javac compilation 
+      -pre-compile-single:       called before javac compilation of single file
+      -post-compile-single:      called after javac compilation of single file
+      -pre-compile-test:         called before javac compilation of JUnit tests
+      -post-compile-test:        called after javac compilation of JUnit tests
+      -pre-compile-test-single:  called before javac compilation of single JUnit test
+      -post-compile-test-single: called after javac compilation of single JUunit test
+      -pre-dist:                 called before archive building 
+      -post-dist:                called after archive building 
+      -post-clean:               called after cleaning build products 
+      -pre-run-deploy:           called before deploying
+      -post-run-deploy:          called after deploying
 
-  
-  <path id="lib.path">
-    <fileset dir="${lib.dir}">
-      <include name="**/*.jar"/>
-    </fileset>
-    <fileset dir="${extralib.dir}">
-      <include name="**/*.jar"/>
-    </fileset>
-  </path>
+    Example of pluging an obfuscator after the compilation could look like 
 
-  <target name="prepare">
-    <delete dir="${build.dir}" />
-    <mkdir dir="${build.web.dir}" />
-    <mkdir dir="${build.metainf.dir}" />
-    <mkdir dir="${build.webinf.dir}" />
-    <mkdir dir="${build.jsp.dir}" />
-    <mkdir dir="${build.classes.dir}" />
-    <mkdir dir="${build.lib.dir}" />
+        <target name="-post-compile">
+            <obfuscate>
+                <fileset dir="${build.classes.dir}"/>
+            </obfuscate>
+        </target>
 
-    <copy todir="${build.lib.dir}">
-      <fileset dir="lib/dom4j">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/hibernate">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/httpclient">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/jakarta-commons">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/jcip">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/spring">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/log4j">
-      	<include name="*.jar"/>
-      </fileset>      
-      <fileset dir="lib/slf4j">
-      	<include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/j2ee">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/displaytag">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/jakarta-taglibs">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/javassist">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/antlr">
-        <include name="*.jar"/>
-      </fileset>          
-      <fileset dir="lib">
-      	<include name="mysql-connector-java-5.1.6-bin.jar"/>
-        <include name="apache-mime4j-0.6.jar"/>
-      </fileset>
-    </copy>
+    For list of available properties check the imported 
+    nbproject/build-impl.xml file. 
 
-    <copy todir="${build.web.dir}">
-      <fileset dir="web">
-        <include name="redirect.jsp"/>
-        <include name="includes/**/*.jsp" />
-        <include name="includes/**/*.css" />
-        <include name="includes/**/*.png" />
-        <include name="includes/**/*.gif" />
-        <include name="includes/**/*.jpg" />
-        <include name="BaltradData/**" />
-      </fileset>
-    </copy>
 
-    <copy todir="${build.metainf.dir}">
-      <fileset dir="${src.dir}/conf">
-        <include name="MANIFEST.MF"/>
-      </fileset>
-      <fileset dir="${web.dir}/META-INF">
-        <include name="context.xml"/>
-      </fileset>
-    </copy>
+    Other way how to customize the build is by overriding existing main targets.
+    The target of interest are: 
 
-    <copy todir="${build.webinf.dir}">
-      <fileset dir="web/WEB-INF">
-        <include name="applicationContext.xml" />
-        <include name="baltraddex-servlet.xml" />
-        <include name="web.xml" />
-        <include name="jsp/**/*.jsp" />
-      </fileset>
-    </copy>
+      init-macrodef-javac:    defines macro for javac compilation
+      init-macrodef-junit:   defines macro for junit execution
+      init-macrodef-debug:    defines macro for class debugging
+      do-dist:                archive building
+      run:                    execution of project 
+      javadoc-build:          javadoc generation 
 
-    <copy todir="${build.classes.dir}">
-      <fileset dir="${src.dir}/java">
-        <include name="**/*.xml"/>
-        <include name="**/*.properties"/>
-      </fileset>
-    </copy>
-  </target>
+    Example of overriding the target for project execution could look like 
 
-  <target name="compile" depends="prepare">
-    <javac encoding="8859_1" srcdir="${src.dir}" deprecation="on"
-           destdir="${build.classes.dir}">
-      <include name="**/*.java"/>
-      <classpath refid="lib.path"/>
-    </javac>
-  </target>
+        <target name="run" depends="<PROJNAME>-impl.jar">
+            <exec dir="bin" executable="launcher.exe">
+                <arg file="${dist.jar}"/>
+            </exec>
+        </target>
 
-  <target name="deliverable" depends="compile">
-    <jar destfile="${build.dir}/BaltradDex.war" basedir="${build.dir}/web">
-      <include name="**"/>
-    </jar>
-  </target>  
+    Notice that overridden target depends on jar target and not only on 
+    compile target as regular run target does. Again, for list of available 
+    properties which you can use check the target you are overriding in 
+    nbproject/build-impl.xml file. 
 
-  <target name="clean">
-    <delete dir="build"/>
-    <delete>
-      <fileset dir=".">
-        <include name="**/*.bak"/>
-        <include name="**/*~"/>
-      </fileset>
-    </delete>
-  </target>
-	
-  <target name="create-testdb">
-    <sql classpath="${lib.dir}/${db.jar}"
-      	 driver="${db.driver}"
-    	 url="${db.url}"
-    	 userid="${db.user}" 
-         password="${db.pwd}" >
-      <transaction src="${etc.dir}/create_db.sql"/>
-    </sql>
-  </target>
+    -->
 
-  <target name="insert-testdata" depends="create-testdb">
-    <sql classpath="${lib.dir}/${db.jar}"
-      	 driver="${db.driver}"
-    	 url="${db.url}"
-    	 userid="${db.user}" 
-         password="${db.pwd}" >
-      <transaction src="${testdata.dir}/testdata.sql"/>
-    </sql>
-  </target>
-  
-  <target name="test.deploy"
-    depends="deliverable, insert-testdata, context.status"
-    if="context.deployable">
-    <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
-    <deploy url="${mgr.url}"
-      username="${mgr.username}"
-      password="${mgr.password}"
-      path="${mgr.path}"
-      update="${mgr.update}"
-      war="file:${build.dir}/BaltradDex.war"/>
-  </target>
- 
-  <!-- From apache-tomcats user manual for using the ant-manager task -->
-  <target name="context.status">
-    <property name="running" value="${mgr.path}:running"/>
-	<property name="stopped" value="${mgr.path}:stopped"/>
-	
-    <list url="${mgr.url}"
-      outputproperty="ctx.status"
-      username="${mgr.username}"
-      password="${mgr.password}">
-    </list>
-		
-    <condition property="context.running">
-      <contains string="${ctx.status}" substring="${running}"/>
-    </condition>
-    <condition property="context.stopped">
-      <contains string="${ctx.status}" substring="${stopped}"/>
-    </condition>
-    <condition property="context.notInstalled">
-      <and>
-        <isfalse value="${context.running}"/>
-        <isfalse value="${context.stopped}"/>
-      </and>
-    </condition>
-    <condition property="context.deployable">
-      <or>
-        <istrue value="${context.notInstalled}"/>
-        <and>
-          <istrue value="${context.running}"/>
-          <istrue value="${mgr.update}"/>
-        </and>
-        <and>
-          <istrue value="${context.stopped}"/>
-          <istrue value="${mgr.update}"/>
-        </and>
-      </or>
-    </condition>
-    <condition property="context.undeployable">
-      <or>
-        <istrue value="${context.running}"/>
-        <istrue value="${context.stopped}"/>
-      </or>
-    </condition>
-  </target>
-  
+    <!--
+    General properties
+    -->
+    <property name="lib.dir" value="lib"/>
+    <!-- 
+    Set classpath
+    -->
+    <path id="classpath.path" description="CLASSPATH for build script">
+        <fileset dir="${lib.dir}">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <!--
+    Set database connection properties
+    -->
+    <property name="pgsqljar" value="postgresql-8.4-701.jdbc4.jar"/>
+    <property name="pgsqldriver" value="org.postgresql.Driver"/>
+    <property name="pgsqlport" value="5432"/>
+    <property name="pgsqlalias" value="baltrad_db"/>
+    <property name="pgsqluser" value="baltrad"/>
+    <property name="pgsqlpasswd" value="baltrad"/>
+
+    <!--
+    Execute DDL commands
+    -->
+    <target name="-pre-init">
+        <sql classpath="${lib.dir}/${pgsqljar}"
+            url="jdbc:postgresql://localhost:${pgsqlport}/${pgsqlalias}" driver="${pgsqldriver}"
+            userid="${pgsqluser}" password="${pgsqlpasswd}" print="yes">
+
+            -- SQL script for BaltradDex application -----------------------------------------------
+            
+            -- drop tables if exist ----------------------------------------------------------------
+
+            DROP TABLE IF EXISTS dex_subscriptions;
+            DROP TABLE IF EXISTS dex_aux_subscriptions;
+            DROP TABLE IF EXISTS dex_delivery_register;
+            DROP TABLE IF EXISTS dex_users;
+            DROP TABLE IF EXISTS dex_messages;
+            DROP TABLE IF EXISTS dex_channels;
+            DROP TABLE IF EXISTS dex_data;
+            DROP SEQUENCE IF EXISTS log_entry_id_seq;
+            DROP SEQUENCE IF EXISTS subscription_id_seq;
+            DROP SEQUENCE IF EXISTS aux_subscription_id_seq;
+            DROP SEQUENCE IF EXISTS delivery_register_id_seq;
+
+            -- create tables -----------------------------------------------------------------------
+
+            -- dex_users ---------------------------------------------------------------------------
+
+            CREATE TABLE dex_users
+            (
+                id SERIAL NOT NULL,
+                name VARCHAR(64) NOT NULL UNIQUE,
+                password VARCHAR(64) NOT NULL,
+                role VARCHAR(32) NOT NULL,
+                factory VARCHAR(256) NOT NULL,
+                country VARCHAR(64) NOT NULL,
+                city VARCHAR(64) NOT NULL,
+                zip_code VARCHAR(12) NOT NULL,
+                street VARCHAR(64) NOT NULL,
+                number VARCHAR(12) NOT NULL,
+                phone VARCHAR(32) NOT NULL,
+                email VARCHAR(64) NOT NULL,
+                node_address VARCHAR(64) NOT NULL,
+                local_directory VARCHAR(128) NOT NULL,
+                PRIMARY KEY (id)
+            );
+
+            -- log_entry_id_seq --------------------------------------------------------------------
+            
+            CREATE SEQUENCE log_entry_id_seq;
+
+            -- dex_messages ------------------------------------------------------------------------
+
+            CREATE TABLE dex_messages
+            (
+                id INT NOT NULL UNIQUE DEFAULT NEXTVAL('log_entry_id_seq'),
+                date VARCHAR(10) NOT NULL,
+                time VARCHAR(8) NOT NULL,
+                type VARCHAR(12) NOT NULL,
+                message TEXT NOT NULL,
+                PRIMARY KEY (id)
+            );
+
+            -- dex_channels ------------------------------------------------------------------------
+
+            CREATE TABLE dex_channels
+		    (
+		        id SERIAL NOT NULL,
+		        name VARCHAR(32) NOT NULL,
+		        wmo_number INT,
+		        selected BOOLEAN DEFAULT false,
+                PRIMARY KEY (id)
+
+		    );
+
+            -- subscription_id_seq -----------------------------------------------------------------
+
+            CREATE SEQUENCE subscription_id_seq;
+
+            -- dex_subscriptions -------------------------------------------------------------------
+
+            CREATE TABLE dex_subscriptions
+		    (
+		        id INT NOT NULL UNIQUE DEFAULT NEXTVAL('subscription_id_seq'),
+		        user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+		        channel_id INT NOT NULL REFERENCES dex_channels (id)
+                                                               ON DELETE CASCADE ON UPDATE CASCADE,
+                PRIMARY KEY (id)
+		    );
+
+            -- aux_subscription_id_seq -------------------------------------------------------------
+
+            CREATE SEQUENCE aux_subscription_id_seq;
+
+            -- dex_aux_subscriptions ---------------------------------------------------------------
+
+            CREATE TABLE dex_aux_subscriptions
+		    (
+		        id INT NOT NULL UNIQUE DEFAULT NEXTVAL('aux_subscription_id_seq'),
+		        user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+		        channel_id INT NOT NULL REFERENCES dex_channels (id)
+                                                               ON DELETE CASCADE ON UPDATE CASCADE,
+                PRIMARY KEY (id)
+		    );
+
+            -- dex_data ----------------------------------------------------------------------------
+
+            CREATE TABLE dex_data
+            (
+               id SERIAL NOT NULL,
+               channel_name VARCHAR(32) NOT NULL,
+               path VARCHAR(256) NOT NULL,
+               date VARCHAR(10) NOT NULL,
+               time VARCHAR(8) NOT NULL,
+               PRIMARY KEY (id)
+            );
+
+            -- delivery_register_id_seq
+
+            CREATE SEQUENCE delivery_register_id_seq;
+            
+            -- dex_delivery_register ---------------------------------------------------------------
+
+            CREATE TABLE dex_delivery_register
+		    (
+		        id INT NOT NULL UNIQUE DEFAULT NEXTVAL('delivery_register_id_seq'),
+		        user_id INT NOT NULL REFERENCES dex_users (id),
+		        data_id INT NOT NULL REFERENCES dex_data (id),
+		        PRIMARY KEY (id)
+		    );
+
+            -- insert test data --------------------------------------------------------------------
+
+            -- dex_users ---------------------------------------------------------------------------
+
+            INSERT INTO dex_users (name, password, role, factory, country, city, zip_code,
+                street, number, phone, email, node_address, local_directory)
+                VALUES ('imgw', MD5('baltrad'), 'operator',
+                   'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+                   '01-673', 'Podlesna', '61', '+48 22 569 44 91', 'baltrad.admin@imgw.pl',
+                   'baltrad.imgw.pl', 'incoming'),
+                   ('admin', MD5('admin'), 'administrator',
+                   'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+                   '01-673', 'Podlesna', '61', '+48 22 569 44 91', 'baltrad.admin@imgw.pl',
+                   'http://localhost:8081/BaltradDex/receiver.htm', 'incoming'),
+                   ('laptok', MD5('baltrad'), 'user',
+                   'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+                   '01-673', 'Podlesna', '61', '+48 22 569 44 91', 'baltrad.admin@imgw.pl',
+                   'http://172.30.9.171:8081/BaltradDex/receiver.htm', 'incoming'),
+                   ('rand', MD5('randomize'), 'user',
+                   'Institute of Meteorology and Water Management', 'Poland', 'Warsaw',
+                   '01-673', 'Podlesna', '61', '+48 22 569 44 91', 'baltrad.admin@imgw.pl',
+                   'http://172.30.9.34:8081/BaltradDex/receiver.htm', 'incoming');
+
+            -- dex_channels ------------------------------------------------------------------------
+
+            INSERT INTO dex_channels (name, wmo_number) VALUES ('legionowo', '12374'),
+                ('swidwin', '12220'), ('brzuchania', '12568'), ('pastewnik', '12544'),
+                ('rzeszow', '12579'), ('ramza', '12514'), ('poznan', '12331'), ('gdansk', '12151');
+
+            -- dex_data ----------------------------------------------------------------------------
+
+            INSERT INTO dex_data (channel_name, path, date, time) VALUES
+                ('brzuchania', 'BaltradData/IMGW/Brzuchania/2007100214008408.h5', '2007/10/02',
+                '21:40:00'),
+                ('brzuchania', 'BaltradData/IMGW/Brzuchania/2007100200002857.h5', '2007/10/02',
+                '00:00:00'),
+                ('brzuchania', 'BaltradData/IMGW/Brzuchania/2008061615002914.h5', '2008/06/16',
+                '15:00:29'),
+                ('brzuchania', 'BaltradData/IMGW/Brzuchania/2008061615002971.h5', '2008/06/16',
+                '15:00:00'),
+                
+                ('gdansk', 'BaltradData/IMGW/Gdansk/2008061615003322.h5', '2008/06/16', '15:00:33'),
+                ('gdansk', 'BaltradData/IMGW/Gdansk/2007100214001176.h5', '2007/10/02', '14:00:00'),
+                ('gdansk', 'BaltradData/IMGW/Gdansk/2008061615003387.h5', '2008/06/16', '15:00:00'),
+
+                ('legionowo', 'BaltradData/IMGW/Legionowo/2007100214006547.h5', '2007/10/02',
+                '14:00:00'),
+                ('legionowo', 'BaltradData/IMGW/Legionowo/2007100201102822.h5', '2007/10/02',
+                '01:10:00'),
+                ('legionowo', 'BaltradData/IMGW/Legionowo/2008061615002517.h5', '2008/06/16',
+                '15:00:00'),
+                ('legionowo', 'BaltradData/IMGW/Legionowo/2008061615002584.h5', '2008/06/16',
+                '15:00:00'),
+                
+                ('poznan', 'BaltradData/IMGW/Poznan/2007100214006032.h5', '2007/10/02', '14:00:00'),
+                ('poznan', 'BaltradData/IMGW/Poznan/2008061615003243.h5', '2008/06/16', '15:00:00'),
+                
+                ('pastewnik', 'BaltradData/IMGW/Pastewnik/2008061615002736.h5', '2008/06/16',
+                '15:00:00'),
+                ('pastewnik', 'BaltradData/IMGW/Pastewnik/2008061615002764.h5', '2008/06/16',
+                '15:00:00'),
+
+                ('ramza', 'BaltradData/IMGW/Ramza/2007100214006843.h5', '2007/10/02', '14:00:00'),
+                ('ramza', 'BaltradData/IMGW/Ramza/2008061615002508.h5', '2008/06/16', '15:00:00'),
+                ('ramza', 'BaltradData/IMGW/Ramza/2008061615002522.h5', '2008/06/16', '15:00:00'),
+                
+                ('rzeszow', 'BaltradData/IMGW/Rzeszow/2007100214008656.h5', '2007/10/02',
+                '14:00:00'),
+                ('rzeszow', 'BaltradData/IMGW/Rzeszow/2008061615002645.h5', '2008/06/16',
+                '15:00:00'),
+                ('rzeszow', 'BaltradData/IMGW/Rzeszow/2008061615002676.h5', '2008/06/16',
+                '15:00:00'),
+                
+                ('swidwin', 'BaltradData/IMGW/Swidwin/2007100214008261.h5', '2007/10/02',
+                '14:00:00'),
+                ('swidwin', 'BaltradData/IMGW/Swidwin/2008061615002401.h5', '2008/06/16',
+                '15:00:00'),
+                ('swidwin', 'BaltradData/IMGW/Swidwin/2008061615002411.h5', '2008/06/16',
+                '15:00:00');
+
+            -- display some records ----------------------------------------------------------------
+
+            SELECT * FROM dex_users;
+            SELECT * FROM dex_channels;
+            SELECT * FROM dex_data;
+
+            ----------------------------------------------------------------------------------------
+
+        </sql>
+    </target>
 </project>
-

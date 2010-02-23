@@ -47,7 +47,8 @@ public class SignOutController implements Controller {
                                                                                 throws Exception {
         User user = ( User )applicationSecurityManager.getUser( request );
         applicationSecurityManager.removeUser( request );
-        logManager.addLogEntry( new Date(), "INFO", "User " + user.getName() + " signed out" );
+        logManager.addLogEntry( new Date(), logManager.MSG_INFO, "User " + user.getName()
+                                                                                + " signed out" );
         return new ModelAndView( getSuccessView() );
     }
 

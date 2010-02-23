@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Date;
 
-
 /**
  * Sign in controller class implementing basic user authentication functionality.
  *
@@ -38,14 +37,13 @@ public class SignInController extends SimpleFormController {
     private UserManager userManager;
     private LogManager logManager = new LogManager();
     private String viewName;
-
 //------------------------------------------------------------------------------------------ Methods
-
     /**
      * Constructor.
      */
     public SignInController() {
-        logManager.addLogEntry( new Date(), "INFO", "Baltrad Data Exchange System started" );
+        logManager.addLogEntry( new Date(), logManager.MSG_INFO,
+                                                        "Baltrad Data Exchange System started" );
     }
 
     /**
@@ -91,15 +89,16 @@ public class SignInController extends SimpleFormController {
         User dbUser = ( User )command;
         // Look for user in the database
         dbUser = userManager.getUserByName( formUser.getName() );
-
-        if( applicationSecurityManager.compareUsers( formUser, dbUser ) ) {
+        if( applicationSecurityManager.authenticateFormUser( formUser, dbUser ) ) {
+            // Set user variable for this session
             applicationSecurityManager.setUser( request, dbUser );
-            logManager.addLogEntry( new Date(), "INFO", "User " + dbUser.getName() + " signed in" );
+            logManager.addLogEntry( new Date(), logManager.MSG_INFO, "User "
+                                                                + dbUser.getName() + " signed in" );
         } else {
-            logManager.addLogEntry( new Date(), "WARNING", "User name or password invalid" );
+            logManager.addLogEntry( new Date(), logManager.MSG_WRN,
+                                                                "User name or password invalid" );
             errors.reject( "error.login.invalid" );
         }
-        
     }
     /**
      * Method executed upon form submission.
@@ -115,43 +114,38 @@ public class SignInController extends SimpleFormController {
                                     Object command, BindException errors) throws Exception {
         return new ModelAndView( getSuccessView() );
     }
-
     /**
      * @return the viewName
      */
-    public String getViewName() {
-        return viewName;
-    }
+    public String getViewName() { return viewName; }
 
     /**
      * @param viewName the viewName to set
      */
-    public void setViewName( String viewName ) {
-        this.viewName = viewName;
-    }
-
+    public void setViewName( String viewName ) { this.viewName = viewName; }
     /**
-     * @return the applicationSecurityManager
+     * Method gets reference to ApplicationSecurityManager object.
+     *
+     * @return Reference to ApplicationSecurityManager object
      */
     public ApplicationSecurityManager getApplicationSecurityManager() {
         return applicationSecurityManager;
     }
-
     /**
-     * @param applicationSecurityManager the applicationSecurityManager to set
+     * Method sets reference to ApplicationSecurityManager object.
+     *
+     * @param applicationSecurityManager Reference to ApplicationSecurityManager object
      */
     public void setApplicationSecurityManager(
                                     ApplicationSecurityManager applicationSecurityManager ) {
         this.applicationSecurityManager = applicationSecurityManager;
     }
-
     /**
      * @return the userManager
      */
     public UserManager getUserManager() {
         return userManager;
     }
-
     /**
      * @param userManager the userManager to set
      */
@@ -159,5 +153,4 @@ public class SignInController extends SimpleFormController {
         this.userManager = userManager;
     }
 }
-
 //--------------------------------------------------------------------------------------------------

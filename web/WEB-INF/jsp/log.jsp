@@ -1,5 +1,5 @@
 <%--
-    Document   : System welcome page
+    Document   : Log message page
     Created on : December 9, 2009, 13:56:14 PM
     Author     : szewczenko
 --%>
@@ -35,14 +35,10 @@
                     doUpdate(self.ajaxRequest.responseText);
                 }
             }
-
             queryString = '';
             self.ajaxRequest.send( queryString );
             self.setTimeout( 'viewLogs()', 5000 );
-
-            
         }
-
         function doUpdate( message ) {
             document.getElementById( "logtable" ).innerHTML = message;
         }
@@ -57,22 +53,11 @@
     <div id="container1">
         <div id="container2">
             <div id="leftcol">
-                <a href="welcome.htm">Home</a>
-                <br>
-                <a href="channels.htm">Data channels</a>
-                <a href="subscriptions.htm">Subscriptions</a>
-                <a href="log.htm">View logs</a>
-                <a href="welcome.htm">Help</a>
-                <a href="welcome.htm">Links</a>
-                <br>
-                <a href="admin.htm">System management</a>
-                <br>
-                <a href="signout.htm">Logout</a>
-                <br>
+                <script type="text/javascript" src="includes/mainmenu.js"></script>
             </div>
             <div id="rightcol">
                 <div id="table-info">
-                    Recently logged messages:
+                    Recently logged messages
                 </div>
                 <div id="table-content">
                     <div id="logtable"></div>
@@ -80,19 +65,14 @@
                         viewLogs();
                     </script>
                 </div>
-                <div id="operator-logo">
-                    <img src="includes/images/logo.png">
+                <div id="table-footer">
+                    <a href="journal.htm">View full message stack</a>
                 </div>
             </div>
         </div>
     </div>
     <div id="footer">
-        <div class="leftcol">
-            Baltrad DEX v.0.1
-        </div>
-        <div class="rightcol">
-            BALTRAD Project Group &#169 2009
-        </div>
+        <script type="text/javascript" src="includes/footer.js"></script>
     </div>
 </div>
 </html>

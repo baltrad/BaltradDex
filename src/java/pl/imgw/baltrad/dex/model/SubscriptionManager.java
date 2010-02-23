@@ -48,15 +48,15 @@ public class SubscriptionManager {
     /**
      * Method removes subscription from the database.
      *
-     * @param subscriptionID Subscription ID
+     * @param id Subscription ID
      */
-    public void cancelSubscription( int subscriptionID ) {
+    public void cancelSubscription( int id ) {
 
         SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
         Session session = sessionFactory.openSession();
 	    session.beginTransaction();
         try {
-            session.delete( session.load( Subscription.class, new Integer( subscriptionID ) ) );
+            session.delete( session.load( Subscription.class, new Integer( id ) ) );
             session.flush();
             session.getTransaction().commit();
         } catch( HibernateException e ) {

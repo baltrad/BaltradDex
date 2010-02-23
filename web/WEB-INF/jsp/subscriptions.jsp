@@ -20,66 +20,57 @@
     <div id="header">
         <img src="includes/images/baltrad_header.png">
     </div>
-        <div id="container1">
-            <div id="container2">
-                <div id="leftcol">
-                    <a href="welcome.htm">Home</a>
-                    <br>
-                    <a href="channels.htm">Data channels</a>
-                    <a href="subscriptions.htm">Subscriptions</a>
-                    <a href="log.htm">View logs</a>
-                    <a href="welcome.htm">Help</a>
-                    <a href="welcome.htm">Links</a>
-                    <br>
-                    <a href="admin.htm">System management</a>
-                    <br>
-                    <a href="signout.htm">Logout</a>
-                    <br>
+    <div id="container1">
+        <div id="container2">
+            <div id="leftcol">
+                <script type="text/javascript" src="includes/mainmenu.js"></script>
+            </div>
+            <div id="rightcol">
+                <div id="table-info">
+                    List of active subscriptions.
+                    Click on a check box to subscribe / unsubscribe to a desired data channel.
                 </div>
-                <div id="rightcol">
-                    <div id="table-info">
-                        List of active subscriptions.
-                        Click on a check box to subscribe / unsubscribe to a desired data channel.
-                    </div>
-                    <div id="table-content">
-                        <form name="submitSubscriptionForm" action="submit.htm">
-                            <display:table name="subscriptions" id="subscription" defaultsort="1"
-                                    requestURI="subscriptions.htm" cellpadding="5" cellspacing="0"
-                                    export="false" class="tableborder">
-                                    <display:caption>Active subscriptions:</display:caption>
-                                    <display:column sortProperty="dataChannelID" sortable="true"
-                                        title="Channel ID" class="tdcenter">
-                                        <fmt:formatNumber value="${subscription.dataChannelID}"
-                                        pattern="00" />
-                                    </display:column>
-                                    <display:column sortable="true" title="Channel name"
-                                        sortProperty="name" paramId="name" paramProperty="name"
-                                        class="tdcenter" value="${subscription.name}">
-                                    </display:column>
+                <div id="table-content">
+                    <form name="submitSubscriptionForm" action="submit.htm">
+                        <display:table name="subscriptions" id="subscription" defaultsort="1"
+                            requestURI="subscriptions.htm" cellpadding="5" cellspacing="0"
+                            export="false" class="tableborder">
+                            <display:caption>Active subscriptions:</display:caption>
+                            <display:column sortProperty="id" sortable="true"
+                                title="Channel ID" class="tdcenter">
+                                <fmt:formatNumber value="${subscription.id}"
+                                pattern="00" />
+                            </display:column>
+                            <display:column sortable="true" title="Channel name"
+                                sortProperty="name" paramId="name" paramProperty="name"
+                                class="tdcenter" value="${subscription.name}">
+                            </display:column>
+                            <c:choose>
+                                <c:when test="${subscription.selected == true}">
                                     <display:column sortable="false" title="Subscription status"
-                                        class="tdcenter"> <input type="checkbox" 
-                                        name="selectedChannels" value="${subscription.name}"
-                                        ${subscription.checked} />
+                                        class="tdcenter"> <input type="checkbox"
+                                        name="selected_channels" value="${subscription.name}"
+                                        checked/>
                                     </display:column>
-                            </display:table>
-                            <div id="table-footer">
-                                <input type="submit" value="Select" name="submitButton"/>
-                            </div>
-                        </form>
-                    </div>
-                    <div id="operator-logo">
-                        <img src="includes/images/logo.png">
-                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <display:column sortable="false" title="Subscription status"
+                                        class="tdcenter"> <input type="checkbox"
+                                        name="selected_channels" value="${subscription.name}"/>
+                                    </display:column>
+                                </c:otherwise>
+                            </c:choose>
+                        </display:table>
+                        <div id="table-footer">
+                            <input type="submit" value="Select" name="submitButton"/>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
     <div id="footer">
-        <div class="leftcol">
-            Baltrad DEX v.0.1
-        </div>
-        <div class="rightcol">
-            BALTRAD Project Group &#169 2009
-        </div>
+        <script type="text/javascript" src="includes/footer.js"></script>
     </div>
 </div>
 </html>

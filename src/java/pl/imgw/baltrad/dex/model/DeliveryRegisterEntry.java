@@ -16,63 +16,46 @@ package pl.imgw.baltrad.dex.model;
  * @since 1.0
  */
 public class DeliveryRegisterEntry {
-
-    private int registerEntryID;
-    private int userID;
-    private int dataID;
-
+//---------------------------------------------------------------------------------------- Variables
+    private int id;
+    private int userId;
+    private int dataId;
+//------------------------------------------------------------------------------------------ Methods    
     /**
-     * Method returns register entry ID.
+     * Method returns register entry id.
      *
-     * @return Register entry ID
+     * @return Register entry id
      */
-    public int getRegisterEntryID() {
-        return registerEntryID;
-    }
-
+    public int getId() { return id; }
     /**
-     * Method sets register entry ID.
+     * Method sets register entry id.
      *
-     * @param registerEntryID Register entry ID
+     * @param registerEntryID Register entry id
      */
-    public void setRegisterEntryID( int registerEntryID ) {
-        this.registerEntryID = registerEntryID;
-    }
-
+    public void setId( int id ) { this.id = id; }
     /**
-     * Method returns user ID.
+     * Method returns user id.
      *
-     * @return User ID
+     * @return User id
      */
-    public int getUserID() {
-        return userID;
-    }
-
+    public int getUserId() { return userId; }
     /**
-     * Method sets user ID.
+     * Method sets user id.
      *
-     * @param userID User ID
+     * @param userId User id
      */
-    public void setUserID( int userID ) {
-        this.userID = userID;
-    }
-
+    public void setUserId( int userId ) { this.userId = userId; }
     /**
-     * Method returns data ID.
+     * Method returns data id.
      *
-     * @return Data ID
+     * @return Data id
      */
-    public int getDataID() {
-        return dataID;
-    }
-
+    public int getDataId() { return dataId; }
     /**
-     * Method sets data ID.
+     * Method sets data id.
      *
-     * @param dataID Data ID
+     * @param dataId Data id
      */
-    public void setDataID( int dataID ) {
-        this.dataID = dataID;
-    }
-
+    public void setDataId( int dataId ) { this.dataId = dataId; }
 }
+//--------------------------------------------------------------------------------------------------

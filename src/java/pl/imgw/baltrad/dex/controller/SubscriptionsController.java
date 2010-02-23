@@ -8,7 +8,7 @@
 
 package pl.imgw.baltrad.dex.controller;
 
-import pl.imgw.baltrad.dex.model.DataChannelManager;
+import pl.imgw.baltrad.dex.model.ChannelManager;
 import pl.imgw.baltrad.dex.model.SubscriptionManager;
 import pl.imgw.baltrad.dex.model.User;
 import pl.imgw.baltrad.dex.util.ApplicationSecurityManager;
@@ -31,20 +31,17 @@ import java.util.List;
  * @since 1.0
  */
 public class SubscriptionsController implements Controller {
-
 //---------------------------------------------------------------------------------------- Constants
     private static final String MAP_KEY = "subscriptions";
 //---------------------------------------------------------------------------------------- Variables
     private ApplicationSecurityManager applicationSecurityManager;
-    private DataChannelManager dataChannelManager;
+    private ChannelManager channelManager;
     private SubscriptionManager subscriptionManager;
-
     private String successView;
 //------------------------------------------------------------------------------------------ Methods
-
     /**
-     * Method handles http request. Returns ModelAndView object containing list of all
-     * available data channels.
+     * Method handles http request. Returns ModelAndView object containing list of 
+     * user subscriptions.
      *
      * @param request Http request
      * @param response Http response
@@ -57,10 +54,9 @@ public class SubscriptionsController implements Controller {
 
         User user = ( User )applicationSecurityManager.getUser( request );
         List userSubscriptions = subscriptionManager.getUserSubscriptions( user.getId() );
-        List subscriptions = dataChannelManager.getDataChannels( userSubscriptions );
+        List subscriptions = channelManager.getChannels( userSubscriptions );
         return new ModelAndView( successView, MAP_KEY, subscriptions );
     }
-
     /**
      * Method returns reference to ApplicationSecurityManager object.
      *
@@ -69,7 +65,6 @@ public class SubscriptionsController implements Controller {
     public ApplicationSecurityManager getApplicationSecurityManager() {
         return applicationSecurityManager;
     }
-
     /**
      * Method sets reference to ApplicationSecurityManager object.
      *
@@ -79,34 +74,26 @@ public class SubscriptionsController implements Controller {
                                         ApplicationSecurityManager applicationSecurityManager ) {
         this.applicationSecurityManager = applicationSecurityManager;
     }
-
     /**
      * Method returns reference to data channel manager object.
      *
      * @return Reference to data channel manager object
      */
-    public DataChannelManager getDataChannelManager() {
-        return dataChannelManager;
-    }
-
+    public ChannelManager getChannelManager() { return channelManager; }
     /**
      * Method sets reference to data channel manager object.
      *
      * @param dataChannelManager Reference to data channel manager object
      */
-    public void setDataChannelManager( DataChannelManager dataChannelManager ) {
-        this.dataChannelManager = dataChannelManager;
+    public void setChannelManager( ChannelManager channelManager ) {
+        this.channelManager = channelManager;
     }
-
     /**
      * Method returns reference to SubscriptionManager object.
      *
      * @return Reference to SubscriptionManager object
      */
-    public SubscriptionManager getSubscriptionManager() {
-        return subscriptionManager;
-    }
-
+    public SubscriptionManager getSubscriptionManager() { return subscriptionManager; }
     /**
      * Method sets reference to SubscriptionManager object.
      *
@@ -115,25 +102,17 @@ public class SubscriptionsController implements Controller {
     public void setSubscriptionManager( SubscriptionManager subscriptionManager ) {
         this.subscriptionManager = subscriptionManager;
     }
-
     /**
      * Method returns reference to success view name string.
      *
      * @return Reference to success view name string
      */
-    public String getSuccessView() {
-        return successView;
-    }
-
+    public String getSuccessView() { return successView; }
     /**
      * Method sets reference to success view name string.
      *
      * @param successView Reference to success view name string
      */
-    public void setSuccessView( String successView ) {
-        this.successView = successView;
-    }
-
+    public void setSuccessView( String successView ) { this.successView = successView; }
 }
-
 //--------------------------------------------------------------------------------------------------

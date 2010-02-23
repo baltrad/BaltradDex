@@ -21,17 +21,18 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="mappings">
             <props>
                 <prop key="welcome.htm">urlFilenameController</prop>
-                <prop key="channels.htm">dataChannelsController</prop>
+                <prop key="channels.htm">channelController</prop>
                 <prop key="channeldata.htm">channelDataController</prop>
                 <prop key="download.htm">downloadController</prop>
                 <prop key="admin.htm">urlFilenameController</prop>
-                <prop key="transmitter_on.htm">transmitterController</prop>
-                <prop key="transmitter_off.htm">transmitterController</prop>
                 <prop key="subscriptions.htm">subscriptionsController</prop>
                 <prop key="submit.htm">submitSubscriptionsController</prop>
                 <prop key="status.htm">subscriptionStatusController</prop>
                 <prop key="log.htm">urlFilenameController</prop>
                 <prop key="logtable.htm">logTableController</prop>
+                <prop key="journal.htm">journalController</prop>
+                <prop key="on.htm">urlFilenameController</prop>
+                <prop key="off.htm">urlFilenameController</prop>
             </props>
         </property>
     </bean>
@@ -65,10 +66,14 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
           class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
 
     <!--
+        Application initialization controller.
+    -->
+    <bean name="initController" class="pl.imgw.baltrad.dex.controller.InitController"></bean>
+
+    <!--
         The signin controller.
     -->
-    <bean name="signInController"
-        class="pl.imgw.baltrad.dex.controller.SignInController">
+    <bean name="signInController" class="pl.imgw.baltrad.dex.controller.SignInController">
         <property name="sessionForm">
 			<value>true</value>
 		</property>
@@ -115,10 +120,10 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Data channels list controller.
     -->
-    <bean name="dataChannelsController"
-        class="pl.imgw.baltrad.dex.controller.DataChannelsController">
-        <property name="dataChannelManager">
-			<ref bean="dataChannelManager" />
+    <bean name="channelController"
+        class="pl.imgw.baltrad.dex.controller.ChannelController">
+        <property name="channelManager">
+			<ref bean="channelManager" />
 		</property>
 		<property name="successView">
 			<value>channels</value>
@@ -155,8 +160,8 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
         </property>
-        <property name="dataChannelManager">
-			<ref bean="dataChannelManager" />
+        <property name="channelManager">
+			<ref bean="channelManager" />
 		</property>
 		<property name="successView">
 			<value>subscriptions</value>
@@ -171,11 +176,11 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
-        <property name="subscriptionManager">
-            <ref bean="subscriptionManager"/>
+        <property name="auxSubscriptionManager">
+            <ref bean="auxSubscriptionManager"/>
         </property>
-        <property name="dataChannelManager">
-			<ref bean="dataChannelManager" />
+        <property name="channelManager">
+			<ref bean="channelManager" />
 		</property>
 		<property name="successView">
 			<value>submit</value>
@@ -193,9 +198,15 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
         </property>
-        <property name="dataChannelManager">
-			<ref bean="dataChannelManager"/>
+        <property name="auxSubscriptionManager">
+            <ref bean="auxSubscriptionManager"/>
+        </property>
+        <property name="channelManager">
+			<ref bean="channelManager"/>
 		</property>
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
         <property name="successView">
 			<value>status</value>
 		</property>
@@ -214,9 +225,24 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </bean>
 
     <!--
+        System journal controller
+    -->
+    <bean name="journalController" class="pl.imgw.baltrad.dex.controller.JournalController">
+        <property name="successView">
+            <value>journal</value>
+        </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
+
+    <!--
         Data download controller.
     -->
     <bean name="downloadController" class="pl.imgw.baltrad.dex.controller.DownloadController">
+        <property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager"/>
+        </property>
         <property name="successView">
             <value>channeldata</value>
         </property>
@@ -228,7 +254,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Data channel manager.
     -->
-    <bean name="dataChannelManager" class="pl.imgw.baltrad.dex.model.DataChannelManager"/>
+    <bean name="channelManager" class="pl.imgw.baltrad.dex.model.ChannelManager"/>
 
     <!--
         Data manager.
@@ -241,24 +267,32 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <bean name="subscriptionManager" class="pl.imgw.baltrad.dex.model.SubscriptionManager"/>
 
     <!--
+        Auxiliary subscription manager.
+    -->
+    <bean name="auxSubscriptionManager" class="pl.imgw.baltrad.dex.model.AuxSubscriptionManager"/>
+
+    <!--
         Log manager
     -->
     <bean name="logManager" class="pl.imgw.baltrad.dex.model.LogManager"/>
 
     <!--
-        Data transmitter module.
-    -->
-    <bean name="transmitter" class="pl.imgw.baltrad.dex.model.Transmitter"/>
-
-    <!--
         Data receiver module.
     -->
-    <bean name="receiver" class="pl.imgw.baltrad.dex.model.Receiver"/>
+    <bean name="receiver" class="pl.imgw.baltrad.dex.model.Receiver">
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
 
     <!--
-        Data transmitter controller.
+        Envelope handler.
     -->
-    <bean name="transmitterController" class="pl.imgw.baltrad.dex.controller.TransmitterController"/>
+    <bean name="envelopeHandler" class="pl.imgw.baltrad.dex.model.EnvelopeHandler">
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
 
     <!--
         Sign in validator.

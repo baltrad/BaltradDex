@@ -29,13 +29,13 @@ import java.io.IOException;
  * @since 1.0
  */
 public class ChannelDataController implements Controller {
-
+//---------------------------------------------------------------------------------------- Constants
     public static final String MAP_KEY = "channeldata";
-    public static final String DATA_CHANNEL_NAME = "name";
-
+    public static final String CHANNEL_NAME = "name";
+//---------------------------------------------------------------------------------------- Variables
     private DataManager dataManager = null;
     private String successView;
-
+//------------------------------------------------------------------------------------------ Methods
     /**
      * Method handles http request
      *
@@ -48,45 +48,33 @@ public class ChannelDataController implements Controller {
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response )
             throws ServletException, IOException {
-        String channelName = request.getParameter( DATA_CHANNEL_NAME );
-        List productList = dataManager.getProductsFromDataChannel( channelName );
-        return new ModelAndView( getSuccessView(), MAP_KEY, productList );
+        String channelName = request.getParameter( CHANNEL_NAME );
+        List dataList = dataManager.getDataFromChannel( channelName );
+        return new ModelAndView( getSuccessView(), MAP_KEY, dataList );
     }
-
     /**
      * Method returns reference to data manager object.
      *
      * @return Reference to data manager object
      */
-    public DataManager getDataManager() {
-        return dataManager;
-    }
-
+    public DataManager getDataManager() { return dataManager; }
     /**
      * Method sets reference to data manager object.
      *
      * @param Reference to data manager object
      */
-    public void setDataManager( DataManager dataManager ) {
-        this.dataManager = dataManager;
-    }
-
+    public void setDataManager( DataManager dataManager ) { this.dataManager = dataManager; }
     /**
      * Method returns reference to success view name string.
      *
      * @return Reference to success view name string
      */
-    public String getSuccessView() {
-        return successView;
-    }
-
+    public String getSuccessView() { return successView; }
     /**
      * Method sets reference to success view name string.
      *
      * @param Reference to success view name string
      */
-    public void setSuccessView( String successView ) {
-        this.successView = successView;
-    }
-
+    public void setSuccessView( String successView ) { this.successView = successView; }
 }
+//--------------------------------------------------------------------------------------------------

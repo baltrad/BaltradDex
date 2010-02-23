@@ -8,10 +8,11 @@
 
 package pl.imgw.baltrad.dex.controller;
 
-import pl.imgw.baltrad.dex.model.DataChannelManager;
-import pl.imgw.baltrad.dex.model.SubscriptionManager;
+import pl.imgw.baltrad.dex.model.ChannelManager;
+import pl.imgw.baltrad.dex.model.AuxSubscriptionManager;
 import pl.imgw.baltrad.dex.model.User;
-import pl.imgw.baltrad.dex.model.Subscription;
+import pl.imgw.baltrad.dex.model.AuxSubscription;
+import pl.imgw.baltrad.dex.model.Channel;
 import pl.imgw.baltrad.dex.util.ApplicationSecurityManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,17 +34,15 @@ import java.util.ArrayList;
  * @since 1.0
  */
 public class SubmitSubscriptionsController implements Controller {
-
 //---------------------------------------------------------------------------------------- Constants
-    private static final String REQUEST_PARAM_KEY = "selectedChannels";
-    private static final String RESPONSE_PARAM_KEY = "submittedSubscriptions";
+    private static final String REQUEST_PARAM_KEY = "selected_channels";
+    private static final String RESPONSE_PARAM_KEY = "submitted_subscriptions";
 //---------------------------------------------------------------------------------------- Variables
-    private DataChannelManager dataChannelManager;
-    private SubscriptionManager subscriptionManager;
+    private ChannelManager channelManager;
+    private AuxSubscriptionManager auxSubscriptionManager;
     private ApplicationSecurityManager applicationSecurityManager;
     private String successView;
 //------------------------------------------------------------------------------------------ Methods
-
     /**
      * Method handles http request. Returns ModelAndView object containing list of
      * subscribed data channels.
@@ -57,28 +56,26 @@ public class SubmitSubscriptionsController implements Controller {
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
 
-        String[] selectedSubscriptions = request.getParameterValues( REQUEST_PARAM_KEY );
-        // Get user from request
+        String[] selectedChannels = request.getParameterValues( REQUEST_PARAM_KEY );
         User user = ( User )applicationSecurityManager.getUser( request );
-        // Remove all active subscriptions
-        subscriptionManager.cancelUserSubscriptions( user.getId() );
-
-        List submittedSubscriptions = new ArrayList();
         
-        if( selectedSubscriptions != null && selectedSubscriptions.length > 0 ) {
-            for( int i = 0; i < selectedSubscriptions.length; i++ ) {
-                String dataChannelName = selectedSubscriptions[ i ].substring( 0, 1 ).toLowerCase()
-                   + selectedSubscriptions[ i ].substring( 1, selectedSubscriptions[ i ].length() );
-                submittedSubscriptions.add( dataChannelManager.getDataChannel( dataChannelName ) );
-                // Add subscription to subscription table
-                Subscription subscription = new Subscription( user.getId(),
-                        dataChannelManager.getDataChannel( dataChannelName ).getDataChannelID() );
-                subscriptionManager.registerSubscription( subscription );
+        List submittedSubscriptions = new ArrayList();
+        if( selectedChannels != null && selectedChannels.length > 0 ) {
+            for( int i = 0; i < selectedChannels.length; i++ ) {
+                // Get selected data channels by name
+                String channelName = selectedChannels[ i ].substring( 0, 1 ).toLowerCase()
+                   + selectedChannels[ i ].substring( 1, selectedChannels[ i ].length() );
+                submittedSubscriptions.add( channelManager.getChannel( channelName ) );
+                
+                // Add selected subscriptions to auxiliary subscriptions table
+                Channel dataChannel = channelManager.getChannel( channelName );
+                AuxSubscription auxSubscription = new AuxSubscription( user.getId(), 
+                                                                            dataChannel.getId() );
+                auxSubscriptionManager.registerSubscription( auxSubscription );
             }
         }
         return new ModelAndView( getSuccessView(), RESPONSE_PARAM_KEY, submittedSubscriptions );
     }
-
     /**
      * Method returns reference to ApplicationSecurityManager object.
      *
@@ -87,7 +84,6 @@ public class SubmitSubscriptionsController implements Controller {
     public ApplicationSecurityManager getApplicationSecurityManager() {
         return applicationSecurityManager;
     }
-
     /**
      * Method sets reference to ApplicationSecurityManager object.
      *
@@ -97,61 +93,45 @@ public class SubmitSubscriptionsController implements Controller {
                                         ApplicationSecurityManager applicationSecurityManager ) {
         this.applicationSecurityManager = applicationSecurityManager;
     }
-
     /**
      * Method returns reference to data channel manager object.
      *
      * @return Reference to data channel manager object
      */
-    public DataChannelManager getDataChannelManager() {
-        return dataChannelManager;
-    }
-
+    public ChannelManager getChannelManager() { return channelManager; }
     /**
      * Method sets reference to data channel manager object.
      *
-     * @param dataChannelManager Reference to data channel manager object
+     * @param channelManager Reference to data channel manager object
      */
-    public void setDataChannelManager( DataChannelManager dataChannelManager ) {
-        this.dataChannelManager = dataChannelManager;
+    public void setChannelManager( ChannelManager channelManager ) {
+        this.channelManager = channelManager;
     }
-
-    /**
-     * Method returns reference to SubscriptionManager object.
-     *
-     * @return Reference to SubscriptionManager object
-     */
-    public SubscriptionManager getSubscriptionManager() {
-        return subscriptionManager;
-    }
-
-    /**
-     * Method sets reference to SubscriptionManager object.
-     *
-     * @param subscriptionManager Reference to SubscriptionManager object
-     */
-    public void setSubscriptionManager( SubscriptionManager subscriptionManager ) {
-        this.subscriptionManager = subscriptionManager;
-    }
-
     /**
      * Method returns reference to success view name string.
      *
      * @return Reference to success view name string
      */
-    public String getSuccessView() {
-        return successView;
-    }
-
+    public String getSuccessView() { return successView; }
     /**
      * Method sets reference to success view name string.
      *
      * @param successView Reference to success view name string
      */
-    public void setSuccessView( String successView ) {
-        this.successView = successView;
+    public void setSuccessView( String successView ) { this.successView = successView; }
+    /**
+     * Method gets reference to auxiliary subscription manager object.
+     *
+     * @return Auxiliary subscription manager object
+     */
+    public AuxSubscriptionManager getAuxSubscriptionManager() { return auxSubscriptionManager; }
+    /**
+     * Method sets reference to auxiliary subscription manager object.
+     *
+     * @param auxSubscriptionManager Reference to auxiliary subscription manager object
+     */
+    public void setAuxSubscriptionManager( AuxSubscriptionManager auxSubscriptionManager ) {
+        this.auxSubscriptionManager = auxSubscriptionManager;
     }
-    
 }
-
 //--------------------------------------------------------------------------------------------------

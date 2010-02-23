@@ -71,16 +71,9 @@
                 </div>
             </form>
         </div>
-
     </div>
-
     <div id="footer">
-        <div class="leftcol">
-            Baltrad DEX v.0.1
-        </div>
-        <div class="rightcol">
-            BALTRAD Project Group &#169 2009
-        </div>
+        <script type="text/javascript" src="includes/footer.js"></script>
     </div>
 </div>
 </html>

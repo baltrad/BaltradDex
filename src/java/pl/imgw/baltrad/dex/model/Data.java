@@ -16,135 +16,72 @@ package pl.imgw.baltrad.dex.model;
  * @since 1.0
  */
 public class Data {
-
 //------------------------------------------------------------------------------------------- Fields
     private int id;
-    private String nodeName;
-    private String stationName;
-    private String absolutePath;
-    private String fileName;
+    private String channelName;
+    private String path;
     private String date;
     private String time;
-    private int numberOfDatasets;
-    
 //------------------------------------------------------------------------------------------ Methods
-
     /**
      * Method gets data id.
      *
      * @return Data id
      */
-    public int getId() {
-        return id;
-    }
-
+    public int getId() { return id; }
     /**
      * Method sets data id.
      *
      * @param id Data id
      */
-    public void setId( int id ) {
-        this.id = id;
-    }
-
+    public void setId( int id ) { this.id = id; }
     /**
-     * @return the nodeName
+     * Method gets channel name.
+     *
+     * @return Channel name
      */
-    public String getNodeName() {
-        return nodeName;
-    }
-
+    public String getChannelName() { return channelName; }
     /**
-     * @param nodeName the nodeName to set
+     * Method sets channel name.
+     *
+     * @param channelName Channel name
      */
-    public void setNodeName( String nodeName ) {
-        this.nodeName = nodeName;
-    }
-
+    public void setChannelName( String channelName ) { this.channelName = channelName; }
     /**
-     * @return the stationName
+     * Method gets file's path.
+     *
+     * @return Path to the file
      */
-    public String getStationName() {
-        return stationName;
-    }
-
+    public String getPath() { return path; }
     /**
-     * @param stationName the stationName to set
+     * Method sets file's path.
+     *
+     * @param path Path to the file
      */
-    public void setStationName( String stationName ) {
-        this.stationName = stationName;
-    }
-
+    public void setPath( String path ) { this.path = path; }
     /**
-     * @return the absolutePath
+     * Method gets date.
+     *
+     * @return Date
      */
-    public String getAbsolutePath() {
-        return absolutePath;
-    }
-
+    public String getDate() { return date; }
     /**
-     * @param absolutePath the absolutePath to set
+     * Method sets date.
+     *
+     * @param date Date
      */
-    public void setAbsolutePath( String absolutePath ) {
-        this.absolutePath = absolutePath;
-    }
-
+    public void setDate( String date ) { this.date = date; }
     /**
-     * @return the fileName
+     * Method gets time.
+     *
+     * @return Time
      */
-    public String getFileName() {
-        return fileName;
-    }
-
+    public String getTime() { return time; }
     /**
-     * @param fileName the fileName to set
+     * Method sets time.
+     *
+     * @param time Time
      */
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    /**
-     * @return the date
-     */
-    public String getDate() {
-        return date;
-    }
-
-    /**
-     * @param date the date to set
-     */
-    public void setDate( String date ) {
-        this.date = date;
-    }
-
-    /**
-     * @return the time
-     */
-    public String getTime() {
-        return time;
-    }
-
-    /**
-     * @param time the time to set
-     */
-    public void setTime( String time ) {
-        this.time = time;
-    }
-
-    /**
-     * @return the numberOfDatasets
-     */
-    public int getNumberOfDatasets() {
-        return numberOfDatasets;
-    }
-
-    /**
-     * @param numberOfDatasets the numberOfDatasets to set
-     */
-    public void setNumberOfDatasets( int numberOfDatasets ) {
-        this.numberOfDatasets = numberOfDatasets;
-    }
-
+    public void setTime( String time ) { this.time = time; }
 }
-
 //--------------------------------------------------------------------------------------------------

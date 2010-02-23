@@ -503,7 +503,6 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${libs.jstl11.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.jstl11.classpath" todir="${dist.ear.dir}"/>
         <copyfiles files="${libs.hibernate-support.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.hibernate-support.classpath" todir="${dist.ear.dir}"/>
         <copyfiles files="${libs.ejb3-persistence.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.ejb3-persistence.classpath" todir="${dist.ear.dir}"/>
-        <copyfiles files="${libs.MySQLDriver.classpath}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.libs.MySQLDriver.classpath" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.displaytag-1.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.displaytag-1.1.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.commons-beanutils-1.7.0.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.commons-beanutils-1.7.0.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.commons-lang-2.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.commons-lang-2.1.jar" todir="${dist.ear.dir}"/>
@@ -515,9 +514,10 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.httpmime-4.0.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.httpmime-4.0.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.commons-fileupload-1.2.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.commons-fileupload-1.2.1.jar" todir="${dist.ear.dir}"/>
         <copyfiles files="${file.reference.commons-io-1.4.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.commons-io-1.4.jar" todir="${dist.ear.dir}"/>
+        <copyfiles files="${file.reference.postgresql-8.4-701.jdbc4.jar}" iftldtodir="${build.web.dir}/WEB-INF" manifestproperty="manifest.file.reference.postgresql-8.4-701.jdbc4.jar" todir="${dist.ear.dir}"/>
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.libs.spring-webmvc.classpath} ${manifest.libs.spring-framework.classpath} ${manifest.libs.jstl11.classpath} ${manifest.libs.hibernate-support.classpath} ${manifest.libs.ejb3-persistence.classpath} ${manifest.libs.MySQLDriver.classpath} ${manifest.file.reference.displaytag-1.1.jar} ${manifest.file.reference.commons-beanutils-1.7.0.jar} ${manifest.file.reference.commons-lang-2.1.jar} ${manifest.file.reference.apache-mime4j-0.6.jar} ${manifest.file.reference.commons-codec-1.3.jar} ${manifest.file.reference.commons-logging-1.1.1.jar} ${manifest.file.reference.httpclient-4.0.jar} ${manifest.file.reference.httpcore-4.0.1.jar} ${manifest.file.reference.httpmime-4.0.jar} ${manifest.file.reference.commons-fileupload-1.2.1.jar} ${manifest.file.reference.commons-io-1.4.jar} "/>
+            <attribute name="Class-Path" value="${manifest.libs.spring-webmvc.classpath} ${manifest.libs.spring-framework.classpath} ${manifest.libs.jstl11.classpath} ${manifest.libs.hibernate-support.classpath} ${manifest.libs.ejb3-persistence.classpath} ${manifest.file.reference.displaytag-1.1.jar} ${manifest.file.reference.commons-beanutils-1.7.0.jar} ${manifest.file.reference.commons-lang-2.1.jar} ${manifest.file.reference.apache-mime4j-0.6.jar} ${manifest.file.reference.commons-codec-1.3.jar} ${manifest.file.reference.commons-logging-1.1.1.jar} ${manifest.file.reference.httpclient-4.0.jar} ${manifest.file.reference.httpcore-4.0.1.jar} ${manifest.file.reference.httpmime-4.0.jar} ${manifest.file.reference.commons-fileupload-1.2.1.jar} ${manifest.file.reference.commons-io-1.4.jar} ${manifest.file.reference.postgresql-8.4-701.jdbc4.jar} "/>
         </manifest>
     </target>
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
@@ -526,7 +526,6 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${libs.jstl11.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.hibernate-support.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${libs.ejb3-persistence.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${libs.MySQLDriver.classpath}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.displaytag-1.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.commons-beanutils-1.7.0.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.commons-lang-2.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
@@ -538,6 +537,7 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${file.reference.httpmime-4.0.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.commons-fileupload-1.2.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.commons-io-1.4.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.postgresql-8.4-701.jdbc4.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
     </target>
     <target depends="init,compile,compile-jsps,-pre-dist,library-inclusion-in-manifest" name="do-ear-dist">
         <dirname file="${dist.ear.war}" property="dist.jar.dir"/>

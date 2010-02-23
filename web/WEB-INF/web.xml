@@ -4,8 +4,11 @@
         <param-name>contextConfigLocation</param-name>
         <param-value>/WEB-INF/applicationContext.xml</param-value>
     </context-param>
-    <listener>
+    <!--listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener-->
+    <listener>
+        <listener-class>pl.imgw.baltrad.dex.util.ServletContextUtil</listener-class>
     </listener>
     <servlet>
         <servlet-name>baltraddex</servlet-name>
@@ -22,6 +25,6 @@
         </session-timeout>
     </session-config>
     <welcome-file-list>
-        <welcome-file>redirect.jsp</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
         </welcome-file-list>
     </web-app>

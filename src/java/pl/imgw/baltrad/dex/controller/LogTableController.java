@@ -31,7 +31,8 @@ import java.io.IOException;
 public class LogTableController implements Controller {
 
 //---------------------------------------------------------------------------------------- Constants
-    private static final String MAP_KEY = "logentrylist";
+    private static final String MAP_KEY = "log_entry_list";
+    private static final int LOG_ENTRY_LIST_SIZE = 12;
 //---------------------------------------------------------------------------------------- Variables
     private LogManager logManager;
     private String successView;
@@ -48,8 +49,7 @@ public class LogTableController implements Controller {
      */
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
-
-        List logEntryList = logManager.getLogEntries();
+        List logEntryList = logManager.getLastLogEntries( LOG_ENTRY_LIST_SIZE );
         return new ModelAndView( successView, MAP_KEY, logEntryList );
     }
 

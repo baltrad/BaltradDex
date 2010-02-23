@@ -9,6 +9,9 @@
 package pl.imgw.baltrad.dex.controller;
 
 import pl.imgw.baltrad.dex.model.LogManager;
+import pl.imgw.baltrad.dex.model.User;
+
+import pl.imgw.baltrad.dex.util.ApplicationSecurityManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,13 +39,13 @@ import java.util.Date;
 public class DownloadController implements Controller {
 
 //---------------------------------------------------------------------------------------- Constants
-    public static final String FILE_PATH = "absolutePath";
+    public static final String FILE_PATH = "path";
 //---------------------------------------------------------------------------------------- Variables
+    private ApplicationSecurityManager applicationSecurityManager;
     private LogManager logManager;
     private String successView;
 
 //------------------------------------------------------------------------------------------ Methods
-
     /**
      * Method handles http request.
      * 
@@ -50,11 +53,10 @@ public class DownloadController implements Controller {
      * @param response Http response
      * @return Model and view
      */
-    public ModelAndView handleRequest( HttpServletRequest request,
-            HttpServletResponse response ) {
+    public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response ) {
 
+        User user = ( User )applicationSecurityManager.getUser( request );
         ServletContext servletContext = request.getSession().getServletContext();
-
         String filePath = request.getParameter( FILE_PATH );
         String fileName = filePath.substring( filePath.lastIndexOf( File.separator ) + 1 );
         File file = new File( servletContext.getRealPath( "/" ), filePath );
@@ -65,7 +67,7 @@ public class DownloadController implements Controller {
             try {
                 in = new BufferedInputStream( new FileInputStream( file ) );
             } catch( FileNotFoundException e ) {
-                logManager.addLogEntry( new Date(), "ERROR", "File not found" );
+                logManager.addLogEntry( new Date(), logManager.MSG_INFO, "File not found" );
             }
             String mimeType = servletContext.getMimeType( filePath );
             response.setBufferSize( fileSize );
@@ -80,12 +82,32 @@ public class DownloadController implements Controller {
                 response.getOutputStream().close();
             } catch( IOException e ) {}
 
-            logManager.addLogEntry( new Date(), "INFO", "Downloading file: " + file.getName() );
-
+            logManager.addLogEntry( new Date(), logManager.MSG_INFO, "User " + user.getName() +
+                                                        " downloading file: " + file.getName() );
         } else {
-            logManager.addLogEntry( new Date(), "ERROR", "Invalid file size: " + fileSize );
+            logManager.addLogEntry( new Date(), logManager.MSG_ERR, "Invalid file size: "
+                                                                                    + fileSize );
         }
         return null;
+    }
+
+    /**
+     * Method returns reference to ApplicationSecurityManager object.
+     *
+     * @return applicationSecurityManager Reference to ApplicationSecurityManager object
+     */
+    public ApplicationSecurityManager getApplicationSecurityManager() {
+        return applicationSecurityManager;
+    }
+
+    /**
+     * Method sets reference to ApplicationSecurityManager object.
+     *
+     * @param applicationSecurityManager Reference to ApplicationSecurityManager object
+     */
+    public void setApplicationSecurityManager(
+                                        ApplicationSecurityManager applicationSecurityManager ) {
+        this.applicationSecurityManager = applicationSecurityManager;
     }
     
     /**

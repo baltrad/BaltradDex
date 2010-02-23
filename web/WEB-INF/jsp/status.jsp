@@ -11,11 +11,11 @@
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 
 <%
-    String submitOption = request.getParameter( "submitButton" );
+    String submitOption = request.getParameter( "submit_button" );
     if( submitOption != null ) {
-        request.getSession().setAttribute( "selectedOption", 1 );
+        request.getSession().setAttribute( "selected_option", 1 );
     } else {
-        request.getSession().setAttribute( "selectedOption", 0 );
+        request.getSession().setAttribute( "selected_option", 0 );
     }
 %>
 
@@ -32,22 +32,11 @@
     <div id="container1">
         <div id="container2">
             <div id="leftcol">
-                <a href="welcome.htm">Home</a>
-                <br>
-                <a href="channels.htm">Data channels</a>
-                <a href="subscriptions.htm">Subscriptions</a>
-                <a href="log.htm">View logs</a>
-                <a href="welcome.htm">Help</a>
-                <a href="welcome.htm">Links</a>
-                <br>
-                <a href="admin.htm">System management</a>
-                <br>
-                <a href="signout.htm">Logout</a>
-                <br>
+                <script type="text/javascript" src="includes/mainmenu.js"></script>
             </div>
             <div id="rightcol">
                 <c:choose>
-                    <c:when test="${selectedOption == 1}">
+                    <c:when test="${selected_option == 1}">
                         <div id="table-info">
                             <div id="message-box">
                                 Your subscription is now submitted.
@@ -55,13 +44,13 @@
                             </div>
                         </div>
                         <div id="table-content">
-                            <display:table name="userSubscriptions" id="subscription"
+                            <display:table name="user_subscriptions" id="subscription"
                                 defaultsort="1" requestURI="submit.htm" cellpadding="5"
                                 cellspacing="0" export="false" class="tableborder">
                                 <display:caption>Subscribed data channels:</display:caption>
-                                <display:column sortProperty="dataChannelID" sortable="true"
+                                <display:column sortProperty="id" sortable="true"
                                     title="Channel ID" class="tdcenter">
-                                    <fmt:formatNumber value="${subscription.dataChannelID}"
+                                    <fmt:formatNumber value="${subscription.id}"
                                         pattern="00" />
                                 </display:column>
                                 <display:column sortable="true" title="Channel name"
@@ -78,19 +67,11 @@
                         </div>
                     </c:otherwise>
                 </c:choose>
-                <div id="operator-logo">
-                    <img src="includes/images/logo.png">
-                </div>
             </div>
         </div>
     </div>
     <div id="footer">
-        <div class="leftcol">
-            Baltrad DEX v.0.1
-        </div>
-        <div class="rightcol">
-            BALTRAD Project Group &#169 2009
-        </div>
+        <script type="text/javascript" src="includes/footer.js"></script>
     </div>
 </div>
 </html>

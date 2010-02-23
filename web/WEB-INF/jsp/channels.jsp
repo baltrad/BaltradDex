@@ -20,60 +20,41 @@
     <div id="header">
         <img src="includes/images/baltrad_header.png">
     </div>
-        <div id="container1">
-            <div id="container2">
-                <div id="leftcol">
-                    <a href="welcome.htm">Home</a>
-                    <br>
-                    <a href="channels.htm">Data channels</a>
-                    <a href="subscriptions.htm">Subscriptions</a>
-                    <a href="log.htm">View logs</a>
-                    <a href="welcome.htm">Help</a>
-                    <a href="welcome.htm">Links</a>
-                    <br>
-                    <a href="admin.htm">System management</a>
-                    <br>
-                    <a href="signout.htm">Logout</a>
-                    <br>
+    <div id="container1">
+        <div id="container2">
+            <div id="leftcol">
+                <script type="text/javascript" src="includes/mainmenu.js"></script>
+            </div>
+            <div id="rightcol">
+                <div id="table-info">
+                    List of available data channels.
+                    Click on channel name for data listing.
                 </div>
-                <div id="rightcol">
-                    <div id="table-info">
-                        List of available data channels.
-                        Click on channel name for data listing.
-                    </div>
-                    <div id="table-content">
-                        <display:table name="channels" id="dataChannel" defaultsort="1"
-                            requestURI="channels.htm" cellpadding="5" cellspacing="0"
-                            export="false" class="tableborder">
-                            <display:caption>Data channels</display:caption>
-                            <display:column sortProperty="dataChannelID" sortable="true"
-                                title="Channel ID" class="tdcenter">
-                                <fmt:formatNumber value="${dataChannel.dataChannelID}" pattern="00" />
-                            </display:column>
-                            <display:column sortable="true" title="Channel WMO number"
-                                sortProperty="wmoNumber" class="tdcenter"
-                                value="${dataChannel.wmoNumber}">
-                            </display:column>
-                            <display:column sortable="true" title="Channel name"
-                                href="channeldata.htm" sortProperty="name"
-                                paramId="name" paramProperty="name" class="tdcenter"
-                                value="${dataChannel.name}">
-                            </display:column>
-                        </display:table>
-                    </div>
-                    <div id="operator-logo">
-                        <img src="includes/images/logo.png">
-                    </div>
+                <div id="table-content">
+                    <display:table name="channels" id="dataChannel" defaultsort="1"
+                        requestURI="channels.htm" cellpadding="5" cellspacing="0"
+                        export="false" class="tableborder">
+                        <display:caption>Data channels</display:caption>
+                        <display:column sortProperty="id" sortable="true"
+                            title="Channel ID" class="tdcenter">
+                            <fmt:formatNumber value="${dataChannel.id}" pattern="00" />
+                        </display:column>
+                        <display:column sortable="true" title="Channel WMO number"
+                            sortProperty="wmoNumber" class="tdcenter"
+                            value="${dataChannel.wmoNumber}">
+                        </display:column>
+                        <display:column sortable="true" title="Channel name"
+                            href="channeldata.htm" sortProperty="name"
+                            paramId="name" paramProperty="name" class="tdcenter"
+                            value="${dataChannel.name}">
+                        </display:column>
+                    </display:table>
                 </div>
             </div>
         </div>
+    </div>
     <div id="footer">
-        <div class="leftcol">
-            Baltrad DEX v.0.1
-        </div>
-        <div class="rightcol">
-            BALTRAD Project Group &#169 2009
-        </div>
+         <script type="text/javascript" src="includes/footer.js"></script>
     </div>
 </div>
 </html>

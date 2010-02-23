@@ -9,16 +9,26 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
+<%@ page import="pl.imgw.baltrad.dex.model.User" %>
 
-<jsp:useBean id="transmitterController" scope="session"
-                class="pl.imgw.baltrad.dex.controller.TransmitterController" />
+<jsp:useBean id="applicationSecurityManager" scope="session"
+                                    class="pl.imgw.baltrad.dex.util.ApplicationSecurityManager">
+</jsp:useBean>
+
+<jsp:useBean id="userManager" scope="session" class="pl.imgw.baltrad.dex.model.UserManager">
+</jsp:useBean>
+
 <%
-    String transmitterStatus = transmitterController.getTransmitterStatus() ?
-                                                                "OPERATING" : "IDLE";
-    String transmitterLink = transmitterController.getTransmitterStatus() ?
-                                        "transmitter_off.htm" : "transmitter_on.htm";
-    String transmitterColor = transmitterController.getTransmitterStatus() ?
-                                                               "#99CC66" : "#FFFFFF";
+    User sessionUser = ( User )applicationSecurityManager.getUser( request );
+    User dbUser = userManager.getUserByName( "admin" );
+    if( !sessionUser.getName().equals( "admin" ) ||
+                    !applicationSecurityManager.authenticateSessionUser( sessionUser, dbUser ) ) {
+        request.getSession().setAttribute( "is_user_admin", 0 );
+    } else {
+        request.getSession().setAttribute( "is_user_admin", 1 );
+    }
+    String serverStatus = applicationSecurityManager.getServerRunning() ? "Running..." : "Idle";
+    String controlColor = applicationSecurityManager.getServerRunning() ? "#99CC66" : "#FFFFFF";
 %>
 
 <head>
@@ -31,57 +41,68 @@
     <div id="header">
         <img src="includes/images/baltrad_header.png">
     </div>
-        <div id="container1">
-            <div id="container2">
-                <div id="leftcol">
-                    <a href="welcome.htm">Home</a>
-                    <br>
-                    <a href="channels.htm">Data channels</a>
-                    <a href="subscriptions.htm">Subscriptions</a>
-                    <a href="log.htm">View logs</a>
-                    <a href="welcome.htm">Help</a>
-                    <a href="welcome.htm">Links</a>
-                    <br>
-                    <a href="admin.htm">System management</a>
-                    <br>
-                    <a href="signout.htm">Logout</a>
-                    <br>
-                </div>
-                <div id="rightcol">
-                    <div id="table-info">
-                        Node control options:
-                    </div>
-                    <div id="table-content">
-                        <div id="admin-leftcol">
-                            <div class="admin_elem_left">
-                                Server process control:
-                            </div>
+    <div id="container1">
+        <div id="container2">
+            <div id="leftcol">
+                <script type="text/javascript" src="includes/mainmenu.js"></script>
+            </div>
+            <div id="rightcol">
+                <c:choose>
+                    <c:when test="${is_user_admin == 1}">
+                        <div id="table-info">
+                            Node control options:
                         </div>
-                        <div id="admin-rightcol">
-                            <div class="admin-elem">
-                                <form method="link" action="<% out.println( transmitterLink );%>">
+                        <div id="table-content">
+                            <div id="admin-leftcol">
+                                <div class="admin-elem">
+                                    Server process control:
+                                </div>
+                                <div class="admin-elem">
+                                    Data delivery register:
+                                </div>
+                                <div class="admin-elem">
+                                    Log messages:
+                                </div>
+                                <div class="admin-elem">
+                                    User management:
+                                </div>
+                            </div>
+                            <div id="admin-rightcol">
+                                <div class="admin-elem">
+                                    <a href="on.htm">ON</a>
+                                    <a href="off.htm">OFF</a>
                                     <input type="submit"
-                                        value="<% out.println( transmitterStatus ); %>"
-                                        style="background-color:
-                                                <% out.println( transmitterColor ); %>;
-                                        width:100px">
-                                </form>
+                                    value="<% out.println( serverStatus ); %>"
+                                    style="background-color:
+                                            <% out.println( controlColor ); %>;
+                                    width:100px">
+                                </div>
+                                <div class="admin-elem">
+                                    <a href="clear_register.htm">Clear register</a>
+                                </div>
+                                <div class="admin-elem">
+                                    <a href="clear_log_messages.htm">Clear messages</a>
+                                </div>
+                                <div class="admin-elem">
+                                    <a href="add_user.htm">Add</a>
+                                    <a href="edit_user.htm">Edit</a>
+                                    <a href="remove_user.htm">Remove</a>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="operator-logo">
-                        <img src="includes/images/logo.png">
-                    </div>
-                </div>
+                    </c:when>
+                    <c:otherwise>
+                        <div id="message-box">
+                            Access to administrative area is restricted.
+                            Please sign in as administrator and try again.
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
+    </div>
     <div id="footer">
-        <div class="leftcol">
-            Baltrad DEX v.0.1
-        </div>
-        <div class="rightcol">
-            BALTRAD Project Group &#169 2009
-        </div>
+        <script type="text/javascript" src="includes/footer.js"></script>
     </div>
 </div>
 </html>
