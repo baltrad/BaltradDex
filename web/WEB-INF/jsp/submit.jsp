@@ -48,8 +48,9 @@
                             <display:table name="submitted_subscriptions" id="subscription"
                                 defaultsort="1" requestURI="submit.htm" cellpadding="5"
                                 cellspacing="0" export="false" class="tableborder">
-                                <display:caption>Data channels selected for subscription
-                                                                                </display:caption>
+                                <display:caption class="tablecaption">
+                                    Data channels selected for subscription
+                                </display:caption>
                                 <display:column sortProperty="id" sortable="true"
                                     title="Channel ID" class="tdcenter">
                                     <fmt:formatNumber value="${subscription.id}"

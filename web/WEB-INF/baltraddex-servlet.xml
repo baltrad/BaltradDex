@@ -31,6 +31,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <prop key="log.htm">urlFilenameController</prop>
                 <prop key="logtable.htm">logTableController</prop>
                 <prop key="journal.htm">journalController</prop>
+                <prop key="incoming.htm">urlFilenameController</prop>
                 <prop key="on.htm">urlFilenameController</prop>
                 <prop key="off.htm">urlFilenameController</prop>
             </props>
@@ -288,7 +289,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Envelope handler.
     -->
-    <bean name="envelopeHandler" class="pl.imgw.baltrad.dex.model.EnvelopeHandler">
+    <bean name="baltradFrameHandler" class="pl.imgw.baltrad.dex.model.BaltradFrameHandler">
         <property name="logManager">
             <ref bean="logManager"/>
         </property>

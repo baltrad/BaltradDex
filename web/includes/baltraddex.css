@@ -154,13 +154,42 @@ div#operator-elem {
     padding:4px;
     font-size:13px;
 }
+
+/* Formatting of displaytag elements */
+.tablecaption {
+    font-size:16px;
+    font-weight:bolder;
+    padding:4px;
+}
+thead {
+    background-color:#69A5D3;
+}
+.even td, .odd td {
+    border-left:1px solid #69A5D3;
+    border-right:1px solid #69A5D3;
+    border-bottom:1px solid #69A5D3;
+}
 .even {
     background-color:#D3E4EC;
 }
 .odd {
     background-color:#FFFFFF;
 }
-
+.logmessage {
+    text-align:left;
+}
+.log-cell-wrn {
+    background-color:#FFE9AD;
+}
+.log-cell-msg-wrn {
+    background-color:#FFE9AD;
+}
+.log-cell-err {
+    background-color:#FF806C;
+}
+.log-cell-msg- {
+    background-color:#FF806C;
+}
 /* Scrollable logtable*/
 div#logtable tbody {
     /*height:360px;

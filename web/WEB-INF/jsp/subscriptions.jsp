@@ -35,7 +35,7 @@
                         <display:table name="subscriptions" id="subscription" defaultsort="1"
                             requestURI="subscriptions.htm" cellpadding="5" cellspacing="0"
                             export="false" class="tableborder">
-                            <display:caption>Active subscriptions:</display:caption>
+                            <display:caption class="tablecaption">Subscription status</display:caption>
                             <display:column sortProperty="id" sortable="true"
                                 title="Channel ID" class="tdcenter">
                                 <fmt:formatNumber value="${subscription.id}"

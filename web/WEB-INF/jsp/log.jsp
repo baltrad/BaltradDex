@@ -57,16 +57,14 @@
             </div>
             <div id="rightcol">
                 <div id="table-info">
-                    Recently logged messages
+                    Latest system messages. Click <a href="journal.htm">here</a> to see
+                    full message stack.
                 </div>
                 <div id="table-content">
                     <div id="logtable"></div>
                     <script>
                         viewLogs();
                     </script>
-                </div>
-                <div id="table-footer">
-                    <a href="journal.htm">View full message stack</a>
                 </div>
             </div>
         </div>

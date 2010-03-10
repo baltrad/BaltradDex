@@ -34,7 +34,7 @@
                     <display:table name="channels" id="dataChannel" defaultsort="1"
                         requestURI="channels.htm" cellpadding="5" cellspacing="0"
                         export="false" class="tableborder">
-                        <display:caption>Data channels</display:caption>
+                        <display:caption class="tablecaption">Data channels</display:caption>
                         <display:column sortProperty="id" sortable="true"
                             title="Channel ID" class="tdcenter">
                             <fmt:formatNumber value="${dataChannel.id}" pattern="00" />

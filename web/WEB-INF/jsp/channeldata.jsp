@@ -33,13 +33,14 @@
             </div>
             <div id="rightcol">
                 <div id="table-info">
-                    Products from <% out.println( name ); %>:
+                    Products available from selected channel.
                 </div>
                 <div id="table-content">
                     <display:table name="channeldata" id="data" defaultsort="1"
                         requestURI="channeldata.htm" cellpadding="5" cellspacing="0"
                         export="false" class="tableborder">
-                        <display:caption><% out.println( name ); %></display:caption>
+                        <display:caption class="tablecaption"><% out.println( name ); %>
+                        </display:caption>
                         <display:column sortProperty="id" sortable="true"
                             title="ID" class="tdcenter">
                             <fmt:formatNumber value="${data.id}" pattern="00" />

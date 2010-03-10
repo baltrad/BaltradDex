@@ -38,12 +38,10 @@ public class User {
     private String localDirectory;
 
 //------------------------------------------------------------------------------------------ Methods
-
     /**
      * Default constructor.
      */
     public User() {}
-
     /**
      * Constructor supporting login mechanism.
      * 
@@ -284,8 +282,6 @@ public class User {
      */
     public void setLocalDirectory(String localDirectory) {
         this.localDirectory = localDirectory;
-    }
-    
+    }   
 }
-
 //--------------------------------------------------------------------------------------------------

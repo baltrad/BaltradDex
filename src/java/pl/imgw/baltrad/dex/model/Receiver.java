@@ -8,19 +8,23 @@
 
 package pl.imgw.baltrad.dex.model;
 
-import javax.servlet.*;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletException;
 
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.ObjectInputStream;
-import java.io.BufferedInputStream;
-import java.io.ObjectOutputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.FileItemIterator;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.util.Streams;
+
 import java.io.File;
+import java.io.InputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 
@@ -53,7 +57,7 @@ public class Receiver extends HttpServlet implements Controller {
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
-        doPost( request, response );
+        doGet( request, response );
         return new ModelAndView();
     }
     /**
@@ -64,57 +68,57 @@ public class Receiver extends HttpServlet implements Controller {
      * @throws javax.servlet.ServletException
      * @throws java.io.IOException
      */
-    public void doPost( HttpServletRequest request, HttpServletResponse response )
+    public void doGet( HttpServletRequest request, HttpServletResponse response )
                                                             throws ServletException, IOException {
         try {
-            BaltradEnvelope baltradEnvelope = null;
-            // Get object input stream
-            ObjectInputStream ois = new ObjectInputStream( new BufferedInputStream(
-                    request.getInputStream() ) );
-            baltradEnvelope = ( BaltradEnvelope )ois.readObject();
-            ois.close();
-            // Check envelope content type
-            String responseStr = "";
-            if( baltradEnvelope.getContentType().equals( BaltradEnvelope.BE_DATA_OBJECT ) ) {
-                // Create response message
-                responseStr = logManager.MSG_INFO + "_New file object received: " +
-                        getRelFileName( baltradEnvelope.getAbsFilePath() );
-                // Save file in the local file system
-                String contextPath = request.getSession().getServletContext().getRealPath(
-                        SERVLET_VIRTUAL_PATH );
-                /* Sender'a address have to be added to the local data directory */
+            ServletFileUpload upload = new ServletFileUpload();
+            FileItemIterator iterator = upload.getItemIterator( request );
+            FileItemStream hdrItem = iterator.next();
+            // Check if incoming frame is BaltradFrame
+            if( hdrItem.getFieldName().equals( BaltradFrame.BF_XML_PART ) ) {
+                InputStream hdrStream = hdrItem.openStream();
+                BaltradFrameHandler bfHandler = new BaltradFrameHandler();
+                // Handle form field / message XML header
+                if( hdrItem.isFormField() ) {
+                    // Get header string
+                    String hdrStr = Streams.asString( hdrStream );
+                    // Check frame content type
+                    // Handle message frame
+                    if( bfHandler.getBFContentType( hdrStr ).equals(
+                            BaltradFrameHandler.BF_MSG_CONTENT ) ) {
+                        logManager.addLogEntry( new Date(), bfHandler.getBFMessageClass( hdrStr ),
+                                bfHandler.getBFMessageText( hdrStr ) );
+                    }
+                    // Handle data frame / file content
+                    if( bfHandler.getBFContentType( hdrStr ).equals(
+                            BaltradFrameHandler.BF_FILE_CONTENT ) && iterator.hasNext() ) {
+                        // Get file content
+                        logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "New incoming " +
+                                "file " + bfHandler.getBFFileName( hdrStr ) + " received from " +
+                                bfHandler.getBFSender( hdrStr ) );
+                        // Save file content to local disk
+                        String ctxPath = request.getSession().getServletContext().getRealPath(
+                            SERVLET_VIRTUAL_PATH );
+                        // Create local directory if not exists
+                        String incomingDir = ctxPath + INCOMING_DATA_DIR + File.separator +
+                                bfHandler.getBFSender( hdrStr ) + File.separator +
+                                bfHandler.getBFChannel( hdrStr );
+                        makeDir( incomingDir );
+                        FileItemStream fileItem = iterator.next();
+                        InputStream fileStream = fileItem.openStream();
+                        String absFilePath = incomingDir + File.separator +
+                                bfHandler.getBFFileName( hdrStr );
+                        saveFile( fileStream, absFilePath );
+                    }
+                } 
+            } else {
 
-                // Incoming directory name
-                String incomingDirName = contextPath + INCOMING_DATA_DIR + File.separator +
-                        baltradEnvelope.getChannelName();
-                // Absolute incoming file name
-                String incomingFileName = incomingDirName + File.separator + getRelFileName(
-                        baltradEnvelope.getAbsFilePath() );
-                makeDir( incomingDirName );
+                // ... redirect the frame in case it was not recognized as BaltradFrame ...
 
-                //
-
-                saveFileAs( baltradEnvelope.getDataFile(), incomingFileName );
             }
-            if( baltradEnvelope.getContentType().equals( BaltradEnvelope.BE_MSG_OBJECT ) ) {
-                // Create response message
-                responseStr = logManager.MSG_INFO + "_New message object received";
-                
-                /* Handle the message */
-
-            }
-            // Create object output stream
-            ObjectOutputStream oos = new ObjectOutputStream( new BufferedOutputStream(
-                    response.getOutputStream() ) );
-            // Reset the response
-            response.reset();
-            // Write response to the stream
-            oos.writeObject( responseStr );
-            oos.flush();
-            oos.close();
-        } catch( Exception e ) {
-            logManager.addLogEntry( new Date(), logManager.MSG_ERR, "Receiver error: "
-                                                                                + e.getMessage() );
+        } catch( FileUploadException e ) {
+            logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "Error while processing " +
+                    "incoming frame: " + e.getMessage() );
         }
     }
     /**
@@ -136,36 +140,35 @@ public class Receiver extends HttpServlet implements Controller {
         File dir = new File( directoryPath );
         if( !dir.exists() ) {
             dir.mkdirs();
-            logManager.addLogEntry( new Date(), logManager.MSG_INFO, "New directory created: "
+            logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "New directory created: "
                     + directoryPath );
         }
     }
     /**
-     * Method saves file object under a given name
+     * Method saves data from input stream to file with a given name.
      *
-     * @param srcFile Source file object
+     * @param is Input data stream
      * @param dstFileName Output file name
      */
-    public void saveFileAs( File srcFile, String dstFileName ) {
+    public void saveFile( InputStream is, String dstFileName ) {
         try {
             File dstFile = new File( dstFileName );
-            FileInputStream fis = new FileInputStream( srcFile );
             FileOutputStream fos = new FileOutputStream( dstFile );
             byte[] bytes = new byte[ 1024 ];
             int len;
-            while( ( len = fis.read( bytes ) ) > 0 ) {
+            while( ( len = is.read( bytes ) ) > 0 ) {
                 fos.write( bytes, 0, len);
             }
-            fis.close();
+            is.close();
             fos.close();
-            logManager.addLogEntry( new Date(), logManager.MSG_INFO, "Incoming file saved: "
-                    + dstFileName );
+            logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "Incoming file " +
+                    getRelFileName( dstFileName ) + " saved" );
         } catch( FileNotFoundException e ) {
-            logManager.addLogEntry( new Date(), logManager.MSG_ERR, "Error while saving file: "
+            logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: "
                     + e.getMessage() );
 
         } catch( IOException e ) {
-            logManager.addLogEntry( new Date(), logManager.MSG_ERR, "Error while saving file: "
+            logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: "
                     + e.getMessage() );
         }
     }
@@ -184,45 +187,4 @@ public class Receiver extends HttpServlet implements Controller {
     public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------
-
-/*
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.disk.DiskFileItem;
-import org.apache.commons.fileupload.FileUploadException;
-
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.MultipartStream;
-*/
-
-/*
-DiskFileItemFactory diskFileItemFactory = new DiskFileItemFactory();
-String ctxPath = request.getSession().getServletContext().getRealPath( SERVLET_VIRTUAL_PATH );
-File incomingDir = new File( ctxPath + INCOMING_DATA_DIR );
-if( !incomingDir.exists() ) {
-    incomingDir.mkdir();
-}
-String repositoryPath = ctxPath + REPOSITORY_PATH;
-File repositoryFile = new File( repositoryPath );
-diskFileItemFactory.setRepository( repositoryFile );
-List fileItemsList = null;
-ServletFileUpload servletFileUpload = new ServletFileUpload( diskFileItemFactory );
-try {
-    fileItemsList = servletFileUpload.parseRequest( request );
-} catch( FileUploadException e ) {
-    logManager.addLogEntry( new Date(), logManager.MSG_ERR, "Receiver error: "
-                                                                    + e.getMessage() );
-}
-/*Iterator it = fileItemsList.iterator();
-while( it.hasNext() ) {
-    DiskFileItem fileItem = ( DiskFileItem )it.next();
-    if( !fileItem.isFormField() ) {
-        fileItem.write( new File( incomingDir + "/" + fileItem.getName() ) );
-        logManager.addLogEntry( new Date(), logManager.MSG_INFO, "Incoming file: " +
-                                                            fileItem.getName() );
-    }
-}
-*/
-
 

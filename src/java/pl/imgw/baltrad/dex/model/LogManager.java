@@ -33,9 +33,9 @@ import java.text.SimpleDateFormat;
 public class LogManager {
 //---------------------------------------------------------------------------------------- Constants
     // Message type strings
-    public final String MSG_INFO = "INFO";
-    public final String MSG_WRN = "WARNING";
-    public final String MSG_ERR = "ERROR";
+    public final static String MSG_INFO = "INFO";
+    public final static String MSG_WRN = "WARNING";
+    public final static String MSG_ERR = "ERROR";
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Method gets all available log entries.

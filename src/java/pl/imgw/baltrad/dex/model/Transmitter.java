@@ -37,6 +37,8 @@ public class Transmitter extends Thread {
     private SubscriptionManager subscriptionManager;
     // Reference to DeliveryRegisterManager class object
     private DeliveryRegisterManager deliveryRegisterManager;
+    // Reference to BaltradFrameHandler object
+    private BaltradFrameHandler bfHandler;
     // Reference to LogManager class object
     private LogManager logManager;
 //------------------------------------------------------------------------------------------ Methods
@@ -50,6 +52,7 @@ public class Transmitter extends Thread {
         this.setDataManager( new DataManager() );
         this.setChannelManager( new ChannelManager() );
         this.setDeliveryRegisterManager( new DeliveryRegisterManager() );
+        this.setBFHandler( new BaltradFrameHandler() );
         this.setLogManager( new LogManager() );
         // Start new thread
         start();
@@ -64,9 +67,9 @@ public class Transmitter extends Thread {
                     try{
                         wait();
                     } catch( Exception e ) {
-                        logManager.addLogEntry( new Date(), logManager.MSG_ERR,
+                        logManager.addLogEntry( new Date(), LogManager.MSG_ERR,
                                                                 "Error while reading request" );
-                        logManager.addLogEntry( new Date(), logManager.MSG_ERR, e.getMessage() );
+                        logManager.addLogEntry( new Date(), LogManager.MSG_ERR, e.getMessage() );
                     }
                 }
             }
@@ -88,24 +91,24 @@ public class Transmitter extends Thread {
                         Data data = ( Data )dataFromChannel.get( j );
                         String localPath = data.getPath();
                         String ctxPath = getServletContextPath();
-                        String fileName = ctxPath + localPath;
+                        String absFilePath = ctxPath + localPath;
                         // Check the file in delivery register
                         DeliveryRegisterEntry deliveryRegisterEntry =
                              deliveryRegisterManager.getEntry( user.getId(), data.getId() );
                         // Data was not found in the register
                         if( deliveryRegisterEntry == null ) {
                             // Post the data
-                            EnvelopeHandler envelopeHandler = new EnvelopeHandler( 
-                                    user.getNodeAddress(), data.getChannelName(), fileName,
-                                    getLogManager() );
-                            envelopeHandler.postEnvelope();
-                            //
+                            bfHandler.setUrl( user.getNodeAddress() );
+                            BaltradFrame bf = new BaltradFrame(
+                                    bfHandler.createBFDataHdr( BaltradFrameHandler.BF_MIME_MULTIPART,
+                                    userManager.getUserByRole( User.ROLE_0 ).getNodeAddress(),
+                                    data.getChannelName(), absFilePath ), absFilePath );
+                            bfHandler.handleBF( bf );
                             String relFileName = data.getPath().substring(
                                             data.getPath().lastIndexOf( File.separator ) + 1,
                                             data.getPath().length() );
-                            logManager.addLogEntry( new Date(), logManager.MSG_INFO,
+                            logManager.addLogEntry( new Date(), LogManager.MSG_INFO,
                                 "Sending file " + relFileName + " to user " + user.getName() );
-                            
                             // Data was not found in the register - add data to delivery register
                             DeliveryRegisterEntry dre = new DeliveryRegisterEntry();
                             dre.setUserId( user.getId() );
@@ -251,6 +254,18 @@ public class Transmitter extends Thread {
     public void setServletContextPath(String servletContextPath) {
         this.servletContextPath = servletContextPath;
     }
+    /**
+     * Method gets reference to BaltradFrameHandler object.
+     *
+     * @return Reference to BaltradFrameHandler object
+     */
+    public BaltradFrameHandler getBFHandler() { return bfHandler; }
+    /**
+     * Method sets reference to BaltradFrameHandler object.
+     *
+     * @param bfHandler Reference to BaltradFrameHandler object
+     */
+    public void setBFHandler( BaltradFrameHandler bfHandler ) { this.bfHandler = bfHandler; }
 }
 //--------------------------------------------------------------------------------------------------
 

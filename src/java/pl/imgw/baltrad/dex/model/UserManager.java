@@ -22,7 +22,7 @@ import org.hibernate.Session;
  * @since 1.0
  */
 public class UserManager {
-
+//------------------------------------------------------------------------------------------ Methods
     /**
      * Method retrieves user with a given userID from the database.
      *
@@ -30,9 +30,7 @@ public class UserManager {
      * @return User object
      */
     public User getUserByID( int id ) {
-
         User user = null;
-
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -46,9 +44,7 @@ public class UserManager {
             throw e;
         }
         return user;
-
     }
-
     /**
      * Method retrieves user with a given name from the database.
      *
@@ -71,9 +67,7 @@ public class UserManager {
             throw e;
         }
         return user;
-        
     }
-
     /**
      * Method retrieves user with a given role from the database.
      *
@@ -81,35 +75,23 @@ public class UserManager {
      * @return User object
      */
     public User getUserByRole( String role ) {
-
         User user = null;
-
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         try {
             user = ( User )session.createQuery(
-                    "from User" + " where role = ?" ).setString( 0, role ).uniqueResult();
+                    "from User where role = ?" ).setString( 0, role ).uniqueResult();
             session.getTransaction().commit();
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
         }
         return user;
-
     }
 
-
-    public void addUser() {
-
-    }
-
-    public void deleteUser( int id ) {
-
-    }
-
-    public void deleteUser( String name ) {
-        
-    }
-
+    public void addUser() {}
+    public void deleteUser( int id ) {}
+    public void deleteUser( String name ) {}
 }
+//--------------------------------------------------------------------------------------------------

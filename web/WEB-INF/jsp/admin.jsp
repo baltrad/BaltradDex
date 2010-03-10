@@ -10,12 +10,14 @@
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 <%@ page import="pl.imgw.baltrad.dex.model.User" %>
+<%@ page import="java.util.Date" %>
 
 <jsp:useBean id="applicationSecurityManager" scope="session"
                                     class="pl.imgw.baltrad.dex.util.ApplicationSecurityManager">
 </jsp:useBean>
-
 <jsp:useBean id="userManager" scope="session" class="pl.imgw.baltrad.dex.model.UserManager">
+</jsp:useBean>
+<jsp:useBean id="logManager" scope="session" class="pl.imgw.baltrad.dex.model.LogManager">
 </jsp:useBean>
 
 <%
@@ -24,6 +26,8 @@
     if( !sessionUser.getName().equals( "admin" ) ||
                     !applicationSecurityManager.authenticateSessionUser( sessionUser, dbUser ) ) {
         request.getSession().setAttribute( "is_user_admin", 0 );
+        logManager.addLogEntry( new Date(), logManager.MSG_WRN, "User failed to access " +
+                "system management area");
     } else {
         request.getSession().setAttribute( "is_user_admin", 1 );
     }
@@ -50,7 +54,7 @@
                 <c:choose>
                     <c:when test="${is_user_admin == 1}">
                         <div id="table-info">
-                            Node control options:
+                            System management options.
                         </div>
                         <div id="table-content">
                             <div id="admin-leftcol">
