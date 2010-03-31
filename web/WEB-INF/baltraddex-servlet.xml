@@ -34,6 +34,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <prop key="incoming.htm">urlFilenameController</prop>
                 <prop key="on.htm">urlFilenameController</prop>
                 <prop key="off.htm">urlFilenameController</prop>
+                <prop key="testdb.htm">databaseTestController</prop>
             </props>
         </property>
     </bean>
@@ -69,12 +70,12 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Application initialization controller.
     -->
-    <bean name="initController" class="pl.imgw.baltrad.dex.controller.InitController"></bean>
+    <bean name="initController" class="eu.baltrad.dex.controller.InitController"></bean>
 
     <!--
         The signin controller.
     -->
-    <bean name="signInController" class="pl.imgw.baltrad.dex.controller.SignInController">
+    <bean name="signInController" class="eu.baltrad.dex.controller.SignInController">
         <property name="sessionForm">
 			<value>true</value>
 		</property>
@@ -88,7 +89,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <value>redirect:welcome.htm</value>
         </property>
         <property name="commandClass">
-            <value>pl.imgw.baltrad.dex.model.User</value>
+            <value>eu.baltrad.dex.model.User</value>
         </property>
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
@@ -99,7 +100,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         The signout controller.
     -->
     <bean name="signOutController"
-        class="pl.imgw.baltrad.dex.controller.SignOutController">
+        class="eu.baltrad.dex.controller.SignOutController">
         <property name="successView">
 			<value>redirect:signin.htm</value>
 		</property>
@@ -122,7 +123,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         Data channels list controller.
     -->
     <bean name="channelController"
-        class="pl.imgw.baltrad.dex.controller.ChannelController">
+        class="eu.baltrad.dex.controller.ChannelController">
         <property name="channelManager">
 			<ref bean="channelManager" />
 		</property>
@@ -141,7 +142,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         Data from data channel controller.
     -->
     <bean name="channelDataController"
-        class="pl.imgw.baltrad.dex.controller.ChannelDataController">
+        class="eu.baltrad.dex.controller.ChannelDataController">
         <property name="dataManager">
 			<ref bean="dataManager" />
 		</property>
@@ -154,7 +155,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         Subscriptions controller
     -->
     <bean name="subscriptionsController"
-                                class="pl.imgw.baltrad.dex.controller.SubscriptionsController">
+                                class="eu.baltrad.dex.controller.SubscriptionsController">
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
@@ -173,7 +174,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         Submit subscriptions controller
     -->
     <bean name="submitSubscriptionsController"
-                            class="pl.imgw.baltrad.dex.controller.SubmitSubscriptionsController">
+                            class="eu.baltrad.dex.controller.SubmitSubscriptionsController">
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
@@ -192,7 +193,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         Subscription status controller
     -->
     <bean name="subscriptionStatusController"
-                            class="pl.imgw.baltrad.dex.controller.SubscriptionStatusController">
+                            class="eu.baltrad.dex.controller.SubscriptionStatusController">
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
@@ -216,7 +217,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Log messages controller
     -->
-    <bean name="logTableController" class="pl.imgw.baltrad.dex.controller.LogTableController">
+    <bean name="logTableController" class="eu.baltrad.dex.controller.LogTableController">
         <property name="successView">
             <value>logtable</value>
         </property>
@@ -228,7 +229,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         System journal controller
     -->
-    <bean name="journalController" class="pl.imgw.baltrad.dex.controller.JournalController">
+    <bean name="journalController" class="eu.baltrad.dex.controller.JournalController">
         <property name="successView">
             <value>journal</value>
         </property>
@@ -240,7 +241,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Data download controller.
     -->
-    <bean name="downloadController" class="pl.imgw.baltrad.dex.controller.DownloadController">
+    <bean name="downloadController" class="eu.baltrad.dex.controller.DownloadController">
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
@@ -255,32 +256,36 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Data channel manager.
     -->
-    <bean name="channelManager" class="pl.imgw.baltrad.dex.model.ChannelManager"/>
+    <bean name="channelManager" class="eu.baltrad.dex.model.ChannelManager"/>
 
     <!--
         Data manager.
     -->
-    <bean name="dataManager" class="pl.imgw.baltrad.dex.model.DataManager"/>
+    <bean name="dataManager" class="eu.baltrad.dex.model.DataManager">
+         <!--property name="fileCatalogConnector">
+			<ref bean="fileCatalogConnector" />
+		</property -->
+    </bean>
 
     <!--
         Subscription manager.
     -->
-    <bean name="subscriptionManager" class="pl.imgw.baltrad.dex.model.SubscriptionManager"/>
+    <bean name="subscriptionManager" class="eu.baltrad.dex.model.SubscriptionManager"/>
 
     <!--
         Auxiliary subscription manager.
     -->
-    <bean name="auxSubscriptionManager" class="pl.imgw.baltrad.dex.model.AuxSubscriptionManager"/>
+    <bean name="auxSubscriptionManager" class="eu.baltrad.dex.model.AuxSubscriptionManager"/>
 
     <!--
         Log manager
     -->
-    <bean name="logManager" class="pl.imgw.baltrad.dex.model.LogManager"/>
+    <bean name="logManager" class="eu.baltrad.dex.model.LogManager"/>
 
     <!--
         Data receiver module.
     -->
-    <bean name="receiver" class="pl.imgw.baltrad.dex.model.Receiver">
+    <bean name="receiver" class="eu.baltrad.dex.model.Receiver">
         <property name="logManager">
             <ref bean="logManager"/>
         </property>
@@ -289,7 +294,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Envelope handler.
     -->
-    <bean name="baltradFrameHandler" class="pl.imgw.baltrad.dex.model.BaltradFrameHandler">
+    <bean name="baltradFrameHandler" class="eu.baltrad.dex.model.BaltradFrameHandler">
         <property name="logManager">
             <ref bean="logManager"/>
         </property>
@@ -298,18 +303,32 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Sign in validator.
     -->
-    <bean name="signInValidator" class="pl.imgw.baltrad.dex.util.SignInValidator"/>
+    <bean name="signInValidator" class="eu.baltrad.dex.util.SignInValidator"/>
 
     <!--
         User manager.
     -->
-    <bean name="userManager" class="pl.imgw.baltrad.dex.model.UserManager"/>
+    <bean name="userManager" class="eu.baltrad.dex.model.UserManager"/>
+
+    <!--
+        Database test controller
+    -->
+    <bean name="databaseTestController" class="eu.baltrad.dex.controller.DatabaseTestController">
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
+
+    <!--
+        File catalog connector
+    -->
+    <!-- bean name="fileCatalogConnector" class="eu.baltrad.dex.util.FileCatalogConnector"/ -->
 
     <!--
         Http request interceptor.
     -->
     <bean id="httpRequestInterceptor"
-		class="pl.imgw.baltrad.dex.util.HttpRequestInterceptor">
+		class="eu.baltrad.dex.util.HttpRequestInterceptor">
         <property name="signInPage">
 			<value>signin.htm</value>
 		</property>
@@ -322,14 +341,14 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         Message digest utility.
     -->
     <bean name="messageDigestUtil" 
-            class="pl.imgw.baltrad.dex.util.MessageDigestUtil">
+            class="eu.baltrad.dex.util.MessageDigestUtil">
     </bean>
 
     <!--
         Application security manager.
     -->
     <bean name="applicationSecurityManager"
-            class="pl.imgw.baltrad.dex.util.ApplicationSecurityManager">
+            class="eu.baltrad.dex.util.ApplicationSecurityManager">
         <property name="messageDigestUtil">
 			<ref bean="messageDigestUtil"/>
 		</property>

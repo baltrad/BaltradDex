@@ -4,9 +4,7 @@
     Author     : szewczenko
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8" %>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN  http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp" %>
 
@@ -18,9 +16,9 @@
 
 <body>       
     <jsp:useBean id="applicationSecurityManager" scope="session"
-            class="pl.imgw.baltrad.dex.util.ApplicationSecurityManager"/>
+            class="eu.baltrad.dex.util.ApplicationSecurityManager"/>
 
-    <jsp:useBean id="logManager" scope="session" class="pl.imgw.baltrad.dex.model.LogManager"/>
+    <jsp:useBean id="logManager" scope="session" class="eu.baltrad.dex.model.LogManager"/>
 
     <%@page import="java.util.Date"%>
 

@@ -8,12 +8,11 @@
     <property name="hibernate.connection.username">baltrad</property>
     <property name="hibernate.connection.password">baltrad</property>
     <property name="hibernate.connection.release_mode">after_transaction</property>
-    <mapping resource="pl/imgw/baltrad/dex/model/Data.hbm.xml"/>
-    <mapping resource="pl/imgw/baltrad/dex/model/Channel.hbm.xml"/>
-    <mapping resource="pl/imgw/baltrad/dex/model/User.hbm.xml"/>
-    <mapping resource="pl/imgw/baltrad/dex/model/Subscription.hbm.xml"/>
-    <mapping resource="pl/imgw/baltrad/dex/model/DeliveryRegisterEntry.hbm.xml"/>
-    <mapping resource="pl/imgw/baltrad/dex/model/LogEntry.hbm.xml"/>
-    <mapping resource="pl/imgw/baltrad/dex/model/AuxSubscription.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/model/Channel.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/model/User.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/model/Subscription.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/model/DeliveryRegisterEntry.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/model/LogEntry.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/model/AuxSubscription.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

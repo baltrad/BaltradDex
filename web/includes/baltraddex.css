@@ -187,6 +187,9 @@ thead {
 .log-cell-err {
     background-color:#FF806C;
 }
+.log-cell-msg-err {
+    background-color:#FF806C;
+}
 .log-cell-msg- {
     background-color:#FF806C;
 }

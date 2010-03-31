@@ -8,7 +8,7 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener-->
     <listener>
-        <listener-class>pl.imgw.baltrad.dex.util.ServletContextUtil</listener-class>
+        <listener-class>eu.baltrad.dex.util.ServletContextUtil</listener-class>
     </listener>
     <servlet>
         <servlet-name>baltraddex</servlet-name>

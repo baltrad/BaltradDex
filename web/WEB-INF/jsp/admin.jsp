@@ -9,15 +9,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
-<%@ page import="pl.imgw.baltrad.dex.model.User" %>
+<%@ page import="eu.baltrad.dex.model.User" %>
 <%@ page import="java.util.Date" %>
 
 <jsp:useBean id="applicationSecurityManager" scope="session"
-                                    class="pl.imgw.baltrad.dex.util.ApplicationSecurityManager">
+                                    class="eu.baltrad.dex.util.ApplicationSecurityManager">
 </jsp:useBean>
-<jsp:useBean id="userManager" scope="session" class="pl.imgw.baltrad.dex.model.UserManager">
+<jsp:useBean id="userManager" scope="session" class="eu.baltrad.dex.model.UserManager">
 </jsp:useBean>
-<jsp:useBean id="logManager" scope="session" class="pl.imgw.baltrad.dex.model.LogManager">
+<jsp:useBean id="logManager" scope="session" class="eu.baltrad.dex.model.LogManager">
 </jsp:useBean>
 
 <%
@@ -70,6 +70,9 @@
                                 <div class="admin-elem">
                                     User management:
                                 </div>
+                                <div class="admin-elem">
+                                    File catalog:
+                                </div>
                             </div>
                             <div id="admin-rightcol">
                                 <div class="admin-elem">
@@ -91,6 +94,9 @@
                                     <a href="add_user.htm">Add</a>
                                     <a href="edit_user.htm">Edit</a>
                                     <a href="remove_user.htm">Remove</a>
+                                </div>
+                                <div class="admin-elem">
+                                    <a href="testdb.htm">Insert test data</a>
                                 </div>
                             </div>
                         </div>

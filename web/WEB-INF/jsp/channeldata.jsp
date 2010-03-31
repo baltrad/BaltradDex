@@ -54,7 +54,7 @@
                         <display:column sortProperty="path" sortable="true"
                             paramId="path" paramProperty="path" title="File" class="tdcenter"
                             href="download.htm" value="${fn:substring(data.path,
-                                        fn:length(data.path) - 19, fn:length(data.path))}">
+                                        fn:length(data.path) - 37, fn:length(data.path))}">
                         </display:column>
                     </display:table>
                 </div>
