@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!--
+    Hibernate mapping file for subscriptions table.
+-->
+<hibernate-mapping>
+  <class name="eu.baltrad.dex.model.Subscription" table="dex_subscriptions">
+    <id column="id" name="id">
+      <generator class="sequence">
+        <param name="sequence">subscription_id_seq</param>
+      </generator>
+    </id>
+    <property column="user_id" name="userId"/>
+    <property column="channel_id" name="channelId"/>
+  </class>
+</hibernate-mapping>

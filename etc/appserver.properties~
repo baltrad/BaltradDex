@@ -1,0 +1,16 @@
+# Point at your tomcat installation
+mgr.url=http://localhost:8080/manager/html
+
+# Administrator
+mgr.username=manager
+
+# Deploy app as
+mgr.path=/BaltradDex
+
+# Update / i.e. always upgrade previously existing app
+mgr.update=true
+
+# Uncomment if you do not care about security.
+# otherwise use ant -Dmgr.password=xxxx
+mgr.password=manager
+

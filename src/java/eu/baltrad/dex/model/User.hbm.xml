@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+  <class name="eu.baltrad.dex.model.User" table="dex_users">
+    <id column="id" name="id">
+      <generator class="sequence"/>
+    </id>
+    <property column="name" name="name"/>
+    <property column="password" name="password"/>
+    <property column="role" name="role"/>
+    <property column="factory" name="factory"/>
+    <property column="country" name="country"/>
+    <property column="city" name="city"/>
+    <property column="zip_code" name="zipCode"/>
+    <property column="street" name="street"/>
+    <property column="number" name="number"/>
+    <property column="phone" name="phone"/>
+    <property column="email" name="email"/>
+    <property column="node_address" name="nodeAddress"/>
+    <property column="local_directory" name="localDirectory"/>
+  </class>
+</hibernate-mapping>
