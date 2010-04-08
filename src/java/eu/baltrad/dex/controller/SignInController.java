@@ -42,7 +42,7 @@ public class SignInController extends SimpleFormController {
      * Constructor.
      */
     public SignInController() {
-        logManager.addLogEntry( new Date(), logManager.MSG_INFO,
+        logManager.addLogEntry( new Date(), LogManager.MSG_INFO,
                                                         "Baltrad Data Exchange System started" );
     }
 
@@ -92,10 +92,10 @@ public class SignInController extends SimpleFormController {
         if( applicationSecurityManager.authenticateFormUser( formUser, dbUser ) ) {
             // Set user variable for this session
             applicationSecurityManager.setUser( request, dbUser );
-            logManager.addLogEntry( new Date(), logManager.MSG_INFO, "User "
+            logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "User "
                                                                 + dbUser.getName() + " signed in" );
         } else {
-            logManager.addLogEntry( new Date(), logManager.MSG_WRN,
+            logManager.addLogEntry( new Date(), LogManager.MSG_WRN,
                                                                 "User name or password invalid" );
             errors.reject( "error.login.invalid" );
         }

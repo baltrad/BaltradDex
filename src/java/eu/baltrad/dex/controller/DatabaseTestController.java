@@ -36,8 +36,7 @@ public class DatabaseTestController implements Controller {
         try {
             ServletContextUtil servletContextUtil = new ServletContextUtil();
 
-            String servletCtx = servletContextUtil.getServletContextPath();
-	    String storageDir = servletCtx + "FileCatalogStorage";
+            String storageDir = servletContextUtil.getServletContextPath() + "FileCatalogStorage";
             File f = new File( storageDir );
             if( !f.exists() ) {
                 f.mkdirs();
@@ -47,27 +46,27 @@ public class DatabaseTestController implements Controller {
             FileCatalog fc = new FileCatalog( databaseConnection, storageDir );
 
             // insert test data
-            fc.catalog( servletCtx + "TestData/swi1.h5" );
-            fc.catalog( servletCtx + "TestData/swi2.h5" );
-            fc.catalog( servletCtx + "TestData/swi3.h5" );
-            fc.catalog( servletCtx + "TestData/gda1.h5" );
-            fc.catalog( servletCtx + "TestData/gda2.h5" );
-            fc.catalog( servletCtx + "TestData/gda3.h5" );
-            fc.catalog( servletCtx + "TestData/rze1.h5" );
-            fc.catalog( servletCtx + "TestData/rze2.h5" );
-            fc.catalog( servletCtx + "TestData/rze3.h5" );
-            fc.catalog( servletCtx + "TestData/poz1.h5" );
-            fc.catalog( servletCtx + "TestData/poz2.h5" );
-            fc.catalog( servletCtx + "TestData/poz3.h5" );
-            fc.catalog( servletCtx + "TestData/leg1.h5" );
-            fc.catalog( servletCtx + "TestData/leg2.h5" );
-            fc.catalog( servletCtx + "TestData/leg3.h5" );
-            fc.catalog( servletCtx + "TestData/pas1.h5" );
-            fc.catalog( servletCtx + "TestData/pas2.h5" );
-            fc.catalog( servletCtx + "TestData/pas3.h5" );
-            fc.catalog( servletCtx + "TestData/brz1.h5" );
-            fc.catalog( servletCtx + "TestData/brz2.h5" );
-            fc.catalog( servletCtx + "TestData/brz3.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/swi1.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/swi2.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/swi3.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/gda1.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/gda2.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/gda3.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/rze1.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/rze2.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/rze3.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/poz1.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/poz2.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/poz3.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/leg1.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/leg2.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/leg3.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/pas1.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/pas2.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/pas3.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/brz1.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/brz2.h5" );
+            fc.catalog( "/home/szewczenko/Projekty/BaltradDex/FCTestData/brz3.h5" );
 
             logManager.addLogEntry( new Date(), LogManager.MSG_WRN, "Successfully added test data "
                     + "to the file catalog" );

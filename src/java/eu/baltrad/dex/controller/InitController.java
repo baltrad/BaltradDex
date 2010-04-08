@@ -40,7 +40,8 @@ public class InitController {
         applicationSecurityManager.setTransmitter( transmitter );
         // Set initial value of server control toggle
         applicationSecurityManager.setServerRunning( true );
-        logManager.addLogEntry( new Date(), logManager.MSG_INFO, "Application initialized" );
+        logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "Application initialized" );
+
     }
 }
 //--------------------------------------------------------------------------------------------------

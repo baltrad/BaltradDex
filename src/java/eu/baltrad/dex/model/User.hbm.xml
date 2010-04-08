@@ -4,7 +4,9 @@
 <hibernate-mapping>
   <class name="eu.baltrad.dex.model.User" table="dex_users">
     <id column="id" name="id">
-      <generator class="sequence"/>
+      <generator class="sequence">
+        <param name="sequence">user_id_seq</param>
+      </generator>
     </id>
     <property column="name" name="name"/>
     <property column="password" name="password"/>

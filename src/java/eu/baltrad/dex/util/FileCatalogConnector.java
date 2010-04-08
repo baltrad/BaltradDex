@@ -12,7 +12,9 @@ import eu.baltrad.dex.model.LogManager;
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileCatalogError;
 
+import java.util.Properties;
 import java.util.Date;
+import java.io.InputStream;
 import java.io.File;
 
 /**
@@ -24,10 +26,12 @@ import java.io.File;
  */
 public class FileCatalogConnector {
 //---------------------------------------------------------------------------------------- Constants
-    // Database connection URI
-    private static final String dbURI = "postgresql://baltrad:baltrad@localhost:5432/baltrad_db";
+    // Properties file name
+    private static final String PROPS_FILE_NAME = "dex.fc.properties";
+    // Database URI property
+    private static final String PROPS_DB_URI = "database.uri";
     // File catalog storage directory
-    private static final String fcStorageDir = "FileCatalogStorage";
+    private static final String FC_STORAGE_DIR = "FileCatalogStorage";
 //---------------------------------------------------------------------------------------- Variables
     // Reference to FileCatalog object
     private static FileCatalog fileCatalog;
@@ -47,7 +51,7 @@ public class FileCatalogConnector {
      */
     public FileCatalog connect() {
         // Check if storage directory exists
-        String storageDir = ServletContextUtil.getServletContextPath() + fcStorageDir;
+        String storageDir = ServletContextUtil.getServletContextPath() + FC_STORAGE_DIR;
         File f = new File( storageDir );
         if( !f.exists() ) {
             f.mkdirs();
@@ -56,10 +60,18 @@ public class FileCatalogConnector {
         }
         // Initialize FileCatalog
         try {
-            
-            fileCatalog = new FileCatalog( dbURI, storageDir );
-            logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "File catalog successfully " +
-                    "initialized" );
+            InputStream is = this.getClass().getResourceAsStream( PROPS_FILE_NAME );
+            Properties props = new Properties();
+            if( is != null ) {
+                props.load( is );
+                String dbURI = props.getProperty( PROPS_DB_URI );
+                fileCatalog = new FileCatalog( dbURI, storageDir );
+                logManager.addLogEntry( new Date(), LogManager.MSG_INFO,
+                        "File catalog successfully initialized" );
+            } else {
+                logManager.addLogEntry( new Date(), LogManager.MSG_ERR, 
+                        "Failed to load properties file: " + PROPS_FILE_NAME );
+            }
         } catch( FileCatalogError e ) {
             logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "File catalog error: " +
                     e.getMessage() );
