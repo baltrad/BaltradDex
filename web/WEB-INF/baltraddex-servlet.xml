@@ -365,4 +365,62 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 		</property>
 	</bean>
 
+    <!-- Integrate beast into BaltradDex -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>db.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="dataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${db.driver}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.user}"/>
+        <property name="password" value="${db.pwd}"/>
+    </bean>
+    
+    <bean id="xmlrpcgenerator" class="eu.baltrad.beast.adaptor.xmlrpc.XmlRpcCommandGenerator"/>
+  
+    <bean id="xmlrpcadaptormanager" class="eu.baltrad.beast.adaptor.xmlrpc.XmlRpcConfigurationManager" autowire="byType"/>
+  
+    <!-- Add the xml adaptor to the baltrad adaptor -->
+    <bean id="adaptormanager" class="eu.baltrad.beast.adaptor.BltAdaptorManager" autowire="byType">
+        <property name="typeRegistry">
+            <list>
+                <ref bean="xmlrpcadaptormanager"/>
+            </list>
+        </property>
+    </bean>
+  
+    <bean id="groovycreator" class="eu.baltrad.beast.rules.GroovyRuleCreator"/>
+  
+    <!-- Create the rule factory -->
+    <bean id="rulefactory" class="eu.baltrad.beast.rules.RuleFactory">
+        <property name="creators">
+            <list>
+                <ref bean="groovycreator"/>
+            </list>
+        </property>
+    </bean>
+  
+    <!-- Create the router -->
+    <bean id="router" class="eu.baltrad.beast.router.impl.BltRouter" autowire="byType" />
+  
+    <!-- Add the baltrad adaptor manager to the baltrad manager -->
+    <bean id="bltmanager" class="eu.baltrad.beast.manager.BltMessageManager" autowire="byType"/>
+    
+    <!-- beastui uses Controller annotations -->
+    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <ref bean="httpRequestInterceptor"/>
+            </list>
+        </property>
+    </bean>
+  
+    <bean id="adaptorsController" class="eu.baltrad.beastui.web.controller.AdaptorsController" autowire="byType" />
+    <bean id="routesController" class="eu.baltrad.beastui.web.controller.RoutesController" autowire="byType" />
+    
 </beans>
