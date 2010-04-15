@@ -47,7 +47,7 @@
   <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
   <property name="beast.path" value="/opt/baltrad/beast" />
   <available file="${baltrad.db.path}/java/jbrfc.jar" property="jbrfc.jar.available" />
-  <available file="${beast.path}/bin/beast-0.1-dev.jar" property="beast.jar.available" />
+  <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
   <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
 
   <fail unless="jbrfc.jar.available" message="baltrad.db.path must specify the installation dir of baltrad-db" />
