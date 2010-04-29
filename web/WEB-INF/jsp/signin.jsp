@@ -11,69 +11,75 @@
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
-    <title>Baltrad Data Exchange System</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+    <title>Sign in</title>
 </head>
 
-<div id="content">
-    <div id="header">
-        <img src="includes/images/baltrad_header.png">
-    </div>
-    <div id="signin-screen">
-        <div id="signin-box">
-            <div id="signin-welcome">
-                Welcome to Baltrad Data Exchange System!
-            </div>
-            <div id="signin-info">
-                This node is operated by
-            </div>
-            <div id="signin-operator">
-                <fmt:setLocale value="en"/>
-                <fmt:setBundle basename="messages"/>
-                <fmt:message key="message.operator.pl"/>
-            </div>
-            <div id="signin-info">
-                Please sign in.
-            </div>
-            <form name="signinForm" method="post">
-                <div id ="signin-form">
-                    <%@ include file="/WEB-INF/jsp/includemessages.jsp"%>
-                    <div id="signin-form-leftcol">
-                        <div id="signin-form-elem">
-                            User name:
-                        </div>
-                        <div id="signin-form-elem">
-                            Password:
+<body>
+    <div id="signin-container">
+        <div id="header"></div>
+            <div class="signin-inner">
+                <div class="signin-float-wrap">
+                    <div id="signin-main">
+                        <div id="signin-box">
+                            <div id="signin-welcome">
+                                Welcome to Baltrad Data Exchange System!
+                            </div>
+                            <div id="signin-info">
+                                This node is operated by
+                            </div>
+                            <div id="signin-operator">
+                                <fmt:setLocale value="en"/>
+                                <fmt:setBundle basename="messages"/>
+                                <fmt:message key="message.operator.pl"/>
+                            </div>
+                            <div id="signin-info">
+                                Please sign in.
+                            </div>
+                            <form method="post" action="signin.htm">
+                                <div id ="signin-form">
+                                    <%@ include file="/WEB-INF/jsp/includemessages.jsp"%>
+                                    <div id="signin-form-leftcol">
+                                        <div id="signin-form-elem">
+                                            User name:
+                                        </div>
+                                        <div id="signin-form-elem">
+                                            Password:
+                                        </div>
+                                    </div>
+                                    <div id="signin-form-rightcol">
+                                        <div id="signin-form-elem">
+                                            <spring:bind path="command.name">
+                                                <input type="text"
+                                                    name='<c:out value="${status.expression}"/>'
+                                                    value='<c:out value="${status.value}"/>'
+                                                    size="20" />
+                                            </spring:bind>
+                                        </div>
+                                        <div id="signin-form-elem">
+                                            <spring:bind path="command.password">
+                                                <input type="password"
+                                                    name='<c:out value="${status.expression}"/>'
+                                                    value='<c:out value="${status.value}"/>'
+                                                    size="20" />
+                                            </spring:bind>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="signin-submit">
+                                    <input type="submit" value="Submit" name="loginButton" />
+                                </div>
+                            </form>
                         </div>
                     </div>
-                    <div id="signin-form-rightcol">
-                        <div id="signin-form-elem">
-                            <spring:bind path="command.name">
-                                <input type="text"
-                                    name='<c:out value="${status.expression}"/>'
-                                    value='<c:out value="${status.value}"/>'
-                                    size="20" />
-                            </spring:bind>
-                        </div>
-                        <div id="signin-form-elem">
-                            <spring:bind path="command.password">
-                                <input type="password"
-                                    name='<c:out value="${status.expression}"/>'
-                                    value='<c:out value="${status.value}"/>'
-                                    size="20" />
-                            </spring:bind>
-                        </div>
-                    </div>
+                    <div class="clear"></div>
                 </div>
-                <div id="signin-submit">
-                    <input type="submit" value="Submit" name="loginButton" />
-                </div>
-            </form>
+                <div class="clear"></div>
         </div>
     </div>
     <div id="footer">
         <script type="text/javascript" src="includes/footer.js"></script>
     </div>
-</div>
+</body>
 </html>

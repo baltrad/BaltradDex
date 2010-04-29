@@ -11,52 +11,62 @@
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
-    <title>Baltrad Data Exchange System</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+    <title>Data channels</title>
 </head>
 
-<div id="content">
-    <div id="header">
-        <img src="includes/images/baltrad_header.png">
-    </div>
-    <div id="container1">
-        <div id="container2">
-            <div id="leftcol">
-                <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div id="rightcol">
-                <div id="table-info">
-                    List of available data channels.
-                    Click on channel name for data listing.
+<body>
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
+        </div>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+                    <div id="main">
+                        <h1>Available data channels</h1>
+                        <br/>
+                        <h2>
+                            <p>
+                            Click on channel name to browse data files.
+                            </p>
+                        </h2>
+                        <display:table name="channels" id="dataChannel" defaultsort="1"
+                            requestURI="channels.htm" cellpadding="0" cellspacing="2"
+                            export="false" class="tableborder">
+                            <display:column sortProperty="id" sortable="true"
+                                title="Channel ID" class="tdcenter">
+                                <fmt:formatNumber value="${dataChannel.id}" pattern="00" />
+                            </display:column>
+                            <display:column sortable="true" title="Channel WMO number"
+                                sortProperty="wmoNumber" class="tdcenter"
+                                value="${dataChannel.wmoNumber}">
+                            </display:column>
+                            <display:column sortable="true" title="Channel name"
+                                href="channeldata.htm" sortProperty="name"
+                                paramId="name" paramProperty="name" class="tdcenter"
+                                value="${dataChannel.name}">
+                            </display:column>
+                        </display:table>
+                        <div id="table-footer">
+                            <a href="welcome.htm">&#60&#60 Home</a>
+                        </div>
+                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>
+                    <div class="clear"></div>
                 </div>
-                <div id="table-content">
-                    <display:table name="channels" id="dataChannel" defaultsort="1"
-                        requestURI="channels.htm" cellpadding="5" cellspacing="0"
-                        export="false" class="tableborder">
-                        <display:caption class="tablecaption">Data channels</display:caption>
-                        <display:column sortProperty="id" sortable="true"
-                            title="Channel ID" class="tdcenter">
-                            <fmt:formatNumber value="${dataChannel.id}" pattern="00" />
-                        </display:column>
-                        <display:column sortable="true" title="Channel WMO number"
-                            sortProperty="wmoNumber" class="tdcenter"
-                            value="${dataChannel.wmoNumber}">
-                        </display:column>
-                        <display:column sortable="true" title="Channel name"
-                            href="channeldata.htm" sortProperty="name"
-                            paramId="name" paramProperty="name" class="tdcenter"
-                            value="${dataChannel.name}">
-                        </display:column>
-                    </display:table>
-                </div>
+                <div class="clear"></div>
             </div>
         </div>
     </div>
     <div id="footer">
-         <script type="text/javascript" src="includes/footer.js"></script>
+        <script type="text/javascript" src="includes/footer.js"></script>
     </div>
-</div>
+</body>
 </html>
 
 

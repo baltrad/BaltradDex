@@ -16,6 +16,7 @@ import org.hibernate.Session;
 import org.hibernate.Query;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Subscription manager class implementing subscription handling functionality.
@@ -68,14 +69,14 @@ public class SubscriptionManager {
      * @param userID User ID
      * @return List of subscriptions
      */
-    public List getUserSubscriptions( int userID ) {
+    public List getUserSubscriptions( int userId ) {
         List subscriptionList = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         try {
             subscriptionList = session.createQuery(
-                    "from Subscription where user_id = ?" ).setInteger( 0, userID ).list();
+                    "FROM Subscription WHERE user_id = ?" ).setInteger( 0, userId ).list();
             session.getTransaction().commit();
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
@@ -88,12 +89,12 @@ public class SubscriptionManager {
      *
      * @param userID User ID
      */
-    public void cancelUserSubscriptions( int userID ) {
+    public void cancelUserSubscriptions( int userId ) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         try {
-            String hql = "delete from Subscription where user_id = " + userID;
+            String hql = "DELETE FROM Subscription WHERE user_id = " + userId;
             Query query = session.createQuery( hql );
             query.executeUpdate();
             session.getTransaction().commit();
@@ -113,7 +114,7 @@ public class SubscriptionManager {
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         try {
-            subscriptionList = session.createQuery( "from Subscription" ).list();
+            subscriptionList = session.createQuery( "FROM Subscription" ).list();
             session.getTransaction().commit();
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
@@ -121,5 +122,32 @@ public class SubscriptionManager {
         }
         return subscriptionList;
     }
+    /**
+     * Method creates list of channel IDs subscribed by a given user.
+     *
+     * @param userId User ID
+     * @return List of channel IDs
+     */
+    public List getChannelIds( int userId ) {
+        List subs = null;
+        List channelIds = new ArrayList();
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        try {
+            subs = session.createQuery( "FROM Subscription WHERE user_id = ?" ).setInteger(
+                    0, userId ).list();
+            session.getTransaction().commit();
+        } catch( HibernateException e ) {
+            session.getTransaction().rollback();
+            throw e;
+        }
+        for( int i = 0; i < subs.size(); i++ ) {
+            Subscription s = ( Subscription )subs.get( i );
+            channelIds.add( s.getChannelId() );
+        }
+        return channelIds;
+    }
+
 }
 //--------------------------------------------------------------------------------------------------

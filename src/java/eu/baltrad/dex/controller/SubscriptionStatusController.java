@@ -11,10 +11,8 @@ package eu.baltrad.dex.controller;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
 import eu.baltrad.dex.model.ChannelManager;
 import eu.baltrad.dex.model.SubscriptionManager;
-import eu.baltrad.dex.model.AuxSubscriptionManager;
 import eu.baltrad.dex.model.LogManager;
 import eu.baltrad.dex.model.Subscription;
-import eu.baltrad.dex.model.AuxSubscription;
 import eu.baltrad.dex.model.Channel;
 import eu.baltrad.dex.model.User;
 
@@ -39,12 +37,12 @@ import java.util.Date;
  */
 public class SubscriptionStatusController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
-    private static final String SUBMIT_OPTION = "submit_button";
+    //private static final String SUBMIT_OPTION = "submit_button";
+    private static final String REQUEST_PARAM_KEY = "submitted_channels";
     private static final String RESPONSE_PARAM_KEY = "user_subscriptions";
 //---------------------------------------------------------------------------------------- Variables
     private ChannelManager channelManager;
     private SubscriptionManager subscriptionManager;
-    private AuxSubscriptionManager auxSubscriptionManager;
     private LogManager logManager;
     private ApplicationSecurityManager applicationSecurityManager;
     private String successView;
@@ -62,36 +60,24 @@ public class SubscriptionStatusController implements Controller {
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
 
-        String submitOption = request.getParameter( SUBMIT_OPTION );
+        // List of channels selected for subscription
+        String[] subChannels = request.getParameterValues( REQUEST_PARAM_KEY );
         User user = ( User )applicationSecurityManager.getUser( request );
-        List userSubscriptions = new ArrayList();
-        if( submitOption != null ) {
-            // Clear subscriptions table
-            subscriptionManager.cancelUserSubscriptions( user.getId() );
-            // Copy subscription records from auxiliary to subscriptions table
-            List auxSubscriptions = auxSubscriptionManager.getUserSubscriptions( user.getId() );
-            for( int i = 0; i < auxSubscriptions.size(); i++ ) {
-                AuxSubscription auxSubscription = ( AuxSubscription )auxSubscriptions.get( i );
-                Subscription subscription = new Subscription( auxSubscription.getUserId(),
-                                                              auxSubscription.getChannelId() );
-                subscriptionManager.registerSubscription( subscription );
-                 // Get user subscriptions object
-                Channel channel = channelManager.getChannel( subscription.getChannelId() );
-                userSubscriptions.add( channel );
-                logManager.addLogEntry( new Date(), logManager.MSG_INFO, "User " + user.getName() +
-                                        " subscribed to " + channel.getName() );
+        List userSubs = new ArrayList();
+        // Cancel user subscriptions
+        subscriptionManager.cancelUserSubscriptions( user.getId() );
+        // Check if submitted channels list is not null
+        if( subChannels != null ) {
+            for( int i = 0; i < subChannels.length; i++ ) {
+                Channel ch = channelManager.getChannel( subChannels[ i ] );
+                userSubs.add( ch );
+                Subscription s = new Subscription( user.getId(), ch.getId() );
+                subscriptionManager.registerSubscription( s );
+                logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "User " + user.getName() +
+                                        " subscribed to " + ch.getName() );
             }
-            // Clear auxiliary subscriptions table
-            auxSubscriptionManager.cancelUserSubscriptions( user.getId() );
-        } else {
-            // Clear subscriptions table
-            subscriptionManager.cancelUserSubscriptions( user.getId() );
-            // Clear auxiliary subscriptions table
-            auxSubscriptionManager.cancelUserSubscriptions( user.getId() );
-            logManager.addLogEntry( new Date(), logManager.MSG_INFO, "User " + user.getName() +
-                                                                    " cancelled subscriptions" );
         }
-        return new ModelAndView( getSuccessView(), RESPONSE_PARAM_KEY, userSubscriptions );
+        return new ModelAndView( getSuccessView(), RESPONSE_PARAM_KEY, userSubs );
     }
     /**
      * Method returns reference to ApplicationSecurityManager object.
@@ -162,19 +148,5 @@ public class SubscriptionStatusController implements Controller {
      * @param logManager Reference to LogManager class instance
      */
     public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
-    /**
-     * Method gets reference to auxiliary subscription manager object.
-     *
-     * @return Auxiliary subscription manager object
-     */
-    public AuxSubscriptionManager getAuxSubscriptionManager() { return auxSubscriptionManager; }
-    /**
-     * Method sets reference to auxiliary subscription manager object.
-     *
-     * @param auxSubscriptionManager Reference to auxiliary subscription manager object
-     */
-    public void setAuxSubscriptionManager( AuxSubscriptionManager auxSubscriptionManager ) {
-        this.auxSubscriptionManager = auxSubscriptionManager;
-    }
 }
 //--------------------------------------------------------------------------------------------------

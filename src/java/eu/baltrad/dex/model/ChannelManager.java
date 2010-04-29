@@ -15,6 +15,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Session;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Data channel manager class implementing data channel handling functionality.
@@ -39,22 +40,12 @@ public class ChannelManager {
         session.beginTransaction();
         try {
             channelsList = session.createQuery(
-                    "from Channel channel order by channel.wmoNumber" ).list();
+                    "FROM Channel channel ORDER BY channel.wmoNumber" ).list();
             session.getTransaction().commit();
         }
         catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
-        }
-        // Change the case of the first character
-        for( int i = 0; i < channelsList.size(); i++ ) {
-            Channel channel = ( Channel )channelsList.get( i );
-            String in = channel.getName();
-            if( !in.isEmpty() && in != null ) {
-                String out = in.substring( 0, 1 ).toUpperCase() + in.substring( 1, in.length() );
-                channel.setName( out );
-                channelsList.set( i, channel );
-            }
         }
         // Check for data channels selected by the currently signed user
         for( int i = 0; i < channelsList.size(); i++ ) {
@@ -68,7 +59,6 @@ public class ChannelManager {
         }
         return channelsList;
     }
-
     /**
      * Method returns data channel identified by a given name.
      *
@@ -76,29 +66,20 @@ public class ChannelManager {
      * @return Data channel identified by a given name
      */
     public Channel getChannel( String channelName ) {
-
         Channel channel = null;
-
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         try {
-            channel = ( Channel )session.createQuery( "from Channel where name= ?" ).setString(
+            channel = ( Channel )session.createQuery( "FROM Channel WHERE name = ?" ).setString(
                     0, channelName ).uniqueResult();
             session.getTransaction().commit();
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
         }
-        // Change the case of the first character
-        String in = channel.getName();
-        if( !in.isEmpty() && in != null ) {
-            String out = in.substring( 0, 1 ).toUpperCase() + in.substring( 1, in.length() );
-            channel.setName( out );
-        }
         return channel;
     }
-
     /**
      * Method returns data channel identified by a channel ID.
      *
@@ -106,27 +87,45 @@ public class ChannelManager {
      * @return Data channel identified by channel ID
      */
     public Channel getChannel( int id ) {
-
         Channel channel = null;
-
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         try {
-            channel = ( Channel )session.createQuery( "from Channel where id = ?").setInteger(
+            channel = ( Channel )session.createQuery( "FROM Channel WHERE id = ?").setInteger(
                     0, id ).uniqueResult();
             session.getTransaction().commit();
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
         }
-        // Change the case of the first character
-        String in = channel.getName();
-        if( !in.isEmpty() && in != null ) {
-            String out = in.substring( 0, 1 ).toUpperCase() + in.substring( 1, in.length() );
-            channel.setName( out );
-        }
         return channel;
+    }
+    /**
+     * Method fetches IDs of the listed channels.
+     *
+     * @param channelNames List of channels' names
+     * @return List of channel IDs
+     */
+    public List getChannelIds( String[ ] channelNames ) {
+        List channelIds = new ArrayList();
+        if( channelNames != null ) {
+            SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+            Session session = sessionFactory.openSession();
+            for( int i = 0; i < channelNames.length; i++ ) {
+                session.beginTransaction();
+                try {
+                    Channel channel = ( Channel )session.createQuery( "FROM Channel WHERE name = ?"
+                            ).setString( 0, channelNames[ i ] ).uniqueResult();
+                    session.getTransaction().commit();
+                    channelIds.add( channel.getId() );
+                } catch( HibernateException e ) {
+                    session.getTransaction().rollback();
+                    throw e;
+                }
+            }
+        }
+        return channelIds;
     }
 }
 //--------------------------------------------------------------------------------------------------

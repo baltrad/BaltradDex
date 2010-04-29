@@ -11,66 +11,74 @@
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
-    <title>Baltrad Data Exchange System</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+    <title>Channel subscription</title>
 </head>
 
-<div id="content">
-    <div id="header">
-        <img src="includes/images/baltrad_header.png">
-    </div>
-    <div id="container1">
-        <div id="container2">
-            <div id="leftcol">
-                <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div id="rightcol">
-                <div id="table-info">
-                    List of active subscriptions.
-                    Click on a check box to subscribe / unsubscribe to a desired data channel.
+<body>
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
+        </div>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+                    <div id="main">
+                        <h1>Channel subscription status</h1>
+                        <br/>
+                        <h2>
+                            <p>
+                            List of active subscriptions.
+                            Click on a check box to subscribe or unsubscribe a desired data channel.
+                            </p>
+                        </h2>
+                        <form action="submit.htm">
+                            <display:table name="subscriptions" id="subscription" defaultsort="1"
+                                requestURI="subscriptions.htm" cellpadding="0" cellspacing="2"
+                                export="false" class="tableborder">
+                                <display:column sortProperty="id" sortable="true"
+                                    title="Channel ID" class="tdcenter">
+                                    <fmt:formatNumber value="${subscription.id}"
+                                    pattern="00" />
+                                </display:column>
+                                <display:column sortable="true" title="Channel name"
+                                    sortProperty="name" paramId="name" paramProperty="name"
+                                    class="tdcenter" value="${subscription.name}">
+                                </display:column>
+                                <c:choose>
+                                    <c:when test="${subscription.selected == true}">
+                                        <display:column sortable="false" title="Subscription status"
+                                            class="tdcheck"> <input type="checkbox"
+                                            name="selected_channels" value="${subscription.name}"
+                                            checked/>
+                                        </display:column>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <display:column sortable="false" title="Subscription status"
+                                            class="tdcheck"> <input type="checkbox"
+                                            name="selected_channels" value="${subscription.name}"/>
+                                        </display:column>
+                                    </c:otherwise>
+                                </c:choose>
+                            </display:table>
+                            <div id="table-footer">
+                                <input type="submit" value="Submit" name="submitButton"/>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>
+                    <div class="clear"></div>
                 </div>
-                <div id="table-content">
-                    <form name="submitSubscriptionForm" action="submit.htm">
-                        <display:table name="subscriptions" id="subscription" defaultsort="1"
-                            requestURI="subscriptions.htm" cellpadding="5" cellspacing="0"
-                            export="false" class="tableborder">
-                            <display:caption class="tablecaption">Subscription status</display:caption>
-                            <display:column sortProperty="id" sortable="true"
-                                title="Channel ID" class="tdcenter">
-                                <fmt:formatNumber value="${subscription.id}"
-                                pattern="00" />
-                            </display:column>
-                            <display:column sortable="true" title="Channel name"
-                                sortProperty="name" paramId="name" paramProperty="name"
-                                class="tdcenter" value="${subscription.name}">
-                            </display:column>
-                            <c:choose>
-                                <c:when test="${subscription.selected == true}">
-                                    <display:column sortable="false" title="Subscription status"
-                                        class="tdcenter"> <input type="checkbox"
-                                        name="selected_channels" value="${subscription.name}"
-                                        checked/>
-                                    </display:column>
-                                </c:when>
-                                <c:otherwise>
-                                    <display:column sortable="false" title="Subscription status"
-                                        class="tdcenter"> <input type="checkbox"
-                                        name="selected_channels" value="${subscription.name}"/>
-                                    </display:column>
-                                </c:otherwise>
-                            </c:choose>
-                        </display:table>
-                        <div id="table-footer">
-                            <input type="submit" value="Select" name="submitButton"/>
-                        </div>
-                    </form>
-                </div>
+                <div class="clear"></div>
             </div>
         </div>
     </div>
     <div id="footer">
         <script type="text/javascript" src="includes/footer.js"></script>
     </div>
-</div>
+</body>
 </html>

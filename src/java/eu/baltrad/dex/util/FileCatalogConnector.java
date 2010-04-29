@@ -29,9 +29,9 @@ public class FileCatalogConnector {
     // Properties file name
     private static final String PROPS_FILE_NAME = "dex.fc.properties";
     // Database URI property
-    private static final String PROPS_DB_URI = "database.uri";
+    private static final String DB_URI_PROP = "database.uri";
     // File catalog storage directory
-    private static final String FC_STORAGE_DIR = "FileCatalogStorage";
+    private static final String STORAGE_DIR_PROP = "storage.dir";
 //---------------------------------------------------------------------------------------- Variables
     // Reference to FileCatalog object
     private static FileCatalog fileCatalog;
@@ -50,21 +50,22 @@ public class FileCatalogConnector {
      * @return Reference to FileCatalog object
      */
     public FileCatalog connect() {
-        // Check if storage directory exists
-        String storageDir = ServletContextUtil.getServletContextPath() + FC_STORAGE_DIR;
-        File f = new File( storageDir );
-        if( !f.exists() ) {
-            f.mkdirs();
-            logManager.addLogEntry( new Date(), LogManager.MSG_WRN, "New storage directory " +
-                    "initialized: " + storageDir );
-        }
-        // Initialize FileCatalog
+        //Initialize FileCatalog
         try {
             InputStream is = this.getClass().getResourceAsStream( PROPS_FILE_NAME );
             Properties props = new Properties();
             if( is != null ) {
                 props.load( is );
-                String dbURI = props.getProperty( PROPS_DB_URI );
+                String storageFolder = props.getProperty( STORAGE_DIR_PROP );
+                String dbURI = props.getProperty( DB_URI_PROP );
+                // Check if storage directory exists
+                String storageDir = ServletContextUtil.getServletContextPath() + storageFolder;
+                File f = new File( storageDir );
+                if( !f.exists() ) {
+                    f.mkdirs();
+                    logManager.addLogEntry( new Date(), LogManager.MSG_WRN, "New storage directory " +
+                            "initialized: " + storageDir );
+                }
                 fileCatalog = new FileCatalog( dbURI, storageDir );
                 logManager.addLogEntry( new Date(), LogManager.MSG_INFO,
                         "File catalog successfully initialized" );

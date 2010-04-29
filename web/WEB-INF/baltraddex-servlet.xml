@@ -32,9 +32,6 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <prop key="logtable.htm">logTableController</prop>
                 <prop key="journal.htm">journalController</prop>
                 <prop key="incoming.htm">urlFilenameController</prop>
-                <prop key="on.htm">urlFilenameController</prop>
-                <prop key="off.htm">urlFilenameController</prop>
-                <prop key="testdb.htm">databaseTestController</prop>
             </props>
         </property>
     </bean>
@@ -48,6 +45,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <props>
                 <prop key="signin.htm">signInController</prop>
                 <prop key="signout.htm">signOutController</prop>
+                <prop key="transmitter.htm">transmitter</prop>
                 <prop key="receiver.htm">receiver</prop>
             </props>
         </property>
@@ -68,20 +66,15 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
           class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
 
     <!--
-        Application initialization controller.
-    -->
-    <bean name="initController" class="eu.baltrad.dex.controller.InitController"></bean>
-
-    <!--
         The signin controller.
     -->
     <bean name="signInController" class="eu.baltrad.dex.controller.SignInController">
         <property name="sessionForm">
-			<value>true</value>
-		</property>
-		<property name="formView">
-			<value>signin</value>
-		</property>
+            <value>true</value>
+	</property>
+	<property name="formView">
+            <value>signin</value>
+        </property>
         <property name="userManager">
             <ref bean="userManager"/>
         </property>
@@ -144,11 +137,11 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <bean name="channelDataController"
         class="eu.baltrad.dex.controller.ChannelDataController">
         <property name="dataManager">
-			<ref bean="dataManager" />
-		</property>
-		<property name="successView">
-			<value>channeldata</value>
-		</property>
+            <ref bean="dataManager" />
+        </property>
+        <property name="successView">
+            <value>channeldata</value>
+        </property>
     </bean>
 
     <!--
@@ -163,11 +156,11 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <ref bean="subscriptionManager"/>
         </property>
         <property name="channelManager">
-			<ref bean="channelManager" />
-		</property>
-		<property name="successView">
-			<value>subscriptions</value>
-		</property>
+            <ref bean="channelManager" />
+        </property>
+        <property name="successView">
+            <value>subscriptions</value>
+        </property>
     </bean>
 
     <!--
@@ -178,15 +171,15 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
-        <property name="auxSubscriptionManager">
-            <ref bean="auxSubscriptionManager"/>
+        <property name="subscriptionManager">
+            <ref bean="subscriptionManager"/>
         </property>
         <property name="channelManager">
-			<ref bean="channelManager" />
-		</property>
-		<property name="successView">
-			<value>submit</value>
-		</property>
+            <ref bean="channelManager" />
+        </property>
+        <property name="successView">
+            <value>submit</value>
+        </property>
     </bean>
 
     <!--
@@ -200,18 +193,15 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
         </property>
-        <property name="auxSubscriptionManager">
-            <ref bean="auxSubscriptionManager"/>
-        </property>
         <property name="channelManager">
-			<ref bean="channelManager"/>
-		</property>
+            <ref bean="channelManager"/>
+        </property>
         <property name="logManager">
             <ref bean="logManager"/>
         </property>
         <property name="successView">
-			<value>status</value>
-		</property>
+            <value>status</value>
+        </property>
     </bean>
 
     <!--
@@ -249,10 +239,20 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <value>channeldata</value>
         </property>
         <property name="logManager">
-			<ref bean="logManager"/>
-		</property>
+            <ref bean="logManager"/>
+	</property>
     </bean>
-    
+
+    <!--
+        Application initializing utility.
+    -->
+    <bean id="initAppUtil" class="eu.baltrad.dex.util.InitAppUtil"/>
+
+    <!--
+        File catalog connector.
+    -->
+    <bean id="fileCatalogConnector" class="eu.baltrad.dex.util.FileCatalogConnector"/>
+
     <!--
         Data channel manager.
     -->
@@ -261,11 +261,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Data manager.
     -->
-    <bean name="dataManager" class="eu.baltrad.dex.model.DataManager">
-         <!--property name="fileCatalogConnector">
-			<ref bean="fileCatalogConnector" />
-		</property -->
-    </bean>
+    <bean name="dataManager" class="eu.baltrad.dex.model.DataManager"/>
 
     <!--
         Subscription manager.
@@ -273,14 +269,36 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <bean name="subscriptionManager" class="eu.baltrad.dex.model.SubscriptionManager"/>
 
     <!--
-        Auxiliary subscription manager.
-    -->
-    <bean name="auxSubscriptionManager" class="eu.baltrad.dex.model.AuxSubscriptionManager"/>
-
-    <!--
         Log manager
     -->
     <bean name="logManager" class="eu.baltrad.dex.model.LogManager"/>
+
+    <!--
+        Data transmitter module
+    -->
+    <bean id="transmitter" class="eu.baltrad.dex.model.Transmitter">
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+        <property name="subscriptionManager">
+            <ref bean="subscriptionManager"/>
+        </property>
+        <property name="channelManager">
+            <ref bean="channelManager"/>
+        </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+        <property name="dataManager">
+            <ref bean="dataManager" />
+        </property>
+        <property name="deliveryRegisterManager">
+            <ref bean="deliveryRegisterManager"/>
+        </property>
+        <property name="fileCatalogConnector">
+            <ref bean="fileCatalogConnector"/>
+        </property>
+    </bean>
 
     <!--
         Data receiver module.
@@ -311,18 +329,9 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <bean name="userManager" class="eu.baltrad.dex.model.UserManager"/>
 
     <!--
-        Database test controller
+        Delivery register manager
     -->
-    <bean name="databaseTestController" class="eu.baltrad.dex.controller.DatabaseTestController">
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
-    </bean>
-
-    <!--
-        File catalog connector
-    -->
-    <!-- bean name="fileCatalogConnector" class="eu.baltrad.dex.util.FileCatalogConnector"/ -->
+    <bean name="deliveryRegisterManager" class="eu.baltrad.dex.model.DeliveryRegisterManager"/>
 
     <!--
         Http request interceptor.
@@ -330,19 +339,17 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <bean id="httpRequestInterceptor"
 		class="eu.baltrad.dex.util.HttpRequestInterceptor">
         <property name="signInPage">
-			<value>signin.htm</value>
-		</property>
-		<property name="applicationSecurityManager">
-			<ref bean="applicationSecurityManager" />
-		</property>
-	</bean>
+            <value>signin.htm</value>
+	</property>
+	<property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager" />
+	</property>
+    </bean>
 
     <!--
         Message digest utility.
     -->
-    <bean name="messageDigestUtil" 
-            class="eu.baltrad.dex.util.MessageDigestUtil">
-    </bean>
+    <bean name="messageDigestUtil" class="eu.baltrad.dex.util.MessageDigestUtil"/>
 
     <!--
         Application security manager.
@@ -350,19 +357,19 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <bean name="applicationSecurityManager"
             class="eu.baltrad.dex.util.ApplicationSecurityManager">
         <property name="messageDigestUtil">
-			<ref bean="messageDigestUtil"/>
-		</property>
+            <ref bean="messageDigestUtil"/>
+	</property>
     </bean>
 
     <!--
         Message resources.
     -->
     <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-		<property name="basenames">
-			<list>
-				<value>messages</value>
-			</list>
-		</property>
-	</bean>
+	<property name="basenames">
+            <list>
+		<value>messages</value>
+            </list>
+	</property>
+    </bean>
 
 </beans>

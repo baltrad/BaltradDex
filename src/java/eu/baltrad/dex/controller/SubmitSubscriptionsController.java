@@ -9,9 +9,8 @@
 package eu.baltrad.dex.controller;
 
 import eu.baltrad.dex.model.ChannelManager;
-import eu.baltrad.dex.model.AuxSubscriptionManager;
+import eu.baltrad.dex.model.SubscriptionManager;
 import eu.baltrad.dex.model.User;
-import eu.baltrad.dex.model.AuxSubscription;
 import eu.baltrad.dex.model.Channel;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
 
@@ -36,10 +35,10 @@ import java.util.ArrayList;
 public class SubmitSubscriptionsController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
     private static final String REQUEST_PARAM_KEY = "selected_channels";
-    private static final String RESPONSE_PARAM_KEY = "submitted_subscriptions";
+    private static final String RESPONSE_PARAM_KEY = "submitted_channels";
 //---------------------------------------------------------------------------------------- Variables
     private ChannelManager channelManager;
-    private AuxSubscriptionManager auxSubscriptionManager;
+    private SubscriptionManager subscriptionManager;
     private ApplicationSecurityManager applicationSecurityManager;
     private String successView;
 //------------------------------------------------------------------------------------------ Methods
@@ -56,25 +55,42 @@ public class SubmitSubscriptionsController implements Controller {
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
 
-        String[] selectedChannels = request.getParameterValues( REQUEST_PARAM_KEY );
+        // List of channels selected for subscription
+        String[] selChannels = request.getParameterValues( REQUEST_PARAM_KEY );
         User user = ( User )applicationSecurityManager.getUser( request );
-        
-        List submittedSubscriptions = new ArrayList();
-        if( selectedChannels != null && selectedChannels.length > 0 ) {
-            for( int i = 0; i < selectedChannels.length; i++ ) {
-                // Get selected data channels by name
-                String channelName = selectedChannels[ i ].substring( 0, 1 ).toLowerCase()
-                   + selectedChannels[ i ].substring( 1, selectedChannels[ i ].length() );
-                submittedSubscriptions.add( channelManager.getChannel( channelName ) );
-                
-                // Add selected subscriptions to auxiliary subscriptions table
-                Channel dataChannel = channelManager.getChannel( channelName );
-                AuxSubscription auxSubscription = new AuxSubscription( user.getId(), 
-                                                                            dataChannel.getId() );
-                auxSubscriptionManager.registerSubscription( auxSubscription );
+        // Selected channel IDs
+        List sel = channelManager.getChannelIds( selChannels );
+        // Subscribed channel IDs
+        List subs = subscriptionManager.getChannelIds( user.getId() );
+        // Compare lists
+        boolean changed = false;
+        if( sel.size() != subs.size() ) {
+            changed = true;
+        } else {
+            for( int i = 0; i < sel.size(); i++ ) {
+                Object o = sel.get( i );
+                if( !subs.contains( o ) ) {
+                    changed = true;
+                }
             }
         }
-        return new ModelAndView( getSuccessView(), RESPONSE_PARAM_KEY, submittedSubscriptions );
+        // If status has not changed, the list remains null 
+        List chSubmit = null;
+        // Status has changed, the list will either be empty or contain some objects
+        if( changed ) {
+            if( selChannels == null ) {
+                // User submits empty list / cancels subscriptions
+                chSubmit = new ArrayList();
+            } else {
+                // User submits new subscriptions list
+                chSubmit = new ArrayList();
+                for( int i = 0; i < selChannels.length; i++ ) {
+                    Channel ch = ( Channel )channelManager.getChannel( selChannels[ i ] );
+                    chSubmit.add( ch );
+                }
+            }
+        }
+        return new ModelAndView( getSuccessView(), RESPONSE_PARAM_KEY, chSubmit );
     }
     /**
      * Method returns reference to ApplicationSecurityManager object.
@@ -120,18 +136,18 @@ public class SubmitSubscriptionsController implements Controller {
      */
     public void setSuccessView( String successView ) { this.successView = successView; }
     /**
-     * Method gets reference to auxiliary subscription manager object.
+     * Method returns reference to SubscriptionManager object.
      *
-     * @return Auxiliary subscription manager object
+     * @return Reference to SubscriptionManager object
      */
-    public AuxSubscriptionManager getAuxSubscriptionManager() { return auxSubscriptionManager; }
+    public SubscriptionManager getSubscriptionManager() { return subscriptionManager; }
     /**
-     * Method sets reference to auxiliary subscription manager object.
+     * Method sets reference to SubscriptionManager object.
      *
-     * @param auxSubscriptionManager Reference to auxiliary subscription manager object
+     * @param subscriptionManager Reference to SubscriptionManager object
      */
-    public void setAuxSubscriptionManager( AuxSubscriptionManager auxSubscriptionManager ) {
-        this.auxSubscriptionManager = auxSubscriptionManager;
+    public void setSubscriptionManager( SubscriptionManager subscriptionManager ) {
+        this.subscriptionManager = subscriptionManager;
     }
 }
 //--------------------------------------------------------------------------------------------------

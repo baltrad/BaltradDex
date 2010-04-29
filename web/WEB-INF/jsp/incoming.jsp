@@ -11,34 +11,42 @@
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
-    <title>Baltrad Data Exchange System</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+    <title>Incoming data</title>
 </head>
 
 <body>
-<div id="content">
-    <div id="header">
-        <img src="includes/images/baltrad_header.png">
-    </div>
-    <div id="container1">
-        <div id="container2">
-            <div id="leftcol">
-                <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div id="rightcol">
-                <div id="table-info">
-                    Incoming data section.
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
+        </div>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+                    <div id="main">
+                        <h1>Incoming data section</h1>
+                        <br/>
+                        <h2>
+                            <p>
+                            </p>
+                        </h2>
+                        <div id="table-footer">
+                            <a href="welcome.htm">&#60&#60 Home</a>
+                        </div>
+                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>
+                    <div class="clear"></div>
                 </div>
-                <div id="table-content">
-
-                </div>
+                <div class="clear"></div>
             </div>
         </div>
     </div>
     <div id="footer">
         <script type="text/javascript" src="includes/footer.js"></script>
     </div>
-</div>
 </body>
 </html>

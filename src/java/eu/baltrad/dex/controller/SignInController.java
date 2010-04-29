@@ -141,16 +141,16 @@ public class SignInController extends SimpleFormController {
         this.applicationSecurityManager = applicationSecurityManager;
     }
     /**
-     * @return the userManager
+     * Method gets reference to user manager object.
+     *
+     * @return Reference to user manager object
      */
-    public UserManager getUserManager() {
-        return userManager;
-    }
+    public UserManager getUserManager() { return userManager; }
     /**
-     * @param userManager the userManager to set
+     * Method sets reference to user manager object.
+     *
+     * @param userManager Reference to user manager object
      */
-    public void setUserManager( UserManager userManager ) {
-        this.userManager = userManager;
-    }
+    public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
 }
 //--------------------------------------------------------------------------------------------------

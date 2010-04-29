@@ -17,52 +17,62 @@
 %>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
-    <title>Baltrad Data Exchange System</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+    <title>Data from <% out.println( name ); %></title>
 </head>
 
-<div id="content">
-    <div id="header">
-        <img src="includes/images/baltrad_header.png">
-    </div>
-    <div id="container1">
-        <div id="container2">
-            <div id="leftcol">
-                <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div id="rightcol">
-                <div id="table-info">
-                    Products available from selected channel.
+<body>
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
+        </div>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+                    <div id="main">
+                        <h1>Data files from channel <% out.println( name );%></h1>
+                        <br/>
+                        <h2>
+                            <p>
+                            Click on file name to download data.
+                            </p>
+                        </h2>
+                        <display:table name="channeldata" id="data" defaultsort="1"
+                            requestURI="channeldata.htm" cellpadding="0" cellspacing="2"
+                            export="false" class="tableborder">
+                            <display:column sortProperty="id" sortable="true"
+                                title="ID" class="tdcenter">
+                                <fmt:formatNumber value="${data.id}" pattern="00" />
+                            </display:column>
+                            <display:column sortProperty="date" sortable="true"
+                                title="Date" class="tdcenter" value="${data.date}">
+                            </display:column>
+                            <display:column sortProperty="time" sortable="true"
+                                title="Time" class="tdcenter" value="${data.time}">
+                            </display:column>
+                            <display:column sortProperty="path" sortable="true"
+                                paramId="path" paramProperty="path" title="File" class="tdcenter"
+                                href="download.htm" value="${fn:substring(data.path,
+                                            fn:length(data.path) - 37, fn:length(data.path))}">
+                            </display:column>
+                        </display:table>
+                        <div id="table-footer">
+                            <a href="channels.htm">&#60&#60 Channel list</a>
+                        </div>
+                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>
+                    <div class="clear"></div>
                 </div>
-                <div id="table-content">
-                    <display:table name="channeldata" id="data" defaultsort="1"
-                        requestURI="channeldata.htm" cellpadding="5" cellspacing="0"
-                        export="false" class="tableborder">
-                        <display:caption class="tablecaption"><% out.println( name ); %>
-                        </display:caption>
-                        <display:column sortProperty="id" sortable="true"
-                            title="ID" class="tdcenter">
-                            <fmt:formatNumber value="${data.id}" pattern="00" />
-                        </display:column>
-                        <display:column sortProperty="date" sortable="true"
-                            title="Date" class="tdcenter" value="${data.date}">
-                        </display:column>
-                        <display:column sortProperty="time" sortable="true"
-                            title="Time" class="tdcenter" value="${data.time}">
-                        </display:column>
-                        <display:column sortProperty="path" sortable="true"
-                            paramId="path" paramProperty="path" title="File" class="tdcenter"
-                            href="download.htm" value="${fn:substring(data.path,
-                                        fn:length(data.path) - 37, fn:length(data.path))}">
-                        </display:column>
-                    </display:table>
-                </div>
+                <div class="clear"></div>
             </div>
         </div>
     </div>
     <div id="footer">
         <script type="text/javascript" src="includes/footer.js"></script>
     </div>
-</div>
+</body>
 </html>

@@ -9,7 +9,6 @@
 package eu.baltrad.dex.util;
 
 import eu.baltrad.dex.model.User;
-import eu.baltrad.dex.model.Transmitter;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -28,10 +27,6 @@ public class ApplicationSecurityManager {
 //---------------------------------------------------------------------------------------- Variables
     // Message digest util
     private MessageDigestUtil messageDigestUtil;
-    // Reference to server class object
-    private static Transmitter transmitter = null;
-    // Server state toggle
-    private static boolean serverRunning;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Method authenticates user based on credentials provided in the login form.
@@ -110,18 +105,6 @@ public class ApplicationSecurityManager {
         request.getSession( true ).removeAttribute( USER );
     }
     /**
-     * Method gets server state toggle value.
-     *
-     * @return Server state toggle value
-     */
-    public static boolean getServerRunning() { return serverRunning; }
-    /**
-     * Method sets server state toggle value.
-     *
-     * @param serverCommmand Server state toggle value
-     */
-    public static void setServerRunning( boolean serverCommand ) { serverRunning = serverCommand; }
-    /**
      * Method returns reference to message digest utility object.
      *
      * @return Reference to message digest utility object
@@ -134,37 +117,6 @@ public class ApplicationSecurityManager {
      */
     public void setMessageDigestUtil( MessageDigestUtil messageDigestUtil ) {
         this.messageDigestUtil = messageDigestUtil;
-    }
-    /**
-     * Method gets reference to server class object.
-     *
-     * @return Reference to server class object
-     */
-    public Transmitter getTransmitter() { return transmitter; }
-    /**
-     * Method sets reference to server class object.
-     *
-     * @param transmitter Server class object
-     */
-    public void setTransmitter( Transmitter trstr ) { transmitter = trstr; }
-    /**
-     * Method sets server toggle value to ON.
-     */
-    public void setTransmitterOn() {
-        synchronized( transmitter ) {
-            transmitter.setDoWait( false );
-            setServerRunning( true );
-            transmitter.notify();
-        }
-    }
-    /**
-     * Method sets server toggle value to OFF.
-     */
-    public void setTransmitterOff() {
-        synchronized( transmitter ) {
-            transmitter.setDoWait( true );
-            setServerRunning( false );
-        }
     }
 }
 //--------------------------------------------------------------------------------------------------

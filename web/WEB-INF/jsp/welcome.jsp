@@ -19,81 +19,94 @@
 %>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
-    <title>Baltrad Data Exchange System</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+    <title>Home</title>
 </head>
 
-<div id="content">
-    <div id="header">
-        <img src="includes/images/baltrad_header.png">
-    </div>
-    <div id="container1">
-        <div id="container2">
-            <div id="leftcol">
-                <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div id="rightcol">
-                <h1>Welcome to the Baltrad Data Exchange System!</h1>
-                <br>
-                <h2>Information on this node:</h2>
-                <div id="operator">
-                    <div id="operator-leftcol">
-                        <div id="operator-elem" class="odd">
-                            Operator name:
+<body>
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
+        </div>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+
+                    <div id="main">
+                        <div id="welcome">
+                            <h1>Welcome to the Baltrad Data Exchange System!</h1>
+                            <br/>
+                            <h2>
+                                <p>
+                                Use the system functionality to browse and download data or establish
+                                operational data exchange links by subscribing to the desired data
+                                channel.
+                                </p>
+                                <p>
+                                Following is the detailed information about this node.
+                                </p>
+                            </h2>
                         </div>
-                        <div id="operator-elem" class="even">
-                            Country:
-                        </div>
-                        <div id="operator-elem" class="odd">
-                            Address / city:
-                        </div>
-                        <div id="operator-elem" class="even">
-                            Address / code:
-                        </div>
-                        <div id="operator-elem" class="odd">
-                            Address / street:
-                        </div>
-                        <div id="operator-elem" class="even">
-                            Contact phone:
-                        </div>
-                        <div id="operator-elem" class="odd">
-                            E-mail:
-                        </div>
+                        <table>
+                            <tr class="even">
+                                <td class="left">Operator name</td>
+                                <td class="right">
+                                    <% out.println( operator.getFactory() ); %>
+                                </td>
+                            </tr>
+                            <tr class="odd">
+                                <td class="left">Country</td>
+                                <td class="right">
+                                    <% out.println( operator.getCountry() ); %>
+                                </td>
+                            </tr>
+                            <tr class="even">
+                                <td class="left">Address :: City</td>
+                                <td class="right">
+                                    <% out.println( operator.getCity() ); %>
+                                </td>
+                            </tr>
+                            <tr class="odd">
+                                <td class="left">Address :: Code</td>
+                                <td class="right">
+                                    <% out.println( operator.getZipCode() ); %>
+                                </td>
+                            </tr>
+                            <tr class="even">
+                                <td class="left">Address :: Street</td>
+                                <td class="right">
+                                    <% out.println( operator.getStreet() ); %>
+                                </td>
+                            </tr>
+                            <tr class="odd">
+                                <td class="left">Phone number</td>
+                                <td class="right">
+                                    <% out.println( operator.getPhone() ); %>
+                                </td>
+                            </tr>
+                            <tr class="even">
+                                <td class="left">E-mail</td>
+                                <td class="right">
+                                    <a href="mailto:<% out.println( operator.getEmail() );%>">
+                                        <% out.println( operator.getEmail() );%>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
-                    <div id="operator-rightcol">
-                        <div id="operator-elem" class="odd">
-                            <% out.println( operator.getFactory() ); %>
-                        </div>
-                        <div id="operator-elem" class="even">
-                            <% out.println( operator.getCountry() ); %>
-                        </div>
-                        <div id="operator-elem" class="odd">
-                            <% out.println( operator.getCity() ); %>
-                        </div>
-                        <div id="operator-elem" class="even">
-                            <% out.println( operator.getZipCode() ); %>
-                        </div>
-                        <div id="operator-elem" class="odd">
-                            <% out.println( operator.getNumber() + ", "
-                                                                    + operator.getStreet() );
-                            %>
-                        </div>
-                        <div id="operator-elem" class="even">
-                            <% out.println( operator.getPhone() ); %>
-                        </div>
-                        <div id="operator-elem" class="odd">
-                            <a href="mailto:baltrad.admin@imgw.pl">
-                                <% out.println( operator.getEmail() ); %>
-                            </a>
-                        </div>
-                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>          
+                    <div class="clear"></div>
                 </div>
+                <div class="clear"></div>
             </div>
         </div>
     </div>
     <div id="footer">
         <script type="text/javascript" src="includes/footer.js"></script>
     </div>
-</div>
+</body>
 </html>

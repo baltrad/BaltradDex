@@ -31,88 +31,77 @@
     } else {
         request.getSession().setAttribute( "is_user_admin", 1 );
     }
-    String serverStatus = applicationSecurityManager.getServerRunning() ? "Running..." : "Idle";
-    String controlColor = applicationSecurityManager.getServerRunning() ? "#99CC66" : "#FFFFFF";
 %>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
-    <title>Baltrad Data Exchange System</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+    <title>System management</title>
 </head>
 
-<div id="content">
-    <div id="header">
-        <img src="includes/images/baltrad_header.png">
-    </div>
-    <div id="container1">
-        <div id="container2">
-            <div id="leftcol">
-                <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div id="rightcol">
-                <c:choose>
-                    <c:when test="${is_user_admin == 1}">
-                        <div id="table-info">
-                            System management options.
+<body>
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
+        </div>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+                    <div id="main">
+                        <c:choose>
+                            <c:when test="${is_user_admin == 1}">
+                                <h1>System management options</h1>
+                                <br/>
+                                <h2>
+                                </h2>
+                                <table>
+                                    <caption>Control features</caption>
+                                    <tr class="even">
+                                        <td class="left">Data delivery register</td>
+                                        <td class="right">
+                                            <a href="clear_register.htm">Clear register</a>
+                                        </td>
+                                    </tr>
+                                    <tr class="odd">
+                                        <td class="left">Log messages</td>
+                                        <td class="right">
+                                            <a href="clear_log_messages.htm">Clear messages</a>
+                                        </td>
+                                    </tr>
+                                    <tr class="even">
+                                        <td class="left">User management</td>
+                                        <td class="right">
+                                            <a href="add_user.htm">Add</a>
+                                            <a href="edit_user.htm">Edit</a>
+                                            <a href="remove_user.htm">Remove</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </c:when>
+                            <c:otherwise>
+                                <div id="message-box">
+                                    Access to administrative area is restricted.
+                                    Please sign in as administrator and try again.
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                        <div id="table-footer">
+                            <a href="welcome.htm">&#60&#60 Home</a>
                         </div>
-                        <div id="table-content">
-                            <div id="admin-leftcol">
-                                <div class="admin-elem">
-                                    Server process control:
-                                </div>
-                                <div class="admin-elem">
-                                    Data delivery register:
-                                </div>
-                                <div class="admin-elem">
-                                    Log messages:
-                                </div>
-                                <div class="admin-elem">
-                                    User management:
-                                </div>
-                                <div class="admin-elem">
-                                    File catalog:
-                                </div>
-                            </div>
-                            <div id="admin-rightcol">
-                                <div class="admin-elem">
-                                    <a href="on.htm">ON</a>
-                                    <a href="off.htm">OFF</a>
-                                    <input type="submit"
-                                    value="<% out.println( serverStatus ); %>"
-                                    style="background-color:
-                                            <% out.println( controlColor ); %>;
-                                    width:100px">
-                                </div>
-                                <div class="admin-elem">
-                                    <a href="clear_register.htm">Clear register</a>
-                                </div>
-                                <div class="admin-elem">
-                                    <a href="clear_log_messages.htm">Clear messages</a>
-                                </div>
-                                <div class="admin-elem">
-                                    <a href="add_user.htm">Add</a>
-                                    <a href="edit_user.htm">Edit</a>
-                                    <a href="remove_user.htm">Remove</a>
-                                </div>
-                                <div class="admin-elem">
-                                    <a href="testdb.htm">Insert test data</a>
-                                </div>
-                            </div>
-                        </div>
-                    </c:when>
-                    <c:otherwise>
-                        <div id="message-box">
-                            Access to administrative area is restricted.
-                            Please sign in as administrator and try again.
-                        </div>
-                    </c:otherwise>
-                </c:choose>
+                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
             </div>
         </div>
     </div>
     <div id="footer">
         <script type="text/javascript" src="includes/footer.js"></script>
     </div>
-</div>
+</body>
+
 </html>

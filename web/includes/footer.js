@@ -8,7 +8,7 @@ document.write( "<div class=\"rightcol\">" );
 document.write( "<img src=\"includes/images/logo_2.png\">" );
 document.write( "</div>" );
 document.write( "<div class=\"midcol\">" );
-document.write( "Baltrad DEX v.0.1" );
+document.write( "Baltrad DEX v.0.1.4" );
 document.write( "</div>" );
 
 

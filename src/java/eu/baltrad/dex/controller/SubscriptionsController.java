@@ -51,7 +51,6 @@ public class SubscriptionsController implements Controller {
      */
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
-
         User user = ( User )applicationSecurityManager.getUser( request );
         List userSubscriptions = subscriptionManager.getUserSubscriptions( user.getId() );
         List subscriptions = channelManager.getChannels( userSubscriptions );

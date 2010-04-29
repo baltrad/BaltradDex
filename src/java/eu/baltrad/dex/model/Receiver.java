@@ -8,6 +8,8 @@
 
 package eu.baltrad.dex.model;
 
+import eu.baltrad.dex.util.InitAppUtil;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,9 +26,7 @@ import org.apache.commons.fileupload.util.Streams;
 
 import java.io.File;
 import java.io.InputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.FileNotFoundException;
 
 import java.util.Date;
 
@@ -39,10 +39,6 @@ import java.util.Date;
  */
 public class Receiver extends HttpServlet implements Controller {
 //---------------------------------------------------------------------------------------- Constants
-    // Servlet virtual path
-    private static final String SERVLET_VIRTUAL_PATH = "/";
-    // Incoming data directory
-    private static final String INCOMING_DATA_DIR = "incoming";
 //---------------------------------------------------------------------------------------- Variables
     private LogManager logManager;
 //------------------------------------------------------------------------------------------ Methods
@@ -58,7 +54,7 @@ public class Receiver extends HttpServlet implements Controller {
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
         doGet( request, response );
-        return new ModelAndView();
+        return null;
     }
     /**
      * Method overrides HTTP POST method.
@@ -93,22 +89,18 @@ public class Receiver extends HttpServlet implements Controller {
                     if( bfHandler.getBFContentType( hdrStr ).equals(
                             BaltradFrameHandler.BF_FILE_CONTENT ) && iterator.hasNext() ) {
                         // Get file content
-                        String fileId = bfHandler.getBFFileId( hdrStr );
                         logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "New file " +
                                 " received from " + bfHandler.getBFSender( hdrStr ) +
-                                ", file ID: " + fileId );
+                                "\n: " + bfHandler.getBFFileName( hdrStr ) );
                         // Save file content to local disk
-                        String ctxPath = request.getSession().getServletContext().getRealPath(
-                            SERVLET_VIRTUAL_PATH );
-                        // Create local directory if not exists
-                        String incomingDir = ctxPath + INCOMING_DATA_DIR + File.separator +
-                                bfHandler.getBFSender( hdrStr );
-                        makeDir( incomingDir );
+                        String incomingDir = InitAppUtil.getIncomingDataDir() +
+                                File.separator + bfHandler.getBFSender( hdrStr );
+                        InitAppUtil.makeDir( incomingDir );
                         FileItemStream fileItem = iterator.next();
                         InputStream fileStream = fileItem.openStream();
                         String absFilePath = incomingDir + File.separator +
                                 bfHandler.getBFFileName( hdrStr );
-                        saveFile( fileStream, absFilePath, fileId );
+                        InitAppUtil.saveFile( fileStream, absFilePath );
                     }
                 } 
             } else {
@@ -119,56 +111,6 @@ public class Receiver extends HttpServlet implements Controller {
         } catch( FileUploadException e ) {
             logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "Error while processing " +
                     "incoming frame: " + e.getMessage() );
-        }
-    }
-    /**
-     * Method extracts relative file name from absolute file path string.
-     *
-     * @param absFilePath Absolute file path string
-     * @return Relative file name
-     */
-    public String getRelFileName( String absFilePath ) {
-        return absFilePath.substring( absFilePath.lastIndexOf( File.separator ) + 1,
-                    absFilePath.length() );
-    }
-    /**
-     * Method creates new directory for incoming data files.
-     *
-     * @param directoryPath Path to the directory
-     */
-    public void makeDir( String directoryPath ) {
-        File dir = new File( directoryPath );
-        if( !dir.exists() ) {
-            dir.mkdirs();
-            logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "New directory created: "
-                    + directoryPath );
-        }
-    }
-    /**
-     * Method saves data from input stream to file with a given name.
-     *
-     * @param is Input data stream
-     * @param dstFileName Output file name
-     */
-    public void saveFile( InputStream is, String dstFileName, String fileId ) {
-        try {
-            File dstFile = new File( dstFileName );
-            FileOutputStream fos = new FileOutputStream( dstFile );
-            byte[] bytes = new byte[ 1024 ];
-            int len;
-            while( ( len = is.read( bytes ) ) > 0 ) {
-                fos.write( bytes, 0, len);
-            }
-            is.close();
-            fos.close();
-            logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "Incoming data succesfully " +
-                    " saved, file ID: " + fileId );
-        } catch( FileNotFoundException e ) {
-            logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: "
-                    + e.getMessage() );
-        } catch( IOException e ) {
-            logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: "
-                    + e.getMessage() );
         }
     }
     /**

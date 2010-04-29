@@ -8,6 +8,5 @@
     <mapping resource="eu/baltrad/dex/model/Subscription.hbm.xml"/>
     <mapping resource="eu/baltrad/dex/model/DeliveryRegisterEntry.hbm.xml"/>
     <mapping resource="eu/baltrad/dex/model/LogEntry.hbm.xml"/>
-    <mapping resource="eu/baltrad/dex/model/AuxSubscription.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

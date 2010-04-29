@@ -11,9 +11,9 @@
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
-    <title>Baltrad Data Exchange System</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+    <title>Current system messages</title>
 
     <script language="Javascript">
         function viewLogs() {
@@ -46,33 +46,42 @@
 
 </head>
 
-<div id="content">
-    <div id="header">
-        <img src="includes/images/baltrad_header.png">
-    </div>
-    <div id="container1">
-        <div id="container2">
-            <div id="leftcol">
-                <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div id="rightcol">
-                <div id="table-info">
-                    Latest system messages. Click <a href="journal.htm">here</a> to see
-                    full message stack.
+<body>
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
+        </div>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+                    <div id="main">
+                        <h1>Current system messages</h1>
+                        <br/>
+                        <h2>
+                            <p>
+                            Latest system messages. Click <a href="journal.htm">here</a> to see
+                            full message stack.
+                            </p>
+                        </h2>
+                        <div id="logtable"></div>
+                        <script type="text/javascript">
+                                viewLogs();
+                        </script>
+                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>
+                    <div class="clear"></div>
                 </div>
-                <div id="table-content">
-                    <div id="logtable"></div>
-                    <script>
-                        viewLogs();
-                    </script>
-                </div>
+                <div class="clear"></div>
             </div>
         </div>
     </div>
     <div id="footer">
         <script type="text/javascript" src="includes/footer.js"></script>
     </div>
-</div>
+</body>
 </html>
 
 
