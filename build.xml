@@ -10,331 +10,440 @@
 		- make some tests;
 -->
 <project name="BaltradDex" basedir="." default="dist">
-	<description>Builds and deploys BaltradDex application</description>
+  <description>Builds and deploys BaltradDex application</description>
+  <property name="root.dir" value="${basedir}"/>
+  <property name="lib.dir" value="lib"/>
+  <property name="extralib.dir" value="extralib"/>
+  <property name="src.dir" value="src"/>
+  <property name="web.dir" value="web"/>
+  <property name="webinf.dir" value="${web.dir}/WEB-INF"/>
+  <property name="etc.dir" value="etc"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="testdata.dir" value="TestData"/>
+  <property name="build.dir" value="build"/>
+  <property name="build.web.dir" value="${build.dir}/web"/>
+  <property name="build.testdata.dir" value="${build.web.dir}/TestData"/>
+  <property name="build.metainf.dir" value="${build.web.dir}/META-INF" />
+  <property name="build.webinf.dir" value="${build.web.dir}/WEB-INF" />
+  <property name="build.jsp.dir" value="${build.webinf.dir}/jsp"/>
+  <property name="build.classes.dir" value="${build.webinf.dir}/classes"/>
+  <property name="build.lib.dir" value="${build.webinf.dir}/lib"/>
+  <property name="build.test.dir" value="${build.dir}/test" />
 
-    <property name="lib.dir" value="lib"/>
-    <property name="extralib.dir" value="extralib"/>
-    <property name="src.dir" value="src"/>
-    <property name="web.dir" value="web"/>
-    <property name="webinf.dir" value="${web.dir}/WEB-INF"/>
-    <property name="etc.dir" value="etc"/>
-    <property name="dist.dir" value="dist"/>
-    <property name="testdata.dir" value="TestData"/>
-    <property name="build.dir" value="build"/>
-    <property name="build.web.dir" value="${build.dir}/web"/>
-    <property name="build.testdata.dir" value="${build.web.dir}/TestData"/>
-    <property name="build.metainf.dir" value="${build.web.dir}/META-INF" />
-    <property name="build.webinf.dir" value="${build.web.dir}/WEB-INF" />
-    <property name="build.jsp.dir" value="${build.webinf.dir}/jsp"/>
-    <property name="build.classes.dir" value="${build.webinf.dir}/classes"/>
-    <property name="build.lib.dir" value="${build.webinf.dir}/lib"/>
+  <property name="compile.debug" value="true"/>
+  <property name="compile.includeAntRuntime" value="no"/>
+  <property name="compile.optimize" value="true"/>
+  
+  <!-- You can override properties in this file -->
+  <property file="develop.properties" />
+  
+  <property file="${etc.dir}/db.properties"/>
+  <property file="${etc.dir}/appserver.properties"/>
 
-    <property file="${etc.dir}/db.properties"/>
-    <property file="${etc.dir}/appserver.properties"/>
+  <property environment="env"/>
 
-    <property environment="env"/>
+  <property name="install.prefix" value="/opt/baltrad"/>
 
-    <property name="install.prefix" value="/opt/baltrad"/>		
+  <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
+  <property name="beast.path" value="/opt/baltrad/beast" />
+  <available file="${baltrad.db.path}/java/jbrfc.jar" property="jbrfc.jar.available" />
+  <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
+  <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
 
-    <!-- Configure ant tasks for tomcat deployment -->
-    <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"
+  <fail unless="jbrfc.jar.available" message="baltrad.db.path must specify the installation dir of baltrad-db" />
+  <fail unless="beast.jar.available" message="beast.path must specify the installation dir of beast" />
+  <fail unless="beast.libs.available" message="beast.path must specify the installation dir of beast" />
+
+  <!-- Configure ant tasks for tomcat deployment -->
+  <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"
 		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
-    <taskdef name="list" classname="org.apache.catalina.ant.ListTask"
+  <taskdef name="list" classname="org.apache.catalina.ant.ListTask"
 		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
-    <taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask"
+  <taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask"
 		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
-    <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask"
+  <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask"
 		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
-    <taskdef name="roles" classname="org.apache.catalina.ant.RolesTask"
+  <taskdef name="roles" classname="org.apache.catalina.ant.RolesTask"
 		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
-    <taskdef name="start" classname="org.apache.catalina.ant.StartTask"
+  <taskdef name="start" classname="org.apache.catalina.ant.StartTask"
 		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
-    <taskdef name="stop" classname="org.apache.catalina.ant.StopTask"
+  <taskdef name="stop" classname="org.apache.catalina.ant.StopTask"
 		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
-    <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask"
+  <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask"
 		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
 
-	<!-- initialize library path -->	
-	<path id="lib.path">
-	    	<fileset dir="${lib.dir}">
-	      		<include name="**/*.jar"/>
-	    	</fileset>
-	    	<fileset dir="${extralib.dir}">
-	      		<include name="**/*.jar"/>
-	    	</fileset> 
-		<fileset dir="${env.CATALINA_HOME}/lib">
-			<include name="jbrfc.jar"/>
-		</fileset>
-  	</path>
+  <!-- initialize library path -->
+  <path id="lib.path">
+    <fileset dir="${lib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+    <fileset dir="${extralib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+    <fileset dir="${baltrad.db.path}/java">
+      <include name="jbrfc.jar"/>
+    </fileset>
+    <fileset dir="${beast.path}/bin">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
 
-	<target name="init">
+  <!-- path for testing -->
+  <path id="test.lib.path">
+    <fileset dir="${lib.dir}">
+      <include name="junit/*.jar"/>
+      <include name="ant-junit/*.jar"/>
+      <include name="easymock/*.jar"/>
+      <include name="cglib/*.jar"/>
+    </fileset>
+    <fileset dir="${beast.path}/libs">
+      <include name="commons-dbcp.jar"/>
+      <include name="commons-pool.jar"/>
+      <include name="groovy-all-1.6.4.jar"/>
+      <include name="ws-commons-util-1.0.2.jar"/>
+      <include name="xmlrpc-client-3.1.2.jar"/>
+      <include name="xmlrpc-common-3.1.2.jar"/>
+      <include name="xmlrpc-server-3.1.2.jar"/>
+    </fileset>
+  </path>  
+  
+  <target name="init">
+    <!-- create directory structure -->
+    <delete dir="${build.dir}"/>
+    <mkdir dir="${build.web.dir}"/>
+    <mkdir dir="${build.metainf.dir}"/>
+    <mkdir dir="${build.webinf.dir}"/>
+    <mkdir dir="${build.jsp.dir}"/>
+    <mkdir dir="${build.classes.dir}"/>
+    <mkdir dir="${build.lib.dir}"/>
+    <mkdir dir="${build.testdata.dir}"/>
+    <delete dir="${dist.dir}"/>
+    <mkdir dir="${dist.dir}"/>
 
-	<!-- create directory structure -->
-	<delete dir="${build.dir}"/>
-    	<mkdir dir="${build.web.dir}"/>
-    	<mkdir dir="${build.metainf.dir}"/>
-    	<mkdir dir="${build.webinf.dir}"/>
-    	<mkdir dir="${build.jsp.dir}"/>
-    	<mkdir dir="${build.classes.dir}"/>
-    	<mkdir dir="${build.lib.dir}"/>
-		<mkdir dir="${build.testdata.dir}"/>
-		<delete dir="${dist.dir}"/>
-		<mkdir dir="${dist.dir}"/>
+    <!-- copy libraries -->
+    <copy todir="${build.lib.dir}">
+      <fileset dir="lib/dom4j">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/hibernate">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/httpclient">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/jakarta-commons">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/jcip">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/spring">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/log4j">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/slf4j">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/j2ee">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/displaytag">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/jakarta-taglibs">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/javassist">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/antlr">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/catalina-ant">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/xerces">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib">
+        <include name="postgresql-8.4-701.jdbc4.jar"/>
+        <include name="apache-mime4j-0.6.jar"/>
+      </fileset>
+      <!-- Also, include nessecary libs from beast-lib -->
+      <fileset dir="${beast.path}/libs">
+        <include name="commons-dbcp.jar"/>
+        <include name="commons-pool.jar"/>
+        <include name="groovy-all-1.6.4.jar"/>
+        <include name="ws-commons-util-1.0.2.jar"/>
+        <include name="xmlrpc-client-3.1.2.jar"/>
+        <include name="xmlrpc-common-3.1.2.jar"/>
+        <include name="xmlrpc-server-3.1.2.jar"/>
+      </fileset>
+      <fileset dir="${beast.path}/bin">
+        <include name="*.jar"/>
+      </fileset>
+    </copy>
 
-		<!-- copy libraries -->
-		<copy todir="${build.lib.dir}">
-		  	<fileset dir="lib/dom4j">
-		    	<include name="*.jar"/>
-		  	</fileset>
-		  	<fileset dir="lib/hibernate">
-		    	<include name="*.jar"/>
-		  	</fileset>
-		  	<fileset dir="lib/httpclient">
-		    	<include name="*.jar"/>
-		  	</fileset>
-		  	<fileset dir="lib/jakarta-commons">
-		    	<include name="*.jar"/>
-		  	</fileset>
-		  	<fileset dir="lib/jcip">
-		    	<include name="*.jar"/>
-		  	</fileset>
-		  	<fileset dir="lib/spring">
-		    	<include name="*.jar"/>
-		  	</fileset>
-		  	<fileset dir="lib/log4j">
-		  		<include name="*.jar"/>
-		  	</fileset>      
-		  	<fileset dir="lib/slf4j">
-		  		<include name="*.jar"/>
-		  	</fileset>
-		  	<fileset dir="lib/j2ee">
-		    	<include name="*.jar"/>
-		  	</fileset>
-		  	<fileset dir="lib/displaytag">
-		    	<include name="*.jar"/>
-		  	</fileset>
-		  	<fileset dir="lib/jakarta-taglibs">
-		    	<include name="*.jar"/>
-		  	</fileset>
-		  	<fileset dir="lib/javassist">
-		    	<include name="*.jar"/>
-		  	</fileset>
-		  	<fileset dir="lib/antlr">
-		    	<include name="*.jar"/>
-		  	</fileset>
-			<fileset dir="lib/catalina-ant">
-		    	<include name="*.jar"/>
-		  	</fileset>
-			<fileset dir="lib/xerces">
-				<include name="*.jar"/>
-			</fileset>       
-		  	<fileset dir="lib">
-		  		<include name="postgresql-8.4-701.jdbc4.jar"/>
-		    	<include name="apache-mime4j-0.6.jar"/>
-		  	</fileset>
-		</copy>
+    <!-- copy web interface files -->
+    <copy todir="${build.web.dir}">
+      <fileset dir="${web.dir}">
+        <include name="index.jsp"/>
+        <include name="includes/**/*.jsp" />
+        <include name="includes/**/*.js" />
+        <include name="includes/**/*.css" />
+        <include name="includes/**/*.png" />
+        <include name="includes/**/*.gif" />
+        <include name="includes/**/*.jpg" />
+      </fileset>
+      
+      <fileset dir="${etc.dir}">
+        <include name="db.properties" />
+        <include name="log4j.properties" />
+      </fileset>
+    </copy>
 
-		<!-- copy web interface files -->
-		<copy todir="${build.web.dir}">
-		  	<fileset dir="${web.dir}">
-				<include name="index.jsp"/>
-				<include name="includes/**/*.jsp" />
-				<include name="includes/**/*.js" />
-				<include name="includes/**/*.css" />
-				<include name="includes/**/*.png" />
-				<include name="includes/**/*.gif" />
-				<include name="includes/**/*.jpg" />
-		  	</fileset>
-		</copy>
+    <!-- copy test data files -->
+    <copy todir="${build.testdata.dir}">
+      <fileset dir="${testdata.dir}"/>
+    </copy>
 
-		<!-- copy test data files -->
-		<copy todir="${build.testdata.dir}">
-		  	<fileset dir="${testdata.dir}"/>
-		</copy>
-		<!-- copy manifest and context definition files -->
-		<copy todir="${build.metainf.dir}">
-      		<fileset dir="${src.dir}/conf">
-        		<include name="MANIFEST.MF"/>
-      		</fileset>
-      		<fileset dir="${web.dir}/META-INF">
-        		<include name="context.xml"/>
-      		</fileset>
-    	</copy>
+    <!-- copy manifest and context definition files -->
+    <copy todir="${build.metainf.dir}">
+      <fileset dir="${src.dir}/conf">
+        <include name="MANIFEST.MF"/>
+      </fileset>
+      <fileset dir="${web.dir}/META-INF">
+        <include name="context.xml"/>
+      </fileset>
+    </copy>
 
-	<!-- copy configuration files -->
-    	<copy todir="${build.webinf.dir}">
-      		<fileset dir="${webinf.dir}">
-        		<include name="applicationContext.xml" />
-        		<include name="baltraddex-servlet.xml" />
-        		<include name="web.xml" />
-        		<include name="jsp/**/*.jsp" />
-      		</fileset>
-    	</copy>
+    <!-- copy configuration files -->
+    <copy todir="${build.webinf.dir}">
+      <fileset dir="${webinf.dir}">
+        <include name="applicationContext.xml" />
+        <include name="baltraddex-servlet.xml" />
+        <include name="web.xml" />
+        <include name="jsp/**/*.jsp" />
+      </fileset>
+    </copy>
 
-    	<copy todir="${build.classes.dir}">
-      		<fileset dir="${src.dir}/java">
-        		<include name="**/*.xml"/>
-        		<include name="**/*.properties"/>
-      		</fileset>
-    	</copy>
-  	</target>
+    <copy todir="${build.classes.dir}">
+      <fileset dir="${src.dir}/java">
+        <include name="**/*.xml"/>
+        <include name="**/*.properties"/>
+      </fileset>
+    </copy>
+  </target>
 
-	<!-- compile source files -->
-	<target name="compile" depends="init">
+  <!-- compile source files -->
+  <target name="compile" depends="init">
+    <javac encoding="8859_1" srcdir="${src.dir}" deprecation="on"
+             destdir="${build.classes.dir}">
+      <include name="**/*.java"/>
+      <classpath refid="lib.path"/>
+    </javac>
+  </target>
 
-    	<javac encoding="8859_1" srcdir="${src.dir}" deprecation="on"
-        	destdir="${build.classes.dir}">
-      		<include name="**/*.java"/>
-      		<classpath refid="lib.path"/>
-    	</javac>
-  	</target>
+  <!-- installs BaltradDex as library -->
+  <target name="install" depends="dist">
+    <mkdir dir="${install.prefix}/BaltradDex"/>
+    <mkdir dir="${install.prefix}/BaltradDex/sql"/>
+    <mkdir dir="${install.prefix}/BaltradDex/bin"/>
+    <copy todir="${install.prefix}/BaltradDex/sql">
+      <fileset dir="${etc.dir}">
+        <include name="**/*.sql"/>
+      </fileset>
+    </copy>
+    <copy todir="${install.prefix}/BaltradDex/bin">
+      <fileset dir="${dist.dir}">
+        <include name="BaltradDex.war"/>
+      </fileset>
+    </copy>
+  </target>
 
-	<!-- installs BaltradDex as library -->
-	<target name="install" depends="dist">
-		<mkdir dir="${install.prefix}/BaltradDex"/>
-		<mkdir dir="${install.prefix}/BaltradDex/sql"/>
-		<mkdir dir="${install.prefix}/BaltradDex/bin"/>
-		<copy todir="${install.prefix}/BaltradDex/sql">
-			<fileset dir="${etc.dir}">
-				<include name="**/*.sql"/>
-			</fileset>
-		</copy>
-		<copy todir="${install.prefix}/BaltradDex/bin">
-			<fileset dir="${dist.dir}">
-				<include name="BaltradDex.war"/>
-			</fileset>
-		</copy>
-	</target>
+  <!-- create WAR file -->
+  <target name="dist" depends="compile">
+    <war destfile="${dist.dir}/BaltradDex.war" webxml="${webinf.dir}/web.xml">
+      <fileset dir="${build.web.dir}">
+        <include name="**/*.*"/>
+        <exclude name="**/web.xml"/>
+      </fileset>
+    </war>
+  </target>
 
-	<!-- create WAR file -->
-	<target name="dist" depends="compile">
-	<war destfile="${dist.dir}/BaltradDex.war" webxml="${webinf.dir}/web.xml">
-		<fileset dir="${build.web.dir}">
-			<include name="**/*.*"/>
-			<exclude name="**/web.xml"/>
-		</fileset>
-	</war>
-  	</target> 
+  <!-- UNIT TEST PART -->
+  <target name="compile.test">
+    <mkdir dir="${build.test.dir}"/>
+    <javac srcdir="${root.dir}/test"
+           encoding="8859_1"
+           deprecation="on"
+           debug="${compile.debug}"
+           includeAntRuntime="${compile.includeAntRuntime}"    	
+           optimize="${compile.optimize}"
+           destdir="${build.test.dir}">
+      <classpath location="${build.classes.dir}"/>
+      <classpath refid="lib.path"/>
+      <classpath refid="test.lib.path"/>
+    </javac>
+  	
+    <!-- copy any resources -->
+    <copy todir="${build.test.dir}">
+      <fileset dir="${root.dir}/test">
+        <include name="**/*.xml"/>
+        <include name="**/*.properties"/>
+      	<include name="**/*.groovy"/>
+      </fileset>
+    </copy>
+  </target>
 
-	<!-- delete build and dist directories -->
-	<target name="clean">
-    	<delete dir="build"/>
-    		<delete>
-      			<fileset dir=".">
-        			<include name="**/*.bak"/>
-        			<include name="**/*~"/>
-    	  		</fileset>
-    		</delete>
-		<delete dir="dist"/>
-    		<delete>
-      			<fileset dir=".">
-        			<include name="**/*.war"/>
-    	  	</fileset>
-    	</delete>
-  	</target>
+  <target name="execute.test" depends="compile.test">
+	<mkdir dir="${dist.dir}/junit-reports" />
+	<junit dir="${build.test.dir}" showoutput="true" forkmode="perBatch" printsummary="no" >
+	  <jvmarg line="-Djava.awt.headless=true -Xmx512m -XX:MaxPermSize=512m"/>
+	  <formatter type="xml"/> 
+	  <classpath refid="test.lib.path"/>
+	  <classpath location="${build.classes.dir}"/>
+	  <classpath refid="lib.path"/>
+	  <classpath location="${build.test.dir}" />
+	  <batchtest fork="yes" todir="${dist.dir}/junit-reports">
+	    <fileset dir="${build.test.dir}" includes="**/*Test.class"/>
+	  </batchtest>
+	</junit>
+  </target>
+  
+  <target name="test" depends="compile,execute.test"/>
+  
+  <!-- delete build and dist directories -->
+  <target name="clean">
+    <delete dir="build"/>
+    <delete>
+      <fileset dir=".">
+        <include name="**/*.bak"/>
+        <include name="**/*~"/>
+      </fileset>
+    </delete>
+    <delete dir="dist" />
+    <delete>
+      <fileset dir=".">
+        <include name="**/*.war" />
+      </fileset>
+    </delete>
+  </target>
 
-	<!-- create database and users -->
-	<target name="create-db">
-    	<sql classpath="${lib.dir}/${db.jar}"
-      		driver="${db.driver}"
-    	 	url="${db.url}"
-    	 	userid="${db.user}" 
-         	password="${db.pwd}" >
-      		<transaction src="${etc.dir}/create_db.sql"/>
-    	</sql>
-  	</target>
+  <!-- create database and users -->
+  <target name="create-db">
+    <sql classpath="${lib.dir}/${db.jar}" driver="${db.driver}" url="${db.url}" userid="${db.user}" password="${db.pwd}">
+      <transaction src="${etc.dir}/create_db.sql"/>
+    </sql>
+  </target>
 
-	<!-- create database schema -->
-	<target name="create-schema">
-    	<sql classpath="${lib.dir}/${db.jar}"
-      		driver="${db.driver}"
-    	 	url="${db.url}"
-    	 	userid="${db.user}" 
-         	password="${db.pwd}" >
-      		<transaction src="${etc.dir}/create_dex_schema.sql"/>
-    	</sql>
-  	</target>
+  <!-- create database schema -->
+  <target name="create-schema">
+    <sql classpath="${lib.dir}/${db.jar}"
+         driver="${db.driver}"
+         url="${db.url}"
+         userid="${db.user}" 
+         password="${db.pwd}" >
+      <transaction src="${etc.dir}/create_dex_schema.sql"/>
+    </sql>
+  </target>
 
-	<!-- insert data into the database -->
-    	<target name="insert-data" depends="create-schema">
-    	<sql classpath="${lib.dir}/${db.jar}"
-      		driver="${db.driver}"
-    	 	url="${db.url}"
-    	 	userid="${db.user}" 
-         	password="${db.pwd}" >
-      		<transaction src="${etc.dir}/insert_dex_data.sql"/>
-    	</sql>
-  	</target>
+  <!-- insert data into the database -->
+  <target name="insert-data" depends="create-schema">
+    <sql classpath="${lib.dir}/${db.jar}"
+         driver="${db.driver}"
+         url="${db.url}"
+         userid="${db.user}" 
+         password="${db.pwd}" >
+      <transaction src="${etc.dir}/insert_dex_data.sql"/>
+    </sql>
+  </target>
 
-	<!-- fetch data from the database -->
-    	<target name="fetch-data">
-    	<sql classpath="${lib.dir}/${db.jar}"
-      		driver="${db.driver}"
-    	 	url="${db.url}"
-    	 	userid="${db.user}" 
-         	password="${db.pwd}"
-			print="true">
-      		<transaction src="${etc.dir}/fetch_dex_data.sql"/>
-    	</sql>
-  	</target>
+  <!-- fetch data from the database -->
+  <target name="fetch-data">
+    <sql classpath="${lib.dir}/${db.jar}"
+         driver="${db.driver}"
+         url="${db.url}"
+         userid="${db.user}" 
+         password="${db.pwd}"
+         print="true">
+      <transaction src="${etc.dir}/fetch_dex_data.sql"/>
+    </sql>
+  </target>
 
-	<!-- deploy on tomcat -->
-	<target name="deploy" depends="dist, insert-data, context-status"
+  <!-- installs the full data scheme used by dex, db and beast -->
+  <target name="create-full-schema" description="Installs all schemes nessecary">
+    <sql classpath="${lib.dir}/${db.jar}"
+         driver="${db.driver}"
+         url="${db.url}"
+         userid="${db.user}" 
+         password="${db.pwd}" >
+      <transaction src="${etc.dir}/drop_dex_schema.sql"/>
+      <transaction src="${baltrad.db.path}/sql/postgresql/drop.sql"/>
+      <transaction src="${baltrad.db.path}/sql/postgresql/create.sql"/>
+      <transaction src="${beast.path}/sql/drop_db.sql"/>
+      <transaction src="${beast.path}/sql/create_db.sql"/>
+      <transaction src="${etc.dir}/create_dex_schema.sql"/>
+    </sql>
+  </target>
+  
+  <!-- deploy on tomcat -->
+  <target name="deploy" depends="dist, insert-data, context-status"
     	if="context.deployable">
-    	<echo message="Deploying ${mgr.path} to ${mgr.url}"/>
-    	<deploy url="${mgr.url}"
-      		username="${mgr.username}"
-      		password="${mgr.password}"
-      		path="${mgr.path}"
-      		update="${mgr.update}"
-      		war="file:${dist.dir}/BaltradDex.war"/>
-  	</target>
+    <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
+    <deploy url="${mgr.url}"
+            username="${mgr.username}"
+            password="${mgr.password}"
+            path="${mgr.path}"
+            update="${mgr.update}"
+            war="file:${dist.dir}/BaltradDex.war"/>
+  </target>
 
-	<!-- From apache-tomcat user manual for using the ant-manager task -->
-  	<target name="context-status">
-    	<property name="running" value="${mgr.path}:running"/>
-		<property name="stopped" value="${mgr.path}:stopped"/>
-	
-    	<list url="${mgr.url}"
+  <!-- From apache-tomcat user manual for using the ant-manager task -->
+  <target name="context-status">
+    <property name="running" value="${mgr.path}:running"/>
+    <property name="stopped" value="${mgr.path}:stopped"/>
+
+    <list url="${mgr.url}"
       		outputproperty="ctx.status"
       		username="${mgr.username}"
       		password="${mgr.password}">
-    	</list>
-		
-    	<condition property="context.running">
-      		<contains string="${ctx.status}" substring="${running}"/>
-    	</condition>
-    	<condition property="context.stopped">
-      		<contains string="${ctx.status}" substring="${stopped}"/>
-    	</condition>
-    	<condition property="context.notInstalled">
-      		<and>
-        		<isfalse value="${context.running}"/>
-        		<isfalse value="${context.stopped}"/>
-      		</and>
-    	</condition>
-    	<condition property="context.deployable">
-      		<or>
-        		<istrue value="${context.notInstalled}"/>
-        		<and>
-          			<istrue value="${context.running}"/>
-          			<istrue value="${mgr.update}"/>
-        		</and>
-        		<and>
-          			<istrue value="${context.stopped}"/>
-          			<istrue value="${mgr.update}"/>
-        		</and>
-      		</or>
-    	</condition>
-    	<condition property="context.undeployable">
-      		<or>
-        		<istrue value="${context.running}"/>
-        		<istrue value="${context.stopped}"/>
-      		</or>
-    	</condition>
-  	</target>
+    </list>
+
+    <condition property="context.running">
+      <contains string="${ctx.status}" substring="${running}"/>
+    </condition>
+    <condition property="context.stopped">
+      <contains string="${ctx.status}" substring="${stopped}"/>
+    </condition>
+    <condition property="context.notInstalled">
+      <and>
+        <isfalse value="${context.running}"/>
+        <isfalse value="${context.stopped}"/>
+      </and>
+    </condition>
+    <condition property="context.deployable">
+      <or>
+        <istrue value="${context.notInstalled}"/>
+        <and>
+          <istrue value="${context.running}"/>
+          <istrue value="${mgr.update}"/>
+        </and>
+        <and>
+          <istrue value="${context.stopped}"/>
+          <istrue value="${mgr.update}"/>
+        </and>
+      </or>
+    </condition>
+    <condition property="context.undeployable">
+      <or>
+        <istrue value="${context.running}"/>
+        <istrue value="${context.stopped}"/>
+      </or>
+    </condition>
+  </target>
 
 </project>
-
-
 

@@ -115,6 +115,6 @@ CREATE TABLE dex_delivery_register
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('delivery_register_id_seq'),
     user_id INT NOT NULL REFERENCES dex_users (id),
-    data_id INT NOT NULL REFERENCES files (id),
+    data_id INT NOT NULL REFERENCES bdb_files (id),
     PRIMARY KEY (id)
 );
