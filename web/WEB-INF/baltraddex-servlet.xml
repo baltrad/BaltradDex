@@ -4,9 +4,12 @@
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
-http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+                           http://www.springframework.org/schema/aop 
+                           http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
     
     <!--
         URL to controller mapping. Bean references http request interceptor which is used
@@ -377,6 +380,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="locations">
             <list>
                 <value>db.properties</value>
+                <value>classpath:eu/baltrad/dex/util/dex.fc.properties</value>
             </list>
         </property>
     </bean>
@@ -387,6 +391,18 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="username" value="${db.user}"/>
         <property name="password" value="${db.pwd}"/>
     </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+ 
+    <!-- Enable transaction management -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+  
+    <!-- we want transactions on classes -->
+    <tx:annotation-driven transaction-manager="txManager" proxy-target-class="true"/>
     
     <bean id="xmlrpcgenerator" class="eu.baltrad.beast.adaptor.xmlrpc.XmlRpcCommandGenerator"/>
   
@@ -394,26 +410,25 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
   
     <!-- Add the xml adaptor to the baltrad adaptor -->
     <bean id="adaptormanager" class="eu.baltrad.beast.adaptor.BltAdaptorManager" autowire="byType">
-        <property name="typeRegistry">
+        <property name="types">
             <list>
                 <ref bean="xmlrpcadaptormanager"/>
             </list>
         </property>
     </bean>
+
+    <!-- Create the router -->
+    <bean id="groovymgr" class="eu.baltrad.beast.rules.groovy.GroovyRuleManager" autowire="byType"/>
+    <bean id="bltcompositemgr" class="eu.baltrad.beast.rules.composite.CompositingRuleManager" autowire="byType"/>
   
-    <bean id="groovycreator" class="eu.baltrad.beast.rules.GroovyRuleCreator"/>
-  
-    <!-- Create the rule factory -->
-    <bean id="rulefactory" class="eu.baltrad.beast.rules.RuleFactory">
-        <property name="creators">
-            <list>
-                <ref bean="groovycreator"/>
-            </list>
+    <bean id="router" class="eu.baltrad.beast.router.impl.BltRouter" autowire="byType">
+        <property name="ruleManagers">
+            <map>
+                <entry key="groovy" value-ref="groovymgr"/>
+                <entry key="blt_composite" value-ref="bltcompositemgr"/>
+            </map>
         </property>
     </bean>
-  
-    <!-- Create the router -->
-    <bean id="router" class="eu.baltrad.beast.router.impl.BltRouter" autowire="byType" />
   
     <!-- Add the baltrad adaptor manager to the baltrad manager -->
     <bean id="bltmanager" class="eu.baltrad.beast.manager.BltMessageManager" autowire="byType"/>
@@ -426,8 +441,24 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             </list>
         </property>
     </bean>
+
+    <!-- We need to have a timeout manager so that we can initiate timeout requests from anywhere -->
+    <bean id="timeoutfactory" class="eu.baltrad.beast.rules.timer.TimeoutTaskFactory"/>  
+    <bean id="timeoutmanager" class="eu.baltrad.beast.rules.timer.TimeoutManager" autowire="byType"/>
+
+    <!-- and the file catalog -->
+    <bean id="fc" class="eu.baltrad.fc.FileCatalog">
+  	    <constructor-arg value="${database.uri}" />
+  	    <constructor-arg value="${storage.dir}" />
+    </bean>
+    
+    <!-- and the abstraction of the catalog -->
+    <bean id="catalog" class="eu.baltrad.beast.db.Catalog" autowire="byType" />
+
+    <!-- And we should have an application context to get hold of relevant managers -->
+    <bean id="managercontext" class="eu.baltrad.beast.ManagerContext" autowire="byType" />
   
     <bean id="adaptorsController" class="eu.baltrad.beastui.web.controller.AdaptorsController" autowire="byType" />
-    <bean id="routesController" class="eu.baltrad.beastui.web.controller.RoutesController" autowire="byType" />
-    
+    <bean id="groovyRoutesController" class="eu.baltrad.beastui.web.controller.GroovyRoutesController" autowire="byType" />
+    <bean id="showRoutesController" class="eu.baltrad.beastui.web.controller.ShowRoutesController" autowire="byType" />
 </beans>

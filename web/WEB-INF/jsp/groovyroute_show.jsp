@@ -74,7 +74,7 @@ Creates a route
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
-    <title>Modify route</title>
+    <title>Modify Groovy Route</title>
 </head>
 
 <body>
@@ -88,22 +88,20 @@ Creates a route
         <div class="inner">
           <div class="float-wrap">
             <div id="main">
-              <h1>Modify route</h1>
+              <h1>Modify Groovy route</h1>
               <br/>
               <h2>
-                Modify or delete a routing rule.
+                Modify or delete a Groovy routing rule.
               </h2>
               <div class="form-content">
-                <form name="showRouteForm" action="showroute.htm">
+                <form name="showRouteForm" action="groovyroute_show.htm">
                   <%
-                    List<String> types = (List<String>)request.getAttribute("types");
                     List<String> adaptors = (List<String>)request.getAttribute("adaptors");
                     String name = (String)request.getAttribute("name");
                     String author = (String)request.getAttribute("author");
                     Boolean active = (Boolean)request.getAttribute("active");
                     String description = (String)request.getAttribute("description");
                     List<String> recipients = (List<String>)request.getAttribute("recipients");
-                    String type = (String)request.getAttribute("type");
                     String definition = (String)request.getAttribute("definition");
                     String activestr = active==true?"checked":"";
                   %>
@@ -126,20 +124,7 @@ Creates a route
                       }
                     %>
                     </select></li>
-                    <li><span>Type:</span> <select name="type">
-                    <%
-                      for (String t : types) {
-                        String selected = "";
-                        if (t.equals(type)) {
-                          selected = "selected";
-                        }
-                    %>
-                        <option value="<%=t%>" <%=selected%>><%=t%></option>
-                    <%
-                      }
-                    %>
-                    </select></li>
-                    <li><span>Rule:</span>&nbsp;</li>
+                    <li><span>Script:</span>&nbsp;</li>
                     <textarea class="routedefinition" name="typdef"><%=definition%></textarea>
                   </ul>
                   <div id="table-footer">

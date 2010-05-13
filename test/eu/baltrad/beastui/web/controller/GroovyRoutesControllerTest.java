@@ -27,17 +27,15 @@ import org.easymock.MockControl;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
-import eu.baltrad.beast.message.IBltMessage;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
-import eu.baltrad.beast.rules.IRule;
-import eu.baltrad.beast.rules.IRuleFactory;
 import eu.baltrad.beast.rules.RuleException;
+import eu.baltrad.beast.rules.groovy.GroovyRule;
 
 /**
  * @author Anders Henja
  */
-public class RoutesControllerTest extends TestCase {
+public class GroovyRoutesControllerTest extends TestCase {
   private static interface MethodMocker {
     public String viewCreateRoute(Model model,
         String name,
@@ -45,7 +43,6 @@ public class RoutesControllerTest extends TestCase {
         Boolean active,
         String description,
         List<String> recipients,
-        String type,
         String definition,
         String emessage);
     
@@ -58,15 +55,17 @@ public class RoutesControllerTest extends TestCase {
         Boolean active,
         String description,
         List<String> recipients,
-        String type,
         String definition,
-        String emessage);    
+        String emessage); 
+    
+    public GroovyRule createRule(String script);
+    
+    public String modifyRoute(Model model, String name, String author,
+        Boolean active, String description, List<String> recipients, String script);
   };
-  private RoutesController classUnderTest = null;
+  private GroovyRoutesController classUnderTest = null;
   private MockControl managerControl = null;
   private IRouterManager manager = null;
-  private MockControl factoryControl = null;
-  private IRuleFactory factory = null;
   private MockControl adaptorControl = null;
   private IBltAdaptorManager adaptorManager = null;
   private MockControl modelControl = null;
@@ -77,8 +76,6 @@ public class RoutesControllerTest extends TestCase {
   public void setUp() throws Exception {
     managerControl = MockControl.createControl(IRouterManager.class);
     manager = (IRouterManager) managerControl.getMock();
-    factoryControl = MockControl.createControl(IRuleFactory.class);
-    factory = (IRuleFactory) factoryControl.getMock();
     adaptorControl = MockControl.createControl(IBltAdaptorManager.class);
     adaptorManager = (IBltAdaptorManager) adaptorControl.getMock();
     modelControl = MockControl.createControl(Model.class);
@@ -86,17 +83,18 @@ public class RoutesControllerTest extends TestCase {
     methodMockControl = MockControl.createControl(MethodMocker.class);
     methodMock = (MethodMocker)methodMockControl.getMock();
     
-    classUnderTest = new RoutesController() {
+    // All creator methods and view methods are mocked to simplify testing
+    //
+    classUnderTest = new GroovyRoutesController() {
       protected String viewCreateRoute(Model model,
           String name,
           String author,
           Boolean active,
           String description,
           List<String> recipients,
-          String type,
           String definition,
           String emessage) {
-        return methodMock.viewCreateRoute(model, name, author, active, description, recipients, type, definition, emessage);
+        return methodMock.viewCreateRoute(model, name, author, active, description, recipients, definition, emessage);
       }
       
       protected String viewShowRoutes(Model model,
@@ -110,15 +108,22 @@ public class RoutesControllerTest extends TestCase {
           Boolean active,
           String description,
           List<String> recipients,
-          String type,
           String definition,
           String emessage) {
         return methodMock.viewShowRoute(model, name, author, active,
-            description, recipients, type, definition, emessage);
+            description, recipients, definition, emessage);
+      }
+      
+      protected GroovyRule createRule(String script) {
+        return methodMock.createRule(script);
+      }
+      
+      protected String modifyRoute(Model model, String name, String author,
+          Boolean active, String description, List<String> recipients, String script) {
+        return methodMock.modifyRoute(model, name, author, active, description, recipients, script);
       }
     };
     classUnderTest.setManager(manager);
-    classUnderTest.setRuleFactory(factory);
     classUnderTest.setAdaptorManager(adaptorManager);
   }
 
@@ -126,8 +131,6 @@ public class RoutesControllerTest extends TestCase {
     classUnderTest = null;
     managerControl = null;
     manager = null;
-    factoryControl = null;
-    factory = null;
     adaptorControl = null;
     adaptorManager = null;
     modelControl = null;
@@ -138,7 +141,6 @@ public class RoutesControllerTest extends TestCase {
 
   private void replay() {
     managerControl.replay();
-    factoryControl.replay();
     adaptorControl.replay();
     modelControl.replay();
     methodMockControl.replay();
@@ -146,25 +148,9 @@ public class RoutesControllerTest extends TestCase {
 
   private void verify() {
     managerControl.verify();
-    factoryControl.verify();
     adaptorControl.verify();
     modelControl.verify();
     methodMockControl.verify();
-  }
-
-  public void testShowRoutes() {
-    List<RouteDefinition> definitions = new ArrayList<RouteDefinition>();
-    manager.getDefinitions();
-    managerControl.setReturnValue(definitions);
-    model.addAttribute("routes", definitions);
-    modelControl.setReturnValue(null);
-
-    replay();
-
-    String result = classUnderTest.showRoutes(model);
-
-    verify();
-    assertEquals("routes", result);
   }
 
   public void testCreateRoute_initial() {
@@ -172,28 +158,24 @@ public class RoutesControllerTest extends TestCase {
     types.add("groovy");
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    factory.getTypes();
-    factoryControl.setReturnValue(types);
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
-    methodMock.viewCreateRoute(model, null, null, null, null, null, null, null, null);
-    methodMockControl.setReturnValue("createroute");
+    methodMock.viewCreateRoute(model, null, null, null, null, null, null,null);
+    methodMockControl.setReturnValue("groovyroute_create");
     
     replay();
 
-    String result = classUnderTest.createRoute(model, null, null, null, null,
+    String result = classUnderTest.createRoute(model, null, null, null,
         null, null, null);
 
     verify();
-    assertEquals("createroute", result);
+    assertEquals("groovyroute_create", result);
   }
 
   public void testCreateRoute_noAdaptors() {
     List<String> types = new ArrayList<String>();
     types.add("groovy");
     List<String> adaptors = new ArrayList<String>();
-    factory.getTypes();
-    factoryControl.setReturnValue(types);
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
 
@@ -203,34 +185,11 @@ public class RoutesControllerTest extends TestCase {
 
     replay();
 
-    String result = classUnderTest.createRoute(model, null, null, null, null,
+    String result = classUnderTest.createRoute(model, null, null, null,
         null, null, null);
 
     verify();
     assertEquals("redirect:adaptors.htm", result);
-  }
-
-  public void testCreateRoute_noTypes() {
-    List<String> types = new ArrayList<String>();
-    List<String> adaptors = new ArrayList<String>();
-    adaptors.add("A1");
-    factory.getTypes();
-    factoryControl.setReturnValue(types);
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
-
-    model
-        .addAttribute("emessage",
-            "No types defined, configuration error, please contact your administrator.");
-    modelControl.setReturnValue(null);
-
-    replay();
-
-    String result = classUnderTest.createRoute(model, null, null, null, null,
-        null, null, null);
-
-    verify();
-    assertEquals("routes", result);
   }
 
   public void testCreateRoute_success() {
@@ -239,28 +198,16 @@ public class RoutesControllerTest extends TestCase {
     String author = "nisse";
     Boolean active = true;
     String description = "some description";
-    String type = "groovy";
     String def = "some code";
-
+    GroovyRule rule = new GroovyRule();
+    
     List<String> recipients = new ArrayList<String>();
-
-    IRule rule = new IRule() {
-      public IBltMessage handle(IBltMessage message) {return null;}
-      public String getType() {return null;}
-      public String getDefinition() {return null;}
-    };
-
-    List<String> types = new ArrayList<String>();
-    types.add("groovy");
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    factory.getTypes();
-    factoryControl.setReturnValue(types);
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
-
-    factory.create(type, def);
-    factoryControl.setReturnValue(rule);
+    methodMock.createRule(def);
+    methodMockControl.setReturnValue(rule);
     manager.create(name, author, active, description, recipients, rule);
     managerControl.setReturnValue(routedef);
     manager.storeDefinition(routedef);
@@ -268,7 +215,7 @@ public class RoutesControllerTest extends TestCase {
     replay();
 
     String result = classUnderTest.createRoute(model, name, author, active,
-        description, recipients, type, def);
+        description, recipients, def);
 
     verify();
     assertEquals("redirect:routes.htm", result);
@@ -279,7 +226,6 @@ public class RoutesControllerTest extends TestCase {
     String author = "nisse";
     Boolean active = true;
     String description = "some description";
-    String type = "groovy";
     String def = "some code";
 
     List<String> recipients = new ArrayList<String>();
@@ -288,20 +234,18 @@ public class RoutesControllerTest extends TestCase {
     types.add("groovy");
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    factory.getTypes();
-    factoryControl.setReturnValue(types);
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
-    methodMock.viewCreateRoute(model, name, "nisse", true, "some description", recipients, "groovy", "some code", "Name must be specified.");
-    methodMockControl.setReturnValue("createroute");
+    methodMock.viewCreateRoute(model, name, "nisse", true, "some description", recipients, "some code", "Name must be specified.");
+    methodMockControl.setReturnValue("groovyroute_create");
 
     replay();
 
     String result = classUnderTest.createRoute(model, name, author, active,
-        description, recipients, type, def);
+        description, recipients, def);
 
     verify();
-    assertEquals("createroute", result);
+    assertEquals("groovyroute_create", result);
   }
   
   public void testCreateRoute_noDefinition() {
@@ -309,7 +253,6 @@ public class RoutesControllerTest extends TestCase {
     String author = "nisse";
     Boolean active = true;
     String description = "some description";
-    String type = "groovy";
     String def = "";
 
     List<String> recipients = new ArrayList<String>();
@@ -318,17 +261,15 @@ public class RoutesControllerTest extends TestCase {
     types.add("groovy");
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    factory.getTypes();
-    factoryControl.setReturnValue(types);
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
-    methodMock.viewCreateRoute(model, name, author, active, description, recipients, type, def, "Definition must be specified.");
+    methodMock.viewCreateRoute(model, name, author, active, description, recipients, def, "Can not create a groovy rule when script is empty.");
     methodMockControl.setReturnValue("createroute");
 
     replay();
 
     String result = classUnderTest.createRoute(model, name, author, active,
-        description, recipients, type, def);
+        description, recipients, def);
 
     verify();
     assertEquals("createroute", result);
@@ -340,41 +281,29 @@ public class RoutesControllerTest extends TestCase {
     String author = "nisse";
     Boolean active = true;
     String description = "some description";
-    String type = "groovy";
     String def = "some code";
-
+    GroovyRule rule = new GroovyRule();
+    
     List<String> recipients = new ArrayList<String>();
-
-    IRule rule = new IRule() {
-      public IBltMessage handle(IBltMessage message) {return null;}
-      public String getType() {return null;}
-      public String getDefinition() {return null;}
-    };
-
-    List<String> types = new ArrayList<String>();
-    types.add("groovy");
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    factory.getTypes();
-    factoryControl.setReturnValue(types);
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
-
-    factory.create(type, def);
-    factoryControl.setReturnValue(rule);
+    methodMock.createRule(def);
+    methodMockControl.setReturnValue(rule);
     manager.create(name, author, active, description, recipients, rule);
     managerControl.setReturnValue(routedef);
     manager.storeDefinition(routedef);
     managerControl.setThrowable(new RuleException("Duplicate name"));
-    methodMock.viewCreateRoute(model, name, author, active, description, recipients, type, def, "Failed to create definition: 'Duplicate name'");
-    methodMockControl.setReturnValue("createroute");
+    methodMock.viewCreateRoute(model, name, author, active, description, recipients, def, "Failed to create definition: 'Duplicate name'");
+    methodMockControl.setReturnValue("groovyroute_create");
     replay();
 
     String result = classUnderTest.createRoute(model, name, author, active,
-        description, recipients, type, def);
+        description, recipients, def);
 
     verify();
-    assertEquals("createroute", result);
+    assertEquals("groovyroute_create", result);
   }
 
   
@@ -388,26 +317,23 @@ public class RoutesControllerTest extends TestCase {
     routeDefinition.setDescription("descr");
     routeDefinition.setName(name);
     routeDefinition.setRecipients(recipients);
-    routeDefinition.setRule(new IRule() {
-      @Override
-      public IBltMessage handle(IBltMessage message) {return null;}
-      @Override
-      public String getType() {return "tt";}
-      @Override
-      public String getDefinition() {return "def";}
+    routeDefinition.setRule(new GroovyRule() {
+      public String getScript() {
+        return "def";
+      }
     });
     manager.getDefinition(name);
     managerControl.setReturnValue(routeDefinition);
     
-    methodMock.viewShowRoute(model, name, "nisse", true, "descr", recipients, "tt", "def", null);
-    methodMockControl.setReturnValue("showroute");
+    methodMock.viewShowRoute(model, name, "nisse", true, "descr", recipients, "def", null);
+    methodMockControl.setReturnValue("groovyroute_show");
     
     replay();
 
-    String result = classUnderTest.showRoute(model, name, null, null, null, null, null, null, null);
+    String result = classUnderTest.showRoute(model, name, null, null, null, null, null, null);
     
     verify();
-    assertEquals("showroute", result);
+    assertEquals("groovyroute_show", result);
   }
 
   public void testShowRoute_byName_nonExisting() {
@@ -415,95 +341,35 @@ public class RoutesControllerTest extends TestCase {
     manager.getDefinition(name);
     managerControl.setReturnValue(null);
     methodMock.viewShowRoutes(model, "No route named \"somename\"");
-    methodMockControl.setReturnValue("routes");
+    methodMockControl.setReturnValue("showroutes");
     
     replay();
 
-    String result = classUnderTest.showRoute(model, name, null, null, null, null, null, null, null);
+    String result = classUnderTest.showRoute(model, name, null, null, null, null,null, null);
     
     verify();
-    assertEquals("routes", result);
+    assertEquals("showroutes", result);
   }
 
   public void testShowRoute_modify() {
     String name = "somename";
     List<String> newrecipients = new ArrayList<String>();
     
-    IRule rule = new IRule() {
-      public IBltMessage handle(IBltMessage message) {return null;}
-      public String getType() {return "groovy";}
-      public String getDefinition() {return "def";}
-    };
-
-    RouteDefinition routeDefinition = new RouteDefinition();
-    RouteDefinition newRouteDefinition = new RouteDefinition();
-    
-    manager.getDefinition(name);
-    managerControl.setReturnValue(routeDefinition);
-    factory.create("groovy", "def");
-    factoryControl.setReturnValue(rule);
-    manager.create("somename", "hugga", false, "new descr", newrecipients, rule);
-    managerControl.setReturnValue(newRouteDefinition);
-    manager.updateDefinition(newRouteDefinition);
-    
-    replay();
-
-    String result = classUnderTest.showRoute(model, name, "hugga", false, "new descr", newrecipients, "groovy", "def", "Modify");
-    
-    verify();
-    assertEquals("redirect:routes.htm", result);
-  }
-
-  public void testShowRoute_modify_badTypDef() {
-    String name = "somename";
-    List<String> newrecipients = new ArrayList<String>();
     RouteDefinition routeDefinition = new RouteDefinition();
     
     manager.getDefinition(name);
     managerControl.setReturnValue(routeDefinition);
-    methodMock.viewShowRoute(model, name, "hugga", false, "new descr", newrecipients, "groovy", null, "Definition missing.");
-    methodMockControl.setReturnValue("showroute");
+    methodMock.modifyRoute(model, name, "hugga", false, "new descr", newrecipients, "def");
+    methodMockControl.setReturnValue("somedirect");
     
     replay();
 
-    String result = classUnderTest.showRoute(model, name, "hugga", false, "new descr", newrecipients, "groovy", null, "Modify");
+    String result = classUnderTest.showRoute(model, name, "hugga", false, "new descr", newrecipients, "def", "Modify");
     
     verify();
-    assertEquals("showroute", result);
+    assertEquals("somedirect", result);
   }
-  
-  public void testShowRoute_modify_failed() {
-    String name = "somename";
-    List<String> newrecipients = new ArrayList<String>();
-    
-    IRule rule = new IRule() {
-      public IBltMessage handle(IBltMessage message) {return null;}
-      public String getType() {return "groovy";}
-      public String getDefinition() {return "def";}
-    };
 
-    RouteDefinition routeDefinition = new RouteDefinition();
-    RouteDefinition newRouteDefinition = new RouteDefinition();
-    
-    manager.getDefinition(name);
-    managerControl.setReturnValue(routeDefinition);
-    factory.create("groovy", "def");
-    factoryControl.setReturnValue(rule);
-    manager.create("somename", "hugga", false, "new descr", newrecipients, rule);
-    managerControl.setReturnValue(newRouteDefinition);
-    manager.updateDefinition(newRouteDefinition);
-    managerControl.setThrowable(new RuleException("null value"));
-    methodMock.viewShowRoute(model, name, "hugga", false, "new descr", newrecipients, "groovy", "def", "Failed to update definition: 'null value'");
-    methodMockControl.setReturnValue("showroute");
-    replay();
-
-    String result = classUnderTest.showRoute(model, name, "hugga", false, "new descr", newrecipients, "groovy", "def", "Modify");
-    
-    verify();
-    assertEquals("showroute", result);
-  }
-  
-  
   public void testShowRoute_delete() {
     String name = "somename";
     RouteDefinition routeDefinition = new RouteDefinition();
@@ -514,7 +380,7 @@ public class RoutesControllerTest extends TestCase {
     
     replay();
 
-    String result = classUnderTest.showRoute(model, name, null, null, null, null, null, null, "Delete");
+    String result = classUnderTest.showRoute(model, name, null, null, null, null, null, "Delete");
     
     verify();
     assertEquals("redirect:routes.htm", result);
@@ -533,7 +399,7 @@ public class RoutesControllerTest extends TestCase {
     
     replay();
 
-    String result = classUnderTest.showRoute(model, name, null, null, null, null, null, null, "Delete");
+    String result = classUnderTest.showRoute(model, name, null, null, null, null, null, "Delete");
     
     verify();
     assertEquals("routes", result);
@@ -541,15 +407,10 @@ public class RoutesControllerTest extends TestCase {
 
   public void testViewCreateRoute() {
     List<String> recipients = new ArrayList<String>();
-    List<String> types = new ArrayList<String>();
     List<String> adaptors = new ArrayList<String>();
 
-    factory.getTypes();
-    factoryControl.setReturnValue(types);
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
-    model.addAttribute("types", types);
-    modelControl.setReturnValue(null);
     model.addAttribute("adaptors", adaptors);
     modelControl.setReturnValue(null);
     model.addAttribute("name", "somename");
@@ -562,21 +423,18 @@ public class RoutesControllerTest extends TestCase {
     modelControl.setReturnValue(null);
     model.addAttribute("recipients", recipients);
     modelControl.setReturnValue(null);
-    model.addAttribute("type", "t");
-    modelControl.setReturnValue(null);
     model.addAttribute("typdef", "def");
     modelControl.setReturnValue(null);
 
-    classUnderTest = new RoutesController();
+    classUnderTest = new GroovyRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);
-    classUnderTest.setRuleFactory(factory);
     
     replay();
 
-    String result = classUnderTest.viewCreateRoute(model, "somename", "someauthor", true, "descr", recipients, "t", "def", null);
+    String result = classUnderTest.viewCreateRoute(model, "somename", "someauthor", true, "descr", recipients, "def", null);
     
     verify();
-    assertEquals("createroute", result);
+    assertEquals("groovyroute_create", result);
     
   }
   
@@ -589,7 +447,7 @@ public class RoutesControllerTest extends TestCase {
     model.addAttribute("routes", definitions);
     modelControl.setReturnValue(null);
     
-    classUnderTest = new RoutesController();
+    classUnderTest = new GroovyRoutesController();
     classUnderTest.setManager(manager);
     
     replay();
@@ -597,20 +455,15 @@ public class RoutesControllerTest extends TestCase {
     String result = classUnderTest.viewShowRoutes(model, null);
     
     verify();
-    assertEquals("routes", result);
+    assertEquals("showroutes", result);
   }
   
   public void testViewShowRoute() {
     List<String> recipients = new ArrayList<String>();
-    List<String> types = new ArrayList<String>();
     List<String> adaptors = new ArrayList<String>();
 
-    factory.getTypes();
-    factoryControl.setReturnValue(types);
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
-    model.addAttribute("types", types);
-    modelControl.setReturnValue(null);
     model.addAttribute("adaptors", adaptors);
     modelControl.setReturnValue(null);
     model.addAttribute("name", "somename");
@@ -622,35 +475,27 @@ public class RoutesControllerTest extends TestCase {
     model.addAttribute("description", "descr");
     modelControl.setReturnValue(null);
     model.addAttribute("recipients", recipients);
-    modelControl.setReturnValue(null);
-    model.addAttribute("type", "t");
     modelControl.setReturnValue(null);
     model.addAttribute("definition", "def");
     modelControl.setReturnValue(null);
     
-    classUnderTest = new RoutesController();
+    classUnderTest = new GroovyRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);
-    classUnderTest.setRuleFactory(factory);
     
     replay();
 
-    String result = classUnderTest.viewShowRoute(model, "somename", "someauthor", true, "descr", recipients, "t", "def", null);
+    String result = classUnderTest.viewShowRoute(model, "somename", "someauthor", true, "descr", recipients, "def", null);
     
     verify();
-    assertEquals("showroute", result);
+    assertEquals("groovyroute_show", result);
   }
 
   public void testViewShowRoute_wEmessage() {
     List<String> recipients = new ArrayList<String>();
-    List<String> types = new ArrayList<String>();
     List<String> adaptors = new ArrayList<String>();
 
-    factory.getTypes();
-    factoryControl.setReturnValue(types);
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
-    model.addAttribute("types", types);
-    modelControl.setReturnValue(null);
     model.addAttribute("adaptors", adaptors);
     modelControl.setReturnValue(null);
     model.addAttribute("name", "somename");
@@ -662,24 +507,135 @@ public class RoutesControllerTest extends TestCase {
     model.addAttribute("description", "descr");
     modelControl.setReturnValue(null);
     model.addAttribute("recipients", recipients);
-    modelControl.setReturnValue(null);
-    model.addAttribute("type", "t");
     modelControl.setReturnValue(null);
     model.addAttribute("definition", "def");
     modelControl.setReturnValue(null);
     model.addAttribute("emessage", "xyz");
     modelControl.setReturnValue(null);
     
-    classUnderTest = new RoutesController();
+    classUnderTest = new GroovyRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);
-    classUnderTest.setRuleFactory(factory);
 
     replay();
 
-    String result = classUnderTest.viewShowRoute(model, "somename", "someauthor", true, "descr", recipients, "t", "def", "xyz");
+    String result = classUnderTest.viewShowRoute(model, "somename", "someauthor", true, "descr", recipients, "def", "xyz");
     
     verify();
-    assertEquals("showroute", result);
+    assertEquals("groovyroute_show", result);
+  }
+  
+  public void testModifyRoute() throws Exception {
+    String name = "A";
+    String author = "B";
+    boolean active = false;
+    String description = "descr";
+    List<String> recipients = new ArrayList<String>();
+    String script = "a script";
+    GroovyRule rule = new GroovyRule();
+    RouteDefinition definition = new RouteDefinition();
+    
+    classUnderTest = new GroovyRoutesController() {
+      protected GroovyRule createRule(String script) {
+        return methodMock.createRule(script);
+      }
+    };
+    classUnderTest.setManager(manager);
+    
+    methodMock.createRule(script);
+    methodMockControl.setReturnValue(rule);
+    manager.create(name, author, active, description, recipients, rule);
+    managerControl.setReturnValue(definition);
+    manager.updateDefinition(definition);
+    
+    replay();
+    
+    String result = classUnderTest.modifyRoute(model, name, author, active, description, recipients, script);
+    
+    verify();
+    assertEquals("redirect:showroutes.htm", result);
+  }
+
+  public void testModifyRoute_noScript() throws Exception {
+    String name = "A";
+    String author = "B";
+    boolean active = false;
+    String description = "descr";
+    List<String> recipients = new ArrayList<String>();
+    String script = null;
+    
+    classUnderTest = new GroovyRoutesController() {
+      protected GroovyRule createRule(String script) {
+        return methodMock.createRule(script);
+      }
+      protected String viewShowRoute(Model model,
+          String name,
+          String author,
+          Boolean active,
+          String description,
+          List<String> recipients,
+          String definition,
+          String emessage) {
+        return methodMock.viewShowRoute(model, name, author, active,
+            description, recipients, definition, emessage);
+      }
+      
+    };
+    classUnderTest.setManager(manager);
+    
+    methodMock.viewShowRoute(model, name, author, active, description, recipients, script, "Definition missing.");
+    methodMockControl.setReturnValue("someredirect");
+    
+    replay();
+    
+    String result = classUnderTest.modifyRoute(model, name, author, active, description, recipients, script);
+    
+    verify();
+    assertEquals("someredirect", result);
+  }
+
+  public void testModifyRoute_failedUpdate() throws Exception {
+    String name = "A";
+    String author = "B";
+    boolean active = false;
+    String description = "descr";
+    List<String> recipients = new ArrayList<String>();
+    String script = "some def";
+    GroovyRule rule = new GroovyRule();
+    RouteDefinition definition = new RouteDefinition();
+     
+    classUnderTest = new GroovyRoutesController() {
+      protected GroovyRule createRule(String script) {
+        return methodMock.createRule(script);
+      }
+      protected String viewShowRoute(Model model,
+          String name,
+          String author,
+          Boolean active,
+          String description,
+          List<String> recipients,
+          String definition,
+          String emessage) {
+        return methodMock.viewShowRoute(model, name, author, active,
+            description, recipients, definition, emessage);
+      }
+      
+    };
+    classUnderTest.setManager(manager);
+    methodMock.createRule(script);
+    methodMockControl.setReturnValue(rule);
+    manager.create(name, author, active, description, recipients, rule);
+    managerControl.setReturnValue(definition);
+    manager.updateDefinition(definition);
+    managerControl.setThrowable(new RuntimeException("Bad..."));
+    methodMock.viewShowRoute(model, name, author, active, description, recipients, script, "Failed to update definition: 'Bad...'");
+    methodMockControl.setReturnValue("someredirect");
+    
+    replay();
+    
+    String result = classUnderTest.modifyRoute(model, name, author, active, description, recipients, script);
+    
+    verify();
+    assertEquals("someredirect", result);
   }
   
 }

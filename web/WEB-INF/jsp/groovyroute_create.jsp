@@ -89,20 +89,17 @@ Creates a route
               <h1>Create route</h1>
               <br/>
               <h2>
-                Create a routing rule. Depending on type of routing rule, different
-                choices will be available. However, right now, you are only able to choose groovy.
+                Create a Groovy scripted routing rule.
               </h2>
               <div class="form-content">
-                <form name="createRouteForm" action="createroute.htm">
+                <form name="createRouteForm" action="groovyroute_create.htm">
                   <%
-                    List<String> types = (List<String>)request.getAttribute("types");
                     List<String> adaptors = (List<String>)request.getAttribute("adaptors");
                     String name = (String)request.getAttribute("name");
                     String author = (String)request.getAttribute("author");
                     Boolean active = (Boolean)request.getAttribute("active");
                     String description = (String)request.getAttribute("description");
                     List<String> recipients = (List<String>)request.getAttribute("recipients");
-                    String type = (String)request.getAttribute("type");
                     String typdef = (String)request.getAttribute("typdef");
                     String activestr = (active == true)?"checked":"";
                   %>
@@ -124,20 +121,7 @@ Creates a route
                       }
                     %>
                     </select></li>
-                    <li><span>Type:</span> <select name="type">
-                    <%
-                      for (String t : types) {
-                        String selected = "";
-                        if (t.equals(type)) {
-                          selected = "selected";
-                        }
-                    %>
-                        <option value="<%=t%>" <%=selected%>><%=t%></option>
-                    <%
-                      }
-                    %>
-                    </select></li>
-                    <li><span>Rule:</span>&nbsp;</li>
+                    <li><span>Script:</span>&nbsp;</li>
                     <textarea class="routedefinition" name="typdef"><%=typdef%></textarea>
                   </ul>
                   <div id="table-footer">

@@ -57,7 +57,7 @@ List of routes
               </h2>
               <form name="createRouteForm" action="createroute.htm">
                 <display:table name="routes" id="route" defaultsort="1"
-                    requestURI="routes.htm" cellpadding="5" cellspacing="0"
+                    requestURI="showroutes.htm" cellpadding="5" cellspacing="0"
                     export="false" class="tableborder">
                   <c:choose>
                     <c:when test="${route.active == true}">
@@ -72,12 +72,12 @@ List of routes
                     </c:otherwise>
                   </c:choose>
                   <display:column sortable="true" title="Name"
-                      sortProperty="name" href="showroute.htm" paramId="name" paramProperty="name"
+                      sortProperty="name" href="groovyroute_show.htm" paramId="name" paramProperty="name"
                       class="tdcenter" value="${route.name}">
                   </display:column>
-                  <display:column sortable="true" title="Author"
-                      sortProperty="author" paramId="author" paramProperty="author"
-                      class="tdcenter" value="${route.author}">
+                  <display:column sortable="true" title="Type"
+                      sortProperty="type" paramId="type" paramProperty="type"
+                      class="tdcenter" value="${route.ruleType}">
                   </display:column>
                   <display:column sortable="true" title="Description"
                       sortProperty="description" paramId="description" paramProperty="description"
@@ -85,7 +85,8 @@ List of routes
                   </display:column>
                 </display:table>
                 <div id="table-footer">
-                  <input type="submit" value="Create" name="submitButton"/>
+                  <input type="submit" value="Script" name="submitButton"/>
+                  <input type="submit" value="Composite" name="submitButton"/>
                 </div>
               </form>
               <%if (request.getAttribute("emessage") != null) {%>

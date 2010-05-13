@@ -13,7 +13,7 @@ document.write( "<br>" );
 document.write( "<a href=\"admin.htm\">System management</a>" );
 document.write( "<br>" );
 document.write( "<a href=\"adaptors.htm\">Adaptors</a>" );
-document.write( "<a href=\"routes.htm\">Routes</a>" );
+document.write( "<a href=\"showroutes.htm\">Routes</a>" );
 document.write( "<br>" );
 document.write( "<a href=\"signout.htm\">Logout</a>" );
 document.write( "<br>" );
