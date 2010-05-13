@@ -36,7 +36,7 @@ import eu.baltrad.beast.rules.RuleException;
 import eu.baltrad.beast.rules.groovy.GroovyRule;
 
 /**
- * Manages the routes and routing rules.
+ * Manages the groovy routes and routing rules.
  * 
  * @author Anders Henja
  */

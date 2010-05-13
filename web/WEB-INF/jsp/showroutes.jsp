@@ -72,16 +72,26 @@ List of routes
                     </c:otherwise>
                   </c:choose>
                   <display:column sortable="true" title="Name"
-                      sortProperty="name" href="groovyroute_show.htm" paramId="name" paramProperty="name"
-                      class="tdcenter" value="${route.name}">
+                    sortProperty="name" href="showroute.htm" paramId="name" paramProperty="name"
+                    class="tdcenter" value="${route.name}">
                   </display:column>
-                  <display:column sortable="true" title="Type"
-                      sortProperty="type" paramId="type" paramProperty="type"
-                      class="tdcenter" value="${route.ruleType}">
-                  </display:column>
+                  <c:choose>
+                    <c:when test="${route.ruleType == 'groovy'}">
+                      <display:column sortable="true" title="Type"
+                        sortProperty="type" paramId="type" paramProperty="type"
+                        class="tdcenter" value="Script">
+                      </display:column>
+                    </c:when>
+                    <c:otherwise>
+                      <display:column sortable="true" title="Type"
+                        sortProperty="type" paramId="type" paramProperty="type"
+                        class="tdcenter" value="Composite">
+                      </display:column>
+                    </c:otherwise>
+                  </c:choose>
                   <display:column sortable="true" title="Description"
-                      sortProperty="description" paramId="description" paramProperty="description"
-                      class="tdcenter" value="${route.description}">
+                    sortProperty="description" paramId="description" paramProperty="description"
+                    class="tdcenter" value="${route.description}">
                   </display:column>
                 </display:table>
                 <div id="table-footer">

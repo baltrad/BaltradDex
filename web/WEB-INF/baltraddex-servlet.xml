@@ -460,5 +460,6 @@
   
     <bean id="adaptorsController" class="eu.baltrad.beastui.web.controller.AdaptorsController" autowire="byType" />
     <bean id="groovyRoutesController" class="eu.baltrad.beastui.web.controller.GroovyRoutesController" autowire="byType" />
+    <bean id="compositeRoutesController" class="eu.baltrad.beastui.web.controller.CompositeRoutesController" autowire="byType" />
     <bean id="showRoutesController" class="eu.baltrad.beastui.web.controller.ShowRoutesController" autowire="byType" />
 </beans>

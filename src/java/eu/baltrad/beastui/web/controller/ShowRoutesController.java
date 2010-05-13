@@ -19,7 +19,6 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 package eu.baltrad.beastui.web.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -81,8 +80,33 @@ public class ShowRoutesController {
     if (operation != null && operation.equals("Script")) {
       return "redirect:groovyroute_create.htm";
     } else if (operation != null && operation.equals("Composite")) {
-      return "redirect:showroutes.htm";
+      return "redirect:compositeroute_create.htm";
     }
+    model.addAttribute("emessage", "Unknown operation: '"+operation+"'");
     return "redirect:showroutes.htm";
+  }
+  
+  @RequestMapping("/showroute.htm")
+  public String showRoute(
+      Model model,
+      @RequestParam(value = "name") String name) {
+    RouteDefinition def = manager.getDefinition(name);
+    String result = null;
+    if (def != null) {
+      String type = def.getRuleType();
+      if (type.equals("groovy")) {
+        result = "redirect:groovyroute_show.htm";
+      } else if (type.equals("blt_composite")) {
+        result = "redirect:compositeroute_show.htm";
+      }
+      if (result != null) {
+        model.addAttribute("name", name);
+      }
+    }
+  
+    if (result == null) {
+      result = "redirect:showroutes.htm";
+    }
+    return result;
   }
 }

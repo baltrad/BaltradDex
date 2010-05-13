@@ -24,6 +24,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
+import org.easymock.classextension.MockClassControl;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.router.IRouterManager;
@@ -77,4 +78,81 @@ public class ShowRoutesControllerTest extends TestCase {
     verify();
     assertEquals("showroutes", result);
   }
+  
+  public void testCreateRoute_Script() {
+    replay();
+    
+    String result = classUnderTest.createRoute(model, "Script");
+    
+    verify();
+    assertEquals("redirect:groovyroute_create.htm", result);
+  }
+
+  public void testCreateRoute_Composite() {
+    replay();
+    
+    String result = classUnderTest.createRoute(model, "Composite");
+    
+    verify();
+    assertEquals("redirect:compositeroute_create.htm", result);
+  }
+  
+  public void testCreateRoute_Unknown() {
+    model.addAttribute("emessage", "Unknown operation: 'Unknown'");
+    modelControl.setReturnValue(null);
+    
+    replay();
+    
+    String result = classUnderTest.createRoute(model, "Unknown");
+    
+    verify();
+    assertEquals("redirect:showroutes.htm", result);
+  }
+  
+  public void testShowRoute_Script() {
+    MockControl defControl = MockClassControl.createControl(RouteDefinition.class);
+    RouteDefinition def = (RouteDefinition)defControl.getMock();
+    
+    manager.getDefinition("Nisse");
+    managerControl.setReturnValue(def);
+    def.getRuleType();
+    defControl.setReturnValue("groovy");
+    
+    model.addAttribute("name", "Nisse");
+    modelControl.setReturnValue(null);
+
+    replay();
+    defControl.replay();
+    
+    String result = classUnderTest.showRoute(model, "Nisse");
+    
+    verify();
+    defControl.verify();
+    
+    assertEquals("redirect:groovyroute_show.htm", result);
+  }
+
+  public void testShowRoute_Composite() {
+    MockControl defControl = MockClassControl.createControl(RouteDefinition.class);
+    RouteDefinition def = (RouteDefinition)defControl.getMock();
+    
+    manager.getDefinition("Nisse");
+    managerControl.setReturnValue(def);
+    def.getRuleType();
+    defControl.setReturnValue("blt_composite");
+    
+    model.addAttribute("name", "Nisse");
+    modelControl.setReturnValue(null);
+
+    replay();
+    defControl.replay();
+    
+    String result = classUnderTest.showRoute(model, "Nisse");
+    
+    verify();
+    defControl.verify();
+    
+    assertEquals("redirect:compositeroute_show.htm", result);
+  }
+  
 }

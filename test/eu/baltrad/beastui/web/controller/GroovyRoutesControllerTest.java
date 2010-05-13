@@ -173,8 +173,6 @@ public class GroovyRoutesControllerTest extends TestCase {
   }
 
   public void testCreateRoute_noAdaptors() {
-    List<String> types = new ArrayList<String>();
-    types.add("groovy");
     List<String> adaptors = new ArrayList<String>();
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
@@ -218,7 +216,7 @@ public class GroovyRoutesControllerTest extends TestCase {
         description, recipients, def);
 
     verify();
-    assertEquals("redirect:routes.htm", result);
+    assertEquals("redirect:showroutes.htm", result);
   }
 
   public void testCreateRoute_noName() {

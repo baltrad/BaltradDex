@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex.  If not, see <http://www.gnu.org/licenses/>.
 -------------------------------------------------------------------
-Creates a groovy route
-@date 2010-03-25
+Creates a composite route
+@date 2010-05-13
 @author Anders Henja
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -89,18 +89,25 @@ Creates a groovy route
               <h1>Create route</h1>
               <br/>
               <h2>
-                Create a Groovy scripted routing rule.
+                Create a Composite routing rule.
               </h2>
               <div class="form-content">
-                <form name="createRouteForm" action="groovyroute_create.htm">
+                <form name="createRouteForm" action="compositeroute_create.htm">
                   <%
                     List<String> adaptors = (List<String>)request.getAttribute("adaptors");
+                    List<String> sourceids = (List<String>)request.getAttribute("sourceids");
+                    List<Integer> intervals = (List<Integer>)request.getAttribute("intervals");
+                    
                     String name = (String)request.getAttribute("name");
                     String author = (String)request.getAttribute("author");
                     Boolean active = (Boolean)request.getAttribute("active");
                     String description = (String)request.getAttribute("description");
                     List<String> recipients = (List<String>)request.getAttribute("recipients");
-                    String typdef = (String)request.getAttribute("typdef");
+                    String areaid = (String)request.getAttribute("areaid");
+                    Integer interval = (Integer)request.getAttribute("interval");
+                    Integer timeout = (Integer)request.getAttribute("timeout");
+                    List<String> sources = (List<String>)request.getAttribute("sources");
+                    
                     String activestr = (active == true)?"checked":"";
                   %>
                   <ul>
@@ -121,8 +128,34 @@ Creates a groovy route
                       }
                     %>
                     </select></li>
-                    <li><span>Script:</span>&nbsp;</li>
-                    <textarea class="routedefinition" name="typdef"><%=typdef%></textarea>
+                    <li><span>Areaid:</span> <input size="50" type="text" name="areaid" value="<%=areaid%>"/></li>
+                    <li><span>Interval:</span> <select name="interval">
+                    <%
+                      for (Integer iv : intervals) {
+                        String selectstr = "";
+                        if (iv.equals(interval)) {
+                          selectstr = "selected";
+                        }
+                    %>
+                        <option value="<%=iv%>" <%=selectstr%>><%=iv%></option>
+                    <%
+                      }
+                    %>
+                    </select></li>
+                    <li><span>Timeout:</span> <input size="15" type="text" name="timeout" value="<%=timeout%>" disabled/></li>
+                    <li><span>Sources:</span><select multiple size="6" name="sources">
+                    <%
+                      for (String id : sourceids) {
+                        String selectstr = "";
+                        if (sources.contains(id)) {
+                          selectstr = "selected";
+                        }
+                    %>
+                        <option value="<%=id%>" <%=selectstr%>><%=id%></option>
+                    <%
+                      }
+                    %>
+                    </select></li>
                   </ul>
                   <div id="table-footer">
                     <input type="submit" value="Add" name="submitButton"/>
