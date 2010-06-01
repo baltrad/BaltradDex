@@ -355,6 +355,14 @@ td {
     padding: 4px 4px 4px 8px;
     border: 1px solid #91ACC1;
 }
+.right input {
+    width: 60%;
+    border: 1px solid #91ACC1;
+}
+.right select {
+    width: 60%;
+    border: 1px solid #91ACC1;
+}
 .right a {
     margin-left: 10px;
     margin-right: 10px;
@@ -399,7 +407,17 @@ div#message-box {
     border: 2px solid #99CC66;
     padding: 10px;
 }
-
+div#message-text {
+    color: #99CC66;
+    padding: 12px;
+    font-size: 1.2em;
+}
+/*
+    Form elements
+*/
+.errors {
+    color: red;
+}
 
 
 

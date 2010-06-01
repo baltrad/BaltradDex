@@ -3,17 +3,19 @@
 -- drop tables if exist ----------------------------------------------------------------
 
 DROP TABLE IF EXISTS dex_subscriptions;
-DROP TABLE IF EXISTS dex_aux_subscriptions;
 DROP TABLE IF EXISTS dex_delivery_register;
 DROP TABLE IF EXISTS dex_users;
+DROP TABLE IF EXISTS dex_roles;
 DROP TABLE IF EXISTS dex_messages;
 DROP TABLE IF EXISTS dex_channels;
+
+-- just for testing
+DROP TABLE IF EXISTS dex_data;
 
 DROP SEQUENCE IF EXISTS log_entry_id_seq;
 DROP SEQUENCE IF EXISTS channel_id_seq;
 DROP SEQUENCE IF EXISTS user_id_seq;	
 DROP SEQUENCE IF EXISTS subscription_id_seq;
-DROP SEQUENCE IF EXISTS aux_subscription_id_seq;
 DROP SEQUENCE IF EXISTS delivery_register_id_seq;
 
 -- create tables -----------------------------------------------------------------------
@@ -26,21 +28,29 @@ CREATE SEQUENCE user_id_seq;
 
 CREATE TABLE dex_users
 (
-    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('user_id_seq'),
+    id SERIAL NOT NULL, --INT NOT NULL UNIQUE DEFAULT NEXTVAL('user_id_seq'),
     name VARCHAR(64) NOT NULL UNIQUE,
-    password VARCHAR(64) NOT NULL,
+    password VARCHAR(32) NOT NULL,
+    ret_password VARCHAR(32),
     role VARCHAR(32) NOT NULL,
     factory VARCHAR(256) NOT NULL,
     country VARCHAR(64) NOT NULL,
     city VARCHAR(64) NOT NULL,
-    zip_code VARCHAR(12) NOT NULL,
+    city_code VARCHAR(12) NOT NULL,
     street VARCHAR(64) NOT NULL,
     number VARCHAR(12) NOT NULL,
     phone VARCHAR(32) NOT NULL,
     email VARCHAR(64) NOT NULL,
     node_address VARCHAR(64) NOT NULL,
-    local_directory VARCHAR(128) NOT NULL,
     PRIMARY KEY (id)
+);
+
+-- dex_roles ---------------------------------------------------------------------------
+
+CREATE TABLE dex_roles
+(
+    id SERIAL NOT NULL,
+    role VARCHAR(32)
 );
 
 -- log_entry_id_seq --------------------------------------------------------------------
@@ -51,7 +61,7 @@ CREATE SEQUENCE log_entry_id_seq;
 
 CREATE TABLE dex_messages
 (
-    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('log_entry_id_seq'),
+    id SERIAL NOT NULL,
     date VARCHAR(10) NOT NULL,
     time VARCHAR(8) NOT NULL,
     type VARCHAR(12) NOT NULL,
@@ -90,24 +100,21 @@ CREATE TABLE dex_subscriptions
     PRIMARY KEY (id)
 );
 
--- aux_subscription_id_seq -------------------------------------------------------------
-
-CREATE SEQUENCE aux_subscription_id_seq;
-
--- dex_aux_subscriptions ---------------------------------------------------------------
-
-CREATE TABLE dex_aux_subscriptions
-(
-    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('aux_subscription_id_seq'),
-    user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE ON UPDATE CASCADE,
-    channel_id INT NOT NULL REFERENCES dex_channels (id)
-                                                    ON DELETE CASCADE ON UPDATE CASCADE,
-    PRIMARY KEY (id)
-);
-
 -- delivery_register_id_seq
 
 CREATE SEQUENCE delivery_register_id_seq;
+
+-- just for testing until baltrad-db is availabe ---------------------------------------
+
+CREATE TABLE dex_data
+(
+    id SERIAL NOT NULL,
+    channel_name VARCHAR(32) NOT NULL,
+    path VARCHAR(256) NOT NULL,
+    date VARCHAR(10) NOT NULL,
+    time VARCHAR(8) NOT NULL,
+    PRIMARY KEY (id)
+);
 
 -- dex_delivery_register ---------------------------------------------------------------
 
@@ -118,3 +125,12 @@ CREATE TABLE dex_delivery_register
     data_id INT NOT NULL REFERENCES bdb_files (id),
     PRIMARY KEY (id)
 );
+
+
+
+
+
+
+
+
+

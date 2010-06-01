@@ -8,7 +8,7 @@
 
 package eu.baltrad.dex.util;
 
-import eu.baltrad.dex.model.User;
+import eu.baltrad.dex.model.user.User;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -24,9 +24,6 @@ public class ApplicationSecurityManager {
 //---------------------------------------------------------------------------------------- Constants
     // Session user attribute
     private static final String USER = "user";
-//---------------------------------------------------------------------------------------- Variables
-    // Message digest util
-    private MessageDigestUtil messageDigestUtil;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Method authenticates user based on credentials provided in the login form.
@@ -43,7 +40,7 @@ public class ApplicationSecurityManager {
         } else {
             String formUserName = formUser.getName().trim();
             String dbUserName = dbUser.getName().trim();
-            String formUserPassword = messageDigestUtil.createHash( formUser.getPassword().trim() );
+            String formUserPassword = MessageDigestUtil.createHash( formUser.getPassword().trim() );
             String dbUserPassword = dbUser.getPassword().trim();
             if( formUserName.equals( dbUserName ) && formUserPassword.equals( dbUserPassword ) ) {
                 return true;
@@ -71,7 +68,7 @@ public class ApplicationSecurityManager {
             String sessionUserPassword = sessionUser.getPassword().trim();
             String dbUserPassword = dbUser.getPassword().trim();
             if( sessionUserName.equals( dbUserName ) && sessionUserPassword.equals(
-                                                                                dbUserPassword ) ) {
+                    dbUserPassword ) ) {
                 return true;
             } else {
                 return false;
@@ -103,20 +100,6 @@ public class ApplicationSecurityManager {
      */
     public void removeUser( HttpServletRequest request ) {
         request.getSession( true ).removeAttribute( USER );
-    }
-    /**
-     * Method returns reference to message digest utility object.
-     *
-     * @return Reference to message digest utility object
-     */
-    public MessageDigestUtil getMessageDigestUtil() { return messageDigestUtil; }
-    /**
-     * Method sets reference to message digest utility object.
-     *
-     * @param messageDigestUtil Reference to message digest utility object
-     */
-    public void setMessageDigestUtil( MessageDigestUtil messageDigestUtil ) {
-        this.messageDigestUtil = messageDigestUtil;
     }
 }
 //--------------------------------------------------------------------------------------------------

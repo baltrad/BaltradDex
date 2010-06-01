@@ -20,22 +20,20 @@ import java.security.NoSuchAlgorithmException;
  * @since 1.0
  */
 public class MessageDigestUtil {
-    
+//---------------------------------------------------------------------------------------- Constants
     // Algorithm type identifier
     private static final String ALGORITHM = "MD5";
     // Hash length constant
     private static final int HASH_LEN = 16;
-    
+//------------------------------------------------------------------------------------------ Methods
     /**
      * Method returns hash for a given message.
      * 
      * @param message Message string
      * @return Hash
      */
-    public String createHash( String message ) {
-
+    public static String createHash( String message ) {
         String hashString = "";
-
         try {
             MessageDigest md = MessageDigest.getInstance( ALGORITHM );
             byte[] messageDigest = md.digest( message.getBytes() );
@@ -44,8 +42,7 @@ public class MessageDigestUtil {
         } catch( NoSuchAlgorithmException e ) {
             System.err.println( "Error while initializing hash function: " + e.getMessage() );
         }
-
         return hashString;
-        
     }
 }
+//--------------------------------------------------------------------------------------------------

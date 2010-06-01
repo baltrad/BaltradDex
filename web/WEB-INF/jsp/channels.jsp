@@ -1,5 +1,5 @@
 <%--
-    Document   : System welcome page
+    Document   : Data channels interface
     Created on : December 9, 2009, 13:56:14 PM
     Author     : szewczenko
 --%>

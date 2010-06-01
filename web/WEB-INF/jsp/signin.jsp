@@ -75,7 +75,7 @@
                     </div>
                     <div class="clear"></div>
                 </div>
-                <div class="clear"></div>
+            <div class="clear"></div>
         </div>
     </div>
     <div id="footer">

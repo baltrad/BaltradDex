@@ -32,6 +32,21 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <prop key="logtable.htm">logTableController</prop>
                 <prop key="journal.htm">journalController</prop>
                 <prop key="incoming.htm">urlFilenameController</prop>
+                <prop key="clearmessages.htm">urlFilenameController</prop>
+                <prop key="confirmclearmessages.htm">clrMsgsController</prop>
+                <prop key="showregister.htm">showRegController</prop>
+                <prop key="clearregister.htm">urlFilenameController</prop>
+                <prop key="confirmclearregister.htm">clrRegController</prop>
+                <prop key="saveuser.htm">saveUserController</prop>
+                <prop key="edituser.htm">editUserController</prop>
+                <prop key="removeusers.htm">showUsersController</prop>
+                <prop key="selectusers.htm">selectUsersController</prop>
+                <prop key="confirmremoveusers.htm">removeUsersController</prop>
+                <prop key="savechannel.htm">saveChannelController</prop>
+                <prop key="editchannel.htm">editChannelController</prop>
+                <prop key="removechannels.htm">showChannelsController</prop>
+                <prop key="selectchannels.htm">selectChannelsController</prop>
+                <prop key="confirmremovechannels.htm">removeChannelsController</prop>
             </props>
         </property>
     </bean>
@@ -68,7 +83,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         The signin controller.
     -->
-    <bean name="signInController" class="eu.baltrad.dex.controller.SignInController">
+    <bean name="signInController" class="eu.baltrad.dex.controller.auth.SignInController">
         <property name="sessionForm">
             <value>true</value>
 	</property>
@@ -82,7 +97,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
             <value>redirect:welcome.htm</value>
         </property>
         <property name="commandClass">
-            <value>eu.baltrad.dex.model.User</value>
+            <value>eu.baltrad.dex.model.user.User</value>
         </property>
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
@@ -93,10 +108,10 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         The signout controller.
     -->
     <bean name="signOutController"
-        class="eu.baltrad.dex.controller.SignOutController">
+        class="eu.baltrad.dex.controller.auth.SignOutController">
         <property name="successView">
-			<value>redirect:signin.htm</value>
-		</property>
+            <value>redirect:signin.htm</value>
+        </property>
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
@@ -116,13 +131,13 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         Data channels list controller.
     -->
     <bean name="channelController"
-        class="eu.baltrad.dex.controller.ChannelController">
+        class="eu.baltrad.dex.controller.channel.ChannelController">
         <property name="channelManager">
-			<ref bean="channelManager" />
-		</property>
-		<property name="successView">
-			<value>channels</value>
-		</property>
+            <ref bean="channelManager" />
+        </property>
+        <property name="successView">
+            <value>channels</value>
+        </property>
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
@@ -135,7 +150,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         Data from data channel controller.
     -->
     <bean name="channelDataController"
-        class="eu.baltrad.dex.controller.ChannelDataController">
+        class="eu.baltrad.dex.controller.channel.ChannelDataController">
         <property name="dataManager">
             <ref bean="dataManager" />
         </property>
@@ -148,7 +163,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         Subscriptions controller
     -->
     <bean name="subscriptionsController"
-                                class="eu.baltrad.dex.controller.SubscriptionsController">
+        class="eu.baltrad.dex.controller.subscription.SubscriptionsController">
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
@@ -167,7 +182,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         Submit subscriptions controller
     -->
     <bean name="submitSubscriptionsController"
-                            class="eu.baltrad.dex.controller.SubmitSubscriptionsController">
+        class="eu.baltrad.dex.controller.subscription.SubmitSubscriptionsController">
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
@@ -186,7 +201,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         Subscription status controller
     -->
     <bean name="subscriptionStatusController"
-                            class="eu.baltrad.dex.controller.SubscriptionStatusController">
+        class="eu.baltrad.dex.controller.subscription.SubscriptionStatusController">
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
@@ -207,7 +222,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Log messages controller
     -->
-    <bean name="logTableController" class="eu.baltrad.dex.controller.LogTableController">
+    <bean name="logTableController" class="eu.baltrad.dex.controller.log.LogTableController">
         <property name="successView">
             <value>logtable</value>
         </property>
@@ -219,7 +234,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         System journal controller
     -->
-    <bean name="journalController" class="eu.baltrad.dex.controller.JournalController">
+    <bean name="journalController" class="eu.baltrad.dex.controller.log.JournalController">
         <property name="successView">
             <value>journal</value>
         </property>
@@ -231,7 +246,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Data download controller.
     -->
-    <bean name="downloadController" class="eu.baltrad.dex.controller.DownloadController">
+    <bean name="downloadController" class="eu.baltrad.dex.controller.channel.DownloadController">
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
@@ -256,27 +271,27 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Data channel manager.
     -->
-    <bean name="channelManager" class="eu.baltrad.dex.model.ChannelManager"/>
+    <bean name="channelManager" class="eu.baltrad.dex.model.channel.ChannelManager"/>
 
     <!--
         Data manager.
     -->
-    <bean name="dataManager" class="eu.baltrad.dex.model.DataManager"/>
+    <bean name="dataManager" class="eu.baltrad.dex.model.data.DataManager"/>
 
     <!--
         Subscription manager.
     -->
-    <bean name="subscriptionManager" class="eu.baltrad.dex.model.SubscriptionManager"/>
+    <bean name="subscriptionManager" class="eu.baltrad.dex.model.subscription.SubscriptionManager"/>
 
     <!--
         Log manager
     -->
-    <bean name="logManager" class="eu.baltrad.dex.model.LogManager"/>
+    <bean name="logManager" class="eu.baltrad.dex.model.log.LogManager"/>
 
     <!--
         Data transmitter module
     -->
-    <bean id="transmitter" class="eu.baltrad.dex.model.Transmitter">
+    <bean id="transmitter" class="eu.baltrad.dex.model.core.Transmitter">
         <property name="logManager">
             <ref bean="logManager"/>
         </property>
@@ -303,16 +318,16 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Data receiver module.
     -->
-    <bean name="receiver" class="eu.baltrad.dex.model.Receiver">
+    <bean name="receiver" class="eu.baltrad.dex.model.core.Receiver">
         <property name="logManager">
             <ref bean="logManager"/>
         </property>
     </bean>
 
     <!--
-        Envelope handler.
+        Frame handler.
     -->
-    <bean name="baltradFrameHandler" class="eu.baltrad.dex.model.BaltradFrameHandler">
+    <bean name="baltradFrameHandler" class="eu.baltrad.dex.model.frame.BaltradFrameHandler">
         <property name="logManager">
             <ref bean="logManager"/>
         </property>
@@ -326,18 +341,236 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         User manager.
     -->
-    <bean name="userManager" class="eu.baltrad.dex.model.UserManager"/>
+    <bean name="userManager" class="eu.baltrad.dex.model.user.UserManager"/>
 
     <!--
         Delivery register manager
     -->
-    <bean name="deliveryRegisterManager" class="eu.baltrad.dex.model.DeliveryRegisterManager"/>
+    <bean name="deliveryRegisterManager"
+                        class="eu.baltrad.dex.model.register.DeliveryRegisterManager"/>
+
+    <!--
+        Clear message table controller - deletes records from message table
+    -->
+    <bean name="clrMsgsController" class="eu.baltrad.dex.controller.admin.ClrMsgsController">
+        <property name="successView">
+            <value>confirmclearmessages</value>
+        </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
+
+    <!--
+        View register controller - displays data delivery register
+    -->
+    <bean name="showRegController" class="eu.baltrad.dex.controller.admin.ShowRegController">
+        <property name="successView">
+            <value>showregister</value>
+        </property>
+        <property name="deliveryRegisterManager">
+            <ref bean="deliveryRegisterManager"/>
+        </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+        <property name="dataManager">
+            <ref bean="dataManager" />
+        </property>
+    </bean>
+    <!--
+        Clear register controller - deletes records from data delivery register table
+    -->
+    <bean name="clrRegController" class="eu.baltrad.dex.controller.admin.ClrRegController">
+        <property name="successView">
+            <value>confirmclearregister</value>
+        </property>
+         <property name="deliveryRegisterManager">
+            <ref bean="deliveryRegisterManager"/>
+        </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Show users controller - creates list of users available in the system
+    -->
+    <bean name="showUsersController" class="eu.baltrad.dex.controller.admin.ShowUsersController">
+        <property name="successView">
+            <value>removeusers</value>
+        </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+        <property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Select users controller - creates list of user accounts selected for removal.
+    -->
+    <bean name="selectUsersController" class="eu.baltrad.dex.controller.admin.SelectUsersController">
+        <property name="successView">
+            <value>selectusers</value>
+        </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Remove users controller - removes user account.
+    -->
+    <bean name="removeUsersController" class="eu.baltrad.dex.controller.admin.RemoveUsersController">
+        <property name="successView">
+            <value>confirmremoveusers</value>
+        </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Edit user controller - allows to modify user credentials
+    -->
+    <bean name="editUserController" class="eu.baltrad.dex.controller.admin.EditUserController">
+        <property name="successView">
+            <value>edituser</value>
+        </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Add user controller - registers new user in the system
+    -->
+    <bean name="saveUserController" class="eu.baltrad.dex.controller.admin.SaveUserController">
+        <property name="successView">
+            <value>redirect:admin.htm</value>
+        </property>
+        <property name="commandClass">
+            <value>eu.baltrad.dex.model.user.User</value>
+        </property>
+        <property name="formView">
+            <value>saveuser</value>
+        </property>
+        <property name="validator">
+            <ref bean="saveUserValidator"/>
+        </property>
+        <property name="sessionForm">
+            <value>false</value>
+        </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Add user validator
+    -->
+    <bean name="saveUserValidator" class="eu.baltrad.dex.controller.admin.SaveUserValidator">
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Add channel controller - registers new data channel in the system
+    -->
+    <bean name="saveChannelController" class="eu.baltrad.dex.controller.admin.SaveChannelController">
+        <property name="successView">
+            <value>redirect:admin.htm</value>
+        </property>
+        <property name="commandClass">
+            <value>eu.baltrad.dex.model.channel.Channel</value>
+        </property>
+        <property name="formView">
+            <value>savechannel</value>
+        </property>
+        <property name="validator">
+            <ref bean="saveChannelValidator"/>
+        </property>
+        <property name="sessionForm">
+            <value>false</value>
+        </property>
+        <property name="channelManager">
+            <ref bean="channelManager"/>
+        </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Add channel validator
+    -->
+    <bean name="saveChannelValidator" class="eu.baltrad.dex.controller.admin.SaveChannelValidator">
+        <property name="channelManager">
+            <ref bean="channelManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Edit channel controller - allows to modify data channel
+    -->
+    <bean name="editChannelController" class="eu.baltrad.dex.controller.admin.EditChannelController">
+        <property name="successView">
+            <value>editchannel</value>
+        </property>
+        <property name="channelManager">
+            <ref bean="channelManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Show channels controller - creates list of channels available in the system
+    -->
+    <bean name="showChannelsController"
+        class="eu.baltrad.dex.controller.admin.ShowChannelsController">
+        <property name="successView">
+            <value>removechannels</value>
+        </property>
+        <property name="channelManager">
+            <ref bean="channelManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Select channels controller - creates list of data channels selected for removal.
+    -->
+    <bean name="selectChannelsController"
+        class="eu.baltrad.dex.controller.admin.SelectChannelsController">
+        <property name="successView">
+            <value>selectchannels</value>
+        </property>
+        <property name="channelManager">
+            <ref bean="channelManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Remove channels controller - removes data channels.
+    -->
+    <bean name="removeChannelsController"
+        class="eu.baltrad.dex.controller.admin.RemoveChannelsController">
+        <property name="successView">
+            <value>confirmremovechannels</value>
+        </property>
+        <property name="channelManager">
+            <ref bean="channelManager"/>
+        </property>
+    </bean>
 
     <!--
         Http request interceptor.
     -->
-    <bean id="httpRequestInterceptor"
-		class="eu.baltrad.dex.util.HttpRequestInterceptor">
+    <bean id="httpRequestInterceptor" class="eu.baltrad.dex.util.HttpRequestInterceptor">
         <property name="signInPage">
             <value>signin.htm</value>
 	</property>
@@ -354,17 +587,13 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Application security manager.
     -->
-    <bean name="applicationSecurityManager"
-            class="eu.baltrad.dex.util.ApplicationSecurityManager">
-        <property name="messageDigestUtil">
-            <ref bean="messageDigestUtil"/>
-	</property>
-    </bean>
+    <bean name="applicationSecurityManager" class="eu.baltrad.dex.util.ApplicationSecurityManager"/>
 
     <!--
         Message resources.
     -->
-    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+    <bean id="messageSource"
+        class="org.springframework.context.support.ResourceBundleMessageSource">
 	<property name="basenames">
             <list>
 		<value>messages</value>
@@ -372,8 +601,11 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 	</property>
     </bean>
 
-    <!-- Integrate beast into BaltradDex -->
-    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <!-- 
+        Integrate beast into BaltradDex
+    -->
+    <bean id="propertyConfigurer"
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
                 <value>db.properties</value>
@@ -381,19 +613,24 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         </property>
     </bean>
 
-    <bean id="dataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
+    <bean id="dataSource" destroy-method="close"
+                        class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${db.driver}"/>
         <property name="url" value="${db.url}"/>
         <property name="username" value="${db.user}"/>
         <property name="password" value="${db.pwd}"/>
     </bean>
     
-    <bean id="xmlrpcgenerator" class="eu.baltrad.beast.adaptor.xmlrpc.XmlRpcCommandGenerator"/>
+    <bean id="xmlrpcgenerator"
+        class="eu.baltrad.beast.adaptor.xmlrpc.XmlRpcCommandGenerator"/>
   
-    <bean id="xmlrpcadaptormanager" class="eu.baltrad.beast.adaptor.xmlrpc.XmlRpcConfigurationManager" autowire="byType"/>
+    <bean id="xmlrpcadaptormanager" 
+        class="eu.baltrad.beast.adaptor.xmlrpc.XmlRpcConfigurationManager"
+        autowire="byType"/>
   
     <!-- Add the xml adaptor to the baltrad adaptor -->
-    <bean id="adaptormanager" class="eu.baltrad.beast.adaptor.BltAdaptorManager" autowire="byType">
+    <bean id="adaptormanager" class="eu.baltrad.beast.adaptor.BltAdaptorManager"
+        autowire="byType">
         <property name="typeRegistry">
             <list>
                 <ref bean="xmlrpcadaptormanager"/>
@@ -427,7 +664,9 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         </property>
     </bean>
   
-    <bean id="adaptorsController" class="eu.baltrad.beastui.web.controller.AdaptorsController" autowire="byType" />
-    <bean id="routesController" class="eu.baltrad.beastui.web.controller.RoutesController" autowire="byType" />
+    <bean id="adaptorsController"
+    class="eu.baltrad.beastui.web.controller.AdaptorsController" autowire="byType" />
+    <bean id="routesController"
+    class="eu.baltrad.beastui.web.controller.RoutesController" autowire="byType" />
     
 </beans>

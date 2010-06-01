@@ -46,7 +46,10 @@
 
   <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
   <property name="beast.path" value="/opt/baltrad/beast" />
-  <available file="${baltrad.db.path}/java/jbrfc.jar" property="jbrfc.jar.available" />
+  <property name="catalina.lib" value="/opt/apache-tomcat-6.0.26/lib" />
+
+  <!--available file="${baltrad.db.path}/java/jbrfc.jar" property="jbrfc.jar.available" /-->
+  <available file="${catalina.lib}/jbrfc.jar" property="jbrfc.jar.available" />
   <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
   <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
 
@@ -334,7 +337,8 @@
 
   <!-- create database and users -->
   <target name="create-db">
-    <sql classpath="${lib.dir}/${db.jar}" driver="${db.driver}" url="${db.url}" userid="${db.user}" password="${db.pwd}">
+    <sql classpath="${lib.dir}/${db.jar}" driver="${db.driver}" url="${db.url}" userid="${db.user}"
+        password="${db.pwd}">
       <transaction src="${etc.dir}/create_db.sql"/>
     </sql>
   </target>
@@ -390,7 +394,7 @@
   </target>
   
   <!-- deploy on tomcat -->
-  <target name="deploy" depends="dist, insert-data, context-status"
+  <target name="deploy" depends="create-full-schema, dist, insert-data, context-status"
     	if="context.deployable">
     <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
     <deploy url="${mgr.url}"
@@ -398,7 +402,7 @@
             password="${mgr.password}"
             path="${mgr.path}"
             update="${mgr.update}"
-            war="file:${dist.dir}/BaltradDex.war"/>
+            war="file:${basedir}/${dist.dir}/BaltradDex.war"/>
   </target>
 
   <!-- From apache-tomcat user manual for using the ant-manager task -->

@@ -32,16 +32,16 @@ public class ServletContextUtil implements ServletContextListener {
      * @param contextEvent Servlet context event
      */
     public void contextInitialized( ServletContextEvent contextEvent ) {
-		servletContext = contextEvent.getServletContext();
-	}
+        servletContext = contextEvent.getServletContext();
+    }
     /**
      * Method sets servlet context.
      *
      * @param contextEvent Servlet context event
      */
-	public void contextDestroyed( ServletContextEvent contextEvent ) {
-		servletContext = contextEvent.getServletContext();
-	}
+    public void contextDestroyed( ServletContextEvent contextEvent ) {
+        servletContext = contextEvent.getServletContext();
+    }
     /**
      * Method determines real servlet context path.
      *
