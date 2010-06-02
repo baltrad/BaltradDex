@@ -9,9 +9,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
-<%@page import="eu.baltrad.dex.model.User"%>
+<%@page import="eu.baltrad.dex.model.user.User"%>
 
-<jsp:useBean id="userManager" scope="session" class="eu.baltrad.dex.model.UserManager">
+<jsp:useBean id="userManager" scope="session" class="eu.baltrad.dex.model.user.UserManager">
 </jsp:useBean>
 
 <%
@@ -71,7 +71,7 @@
                             <tr class="odd">
                                 <td class="left">Address :: Code</td>
                                 <td class="right">
-                                    <% out.println( operator.getZipCode() ); %>
+                                    <% out.println( operator.getCityCode() ); %>
                                 </td>
                             </tr>
                             <tr class="even">

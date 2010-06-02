@@ -9,15 +9,15 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
-<%@ page import="eu.baltrad.dex.model.User" %>
+<%@ page import="eu.baltrad.dex.model.user.User" %>
 <%@ page import="java.util.Date" %>
 
 <jsp:useBean id="applicationSecurityManager" scope="session"
                                     class="eu.baltrad.dex.util.ApplicationSecurityManager">
 </jsp:useBean>
-<jsp:useBean id="userManager" scope="session" class="eu.baltrad.dex.model.UserManager">
+<jsp:useBean id="userManager" scope="session" class="eu.baltrad.dex.model.user.UserManager">
 </jsp:useBean>
-<jsp:useBean id="logManager" scope="session" class="eu.baltrad.dex.model.LogManager">
+<jsp:useBean id="logManager" scope="session" class="eu.baltrad.dex.model.log.LogManager">
 </jsp:useBean>
 
 <%
@@ -26,7 +26,7 @@
     if( !sessionUser.getName().equals( "admin" ) ||
                     !applicationSecurityManager.authenticateSessionUser( sessionUser, dbUser ) ) {
         request.getSession().setAttribute( "is_user_admin", 0 );
-        logManager.addLogEntry( new Date(), logManager.MSG_WRN, "User failed to access " +
+        logManager.addEntry( new Date(), logManager.MSG_WRN, "User failed to access " +
                 "system management area");
     } else {
         request.getSession().setAttribute( "is_user_admin", 1 );
@@ -56,25 +56,40 @@
                                 <h2>
                                 </h2>
                                 <table>
+                                    <div id="message-text">
+                                        <c:if test="${not empty message}">
+                                            <c:out value="${message}" />
+                                            <c:set var="message" value="" scope="session" />
+                                        </c:if>
+                                    </div>
                                     <caption>Control features</caption>
                                     <tr class="even">
                                         <td class="left">Data delivery register</td>
                                         <td class="right">
-                                            <a href="clear_register.htm">Clear register</a>
+                                            <a href="showregister.htm">Show register</a>
+                                            <a href="clearregister.htm">Clear</a>
                                         </td>
                                     </tr>
                                     <tr class="odd">
                                         <td class="left">Log messages</td>
                                         <td class="right">
-                                            <a href="clear_log_messages.htm">Clear messages</a>
+                                            <a href="clearmessages.htm">Clear messages</a>
                                         </td>
                                     </tr>
                                     <tr class="even">
                                         <td class="left">User management</td>
                                         <td class="right">
-                                            <a href="add_user.htm">Add</a>
-                                            <a href="edit_user.htm">Edit</a>
-                                            <a href="remove_user.htm">Remove</a>
+                                            <a href="edituser.htm">Edit</a>
+                                            <a href="saveuser.htm">Add</a>
+                                            <a href="removeusers.htm">Remove</a>
+                                        </td>
+                                    </tr>
+                                    <tr class="odd">
+                                        <td class="left">Data channel management</td>
+                                        <td class="right">
+                                            <a href="editchannel.htm">Edit</a>
+                                            <a href="savechannel.htm">Add</a>
+                                            <a href="removechannels.htm">Remove</a>
                                         </td>
                                     </tr>
                                 </table>

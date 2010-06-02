@@ -7,19 +7,17 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                                                 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
-
+     
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 
-<%! String s = ""; %>
 <%
-    s = request.getParameter( "name" );
-    String name = s.substring( 0, 1 ).toUpperCase() + s.substring( 1, s.length() );
+    String name = request.getParameter( "name" );
 %>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Data from <% out.println( name ); %></title>
+    <title>Data from <%= name %></title>
 </head>
 
 <body>
@@ -32,7 +30,7 @@
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Data files from channel <% out.println( name );%></h1>
+                        <h1>Data files from channel <%= name %></h1>
                         <br/>
                         <h2>
                             <p>
@@ -55,7 +53,7 @@
                             <display:column sortProperty="path" sortable="true"
                                 paramId="path" paramProperty="path" title="File" class="tdcenter"
                                 href="download.htm" value="${fn:substring(data.path,
-                                            fn:length(data.path) - 37, fn:length(data.path))}">
+                                            fn:length(data.path) - 44, fn:length(data.path))}">
                             </display:column>
                         </display:table>
                         <div id="table-footer">

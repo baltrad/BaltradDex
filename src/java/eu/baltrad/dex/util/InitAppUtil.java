@@ -8,7 +8,7 @@
 
 package eu.baltrad.dex.util;
 
-import eu.baltrad.dex.model.LogManager;
+import eu.baltrad.dex.model.log.LogManager;
 
 import java.io.File;
 import java.io.InputStream;
@@ -63,14 +63,14 @@ public class InitAppUtil {
                 // Create directories
                 //makeDir( getLocalProdDir() );
                 makeDir( getIncomingDataDir() );
-                logManager.addLogEntry( new Date(), LogManager.MSG_INFO,
+                logManager.addEntry( new Date(), LogManager.MSG_INFO,
                         "Application successfully initialized" );
             } else {
-                logManager.addLogEntry( new Date(), LogManager.MSG_ERR,
+                logManager.addEntry( new Date(), LogManager.MSG_ERR,
                         "Failed to load properties file: " + PROPS_FILE_NAME );
             }
         } catch( IOException e ) {
-            logManager.addLogEntry( new Date(), LogManager.MSG_ERR,
+            logManager.addEntry( new Date(), LogManager.MSG_ERR,
                         "Failed to load properties file: " + PROPS_FILE_NAME );
         }
     }
@@ -131,7 +131,7 @@ public class InitAppUtil {
         File dir = new File( directoryPath );
         if( !dir.exists() ) {
             dir.mkdirs();
-            logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "New directory created: \n"
+            logManager.addEntry( new Date(), LogManager.MSG_INFO, "New directory created: \n"
                     + directoryPath );
         }
     }
@@ -152,13 +152,13 @@ public class InitAppUtil {
             }
             is.close();
             fos.close();
-            logManager.addLogEntry( new Date(), LogManager.MSG_INFO, "Incoming data succesfully " +
+            logManager.addEntry( new Date(), LogManager.MSG_INFO, "Incoming data succesfully " +
                     " saved: \n" + getRelFileName( dstFileName ) );
         } catch( FileNotFoundException e ) {
-            logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
                     + e.getMessage() );
         } catch( IOException e ) {
-            logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
                     + e.getMessage() );
         }
     }
@@ -172,7 +172,7 @@ public class InitAppUtil {
             File f = new File( filePath );
             f.delete();
         } catch( Exception e ) {
-            logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "Error while deleting file: \n"
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while deleting file: \n"
                     + e.getMessage() );
         }
     }

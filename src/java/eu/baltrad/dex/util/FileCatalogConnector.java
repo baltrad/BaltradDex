@@ -8,7 +8,7 @@
 
 package eu.baltrad.dex.util;
 
-import eu.baltrad.dex.model.LogManager;
+import eu.baltrad.dex.model.log.LogManager;
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileCatalogError;
 
@@ -63,21 +63,21 @@ public class FileCatalogConnector {
                 File f = new File( storageDir );
                 if( !f.exists() ) {
                     f.mkdirs();
-                    logManager.addLogEntry( new Date(), LogManager.MSG_WRN, "New storage directory " +
+                    logManager.addEntry( new Date(), LogManager.MSG_WRN, "New storage directory " +
                             "initialized: " + storageDir );
                 }
                 fileCatalog = new FileCatalog( dbURI, storageDir );
-                logManager.addLogEntry( new Date(), LogManager.MSG_INFO,
+                logManager.addEntry( new Date(), LogManager.MSG_INFO,
                         "File catalog successfully initialized" );
             } else {
-                logManager.addLogEntry( new Date(), LogManager.MSG_ERR, 
+                logManager.addEntry( new Date(), LogManager.MSG_ERR, 
                         "Failed to load properties file: " + PROPS_FILE_NAME );
             }
         } catch( FileCatalogError e ) {
-            logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "File catalog error: " +
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "File catalog error: " +
                     e.getMessage() );
         } catch( Exception e ) {
-            logManager.addLogEntry( new Date(), LogManager.MSG_ERR, "File catalog error: " +
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "File catalog error: " +
                     e.getMessage() );
         }
         return fileCatalog;

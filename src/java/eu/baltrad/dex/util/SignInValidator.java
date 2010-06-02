@@ -11,7 +11,7 @@ package eu.baltrad.dex.util;
 import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
 
-import eu.baltrad.dex.model.User;
+import eu.baltrad.dex.model.user.User;
 
 /**
  * Class implementing functionality for validating user authentication information.
