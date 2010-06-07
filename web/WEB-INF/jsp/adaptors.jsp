@@ -34,60 +34,73 @@ List of adaptors
 </style>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
     <title>Adaptors</title>
 </head>
 
 <body>
-  <div id="container">
-    <div id="content">
-      <div id="header"></div>
-      <div id="nav">
-        <script type="text/javascript" src="includes/navigation.js"></script>
-      </div>    
-      <div class="outer">
-        <div class="inner">
-          <div class="float-wrap">
-            <div id="main">
-              <h1>Adaptors</h1>
-              <br/>
-              <h2>
-                <p>List of adaptors. Press on adaptor name to modify/delete or press Create to create a new adaptor.</p>
-              </h2>
-              <form name="createAdaptorForm" action="createadaptor.htm">
-                <display:table name="adaptors" id="adaptor" defaultsort="1"
-                    requestURI="adaptors.htm" cellpadding="5" cellspacing="0"
-                    export="false" class="tableborder">
-                  <display:column sortable="true" title="Name"
-                      sortProperty="name" href="showadaptor.htm" paramId="name" paramProperty="name"
-                      class="tdcenter" value="${adaptor.name}">
-                  </display:column>
-                  <display:column sortable="true" title="Type"
-                      sortProperty="type" paramId="type" paramProperty="type"
-                      class="tdcenter" value="${adaptor.type}">
-                  </display:column>
-                </display:table>
-                <div id="table-footer">
-                  <input type="submit" value="Create" name="submitButton"/>
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
+        </div>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+                    <div id="main">
+                        <h1>Adaptors</h1>
+                      <br/>
+                      <h2>
+                        <p>List of adaptors. Press on adaptor name to modify/delete or press Create to create a new adaptor.</p>
+                      </h2>
+                      <form name="createAdaptorForm" action="createadaptor.htm">
+                        <display:table name="adaptors" id="adaptor" defaultsort="1"
+                            requestURI="adaptors.htm" cellpadding="5" cellspacing="0"
+                            export="false" class="tableborder">
+                          <display:column sortable="true" title="Name"
+                              sortProperty="name" href="showadaptor.htm" paramId="name" paramProperty="name"
+                              class="tdcenter" value="${adaptor.name}">
+                          </display:column>
+                          <display:column sortable="true" title="Type"
+                              sortProperty="type" paramId="type" paramProperty="type"
+                              class="tdcenter" value="${adaptor.type}">
+                          </display:column>
+                        </display:table>
+                        <div id="table-footer">
+                          <input type="submit" value="Create" name="submitButton"/>
+                        </div>
+                      </form>
+                      <%if (request.getAttribute("emessage") != null) {%>
+                        <span class="adaptorerror"><%=request.getAttribute("emessage")%></span>
+                      <%}%>
+                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>
+                    <div class="clear"></div>
                 </div>
-              </form>
-              <%if (request.getAttribute("emessage") != null) {%>
-                <span class="adaptorerror"><%=request.getAttribute("emessage")%></span>
-              <%}%>                    
+                <div class="clear"></div>
             </div>
-            <div id="left">
-              <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div class="clear"></div>
-          </div>
-          <div class="clear"></div>
         </div>
-        <div id="footer">
-          <script type="text/javascript" src="includes/footer.js"></script>
-        </div>
-      </div>
     </div>
-  </div>
+    <div id="footer">
+        <script type="text/javascript" src="includes/footer.js"></script>
+    </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

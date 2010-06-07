@@ -72,83 +72,81 @@ Modifies a groovy route
 </style>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
-    <title>Modify Groovy Route</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+    <title>Modify Groovy route</title>
 </head>
 
 <body>
-  <div id="container">
-    <div id="content">
-      <div id="header"></div>
-      <div id="nav">
-        <script type="text/javascript" src="includes/navigation.js"></script>
-      </div>    
-      <div class="outer">
-        <div class="inner">
-          <div class="float-wrap">
-            <div id="main">
-              <h1>Modify Groovy route</h1>
-              <br/>
-              <h2>
-                Modify or delete a Groovy routing rule.
-              </h2>
-              <div class="form-content">
-                <form name="showRouteForm" action="groovyroute_show.htm">
-                  <%
-                    List<String> adaptors = (List<String>)request.getAttribute("adaptors");
-                    String name = (String)request.getAttribute("name");
-                    String author = (String)request.getAttribute("author");
-                    Boolean active = (Boolean)request.getAttribute("active");
-                    String description = (String)request.getAttribute("description");
-                    List<String> recipients = (List<String>)request.getAttribute("recipients");
-                    String definition = (String)request.getAttribute("definition");
-                    String activestr = active==true?"checked":"";
-                  %>
-                  <ul>
-                    <li><span>Name:</span> <input size="50" type="text" name="name" value="<%=name%>" disabled/></li>
-                    <input type="hidden" name="name" value="<%=name%>"/>                        
-                    <li><span>Author:</span> <input size="50" type="text" name="author" value="<%=author%>"/></li>
-                    <li><span>Active:</span> <input type="checkbox" name="active" <%=activestr%>/></li>
-                    <li><span>Description:</span> <input size="50" type="text" name="description" value="<%=description%>"/></li>
-                    <li><span>Recipients:</span><select multiple size="4" name="recipients">
-                    <%
-                      for (String adaptor : adaptors) {
-                        String selectstr = "";
-                        if (recipients.contains(adaptor)) {
-                          selectstr = "selected";
-                        }
-                    %>
-                        <option value="<%=adaptor%>" <%=selectstr%>><%=adaptor%></option>
-                    <%
-                      }
-                    %>
-                    </select></li>
-                    <li><span>Script:</span>&nbsp;</li>
-                    <textarea class="routedefinition" name="typdef"><%=definition%></textarea>
-                  </ul>
-                  <div id="table-footer">
-                    <input type="submit" value="Modify" name="submitButton"/>
-                    <input type="submit" value="Delete" name="submitButton"/>
-                  </div>                        
-                </form>
-              </div>
-              <%if (request.getAttribute("emessage") != null) {%>
-                <span class="routererror"><%=request.getAttribute("emessage")%></span>
-              <%}%>                    
-            </div>
-            <div id="left">
-              <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div class="clear"></div>
-          </div>
-          <div class="clear"></div>
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
         </div>
-        <div id="footer">
-          <script type="text/javascript" src="includes/footer.js"></script>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+                    <div id="main">
+                        <h1>Modify Groovy route</h1>
+                          <br/>
+                          <h2>
+                            Modify or delete a Groovy routing rule.
+                          </h2>
+                          <div class="form-content">
+                            <form name="showRouteForm" action="groovyroute_show.htm">
+                              <%
+                                List<String> adaptors = (List<String>)request.getAttribute("adaptors");
+                                String name = (String)request.getAttribute("name");
+                                String author = (String)request.getAttribute("author");
+                                Boolean active = (Boolean)request.getAttribute("active");
+                                String description = (String)request.getAttribute("description");
+                                List<String> recipients = (List<String>)request.getAttribute("recipients");
+                                String definition = (String)request.getAttribute("definition");
+                                String activestr = active==true?"checked":"";
+                              %>
+                              <ul>
+                                <li><span>Name:</span> <input size="50" type="text" name="name" value="<%=name%>" disabled/></li>
+                                <input type="hidden" name="name" value="<%=name%>"/>
+                                <li><span>Author:</span> <input size="50" type="text" name="author" value="<%=author%>"/></li>
+                                <li><span>Active:</span> <input type="checkbox" name="active" <%=activestr%>/></li>
+                                <li><span>Description:</span> <input size="50" type="text" name="description" value="<%=description%>"/></li>
+                                <li><span>Recipients:</span><select multiple size="4" name="recipients">
+                                <%
+                                  for (String adaptor : adaptors) {
+                                    String selectstr = "";
+                                    if (recipients.contains(adaptor)) {
+                                      selectstr = "selected";
+                                    }
+                                %>
+                                    <option value="<%=adaptor%>" <%=selectstr%>><%=adaptor%></option>
+                                <%
+                                  }
+                                %>
+                                </select></li>
+                                <li><span>Script:</span>&nbsp;</li>
+                                <textarea class="routedefinition" name="typdef"><%=definition%></textarea>
+                              </ul>
+                              <div id="table-footer">
+                                <input type="submit" value="Modify" name="submitButton"/>
+                                <input type="submit" value="Delete" name="submitButton"/>
+                              </div>
+                            </form>
+                          </div>
+                          <%if (request.getAttribute("emessage") != null) {%>
+                            <span class="routererror"><%=request.getAttribute("emessage")%></span>
+                          <%}%>
+                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+    <div id="footer">
+        <script type="text/javascript" src="includes/footer.js"></script>
+    </div>
 </body>
 </html>

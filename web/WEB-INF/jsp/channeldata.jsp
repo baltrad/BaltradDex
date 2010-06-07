@@ -39,7 +39,8 @@
                         </h2>
                         <display:table name="channeldata" id="data" defaultsort="1"
                             requestURI="channeldata.htm" cellpadding="0" cellspacing="2"
-                            export="false" class="tableborder">
+                            export="false" class="tableborder" pagesize="10" sort="list"
+                            defaultorder="descending">
                             <display:column sortProperty="id" sortable="true"
                                 title="ID" class="tdcenter">
                                 <fmt:formatNumber value="${data.id}" pattern="00" />

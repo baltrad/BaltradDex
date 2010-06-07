@@ -70,114 +70,112 @@ Creates a composite route
 </style>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
     <title>Create route</title>
 </head>
 
 <body>
-  <div id="container">
-    <div id="content">
-      <div id="header"></div>
-      <div id="nav">
-        <script type="text/javascript" src="includes/navigation.js"></script>
-      </div>    
-      <div class="outer">
-        <div class="inner">
-          <div class="float-wrap">
-            <div id="main">
-              <h1>Create route</h1>
-              <br/>
-              <h2>
-                Create a Composite routing rule.
-              </h2>
-              <div class="form-content">
-                <form name="createRouteForm" action="compositeroute_create.htm">
-                  <%
-                    List<String> adaptors = (List<String>)request.getAttribute("adaptors");
-                    List<String> sourceids = (List<String>)request.getAttribute("sourceids");
-                    List<Integer> intervals = (List<Integer>)request.getAttribute("intervals");
-                    
-                    String name = (String)request.getAttribute("name");
-                    String author = (String)request.getAttribute("author");
-                    Boolean active = (Boolean)request.getAttribute("active");
-                    String description = (String)request.getAttribute("description");
-                    List<String> recipients = (List<String>)request.getAttribute("recipients");
-                    String areaid = (String)request.getAttribute("areaid");
-                    Integer interval = (Integer)request.getAttribute("interval");
-                    Integer timeout = (Integer)request.getAttribute("timeout");
-                    List<String> sources = (List<String>)request.getAttribute("sources");
-                    
-                    String activestr = (active == true)?"checked":"";
-                  %>
-                  <ul>
-                    <li><span>Name:</span> <input size="50" type="text" name="name" value="<%=name%>"/></li>
-                    <li><span>Author:</span> <input size="50" type="text" name="author" value="<%=author%>"/></li>
-                    <li><span>Active:</span> <input type="checkbox" name="active" <%=activestr%>/></li>
-                    <li><span>Description:</span> <input size="50" type="text" name="description" value="<%=description%>"/></li>
-                    <li><span>Recipients:</span><select multiple size="4" name="recipients">
-                    <%
-                      for (String adaptor : adaptors) {
-                        String selectstr = "";
-                        if (recipients.contains(adaptor)) {
-                          selectstr = "selected";
-                        }
-                    %>
-                        <option value="<%=adaptor%>" <%=selectstr%>><%=adaptor%></option>
-                    <%
-                      }
-                    %>
-                    </select></li>
-                    <li><span>Areaid:</span> <input size="50" type="text" name="areaid" value="<%=areaid%>"/></li>
-                    <li><span>Interval:</span> <select name="interval">
-                    <%
-                      for (Integer iv : intervals) {
-                        String selectstr = "";
-                        if (iv.equals(interval)) {
-                          selectstr = "selected";
-                        }
-                    %>
-                        <option value="<%=iv%>" <%=selectstr%>><%=iv%></option>
-                    <%
-                      }
-                    %>
-                    </select></li>
-                    <li><span>Timeout:</span> <input size="15" type="text" name="timeout" value="<%=timeout%>" disabled/></li>
-                    <li><span>Sources:</span><select multiple size="6" name="sources">
-                    <%
-                      for (String id : sourceids) {
-                        String selectstr = "";
-                        if (sources.contains(id)) {
-                          selectstr = "selected";
-                        }
-                    %>
-                        <option value="<%=id%>" <%=selectstr%>><%=id%></option>
-                    <%
-                      }
-                    %>
-                    </select></li>
-                  </ul>
-                  <div id="table-footer">
-                    <input type="submit" value="Add" name="submitButton"/>
-                  </div>                        
-                </form>
-              </div>
-              <%if (request.getAttribute("emessage") != null) {%>
-                <span class="routererror"><%=request.getAttribute("emessage")%></span>
-              <%}%>                    
-            </div>
-            <div id="left">
-              <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div class="clear"></div>
-          </div>
-          <div class="clear"></div>
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
         </div>
-        <div id="footer">
-          <script type="text/javascript" src="includes/footer.js"></script>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+                    <div id="main">
+                        <h1>Create route</h1>
+                      <br/>
+                      <h2>
+                        Create a Composite routing rule.
+                      </h2>
+                      <div class="form-content">
+                        <form name="createRouteForm" action="compositeroute_create.htm">
+                          <%
+                            List<String> adaptors = (List<String>)request.getAttribute("adaptors");
+                            List<String> sourceids = (List<String>)request.getAttribute("sourceids");
+                            List<Integer> intervals = (List<Integer>)request.getAttribute("intervals");
+
+                            String name = (String)request.getAttribute("name");
+                            String author = (String)request.getAttribute("author");
+                            Boolean active = (Boolean)request.getAttribute("active");
+                            String description = (String)request.getAttribute("description");
+                            List<String> recipients = (List<String>)request.getAttribute("recipients");
+                            String areaid = (String)request.getAttribute("areaid");
+                            Integer interval = (Integer)request.getAttribute("interval");
+                            Integer timeout = (Integer)request.getAttribute("timeout");
+                            List<String> sources = (List<String>)request.getAttribute("sources");
+
+                            String activestr = (active == true)?"checked":"";
+                          %>
+                          <ul>
+                            <li><span>Name:</span> <input size="50" type="text" name="name" value="<%=name%>"/></li>
+                            <li><span>Author:</span> <input size="50" type="text" name="author" value="<%=author%>"/></li>
+                            <li><span>Active:</span> <input type="checkbox" name="active" <%=activestr%>/></li>
+                            <li><span>Description:</span> <input size="50" type="text" name="description" value="<%=description%>"/></li>
+                            <li><span>Recipients:</span><select multiple size="4" name="recipients">
+                            <%
+                              for (String adaptor : adaptors) {
+                                String selectstr = "";
+                                if (recipients.contains(adaptor)) {
+                                  selectstr = "selected";
+                                }
+                            %>
+                                <option value="<%=adaptor%>" <%=selectstr%>><%=adaptor%></option>
+                            <%
+                              }
+                            %>
+                            </select></li>
+                            <li><span>Areaid:</span> <input size="50" type="text" name="areaid" value="<%=areaid%>"/></li>
+                            <li><span>Interval:</span> <select name="interval">
+                            <%
+                              for (Integer iv : intervals) {
+                                String selectstr = "";
+                                if (iv.equals(interval)) {
+                                  selectstr = "selected";
+                                }
+                            %>
+                                <option value="<%=iv%>" <%=selectstr%>><%=iv%></option>
+                            <%
+                              }
+                            %>
+                            </select></li>
+                            <li><span>Timeout:</span> <input size="15" type="text" name="timeout" value="<%=timeout%>" disabled/></li>
+                            <li><span>Sources:</span><select multiple size="6" name="sources">
+                            <%
+                              for (String id : sourceids) {
+                                String selectstr = "";
+                                if (sources.contains(id)) {
+                                  selectstr = "selected";
+                                }
+                            %>
+                                <option value="<%=id%>" <%=selectstr%>><%=id%></option>
+                            <%
+                              }
+                            %>
+                            </select></li>
+                          </ul>
+                          <div id="table-footer">
+                            <input type="submit" value="Add" name="submitButton"/>
+                          </div>
+                        </form>
+                      </div>
+                      <%if (request.getAttribute("emessage") != null) {%>
+                        <span class="routererror"><%=request.getAttribute("emessage")%></span>
+                      <%}%>
+                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+    <div id="footer">
+        <script type="text/javascript" src="includes/footer.js"></script>
+    </div>
 </body>
 </html>

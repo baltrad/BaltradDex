@@ -18,7 +18,7 @@
   <property name="web.dir" value="web"/>
   <property name="webinf.dir" value="${web.dir}/WEB-INF"/>
   <property name="etc.dir" value="etc"/>
-  <property name="dist.dir" value="dist"/>
+  <property name="dist.dir" value="${root.dir}/dist"/>
   <property name="testdata.dir" value="TestData"/>
   <property name="build.dir" value="build"/>
   <property name="build.web.dir" value="${build.dir}/web"/>

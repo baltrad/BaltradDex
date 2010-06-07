@@ -62,80 +62,79 @@ List of adaptors
 
 </style>
 
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
     <title>Modify adaptor</title>
 </head>
 
 <body>
-  <div id="container">
-    <div id="content">
-      <div id="header"></div>
-      <div id="nav">
-        <script type="text/javascript" src="includes/navigation.js"></script>
-      </div>    
-      <div class="outer">
-        <div class="inner">
-          <div class="float-wrap">
-            <div id="main">
-              <h1>Modify adaptor</h1>
-              <br/>
-              <h2>
-                Modify an adaptor. Depending on type of adaptor, different choices will
-                be available. However, right now, you are only able to choose XMLRPC.
-              </h2>
-              <div class="form-content">
-                <form name="showAdaptorForm" action="modifyadaptor.htm">
-                  <%
-                    List<String> types = (List<String>)request.getAttribute("types");
-                    String uri = (String)request.getAttribute("uri");
-                    Long timeout = (Long)request.getAttribute("timeout");
-                    String timeoutstr = "";
-                    if (uri == null) {
-                      uri = "";
-                    }
-                    if (timeout != null) {
-                      timeoutstr = "" + timeout;
-                    }
-                  %>
-                  <ul>
-                    <li><span>Name:</span> <input size="50" type="text" name="name" value="<%=request.getAttribute("name")%>" disabled/></li>
-                    <input type="hidden" name="name" value="<%=request.getAttribute("name")%>"/>
-                    <li><span>Type:</span> <select name="type">
-                    <%
-                      for (String adtype : types) {
-                    %>
-                        <option value="<%=adtype%>"><%=adtype%></option>
-                    <%
-                      }
-                    %>
-                    </select></li>
-                    <li><span>URI:</span> <input size="50" type="text" name="uri" value="<%=uri%>"/></li>
-                    <li><span>Timeout:</span> <input size="10" type="text" name="timeout" value="<%=timeoutstr%>"/></li>
-                  </ul>                        
-                  <div id="table-footer">
-                    <input type="submit" value="Modify" name="submitButton"/>
-                    <input type="submit" value="Delete" name="submitButton"/>
-                  </div>
-                </form>
-              </div>
-              <%if (request.getAttribute("emessage") != null) {%>
-                <span class="adaptorerror"><%=request.getAttribute("emessage")%></span>
-              <%}%>                    
-            </div>
-            <div id="left">
-              <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div class="clear"></div>
-          </div>
-          <div class="clear"></div>
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
         </div>
-        <div id="footer">
-          <script type="text/javascript" src="includes/footer.js"></script>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+                    <div id="main">
+                        <h1>Modify adaptor</h1>
+                          <br/>
+                          <h2>
+                            Modify an adaptor. Depending on type of adaptor, different choices will
+                            be available. However, right now, you are only able to choose XMLRPC.
+                          </h2>
+                          <div class="form-content">
+                            <form name="showAdaptorForm" action="modifyadaptor.htm">
+                              <%
+                                List<String> types = (List<String>)request.getAttribute("types");
+                                String uri = (String)request.getAttribute("uri");
+                                Long timeout = (Long)request.getAttribute("timeout");
+                                String timeoutstr = "";
+                                if (uri == null) {
+                                  uri = "";
+                                }
+                                if (timeout != null) {
+                                  timeoutstr = "" + timeout;
+                                }
+                              %>
+                              <ul>
+                                <li><span>Name:</span> <input size="50" type="text" name="name" value="<%=request.getAttribute("name")%>" disabled/></li>
+                                <input type="hidden" name="name" value="<%=request.getAttribute("name")%>"/>
+                                <li><span>Type:</span> <select name="type">
+                                <%
+                                  for (String adtype : types) {
+                                %>
+                                    <option value="<%=adtype%>"><%=adtype%></option>
+                                <%
+                                  }
+                                %>
+                                </select></li>
+                                <li><span>URI:</span> <input size="50" type="text" name="uri" value="<%=uri%>"/></li>
+                                <li><span>Timeout:</span> <input size="10" type="text" name="timeout" value="<%=timeoutstr%>"/></li>
+                              </ul>
+                              <div id="table-footer">
+                                <input type="submit" value="Modify" name="submitButton"/>
+                                <input type="submit" value="Delete" name="submitButton"/>
+                              </div>
+                            </form>
+                          </div>
+                          <%if (request.getAttribute("emessage") != null) {%>
+                            <span class="adaptorerror"><%=request.getAttribute("emessage")%></span>
+                          <%}%>
+                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                <div class="clear"></div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+    <div id="footer">
+        <script type="text/javascript" src="includes/footer.js"></script>
+    </div>
 </body>
 </html>

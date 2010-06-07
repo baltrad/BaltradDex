@@ -34,87 +34,85 @@ List of routes
 </style>
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
     <title>Routes</title>
 </head>
 
 <body>
-  <div id="container">
-    <div id="content">
-      <div id="header"></div>
-      <div id="nav">
-        <script type="text/javascript" src="includes/navigation.js"></script>
-      </div>    
-      <div class="outer">
-        <div class="inner">
-          <div class="float-wrap">
-            <div id="main">
-              <h1>Routes</h1>
-              <br/>
-              <h2>
-                <p>List of routes. Create or choose a route.</p>
-              </h2>
-              <form name="createRouteForm" action="createroute.htm">
-                <display:table name="routes" id="route" defaultsort="1"
-                    requestURI="showroutes.htm" cellpadding="5" cellspacing="0"
-                    export="false" class="tableborder">
-                  <c:choose>
-                    <c:when test="${route.active == true}">
-                      <display:column sortable="false" title="Active" class="tdcenter">
-                        <img src="includes/images/Green_ball.jpg" width="12" height="12"/>
-                      </display:column>
-                    </c:when>
-                    <c:otherwise>
-                      <display:column sortable="false" title="Active" class="tdcenter">
-                        <img src="includes/images/Red_ball.jpg" width="12" height="12"/>
-                      </display:column>
-                    </c:otherwise>
-                  </c:choose>
-                  <display:column sortable="true" title="Name"
-                    sortProperty="name" href="showroute.htm" paramId="name" paramProperty="name"
-                    class="tdcenter" value="${route.name}">
-                  </display:column>
-                  <c:choose>
-                    <c:when test="${route.ruleType == 'groovy'}">
-                      <display:column sortable="true" title="Type"
-                        sortProperty="type" paramId="type" paramProperty="type"
-                        class="tdcenter" value="Script">
-                      </display:column>
-                    </c:when>
-                    <c:otherwise>
-                      <display:column sortable="true" title="Type"
-                        sortProperty="type" paramId="type" paramProperty="type"
-                        class="tdcenter" value="Composite">
-                      </display:column>
-                    </c:otherwise>
-                  </c:choose>
-                  <display:column sortable="true" title="Description"
-                    sortProperty="description" paramId="description" paramProperty="description"
-                    class="tdcenter" value="${route.description}">
-                  </display:column>
-                </display:table>
-                <div id="table-footer">
-                  <input type="submit" value="Script" name="submitButton"/>
-                  <input type="submit" value="Composite" name="submitButton"/>
+    <div id="container">
+        <div id="header"></div>
+        <div id="nav">
+            <script type="text/javascript" src="includes/navigation.js"></script>
+        </div>
+        <div class="outer">
+            <div class="inner">
+                <div class="float-wrap">
+                    <div id="main">
+                        <h1>Routes</h1>
+                          <br/>
+                          <h2>
+                            <p>List of routes. Create or choose a route.</p>
+                          </h2>
+                          <form name="createRouteForm" action="createroute.htm">
+                            <display:table name="routes" id="route" defaultsort="1"
+                                requestURI="showroutes.htm" cellpadding="5" cellspacing="0"
+                                export="false" class="tableborder">
+                              <c:choose>
+                                <c:when test="${route.active == true}">
+                                  <display:column sortable="false" title="Active" class="tdcenter">
+                                    <img src="includes/images/Green_ball.jpg" width="12" height="12"/>
+                                  </display:column>
+                                </c:when>
+                                <c:otherwise>
+                                  <display:column sortable="false" title="Active" class="tdcenter">
+                                    <img src="includes/images/Red_ball.jpg" width="12" height="12"/>
+                                  </display:column>
+                                </c:otherwise>
+                              </c:choose>
+                              <display:column sortable="true" title="Name"
+                                sortProperty="name" href="showroute.htm" paramId="name" paramProperty="name"
+                                class="tdcenter" value="${route.name}">
+                              </display:column>
+                              <c:choose>
+                                <c:when test="${route.ruleType == 'groovy'}">
+                                  <display:column sortable="true" title="Type"
+                                    sortProperty="type" paramId="type" paramProperty="type"
+                                    class="tdcenter" value="Script">
+                                  </display:column>
+                                </c:when>
+                                <c:otherwise>
+                                  <display:column sortable="true" title="Type"
+                                    sortProperty="type" paramId="type" paramProperty="type"
+                                    class="tdcenter" value="Composite">
+                                  </display:column>
+                                </c:otherwise>
+                              </c:choose>
+                              <display:column sortable="true" title="Description"
+                                sortProperty="description" paramId="description" paramProperty="description"
+                                class="tdcenter" value="${route.description}">
+                              </display:column>
+                            </display:table>
+                            <div id="table-footer">
+                              <input type="submit" value="Script" name="submitButton"/>
+                              <input type="submit" value="Composite" name="submitButton"/>
+                            </div>
+                          </form>
+                          <%if (request.getAttribute("emessage") != null) {%>
+                            <span class="routerrerror"><%=request.getAttribute("emessage")%></span>
+                          <%}%>
+                    </div>
+                    <div id="left">
+                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                    </div>
+                    <div class="clear"></div>
                 </div>
-              </form>
-              <%if (request.getAttribute("emessage") != null) {%>
-                <span class="routerrerror"><%=request.getAttribute("emessage")%></span>
-              <%}%>                    
+                <div class="clear"></div>
             </div>
-            <div id="left">
-              <script type="text/javascript" src="includes/mainmenu.js"></script>
-            </div>
-            <div class="clear"></div>
-          </div>
-          <div class="clear"></div>
         </div>
-        <div id="footer">
-          <script type="text/javascript" src="includes/footer.js"></script>
-        </div>
-      </div>
     </div>
-  </div>
+    <div id="footer">
+        <script type="text/javascript" src="includes/footer.js"></script>
+    </div>
 </body>
 </html>
