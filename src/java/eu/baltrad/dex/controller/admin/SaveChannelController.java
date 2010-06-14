@@ -45,7 +45,8 @@ public class SaveChannelController extends SimpleFormController {
         Channel channel = null;
         if( request.getParameter( CHANNEL_ID ) != null
                 && request.getParameter( CHANNEL_ID ).trim().length() > 0 ) {
-            channel = channelManager.getChannel( Integer.parseInt( request.getParameter( CHANNEL_ID ) ) );
+            channel = channelManager.getChannel( Integer.parseInt(
+                    request.getParameter( CHANNEL_ID ) ) );
         } else {
             channel = new Channel();
         }

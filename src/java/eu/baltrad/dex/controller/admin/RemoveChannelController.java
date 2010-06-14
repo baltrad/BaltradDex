@@ -1,0 +1,134 @@
+/*
+ * BaltradNode :: Radar data exchange and communication system
+ * Remote Sensing Department, Institute of Meteorology and Water Management
+ * Maciej Szewczykowski, 2010
+ *
+ * maciej.szewczykowski@imgw.pl
+ */
+
+package eu.baltrad.dex.controller.admin;
+
+import eu.baltrad.dex.model.channel.ChannelManager;
+import eu.baltrad.dex.model.channel.Channel;
+
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
+import org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.hibernate.HibernateException;
+
+import java.util.List;
+import java.util.ArrayList;
+
+/**
+ * Multi action controller handling data channel removal functionality.
+ *
+ * @author szewczenko
+ * @version 1.0
+ * @since 1.0
+ */
+public class RemoveChannelController extends MultiActionController {
+//---------------------------------------------------------------------------------------- Constants
+    // model keys
+    private static final String SHOW_CHANNELS_KEY = "channels";
+    private static final String SELECTED_CHANNELS_KEY = "selected_channels";
+    private static final String REMOVED_CHANNELS_KEY = "removed_channels";
+    private static final String HIBERNATE_ERRORS_KEY = "hibernate_errors";
+    // view names
+    private static final String SHOW_CHANNELS_VIEW = "showChannels";
+    private static final String SELECTED_CHANNELS_VIEW = "showSelectedChannels";
+    private static final String REMOVED_CHANNELS_VIEW = "showRemovedChannels";
+//---------------------------------------------------------------------------------------- Variables
+    // Channel manager
+    private ChannelManager channelManager;
+    // Name resolver
+    private PropertiesMethodNameResolver nameResolver;
+//------------------------------------------------------------------------------------------ Methods
+    /**
+     * Shows all available channels.
+     *
+     * @param request Http request
+     * @param response Http response
+     * @return Models and view containing list of all available channels
+     */
+    public ModelAndView showChannels( HttpServletRequest request, HttpServletResponse response ) {
+        List channels = channelManager.getAllChannels();
+        return new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
+    }
+    /**
+     * Shows channels selected for removal.
+     *
+     * @param request Http request
+     * @param response Http response
+     * @return Model and view containing list of channels selected for removal
+     */
+    public ModelAndView showSelectedChannels( HttpServletRequest request,
+            HttpServletResponse response ) {
+        ModelAndView modelAndView = null;
+        String[] channelIds = request.getParameterValues( SELECTED_CHANNELS_KEY );
+        if( channelIds != null ) {
+            List< Channel > channels = new ArrayList< Channel >();
+            for( int i = 0; i < channelIds.length; i++ ) {
+                channels.add( channelManager.getChannel( Integer.parseInt( channelIds[ i ] ) ) );
+            }
+            modelAndView = new ModelAndView( SELECTED_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
+        } else {
+            List channels = channelManager.getAllChannels();
+            modelAndView = new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
+        }
+        return modelAndView;
+    }
+    /**
+     * Displays information about channel removal status and errors if occured.
+     *
+     * @param request Http request
+     * @param response Http response
+     * @return Model and view containing data access exception errors if occured.
+     */
+    public ModelAndView showRemovedChannels( HttpServletRequest request,
+            HttpServletResponse response ) {
+        String[] channelIds = request.getParameterValues( REMOVED_CHANNELS_KEY );
+        List< String > errorMsgs = new ArrayList< String >();
+        for( int i = 0; i < channelIds.length; i++ ) {
+            try {
+                channelManager.removeChannel( Integer.parseInt( channelIds[ i ] ) );
+            } catch( HibernateException e ) {
+                errorMsgs.add( "Data access exception while removing data channel " +
+                        "(Channel ID: " + channelIds[ i ] + ")" );
+            }
+        }
+        return new ModelAndView( REMOVED_CHANNELS_VIEW, HIBERNATE_ERRORS_KEY, errorMsgs );
+    }
+    /**
+     * Gets reference to name resolver object.
+     *
+     * @return the multiactionMethodNameResolver Name resolver class
+     */
+    public PropertiesMethodNameResolver getNameResolver() { return nameResolver; }
+    /**
+     * Sets reference to name resolver object.
+     *
+     * @param multiactionMethodNameResolver 
+     */
+    public void setNameResolver( PropertiesMethodNameResolver nameResolver ) {
+        this.nameResolver = nameResolver;
+    }
+    /*
+     * Method returns reference to data channel manager object.
+     *
+     * @return Reference to data channel manager object
+     */
+    public ChannelManager getChannelManager() { return channelManager; }
+    /**
+     * Method sets reference to data channel manager object.
+     *
+     * @param Reference to data channel manager object
+     */
+    public void setChannelManager( ChannelManager channelManager ) {
+        this.channelManager = channelManager;
+    }
+}
+//--------------------------------------------------------------------------------------------------

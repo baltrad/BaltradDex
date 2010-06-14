@@ -1,6 +1,6 @@
 <%--
-    Document   : Confirm channel removal page
-    Created on : May 24, 2010, 12:38:42 PM
+    Document   : User listing interface
+    Created on : May 24, 2010, 12:40:14 PM
     Author     : szewczenko
 --%>
 
@@ -13,7 +13,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Remove data channel</title>
+    <title>Remove user account</title>
 </head>
 
 <body>
@@ -26,41 +26,43 @@
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Remove data channel</h1>
+                        <h1>Remove user account</h1>
                         <br/>
                         <h2>
                             <p>
-                            Warning: The following data channels will be removed from the system:
+                            Select user account to remove.
                             </p>
                         </h2>
-                        <form method="post" action="confirmremovechannels.htm">
-                            <display:table name="channels" id="channel" defaultsort="1"
-                                requestURI="selectusers.htm" cellpadding="0" cellspacing="2"
+                        <form action="showSelectedUsers.htm">
+                            <display:table name="users" id="user" defaultsort="1"
+                                requestURI="showUsers.htm" cellpadding="0" cellspacing="2"
                                 export="false" class="tableborder" pagesize="10">
                                 <display:column sortProperty="id" sortable="true"
                                     title="ID" class="tdcenter">
-                                    <fmt:formatNumber value="${channel.id}" pattern="00" />
+                                    <fmt:formatNumber value="${user.id}" pattern="00" />
                                 </display:column>
-                                <display:column sortable="true" title="Channel name"
+                                <display:column sortable="true" title="User name"
                                     sortProperty="name" class="tdcenter"
-                                    value="${channel.name}">
+                                    value="${user.name}">
                                 </display:column>
-                                <display:column sortable="true" title="WMO number"
-                                    sortProperty="wmoNumber" class="tdcenter"
-                                    value="${channel.wmoNumber}">
+                                <display:column sortable="true" title="Role" sortProperty="role"
+                                    class="tdcenter" value="${user.role}">
                                 </display:column>
-                                <display:column class="tdhidden">
-                                    <input type="checkbox" name="submitted_channels"
-                                           value="${channel.id}" checked/>
+                                <display:column sortable="true" title="Company"
+                                    sortProperty="factory" class="tdcenter"
+                                    value="${user.factory}">
+                                </display:column>
+                                <display:column sortable="true" title="Node address"
+                                    sortProperty="nodeAddress" class="tdcenter"
+                                    value="${user.nodeAddress}">
+                                </display:column>
+                                <display:column sortable="false" title="Select" class="tdcheck">
+                                    <input type="checkbox" name="selected_users"
+                                        value="${user.id}"/>
                                 </display:column>
                             </display:table>
-                            <div id="table-footer-rightcol">
+                            <div id="table-footer">
                                 <input type="submit" value="Submit" name="submitButton"/>
-                            </div>
-                        </form>
-                        <form action="admin.htm">
-                            <div id="table-footer-leftcol">
-                                <input type="submit" value="Cancel" name="submitButton"/>
                             </div>
                         </form>
                         <div id="table-footer">

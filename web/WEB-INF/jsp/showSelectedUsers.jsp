@@ -33,9 +33,9 @@
                             Warning: The following user accounts will be removed from the system:
                             </p>
                         </h2>
-                        <form method="post" action="confirmremoveusers.htm">
-                            <display:table name="users" id="user" defaultsort="1"
-                                requestURI="selectusers.htm" cellpadding="0" cellspacing="2"
+                        <form method="post" action="showRemovedUsers.htm">
+                            <display:table name="selected_users" id="user" defaultsort="1"
+                                requestURI="showSelectedUsers.htm" cellpadding="0" cellspacing="2"
                                 export="false" class="tableborder" pagesize="10">
                                 <display:column sortProperty="id" sortable="true"
                                     title="ID" class="tdcenter">
@@ -57,9 +57,9 @@
                                     value="${user.nodeAddress}">
                                 </display:column>
                                 <display:column class="tdhidden">
-                                    <input type="checkbox" name="submitted_users"
+                                    <input type="checkbox" name="removed_users"
                                            value="${user.id}" checked/>
-                                </display:column> 
+                                </display:column>
                             </display:table>
                             <div id="table-footer-rightcol">
                                 <input type="submit" value="Submit" name="submitButton"/>

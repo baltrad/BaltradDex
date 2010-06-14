@@ -81,7 +81,7 @@
                                         <td class="right">
                                             <a href="edituser.htm">Edit</a>
                                             <a href="saveuser.htm">Add</a>
-                                            <a href="removeusers.htm">Remove</a>
+                                            <a href="showUsers.htm">Remove</a>
                                         </td>
                                     </tr>
                                     <tr class="odd">
@@ -89,7 +89,7 @@
                                         <td class="right">
                                             <a href="editchannel.htm">Edit</a>
                                             <a href="savechannel.htm">Add</a>
-                                            <a href="removechannels.htm">Remove</a>
+                                            <a href="showChannels.htm">Remove</a>
                                         </td>
                                     </tr>
                                 </table>

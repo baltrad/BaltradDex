@@ -58,7 +58,7 @@ public class DataManager {
         ResultSet r = q.execute();
         List dataList = new ArrayList();
         while( r.next() ) {
-            Data data = new Data( r.string( 0 ), r.integer( 1 ), channelName,
+            Data data = new Data( r.string( 0 ), r.int64_( 1 ), channelName,
                     r.date( 2 ).to_string( FC_DATE_STR ), r.time( 3 ).to_string( FC_TIME_STR ) );
             dataList.add( data );
         }
@@ -84,10 +84,10 @@ public class DataManager {
         // channel name
         q.fetch( xpr.attribute( FC_SRC_PLC_ATTR ) );
         // filter the query with a given data id
-        q.filter( xpr.attribute( FC_ID_ATTR ).eq( xpr.integer( dataId ) ) );
+        q.filter( xpr.attribute( FC_ID_ATTR ).eq( xpr.int64_( dataId ) ) );
         ResultSet r = q.execute();
         while( r.next() ) {
-            data = new Data( r.integer( 0 ), r.string( 1 ) );
+            data = new Data( r.int64_( 0 ), r.string( 1 ) );
         }
         // delete the result set
         r.delete();

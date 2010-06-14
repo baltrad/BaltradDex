@@ -37,16 +37,20 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <prop key="showregister.htm">showRegController</prop>
                 <prop key="clearregister.htm">urlFilenameController</prop>
                 <prop key="confirmclearregister.htm">clrRegController</prop>
+
                 <prop key="saveuser.htm">saveUserController</prop>
                 <prop key="edituser.htm">editUserController</prop>
-                <prop key="removeusers.htm">showUsersController</prop>
-                <prop key="selectusers.htm">selectUsersController</prop>
-                <prop key="confirmremoveusers.htm">removeUsersController</prop>
+                
+                <prop key="showUsers.htm">removeUserController</prop>
+                <prop key="showSelectedUsers.htm">removeUserController</prop>
+                <prop key="showRemovedUsers.htm">removeUserController</prop>
+
                 <prop key="savechannel.htm">saveChannelController</prop>
                 <prop key="editchannel.htm">editChannelController</prop>
-                <prop key="removechannels.htm">showChannelsController</prop>
-                <prop key="selectchannels.htm">selectChannelsController</prop>
-                <prop key="confirmremovechannels.htm">removeChannelsController</prop>
+               
+                <prop key="showChannels.htm">removeChannelController</prop>
+                <prop key="showSelectedChannels.htm">removeChannelController</prop>
+                <prop key="showRemovedChannels.htm">removeChannelController</prop>
             </props>
         </property>
     </bean>
@@ -61,7 +65,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <prop key="signin.htm">signInController</prop>
                 <prop key="signout.htm">signOutController</prop>
                 <prop key="transmitter.htm">transmitter</prop>
-                <prop key="receiver.htm">receiver</prop>
+                <prop key="receiver.htm">receiver</prop> 
             </props>
         </property>
     </bean>
@@ -73,6 +77,23 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
           class="org.springframework.web.servlet.view.InternalResourceViewResolver"
           p:prefix="/WEB-INF/jsp/"
           p:suffix=".jsp" />
+
+    <!--
+        Name resolver to be used with classes extending MultiActionController
+    -->
+    <bean id="nameResolver"
+        class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
+        <property name="mappings">
+            <props>
+                <prop key="showChannels">showChannels</prop>
+                <prop key="showSelectedChannels">showSelectedChannels</prop>
+                <prop key="showRemovedChannels">showRemovedChannels</prop>
+                <prop key="showUsers">showUsers</prop>
+                <prop key="showSelectedUsers">showSelectedUsers</prop>
+                <prop key="showRemovedUsers">showRemovedUsers</prop>
+            </props>
+        </property>
+    </bean>
 
     <!--
         URL filename view controller.
@@ -395,7 +416,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
 
     <!--
         Show users controller - creates list of users available in the system
-    -->
+    
     <bean name="showUsersController" class="eu.baltrad.dex.controller.admin.ShowUsersController">
         <property name="successView">
             <value>removeusers</value>
@@ -408,9 +429,9 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         </property>
     </bean>
 
-    <!--
+    
         Select users controller - creates list of user accounts selected for removal.
-    -->
+    
     <bean name="selectUsersController" class="eu.baltrad.dex.controller.admin.SelectUsersController">
         <property name="successView">
             <value>selectusers</value>
@@ -420,9 +441,9 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         </property>
     </bean>
 
-    <!--
+    
         Remove users controller - removes user account.
-    -->
+    
     <bean name="removeUsersController" class="eu.baltrad.dex.controller.admin.RemoveUsersController">
         <property name="successView">
             <value>confirmremoveusers</value>
@@ -430,7 +451,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         <property name="userManager">
             <ref bean="userManager"/>
         </property>
-    </bean>
+    </bean -->
 
     <!--
         Edit user controller - allows to modify user credentials
@@ -477,6 +498,22 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <bean name="saveUserValidator" class="eu.baltrad.dex.controller.admin.SaveUserValidator">
         <property name="userManager">
             <ref bean="userManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Remove user account controller extends MultiActionController
+    -->
+    <bean id="removeUserController"
+        class="eu.baltrad.dex.controller.admin.RemoveUserController">
+        <property name="nameResolver">
+            <ref local="nameResolver"/>
+        </property>
+        <property name="userManager">
+            <ref bean="userManager" />
+        </property>
+        <property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager"/>
         </property>
     </bean>
 
@@ -529,41 +566,15 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </bean>
 
     <!--
-        Show channels controller - creates list of channels available in the system
+        Remove channels controller extends MultiActionController
     -->
-    <bean name="showChannelsController"
-        class="eu.baltrad.dex.controller.admin.ShowChannelsController">
-        <property name="successView">
-            <value>removechannels</value>
+    <bean id="removeChannelController"
+        class="eu.baltrad.dex.controller.admin.RemoveChannelController">
+        <property name="nameResolver">
+            <ref local="nameResolver"/>
         </property>
         <property name="channelManager">
-            <ref bean="channelManager"/>
-        </property>
-    </bean>
-
-    <!--
-        Select channels controller - creates list of data channels selected for removal.
-    -->
-    <bean name="selectChannelsController"
-        class="eu.baltrad.dex.controller.admin.SelectChannelsController">
-        <property name="successView">
-            <value>selectchannels</value>
-        </property>
-        <property name="channelManager">
-            <ref bean="channelManager"/>
-        </property>
-    </bean>
-
-    <!--
-        Remove channels controller - removes data channels.
-    -->
-    <bean name="removeChannelsController"
-        class="eu.baltrad.dex.controller.admin.RemoveChannelsController">
-        <property name="successView">
-            <value>confirmremovechannels</value>
-        </property>
-        <property name="channelManager">
-            <ref bean="channelManager"/>
+            <ref bean="channelManager" />
         </property>
     </bean>
 

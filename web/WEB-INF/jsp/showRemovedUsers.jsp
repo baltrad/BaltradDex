@@ -1,4 +1,4 @@
-<%-- 
+<%--
     Document   : Confirm user account removal page
     Created on : May 25, 2010, 4:04:09 PM
     Author     : szewczenko

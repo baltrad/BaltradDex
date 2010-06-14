@@ -1,6 +1,6 @@
 <%--
-    Document   : User listing interface
-    Created on : May 24, 2010, 12:40:14 PM
+    Document   : Channels listing page
+    Created on : May 27, 2010, 12:17:14 PM
     Author     : szewczenko
 --%>
 
@@ -13,7 +13,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Remove user account</title>
+    <title>Remove data channel</title>
 </head>
 
 <body>
@@ -26,39 +26,32 @@
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Remove user account</h1>
+                        <h1>Remove data channel</h1>
                         <br/>
                         <h2>
                             <p>
-                            Select user account to remove.
+                            Select data channel to remove.
                             </p>
                         </h2>
-                        <form action="selectusers.htm">
-                            <display:table name="users" id="user" defaultsort="1"
-                                requestURI="showusers.htm" cellpadding="0" cellspacing="2"
+                        <form action="showSelectedChannels.htm">
+                            <display:table name="channels" id="channel" defaultsort="1"
+                                requestURI="showchannels.htm" cellpadding="0" cellspacing="2"
                                 export="false" class="tableborder" pagesize="10">
                                 <display:column sortProperty="id" sortable="true"
                                     title="ID" class="tdcenter">
-                                    <fmt:formatNumber value="${user.id}" pattern="00" />
+                                    <fmt:formatNumber value="${channel.id}" pattern="00" />
                                 </display:column>
-                                <display:column sortable="true" title="User name"
+                                <display:column sortable="true" title="Channel name"
                                     sortProperty="name" class="tdcenter"
-                                    value="${user.name}">
+                                    value="${channel.name}">
                                 </display:column>
-                                <display:column sortable="true" title="Role" sortProperty="role"
-                                    class="tdcenter" value="${user.role}">
-                                </display:column>
-                                <display:column sortable="true" title="Company"
-                                    sortProperty="factory" class="tdcenter"
-                                    value="${user.factory}">
-                                </display:column>
-                                <display:column sortable="true" title="Node address"
-                                    sortProperty="nodeAddress" class="tdcenter"
-                                    value="${user.nodeAddress}">
+                                <display:column sortable="true" title="WMO number"
+                                    sortProperty="wmoNumber" class="tdcenter"
+                                    value="${channel.wmoNumber}">
                                 </display:column>
                                 <display:column sortable="false" title="Select" class="tdcheck">
-                                    <input type="checkbox" name="selected_users"
-                                        value="${user.id}"/>
+                                    <input type="checkbox" name="selected_channels"
+                                        value="${channel.id}"/>
                                 </display:column>
                             </display:table>
                             <div id="table-footer">

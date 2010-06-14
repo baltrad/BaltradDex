@@ -1,6 +1,6 @@
 <%--
-    Document   : Channels listing page
-    Created on : May 27, 2010, 12:17:14 PM
+    Document   : Confirm channel removal page
+    Created on : May 24, 2010, 12:38:42 PM
     Author     : szewczenko
 --%>
 
@@ -30,12 +30,12 @@
                         <br/>
                         <h2>
                             <p>
-                            Select data channel to remove.
+                            Warning: The following data channels will be removed from the system:
                             </p>
                         </h2>
-                        <form action="selectchannels.htm">
+                        <form method="post" action="showRemovedChannels.htm">
                             <display:table name="channels" id="channel" defaultsort="1"
-                                requestURI="showchannels.htm" cellpadding="0" cellspacing="2"
+                                requestURI="showSelectedChannels.htm" cellpadding="0" cellspacing="2"
                                 export="false" class="tableborder" pagesize="10">
                                 <display:column sortProperty="id" sortable="true"
                                     title="ID" class="tdcenter">
@@ -49,13 +49,18 @@
                                     sortProperty="wmoNumber" class="tdcenter"
                                     value="${channel.wmoNumber}">
                                 </display:column>
-                                <display:column sortable="false" title="Select" class="tdcheck">
-                                    <input type="checkbox" name="selected_channels"
-                                        value="${channel.id}"/>
+                                <display:column class="tdhidden">
+                                    <input type="checkbox" name="removed_channels"
+                                           value="${channel.id}" checked/>
                                 </display:column>
                             </display:table>
-                            <div id="table-footer">
+                            <div id="table-footer-rightcol">
                                 <input type="submit" value="Submit" name="submitButton"/>
+                            </div>
+                        </form>
+                        <form action="admin.htm">
+                            <div id="table-footer-leftcol">
+                                <input type="submit" value="Cancel" name="submitButton"/>
                             </div>
                         </form>
                         <div id="table-footer">
