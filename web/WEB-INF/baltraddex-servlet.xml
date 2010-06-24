@@ -1,21 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+
+This file is part of the BaltradDex software.
+
+BaltradDex is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+BaltradDex is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+-->
+
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
-http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-    
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
     <!--
-        URL to controller mapping. Bean references http request interceptor which is used
-        to control user authentication process.
+        URLs controlled by the role based USER level http request interceptor.
     -->
     <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
         <property name="interceptors">
             <list>
-                <ref bean="httpRequestInterceptor"/>
+                <ref bean="userHttpRequestInterceptor"/>
             </list>
         </property>
         <property name="mappings">
@@ -23,31 +44,72 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <prop key="welcome.htm">urlFilenameController</prop>
                 <prop key="channels.htm">channelController</prop>
                 <prop key="channeldata.htm">channelDataController</prop>
+                <prop key="credits.htm">urlFilenameController</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--
+        URLs controlled by the role based PEER level http request interceptor.
+    -->
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <ref bean="peerHttpRequestInterceptor"/>
+            </list>
+        </property>
+        <property name="mappings">
+            <props>
                 <prop key="download.htm">downloadController</prop>
-                <prop key="admin.htm">urlFilenameController</prop>
-                <prop key="subscriptions.htm">subscriptionsController</prop>
-                <prop key="submit.htm">submitSubscriptionsController</prop>
-                <prop key="status.htm">subscriptionStatusController</prop>
+                <prop key="showSubscriptions.htm">subscriptionController</prop>
+                <prop key="showSelectedSubscriptions.htm">subscriptionController</prop>
+                <prop key="showSubscriptionStatus.htm">subscriptionController</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--
+        URLs controlled by the role based OPERATOR level http request interceptor.
+    -->
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <ref bean="operatorHttpRequestInterceptor"/>
+            </list>
+        </property>
+        <property name="mappings">
+            <props>
                 <prop key="log.htm">urlFilenameController</prop>
                 <prop key="logtable.htm">logTableController</prop>
                 <prop key="journal.htm">journalController</prop>
-                <prop key="incoming.htm">urlFilenameController</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!--
+        URLs controlled by the role based ADMIN level http request interceptor.
+    -->
+    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <ref bean="adminHttpRequestInterceptor"/>
+            </list>
+        </property>
+        <property name="mappings">
+            <props>
+                <prop key="admin.htm">urlFilenameController</prop>
                 <prop key="clearmessages.htm">urlFilenameController</prop>
                 <prop key="confirmclearmessages.htm">clrMsgsController</prop>
                 <prop key="showregister.htm">showRegController</prop>
                 <prop key="clearregister.htm">urlFilenameController</prop>
                 <prop key="confirmclearregister.htm">clrRegController</prop>
-
                 <prop key="saveuser.htm">saveUserController</prop>
                 <prop key="edituser.htm">editUserController</prop>
-                
                 <prop key="showUsers.htm">removeUserController</prop>
                 <prop key="showSelectedUsers.htm">removeUserController</prop>
                 <prop key="showRemovedUsers.htm">removeUserController</prop>
-
                 <prop key="savechannel.htm">saveChannelController</prop>
                 <prop key="editchannel.htm">editChannelController</prop>
-               
                 <prop key="showChannels.htm">removeChannelController</prop>
                 <prop key="showSelectedChannels.htm">removeChannelController</prop>
                 <prop key="showRemovedChannels.htm">removeChannelController</prop>
@@ -56,8 +118,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </bean>
 
     <!--
-        URL to controller mapping. These URLs are not intercepted by the http request interceptor
-        class.
+        The following URLs are not intercepted by any of the http request interceptors.
     -->
     <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
         <property name="mappings">
@@ -68,6 +129,43 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <prop key="receiver.htm">receiver</prop> 
             </props>
         </property>
+    </bean>
+
+    <!--
+        USER level role based http request interceptor.
+    -->
+    <bean id="userHttpRequestInterceptor" class="eu.baltrad.dex.util.UserHttpRequestInterceptor">
+	<property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager" />
+	</property>
+    </bean>
+
+    <!--
+        PEER level role based http request interceptor.
+    -->
+    <bean id="peerHttpRequestInterceptor" class="eu.baltrad.dex.util.PeerHttpRequestInterceptor">
+	<property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager" />
+	</property>
+    </bean>
+
+    <!--
+        OPERATOR level role based http request interceptor.
+    -->
+    <bean id="operatorHttpRequestInterceptor"
+            class="eu.baltrad.dex.util.OperatorHttpRequestInterceptor">
+	<property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager" />
+	</property>
+    </bean>
+
+    <!--
+        ADMIN level role based http request interceptor.
+    -->
+    <bean id="adminHttpRequestInterceptor" class="eu.baltrad.dex.util.AdminHttpRequestInterceptor">
+	<property name="applicationSecurityManager">
+            <ref bean="applicationSecurityManager" />
+	</property>
     </bean>
 
     <!--
@@ -91,6 +189,9 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
                 <prop key="showUsers">showUsers</prop>
                 <prop key="showSelectedUsers">showSelectedUsers</prop>
                 <prop key="showRemovedUsers">showRemovedUsers</prop>
+                <prop key="showSubscriptions">showSubscriptions</prop>
+                <prop key="showSelectedSubscriptions">showSelectedSubscriptions</prop>
+                <prop key="showSubscriptionStatus">showSubscriptionStatus</prop>
             </props>
         </property>
     </bean>
@@ -181,10 +282,10 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </bean>
 
     <!--
-        Subscriptions controller
+        Subscription controller
     -->
-    <bean name="subscriptionsController"
-        class="eu.baltrad.dex.controller.subscription.SubscriptionsController">
+    <bean name="subscriptionController"
+        class="eu.baltrad.dex.controller.subscription.SubscriptionController">
         <property name="applicationSecurityManager">
             <ref bean="applicationSecurityManager"/>
         </property>
@@ -193,50 +294,9 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
         </property>
         <property name="channelManager">
             <ref bean="channelManager" />
-        </property>
-        <property name="successView">
-            <value>subscriptions</value>
-        </property>
-    </bean>
-
-    <!--
-        Submit subscriptions controller
-    -->
-    <bean name="submitSubscriptionsController"
-        class="eu.baltrad.dex.controller.subscription.SubmitSubscriptionsController">
-        <property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager"/>
-        </property>
-        <property name="subscriptionManager">
-            <ref bean="subscriptionManager"/>
-        </property>
-        <property name="channelManager">
-            <ref bean="channelManager" />
-        </property>
-        <property name="successView">
-            <value>submit</value>
-        </property>
-    </bean>
-
-    <!--
-        Subscription status controller
-    -->
-    <bean name="subscriptionStatusController"
-        class="eu.baltrad.dex.controller.subscription.SubscriptionStatusController">
-        <property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager"/>
-        </property>
-        <property name="subscriptionManager">
-            <ref bean="subscriptionManager"/>
-        </property>
-        <property name="channelManager">
-            <ref bean="channelManager"/>
         </property>
         <property name="logManager">
             <ref bean="logManager"/>
-        </property>
-        <property name="successView">
-            <value>status</value>
         </property>
     </bean>
 
@@ -415,45 +475,6 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </bean>
 
     <!--
-        Show users controller - creates list of users available in the system
-    
-    <bean name="showUsersController" class="eu.baltrad.dex.controller.admin.ShowUsersController">
-        <property name="successView">
-            <value>removeusers</value>
-        </property>
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-        <property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager"/>
-        </property>
-    </bean>
-
-    
-        Select users controller - creates list of user accounts selected for removal.
-    
-    <bean name="selectUsersController" class="eu.baltrad.dex.controller.admin.SelectUsersController">
-        <property name="successView">
-            <value>selectusers</value>
-        </property>
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-    </bean>
-
-    
-        Remove users controller - removes user account.
-    
-    <bean name="removeUsersController" class="eu.baltrad.dex.controller.admin.RemoveUsersController">
-        <property name="successView">
-            <value>confirmremoveusers</value>
-        </property>
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-    </bean -->
-
-    <!--
         Edit user controller - allows to modify user credentials
     -->
     <bean name="editUserController" class="eu.baltrad.dex.controller.admin.EditUserController">
@@ -495,7 +516,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Add user validator
     -->
-    <bean name="saveUserValidator" class="eu.baltrad.dex.controller.admin.SaveUserValidator">
+    <bean name="saveUserValidator" class="eu.baltrad.dex.model.admin.SaveUserValidator">
         <property name="userManager">
             <ref bean="userManager"/>
         </property>
@@ -547,7 +568,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Add channel validator
     -->
-    <bean name="saveChannelValidator" class="eu.baltrad.dex.controller.admin.SaveChannelValidator">
+    <bean name="saveChannelValidator" class="eu.baltrad.dex.model.admin.SaveChannelValidator">
         <property name="channelManager">
             <ref bean="channelManager"/>
         </property>
@@ -579,18 +600,6 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     </bean>
 
     <!--
-        Http request interceptor.
-    -->
-    <bean id="httpRequestInterceptor" class="eu.baltrad.dex.util.HttpRequestInterceptor">
-        <property name="signInPage">
-            <value>signin.htm</value>
-	</property>
-	<property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager" />
-	</property>
-    </bean>
-
-    <!--
         Message digest utility.
     -->
     <bean name="messageDigestUtil" class="eu.baltrad.dex.util.MessageDigestUtil"/>
@@ -598,7 +607,11 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <!--
         Application security manager.
     -->
-    <bean name="applicationSecurityManager" class="eu.baltrad.dex.util.ApplicationSecurityManager"/>
+    <bean name="applicationSecurityManager" class="eu.baltrad.dex.util.ApplicationSecurityManager">
+         <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+    </bean>
 
     <!--
         Message resources.
@@ -674,7 +687,7 @@ http://www.springframework.org/schema/tx http://www.springframework.org/schema/t
     <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
         <property name="interceptors">
             <list>
-                <ref bean="httpRequestInterceptor"/>
+                <ref bean="adminHttpRequestInterceptor"/>
             </list>
         </property>
     </bean>

@@ -1,10 +1,23 @@
-/*
- * BaltradNode :: Radar data exchange and communication system
- * Remote Sensing Department, Institute of Meteorology and Water Management
- * Maciej Szewczykowski, 2010
- *
- * maciej.szewczykowski@imgw.pl
- */
+/***************************************************************************************************
+*
+* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+*
+* This file is part of the BaltradDex software.
+*
+* BaltradDex is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* BaltradDex is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+*
+***************************************************************************************************/
 
 package eu.baltrad.dex.util;
 
@@ -19,9 +32,9 @@ import java.util.Date;
 import java.util.Properties;
 
 /**
- * Utility class used to initialize application upon start.
+ * Utility class used to initialize application on startup.
  *
- * @author szewczenko
+ * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
  * @version 1.0
  * @since 1.0
  */
@@ -29,15 +42,39 @@ public class InitAppUtil {
 //---------------------------------------------------------------------------------------- Constants
     // Properties file name
     private static final String PROPS_FILE_NAME = "dex.init.properties";
-    // Property holding name of the directory storing data from local production system
+    // Node address property
+    private static final String NODE_ADDRESS_PROP = "node.address";
+    // Node type property key
+    private static final String NODE_TYPE_PROP = "node.type";
+    // Organization name property key
+    private static final String ORG_NAME_PROP = "node.organization.name";
+    // Organization address property key
+    private static final String ORG_ADDRESS_PROP = "node.organization.address";
+    // Timezone property key
+    private static final String TIME_ZONE_PROP = "node.timezone";
+    // Node administrator email property key
+    private static final String ADMIN_EMAIL_PROP = "node.admin.email";
+    // Local production directory property key
     private static final String PROD_DIR_PROP = "local.production.dir";
-    // Property holding name of the temporary directory where for local data
+    // Temporary directory property key
     private static final String TEMP_DIR_PROP = "local.temp.dir";
-    // Property holding name of the directory storing incoming data from foreign nodes
+    // Incoming data directory property key
     private static final String INCOMING_DIR_PROP = "incoming.data.dir";
 //---------------------------------------------------------------------------------------- Variables
     // Reference to LogManager object
     private static LogManager logManager = new LogManager();
+    // Node address
+    private static String nodeAddress;
+    // Node type
+    private static String nodeType;
+    // Organization name
+    private static String orgName;
+    // Organization address
+    private static String orgAddress;
+    // Time zone
+    private static String timeZone;
+    // Node administrator email
+    private static String adminEmail;
     // Directory storing data from local production system
     private static String localProdDir;
     // Temporary directory for local data
@@ -55,6 +92,12 @@ public class InitAppUtil {
             Properties props = new Properties();
             if( is != null ) {
                 props.load( is );
+                setNodeAddress( props.getProperty( NODE_ADDRESS_PROP ) );
+                setNodeType( props.getProperty( NODE_TYPE_PROP ) );
+                setOrgName( props.getProperty( ORG_NAME_PROP ) );
+                setOrgAddress( props.getProperty( ORG_ADDRESS_PROP ) );
+                setTimeZone( props.getProperty( TIME_ZONE_PROP ) );
+                setAdminEmail( props.getProperty( ADMIN_EMAIL_PROP ) );
                 setLocalProdDir( ServletContextUtil.getServletContextPath() +
                         props.getProperty( PROD_DIR_PROP ) );
                 setIncomingDataDir( ServletContextUtil.getServletContextPath() +
@@ -74,6 +117,78 @@ public class InitAppUtil {
                         "Failed to load properties file: " + PROPS_FILE_NAME );
         }
     }
+    /**
+     * Gets node address property.
+     *
+     * @return Node address property
+     */
+    public static String getNodeAddress() { return nodeAddress; }
+    /**
+     * Sets node address property.
+     *
+     * @param _nodeAddress Node address property to set
+     */
+    public void setNodeAddress( String _nodeAddress ) { nodeAddress = _nodeAddress; }
+    /**
+     * Gets node type property.
+     *
+     * @return Node type property
+     */
+    public static String getNodeType() { return nodeType; }
+    /**
+     * Sets node type property.
+     *
+     * @param _nodeType Node type property to set
+     */
+    public void setNodeType( String _nodeType ) { nodeType = _nodeType; }
+    /**
+     * Gets organization name property.
+     *
+     * @return Organization name property
+     */
+    public static String getOrgName() { return orgName; }
+    /**
+     * Sets organization name property.
+     *
+     * @param _orgName Organization name property to set
+     */
+    public void setOrgName( String _orgName ) { orgName = _orgName; }
+    /**
+     * Gets organization address property.
+     *
+     * @return Organization address property
+     */
+    public static String getOrgAddress() { return orgAddress; }
+    /**
+     * Sets organization address property.
+     *
+     * @param _orgAddress Organization address property to set
+     */
+    public void setOrgAddress( String _orgAddress ) { orgAddress = _orgAddress; }
+    /**
+     * Gets time zone property.
+     *
+     * @return Time zone property
+     */
+    public static String getTimeZone() { return timeZone; }
+    /**
+     * Sets time zone property.
+     *
+     * @param _timeZone Time zone property to set
+     */
+    public void setTimeZone( String _timeZone ) { timeZone = _timeZone; }
+    /**
+     * Gets administrator email property.
+     *
+     * @return Administrator email property
+     */
+    public static String getAdminEmail() { return adminEmail; }
+    /**
+     * Sets administrator email property.
+     *
+     * @param _adminEmail Administrator email property to set
+     */
+    public void setAdminEmail( String _adminEmail ) { adminEmail = _adminEmail; }
     /**
      * Method gets local production directory name.
      *

@@ -1,37 +1,31 @@
-<%--
-    Document   : System welcome page
-    Created on : December 9, 2009, 13:56:14 PM
-    Author     : szewczenko
---%>
+<%--------------------------------------------------------------------------------------------------
+Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+
+This file is part of the BaltradDex software.
+
+BaltradDex is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+BaltradDex is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+----------------------------------------------------------------------------------------------------
+Document   : System management page
+Created on : Jun 22, 2010, 11:57:02 AM
+Author     : szewczenko
+--------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                                                 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">    
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
-<%@ page import="eu.baltrad.dex.model.user.User" %>
-<%@ page import="java.util.Date" %>
-
-<jsp:useBean id="applicationSecurityManager" scope="session"
-                                    class="eu.baltrad.dex.util.ApplicationSecurityManager">
-</jsp:useBean>
-<jsp:useBean id="userManager" scope="session" class="eu.baltrad.dex.model.user.UserManager">
-</jsp:useBean>
-<jsp:useBean id="logManager" scope="session" class="eu.baltrad.dex.model.log.LogManager">
-</jsp:useBean>
-
-<%
-    User sessionUser = ( User )applicationSecurityManager.getUser( request );
-    User dbUser = userManager.getUserByName( "admin" );
-    if( !sessionUser.getName().equals( "admin" ) ||
-                    !applicationSecurityManager.authenticateSessionUser( sessionUser, dbUser ) ) {
-        request.getSession().setAttribute( "is_user_admin", 0 );
-        logManager.addEntry( new Date(), logManager.MSG_WRN, "User failed to access " +
-                "system management area");
-    } else {
-        request.getSession().setAttribute( "is_user_admin", 1 );
-    }
-%>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -49,64 +43,54 @@
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <c:choose>
-                            <c:when test="${is_user_admin == 1}">
-                                <h1>System management options</h1>
-                                <br/>
-                                <h2>
-                                </h2>
-                                <table>
-                                    <div id="message-text">
-                                        <c:if test="${not empty message}">
-                                            <c:out value="${message}" />
-                                            <c:set var="message" value="" scope="session" />
-                                        </c:if>
-                                    </div>
-                                    <caption>Control features</caption>
-                                    <tr class="even">
-                                        <td class="left">Data delivery register</td>
-                                        <td class="right">
-                                            <a href="showregister.htm">Show register</a>
-                                            <a href="clearregister.htm">Clear</a>
-                                        </td>
-                                    </tr>
-                                    <tr class="odd">
-                                        <td class="left">Log messages</td>
-                                        <td class="right">
-                                            <a href="clearmessages.htm">Clear messages</a>
-                                        </td>
-                                    </tr>
-                                    <tr class="even">
-                                        <td class="left">User management</td>
-                                        <td class="right">
-                                            <a href="edituser.htm">Edit</a>
-                                            <a href="saveuser.htm">Add</a>
-                                            <a href="showUsers.htm">Remove</a>
-                                        </td>
-                                    </tr>
-                                    <tr class="odd">
-                                        <td class="left">Data channel management</td>
-                                        <td class="right">
-                                            <a href="editchannel.htm">Edit</a>
-                                            <a href="savechannel.htm">Add</a>
-                                            <a href="showChannels.htm">Remove</a>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </c:when>
-                            <c:otherwise>
-                                <div id="message-box">
-                                    Access to administrative area is restricted.
-                                    Please sign in as administrator and try again.
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
+                        <h1>System management options</h1>
+                        <br/>
+                        <h2>
+                        </h2>
+                        <table>
+                            <div id="message-text">
+                                <c:if test="${not empty message}">
+                                    <c:out value="${message}" />
+                                    <c:set var="message" value="" scope="session" />
+                                </c:if>
+                            </div>
+                            <caption>Control features</caption>
+                            <tr class="even">
+                                <td class="left">Data delivery register</td>
+                                <td class="right">
+                                    <a href="showregister.htm">Show register</a>
+                                    <a href="clearregister.htm">Clear</a>
+                                </td>
+                            </tr>
+                            <tr class="odd">
+                                <td class="left">Log messages</td>
+                                <td class="right">
+                                    <a href="clearmessages.htm">Clear messages</a>
+                                </td>
+                            </tr>
+                            <tr class="even">
+                                <td class="left">User management</td>
+                                <td class="right">
+                                    <a href="edituser.htm">Edit</a>
+                                    <a href="saveuser.htm">Add</a>
+                                    <a href="showUsers.htm">Remove</a>
+                                </td>
+                            </tr>
+                            <tr class="odd">
+                                <td class="left">Data channel management</td>
+                                <td class="right">
+                                    <a href="editchannel.htm">Edit</a>
+                                    <a href="savechannel.htm">Add</a>
+                                    <a href="showChannels.htm">Remove</a>
+                                </td>
+                            </tr>
+                        </table>
                         <div id="table-footer">
                             <a href="welcome.htm">&#60&#60 Home</a>
                         </div>
                     </div>
                     <div id="left">
-                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
                     </div>
                     <div class="clear"></div>
                 </div>

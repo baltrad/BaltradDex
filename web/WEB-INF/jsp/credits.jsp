@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Edit data channel page
-Created on : Jun 22, 2010, 11:57:02 AM
+Document   : Credits page
+Created on : Jun 24, 2010, 8:32:26 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
@@ -30,7 +30,7 @@ Author     : szewczenko
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Modify data channel</title>
+    <title>Credits</title>
 </head>
 
 <body>
@@ -42,31 +42,16 @@ Author     : szewczenko
         <div class="outer">
             <div class="inner">
                 <div class="float-wrap">
+
                     <div id="main">
-                        <h1>Modify data channel</h1>
-                        <br/>
-                        <h2>
-                            <p>
-                            Click on data channel ID to modify selected channel.
-                            </p>
-                        </h2>
-                        <display:table name="registered_channels" id="channel" defaultsort="1"
-                            requestURI="showchannel.htm" cellpadding="0" cellspacing="2"
-                            export="false" class="tableborder" pagesize="10">
-                            <display:column sortable="true" title="ID" href="savechannel.htm"
-                                sortProperty="id" class="tdcenter" paramProperty="id"
-                                paramId="id" value="${channel.id}">
-                            </display:column>
-                            <display:column sortable="true" title="Channel name" sortProperty="name"
-                                class="tdcenter" value="${channel.name}">
-                            </display:column>
-                            <display:column sortable="true" title="WMO number"
-                                sortProperty="wmoNumber" class="tdcenter"
-                                value="${channel.wmoNumber}">
-                            </display:column>
-                        </display:table>
-                        <div id="table-footer">
-                            <a href="admin.htm">&#60&#60 System management</a>
+                        <div id="welcome">
+                            <h1>Credits</h1>
+                            <br/>
+                            <h2>
+                                <p>
+                                This is a place for credits.
+                                </p>
+                            </h2>
                         </div>
                     </div>
                     <div id="left">

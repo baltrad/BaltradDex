@@ -1,35 +1,26 @@
--- SQL script inserts data into baltrad_db database 
-
--- dex_users ----------------------------------------------------------------------------
-
-INSERT INTO dex_users (name, password, role, factory, country, city, city_code,
-    street, number, phone, email, node_address)
-    VALUES ('imgw', MD5('baltrad'), 'operator',
-        'IMGW', 'Poland', 'Warsaw',
-        '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'baltrad.admin@imgw.pl',
-        'baltrad.imgw.pl'),
-        ('admin', MD5('admin'), 'administrator',
-        'IMGW', 'Poland', 'Warsaw',
-        '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'baltrad.admin@imgw.pl',
-        'http://localhost:8084/BaltradDex/receiver.htm'),
-        ('laptok', MD5('baltrad'), 'user',
-        'IMGW', 'Poland', 'Warsaw',
-        '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'baltrad.admin@imgw.pl',
-        'http://172.30.9.171:8084/BaltradDex/receiver.htm'),
-        ('rand', MD5('randomize'), 'user',
-        'IMGW', 'Poland', 'Warsaw',
-        '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'baltrad.admin@imgw.pl',
-        'http://172.30.9.34:8084/BaltradDex/receiver.htm'),
-        ('test', MD5('password'), 'user',
-        'IMGW', 'Poland', 'Warsaw',
-        '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'baltrad.admin@imgw.pl',
-        'http://172.30.9.34:8084/BaltradDex/receiver.htm');
+-- SQL script inserts data into baltrad_db database
 
 -- dex_roles ---------------------------------------------------------------------------
 
-INSERT INTO dex_roles (id, role) VALUES (1, 'Operator'), (2, 'Administrator'),
-    (3, 'User'), (4, 'Guest');
+INSERT INTO dex_roles (id, role) VALUES (1, 'admin'), (2, 'operator'),
+    (3, 'peer'), (4, 'user');
 
+-- dex_users ----------------------------------------------------------------------------
+
+INSERT INTO dex_users (name, role_name, password, factory, country, city, city_code,
+    street, number, phone, email, node_address)
+    VALUES ('admin', 'admin', MD5('baltrad'), 'IMGW', 'Poland', 'Warsaw',
+        '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'admin@baltrad.imgw.pl',
+        'http://localhost:8084/BaltradDex/receiver.htm'),
+        ('operator', 'operator', MD5('baltrad'), 'IMGW', 'Poland', 'Warsaw',
+        '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'operator@baltrad.imgw.pl',
+        'http://172.30.9.171:8084/BaltradDex/receiver.htm'),
+        ('peer', 'peer', MD5('baltrad'), 'IMGW', 'Poland', 'Warsaw',
+        '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'peer@baltrad.imgw.pl',
+        'http://172.30.9.34:8084/BaltradDex/receiver.htm'),
+        ('user', 'user', MD5('baltrad'), 'IMGW', 'Poland', 'Warsaw',
+        '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'user@baltrad.imgw.pl',
+        'http://172.30.9.34:8084/BaltradDex/receiver.htm');
 
 -- dex_channels ------------------------------------------------------------------------
 

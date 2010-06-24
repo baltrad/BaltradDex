@@ -1,21 +1,41 @@
-<%-- 
-    Document   : System welcome page
-    Created on : December 9, 2009, 13:56:14 PM
-    Author     : szewczenko
---%>
+<%--------------------------------------------------------------------------------------------------
+Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+
+This file is part of the BaltradDex software.
+
+BaltradDex is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+BaltradDex is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+----------------------------------------------------------------------------------------------------
+Document   : Welcome page
+Created on : Jun 22, 2010, 11:57:02 AM
+Author     : szewczenko
+--------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                                                 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
-<%@page import="eu.baltrad.dex.model.user.User"%>
 
-<jsp:useBean id="userManager" scope="session" class="eu.baltrad.dex.model.user.UserManager">
+<jsp:useBean id="initAppUtil" scope="session" class="eu.baltrad.dex.util.InitAppUtil">
+</jsp:useBean>
+
+<jsp:useBean id="securityManager" scope="session" class="eu.baltrad.dex.util.ApplicationSecurityManager">
 </jsp:useBean>
 
 <%
-    User operator = userManager.getUserByRole( "operator" );
+    User user = ( User )securityManager.getUser( request );
+    String userName = user.getName();
 %>
 
 <head>
@@ -40,6 +60,9 @@
                             <br/>
                             <h2>
                                 <p>
+                                You are signed in as user <% out.println( userName ); %>.
+                                </p>
+                                <p>
                                 Use the system functionality to browse and download data or establish
                                 operational data exchange links by subscribing to the desired data
                                 channel.
@@ -51,53 +74,45 @@
                         </div>
                         <table>
                             <tr class="even">
-                                <td class="left">Operator name</td>
-                                <td class="right">
-                                    <% out.println( operator.getFactory() ); %>
+                                <td class="welcome-leftcol">Node address</td>
+                                <td class="welcome-rightcol">
+                                    <% out.println( initAppUtil.getNodeAddress() ); %>
                                 </td>
                             </tr>
                             <tr class="odd">
-                                <td class="left">Country</td>
-                                <td class="right">
-                                    <% out.println( operator.getCountry() ); %>
+                                <td class="welcome-leftcol">Node type</td>
+                                <td class="welcome-rightcol">
+                                    <% out.println( initAppUtil.getNodeType() ); %>
                                 </td>
                             </tr>
                             <tr class="even">
-                                <td class="left">Address :: City</td>
-                                <td class="right">
-                                    <% out.println( operator.getCity() ); %>
+                                <td class="welcome-leftcol">Organization name</td>
+                                <td class="welcome-rightcol">
+                                    <% out.println( initAppUtil.getOrgName() ); %>
                                 </td>
                             </tr>
                             <tr class="odd">
-                                <td class="left">Address :: Code</td>
-                                <td class="right">
-                                    <% out.println( operator.getCityCode() ); %>
+                                <td class="welcome-leftcol">Address</td>
+                                <td class="welcome-rightcol">
+                                    <% out.println( initAppUtil.getOrgAddress() ); %>
                                 </td>
                             </tr>
                             <tr class="even">
-                                <td class="left">Address :: Street</td>
-                                <td class="right">
-                                    <% out.println( operator.getStreet() ); %>
+                                <td class="welcome-leftcol">Time zone</td>
+                                <td class="welcome-rightcol">
+                                    <% out.println( initAppUtil.getTimeZone() ); %>
                                 </td>
                             </tr>
                             <tr class="odd">
-                                <td class="left">Phone number</td>
-                                <td class="right">
-                                    <% out.println( operator.getPhone() ); %>
-                                </td>
-                            </tr>
-                            <tr class="even">
-                                <td class="left">E-mail</td>
-                                <td class="right">
-                                    <a href="mailto:<% out.println( operator.getEmail() );%>">
-                                        <% out.println( operator.getEmail() );%>
-                                    </a>
+                                <td class="welcome-leftcol">Node administrator's email</td>
+                                <td class="welcome-rightcol">
+                                    <% out.println( initAppUtil.getAdminEmail() ); %>
                                 </td>
                             </tr>
                         </table>
                     </div>
                     <div id="left">
-                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
                     </div>          
                     <div class="clear"></div>
                 </div>

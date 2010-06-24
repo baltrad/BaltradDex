@@ -1,8 +1,25 @@
-<%--
-    Document   : Submit subscription page
-    Created on : December 9, 2009, 13:56:14 PM
-    Author     : szewczenko
---%>
+<%--------------------------------------------------------------------------------------------------
+Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+
+This file is part of the BaltradDex software.
+
+BaltradDex is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+BaltradDex is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+----------------------------------------------------------------------------------------------------
+Document   : Subscription selection page
+Created on : Jun 24, 2010, 8:56:35 AM
+Author     : szewczenko
+--------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                                                 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -12,7 +29,7 @@
 <%@ page import="java.util.List" %>
 <%
     // Check if subscription list is not empty
-    List chSubmit = ( List )request.getAttribute( "submitted_channels" );
+    List chSubmit = ( List )request.getAttribute( "submitted_subscriptions" );
     // Subscription status is not changed
     if( chSubmit == null ) {
         request.getSession().setAttribute( "subs_status", 0 );
@@ -52,8 +69,8 @@
                                     </p>
                                 </h2>
                                 <div id="table-content">
-                                    <form action="status.htm">
-                                        <display:table name="submitted_channels" id="channel"
+                                    <form action="showSubscriptionStatus.htm">
+                                        <display:table name="submitted_subscriptions" id="channel"
                                             defaultsort="1" requestURI="submit.htm"
                                             export="false" cellpadding="0" cellspacing="2"
                                             class="tableborder">
@@ -67,7 +84,7 @@
                                                 class="tdcenter" value="${channel.name}">
                                             </display:column>
                                             <display:column class="tdhidden">
-                                                <input type="checkbox" name="submitted_channels"
+                                                <input type="checkbox" name="submitted_subscriptions"
                                                        value="${channel.name}" checked/>
                                             </display:column>
                                         </display:table>
@@ -76,12 +93,12 @@
                                         </div>
                                     </form>
                                     <div id="table-footer-rightcol">
-                                        <form action="subscriptions.htm">
+                                        <form action="showSubscriptions.htm">
                                             <input type="submit" value="Cancel" name="cancel_button"/>
                                         </form>
                                     </div>
                                     <div id="table-footer">
-                                        <a href="subscriptions.htm">&#60&#60 Subscription status</a>
+                                        <a href="showSubscriptions.htm">&#60&#60 Subscription status</a>
                                     </div>
                                 </div>
                             </c:when>
@@ -92,12 +109,12 @@
                                 </div>
                                 <div id="table-footer">
                                     <div id="table-footer-leftcol">
-                                        <form action="status.htm">
+                                        <form action="showSubscriptionStatus.htm">
                                             <input type="submit" value="Submit" name="submit_button"/>
                                         </form>
                                     </div>
                                     <div id="table-footer-rightcol">
-                                        <form action="subscriptions.htm">
+                                        <form action="showSubscriptions.htm">
                                             <input type="submit" value="Cancel" name="cancel_button"/>
                                         </form>
                                     </div>
@@ -110,7 +127,7 @@
                                 </div>
                                 <div id="table-footer">
                                     <div id="table-footer-rightcol">
-                                        <form action="subscriptions.htm">
+                                        <form action="showSubscriptions.htm">
                                             <input type="submit" value="OK" name="cancel_button"/>
                                         </form>
                                     </div>
@@ -119,7 +136,7 @@
                         </c:choose>
                     </div>
                     <div id="left">
-                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
                     </div>
                     <div class="clear"></div>
                 </div>
@@ -132,8 +149,3 @@
     </div>
 </body>
 </html>
-
-
-
-
-

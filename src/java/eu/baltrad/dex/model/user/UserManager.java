@@ -1,10 +1,23 @@
-/*
- * BaltradNode :: Radar data exchange and communication system
- * Remote Sensing Department, Institute of Meteorology and Water Management
- * Maciej Szewczykowski, 2009
- *
- * maciej.szewczykowski@imgw.pl
- */
+/***************************************************************************************************
+*
+* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+*
+* This file is part of the BaltradDex software.
+*
+* BaltradDex is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* BaltradDex is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+*
+***************************************************************************************************/
 
 package eu.baltrad.dex.model.user;
 
@@ -20,7 +33,7 @@ import java.util.List;
 /**
  * User manager class implementing user-object handling functionality.
  *
- * @author szewczenko
+ * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
  * @version 1.0
  * @since 1.0
  */
@@ -62,28 +75,6 @@ public class UserManager {
         try {
             user = ( User )session.createQuery(
                     "FROM User WHERE name = ?" ).setString( 0, name ).uniqueResult();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        }
-        return user;
-    }
-    /**
-     * Method retrieves user with a given role from the database.
-     * Not applicable to multiple users of the same role.
-     *
-     * @param role User role
-     * @return User object
-     */
-    public User getUserByRole( String role ) {
-        User user = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            user = ( User )session.createQuery(
-                    "FROM User WHERE role = ?" ).setString( 0, role ).uniqueResult();
             session.getTransaction().commit();
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();

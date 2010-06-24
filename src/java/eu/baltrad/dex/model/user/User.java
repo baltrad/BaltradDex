@@ -1,32 +1,46 @@
-/*
- * BaltradNode :: Radar data exchange and communication system
- * Remote Sensing Department, Institute of Meteorology and Water Management
- * Maciej Szewczykowski, 2009
- *
- * maciej.szewczykowski@imgw.pl
- */
+/***************************************************************************************************
+*
+* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+*
+* This file is part of the BaltradDex software.
+*
+* BaltradDex is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* BaltradDex is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+*
+***************************************************************************************************/
 
 package eu.baltrad.dex.model.user;
 
 /**
  * Class implements user object.
  *
- * @author szewczenko
+ * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
  * @version 1.0
  * @since 1.0
  */
 public class User {
 //---------------------------------------------------------------------------------------- Constants
-    public final static String ROLE_0 = "operator";
-    public final static String ROLE_1 = "administrator";
-    public final static String ROLE_2 = "user";
-    public final static String ROLE_3 = "guest";
+    // Role key values
+    public final static String ROLE_ADMIN = "admin";
+    public final static String ROLE_OPERATOR = "operator";
+    public final static String ROLE_PEER = "peer";
+    public final static String ROLE_USER = "user";
 //---------------------------------------------------------------------------------------- Variables
     private int id;
     private String name;
+    private String roleName;
     private String password;
     private String retPassword;
-    private String role;
     private String factory;
     private String country;
     private String city;
@@ -36,7 +50,6 @@ public class User {
     private String phone;
     private String email;
     private String nodeAddress;
-
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Default constructor.
@@ -53,21 +66,29 @@ public class User {
         this.password = password;
     }
     /**
-     * Constructor creating new user object with given field values.
+     * Constructor creates user object with field values provided as parameters.
      *
      * @param name User name
-     * @param password User password
-     * @param role User role in the system
-     * @param factory Name of user's organization
-     * @param nodeAddress Node address
+     * @param roleName User role name
+     * @param password Password
+     * @param retPassword Password repeated
+     * @param factory Name of the organization
+     * @param country Country
+     * @param city City
+     * @param cityCode City code
+     * @param street Street name
+     * @param number Address number
+     * @param phone Phone number
+     * @param email Contact email
+     * @param nodeAddress Address of the node
      */
-    public User( String name, String password, String retPassword, String role, String factory, String country,
-            String city, String cityCode, String street, String number, String phone, String email,
-            String nodeAddress ) {
+    public User( String name, String roleName, String password, String retPassword, String factory,
+            String country, String city, String cityCode, String street, String number,
+            String phone, String email, String nodeAddress ) {
         this.name = name;
+        this.roleName = roleName;
         this.password = password;
         this.retPassword = retPassword;
-        this.role = role;
         this.factory = factory;
         this.country = country;
         this.city = city;
@@ -84,19 +105,25 @@ public class User {
      *
      * @return User id
      */
-    public int getId() {
-        return id;
-    }
-
+    public int getId() { return id; }
     /**
      * Method sets user id.
      *
      * @param id User id
      */
-    public void setId( int id ) {
-        this.id = id;
-    }
-
+    public void setId( int id ) { this.id = id; }
+    /**
+     * Method gets role name.
+     *
+     * @return Role name
+     */
+    public String getRoleName() { return roleName; }
+    /**
+     * Method sets role name.
+     *
+     * @param roleName Role name
+     */
+    public void setRoleName( String roleName ) { this.roleName = roleName; }
     /**
      * Method gets user name.
      *
@@ -142,21 +169,6 @@ public class User {
     public void setRetPassword(String retPassword) {
         this.retPassword = retPassword;
     }
-
-    /**
-     * @return the role
-     */
-    public String getRole() {
-        return role;
-    }
-
-    /**
-     * @param role the role to set
-     */
-    public void setRole(String role) {
-        this.role = role;
-    }
-
     /**
      * @return the factory
      */

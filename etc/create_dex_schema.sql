@@ -20,6 +20,14 @@ DROP SEQUENCE IF EXISTS delivery_register_id_seq;
 
 -- create tables -----------------------------------------------------------------------
 
+-- dex_roles ---------------------------------------------------------------------------
+
+CREATE TABLE dex_roles
+(
+    id SERIAL NOT NULL,
+    role VARCHAR(32) PRIMARY KEY
+);
+
 -- user_id_seq -------------------------------------------------------------------------
 
 CREATE SEQUENCE user_id_seq;
@@ -28,11 +36,11 @@ CREATE SEQUENCE user_id_seq;
 
 CREATE TABLE dex_users
 (
-    id SERIAL NOT NULL, --INT NOT NULL UNIQUE DEFAULT NEXTVAL('user_id_seq'),
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('user_id_seq'),
     name VARCHAR(64) NOT NULL UNIQUE,
+    role_name VARCHAR(32) NOT NULL REFERENCES dex_roles (role),
     password VARCHAR(32) NOT NULL,
     ret_password VARCHAR(32),
-    role VARCHAR(32) NOT NULL,
     factory VARCHAR(256) NOT NULL,
     country VARCHAR(64) NOT NULL,
     city VARCHAR(64) NOT NULL,
@@ -43,14 +51,6 @@ CREATE TABLE dex_users
     email VARCHAR(64) NOT NULL,
     node_address VARCHAR(64) NOT NULL,
     PRIMARY KEY (id)
-);
-
--- dex_roles ---------------------------------------------------------------------------
-
-CREATE TABLE dex_roles
-(
-    id SERIAL NOT NULL,
-    role VARCHAR(32)
 );
 
 -- log_entry_id_seq --------------------------------------------------------------------
@@ -94,9 +94,8 @@ CREATE SEQUENCE subscription_id_seq;
 CREATE TABLE dex_subscriptions
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('subscription_id_seq'),
-    user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE ON UPDATE CASCADE,
-    channel_id INT NOT NULL REFERENCES dex_channels (id)
-                                                    ON DELETE CASCADE ON UPDATE CASCADE,
+    user_id INT NOT NULL REFERENCES dex_users (id),
+    channel_id INT NOT NULL REFERENCES dex_channels (id),
     PRIMARY KEY (id)
 );
 

@@ -168,7 +168,7 @@ Creates a composite route
                           <%}%>
                     </div>
                     <div id="left">
-                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
                     </div>
                     <div class="clear"></div>
                 </div>

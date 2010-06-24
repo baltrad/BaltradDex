@@ -20,8 +20,16 @@
 ***************************************************************************************************/
 
 /*
- * BaltradDex navigation script.
+ * Operator's menu
  */
-document.write( "Baltrad Data Exchange System :: " + document.title );
+document.write( "<a href=\"welcome.htm\">Home</a>" );
+document.write( "<br>" );
+document.write( "<a href=\"log.htm\">Messages</a>" );
+document.write( "<a href=\"channels.htm\">Data channels</a>" );
+document.write( "<a href=\"showSubscriptions.htm\">Subscriptions</a>" );
+document.write( "<a href=\"credits.htm\">Credits</a>" );
+document.write( "<br>" );
+document.write( "<a href=\"signout.htm\">Logout</a>" );
+document.write( "<br>" );
 
 

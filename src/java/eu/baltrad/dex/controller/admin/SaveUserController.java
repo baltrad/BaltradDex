@@ -19,6 +19,8 @@ import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
 
+import org.hibernate.HibernateException;
+
 import java.util.HashMap;
 import java.util.Date;
 
@@ -76,11 +78,17 @@ public class SaveUserController extends SimpleFormController {
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors) {
         User user = ( User )command;
-        userManager.addUser( user );
-        request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
+        try {
+            userManager.addUser( user );
+            request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
                 "message.adduser.savesuccess" ) );
-        logManager.addEntry( new Date(), LogManager.MSG_WRN, "User account saved: " +
+            logManager.addEntry( new Date(), LogManager.MSG_WRN, "User account saved: " +
                 user.getName() );
+        } catch( HibernateException e ) {
+            request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
+                "message.adduser.nameexists" ) );
+            errors.reject( "message.adduser.nameexists" );
+        }
         return new ModelAndView( getSuccessView() );
     }
     /**

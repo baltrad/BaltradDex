@@ -1,8 +1,25 @@
-<%--
-    Document   : Save user account page
-    Created on : December 9, 2009, 13:56:14 PM
-    Author     : szewczenko
---%>
+<%--------------------------------------------------------------------------------------------------
+Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+
+This file is part of the BaltradDex software.
+
+BaltradDex is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+BaltradDex is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+----------------------------------------------------------------------------------------------------
+Document   : Save user page
+Created on : Jun 22, 2010, 11:57:02 AM
+Author     : szewczenko
+--------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                                                 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -34,7 +51,7 @@
                             </p>
                         </h2>
                         <form method="post">
-                            <table>
+                            <table class="tableborder">
                                 <caption>User account information</caption>
                                 <tr class="even">
                                     <td class="left">User name</td>
@@ -60,7 +77,7 @@
                                 <tr class="odd">
                                     <td class="left">User role</td>
                                     <td class="right">
-                                    <spring:bind path="command.role">
+                                    <spring:bind path="command.roleName">
                                         <select name='<c:out value="${status.expression}"/>'>
                                             <c:forEach items="${roles}" var="role">
 						<option value='<c:out value="${role.role}"/>'
@@ -70,7 +87,7 @@
                                             </c:forEach>
 					</select>
                                     </spring:bind>
-                                    <form:errors path="command.role" cssClass="errors"/>
+                                    <form:errors path="command.roleName" cssClass="errors"/>
                                     </td>
                                 </tr>
                                 <tr class="even">
@@ -146,7 +163,7 @@
                         </div>
                     </div>
                     <div id="left">
-                        <script type="text/javascript" src="includes/mainmenu.js"></script>
+                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
                     </div>
                     <div class="clear"></div>
                 </div>
