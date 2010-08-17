@@ -19,14 +19,15 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.model.admin;
+package eu.baltrad.dex.user.util;
 
 import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
-import eu.baltrad.dex.model.user.User;
-import eu.baltrad.dex.model.user.UserManager;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.model.UserManager;
+import eu.baltrad.dex.util.WebUtil;
 
 /**
  * Validator class used to validate input from add user form.
@@ -71,10 +72,6 @@ public class SaveUserValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "number", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "phone", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", "error.field.required" );
-        // validate user name
-        //if( userManager.userExists( user.getName() ) ) {
-        //    errors.rejectValue( "name", "error.field.user.nameexists" );
-        //}
         // validate password
         if( !errors.hasFieldErrors( "password" ) && !errors.hasFieldErrors( "retPassword" ) ) {
             if( !user.getPassword().trim().equals( user.getRetPassword().trim() ) ) {
@@ -85,21 +82,13 @@ public class SaveUserValidator implements Validator {
                 < MIN_FIELD_LENGTH ) {
             errors.rejectValue( "password", "error.field.passwd.tooshort" );
         }
-        /* validate user role - only one administrator's account is allowed
-        if( user.getRoleName().equals( User.ROLE_ADMIN ) ) {
-            if( userManager.getUserByName( user.getName() ).getRoleName().equals( 
-                    User.ROLE_ADMIN ) ) {
-                errors.rejectValue( "roleName", "error.field.user.roleexists" );
-            }
-        }*/
         // validate node address
         if( user.getNodeAddress().trim().length() > 0
-                && user.getNodeAddress().trim().length() < MIN_FIELD_LENGTH ) {
+                && !WebUtil.validateWebAddress( user.getNodeAddress() ) ) {
             errors.rejectValue( "nodeAddress", "error.field.nodeaddress.invalid" );
         }
         // validate email address
-        if( user.getEmail().trim().length() > 0 && user.getEmail().trim().length() < 
-                MIN_FIELD_LENGTH ) {
+        if( user.getEmail().trim().length() > 0 && !WebUtil.validateEmailAddress( user.getEmail() ) ) {
             errors.rejectValue( "email", "error.field.email.invalid" );
         }
     }

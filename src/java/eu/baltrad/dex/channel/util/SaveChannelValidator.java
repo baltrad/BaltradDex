@@ -6,14 +6,14 @@
  * maciej.szewczykowski@imgw.pl
  */
 
-package eu.baltrad.dex.model.admin;
+package eu.baltrad.dex.channel.util;
 
 import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
-import eu.baltrad.dex.model.channel.Channel;
-import eu.baltrad.dex.model.channel.ChannelManager;
+import eu.baltrad.dex.channel.model.Channel;
+import eu.baltrad.dex.channel.model.ChannelManager;
 
 /**
  * Validator class used to validate add channel form input.

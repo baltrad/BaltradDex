@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!--
+Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+
+This file is part of the BaltradDex software.
+
+BaltradDex is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+BaltradDex is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+
+Document   : Hibernate mapping file for LogEntry class
+Created on : Aug 13, 2010, 2:47:34 PM
+Author     : szewczenko
+-->
+<hibernate-mapping>
+  <class name="eu.baltrad.dex.log.model.LogEntry" table="dex_messages">
+    <id column="id" name="id">
+      <generator class="sequence">
+        <param name="sequence">log_entry_id_seq</param>
+      </generator>
+    </id>
+    <property column="date" name="date"/>
+    <property column="time" name="time"/>
+    <property column="type" name="type"/>
+    <property column="message" name="message"/>
+  </class>
+</hibernate-mapping>
