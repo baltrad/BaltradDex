@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-"http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
   <session-factory>
-    <mapping resource="eu/baltrad/dex/model/channel/Channel.hbm.xml"/>
-    <mapping resource="eu/baltrad/dex/model/user/User.hbm.xml"/>
-    <mapping resource="eu/baltrad/dex/model/user/Role.hbm.xml"/>
-    <mapping resource="eu/baltrad/dex/model/subscription/Subscription.hbm.xml"/>
-    <mapping resource="eu/baltrad/dex/model/register/DeliveryRegisterEntry.hbm.xml"/>
-    <mapping resource="eu/baltrad/dex/model/log/LogEntry.hbm.xml"/>
-    <mapping resource="eu/baltrad/dex/model/data/Data.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/channel/model/Channel.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/user/model/User.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/user/model/Role.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/subscription/model/Subscription.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/register/model/DeliveryRegisterEntry.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/log/model/LogEntry.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/data/model/Data.hbm.xml"/>
+    <mapping resource="eu/baltrad/dex/core/model/NodeConnection.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

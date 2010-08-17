@@ -60,7 +60,7 @@ Author     : szewczenko
                             <br/>
                             <h2>
                                 <p>
-                                You are signed in as user <% out.println( userName ); %>.
+                                You are signed in as user <% out.println( userName + "."); %>
                                 </p>
                                 <p>
                                 Use the system functionality to browse and download data or establish
@@ -74,9 +74,9 @@ Author     : szewczenko
                         </div>
                         <table>
                             <tr class="even">
-                                <td class="welcome-leftcol">Node address</td>
+                                <td class="welcome-leftcol">Node name</td>
                                 <td class="welcome-rightcol">
-                                    <% out.println( initAppUtil.getNodeAddress() ); %>
+                                    <% out.println( initAppUtil.getNodeName() ); %>
                                 </td>
                             </tr>
                             <tr class="odd">

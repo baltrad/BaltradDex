@@ -22,15 +22,15 @@ Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
-<%@ page import="eu.baltrad.dex.model.user.User" %>
+<%@ page import="eu.baltrad.dex.user.model.User" %>
 <%@ page import="java.util.Date" %>
 
 <jsp:useBean id="applicationSecurityManager" scope="session"
                                     class="eu.baltrad.dex.util.ApplicationSecurityManager">
 </jsp:useBean>
-<jsp:useBean id="userManager" scope="session" class="eu.baltrad.dex.model.user.UserManager">
+<jsp:useBean id="userManager" scope="session" class="eu.baltrad.dex.user.model.UserManager">
 </jsp:useBean>
-<jsp:useBean id="logManager" scope="session" class="eu.baltrad.dex.model.log.LogManager">
+<jsp:useBean id="logManager" scope="session" class="eu.baltrad.dex.log.model.LogManager">
 </jsp:useBean>
 
 <%

@@ -71,8 +71,8 @@ Author     : szewczenko
                             <tr class="even">
                                 <td class="left">User management</td>
                                 <td class="right">
-                                    <a href="edituser.htm">Edit</a>
-                                    <a href="saveuser.htm">Add</a>
+                                    <a href="editUser.htm">Edit</a>
+                                    <a href="saveUser.htm">Add</a>
                                     <a href="showUsers.htm">Remove</a>
                                 </td>
                             </tr>

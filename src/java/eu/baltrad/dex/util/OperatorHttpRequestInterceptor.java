@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.util;
 
-import eu.baltrad.dex.model.user.User;
+import eu.baltrad.dex.user.model.User;
 
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 

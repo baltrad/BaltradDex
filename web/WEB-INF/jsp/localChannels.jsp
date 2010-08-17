@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Page displaying selected data channels
+Document   : Data channel listing page
 Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
@@ -30,7 +30,7 @@ Author     : szewczenko
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Remove data channel</title>
+    <title>Local data channels</title>
 </head>
 
 <body>
@@ -43,45 +43,32 @@ Author     : szewczenko
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Remove data channel</h1>
+                        <h1>Local data channels</h1>
                         <br/>
                         <h2>
                             <p>
-                            Warning: The following data channels will be removed from the system:
+                            Click on channel name to browse data files.
                             </p>
                         </h2>
-                        <form method="post" action="showRemovedChannels.htm">
-                            <display:table name="channels" id="channel" defaultsort="1"
-                                requestURI="showSelectedChannels.htm" cellpadding="0" cellspacing="2"
-                                export="false" class="tableborder" pagesize="10">
-                                <display:column sortProperty="id" sortable="true"
-                                    title="ID" class="tdcenter">
-                                    <fmt:formatNumber value="${channel.id}" pattern="00" />
-                                </display:column>
-                                <display:column sortable="true" title="Channel name"
-                                    sortProperty="channelName" class="tdcenter"
-                                    value="${channel.channelName}">
-                                </display:column>
-                                <display:column sortable="true" title="WMO number"
-                                    sortProperty="wmoNumber" class="tdcenter"
-                                    value="${channel.wmoNumber}">
-                                </display:column>
-                                <display:column class="tdhidden">
-                                    <input type="checkbox" name="removed_channels"
-                                           value="${channel.id}" checked/>
-                                </display:column>
-                            </display:table>
-                            <div id="table-footer-rightcol">
-                                <input type="submit" value="Submit" name="submitButton"/>
-                            </div>
-                        </form>
-                        <form action="admin.htm">
-                            <div id="table-footer-leftcol">
-                                <input type="submit" value="Cancel" name="submitButton"/>
-                            </div>
-                        </form>
+                        <display:table name="channels" id="dataChannel" defaultsort="1"
+                            requestURI="localChannels.htm" cellpadding="0" cellspacing="2"
+                            export="false" class="tableborder">
+                            <display:column sortProperty="id" sortable="true"
+                                title="Channel ID" class="tdcenter">
+                                <fmt:formatNumber value="${dataChannel.id}" pattern="00" />
+                            </display:column>
+                            <display:column sortable="true" title="Channel WMO number"
+                                sortProperty="wmoNumber" class="tdcenter"
+                                value="${dataChannel.wmoNumber}">
+                            </display:column>
+                            <display:column sortable="true" title="Channel name"
+                                href="dataFromChannel.htm" sortProperty="channelName"
+                                paramId="channelName" paramProperty="channelName" class="tdcenter"
+                                value="${dataChannel.channelName}">
+                            </display:column>
+                        </display:table>
                         <div id="table-footer">
-                            <a href="admin.htm">&#60&#60 System management</a>
+                            <a href="welcome.htm">&#60&#60 Home</a>
                         </div>
                     </div>
                     <div id="left">
@@ -98,3 +85,7 @@ Author     : szewczenko
     </div>
 </body>
 </html>
+
+
+
+       

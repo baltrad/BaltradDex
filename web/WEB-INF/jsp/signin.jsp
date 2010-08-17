@@ -49,7 +49,7 @@ Author     : szewczenko
                             <div id="signin-operator">
                                 <fmt:setLocale value="en"/>
                                 <fmt:setBundle basename="messages"/>
-                                <fmt:message key="message.operator.pl"/>
+                                <fmt:message key="message.operator"/>
                             </div>
                             <div id="signin-info">
                                 Please sign in.

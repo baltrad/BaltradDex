@@ -24,9 +24,10 @@
  */
 document.write( "<a href=\"welcome.htm\">Home</a>" );
 document.write( "<br>" );
-document.write( "<a href=\"log.htm\">Messages</a>" );
-document.write( "<a href=\"channels.htm\">Data channels</a>" );
+document.write( "<a href=\"localChannels.htm\">Local</a>" );
+document.write( "<a href=\"connectToNode.htm\">Connect</a>" );
 document.write( "<a href=\"showSubscriptions.htm\">Subscriptions</a>" );
+document.write( "<a href=\"log.htm\">Messages</a>" );
 document.write( "<a href=\"credits.htm\">Credits</a>" );
 document.write( "<br>" );
 document.write( "<a href=\"admin.htm\">Administration</a>" );

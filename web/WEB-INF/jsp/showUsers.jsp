@@ -65,13 +65,13 @@ Author     : szewczenko
                                 <display:column sortable="true" title="Role" sortProperty="role"
                                     class="tdcenter" value="${user.roleName}">
                                 </display:column>
-                                <display:column sortable="true" title="Company"
-                                    sortProperty="factory" class="tdcenter"
-                                    value="${user.factory}">
-                                </display:column>
                                 <display:column sortable="true" title="Node address"
                                     sortProperty="nodeAddress" class="tdcenter"
                                     value="${user.nodeAddress}">
+                                </display:column>
+                                <display:column sortable="true" title="Company"
+                                    sortProperty="factory" class="tdcenter"
+                                    value="${user.factory}">
                                 </display:column>
                                 <display:column sortable="false" title="Select" class="tdcheck">
                                     <input type="checkbox" name="selected_users"

@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.util;
 
-import eu.baltrad.dex.model.log.LogManager;
+import eu.baltrad.dex.log.model.LogManager;
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileCatalogError;
 

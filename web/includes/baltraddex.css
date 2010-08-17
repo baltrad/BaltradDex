@@ -365,11 +365,14 @@ thead {
 */
 table {
     width: 100%;
-    background-color: #CACACA;
+    /*background-color: #CACACA;*/
 }
 td {
     padding: 4px 4px 4px 8px;
     border: 1px solid #91ACC1;
+}
+tr .right {
+    width: 60%;
 }
 .right input {
     width: 60%;
@@ -421,6 +424,7 @@ caption {
 */
 div#message-box {
     border: 2px solid #99CC66;
+    margin-top: 12px;
     padding: 10px;
 }
 div#message-text {
@@ -445,7 +449,14 @@ div#message-text {
     font-weight: bold;
     color: #003399;
 }
-
+/*
+    Input field areas
+*/
+.user-input {
+    padding: 12px;
+    display: block;
+    /*background: #CACACA;*/
+}
 
 
 

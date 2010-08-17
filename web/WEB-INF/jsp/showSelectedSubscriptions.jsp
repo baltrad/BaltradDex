@@ -28,24 +28,13 @@ Author     : szewczenko
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 <%@ page import="java.util.List" %>
 <%
-    // Check if subscription list is not empty
-    List chSubmit = ( List )request.getAttribute( "submitted_subscriptions" );
-    // Subscription status is not changed
-    if( chSubmit == null ) {
-        request.getSession().setAttribute( "subs_status", 0 );
-    // User submitted empty list
-    } else if( chSubmit.size() <= 0 ) {
-        request.getSession().setAttribute( "subs_status", 1 );
-    // User changed subscription status
-    } else {
-        request.getSession().setAttribute( "subs_status", 2 );
-    }
+    int request_status = ( Integer )request.getAttribute( "request_status" );
 %>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Subscription order</title>
+    <title>Subscription request</title>
 </head>
 
 <body>
@@ -58,35 +47,51 @@ Author     : szewczenko
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Subscription order</h1>
+                        <h1>Subscription request</h1>
                         <br/>
                         <c:choose>
-                            <c:when test="${subs_status == 2}">
+                            <c:when test="${request_status == 1}">
                                 <h2>
                                     <p>
-                                    Confirm your subscription order by clicking on OK
+                                    Confirm your subscription request by clicking on OK
                                     button.
                                     </p>
                                 </h2>
                                 <div id="table-content">
                                     <form action="showSubscriptionStatus.htm">
-                                        <display:table name="submitted_subscriptions" id="channel"
-                                            defaultsort="1" requestURI="submit.htm"
+                                        <display:table name="selected_subscriptions" 
+                                            id="subscription" defaultsort="1" requestURI="submit.htm"
                                             export="false" cellpadding="0" cellspacing="2"
                                             class="tableborder">
-                                            <display:column sortProperty="id" sortable="true"
-                                                title="Channel ID" class="tdcenter">
-                                                <fmt:formatNumber value="${channel.id}"
-                                                    pattern="00" />
+                                            <display:column sortable="true" title="Channel"
+                                                sortProperty="channelName"
+                                                paramProperty="channelName" class="tdcenter"
+                                                value="${subscription.channelName}">
                                             </display:column>
-                                            <display:column sortable="true" title="Channel name"
-                                                sortProperty="name" paramId="name" paramProperty="name"
-                                                class="tdcenter" value="${channel.name}">
+                                            <display:column sortable="true" title="Operator"
+                                                sortProperty="operatorName"
+                                                paramProperty="operatorName" class="tdcenter"
+                                                value="${subscription.operatorName}">
                                             </display:column>
-                                            <display:column class="tdhidden">
-                                                <input type="checkbox" name="submitted_subscriptions"
-                                                       value="${channel.name}" checked/>
+                                            <display:column sortable="true" title="Node address"
+                                                sortProperty="nodeAddress"
+                                                paramProperty="nodeAddress" class="tdcenter"
+                                                value="${subscription.nodeAddress}">
                                             </display:column>
+                                            <c:choose>
+                                                <c:when test="${subscription.selected == true}">
+                                                    <display:column sortable="false" 
+                                                        title="Request status" class="tdcenter"
+                                                        value="Subscribe">
+                                                    </display:column>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <display:column sortable="false" 
+                                                        title="Request status" class="tdcenter"
+                                                        value="Unsubscribe">
+                                                    </display:column>
+                                                </c:otherwise>
+                                            </c:choose>
                                         </display:table>
                                         <div id="table-footer-leftcol">
                                             <input type="submit" value="OK" name="submit_button"/>
@@ -102,7 +107,7 @@ Author     : szewczenko
                                     </div>
                                 </div>
                             </c:when>
-                            <c:when test="${subs_status == 1}">
+                            <c:when test="${request_status == 2}">
                                 <div id="message-box">
                                     Click on Submit button now to cancel all your
                                     active subscriptions.

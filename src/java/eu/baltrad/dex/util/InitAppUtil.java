@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.util;
 
-import eu.baltrad.dex.model.log.LogManager;
+import eu.baltrad.dex.log.model.LogManager;
 
 import java.io.File;
 import java.io.InputStream;
@@ -44,6 +44,8 @@ public class InitAppUtil {
     private static final String PROPS_FILE_NAME = "dex.init.properties";
     // Node address property
     private static final String NODE_ADDRESS_PROP = "node.address";
+    // Node alias property
+    private static final String NODE_NAME_PROP = "node.name";
     // Node type property key
     private static final String NODE_TYPE_PROP = "node.type";
     // Organization name property key
@@ -58,13 +60,17 @@ public class InitAppUtil {
     private static final String PROD_DIR_PROP = "local.production.dir";
     // Temporary directory property key
     private static final String TEMP_DIR_PROP = "local.temp.dir";
-    // Incoming data directory property key
-    private static final String INCOMING_DIR_PROP = "incoming.data.dir";
+    // Temporary file prefix
+    private final static String TEMP_FILE_PREFIX = "dex";
+    // Temporary file suffix
+    private final static String TEMP_FILE_SUFFIX = ".dat";
 //---------------------------------------------------------------------------------------- Variables
     // Reference to LogManager object
     private static LogManager logManager = new LogManager();
     // Node address
     private static String nodeAddress;
+    // Node name
+    private static String nodeName;
     // Node type
     private static String nodeType;
     // Organization name
@@ -79,9 +85,6 @@ public class InitAppUtil {
     private static String localProdDir;
     // Temporary directory for local data
     private static String localTempDir;
-    // Directory storing incoming data from foreign nodes
-    private static String incomingDataDir;
-    
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor performs initialization task
@@ -93,6 +96,8 @@ public class InitAppUtil {
             if( is != null ) {
                 props.load( is );
                 setNodeAddress( props.getProperty( NODE_ADDRESS_PROP ) );
+                setNodeName( props.getProperty( NODE_NAME_PROP ) );
+                setNodeAddress( props.getProperty( NODE_ADDRESS_PROP ) );
                 setNodeType( props.getProperty( NODE_TYPE_PROP ) );
                 setOrgName( props.getProperty( ORG_NAME_PROP ) );
                 setOrgAddress( props.getProperty( ORG_ADDRESS_PROP ) );
@@ -100,12 +105,10 @@ public class InitAppUtil {
                 setAdminEmail( props.getProperty( ADMIN_EMAIL_PROP ) );
                 setLocalProdDir( ServletContextUtil.getServletContextPath() +
                         props.getProperty( PROD_DIR_PROP ) );
-                setIncomingDataDir( ServletContextUtil.getServletContextPath() +
-                        props.getProperty( INCOMING_DIR_PROP ) );
-                setLocalTempDir( props.getProperty( TEMP_DIR_PROP ) );
-                // Create directories
-                //makeDir( getLocalProdDir() );
-                makeDir( getIncomingDataDir() );
+                setLocalTempDir( ServletContextUtil.getServletContextPath() +
+                        props.getProperty( TEMP_DIR_PROP ) );
+                // create temporary directory
+                makeDir( getLocalTempDir() );
                 logManager.addEntry( new Date(), LogManager.MSG_INFO,
                         "Application successfully initialized" );
             } else {
@@ -129,6 +132,18 @@ public class InitAppUtil {
      * @param _nodeAddress Node address property to set
      */
     public void setNodeAddress( String _nodeAddress ) { nodeAddress = _nodeAddress; }
+    /**
+     * Gets node name property.
+     *
+     * @return Node name property
+     */
+    public static String getNodeName() { return nodeName; }
+    /**
+     * Sets node name property.
+     *
+     * @param _nodeName Node name property to set
+     */
+    public void setNodeName( String _nodeName ) { nodeName = _nodeName; }
     /**
      * Gets node type property.
      *
@@ -214,20 +229,6 @@ public class InitAppUtil {
      */
     public void setLocalTempDir( String _localTempDir ) { localTempDir = _localTempDir; }
     /**
-     * Method gets incoming data directory name.
-     *
-     * @return Incoming data directory name
-     */
-    public static String getIncomingDataDir() { return incomingDataDir; }
-    /**
-     * Method sets incoming data directory name.
-     *
-     * @param _incomingDataDir The name of incoming data directory
-     */
-    public void setIncomingDataDir( String _incomingDataDir ) {
-        incomingDataDir = _incomingDataDir;
-    }
-    /**
      * Method extracts relative file name from absolute file path string.
      *
      * @param absFilePath Absolute file path string
@@ -251,6 +252,22 @@ public class InitAppUtil {
         }
     }
     /**
+     * Creates temporary file.
+     *
+     * @param tempDir Temporary directory
+     * @return Reference to temporary file
+     */
+    public static File createTempFile( File tempDir ) {
+        File f = null;
+        try {
+            f = File.createTempFile( TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX, tempDir );
+        } catch( IOException e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while creating temporary " +
+                    "file: \n" + e.getMessage() );
+        }
+        return f;
+    }
+    /**
      * Method saves data from input stream to file with a given name.
      *
      * @param is Input data stream
@@ -267,8 +284,30 @@ public class InitAppUtil {
             }
             is.close();
             fos.close();
-            logManager.addEntry( new Date(), LogManager.MSG_INFO, "Incoming data succesfully " +
-                    " saved: \n" + getRelFileName( dstFileName ) );
+        } catch( FileNotFoundException e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
+                    + e.getMessage() );
+        } catch( IOException e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
+                    + e.getMessage() );
+        }
+    }
+    /**
+     * Method saves data from input stream to file with a given name.
+     *
+     * @param is Input data stream
+     * @param dstFile Output file
+     */
+    public static void saveFile( InputStream is, File dstFile ) {
+        try {
+            FileOutputStream fos = new FileOutputStream( dstFile );
+            byte[] bytes = new byte[ 1024 ];
+            int len;
+            while( ( len = is.read( bytes ) ) > 0 ) {
+                fos.write( bytes, 0, len);
+            }
+            is.close();
+            fos.close();
         } catch( FileNotFoundException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
                     + e.getMessage() );

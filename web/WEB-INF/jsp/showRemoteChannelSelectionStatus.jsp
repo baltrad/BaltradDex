@@ -26,6 +26,16 @@ Author     : szewczenko
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
+<%@ page import="java.util.List" %>
+<%
+    // Check if subscription list is not empty
+    List subsStatus = ( List )request.getAttribute( "subscribed_channels" );
+    if( subsStatus == null || subsStatus.size() <= 0 ) {
+        request.getSession().setAttribute( "subs_status", 0 );
+    } else {
+        request.getSession().setAttribute( "subs_status", 1 );
+    }
+%>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -45,18 +55,42 @@ Author     : szewczenko
                     <div id="main">
                         <h1>Subscription confirmation</h1>
                         <br/>
-                        <div id="message-box">
+                        <c:choose>
+                            <c:when test="${subs_status == 1}">
                             <h2>
                                 <p>
-                                Your subscription request is now submitted.
-                                Click OK to go back to subscription selection page.
+                                Your subscription is now submitted.
                                 </p>
+                                <p>
+                                Following data channels have been added to your subscriptions page:
+                                </p>
+                                <br/>
                             </h2>
-                        </div>
-                        <div id="table-footer-rightcol">
-                            <form action="showSubscriptions.htm">
-                                <input type="submit" value="OK" name="submit_button"/>
-                            </form>
+                                <display:table name="subscribed_channels" id="channel"
+                                    defaultsort="1" 
+                                    requestURI="showRemoteChannelsSelectionStatus.htm"
+                                    cellpadding="0" cellspacing="2" export="false"
+                                    class="tableborder">
+                                    <display:column sortProperty="wmoNumber" sortable="true"
+                                        paramId="wmoNumber" title="Channel WMO number"
+                                        class="tdcenter" value="${channel.wmoNumber}">
+                                    </display:column>
+                                    <display:column sortable="true" title="Channel name"
+                                        sortProperty="channelName" paramId="channelName"
+                                        paramProperty="channelName" class="tdcenter"
+                                        value="${channel.channelName}">
+                                    </display:column>
+                                </display:table>
+                            </c:when>
+                            <c:otherwise>
+                                <div id="message-box">
+                                    The remote system failed to complete your subscription request.
+                                    Try again or contact remote node administrator.
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                        <div id="table-footer">
+                            <a href="showSubscriptions.htm">&#60&#60 Subscriptions</a>
                         </div>
                     </div>
                     <div id="left">

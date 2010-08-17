@@ -20,8 +20,8 @@
 ***************************************************************************************************/
 package eu.baltrad.dex.util;
 
-import eu.baltrad.dex.model.user.User;
-import eu.baltrad.dex.model.user.UserManager;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.model.UserManager;
 
 import javax.servlet.http.HttpServletRequest;
 
