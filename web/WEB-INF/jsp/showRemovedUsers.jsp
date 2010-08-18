@@ -71,9 +71,6 @@ Author     : szewczenko
                                 <input type="submit" value="OK" name="submit_button"/>
                             </div>
                         </form>
-                        <div id="table-footer">
-                            <a href="admin.htm">&#60&#60 System management</a>
-                        </div>
                     </div>
                     <div id="left">
                         <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>

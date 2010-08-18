@@ -45,22 +45,14 @@ Author     : szewczenko
                     <div id="main">
                         <h1>Clear data delivery register</h1>
                         <br/>
-                        <h2>
-                            <p>
-                            Delivery register operation status:
-                            </p>
-                        </h2>
-                            <p>
-                                ${operation_status}
-                            </p>
+                        <div id="message-box">
+                            ${operation_status}
+                        </div>
                         <form action="admin.htm">
                             <div id="table-footer-rightcol">
                                 <input type="submit" value="OK" name="submit_button"/>
                             </div>
                         </form>
-                        <div id="table-footer">
-                            <a href="welcome.htm">&#60&#60 Home</a>
-                        </div>
                     </div>
                     <div id="left">
                         <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>

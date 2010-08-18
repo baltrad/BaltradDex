@@ -69,7 +69,7 @@ Author     : szewczenko
                                 </td>
                             </tr>
                             <tr class="even">
-                                <td class="left">User management</td>
+                                <td class="left">Users</td>
                                 <td class="right">
                                     <a href="editUser.htm">Edit</a>
                                     <a href="saveUser.htm">Add</a>
@@ -77,16 +77,30 @@ Author     : szewczenko
                                 </td>
                             </tr>
                             <tr class="odd">
-                                <td class="left">Data channel management</td>
+                                <td class="left">Local data channels</td>
                                 <td class="right">
                                     <a href="editchannel.htm">Edit</a>
                                     <a href="savechannel.htm">Add</a>
                                     <a href="showChannels.htm">Remove</a>
                                 </td>
                             </tr>
+                            <tr class="even">
+                                <td class="left">Subscribed data channels</td>
+                                <td class="right">
+                                    <a href="selectRemoveSubscriptions.htm">Remove</a>
+                                </td>
+                            </tr>
+                            <tr class="odd">
+                                <td class="left">Node connections</td>
+                                <td class="right">
+                                    <a href="removeNodeConnection.htm">Remove</a>
+                                </td>
+                            </tr>
                         </table>
                         <div id="table-footer">
-                            <a href="welcome.htm">&#60&#60 Home</a>
+                            <form action="welcome.htm">
+                                <input type="submit" value="Home" name="home_button"/>
+                            </form>
                         </div>
                     </div>
                     <div id="left">

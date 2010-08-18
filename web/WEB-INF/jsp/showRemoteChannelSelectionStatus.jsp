@@ -90,7 +90,10 @@ Author     : szewczenko
                             </c:otherwise>
                         </c:choose>
                         <div id="table-footer">
-                            <a href="showSubscriptions.htm">&#60&#60 Subscriptions</a>
+                            <form action="showSubscriptions.htm">
+                                <input type="submit" value="Subscriptions"
+                                       name="show_subscriptions_button"/>
+                            </form>
                         </div>
                     </div>
                     <div id="left">

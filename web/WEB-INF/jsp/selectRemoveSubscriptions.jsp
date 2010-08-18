@@ -54,24 +54,22 @@ Author     : szewczenko
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Channel subscription status</h1>
+                        <h1>Remove subscribed channels</h1>
                         <br/>
                         <c:choose>
                             <c:when test="${av_subs_status == 1}">
                             <h2>
                                 <p>
-                                Click on a check box to subscribe or unsubscribe a desired 
-                                data channel.
-                                Click on channel name in order to browse data from this channel.
+                                Click on a check box to select subscribed channel for removal.
                                 </p>
                             </h2>
-                            <form action="showSelectedSubscriptions.htm">
+                            <form action="showRemovedSubscriptions.htm">
                                 <display:table name="subscriptions" id="subscription" defaultsort="1"
-                                    requestURI="showSubscriptions.htm" cellpadding="0" cellspacing="2"
-                                    export="false" class="tableborder">
+                                    requestURI="selectRemoveSubscriptions.htm" cellpadding="0"
+                                    cellspacing="2" export="false" class="tableborder">
                                     <display:column sortable="true" title="Channel"
-                                        href="dataFromChannel.htm" sortProperty="channelName"
-                                        paramId="channelName" paramProperty="channelName"
+                                        sortProperty="channelName" paramId="channelName"
+                                        paramProperty="channelName"
                                         class="tdcenter" value="${subscription.channelName}">
                                     </display:column>
 
@@ -81,26 +79,27 @@ Author     : szewczenko
                                         value="${subscription.operatorName}">
                                     </display:column>
                                     <display:column sortable="true" title="Node address"
-                                        sortProperty="nodeAddress" paramId="" paramProperty="nodeAddress"
-                                        class="tdcenter" value="${subscription.nodeAddress}">
+                                        sortProperty="nodeAddress" paramId="" 
+                                        paramProperty="nodeAddress" class="tdcenter"
+                                        value="${subscription.nodeAddress}">
                                     </display:column>
                                     <c:choose>
                                         <c:when test="${subscription.selected == true}">
                                             <display:column sortable="false" title="Status"
-                                                class="tdcheck"> <input type="checkbox"
-                                                name="selected_channels"
-                                                value="${subscription.channelName}"
-                                                checked/>
+                                                class="tdcenter-green" value="Online">
                                             </display:column>
                                         </c:when>
                                         <c:otherwise>
                                             <display:column sortable="false" title="Status"
-                                                class="tdcheck"> <input type="checkbox"
-                                                name="selected_channels"
-                                                value="${subscription.channelName}"/>
+                                                class="tdcenter-red" value="Offline">
                                             </display:column>
                                         </c:otherwise>
                                     </c:choose>
+                                    <display:column sortable="false" title="Remove"
+                                        class="tdcheck"> <input type="checkbox"
+                                        name="selected_channels"
+                                        value="${subscription.channelName}"/>
+                                    </display:column>
                                 </display:table>
                             <div id="table-footer">
                                 <input type="submit" value="Submit" name="submitButton"/>
@@ -109,12 +108,11 @@ Author     : szewczenko
                             </c:when>
                             <c:otherwise>
                                 <div id="message-box">
-                                    List of channels available for subscription is currently empty.
-                                    Use node connection functionality to add new channels.
+                                    List of subscribed channels is currently empty.
                                 </div>
                                 <div id="table-footer">
-                                    <form action="connectToNode.htm">
-                                        <input type="submit" value="Connect" name="connect_button"/>
+                                    <form action="admin.htm">
+                                        <input type="submit" value="Back" name="admin_button"/>
                                     </form>
                                 </div>
                             </c:otherwise>

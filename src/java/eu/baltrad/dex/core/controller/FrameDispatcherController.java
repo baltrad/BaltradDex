@@ -50,10 +50,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.util.Streams;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.InputStream;
 import java.io.File;
 import java.io.IOException;
@@ -140,6 +136,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     "Channel listing request received from user " +
                                      getUserName( bfHandler.getUserName( header ) ) + " ("
                                      + bfHandler.getSenderNodeName( header ) + ")" );
+                                
                                 // process channel listing request
 
                                 // create a list of available channels
@@ -147,13 +144,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 // write list to temporary file
                                 File tempFile = InitAppUtil.createTempFile(
                                         new File( InitAppUtil.getLocalTempDir() ) );
-                                ObjectOutputStream oos = new ObjectOutputStream(
-                                        new FileOutputStream( tempFile ) );
-                                try {
-                                    oos.writeObject( channels );
-                                } finally {
-                                    oos.close();
-                                }
+                                // write object to stream
+                                InitAppUtil.writeObjectToStream( channels, tempFile );
                                 // set the return address
                                 bfHandler.setUrl( bfHandler.getSenderNodeAddress( header ) );
                                 // prepare the return message header
@@ -198,15 +190,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             File tempFile = InitAppUtil.createTempFile(
                                         new File( InitAppUtil.getLocalTempDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
-                            ObjectInputStream ois = new ObjectInputStream(
-                                    new FileInputStream( tempFile ) );
                             // retrieve channel list and save it to class field
-                            List remoteChannels = null;
-                            try {
-                                remoteChannels = ( List )ois.readObject();
-                            } finally {
-                                ois.close();
-                            }
+                            List remoteChannels = ( List )InitAppUtil.readObjectFromStream( tempFile );
                             // set channel listing
                             setChannelListing( remoteChannels );
                             // set remote node name
@@ -232,15 +217,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             File tempFile = InitAppUtil.createTempFile(
                                         new File( InitAppUtil.getLocalTempDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
-                            ObjectInputStream ois = new ObjectInputStream(
-                                    new FileInputStream( tempFile ) );
                             // retrieve subscription list
-                            List subscribedChannels = null;
-                            try {
-                                subscribedChannels = ( List )ois.readObject();
-                            } finally {
-                                ois.close();
-                            }
+                            List subscribedChannels = ( List )InitAppUtil.readObjectFromStream(
+                                    tempFile );
                             // identify user by name
                             User user = userManager.getUserByName( bfHandler.getUserName( header ) );
                             // return channel list sent back to user to confirm
@@ -275,13 +254,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // write list to temporary file
                             tempFile = InitAppUtil.createTempFile(
                                     new File( InitAppUtil.getLocalTempDir() ) );
-                            ObjectOutputStream oos = new ObjectOutputStream(
-                                    new FileOutputStream( tempFile ) );
-                            try {
-                                oos.writeObject( confirmedChannels );
-                            } finally {
-                                oos.close();
-                            }
+                            // write object to the stream
+                            InitAppUtil.writeObjectToStream( confirmedChannels, tempFile );
                             // set the return address
                             bfHandler.setUrl( bfHandler.getSenderNodeAddress( header ) );
                             // prepare the return message header
@@ -312,15 +286,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             File tempFile = InitAppUtil.createTempFile(
                                         new File( InitAppUtil.getLocalTempDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
-                            ObjectInputStream ois = new ObjectInputStream(
-                                    new FileInputStream( tempFile ) );
                             // retrieve list of confirmed channels
-                            List confirmedChannels = null;
-                            try {
-                                confirmedChannels = ( List )ois.readObject();
-                            } finally {
-                                ois.close();
-                            }
+                            List confirmedChannels = ( List )InitAppUtil.readObjectFromStream(
+                                    tempFile );
                             setConfirmedSubscriptions( confirmedChannels );
                         }
 
@@ -340,15 +308,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             File tempFile = InitAppUtil.createTempFile(
                                         new File( InitAppUtil.getLocalTempDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
-                            ObjectInputStream ois = new ObjectInputStream(
-                                    new FileInputStream( tempFile ) );
                             // retrieve subscription object
-                            Subscription subs = null;
-                            try {
-                                subs = ( Subscription )ois.readObject();
-                            } finally {
-                                ois.close();
-                            }
+                            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
+                                    tempFile );
                             // create new subscription object
                             Subscription s = new Subscription( subs.getUserName(),
                                     subs.getChannelName(), Subscription.REMOTE_SUBSCRIPTION );
@@ -376,33 +338,26 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // write subscription object to temporary file
                             tempFile = InitAppUtil.createTempFile(
                                     new File( InitAppUtil.getLocalTempDir() ) );
-                            ObjectOutputStream oos = new ObjectOutputStream(
-                                    new FileOutputStream( tempFile ) );
                             // set the return address
                             bfHandler.setUrl( bfHandler.getSenderNodeAddress( header ) );
                              
                             String retHeader = null;
                             if( confirmedSub != null ) {
-                                retHeader = bfHandler.createObjectHdr( BaltradFrameHandler.BF_MIME_MULTIPART,
+                                retHeader = bfHandler.createObjectHdr(
+                                    BaltradFrameHandler.BF_MIME_MULTIPART,
                                     InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
                                     BaltradFrameHandler.BF_MSG_SUBSCRIPTION_CHANGE_SUCCESS,
                                     tempFile.getAbsolutePath() );
-                                try {
-                                    oos.writeObject( confirmedSub );
-                                } finally {
-                                    oos.close();
-                                }
+                                // write object to the stream
+                                InitAppUtil.writeObjectToStream( confirmedSub, tempFile );
                             } else {
                                 retHeader = bfHandler.createMsgHdr(
                                     BaltradFrameHandler.BF_MIME_MULTIPART,
                                     InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
                                     BaltradFrameHandler.BF_MSG_SUBSCRIPTION_CHANGE_FAILURE,
                                     tempFile.getAbsolutePath() );
-                                try {
-                                    oos.writeObject( subs );
-                                } finally {
-                                    oos.close();
-                                }
+                                // write object to the stream
+                                InitAppUtil.writeObjectToStream( subs, tempFile );
                             }
                             BaltradFrame baltradFrame =
                                     new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
@@ -420,15 +375,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             File tempFile = InitAppUtil.createTempFile(
                                         new File( InitAppUtil.getLocalTempDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
-                            ObjectInputStream ois = new ObjectInputStream(
-                                    new FileInputStream( tempFile ) );
                             // retrieve subscription object
-                            Subscription subs = null;
-                            try {
-                                subs = ( Subscription )ois.readObject();
-                            } finally {
-                                ois.close();
-                            }
+                            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
+                                    tempFile );
                             String selected = subs.getSelected() ? "Subscribed" : "Unsubscribed";
                             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                 "Remote node " + bfHandler.getSenderNodeName( header )
@@ -446,15 +395,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             File tempFile = InitAppUtil.createTempFile(
                                         new File( InitAppUtil.getLocalTempDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
-                            ObjectInputStream ois = new ObjectInputStream(
-                                    new FileInputStream( tempFile ) );
                             // retrieve subscription object
-                            Subscription subs = null;
-                            try {
-                                subs = ( Subscription )ois.readObject();
-                            } finally {
-                                ois.close();
-                            }
+                            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
+                                    tempFile );
                             String selected = subs.getSelected() ? "Subscribed" : "Unsubscribed";
                             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                 "Remote node " + bfHandler.getSenderNodeName( header )  +

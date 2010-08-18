@@ -78,13 +78,16 @@ Author     : szewczenko
                                         value="${user.id}"/>
                                 </display:column>
                             </display:table>
-                            <div id="table-footer">
+                            <div id="table-footer-rightcol">
                                 <input type="submit" value="Submit" name="submitButton"/>
                             </div>
                         </form>
-                        <div id="table-footer">
-                            <a href="admin.htm">&#60&#60 System management</a>
-                        </div>
+                        <form action="admin.htm">
+                            <div id="table-footer-leftcol">
+                                <input type="submit" value="Back" name="cancelButton"/>
+                            </div>
+                        </form>
+
                     </div>
                     <div id="left">
                         <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>

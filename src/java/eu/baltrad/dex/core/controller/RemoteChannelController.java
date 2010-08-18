@@ -35,9 +35,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.io.ObjectOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.File;
 
 import java.util.List;
@@ -146,12 +143,7 @@ public class RemoteChannelController extends MultiActionController {
         try {
             File tempFile = InitAppUtil.createTempFile(
                     new File( InitAppUtil.getLocalTempDir() ) );
-            ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream( tempFile ) );
-            try {
-                oos.writeObject( getSelectedChannels() );
-            } finally {
-                oos.close();
-            }
+            InitAppUtil.writeObjectToStream( getSelectedChannels(), tempFile );
             // prepare frame
             BaltradFrameHandler bfHandler = new BaltradFrameHandler( getSenderNodeAddress() );
             String hdrStr = bfHandler.createObjectHdr( BaltradFrameHandler.BF_MIME_MULTIPART,
@@ -184,9 +176,6 @@ public class RemoteChannelController extends MultiActionController {
                     subscriptionManager.addSubscription( subs );
                 }
             }
-        } catch( IOException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while adding remote " +
-                    "channels to subscription list: " + e.getMessage() );
         } catch( Exception e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while adding remote " +
                     "channels to subscription list: " + e.getMessage() );

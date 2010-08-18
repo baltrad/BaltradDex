@@ -54,7 +54,7 @@ Author     : szewczenko
             }
             queryString = '';
             self.ajaxRequest.send( queryString );
-            self.setTimeout( 'viewLogs()', 5000 );
+            self.setTimeout( 'viewLogs()', 1000 );
         }
         function doUpdate( message ) {
             document.getElementById( "logtable" ).innerHTML = message;

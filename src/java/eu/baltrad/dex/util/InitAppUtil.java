@@ -25,7 +25,10 @@ import eu.baltrad.dex.log.model.LogManager;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.util.Date;
@@ -329,6 +332,46 @@ public class InitAppUtil {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while deleting file: \n"
                     + e.getMessage() );
         }
+    }
+    /**
+     * Creates ObjectOutputStream connected to a given file and writes given object to the stream.
+     *
+     * @param o Input object to write
+     * @param f Input file for writing object
+     */
+    public static void writeObjectToStream( Object obj, File f ) {
+        try {
+            ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream( f ) );
+            oos.writeObject( obj );
+            oos.close();
+        } catch( FileNotFoundException e )  {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                    "Error while writing object to stream: " + e.getMessage() );
+        } catch( IOException e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                    "Error while writing object to stream: " + e.getMessage() );
+        }
+    }
+    /**
+     * Creates ObjectInputStream connected to a given file and reads object from the stream.
+     *
+     * @param f Input file
+     * @return Object read from file upon success, null in case of a failure
+     */
+    public static Object readObjectFromStream( File f ) {
+        Object obj = null;
+        try {
+            ObjectInputStream ois = new ObjectInputStream( new FileInputStream( f ) );
+            obj = ois.readObject();
+            ois.close();
+        } catch( ClassNotFoundException e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                    "Error while reading object from stream: " + e.getMessage() );
+        } catch( IOException e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                    "Error while reading object from stream: " + e.getMessage() );
+        }
+        return obj;
     }
 }
 //--------------------------------------------------------------------------------------------------

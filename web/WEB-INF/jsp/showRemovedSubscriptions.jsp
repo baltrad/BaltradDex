@@ -59,7 +59,7 @@ Author     : szewczenko
                                 </h2>
                                 <div id="table-content">
                                     <form action="showSubscriptionStatus.htm">
-                                        <display:table name="selected_subscriptions" 
+                                        <display:table name="selected_subscriptions"
                                             id="subscription" defaultsort="1" requestURI="submit.htm"
                                             export="false" cellpadding="0" cellspacing="2"
                                             class="tableborder">
@@ -80,13 +80,13 @@ Author     : szewczenko
                                             </display:column>
                                             <c:choose>
                                                 <c:when test="${subscription.selected == true}">
-                                                    <display:column sortable="false" 
+                                                    <display:column sortable="false"
                                                         title="Request status" class="tdcenter-green"
                                                         value="Online">
                                                     </display:column>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <display:column sortable="false" 
+                                                    <display:column sortable="false"
                                                         title="Request status" class="tdcenter-red"
                                                         value="Offline">
                                                     </display:column>

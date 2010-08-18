@@ -60,9 +60,6 @@ Author     : szewczenko
                                 <input type="submit" value="Cancel" name="cancel_button"/>
                             </div>
                         </form>
-                        <div id="table-footer">
-                            <a href="welcome.htm">&#60&#60 Home</a>
-                        </div>
                     </div>
                     <div id="left">
                         <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>

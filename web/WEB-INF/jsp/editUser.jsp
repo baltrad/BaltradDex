@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Confirm clear message stack page
+Document   : Edit user account page
 Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
@@ -30,7 +30,7 @@ Author     : szewczenko
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Clear message stack</title>
+    <title>Modify user account</title>
 </head>
 
 <body>
@@ -43,16 +43,40 @@ Author     : szewczenko
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Clear message stack</h1>
+                        <h1>Modify user account</h1>
                         <br/>
-                        <div id="message-box">
-                            ${operation_status}
+                        <h2>
+                            <p>
+                            Click on user ID to modify selected account.
+                            </p>
+                        </h2>
+                        <display:table name="registered_users" id="user" defaultsort="1"
+                            requestURI="showUsers.htm" cellpadding="0" cellspacing="2"
+                            export="false" class="tableborder" pagesize="10">
+                            <display:column sortable="true" title="ID" href="saveUser.htm"
+                                sortProperty="id" class="tdcenter" paramProperty="id"
+                                paramId="id" value="${user.id}">
+                            </display:column>
+                            <display:column sortable="true" title="User name" sortProperty="name"
+                                class="tdcenter" value="${user.name}">
+                            </display:column>
+                            <display:column sortable="true" title="Role" sortProperty="role"
+                                class="tdcenter" value="${user.roleName}">
+                            </display:column>
+                            <display:column sortable="true" title="Node address"
+                                sortProperty="nodeAddress" class="tdcenter"
+                                value="${user.nodeAddress}">
+                            </display:column>
+                            <display:column sortable="true" title="Company"
+                                sortProperty="factory" class="tdcenter"
+                                value="${user.factory}">
+                            </display:column>
+                        </display:table>
+                        <div id="table-footer">
+                            <form action="admin.htm">
+                                <input type="submit" value="Back" name="back_button"/>
+                            </form>
                         </div>
-                        <form action="admin.htm">
-                            <div id="table-footer-rightcol">
-                                <input type="submit" value="OK" name="submit_button"/>
-                            </div>
-                        </form>
                     </div>
                     <div id="left">
                         <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
@@ -68,7 +92,3 @@ Author     : szewczenko
     </div>
 </body>
 </html>
-
-
-
-

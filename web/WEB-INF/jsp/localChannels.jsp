@@ -68,7 +68,9 @@ Author     : szewczenko
                             </display:column>
                         </display:table>
                         <div id="table-footer">
-                            <a href="welcome.htm">&#60&#60 Home</a>
+                            <form action="welcome.htm">
+                                <input type="submit" value="Home" name="home_button"/>
+                            </form>
                         </div>
                     </div>
                     <div id="left">

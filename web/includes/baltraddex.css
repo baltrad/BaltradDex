@@ -457,6 +457,16 @@ div#message-text {
     display: block;
     /*background: #CACACA;*/
 }
+.tdcenter-red {
+    padding: 4px 4px 4px 8px;
+    border: 1px solid #91ACC1;
+    color: red;
+}
+.tdcenter-green {
+    padding: 4px 4px 4px 8px;
+    border: 1px solid #91ACC1;
+    color: #99CC66;
+}
 
 
 

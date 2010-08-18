@@ -117,6 +117,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="showChannels.htm">removeChannelController</prop>
                 <prop key="showSelectedChannels.htm">removeChannelController</prop>
                 <prop key="showRemovedChannels.htm">removeChannelController</prop>
+                <prop key="selectRemoveSubscriptions.htm">subscriptionController</prop>
+                <prop key="showRemovedSubscriptions.htm">subscriptionController</prop>
+                <prop key="showSubscription.htm">subscriptionController</prop>
             </props>
         </property>
     </bean>

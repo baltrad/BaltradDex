@@ -61,13 +61,14 @@ public class SubscriptionController extends MultiActionController {
     private static final String SELECTED_CHANNELS_KEY = "selected_channels";
     private static final String SELECTED_SUBSCRIPTIONS_KEY = "selected_subscriptions";
     private static final String REQUEST_STATUS_KEY = "request_status";
-
-    private static final String SUBMITTED_SUBSCRIPTIONS_KEY = "submitted_subscriptions";
-    private static final String SUBSCRIPTION_STATUS_KEY = "subscription_status";
     // view names
     private static final String SHOW_SUBSCRIPTIONS_VIEW = "showSubscriptions";
     private static final String SELECTED_SUBSCRIPTIONS_VIEW = "showSelectedSubscriptions";
     private static final String SUBSCRIPTION_STATUS_VIEW = "showSubscriptionStatus";
+
+    private static final String REMOVE_SUBSCRIPTIONS_VIEW = "selectRemoveSubscriptions";
+    private static final String SELECT_REMOVE_SUBSCRIPTION_VIEW = "showRemovedSubscriptions";
+
 //---------------------------------------------------------------------------------------- Variables
     private ChannelManager channelManager;
     private SubscriptionManager subscriptionManager;
@@ -202,6 +203,66 @@ public class SubscriptionController extends MultiActionController {
         }
         return new ModelAndView( SUBSCRIPTION_STATUS_VIEW );
     }
+
+    /**
+     * Shows list of all subscribed channels with check-boxes allowing user to select channels
+     * for removal.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @return ModelAndView holding list of all available channels
+     */
+    public ModelAndView selectRemoveSubscriptions( HttpServletRequest request,
+            HttpServletResponse response ) {
+        List subscriptions = subscriptionManager.getSubscriptionsByType(
+                Subscription.LOCAL_SUBSCRIPTION );
+        return new ModelAndView( REMOVE_SUBSCRIPTIONS_VIEW, SHOW_SUBSCRIPTIONS_KEY, subscriptions );
+    }
+    /**
+     * Shows subscribed channels selected for removal.
+     * 
+     * @param request HTTP request
+     * @param response HTTP response
+     * @return ModelAndView holding list of channels selected for removal
+     */
+    public ModelAndView showRemovedSubscriptions( HttpServletRequest request,
+            HttpServletResponse response ) {
+        // get the list of channels selected for subscription by the user
+        String[] selChannels = request.getParameterValues( SELECTED_CHANNELS_KEY );
+        List< Subscription > currentSubs = new ArrayList< Subscription >();
+        // make sure the list of selected channels is not null
+        if( selChannels != null ) {
+            request.setAttribute( REQUEST_STATUS_KEY, 1 );
+            // create subscription list based on chosen channels
+            for( int i = 0; i < selChannels.length; i++ ) {
+                Subscription subs = subscriptionManager.getSubscription( selChannels[ i ],
+                        Subscription.LOCAL_SUBSCRIPTION );
+                if( subs != null ) {
+                    currentSubs.add( subs );
+                }
+            }
+        } else {
+            request.setAttribute( REQUEST_STATUS_KEY, 0 );
+        }
+        return new ModelAndView( SELECT_REMOVE_SUBSCRIPTION_VIEW, SELECTED_SUBSCRIPTIONS_KEY,
+                currentSubs );
+    }
+
+
+
+
+
+    
+
+    public ModelAndView showSubscriptionRemovalStatus( HttpServletRequest request,
+            HttpServletResponse response ) {
+        return new ModelAndView();
+    }
+
+
+
+
+
     /**
      * Method returns reference to ApplicationSecurityManager object.
      *

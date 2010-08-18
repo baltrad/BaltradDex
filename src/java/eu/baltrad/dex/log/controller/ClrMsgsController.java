@@ -62,7 +62,7 @@ public class ClrMsgsController implements Controller {
         String msg = null;
         try {
             int deletedEntries = logManager.deleteAllEntries();
-            msg = "Successfully deleted " + Integer.toString( deletedEntries ) + " messages.";
+            msg = "Successfully deleted " + Integer.toString( deletedEntries ) + " message(s).";
             logManager.addEntry( new Date(), LogManager.MSG_WRN, "All messages have been deleted\n" +
                     " from the stack" );
         } catch( HibernateException e ) {
