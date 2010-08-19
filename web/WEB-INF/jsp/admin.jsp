@@ -79,9 +79,9 @@ Author     : szewczenko
                             <tr class="odd">
                                 <td class="left">Local data channels</td>
                                 <td class="right">
-                                    <a href="editchannel.htm">Edit</a>
-                                    <a href="savechannel.htm">Add</a>
-                                    <a href="showChannels.htm">Remove</a>
+                                    <a href="editLocalChannel.htm">Edit</a>
+                                    <a href="saveLocalChannel.htm">Add</a>
+                                    <a href="showLocalChannels.htm">Remove</a>
                                 </td>
                             </tr>
                             <tr class="even">

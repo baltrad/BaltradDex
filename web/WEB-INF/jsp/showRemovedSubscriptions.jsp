@@ -34,7 +34,7 @@ Author     : szewczenko
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Subscription request</title>
+    <title>Subscribed channels selected for removal</title>
 </head>
 
 <body>
@@ -47,18 +47,18 @@ Author     : szewczenko
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Subscription request</h1>
+                        <h1>Subscribed channels selected for removal</h1>
                         <br/>
                         <c:choose>
                             <c:when test="${request_status == 1}">
                                 <h2>
                                     <p>
-                                    Confirm your subscription request by clicking on OK
-                                    button.
+                                    Click OK to remove the following channels from your
+                                    subscription list.
                                     </p>
                                 </h2>
                                 <div id="table-content">
-                                    <form action="showSubscriptionStatus.htm">
+                                    <form action="showSubscriptionRemovalStatus.htm">
                                         <display:table name="selected_subscriptions"
                                             id="subscription" defaultsort="1" requestURI="submit.htm"
                                             export="false" cellpadding="0" cellspacing="2"
@@ -78,58 +78,25 @@ Author     : szewczenko
                                                 paramProperty="nodeAddress" class="tdcenter"
                                                 value="${subscription.nodeAddress}">
                                             </display:column>
-                                            <c:choose>
-                                                <c:when test="${subscription.selected == true}">
-                                                    <display:column sortable="false"
-                                                        title="Request status" class="tdcenter-green"
-                                                        value="Online">
-                                                    </display:column>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <display:column sortable="false"
-                                                        title="Request status" class="tdcenter-red"
-                                                        value="Offline">
-                                                    </display:column>
-                                                </c:otherwise>
-                                            </c:choose>
                                         </display:table>
                                         <div id="table-footer-leftcol">
                                             <input type="submit" value="OK" name="submit_button"/>
                                         </div>
                                     </form>
                                     <div id="table-footer-rightcol">
-                                        <form action="showSubscriptions.htm">
+                                        <form action="selectRemoveSubscriptions.htm">
                                             <input type="submit" value="Back" name="back_button"/>
-                                        </form>
-                                    </div>
-                                </div>
-                            </c:when>
-                            <c:when test="${request_status == 2}">
-                                <div id="message-box">
-                                    Click on Submit button now to cancel all your
-                                    active subscriptions.
-                                </div>
-                                <div id="table-footer">
-                                    <div id="table-footer-leftcol">
-                                        <form action="showSubscriptionStatus.htm">
-                                            <input type="submit" value="Submit" name="submit_button"/>
-                                        </form>
-                                    </div>
-                                    <div id="table-footer-rightcol">
-                                        <form action="showSubscriptions.htm">
-                                            <input type="submit" value="Cancel" name="cancel_button"/>
                                         </form>
                                     </div>
                                 </div>
                             </c:when>
                             <c:otherwise>
                                 <div id="message-box">
-                                    Your subscription status was not changed.
-                                    Click on OK button to go back to the selection page.
+                                    Please check select channels to be removed from .
                                 </div>
                                 <div id="table-footer">
                                     <div id="table-footer-rightcol">
-                                        <form action="showSubscriptions.htm">
+                                        <form action="selectRemoveSubscriptions.htm">
                                             <input type="submit" value="OK" name="cancel_button"/>
                                         </form>
                                     </div>

@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Edit data channel page
+Document   : Confirm channel removal page
 Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
@@ -30,7 +30,7 @@ Author     : szewczenko
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Modify data channel</title>
+    <title>Data channel removal status</title>
 </head>
 
 <body>
@@ -43,31 +43,32 @@ Author     : szewczenko
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Modify data channel</h1>
+                        <h1>Data channel removal status</h1>
                         <br/>
                         <h2>
                             <p>
-                            Click on data channel ID to modify selected channel.
+                            <c:choose>
+                                <c:when test="${not empty hibernate_errors}">
+                                    <p>
+                                    Failed to remove data channel:
+                                    </p>
+                                    <c:forEach var="error_msg" items="${hibernate_errors}">
+                                        <c:out value="${error_msg}" escapeXml="false"/><br/>
+                                    </c:forEach>
+                                    <p>
+                                    </p>
+                                </c:when>
+                                <c:otherwise>
+                                    Selected data channels have been removed from the system.
+                                </c:otherwise>
+                            </c:choose>
                             </p>
                         </h2>
-                        <display:table name="registered_channels" id="channel" defaultsort="1"
-                            requestURI="showchannel.htm" cellpadding="0" cellspacing="2"
-                            export="false" class="tableborder" pagesize="10">
-                            <display:column sortable="true" title="ID" href="savechannel.htm"
-                                sortProperty="id" class="tdcenter" paramProperty="id"
-                                paramId="id" value="${channel.id}">
-                            </display:column>
-                            <display:column sortable="true" title="Channel name" sortProperty="name"
-                                class="tdcenter" value="${channel.name}">
-                            </display:column>
-                            <display:column sortable="true" title="WMO number"
-                                sortProperty="wmoNumber" class="tdcenter"
-                                value="${channel.wmoNumber}">
-                            </display:column>
-                        </display:table>
-                        <div id="table-footer">
-                            <a href="admin.htm">&#60&#60 System management</a>
-                        </div>
+                        <form action="showLocalChannels.htm">
+                            <div id="table-footer-rightcol">
+                                <input type="submit" value="OK" name="submit_button"/>
+                            </div>
+                        </form>
                     </div>
                     <div id="left">
                         <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>

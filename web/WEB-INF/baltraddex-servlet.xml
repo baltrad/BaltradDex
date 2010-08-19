@@ -112,11 +112,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="showUsers.htm">removeUserController</prop>
                 <prop key="showSelectedUsers.htm">removeUserController</prop>
                 <prop key="showRemovedUsers.htm">removeUserController</prop>
-                <prop key="savechannel.htm">saveChannelController</prop>
-                <prop key="editchannel.htm">editChannelController</prop>
-                <prop key="showChannels.htm">removeChannelController</prop>
-                <prop key="showSelectedChannels.htm">removeChannelController</prop>
-                <prop key="showRemovedChannels.htm">removeChannelController</prop>
+                <prop key="saveLocalChannel.htm">saveChannelController</prop>
+                <prop key="editLocalChannel.htm">editChannelController</prop>
+                <prop key="showLocalChannels.htm">removeChannelController</prop>
+                <prop key="showSelectedLocalChannels.htm">removeChannelController</prop>
+                <prop key="showRemovedLocalChannels.htm">removeChannelController</prop>
                 <prop key="selectRemoveSubscriptions.htm">subscriptionController</prop>
                 <prop key="showRemovedSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSubscription.htm">subscriptionController</prop>
@@ -538,7 +538,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <value>eu.baltrad.dex.channel.model.Channel</value>
         </property>
         <property name="formView">
-            <value>savechannel</value>
+            <value>saveLocalChannel</value>
         </property>
         <property name="validator">
             <ref bean="saveChannelValidator"/>
@@ -568,7 +568,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="editChannelController" class="eu.baltrad.dex.channel.controller.EditChannelController">
         <property name="successView">
-            <value>editchannel</value>
+            <value>editLocalChannel</value>
         </property>
         <property name="channelManager">
             <ref bean="channelManager"/>

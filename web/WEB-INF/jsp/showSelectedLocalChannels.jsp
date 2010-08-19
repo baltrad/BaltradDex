@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Confirm channel removal page
+Document   : Page displaying selected data channels
 Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
@@ -47,31 +47,39 @@ Author     : szewczenko
                         <br/>
                         <h2>
                             <p>
-                            <c:choose>
-                                <c:when test="${not empty hibernate_errors}">
-                                    <p>
-                                    Failed to remove data channel:
-                                    </p>
-                                    <c:forEach var="error_msg" items="${hibernate_errors}">
-                                        <c:out value="${error_msg}" escapeXml="false"/><br/>
-                                    </c:forEach>
-                                    <p>
-                                    </p>
-                                </c:when>
-                                <c:otherwise>
-                                    Selected data channels have been removed from the system.
-                                </c:otherwise>
-                            </c:choose>
+                            Warning: The following data channels will be removed from the system:
                             </p>
                         </h2>
-                        <form action="admin.htm">
+                        <form method="post" action="showRemovedLocalChannels.htm">
+                            <display:table name="channels" id="channel" defaultsort="1"
+                                requestURI="showSelectedLocalChannels.htm" cellpadding="0"
+                                cellspacing="2" export="false" class="tableborder" pagesize="10">
+                                <display:column sortProperty="id" sortable="true"
+                                    title="ID" class="tdcenter">
+                                    <fmt:formatNumber value="${channel.id}" pattern="00" />
+                                </display:column>
+                                <display:column sortable="true" title="Channel name"
+                                    sortProperty="channelName" class="tdcenter"
+                                    value="${channel.channelName}">
+                                </display:column>
+                                <display:column sortable="true" title="WMO number"
+                                    sortProperty="wmoNumber" class="tdcenter"
+                                    value="${channel.wmoNumber}">
+                                </display:column>
+                                <display:column class="tdhidden">
+                                    <input type="checkbox" name="removed_channels"
+                                           value="${channel.id}" checked/>
+                                </display:column>
+                            </display:table>
                             <div id="table-footer-rightcol">
-                                <input type="submit" value="OK" name="submit_button"/>
+                                <input type="submit" value="Submit" name="submitButton"/>
                             </div>
                         </form>
-                        <div id="table-footer">
-                            <a href="admin.htm">&#60&#60 System management</a>
-                        </div>
+                        <form action="showLocalChannels.htm">
+                            <div id="table-footer-leftcol">
+                                <input type="submit" value="Back" name="submitButton"/>
+                            </div>
+                        </form>
                     </div>
                     <div id="left">
                         <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>

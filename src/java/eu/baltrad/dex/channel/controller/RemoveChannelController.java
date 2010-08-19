@@ -51,9 +51,9 @@ public class RemoveChannelController extends MultiActionController {
     private static final String REMOVED_CHANNELS_KEY = "removed_channels";
     private static final String HIBERNATE_ERRORS_KEY = "hibernate_errors";
     // view names
-    private static final String SHOW_CHANNELS_VIEW = "showChannels";
-    private static final String SELECTED_CHANNELS_VIEW = "showSelectedChannels";
-    private static final String REMOVED_CHANNELS_VIEW = "showRemovedChannels";
+    private static final String SHOW_CHANNELS_VIEW = "showLocalChannels";
+    private static final String SELECTED_CHANNELS_VIEW = "showSelectedLocalChannels";
+    private static final String REMOVED_CHANNELS_VIEW = "showRemovedLocalChannels";
 //---------------------------------------------------------------------------------------- Variables
     // Channel manager
     private ChannelManager channelManager;
@@ -67,7 +67,7 @@ public class RemoveChannelController extends MultiActionController {
      * @param response Http response
      * @return Models and view containing list of all available channels
      */
-    public ModelAndView showChannels( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView showLocalChannels( HttpServletRequest request, HttpServletResponse response ) {
         List channels = channelManager.getChannels();
         return new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
     }
@@ -78,7 +78,7 @@ public class RemoveChannelController extends MultiActionController {
      * @param response Http response
      * @return Model and view containing list of channels selected for removal
      */
-    public ModelAndView showSelectedChannels( HttpServletRequest request,
+    public ModelAndView showSelectedLocalChannels( HttpServletRequest request,
             HttpServletResponse response ) {
         ModelAndView modelAndView = null;
         String[] channelIds = request.getParameterValues( SELECTED_CHANNELS_KEY );
@@ -101,7 +101,7 @@ public class RemoveChannelController extends MultiActionController {
      * @param response Http response
      * @return Model and view containing data access exception errors if occured.
      */
-    public ModelAndView showRemovedChannels( HttpServletRequest request,
+    public ModelAndView showRemovedLocalChannels( HttpServletRequest request,
             HttpServletResponse response ) {
         String[] channelIds = request.getParameterValues( REMOVED_CHANNELS_KEY );
         List< String > errorMsgs = new ArrayList< String >();

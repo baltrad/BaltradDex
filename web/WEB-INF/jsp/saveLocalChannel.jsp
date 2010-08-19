@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Page displaying selected data channels
+Document   : Save data channel page
 Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
@@ -30,7 +30,7 @@ Author     : szewczenko
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Remove data channel</title>
+    <title>Modify local data channel</title>
 </head>
 
 <body>
@@ -43,45 +43,39 @@ Author     : szewczenko
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Remove data channel</h1>
+                        <h1>Modify local data channel</h1>
                         <br/>
                         <h2>
                             <p>
-                            Warning: The following data channels will be removed from the system:
+                            Create new data channel / manage existing data channel
                             </p>
                         </h2>
-                        <form method="post" action="showRemovedChannels.htm">
-                            <display:table name="channels" id="channel" defaultsort="1"
-                                requestURI="showSelectedChannels.htm" cellpadding="0" cellspacing="2"
-                                export="false" class="tableborder" pagesize="10">
-                                <display:column sortProperty="id" sortable="true"
-                                    title="ID" class="tdcenter">
-                                    <fmt:formatNumber value="${channel.id}" pattern="00" />
-                                </display:column>
-                                <display:column sortable="true" title="Channel name"
-                                    sortProperty="channelName" class="tdcenter"
-                                    value="${channel.channelName}">
-                                </display:column>
-                                <display:column sortable="true" title="WMO number"
-                                    sortProperty="wmoNumber" class="tdcenter"
-                                    value="${channel.wmoNumber}">
-                                </display:column>
-                                <display:column class="tdhidden">
-                                    <input type="checkbox" name="removed_channels"
-                                           value="${channel.id}" checked/>
-                                </display:column>
-                            </display:table>
+                        <form method="post">
+                            <table>
+                                <caption>Data channel information</caption>
+                                <tr class="even">
+                                    <td class="left">Channel name</td>
+                                    <td class="right">
+                                        <form:input path="command.channelName"/>
+                                        <form:errors path="command.channelName" cssClass="errors"/>
+                                    </td>
+                                </tr>
+                                <tr class="odd">
+                                    <td class="left">Channel WMO number</td>
+                                    <td class="right">
+                                        <form:input path="command.wmoNumber"/>
+                                        <form:errors path="command.wmoNumber" cssClass="errors"/>
+                                    </td>
+                                </tr>
+                            </table>
                             <div id="table-footer-rightcol">
-                                <input type="submit" value="Submit" name="submitButton"/>
+                                <input type="submit" value="Submit" name="submit_button"/>
                             </div>
                         </form>
-                        <form action="admin.htm">
-                            <div id="table-footer-leftcol">
-                                <input type="submit" value="Cancel" name="submitButton"/>
-                            </div>
-                        </form>
-                        <div id="table-footer">
-                            <a href="admin.htm">&#60&#60 System management</a>
+                        <div id="table-footer-leftcol">
+                            <form action="editLocalChannel.htm">
+                                <input type="submit" value="Back" name="back_button"/>
+                            </form>
                         </div>
                     </div>
                     <div id="left">
@@ -97,4 +91,5 @@ Author     : szewczenko
         <script type="text/javascript" src="includes/footer.js"></script>
     </div>
 </body>
+
 </html>

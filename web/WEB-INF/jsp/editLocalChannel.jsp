@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Show data channel page
+Document   : Edit data channel page
 Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
@@ -30,7 +30,7 @@ Author     : szewczenko
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Remove data channel</title>
+    <title>Modify local data channel</title>
 </head>
 
 <body>
@@ -43,40 +43,33 @@ Author     : szewczenko
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Remove data channel</h1>
+                        <h1>Modify local data channel</h1>
                         <br/>
                         <h2>
                             <p>
-                            Select data channel to remove.
+                            Click on data channel ID to modify selected channel.
                             </p>
                         </h2>
-                        <form action="showSelectedChannels.htm">
-                            <display:table name="channels" id="channel" defaultsort="1"
-                                requestURI="showchannels.htm" cellpadding="0" cellspacing="2"
-                                export="false" class="tableborder" pagesize="10">
-                                <display:column sortProperty="id" sortable="true"
-                                    title="ID" class="tdcenter">
-                                    <fmt:formatNumber value="${channel.id}" pattern="00" />
-                                </display:column>
-                                <display:column sortable="true" title="Channel name"
-                                    sortProperty="name" class="tdcenter"
-                                    value="${channel.name}">
-                                </display:column>
-                                <display:column sortable="true" title="WMO number"
-                                    sortProperty="wmoNumber" class="tdcenter"
-                                    value="${channel.wmoNumber}">
-                                </display:column>
-                                <display:column sortable="false" title="Select" class="tdcheck">
-                                    <input type="checkbox" name="selected_channels"
-                                        value="${channel.id}"/>
-                                </display:column>
-                            </display:table>
-                            <div id="table-footer">
-                                <input type="submit" value="Submit" name="submitButton"/>
-                            </div>
-                        </form>
+                        <display:table name="registered_channels" id="channel" defaultsort="1"
+                            cellpadding="0" cellspacing="2" export="false" class="tableborder"
+                            pagesize="10">
+                            <display:column sortable="true" title="ID" href="saveLocalChannel.htm"
+                                sortProperty="id" class="tdcenter" paramProperty="id"
+                                paramId="id" value="${channel.id}">
+                            </display:column>
+                            <display:column sortable="true" title="Channel name" 
+                                sortProperty="channelName" class="tdcenter"
+                                value="${channel.channelName}">
+                            </display:column>
+                            <display:column sortable="true" title="WMO number"
+                                sortProperty="wmoNumber" class="tdcenter"
+                                value="${channel.wmoNumber}">
+                            </display:column>
+                        </display:table>
                         <div id="table-footer">
-                            <a href="admin.htm">&#60&#60 System management</a>
+                            <form action="admin.htm">
+                                <input type="submit" value="Back" name="admin_button"/>
+                            </form>
                         </div>
                     </div>
                     <div id="left">

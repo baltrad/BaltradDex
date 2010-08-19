@@ -44,7 +44,7 @@ public class SaveChannelValidator implements Validator {
     public void validate( Object command, Errors errors ) {
         Channel channel = ( Channel )command;
         if( channel == null ) return;
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name", "error.field.required" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "channelName", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "wmoNumber", "error.field.required" );
     }
     /**
