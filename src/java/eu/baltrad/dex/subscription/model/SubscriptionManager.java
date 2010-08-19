@@ -104,7 +104,7 @@ public class SubscriptionManager {
      *
      * @param id Subscription ID
      */
-    public void removeSubscription( int id ) {
+    public void removeSubscription( int id ) throws HibernateException {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
 	    session.beginTransaction();
@@ -123,7 +123,7 @@ public class SubscriptionManager {
      * @param channelName Channel name
      * @param type Subscription type
      */
-    public void removeSubscription( String channelName, String type ) {
+    public void removeSubscription( String channelName, String type ) throws HibernateException {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -147,7 +147,8 @@ public class SubscriptionManager {
      * @param channelName Channel name
      * @param type Subscription type
      */
-    public void removeSubscription( String userName, String channelName, String type ) {
+    public void removeSubscription( String userName, String channelName, String type )
+            throws HibernateException {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -275,32 +276,5 @@ public class SubscriptionManager {
         }
         return res;
     }
-    /**
-     * Method creates list of channel IDs subscribed by a given user.
-     *
-     * @param userId User ID
-     * @return List of channel IDs
-     *
-    public List getChannelIds( int userId ) {
-        List subs = null;
-        List channelIds = new ArrayList();
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            subs = session.createQuery( "FROM Subscription WHERE user_id = ?" ).setInteger(
-                    0, userId ).list();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        }
-        for( int i = 0; i < subs.size(); i++ ) {
-            Subscription s = ( Subscription )subs.get( i );
-            channelIds.add( s.getChannelId() );
-        }
-        return channelIds;
-    }*/
-
 }
 //--------------------------------------------------------------------------------------------------

@@ -62,7 +62,7 @@ Author     : szewczenko
                             </c:choose>
                             </p>
                         </h2>
-                        <form action="showSubscriptionStatus.htm">
+                        <form action="selectRemoveSubscriptions.htm">
                             <div id="table-footer-rightcol">
                                 <input type="submit" value="OK" name="submit_button"/>
                             </div>

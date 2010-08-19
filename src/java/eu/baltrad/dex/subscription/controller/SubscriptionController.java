@@ -34,6 +34,8 @@ import eu.baltrad.dex.util.InitAppUtil;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.hibernate.HibernateException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -62,6 +64,8 @@ public class SubscriptionController extends MultiActionController {
     private static final String SELECTED_SUBSCRIPTIONS_KEY = "selected_subscriptions";
     private static final String REQUEST_STATUS_KEY = "request_status";
     private static final String REMOVED_SUBSCRIPTIONS_KEY = "removed_subscriptions";
+    // hibernate errors
+    private static final String HIBERNATE_ERRORS_KEY = "hibernate_errors";
     // view names
     private static final String SHOW_SUBSCRIPTIONS_VIEW = "showSubscriptions";
     private static final String SELECTED_SUBSCRIPTIONS_VIEW = "showSelectedSubscriptions";
@@ -261,12 +265,19 @@ public class SubscriptionController extends MultiActionController {
      */
     public ModelAndView showSubscriptionRemovalStatus( HttpServletRequest request,
             HttpServletResponse response ) {
-
-        
-
-
-        return new ModelAndView( SUBSCRIPTION_REMOVAL_STATUS_VIEW, REMOVED_SUBSCRIPTIONS_KEY,
-                getRemovedSubscriptions() );
+        List< String > errorMsgs = new ArrayList<String>();
+        for( int i = 0; i < getRemovedSubscriptions().size(); i++ ) {
+            try {
+                subscriptionManager.removeSubscription(
+                    getRemovedSubscriptions().get( i ).getChannelName(),
+                    Subscription.LOCAL_SUBSCRIPTION );
+            } catch( HibernateException e ) {
+                errorMsgs.add( "Data access exception while removing subscription " +
+                     "(Channel name: " + getRemovedSubscriptions().get( i ).getChannelName() + ")" );
+            }
+        }
+        return new ModelAndView( SUBSCRIPTION_REMOVAL_STATUS_VIEW, HIBERNATE_ERRORS_KEY,
+                errorMsgs );
     }
     /**
      * Method returns reference to ApplicationSecurityManager object.
