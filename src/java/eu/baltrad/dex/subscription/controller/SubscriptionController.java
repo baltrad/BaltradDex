@@ -61,13 +61,14 @@ public class SubscriptionController extends MultiActionController {
     private static final String SELECTED_CHANNELS_KEY = "selected_channels";
     private static final String SELECTED_SUBSCRIPTIONS_KEY = "selected_subscriptions";
     private static final String REQUEST_STATUS_KEY = "request_status";
+    private static final String REMOVED_SUBSCRIPTIONS_KEY = "removed_subscriptions";
     // view names
     private static final String SHOW_SUBSCRIPTIONS_VIEW = "showSubscriptions";
     private static final String SELECTED_SUBSCRIPTIONS_VIEW = "showSelectedSubscriptions";
     private static final String SUBSCRIPTION_STATUS_VIEW = "showSubscriptionStatus";
-
     private static final String REMOVE_SUBSCRIPTIONS_VIEW = "selectRemoveSubscriptions";
     private static final String SELECT_REMOVE_SUBSCRIPTION_VIEW = "showRemovedSubscriptions";
+    private static final String SUBSCRIPTION_REMOVAL_STATUS_VIEW = "showSubscriptionRemovalStatus";
 
 //---------------------------------------------------------------------------------------- Variables
     private ChannelManager channelManager;
@@ -75,8 +76,10 @@ public class SubscriptionController extends MultiActionController {
     private FrameDispatcherController frameDispatcherController;
     private ApplicationSecurityManager applicationSecurityManager;
     private LogManager logManager;
-    // subscription request
+    // subscription change request
     private List< Subscription > changedSubscriptions;
+    // removed subscriptions
+    private List< Subscription > removedSubscriptions;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Shows list of all subscriptions.
@@ -244,25 +247,27 @@ public class SubscriptionController extends MultiActionController {
         } else {
             request.setAttribute( REQUEST_STATUS_KEY, 0 );
         }
+        // write the list to class variable
+        setRemovedSubscriptions( currentSubs );
         return new ModelAndView( SELECT_REMOVE_SUBSCRIPTION_VIEW, SELECTED_SUBSCRIPTIONS_KEY,
                 currentSubs );
     }
-
-
-
-
-
-    
-
+    /**
+     * Removes selected subscriptions.
+     * 
+     * @param request HTTP request
+     * @param response HTTP response
+     * @return ModelAndView holding list of removed subscriptions
+     */
     public ModelAndView showSubscriptionRemovalStatus( HttpServletRequest request,
             HttpServletResponse response ) {
-        return new ModelAndView();
+
+        
+
+
+        return new ModelAndView( SUBSCRIPTION_REMOVAL_STATUS_VIEW, REMOVED_SUBSCRIPTIONS_KEY,
+                getRemovedSubscriptions() );
     }
-
-
-
-
-
     /**
      * Method returns reference to ApplicationSecurityManager object.
      *
@@ -350,6 +355,20 @@ public class SubscriptionController extends MultiActionController {
      */
     public void setChangedSubscriptions( List< Subscription > changedSubscriptions ) {
         this.changedSubscriptions = changedSubscriptions;
+    }
+    /**
+     * Gets a list of removed subscriptions.
+     *
+     * @return List of removed subscriptions
+     */
+    public List< Subscription > getRemovedSubscriptions() { return removedSubscriptions; }
+    /**
+     * Sets a list of removed subscriptions.
+     *
+     * @param removedSubscriptions List of removed subscriptions
+     */
+    public void setRemovedSubscriptions( List< Subscription > removedSubscriptions ) {
+        this.removedSubscriptions = removedSubscriptions;
     }
 }
 //--------------------------------------------------------------------------------------------------
