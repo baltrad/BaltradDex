@@ -73,7 +73,7 @@ Author     : szewczenko
                             </div>
                         </form>
                         <div id="table-footer-leftcol">
-                            <form action="adminControl.htm">
+                            <form action="adminControls.htm">
                                 <input type="submit" value="Back" name="back_button"/>
                             </form>
                         </div>

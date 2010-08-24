@@ -55,7 +55,7 @@ Author     : szewczenko
                                 <input type="submit" value="OK" name="submit_button"/>
                             </div>
                         </form>
-                        <form action="adminControl.htm">
+                        <form action="adminControls.htm">
                             <div id="table-footer-rightcol">
                                 <input type="submit" value="Cancel" name="cancel_button"/>
                             </div>

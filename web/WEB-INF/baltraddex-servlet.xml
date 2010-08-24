@@ -771,24 +771,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="timeoutfactory" class="eu.baltrad.beast.rules.timer.TimeoutTaskFactory"/>  
     <bean id="timeoutmanager" class="eu.baltrad.beast.rules.timer.TimeoutManager" autowire="byType"/>
 
-
-
-
-
-
     <!-- and the file catalog -->
     <bean id="fc" class="eu.baltrad.fc.FileCatalog">
   	    <constructor-arg value="${database.uri}" />
             <!--constructor-arg value="${storage.dir}" /-->
             <constructor-arg value="/tmp" />
     </bean>
-
-
-
-
-
-
-
     
     <!-- and the abstraction of the catalog -->
     <bean id="catalog" class="eu.baltrad.beast.db.Catalog" autowire="byType" />
