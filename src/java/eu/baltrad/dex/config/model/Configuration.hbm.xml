@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!--
 Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
 
@@ -18,22 +19,24 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
-Document   : Hibernate mapping file for Subscription class
-Created on : Aug 5, 2010, 9:00:02 AM
+Document   : Hibernate mapping file for Configuration class object
+Created on : Aug 23, 2010, 8:38:17 AM
 Author     : szewczenko
 -->
 <hibernate-mapping>
-  <class name="eu.baltrad.dex.subscription.model.Subscription" table="dex_subscriptions">
+  <class name="eu.baltrad.dex.config.model.Configuration" table="dex_node_configuration">
     <id column="id" name="id">
       <generator class="sequence">
-        <param name="sequence">subscription_id_seq</param>
+        <param name="sequence">configuration_id_seq</param>
       </generator>
     </id>
-    <property column="user_name" name="userName"/>
-    <property column="channel_name" name="channelName"/>
-    <property column="node_address" name="nodeAddress"/>
-    <property column="operator_name" name="operatorName"/>
-    <property column="type" name="type"/>
-    <property column="selected" name="selected"/>
+    <property column="name" name="nodeName"/>
+    <property column="type" name="nodeType"/>
+    <property column="address" name="nodeAddress"/>
+    <property column="org_name" name="orgName"/>
+    <property column="org_address" name="orgAddress"/>
+    <property column="time_zone" name="timeZone"/>
+    <property column="temp_dir" name="tempDir"/>
+    <property column="email" name="adminEmail"/>
   </class>
 </hibernate-mapping>

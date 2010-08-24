@@ -467,7 +467,103 @@ div#message-text {
     border: 1px solid #91ACC1;
     color: #99CC66;
 }
+/*
+    Tabbed control panel layout
+*/
+div.tabs {
+    position: relative;
+}
+div.active-rtab, div.active-ltab, div.inactive-rtab, div.inactive-ltab {
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid #91ACC1;
+    color:#003097;
+    border-bottom: 1px solid #EEEEEE;
+    display: inline;
+    padding: 6px;
+    position: relative;
+    z-index: 2;
+}
+div.active-rtab {
+    right: 1px;
+}
+div.inactive-rtab, div.inactive-ltab {
+    background: #CACACA;
+    border-bottom: 1px solid #91ACC1;
+}
+div.inactive-rtab {
+    right: 1px;
+}
+div.active-rtab:hover, div.active-ltab:hover, div.inactive-rtab:hover, div.inactive-ltab:hover {
+    background: white;
+}
+div.active-rtab > a, div.active-ltab > a, div.inactive-rtab > a, div.inactive-ltab > a {
+    text-decoration: none;
+}
+div.controls, div.config {
+    border: 1px solid #91ACC1;
+    padding: 6px;
+    position: absolute;
+    display: block;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+    overflow: auto;
+    top: 24px;
+}
+div.controls {
+    min-height: 264px;
+}
+div.config {
+    min-height: 344px;
+}
 
 
 
 
+/*
+    Tabbed control panel
+ */
+/*div.tabs {
+    min-height: 400px;		 No height: can grow if :target doesn't work 
+    position: relative;		 Establish a containing block 
+    line-height: 1;		 Easier to calculate with 
+    z-index: 0;			 So that we can put other things behind 
+}
+div.tabs > div {
+    display: inline;
+}
+div.tabs > div > a {
+    font-size: 14px;
+    font-weight: bold;
+    background: #EEEEEE;		 Active tabs are light gray 
+    padding: 6px;		
+    border: 1px solid #91ACC1;
+    border-bottom: 1px solid #EEEEEE;  Visually connect tab and tab body 
+}
+div.tabs > div:not(:target) > a {
+    border-bottom: none;		 Make the bottom border disappear 
+    background: #CACACA;		 Inactive tabs are dark gray 
+}
+div.tabs > div:target > a,	 Apply to the targeted item or... 
+:target #config > a {		 ... to the default item 
+    border-bottom: 1px solid #EEEEEE;  Visually connect tab and tab body 
+}
+div.tabs > div > div {
+  background: #EEEEEE;		 Light gray 
+  z-index: -2;			 Behind, because the borders overlap 
+  left: 0; top: 22px;		 The top needs some calculation... 
+  bottom: 0; right: 0;		 Other sides flush with containing block 
+  overflow: auto;		 Scroll bar if needed 
+  padding: 6px;		 Looks better 
+  border: 1px solid #91ACC1;
+}
+div.tabs > div:not(:target) > div {  Protect CSS1 & CSS2 browsers 
+  position: absolute;		 All these DIVs overlap 
+}
+div.tabs > div:target > div, :target #config > div {
+  position: absolute;		 All these DIVs overlap 
+  z-index: -1;			 Raise it above the others 
+}
+*/

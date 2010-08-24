@@ -54,16 +54,10 @@ public class FileCatalogConnector {
     /**
      * Constructor.
      */
-    public FileCatalogConnector() { this.logManager = new LogManager(); }
-    /**
-     * Method initializes storage directory and connects to the database.
-     *
-     * @param dbURI Database URI
-     * @param storageDir Storage directory
-     * @return Reference to FileCatalog object
-     */
-    public FileCatalog connect() {
-        //Initialize FileCatalog
+    public FileCatalogConnector() {
+        // Initialize LogManager
+        this.logManager = new LogManager();
+        // Initialize FileCatalog
         try {
             InputStream is = this.getClass().getResourceAsStream( PROPS_FILE_NAME );
             Properties props = new Properties();
@@ -71,19 +65,25 @@ public class FileCatalogConnector {
                 props.load( is );
                 String storageFolder = props.getProperty( STORAGE_DIR_PROP );
                 String dbURI = props.getProperty( DB_URI_PROP );
-                // Check if storage directory exists
-                String storageDir = ServletContextUtil.getServletContextPath() + storageFolder;
+                // Check if storage folder is relative or absolute path
+                String storageDir = null;
+                if( storageFolder.startsWith( File.separator ) ) {
+                    storageDir = storageFolder;
+                } else {
+                    storageDir = ServletContextUtil.getServletContextPath() + storageFolder;
+                }
                 File f = new File( storageDir );
                 if( !f.exists() ) {
                     f.mkdirs();
                     logManager.addEntry( new Date(), LogManager.MSG_WRN, "New storage directory " +
                             "initialized: " + storageDir );
+
                 }
                 fileCatalog = new FileCatalog( dbURI, storageDir );
                 logManager.addEntry( new Date(), LogManager.MSG_INFO,
                         "File catalog successfully initialized" );
             } else {
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, 
+                logManager.addEntry( new Date(), LogManager.MSG_ERR,
                         "Failed to load properties file: " + PROPS_FILE_NAME );
             }
         } catch( FileCatalogError e ) {
@@ -93,8 +93,13 @@ public class FileCatalogConnector {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "File catalog error: " +
                     e.getMessage() );
         }
-        return fileCatalog;
     }
+    /**
+     * Method initializes storage directory and connects to the database.
+     *
+     * @return Reference to FileCatalog object
+     */
+    public FileCatalog connect() { return fileCatalog; }
     /**
      * Method gets reference to FileCatalog object.
      *

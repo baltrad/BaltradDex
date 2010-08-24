@@ -71,7 +71,9 @@ Author     : szewczenko
                             </display:column>
                         </display:table>
                         <div id="table-footer">
-                            <a href="admin.htm">&#60&#60 System management</a>
+                            <form action="adminControl.htm">
+                                <input type="submit" value="OK" name="ok_button"/>
+                            </form>
                         </div>
                     </div>
                     <div id="left">

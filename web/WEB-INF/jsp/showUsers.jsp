@@ -82,7 +82,7 @@ Author     : szewczenko
                                 <input type="submit" value="Submit" name="submitButton"/>
                             </div>
                         </form>
-                        <form action="admin.htm">
+                        <form action="adminControl.htm">
                             <div id="table-footer-leftcol">
                                 <input type="submit" value="Back" name="cancelButton"/>
                             </div>

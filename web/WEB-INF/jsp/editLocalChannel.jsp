@@ -67,7 +67,7 @@ Author     : szewczenko
                             </display:column>
                         </display:table>
                         <div id="table-footer">
-                            <form action="admin.htm">
+                            <form action="adminControl.htm">
                                 <input type="submit" value="Back" name="admin_button"/>
                             </form>
                         </div>
