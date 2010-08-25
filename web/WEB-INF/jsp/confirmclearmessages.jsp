@@ -48,7 +48,7 @@ Author     : szewczenko
                         <div id="message-box">
                             ${operation_status}
                         </div>
-                        <form action="admin.htm">
+                        <form action="adminControls.htm">
                             <div id="table-footer-rightcol">
                                 <input type="submit" value="OK" name="submit_button"/>
                             </div>

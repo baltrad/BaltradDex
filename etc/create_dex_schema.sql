@@ -30,6 +30,7 @@ DROP TABLE IF EXISTS dex_roles;
 DROP TABLE IF EXISTS dex_messages;
 DROP TABLE IF EXISTS dex_channels;
 DROP TABLE IF EXISTS dex_node_connections;
+DROP TABLE IF EXISTS dex_node_configuration;
 
 DROP SEQUENCE IF EXISTS log_entry_id_seq;
 DROP SEQUENCE IF EXISTS channel_id_seq;
@@ -37,6 +38,7 @@ DROP SEQUENCE IF EXISTS user_id_seq;
 DROP SEQUENCE IF EXISTS subscription_id_seq;
 DROP SEQUENCE IF EXISTS delivery_register_id_seq;
 DROP SEQUENCE IF EXISTS node_connection_id_seq;
+DROP SEQUENCE IF EXISTS configuration_id_seq;
 
 -- create tables -----------------------------------------------------------------------------------
 
@@ -109,7 +111,7 @@ CREATE TABLE dex_subscriptions
     PRIMARY KEY (id)
 );
 
--- delivery_register_id_seq
+-- delivery_register_id_seq ------------------------------------------------------------------------
 CREATE SEQUENCE delivery_register_id_seq;
 -- dex_delivery_register ---------------------------------------------------------------------------
 CREATE TABLE dex_delivery_register
@@ -120,9 +122,9 @@ CREATE TABLE dex_delivery_register
     PRIMARY KEY (id)
 );
 
--- node id sequence
+-- node id sequence --------------------------------------------------------------------------------
 CREATE SEQUENCE node_connection_id_seq;
--- dex_nodes ---------------------------------------------------------------------------------------
+-- dex_node connections-----------------------------------------------------------------------------
 CREATE TABLE dex_node_connections
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('node_connection_id_seq'),
@@ -130,6 +132,22 @@ CREATE TABLE dex_node_connections
     address VARCHAR(64) NOT NULL,
     user_name VARCHAR(64) NOT NULL,
     password VARCHAR(32) NOT NULL,
+    PRIMARY KEY (id)
+);
+-- configuration id sequence -----------------------------------------------------------------------
+CREATE SEQUENCE configuration_id_seq;
+-- dex_node_configuration --------------------------------------------------------------------------
+CREATE TABLE dex_node_configuration
+(
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('configuration_id_seq'),
+    name VARCHAR(64) NOT NULL,
+    type VARCHAR(16) NOT NULL,
+    address VARCHAR(128) NOT NULL,
+    org_name VARCHAR(128) NOT NULL,
+    org_address VARCHAR(128) NOT NULL,
+    time_zone VARCHAR(16) NOT NULL,
+    temp_dir VARCHAR(32) NOT NULL,
+    email VARCHAR(32) NOT NULL,
     PRIMARY KEY (id)
 );
 ----------------------------------------------------------------------------------------------------

@@ -101,7 +101,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="mappings">
             <props>
-                <prop key="admin.htm">urlFilenameController</prop>
+                <prop key="adminControls.htm">urlFilenameController</prop>
+                <prop key="adminConfig.htm">saveConfigurationController</prop>
                 <prop key="clearmessages.htm">urlFilenameController</prop>
                 <prop key="confirmclearmessages.htm">clrMsgsController</prop>
                 <prop key="showregister.htm">showRegController</prop>
@@ -479,7 +480,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="saveUserController" class="eu.baltrad.dex.user.controller.SaveUserController">
         <property name="successView">
-            <value>redirect:admin.htm</value>
+            <value>redirect:adminControls.htm</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.user.model.User</value>
@@ -532,7 +533,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="saveChannelController" 
         class="eu.baltrad.dex.channel.controller.SaveChannelController">
         <property name="successView">
-            <value>redirect:admin.htm</value>
+            <value>redirect:adminControls.htm</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.channel.model.Channel</value>
@@ -643,8 +644,47 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         Application security manager.
     -->
     <bean name="applicationSecurityManager" class="eu.baltrad.dex.util.ApplicationSecurityManager">
-         <property name="userManager">
+        <property name="userManager">
             <ref bean="userManager"/>
+        </property>
+    </bean>
+    
+    <!-- Configuration manager -->
+
+    <bean name="configurationManager" class="eu.baltrad.dex.config.model.ConfigurationManager"/>
+
+    <!--
+        Add channel validator
+    -->
+    <bean name="saveConfigurationValidator"
+            class="eu.baltrad.dex.config.util.SaveConfigurationValidator">
+    </bean>
+
+    <!--
+        Save configuration controller.
+    -->
+    <bean name="saveConfigurationController"
+            class="eu.baltrad.dex.config.controller.SaveConfigurationController">
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+        <property name="successView">
+            <value>redirect:adminConfig.htm</value>
+        </property>
+        <property name="commandClass">
+            <value>eu.baltrad.dex.config.model.Configuration</value>
+        </property>
+        <property name="validator">
+            <ref bean="saveConfigurationValidator"/>
+        </property>
+        <property name="sessionForm">
+            <value>false</value>
+        </property>
+        <property name="formView">
+            <value>adminConfig</value>
+        </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
         </property>
     </bean>
 
@@ -737,7 +777,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- and the file catalog -->
     <bean id="fc" class="eu.baltrad.fc.FileCatalog">
   	    <constructor-arg value="${database.uri}" />
-  	    <constructor-arg value="${storage.dir}" />
+            <!--constructor-arg value="${storage.dir}" /-->
+            <constructor-arg value="/tmp" />
     </bean>
     
     <!-- and the abstraction of the catalog -->

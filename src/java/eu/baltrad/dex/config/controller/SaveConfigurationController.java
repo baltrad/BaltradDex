@@ -19,73 +19,79 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.user.controller;
+package eu.baltrad.dex.config.controller;
 
-import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.config.model.Configuration;
+import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.log.model.LogManager;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.validation.BindException;
 
 import org.hibernate.HibernateException;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Controller class registers new user in the system or modifies existing user account.
+ * Controller class creates new system configuration or modifies existing configuration.
  *
  * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
  * @version 0.1.6
  * @since 0.1.6
  */
-public class SaveUserController extends SimpleFormController {
+public class SaveConfigurationController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
-    public static final String USER_ID = "id";
+    public static final String NODE_TYPES = "node_types";
+    public static final String PRIMARY_NODE = "Primary";
+    public static final String BACKUP_NODE = "Backup";
     public static final String MSG = "message";
-    public static final String ROLES = "roles";
 //---------------------------------------------------------------------------------------- Variables
-    private UserManager userManager;
+    private ConfigurationManager configurationManager;
     private LogManager logManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Fetches User object with a given USER_ID passed as request parameter,
-     * or creates new User instance in case USER_ID is not set in request.
+     * Fetches Configuration object from the database.
      *
      * @param request HttpServletRequest
-     * @return User class object
+     * @return Configuration class object
      */
     @Override
     protected Object formBackingObject( HttpServletRequest request ) {
-        User user = null;
-        if( request.getParameter( USER_ID ) != null
-                && request.getParameter( USER_ID ).trim().length() > 0 ) {
-            user = userManager.getUserByID( Integer.parseInt( request.getParameter( USER_ID ) ) );
-        } else {
-            user = new User();
+        Configuration conf = null;
+        conf = configurationManager.getConfiguration( ConfigurationManager.CONF_REC_ID );
+        if( conf == null ) {
+            conf = new Configuration( "Short node name", PRIMARY_NODE,
+                    "Full node address", "Your organization name", "Your organization address",
+                    "Local time zone", "Temporary directory", "Node administrator's email" );
         }
-        return user;
+        return conf;
     }
     /**
-     * Returns HashMap holding list of all user roles defined in the system.
+     * Returns HashMap holding list of available node types.
      *
      * @param request HttpServletRequest
-     * @return HashMap object holding role names
+     * @return HashMap object holding node types
      * @throws Exception
      */
     @Override
     protected HashMap referenceData( HttpServletRequest request ) throws Exception {
         HashMap model = new HashMap();
-        model.put( ROLES, userManager.getAllRoles() );
+        List< String > nodeTypes = new ArrayList< String >();
+        nodeTypes.add( PRIMARY_NODE );
+        nodeTypes.add( BACKUP_NODE );
+        model.put( NODE_TYPES, nodeTypes );
         return model;
     }
     /**
-     * Saves User object.
+     * Saves configuration object.
      *
      * @param request HttpServletRequest
      * @param response HttpServletResponse
@@ -96,32 +102,33 @@ public class SaveUserController extends SimpleFormController {
     @Override
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors) {
-        User user = ( User )command;
+        Configuration conf = ( Configuration )command;
         try {
-            userManager.addUser( user );
+            configurationManager.saveConfiguration( conf );
             request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
-                "message.adduser.savesuccess" ) );
-            logManager.addEntry( new Date(), LogManager.MSG_WRN, "User account saved: " +
-                user.getName() );
+                "message.saveconf.savesuccess" ) );
+            logManager.addEntry( new Date(), LogManager.MSG_WRN, "System configuration saved" );
         } catch( HibernateException e ) {
             request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
-                "message.adduser.nameexists" ) );
-            errors.reject( "message.adduser.nameexists" );
+                "message.saveconf.savefail" ) );
+            errors.reject( "message.saveconf.savefail" ); 
         }
         return new ModelAndView( getSuccessView() );
     }
     /**
-     * Method gets reference to user manager object.
+     * Gets reference to ConfigurationManager object.
      *
-     * @return Reference to user manager object
+     * @return Reference to ConfigurationManager object
      */
-    public UserManager getUserManager() { return userManager; }
+    public ConfigurationManager getConfigurationManager() { return configurationManager; }
     /**
-     * Method sets reference to user manager object.
+     * Sets reference to ConfigurationManager object.
      *
-     * @param userManager Reference to user manager object
+     * @param configurationManager Reference to ConfigurationManager object.
      */
-    public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
+    public void setConfigurationManager( ConfigurationManager configurationManager ) {
+        this.configurationManager = configurationManager;
+    }
     /**
      * Method gets reference to LogManager class instance.
      *

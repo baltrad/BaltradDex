@@ -26,10 +26,14 @@ INSERT INTO dex_roles (id, role) VALUES (1, 'admin'), (2, 'operator'),
     (3, 'peer'), (4, 'user');
 
 -- insert default user admin into dex_users table --------------------------------------------------
-
 INSERT INTO dex_users (name, name_hash, role_name, password, node_address, factory, country, city,
     city_code, street, number, phone, email)
     VALUES ('admin', MD5('admin'), 'admin', MD5('baltrad'),
         'http://localhost:8084/BaltradDex/dispatch.htm', 'Company', 'Country', 'City', 'Code',
         'Street', 'Number', 'Phone', 'email address');
+-- create default node configuration ---------------------------------------------------------------
+INSERT INTO dex_node_configuration (name, type, address, org_name, org_address, time_zone, temp_dir,
+    email ) VALUES('Your node name', 'Primary', 'http://localhost:8084/BaltradDex/dispatch.htm',
+    'Your organization name', 'Your organization address', 'Time zone',
+    'Relative temporary directory', 'Node administrator email');
 

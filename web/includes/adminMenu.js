@@ -30,7 +30,7 @@ document.write( "<a href=\"showSubscriptions.htm\">Subscriptions</a>" );
 document.write( "<a href=\"log.htm\">Messages</a>" );
 document.write( "<a href=\"credits.htm\">Credits</a>" );
 document.write( "<br>" );
-document.write( "<a href=\"admin.htm\">Administration</a>" );
+document.write( "<a href=\"adminControls.htm\">Administration</a>" );
 document.write( "<br>" );
 document.write( "<a href=\"adaptors.htm\">Adaptors</a>" );
 document.write( "<a href=\"showroutes.htm\">Routes</a>" );

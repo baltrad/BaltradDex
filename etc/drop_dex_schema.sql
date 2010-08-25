@@ -30,6 +30,7 @@ DROP TABLE IF EXISTS dex_roles;
 DROP TABLE IF EXISTS dex_messages;
 DROP TABLE IF EXISTS dex_channels;
 DROP TABLE IF EXISTS dex_node_connections;
+DROP TABLE IF EXISTS dex_node_configuration;
 
 DROP SEQUENCE IF EXISTS log_entry_id_seq;
 DROP SEQUENCE IF EXISTS channel_id_seq;
@@ -37,4 +38,5 @@ DROP SEQUENCE IF EXISTS user_id_seq;
 DROP SEQUENCE IF EXISTS subscription_id_seq;
 DROP SEQUENCE IF EXISTS delivery_register_id_seq;
 DROP SEQUENCE IF EXISTS node_connection_id_seq;
+DROP SEQUENCE IF EXISTS configuration_id_seq;
 ----------------------------------------------------------------------------------------------------

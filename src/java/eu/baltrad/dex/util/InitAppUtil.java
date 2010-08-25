@@ -22,6 +22,10 @@
 package eu.baltrad.dex.util;
 
 import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.config.model.ConfigurationManager;
+import eu.baltrad.dex.config.model.Configuration;
+
+import org.hibernate.HibernateException;
 
 import java.io.File;
 import java.io.InputStream;
@@ -32,7 +36,6 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.util.Date;
-import java.util.Properties;
 
 /**
  * Utility class used to initialize application on startup.
@@ -43,33 +46,15 @@ import java.util.Properties;
  */
 public class InitAppUtil {
 //---------------------------------------------------------------------------------------- Constants
-    // Properties file name
-    private static final String PROPS_FILE_NAME = "dex.init.properties";
-    // Node address property
-    private static final String NODE_ADDRESS_PROP = "node.address";
-    // Node alias property
-    private static final String NODE_NAME_PROP = "node.name";
-    // Node type property key
-    private static final String NODE_TYPE_PROP = "node.type";
-    // Organization name property key
-    private static final String ORG_NAME_PROP = "node.organization.name";
-    // Organization address property key
-    private static final String ORG_ADDRESS_PROP = "node.organization.address";
-    // Timezone property key
-    private static final String TIME_ZONE_PROP = "node.timezone";
-    // Node administrator email property key
-    private static final String ADMIN_EMAIL_PROP = "node.admin.email";
-    // Local production directory property key
-    private static final String PROD_DIR_PROP = "local.production.dir";
-    // Temporary directory property key
-    private static final String TEMP_DIR_PROP = "local.temp.dir";
     // Temporary file prefix
     private final static String TEMP_FILE_PREFIX = "dex";
     // Temporary file suffix
     private final static String TEMP_FILE_SUFFIX = ".dat";
 //---------------------------------------------------------------------------------------- Variables
-    // Reference to LogManager object
+    // Initialize LogManager object
     private static LogManager logManager = new LogManager();
+    // Initialize Configuration manager
+    private ConfigurationManager configurationManager = new ConfigurationManager();
     // Node address
     private static String nodeAddress;
     // Node name
@@ -84,43 +69,33 @@ public class InitAppUtil {
     private static String timeZone;
     // Node administrator email
     private static String adminEmail;
-    // Directory storing data from local production system
-    private static String localProdDir;
-    // Temporary directory for local data
+    // Temporary directory
     private static String localTempDir;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor performs initialization task
      */
     public InitAppUtil() {
+        Configuration conf = null;
         try {
-            InputStream is = this.getClass().getResourceAsStream( PROPS_FILE_NAME );
-            Properties props = new Properties();
-            if( is != null ) {
-                props.load( is );
-                setNodeAddress( props.getProperty( NODE_ADDRESS_PROP ) );
-                setNodeName( props.getProperty( NODE_NAME_PROP ) );
-                setNodeAddress( props.getProperty( NODE_ADDRESS_PROP ) );
-                setNodeType( props.getProperty( NODE_TYPE_PROP ) );
-                setOrgName( props.getProperty( ORG_NAME_PROP ) );
-                setOrgAddress( props.getProperty( ORG_ADDRESS_PROP ) );
-                setTimeZone( props.getProperty( TIME_ZONE_PROP ) );
-                setAdminEmail( props.getProperty( ADMIN_EMAIL_PROP ) );
-                setLocalProdDir( ServletContextUtil.getServletContextPath() +
-                        props.getProperty( PROD_DIR_PROP ) );
-                setLocalTempDir( ServletContextUtil.getServletContextPath() +
-                        props.getProperty( TEMP_DIR_PROP ) );
-                // create temporary directory
-                makeDir( getLocalTempDir() );
-                logManager.addEntry( new Date(), LogManager.MSG_INFO,
-                        "Application successfully initialized" );
-            } else {
-                logManager.addEntry( new Date(), LogManager.MSG_ERR,
-                        "Failed to load properties file: " + PROPS_FILE_NAME );
-            }
-        } catch( IOException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
-                        "Failed to load properties file: " + PROPS_FILE_NAME );
+            conf = configurationManager.getConfiguration( ConfigurationManager.CONF_REC_ID );
+        } catch( HibernateException e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while reading configuration"
+                    + " from database: " + e.getMessage() );
+        }
+        if( conf != null ) {
+            setNodeName( conf.getNodeName() );
+            setNodeAddress( conf.getNodeAddress() );
+            setNodeType( conf.getNodeType() );
+            setOrgName( conf.getOrgName() );
+            setOrgAddress( conf.getOrgAddress() );
+            setTimeZone( conf.getTimeZone() );
+            setAdminEmail( conf.getAdminEmail() );
+            setLocalTempDir( ServletContextUtil.getServletContextPath() + conf.getTempDir() );
+            // create temporary directory
+            makeDir( getLocalTempDir() );
+            logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                    "Application successfully initialized" );
         }
     }
     /**
@@ -207,18 +182,6 @@ public class InitAppUtil {
      * @param _adminEmail Administrator email property to set
      */
     public void setAdminEmail( String _adminEmail ) { adminEmail = _adminEmail; }
-    /**
-     * Method gets local production directory name.
-     *
-     * @return The name of local production directory
-     */
-    public static String getLocalProdDir() { return localProdDir; }
-    /**
-     * Method sets local production directory name.
-     *
-     * @param _localProdDir The name of local production directory
-     */
-    public void setLocalProdDir( String _localProdDir ) { localProdDir = _localProdDir; }
     /**
      * Method gets local temporary directory name.
      *
