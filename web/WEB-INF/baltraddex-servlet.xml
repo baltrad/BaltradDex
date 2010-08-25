@@ -731,6 +731,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="timeoutfactory" class="eu.baltrad.beast.rules.timer.TimeoutTaskFactory"/>  
     <bean id="timeoutmanager" class="eu.baltrad.beast.rules.timer.TimeoutManager" autowire="byType"/>
 
+    <!-- Nice to have a cron-like scheduler -->
+    <bean id="beastscheduler" class="eu.baltrad.beast.scheduler.BeastScheduler" autowire="byType"/>
+
     <!-- and the file catalog -->
     <bean id="fc" class="eu.baltrad.fc.FileCatalog">
   	    <constructor-arg value="${database.uri}" />
@@ -747,4 +750,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="groovyRoutesController" class="eu.baltrad.beastui.web.controller.GroovyRoutesController" autowire="byType" />
     <bean id="compositeRoutesController" class="eu.baltrad.beastui.web.controller.CompositeRoutesController" autowire="byType" />
     <bean id="showRoutesController" class="eu.baltrad.beastui.web.controller.ShowRoutesController" autowire="byType" />
+    
+    <bean id="schedulerController" class="eu.baltrad.beastui.web.controller.SchedulerController" autowire="byType" />
+    
 </beans>

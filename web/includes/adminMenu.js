@@ -34,6 +34,7 @@ document.write( "<a href=\"admin.htm\">Administration</a>" );
 document.write( "<br>" );
 document.write( "<a href=\"adaptors.htm\">Adaptors</a>" );
 document.write( "<a href=\"showroutes.htm\">Routes</a>" );
+document.write( "<a href=\"showschedule.htm\">Schedule</a>" );
 document.write( "<br>" );
 document.write( "<a href=\"signout.htm\">Logout</a>" );
 document.write( "<br>" );

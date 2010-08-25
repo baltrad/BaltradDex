@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the baltrad dex library.  If not, see <http://www.gnu.org/licenses/>.
 -------------------------------------------------------------------
-Create adaptors
-@date 2010-03-23
+Create scheduled job
+@date 2010-08-23
 @author Anders Henja
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -78,46 +78,37 @@ Create adaptors
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Create adaptor</h1>
+                        <h1>Create scheduled job</h1>
                           <br/>
                           <h2>
-                            Create an adaptor. Depending on type of adaptor, different choices will
-                            be available. However, right now, you are only able to choose XMLRPC.
+                            Create a scheduled job.
                           </h2>
                           <div class="form-content">
-                            <form name="createAdaptorForm" action="createadaptor.htm">
+                            <form name="createScheduledJobForm" action="createscheduledjob.htm">
                               <%
-                                List<String> types = (List<String>)request.getAttribute("types");
-                                String name = (String)request.getAttribute("name");
-                                String type = (String)request.getAttribute("type");
-                                String uri = (String)request.getAttribute("uri");
-                                Long timeout = (Long)request.getAttribute("timeout");
-                                String timeoutstr = "5000";
+                                List<String> jobnames = (List<String>)request.getAttribute("jobnames");
+                                String expression = (String)request.getAttribute("expression");
+                                String jobname = (String)request.getAttribute("jobname");
 
-                                name = (name == null)?"":name;
-                                type = (type == null)?"":type;
-                                uri = (uri == null)?"":uri;
-                                if (timeout != null) {
-                                  timeoutstr = "" + timeout;
-                                }
+                                jobnames = (jobnames == null)?new ArrayList<String>():jobnames;
+                                expression = (expression == null)?"":expression;
+                                jobname = (jobname == null)?"":jobname;
                               %>
                               <ul>
-                                <li><span>Name:</span> <input size="50" type="text" name="name" value="<%=name%>"/></li>
-                                <li><span>Type:</span> <select name="type">
+                                <li><span>Expression:</span> <input size="50" type="text" name="expression" value="<%=expression%>"/></li>
+                                <li><span>Jobname:</span> <select name="jobname">
                                 <%
-                                  for (String adtype : types) {
+                                  for (String job : jobnames) {
                                     String selected = "";
-                                    if (adtype.equals(type)) {
+                                    if (job.equals(jobname)) {
                                       selected = "selected";
                                     }
                                 %>
-                                    <option value="<%=adtype%>" <%=selected%>><%=adtype%></option>
+                                    <option value="<%=job%>" <%=selected%>><%=job%></option>
                                 <%
                                   }
                                 %>
                                 </select></li>
-                                <li><span>URI:</span> <input size="50" type="text" name="uri" value="<%=uri%>"/></li>
-                                <li><span>Timeout:</span> <input size="10" type="text" name="timeout" value="<%=timeoutstr%>"/></li>
                               </ul>
                               <div id="table-footer">
                                 <input type="submit" value="Add" name="submitButton"/>
