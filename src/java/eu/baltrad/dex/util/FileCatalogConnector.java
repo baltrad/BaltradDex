@@ -99,7 +99,7 @@ public class FileCatalogConnector {
      *
      * @return Reference to FileCatalog object
      */
-    public FileCatalog connect() { return fileCatalog; }
+    public static FileCatalog connect() { return fileCatalog; }
     /**
      * Method gets reference to FileCatalog object.
      *

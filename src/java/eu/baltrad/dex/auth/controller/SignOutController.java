@@ -1,10 +1,23 @@
-/*
- * BaltradNode :: Radar data exchange and communication system
- * Remote Sensing Department, Institute of Meteorology and Water Management
- * Maciej Szewczykowski, 2009
- *
- * maciej.szewczykowski@imgw.pl
- */
+/***************************************************************************************************
+*
+* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+*
+* This file is part of the BaltradDex software.
+*
+* BaltradDex is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* BaltradDex is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+*
+***************************************************************************************************/
 
 package eu.baltrad.dex.auth.controller;
 
@@ -23,17 +36,14 @@ import java.util.Date;
 /**
  * Sign out controller class implementing basic user authentication functionality.
  *
- * @author szewczenko
+ * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
  * @version 1.0
  * @since 1.0
  */
 public class SignOutController implements Controller {
-
 //---------------------------------------------------------------------------------------- Variables
-    private ApplicationSecurityManager applicationSecurityManager;
     private LogManager logManager = new LogManager();
     private String successView;
-
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Method handles http request. Removes user attribute from session.
@@ -44,42 +54,24 @@ public class SignOutController implements Controller {
      * @throws java.lang.Exception
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response)
-                                                                                throws Exception {
-        User user = ( User )applicationSecurityManager.getUser( request );
-        applicationSecurityManager.removeUser( request );
-        logManager.addEntry( new Date(), logManager.MSG_INFO, "User " + user.getName()
-                                                                                + " signed out" );
+            throws Exception {
+        User user = ( User )ApplicationSecurityManager.getUser( request );
+        ApplicationSecurityManager.removeUser( request );
+        logManager.addEntry( new Date(), LogManager.MSG_INFO, "User " + user.getName()
+                + " signed out" );
         return new ModelAndView( getSuccessView() );
     }
-
     /**
-     * @return the applicationSecurityManager
+     * Gets reference to success view name.
+     *
+     * @return Reference to success view name
      */
-    public ApplicationSecurityManager getApplicationSecurityManager() {
-        return applicationSecurityManager;
-    }
-
+    public String getSuccessView() { return successView; }
     /**
-     * @param applicationSecurityManager the applicationSecurityManager to set
+     * Sets reference to success view name.
+     *
+     * @param successView Reference to success view name
      */
-    public void setApplicationSecurityManager( 
-                                        ApplicationSecurityManager applicationSecurityManager ) {
-        this.applicationSecurityManager = applicationSecurityManager;
-    }
-
-    /**
-     * @return the successView
-     */
-    public String getSuccessView() {
-        return successView;
-    }
-
-    /**
-     * @param successView the successView to set
-     */
-    public void setSuccessView(String successView) {
-        this.successView = successView;
-    }
-
+    public void setSuccessView( String successView ) { this.successView = successView; }
 }
 //--------------------------------------------------------------------------------------------------

@@ -21,10 +21,12 @@
 
 package eu.baltrad.dex.auth.util;
 
+import eu.baltrad.dex.util.ApplicationSecurityManager;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.model.UserManager;
+
 import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
-
-import eu.baltrad.dex.user.model.User;
 
 /**
  * Class implementing user authentication functionality.
@@ -34,15 +36,17 @@ import eu.baltrad.dex.user.model.User;
  * @since 1.0
  */
 public class SignInValidator implements Validator {
-//--------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------- Variables
+    private UserManager userManager = new UserManager();
+//------------------------------------------------------------------------------------------ Methods
     /**
-     * Method implemented by the Validator interface
+     * Declares classes supported by this validator.
      *
-     * @param clazz User class object
-     * @return True if classes are equal
+     * @param aClass Class instance of supported type
+     * @return True if class is supported, false otherwise
      */
-    public boolean supports( Class clazz ) {
-        return clazz.equals( User.class );
+    public boolean supports( Class aClass ) {
+        return User.class.equals( aClass );
     }
     /**
      * Method validating user object.
@@ -52,12 +56,15 @@ public class SignInValidator implements Validator {
      * @return True if validation is successful, false otherwise
      */
     public void validate( Object command, Errors errors ) {
-        User user = ( User )command;
-        if( user == null ) return;
-        String userName = user.getName().trim();
-        String password = user.getPassword().trim();
-        if( userName == null || password == null || userName.isEmpty() || password.isEmpty() ) {
-            errors.reject( "error.login.invalid" );
+        User formUser = ( User )command;
+        if( formUser == null ) return;
+        // Look for user in the database
+        User dbUser = userManager.getUserByName( formUser.getName() );
+        String userName = formUser.getName().trim();
+        String password = formUser.getPassword().trim();
+        if( userName == null || password == null || userName.isEmpty() || password.isEmpty() ||
+                ApplicationSecurityManager.authenticateFormUser( formUser, dbUser ) == false ) {
+            errors.rejectValue( "name", "error.login.invalid" );
         }
     }
 }

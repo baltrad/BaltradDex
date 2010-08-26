@@ -63,7 +63,6 @@ public class SubscriptionController extends MultiActionController {
     private static final String SELECTED_CHANNELS_KEY = "selected_channels";
     private static final String SELECTED_SUBSCRIPTIONS_KEY = "selected_subscriptions";
     private static final String REQUEST_STATUS_KEY = "request_status";
-    private static final String REMOVED_SUBSCRIPTIONS_KEY = "removed_subscriptions";
     // hibernate errors
     private static final String HIBERNATE_ERRORS_KEY = "hibernate_errors";
     // view names
@@ -78,7 +77,6 @@ public class SubscriptionController extends MultiActionController {
     private ChannelManager channelManager;
     private SubscriptionManager subscriptionManager;
     private FrameDispatcherController frameDispatcherController;
-    private ApplicationSecurityManager applicationSecurityManager;
     private LogManager logManager;
     // subscription change request
     private List< Subscription > changedSubscriptions;
@@ -278,23 +276,6 @@ public class SubscriptionController extends MultiActionController {
         }
         return new ModelAndView( SUBSCRIPTION_REMOVAL_STATUS_VIEW, HIBERNATE_ERRORS_KEY,
                 errorMsgs );
-    }
-    /**
-     * Method returns reference to ApplicationSecurityManager object.
-     *
-     * @return applicationSecurityManager Reference to ApplicationSecurityManager object
-     */
-    public ApplicationSecurityManager getApplicationSecurityManager() {
-        return applicationSecurityManager;
-    }
-    /**
-     * Method sets reference to ApplicationSecurityManager object.
-     *
-     * @param applicationSecurityManager Reference to ApplicationSecurityManager object
-     */
-    public void setApplicationSecurityManager(
-                                        ApplicationSecurityManager applicationSecurityManager ) {
-        this.applicationSecurityManager = applicationSecurityManager;
     }
     /**
      * Method returns reference to data channel manager object.
