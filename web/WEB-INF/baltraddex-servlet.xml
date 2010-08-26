@@ -141,39 +141,23 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         USER level role based http request interceptor.
     -->
-    <bean id="userHttpRequestInterceptor" class="eu.baltrad.dex.util.UserHttpRequestInterceptor">
-	<property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager" />
-	</property>
-    </bean>
+    <bean id="userHttpRequestInterceptor" class="eu.baltrad.dex.util.UserHttpRequestInterceptor"/>
 
     <!--
         PEER level role based http request interceptor.
     -->
-    <bean id="peerHttpRequestInterceptor" class="eu.baltrad.dex.util.PeerHttpRequestInterceptor">
-	<property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager" />
-	</property>
-    </bean>
+    <bean id="peerHttpRequestInterceptor" class="eu.baltrad.dex.util.PeerHttpRequestInterceptor"/>
 
     <!--
         OPERATOR level role based http request interceptor.
     -->
-    <bean id="operatorHttpRequestInterceptor"
-            class="eu.baltrad.dex.util.OperatorHttpRequestInterceptor">
-	<property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager" />
-	</property>
-    </bean>
+    <bean id="operatorHttpRequestInterceptor" 
+            class="eu.baltrad.dex.util.OperatorHttpRequestInterceptor"/>
 
     <!--
         ADMIN level role based http request interceptor.
     -->
-    <bean id="adminHttpRequestInterceptor" class="eu.baltrad.dex.util.AdminHttpRequestInterceptor">
-	<property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager" />
-	</property>
-    </bean>
+    <bean id="adminHttpRequestInterceptor" class="eu.baltrad.dex.util.AdminHttpRequestInterceptor"/>
 
     <!--
         View resolver.
@@ -228,8 +212,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="commandClass">
             <value>eu.baltrad.dex.user.model.User</value>
         </property>
-        <property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager"/>
+        <property name="validator">
+            <ref bean="signInValidator"/>
         </property>
     </bean>
 
@@ -240,9 +224,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         class="eu.baltrad.dex.auth.controller.SignOutController">
         <property name="successView">
             <value>redirect:signin.htm</value>
-        </property>
-        <property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager"/>
         </property>
      </bean>
 
@@ -287,9 +268,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="subscriptionController"
         class="eu.baltrad.dex.subscription.controller.SubscriptionController">
-        <property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager"/>
-        </property>
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
         </property>
@@ -332,9 +310,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         Data download controller.
     -->
     <bean name="downloadController" class="eu.baltrad.dex.channel.controller.DownloadController">
-        <property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager"/>
-        </property>
         <property name="successView">
             <value>dataFromChannel</value>
         </property>
@@ -522,9 +497,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="userManager">
             <ref bean="userManager" />
         </property>
-        <property name="applicationSecurityManager">
-            <ref bean="applicationSecurityManager"/>
-        </property>
     </bean>
 
     <!--
@@ -643,11 +615,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Application security manager.
     -->
-    <bean name="applicationSecurityManager" class="eu.baltrad.dex.util.ApplicationSecurityManager">
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-    </bean>
+    <bean name="applicationSecurityManager" class="eu.baltrad.dex.util.ApplicationSecurityManager"/>
     
     <!-- Configuration manager -->
 

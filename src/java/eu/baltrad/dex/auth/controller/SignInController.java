@@ -33,7 +33,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.util.Map;
 import java.util.Date;
 
 /**
@@ -44,74 +43,27 @@ import java.util.Date;
  * @since 1.0
  */
 public class SignInController extends SimpleFormController {
-
-//------------------------------------------------------------------------------------------- Fields
-    private ApplicationSecurityManager applicationSecurityManager;
+//---------------------------------------------------------------------------------------- Variables
     private UserManager userManager;
     private LogManager logManager = new LogManager();
-    private String viewName;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Constructor.
+     * Default constructor.
      */
     public SignInController() {
         logManager.addEntry( new Date(), LogManager.MSG_INFO,
-                                                        "Baltrad Data Exchange System started" );
+                "Baltrad Data Exchange System started" );
     }
-
     /**
-     * Method returns new user object. 
+     * Creates new user object.
      * 
      * @param request Http request
      * @return User object
      * @throws java.lang.Exception
      */
+    @Override
     protected Object formBackingObject( HttpServletRequest request ) throws Exception {
         return new User();
-    }
-
-    /**
-     * Method redirects user to the welcome page once authentication is completed.
-     *
-     * @param request Http request
-     * @param response Http response
-     * @param errors Form bind errors
-     * @param controlModel
-     * @return ModelAndView object
-     * @throws java.lang.Exception
-     */
-    public ModelAndView showForm( HttpServletRequest request, HttpServletResponse response,
-                                    BindException errors, Map controlModel ) throws Exception {
-        if( applicationSecurityManager.getUser( request ) != null )
-            return new ModelAndView( getViewName() );
-        return super.showForm( request, response, errors, controlModel );
-    }
-
-    /**
-     * Method looks up user and password in the database.
-     *
-     * @param request Http request
-     * @param command Command object
-     * @param errors Form bind errors
-     * @throws java.lang.Exception
-     */
-    public void onBindAndValidate( HttpServletRequest request, Object command,
-                                                        BindException errors) throws Exception {
-        if( errors.hasErrors() ) return;
-        User formUser = ( User )command;
-        User dbUser = ( User )command;
-        // Look for user in the database
-        dbUser = userManager.getUserByName( formUser.getName() );
-        if( applicationSecurityManager.authenticateFormUser( formUser, dbUser ) ) {
-            // Set user variable for this session
-            applicationSecurityManager.setUser( request, dbUser );
-            logManager.addEntry( new Date(), LogManager.MSG_INFO, "User "
-                                                                + dbUser.getName() + " signed in" );
-        } else {
-            logManager.addEntry( new Date(), LogManager.MSG_WRN,
-                                                                "User name or password invalid" );
-            errors.reject( "error.login.invalid" );
-        }
     }
     /**
      * Method executed upon form submission.
@@ -123,35 +75,20 @@ public class SignInController extends SimpleFormController {
      * @return ModelAndView object
      * @throws java.lang.Exception
      */
+    @Override
     public ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
-                                    Object command, BindException errors) throws Exception {
+                                    Object command, BindException errors ) throws Exception {
+        User formUser = ( User )command;
+        User dbUser = ( User )command;
+        // Look for user in the database
+        dbUser = userManager.getUserByName( formUser.getName() );
+        if( ApplicationSecurityManager.authenticateFormUser( formUser, dbUser ) ) {
+            // Set user variable for this session
+            ApplicationSecurityManager.setUser( request, dbUser );
+            logManager.addEntry( new Date(), LogManager.MSG_INFO, "User "
+                    + dbUser.getName() + " signed in" );
+        } 
         return new ModelAndView( getSuccessView() );
-    }
-    /**
-     * @return the viewName
-     */
-    public String getViewName() { return viewName; }
-
-    /**
-     * @param viewName the viewName to set
-     */
-    public void setViewName( String viewName ) { this.viewName = viewName; }
-    /**
-     * Method gets reference to ApplicationSecurityManager object.
-     *
-     * @return Reference to ApplicationSecurityManager object
-     */
-    public ApplicationSecurityManager getApplicationSecurityManager() {
-        return applicationSecurityManager;
-    }
-    /**
-     * Method sets reference to ApplicationSecurityManager object.
-     *
-     * @param applicationSecurityManager Reference to ApplicationSecurityManager object
-     */
-    public void setApplicationSecurityManager(
-                                    ApplicationSecurityManager applicationSecurityManager ) {
-        this.applicationSecurityManager = applicationSecurityManager;
     }
     /**
      * Method gets reference to user manager object.

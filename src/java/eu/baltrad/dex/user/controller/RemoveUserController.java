@@ -58,8 +58,6 @@ public class RemoveUserController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Variables
     // User manager
     private UserManager userManager;
-    // Application security manager
-    private ApplicationSecurityManager applicationSecurityManager;
     // Name resolver
     private PropertiesMethodNameResolver nameResolver;
 //------------------------------------------------------------------------------------------ Methods
@@ -72,10 +70,10 @@ public class RemoveUserController extends MultiActionController {
      */
     public ModelAndView showUsers( HttpServletRequest request, HttpServletResponse response ) {
         List users = userManager.getAllUsers();
-        User signedUser = ( User )applicationSecurityManager.getUser( request );
+        User signedUser = ( User )ApplicationSecurityManager.getUser( request );
         for( int i = 0; i < users.size(); i++ ) {
             User user = ( User )users.get( i );
-            if( applicationSecurityManager.authenticateSessionUser( signedUser, user ) ) {
+            if( ApplicationSecurityManager.authenticateSessionUser( signedUser, user ) ) {
                 users.remove( i );
             }
         }
@@ -100,10 +98,10 @@ public class RemoveUserController extends MultiActionController {
             modelAndView = new ModelAndView( SELECTED_USERS_VIEW, SELECTED_USERS_KEY, users );
         } else {
             List users = userManager.getAllUsers();
-            User signedUser = ( User )applicationSecurityManager.getUser( request );
+            User signedUser = ( User )ApplicationSecurityManager.getUser( request );
             for( int i = 0; i < users.size(); i++ ) {
                 User user = ( User )users.get( i );
-                if( applicationSecurityManager.authenticateSessionUser( signedUser, user ) ) {
+                if( ApplicationSecurityManager.authenticateSessionUser( signedUser, user ) ) {
                     users.remove( i );
                 }
             }
@@ -158,22 +156,5 @@ public class RemoveUserController extends MultiActionController {
      * @param userManager Reference to user manager object
      */
     public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
-    /**
-     * Method returns reference to ApplicationSecurityManager object.
-     *
-     * @return applicationSecurityManager Reference to ApplicationSecurityManager object
-     */
-    public ApplicationSecurityManager getApplicationSecurityManager() {
-        return applicationSecurityManager;
-    }
-    /**
-     * Method sets reference to ApplicationSecurityManager object.
-     *
-     * @param applicationSecurityManager Reference to ApplicationSecurityManager object
-     */
-    public void setApplicationSecurityManager(
-            ApplicationSecurityManager applicationSecurityManager ) {
-        this.applicationSecurityManager = applicationSecurityManager;
-    }
 }
 //--------------------------------------------------------------------------------------------------

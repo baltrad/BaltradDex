@@ -37,12 +37,6 @@ import javax.servlet.http.HttpServletResponse;
  * @since 1.0
  */
 public class AdminHttpRequestInterceptor extends HandlerInterceptorAdapter {
-//---------------------------------------------------------------------------------------- Constants
-    private static final String SIGNIN_PAGE_REDIRECT = "signin.htm";
-    private static final String WELCOME_PAGE_REDIRECT = "welcome.htm";
-//---------------------------------------------------------------------------------------- Variables
-    // Application security manager utility
-    private ApplicationSecurityManager applicationSecurityManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Method handles http request.
@@ -53,34 +47,18 @@ public class AdminHttpRequestInterceptor extends HandlerInterceptorAdapter {
      * @return True if user object is not null, false otherwise
      * @throws java.lang.Exception
      */
+    @Override
     public boolean preHandle( HttpServletRequest request, HttpServletResponse response,
                                                                 Object handler ) throws Exception {
-        if( applicationSecurityManager.getUser( request ) == null ) {
-            response.sendRedirect( SIGNIN_PAGE_REDIRECT );
+        if( ApplicationSecurityManager.getUser( request ) == null ) {
+            response.sendRedirect( ApplicationSecurityManager.SIGNIN_PAGE_REDIRECT );
             return false;
-        } else if ( !applicationSecurityManager.getUserRole( request ).equals( User.ROLE_ADMIN ) ) {
-            response.sendRedirect( WELCOME_PAGE_REDIRECT );
+        } else if ( !ApplicationSecurityManager.getUserRole( request ).equals( User.ROLE_ADMIN ) ) {
+            response.sendRedirect( ApplicationSecurityManager.WELCOME_PAGE_REDIRECT );
             return false;
         } else {
             return true;
         }
-    }
-    /**
-     * Method returns reference to application security manager object.
-     *
-     * @return Reference to application security manager object
-     */
-    public ApplicationSecurityManager getApplicationSecurityManager() {
-        return applicationSecurityManager;
-    }
-    /**
-     * Method sets reference to application security manager object.
-     *
-     * @param applicationSecurityManager Reference to application security manager object.
-     */
-    public void setApplicationSecurityManager(
-                                ApplicationSecurityManager applicationSecurityManager ) {
-        this.applicationSecurityManager = applicationSecurityManager;
     }
 }
 //--------------------------------------------------------------------------------------------------

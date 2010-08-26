@@ -33,12 +33,14 @@ import javax.servlet.http.HttpServletRequest;
  * @since 1.0
  */
 public class ApplicationSecurityManager {
-
 //---------------------------------------------------------------------------------------- Constants
     // Session user attribute
     private static final String USER = "user";
+    // Redirect views
+    public static final String SIGNIN_PAGE_REDIRECT = "signin.htm";
+    public static final String WELCOME_PAGE_REDIRECT = "welcome.htm";
 //---------------------------------------------------------------------------------------- Variables
-    private UserManager userManager;
+    private static UserManager userManager = new UserManager();
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Method authenticates user based on credentials provided in the login form.
@@ -48,8 +50,7 @@ public class ApplicationSecurityManager {
      * @param dbUser User in the database
      * @return True if users are the same, false otherwise
      */
-    public boolean authenticateFormUser( User formUser, User dbUser ) {
-
+    public static boolean authenticateFormUser( User formUser, User dbUser ) {
         if( formUser == null || dbUser == null ) {
             return false;
         } else {
@@ -73,7 +74,7 @@ public class ApplicationSecurityManager {
      * @param dbUser User in the database
      * @return True if users are the same, false otherwise
      */
-    public boolean authenticateSessionUser( User sessionUser, User dbUser ) {
+    public static boolean authenticateSessionUser( User sessionUser, User dbUser ) {
 
         if( sessionUser == null || dbUser == null ) {
             return false;
@@ -96,7 +97,7 @@ public class ApplicationSecurityManager {
      * @param request Http request
      * @return User attribute
      */
-    public Object getUser( HttpServletRequest request ) {
+    public static Object getUser( HttpServletRequest request ) {
         return request.getSession( true ).getAttribute( USER );
     }
     /**
@@ -105,7 +106,7 @@ public class ApplicationSecurityManager {
      * @param request Http request
      * @param user User object
      */
-    public void setUser( HttpServletRequest request, Object user ) {
+    public static void setUser( HttpServletRequest request, Object user ) {
         request.getSession( true ).setAttribute( USER, user );
     }
     /**
@@ -115,7 +116,7 @@ public class ApplicationSecurityManager {
      * @param request HTTP request method
      * @return User role name
      */
-    public String getUserRole( HttpServletRequest request ) {
+    public static String getUserRole( HttpServletRequest request ) {
         User sessionUser = ( User )request.getSession( true ).getAttribute( USER );
         User dbUser = userManager.getUserByName( sessionUser.getName() );
         return dbUser.getRoleName();
@@ -125,20 +126,8 @@ public class ApplicationSecurityManager {
      *
      * @param request Http request
      */
-    public void removeUser( HttpServletRequest request ) {
+    public static void removeUser( HttpServletRequest request ) {
         request.getSession( true ).removeAttribute( USER );
     }
-    /**
-     * Method gets reference to user manager object.
-     *
-     * @return Reference to user manager object
-     */
-    public UserManager getUserManager() { return userManager; }
-    /**
-     * Method sets reference to user manager object.
-     *
-     * @param userManager Reference to user manager object
-     */
-    public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
 }
 //--------------------------------------------------------------------------------------------------

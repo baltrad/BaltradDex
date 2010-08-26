@@ -56,7 +56,7 @@ Author     : szewczenko
                             </div>
                             <form method="post" action="signin.htm">
                                 <div id ="signin-form">
-                                    <%@ include file="/WEB-INF/jsp/includemessages.jsp"%>
+                                    <%@ include file="/WEB-INF/jsp/includeMessages.jsp" %>
                                     <div id="signin-form-leftcol">
                                         <div id="signin-form-elem">
                                             User name:
@@ -67,20 +67,10 @@ Author     : szewczenko
                                     </div>
                                     <div id="signin-form-rightcol">
                                         <div id="signin-form-elem">
-                                            <spring:bind path="command.name">
-                                                <input type="text"
-                                                    name='<c:out value="${status.expression}"/>'
-                                                    value='<c:out value="${status.value}"/>'
-                                                    size="20" />
-                                            </spring:bind>
+                                            <form:input path="command.name"/>
                                         </div>
                                         <div id="signin-form-elem">
-                                            <spring:bind path="command.password">
-                                                <input type="password"
-                                                    name='<c:out value="${status.expression}"/>'
-                                                    value='<c:out value="${status.value}"/>'
-                                                    size="20" />
-                                            </spring:bind>
+                                            <form:password path="command.password"/>
                                         </div>
                                     </div>
                                 </div>
