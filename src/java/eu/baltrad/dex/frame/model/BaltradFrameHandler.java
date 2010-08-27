@@ -114,6 +114,10 @@ public class BaltradFrameHandler {
     public static final String BF_MSG_CHANNEL_LISTING_REQUEST = "channel_list_request";
     // channel list object identifier
     public static final String BF_MSG_CHANNELS_LIST = "channels_list";
+    // channel synchronization request
+    public static final String BF_MSG_CHANNEL_SYNCHRO_REQUEST = "channel_synchronization_request";
+    // channel synchronization response
+    public static final String BF_MSG_CHANNEL_SYNCHRO_RESPONSE = "channel_synchronization_response";
     // channel subscription request
     public static final String BF_MSG_CHANNEL_SUBSCRIPTION_REQUEST = "channel_subscription_request";
     // channel subscription request

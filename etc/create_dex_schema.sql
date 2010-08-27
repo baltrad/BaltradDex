@@ -108,6 +108,7 @@ CREATE TABLE dex_subscriptions
     operator_name VARCHAR(64),
     type VARCHAR(16),
     selected BOOLEAN DEFAULT false,
+    synkronized BOOLEAN DEFAULT false,
     PRIMARY KEY (id)
 );
 

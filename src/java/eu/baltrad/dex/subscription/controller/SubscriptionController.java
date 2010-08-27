@@ -24,7 +24,6 @@ package eu.baltrad.dex.subscription.controller;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.channel.model.ChannelManager;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
-import eu.baltrad.dex.util.ApplicationSecurityManager;
 import eu.baltrad.dex.core.controller.FrameDispatcherController;
 import eu.baltrad.dex.frame.model.BaltradFrame;
 import eu.baltrad.dex.frame.model.BaltradFrameHandler;
@@ -40,9 +39,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.IOException;
 
 import java.util.Date;
 import java.util.List;
@@ -92,8 +88,40 @@ public class SubscriptionController extends MultiActionController {
      */
     public ModelAndView showSubscriptions( HttpServletRequest request,
             HttpServletResponse response ) {
-        List subscriptions = subscriptionManager.getSubscriptionsByType(
+        List< Subscription > subscriptions = subscriptionManager.getSubscriptionsByType(
                 Subscription.LOCAL_SUBSCRIPTION );
+
+        // synchronize local and remote subscriptions
+        for( int i = 0; i < subscriptions.size(); i++ ) {
+            File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getLocalTempDir() ) );
+            InitAppUtil.writeObjectToStream( subscriptions.get( i ), tempFile );
+
+            BaltradFrameHandler bfHandler = new BaltradFrameHandler(
+                    subscriptions.get( i ).getNodeAddress() );
+
+            String hdfStr = bfHandler.createObjectHdr( BaltradFrameHandler.BF_MIME_MULTIPART,
+                    InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
+                    BaltradFrameHandler.BF_MSG_CHANNEL_SYNCHRO_REQUEST, 
+                    tempFile.getAbsolutePath() );
+            // 
+            BaltradFrame baltradFrame = new BaltradFrame( hdfStr, tempFile.getAbsolutePath() );
+            // handle the frame
+            frameDispatcherController.setBfHandler( bfHandler );
+            frameDispatcherController.doPost( request, response, baltradFrame );
+
+            if( frameDispatcherController.getSynkronizedSubscription() != null ) {
+                // check if current subscription matches sunchronized subscription
+                if( subscriptionManager.compareSubscriptions( subscriptions.get( i ),
+                        frameDispatcherController.getSynkronizedSubscription() ) ) {
+                    subscriptions.get( i ).setSynkronized(
+                        frameDispatcherController.getSynkronizedSubscription().getSynkronized() );
+                    frameDispatcherController.resetSynkronizedSubscription();
+                }
+
+            }
+            // delete temporary file
+            InitAppUtil.deleteFile( tempFile );
+        }
         return new ModelAndView( SHOW_SUBSCRIPTIONS_VIEW, SHOW_SUBSCRIPTIONS_KEY, subscriptions );
     }
     /**
@@ -169,12 +197,7 @@ public class SubscriptionController extends MultiActionController {
         for( int i = 0; i < getChangedSubscriptions().size(); i++ ) {
             try {
                 File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getLocalTempDir() ) );
-                ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream( tempFile ) );
-                try {
-                    oos.writeObject( getChangedSubscriptions().get( i ) );
-                } finally {
-                    oos.close();
-                }
+                InitAppUtil.writeObjectToStream( getChangedSubscriptions().get( i ), tempFile );
                 // prepare the frame
                 BaltradFrameHandler bfHandler = new BaltradFrameHandler(
                         getChangedSubscriptions().get( i ).getNodeAddress() );
@@ -194,11 +217,6 @@ public class SubscriptionController extends MultiActionController {
                         getChangedSubscriptions().get( i ).getChannelName(),
                         Subscription.LOCAL_SUBSCRIPTION,
                         getChangedSubscriptions().get( i ).getSelected() );
-            } catch( IOException e ) {
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while processing " +
-                    "subscription change request for " +
-                    getChangedSubscriptions().get( i ).getOperatorName() + ", channel " +
-                    getChangedSubscriptions().get( i ).getChannelName() + ": " + e.getMessage() );
             } catch( Exception e ) {
                 logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while processing " +
                     "subscription change request for " +

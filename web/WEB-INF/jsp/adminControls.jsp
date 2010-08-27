@@ -58,20 +58,7 @@ Author     : szewczenko
                                 </div>
                                 <table>
                                     <tr class="even">
-                                        <td class="left">Data delivery register</td>
-                                        <td class="right">
-                                            <a href="showregister.htm">Show register</a>
-                                            <a href="clearregister.htm">Clear</a>
-                                        </td>
-                                    </tr>
-                                    <tr class="odd">
-                                        <td class="left">Log messages</td>
-                                        <td class="right">
-                                            <a href="clearmessages.htm">Clear messages</a>
-                                        </td>
-                                    </tr>
-                                    <tr class="even">
-                                        <td class="left">Users</td>
+                                        <td class="left">Users' accounts</td>
                                         <td class="right">
                                             <a href="editUser.htm">Edit</a>
                                             <a href="saveUser.htm">Add</a>
@@ -79,7 +66,7 @@ Author     : szewczenko
                                         </td>
                                     </tr>
                                     <tr class="odd">
-                                        <td class="left">Local data channels</td>
+                                        <td class="left">Local channels</td>
                                         <td class="right">
                                             <a href="editLocalChannel.htm">Edit</a>
                                             <a href="saveLocalChannel.htm">Add</a>
@@ -87,9 +74,22 @@ Author     : szewczenko
                                         </td>
                                     </tr>
                                     <tr class="even">
-                                        <td class="left">Subscribed data channels</td>
+                                        <td class="left">Subscribed channels</td>
                                         <td class="right">
                                             <a href="selectRemoveSubscriptions.htm">Remove</a>
+                                        </td>
+                                    </tr>
+                                    <tr class="odd">
+                                        <td class="left">Data delivery register</td>
+                                        <td class="right">
+                                            <a href="showregister.htm">Show</a>
+                                            <a href="clearregister.htm">Delete</a>
+                                        </td>
+                                    </tr>
+                                    <tr class="even">
+                                        <td class="left">Messages</td>
+                                        <td class="right">
+                                            <a href="clearmessages.htm">Delete</a>
                                         </td>
                                     </tr>
                                     <tr class="odd">

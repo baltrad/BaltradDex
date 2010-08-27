@@ -42,6 +42,7 @@ public class Subscription implements Serializable, Comparable< Subscription > {
     private String operatorName;
     private String type;
     private boolean selected;
+    private boolean synkronized;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Default constructor.
@@ -68,15 +69,17 @@ public class Subscription implements Serializable, Comparable< Subscription > {
      * @param operatorName Operator name
      * @param type Subscription type
      * @param selected Selection toggle
+     * @param synkronized Synchronization toggle
      */
     public Subscription( String userName, String channelName, String nodeAddress,
-            String operatorName, String type, boolean selected ) {
+            String operatorName, String type, boolean selected, boolean synkronized ) {
         this.userName = userName;
         this.channelName = channelName;
         this.nodeAddress = nodeAddress;
         this.operatorName = operatorName;
         this.type = type;
         this.selected = selected;
+        this.synkronized = synkronized;
     }
     /**
      * Method gets subscription id.
@@ -162,6 +165,18 @@ public class Subscription implements Serializable, Comparable< Subscription > {
      * @param selected Channel selection toggle state
      */
     public void setSelected( boolean selected ) { this.selected = selected; }
+    /**
+     * Method gets subscription synchronization toggle state.
+     *
+     * @return Subscription synchronization toggle state
+     */
+    public boolean getSynkronized() { return synkronized; }
+    /**
+     * Method sets subscription synchronization toggle state.
+     *
+     * @param synkronized Subscription synchronization toggle state
+     */
+    public void setSynkronized( boolean synkronized ) { this.synkronized = synkronized; }
     /**
      * Method implementing comparable interface. Sorts subscription objects based
      * on channel name.

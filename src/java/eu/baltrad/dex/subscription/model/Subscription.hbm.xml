@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <!--
 Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
 
@@ -35,5 +36,6 @@ Author     : szewczenko
     <property column="operator_name" name="operatorName"/>
     <property column="type" name="type"/>
     <property column="selected" name="selected"/>
+    <property column="synkronized" name="synkronized"/>
   </class>
 </hibernate-mapping>

@@ -67,7 +67,7 @@ Author     : szewczenko
                                 <display:table name="subscriptions" id="subscription" defaultsort="1"
                                     requestURI="selectRemoveSubscriptions.htm" cellpadding="0"
                                     cellspacing="2" export="false" class="tableborder">
-                                    <display:column sortable="true" title="Channel"
+                                    <display:column sortable="true" title="Channel name"
                                         sortProperty="channelName" paramId="channelName"
                                         paramProperty="channelName"
                                         class="tdcenter" value="${subscription.channelName}">
@@ -85,13 +85,15 @@ Author     : szewczenko
                                     </display:column>
                                     <c:choose>
                                         <c:when test="${subscription.selected == true}">
-                                            <display:column sortable="false" title="Status"
-                                                class="tdcenter-green" value="Online">
+                                            <display:column sortable="false" 
+                                                title="Subscription" class="tdcenter-green"
+                                                value="Active">
                                             </display:column>
                                         </c:when>
                                         <c:otherwise>
-                                            <display:column sortable="false" title="Status"
-                                                class="tdcenter-red" value="Offline">
+                                            <display:column sortable="false" 
+                                                title="Subscription"
+                                                class="tdcenter-red" value="Inactive">
                                             </display:column>
                                         </c:otherwise>
                                     </c:choose>

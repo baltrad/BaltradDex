@@ -155,6 +155,8 @@ public class RemoteChannelController extends MultiActionController {
             // handle the frame
             frameDispatcherController.setBfHandler( bfHandler );
             frameDispatcherController.doPost( request, response, baltradFrame );
+            // delete temporary file
+            InitAppUtil.deleteFile( tempFile );
 
             // check subscription operation status
             setSubscribedChannels( frameDispatcherController.getConfirmedSubscriptions() );
@@ -172,7 +174,7 @@ public class RemoteChannelController extends MultiActionController {
                     Subscription subs = new Subscription(
                         frameDispatcherController.getLocalUserName(),
                         channel.getChannelName(), getSenderNodeAddress(), getSenderNodeName(),
-                        Subscription.LOCAL_SUBSCRIPTION, true );
+                        Subscription.LOCAL_SUBSCRIPTION, true, true );
                     subscriptionManager.addSubscription( subs );
                 }
             }

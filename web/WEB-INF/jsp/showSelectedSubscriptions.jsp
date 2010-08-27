@@ -82,13 +82,13 @@ Author     : szewczenko
                                                 <c:when test="${subscription.selected == true}">
                                                     <display:column sortable="false" 
                                                         title="Request status" class="tdcenter-green"
-                                                        value="Online">
+                                                        value="Activate">
                                                     </display:column>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <display:column sortable="false" 
                                                         title="Request status" class="tdcenter-red"
-                                                        value="Offline">
+                                                        value="Deactivate">
                                                     </display:column>
                                                 </c:otherwise>
                                             </c:choose>

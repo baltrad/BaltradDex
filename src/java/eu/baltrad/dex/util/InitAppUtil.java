@@ -54,7 +54,7 @@ public class InitAppUtil {
     // Initialize LogManager object
     private static LogManager logManager = new LogManager();
     // Initialize Configuration manager
-    private ConfigurationManager configurationManager = new ConfigurationManager();
+    private static ConfigurationManager configurationManager = new ConfigurationManager();
     // Node address
     private static String nodeAddress;
     // Node name
@@ -75,7 +75,11 @@ public class InitAppUtil {
     /**
      * Constructor performs initialization task
      */
-    public InitAppUtil() {
+    public InitAppUtil() { initApp(); }
+    /**
+     * Method initializes application by reading configuration from database.
+     */
+    public static void initApp() {
         Configuration conf = null;
         try {
             conf = configurationManager.getConfiguration( ConfigurationManager.CONF_REC_ID );
@@ -109,7 +113,7 @@ public class InitAppUtil {
      *
      * @param _nodeAddress Node address property to set
      */
-    public void setNodeAddress( String _nodeAddress ) { nodeAddress = _nodeAddress; }
+    public static void setNodeAddress( String _nodeAddress ) { nodeAddress = _nodeAddress; }
     /**
      * Gets node name property.
      *
@@ -121,7 +125,7 @@ public class InitAppUtil {
      *
      * @param _nodeName Node name property to set
      */
-    public void setNodeName( String _nodeName ) { nodeName = _nodeName; }
+    public static void setNodeName( String _nodeName ) { nodeName = _nodeName; }
     /**
      * Gets node type property.
      *
@@ -133,7 +137,7 @@ public class InitAppUtil {
      *
      * @param _nodeType Node type property to set
      */
-    public void setNodeType( String _nodeType ) { nodeType = _nodeType; }
+    public static void setNodeType( String _nodeType ) { nodeType = _nodeType; }
     /**
      * Gets organization name property.
      *
@@ -145,7 +149,7 @@ public class InitAppUtil {
      *
      * @param _orgName Organization name property to set
      */
-    public void setOrgName( String _orgName ) { orgName = _orgName; }
+    public static void setOrgName( String _orgName ) { orgName = _orgName; }
     /**
      * Gets organization address property.
      *
@@ -157,7 +161,7 @@ public class InitAppUtil {
      *
      * @param _orgAddress Organization address property to set
      */
-    public void setOrgAddress( String _orgAddress ) { orgAddress = _orgAddress; }
+    public static void setOrgAddress( String _orgAddress ) { orgAddress = _orgAddress; }
     /**
      * Gets time zone property.
      *
@@ -169,7 +173,7 @@ public class InitAppUtil {
      *
      * @param _timeZone Time zone property to set
      */
-    public void setTimeZone( String _timeZone ) { timeZone = _timeZone; }
+    public static void setTimeZone( String _timeZone ) { timeZone = _timeZone; }
     /**
      * Gets administrator email property.
      *
@@ -181,7 +185,7 @@ public class InitAppUtil {
      *
      * @param _adminEmail Administrator email property to set
      */
-    public void setAdminEmail( String _adminEmail ) { adminEmail = _adminEmail; }
+    public static void setAdminEmail( String _adminEmail ) { adminEmail = _adminEmail; }
     /**
      * Method gets local temporary directory name.
      *
@@ -193,7 +197,7 @@ public class InitAppUtil {
      *
      * @param _localTempDir The name of local temporary directory
      */
-    public void setLocalTempDir( String _localTempDir ) { localTempDir = _localTempDir; }
+    public static void setLocalTempDir( String _localTempDir ) { localTempDir = _localTempDir; }
     /**
      * Method extracts relative file name from absolute file path string.
      *
@@ -283,7 +287,7 @@ public class InitAppUtil {
         }
     }
     /**
-     * Method deletes file
+     * Deletes file.
      *
      * @param filePath Absolute file path
      */
@@ -294,6 +298,17 @@ public class InitAppUtil {
         } catch( Exception e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while deleting file: \n"
                     + e.getMessage() );
+        }
+    }
+    /**
+     * Deletes file.
+     * 
+     * @param f File object
+     */
+    public static void deleteFile( File f ) {
+        if( !f.delete() ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while deleting file: "
+                    + f.getName() );
         }
     }
     /**

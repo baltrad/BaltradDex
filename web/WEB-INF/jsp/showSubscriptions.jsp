@@ -69,34 +69,44 @@ Author     : szewczenko
                                 <display:table name="subscriptions" id="subscription" defaultsort="1"
                                     requestURI="showSubscriptions.htm" cellpadding="0" cellspacing="2"
                                     export="false" class="tableborder">
-                                    <display:column sortable="true" title="Channel"
+                                    <display:column sortable="true" title="Channel name"
                                         href="dataFromChannel.htm" sortProperty="channelName"
                                         paramId="channelName" paramProperty="channelName"
                                         class="tdcenter" value="${subscription.channelName}">
                                     </display:column>
-
+                                     <c:choose>
+                                        <c:when test="${subscription.synkronized == true}">
+                                            <display:column sortable="false"
+                                                title="Channel status" class="tdcheck">
+                                                <img src="includes/images/green_bulb.png"
+                                                     alt="green_bulb"/>
+                                            </display:column>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <display:column sortable="false"
+                                                title="Channel status" class="tdcheck">
+                                                <img src="includes/images/red_bulb.png"
+                                                     alt="red_bulb"/>
+                                            </display:column>
+                                        </c:otherwise>
+                                    </c:choose>
                                     <display:column sortable="true" title="Operator"
                                         sortProperty="operatorName" paramId=""
                                         paramProperty="operatorName" class="tdcenter"
                                         value="${subscription.operatorName}">
                                     </display:column>
-                                    <display:column sortable="true" title="Node address"
-                                        sortProperty="nodeAddress" paramId="" paramProperty="nodeAddress"
-                                        class="tdcenter" value="${subscription.nodeAddress}">
-                                    </display:column>
                                     <c:choose>
                                         <c:when test="${subscription.selected == true}">
-                                            <display:column sortable="false" title="Status"
-                                                class="tdcheck"> <input type="checkbox"
-                                                name="selected_channels"
-                                                value="${subscription.channelName}"
-                                                checked/>
+                                            <display:column sortable="false" 
+                                                title="Subscription" class="tdcheck">
+                                                <input type="checkbox" name="selected_channels"
+                                                value="${subscription.channelName}" checked/>
                                             </display:column>
                                         </c:when>
                                         <c:otherwise>
-                                            <display:column sortable="false" title="Status"
-                                                class="tdcheck"> <input type="checkbox"
-                                                name="selected_channels"
+                                            <display:column sortable="false"
+                                                title="Subscription" class="tdcheck">
+                                                <input type="checkbox" name="selected_channels"
                                                 value="${subscription.channelName}"/>
                                             </display:column>
                                         </c:otherwise>

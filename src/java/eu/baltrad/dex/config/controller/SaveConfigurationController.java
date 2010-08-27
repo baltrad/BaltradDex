@@ -23,11 +23,11 @@ package eu.baltrad.dex.config.controller;
 
 import eu.baltrad.dex.config.model.Configuration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
+import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.log.model.LogManager;
 
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.validation.BindException;
 
 import org.hibernate.HibernateException;
@@ -107,6 +107,8 @@ public class SaveConfigurationController extends SimpleFormController {
             configurationManager.saveConfiguration( conf );
             request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
                 "message.saveconf.savesuccess" ) );
+            // read modified configuration
+            InitAppUtil.initApp();
             logManager.addEntry( new Date(), LogManager.MSG_WRN, "System configuration saved" );
         } catch( HibernateException e ) {
             request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(

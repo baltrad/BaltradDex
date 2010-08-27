@@ -82,6 +82,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private List channelListing;
     // confirmed subscription list
     private List confirmedSubscriptions;
+    // synchronized subscription
+    private Subscription synkronizedSubscription;
     // remote node name
     private String remoteNodeName;
     // remote node address
@@ -158,6 +160,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
                                 // process the frame
                                 bfHandler.handleBF( baltradFrame );
+                                // delete temporary file
+                                InitAppUtil.deleteFile( tempFile );
                             } else {
                                 logManager.addEntry( new Date(), LogManager.MSG_WRN,
                                     "Incoming frame could not be authenticated" );
@@ -198,6 +202,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             setRemoteNodeName( bfHandler.getSenderNodeName( header ) );
                             // set remote node address
                             setRemoteNodeAddress( bfHandler.getSenderNodeAddress( header ) );
+                            // delete temporary file
+                            InitAppUtil.deleteFile( tempFile );
                         }
 
                         // incoming channel subscription request
@@ -220,6 +226,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // retrieve subscription list
                             List subscribedChannels = ( List )InitAppUtil.readObjectFromStream(
                                     tempFile );
+                            // delete temporary file
+                            InitAppUtil.deleteFile( tempFile );
                             // identify user by name
                             User user = userManager.getUserByName( bfHandler.getUserName( header ) );
                             // return channel list sent back to user to confirm
@@ -267,7 +275,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             BaltradFrame baltradFrame =
                                     new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
                             // process the frame
-                            bfHandler.handleBF( baltradFrame );                            
+                            bfHandler.handleBF( baltradFrame );
+                            // delete temporary file
+                            InitAppUtil.deleteFile( tempFile );
                         }
 
                         // incoming channel subscription confirmation
@@ -290,6 +300,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             List confirmedChannels = ( List )InitAppUtil.readObjectFromStream(
                                     tempFile );
                             setConfirmedSubscriptions( confirmedChannels );
+                            // delete temporary file
+                            InitAppUtil.deleteFile( tempFile );
                         }
 
                         // incoming channel subscription change request
@@ -311,6 +323,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // retrieve subscription object
                             Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
                                     tempFile );
+                            // delete temporary file
+                            InitAppUtil.deleteFile( tempFile );
                             // create new subscription object
                             Subscription s = new Subscription( subs.getUserName(),
                                     subs.getChannelName(), Subscription.REMOTE_SUBSCRIPTION );
@@ -363,6 +377,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
                             // process the frame
                             bfHandler.handleBF( baltradFrame );
+                            // delete temporary file
+                            InitAppUtil.deleteFile( tempFile );
                         }
 
                         // incoming channel subscription change confirmation - success
@@ -378,6 +394,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // retrieve subscription object
                             Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
                                     tempFile );
+                            // delete temporary file
+                            InitAppUtil.deleteFile( tempFile );
                             String selected = subs.getSelected() ? "Subscribed" : "Unsubscribed";
                             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                 "Remote node " + bfHandler.getSenderNodeName( header )
@@ -398,11 +416,79 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // retrieve subscription object
                             Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
                                     tempFile );
+                            // delete temporary file
+                            InitAppUtil.deleteFile( tempFile );
                             String selected = subs.getSelected() ? "Subscribed" : "Unsubscribed";
                             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                 "Remote node " + bfHandler.getSenderNodeName( header )  +
                                 " failed to change your subscription status for "
                                 + subs.getChannelName() + " to: " + selected );
+                        }
+
+                        // channel synchronization request
+
+                        if( bfHandler.getMessageText( header ).equals(
+                                BaltradFrameHandler.BF_MSG_CHANNEL_SYNCHRO_REQUEST ) ) {
+                            FileItemStream fileItem = iterator.next();
+                            InputStream fileStream = fileItem.openStream();
+                            // write subscription object to temporary file
+                            File tempFile = InitAppUtil.createTempFile(
+                                        new File( InitAppUtil.getLocalTempDir() ) );
+                            InitAppUtil.saveFile( fileStream, tempFile );
+                            // retrieve subscription object from stream
+                            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
+                                    tempFile );
+                            // delete temporary file
+                            InitAppUtil.deleteFile( tempFile );
+                            // check if the subscribed channel is available
+                            try {
+                                Channel channel = channelManager.getChannel( subs.getChannelName() );
+                                if( channel == null ) {
+                                    subs.setSynkronized( false );
+                                }
+                            } catch( NullPointerException e ) {
+                                System.err.println( "Failed to synchronize subscribed channel: "
+                                        + subs.getChannelName() );
+                            }
+
+                            // send subscription back to requesting node
+
+                            // write list to temporary file
+                            tempFile = InitAppUtil.createTempFile(
+                                    new File( InitAppUtil.getLocalTempDir() ) );
+                            // write object to the stream
+                            InitAppUtil.writeObjectToStream( subs, tempFile );
+                            // set the return address
+                            bfHandler.setUrl( bfHandler.getSenderNodeAddress( header ) );
+                            // prepare the return message header
+                            String retHeader = bfHandler.createObjectHdr(
+                                    BaltradFrameHandler.BF_MIME_MULTIPART,
+                                    InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
+                                    BaltradFrameHandler.BF_MSG_CHANNEL_SYNCHRO_RESPONSE,
+                                    tempFile.getAbsolutePath() );
+                            BaltradFrame baltradFrame =
+                                    new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
+                            // process the frame
+                            bfHandler.handleBF( baltradFrame );
+                            // delete temporary file
+                            InitAppUtil.deleteFile( tempFile );
+                        }
+                        // channel synchronization response
+
+                        if( bfHandler.getMessageText( header ).equals(
+                                BaltradFrameHandler.BF_MSG_CHANNEL_SYNCHRO_RESPONSE ) ) {
+                            FileItemStream fileItem = iterator.next();
+                            InputStream fileStream = fileItem.openStream();
+                            // write subscription object to temporary file
+                            File tempFile = InitAppUtil.createTempFile(
+                                        new File( InitAppUtil.getLocalTempDir() ) );
+                            InitAppUtil.saveFile( fileStream, tempFile );
+                            // retrieve subscription object from stream
+                            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
+                                    tempFile );
+                            // delete temporary file
+                            InitAppUtil.deleteFile( tempFile );
+                            setSynkronizedSubscription( subs );
                         }
                     }
 
@@ -421,7 +507,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         InitAppUtil.saveFile( fileStream, tempFile );
                         // save data in the catalogue
                         if( fileCatalog == null ) {
-                            fileCatalog = getFileCatalogConnector().connect();
+                            fileCatalog = FileCatalogConnector.connect();
                         }
                         eu.baltrad.fc.oh5.File cFile = fileCatalog.catalog(
                                 tempFile.getAbsolutePath() );
@@ -606,6 +692,24 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public void resetLocalUserName() { this.localUserName = null; }
     /**
+     * Gets synchronized subscription.
+     *
+     * @return Synchronized subscription
+     */
+    public Subscription getSynkronizedSubscription() { return synkronizedSubscription; }
+    /**
+     * Sets synchronized subscription.
+     *
+     * @param synkronizedSubscription Synchronized subscription
+     */
+    public void setSynkronizedSubscription( Subscription synkronizedSubscription ) {
+        this.synkronizedSubscription = synkronizedSubscription;
+    }
+    /**
+     * Resets synchronized subscription object.
+     */
+    public void resetSynkronizedSubscription() { this.synkronizedSubscription = null; }
+    /**
      * Gets reference to BaltradFrameHandler object.
      *
      * @return Reference to BaltradFrameHandler object
@@ -669,20 +773,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param logManager Reference to LogManager class instance
      */
     public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
-    /**
-     * Gets reference to FileCatalogConnector object.
-     *
-     * @return Reference to FileCatalogConnector object
-     */
-    public FileCatalogConnector getFileCatalogConnector() { return fileCatalogConnector; }
-    /**
-     * Sets reference to FileCatalogConnector object.
-     *
-     * @param fileCatalogConnector Reference to FileCatalogConnector object
-     */
-    public void setFileCatalogConnector( FileCatalogConnector fileCatalogConnector ) {
-        this.fileCatalogConnector = fileCatalogConnector;
-    }
     /**
      * Method gets reference to DeliveryRegisterManager class instance.
      *

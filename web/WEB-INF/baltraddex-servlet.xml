@@ -366,9 +366,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="deliveryRegisterManager">
             <ref bean="deliveryRegisterManager"/>
         </property>
-        <property name="fileCatalogConnector">
-            <ref bean="fileCatalogConnector"/>
-        </property>
     </bean>
 
     <!-- Frame handler -->
