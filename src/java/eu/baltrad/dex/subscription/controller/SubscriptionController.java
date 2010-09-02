@@ -99,9 +99,9 @@ public class SubscriptionController extends MultiActionController {
             BaltradFrameHandler bfHandler = new BaltradFrameHandler(
                     subscriptions.get( i ).getNodeAddress() );
 
-            String hdfStr = bfHandler.createObjectHdr( BaltradFrameHandler.BF_MIME_MULTIPART,
+            String hdfStr = bfHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
                     InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                    BaltradFrameHandler.BF_MSG_CHANNEL_SYNCHRO_REQUEST, 
+                    BaltradFrameHandler.CHNL_SYNC_RQST,
                     tempFile.getAbsolutePath() );
             // 
             BaltradFrame baltradFrame = new BaltradFrame( hdfStr, tempFile.getAbsolutePath() );
@@ -201,10 +201,10 @@ public class SubscriptionController extends MultiActionController {
                 // prepare the frame
                 BaltradFrameHandler bfHandler = new BaltradFrameHandler(
                         getChangedSubscriptions().get( i ).getNodeAddress() );
-                String hdrStr = bfHandler.createObjectHdr( BaltradFrameHandler.BF_MIME_MULTIPART,
+                String hdrStr = bfHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
                     InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
                     getChangedSubscriptions().get( i ).getUserName(),
-                    BaltradFrameHandler.BF_MSG_SUBSCRIPTION_CHANGE_REQUEST,
+                    BaltradFrameHandler.SBN_CHNG_RQST,
                     tempFile.getAbsolutePath() );
                 BaltradFrame baltradFrame = new BaltradFrame( hdrStr, tempFile.getAbsolutePath() );
                 // handle the frame

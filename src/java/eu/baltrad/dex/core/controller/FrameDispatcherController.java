@@ -116,7 +116,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             ServletFileUpload upload = new ServletFileUpload();
             FileItemIterator iterator = upload.getItemIterator( request );
             FileItemStream hdrItem = iterator.next();
-             if( hdrItem.getFieldName().equals( BaltradFrame.BF_XML_PART ) ) {
+             if( hdrItem.getFieldName().equals( BaltradFrame.XML_PART ) ) {
                 InputStream hdrStream = hdrItem.openStream();
                 bfHandler = new BaltradFrameHandler();
                 // Handle form field / message XML header
@@ -127,12 +127,12 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     // process message frame
 
                     if( bfHandler.getContentType( header ).equals(
-                            BaltradFrameHandler.BF_MSG) ) {
+                            BaltradFrameHandler.MSG) ) {
 
                         // channel listing request - has to be authenticated
 
                         if( bfHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.BF_MSG_CHANNEL_LISTING_REQUEST ) ) {
+                                BaltradFrameHandler.CHNL_LIST_RQST ) ) {
                             if( authenticateFrame( header ) ) {
                                 logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                     "Channel listing request received from user " +
@@ -152,9 +152,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 bfHandler.setUrl( bfHandler.getSenderNodeAddress( header ) );
                                 // prepare the return message header
                                 String retHeader = bfHandler.createObjectHdr(
-                                        BaltradFrameHandler.BF_MIME_MULTIPART,
+                                        BaltradFrameHandler.MIME_MULTIPART,
                                         InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                                        BaltradFrameHandler.BF_MSG_CHANNELS_LIST,
+                                        BaltradFrameHandler.CHNL_LIST,
                                         tempFile.getAbsolutePath() );
                                 BaltradFrame baltradFrame =
                                         new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
@@ -176,12 +176,12 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     // process object frame
 
                     if( bfHandler.getContentType( header ).equals(
-                            BaltradFrameHandler.BF_OBJECT ) ) {
+                            BaltradFrameHandler.OBJECT ) ) {
 
                         // incoming channel listing
 
                         if( bfHandler.getMessageText( header ).equals(
-                            BaltradFrameHandler.BF_MSG_CHANNELS_LIST ) ) {
+                            BaltradFrameHandler.CHNL_LIST ) ) {
                             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                 "Channel listing received from " + bfHandler.getSenderNodeName(
                                 header ) );
@@ -209,7 +209,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         // incoming channel subscription request
 
                         if( bfHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.BF_MSG_CHANNEL_SUBSCRIPTION_REQUEST ) ) {
+                                BaltradFrameHandler.CHNL_SBN_RQST ) ) {
                             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                 "Channel subscription request received from " +
                                 bfHandler.getSenderNodeName( header ) );
@@ -268,9 +268,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             bfHandler.setUrl( bfHandler.getSenderNodeAddress( header ) );
                             // prepare the return message header
                             String retHeader = bfHandler.createObjectHdr(
-                                    BaltradFrameHandler.BF_MIME_MULTIPART,
+                                    BaltradFrameHandler.MIME_MULTIPART,
                                     InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                                    BaltradFrameHandler.BF_MSG_CHANNEL_SUBSCRIPTION_CONFIRMATION,
+                                    BaltradFrameHandler.CHNL_SBN_CFN,
                                     tempFile.getAbsolutePath() );
                             BaltradFrame baltradFrame =
                                     new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
@@ -283,7 +283,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         // incoming channel subscription confirmation
 
                         if( bfHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.BF_MSG_CHANNEL_SUBSCRIPTION_CONFIRMATION ) ) {
+                                BaltradFrameHandler.CHNL_SBN_CFN ) ) {
                             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                 "Channel subscription confirmation received from " +
                                 bfHandler.getSenderNodeName( header ) );
@@ -307,7 +307,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         // incoming channel subscription change request
 
                         if( bfHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.BF_MSG_SUBSCRIPTION_CHANGE_REQUEST ) ) {
+                                BaltradFrameHandler.SBN_CHNG_RQST ) ) {
                             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                 "Channel subscription change request received from " +
                                 bfHandler.getSenderNodeName( header ) );
@@ -358,17 +358,17 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             String retHeader = null;
                             if( confirmedSub != null ) {
                                 retHeader = bfHandler.createObjectHdr(
-                                    BaltradFrameHandler.BF_MIME_MULTIPART,
+                                    BaltradFrameHandler.MIME_MULTIPART,
                                     InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                                    BaltradFrameHandler.BF_MSG_SUBSCRIPTION_CHANGE_SUCCESS,
+                                    BaltradFrameHandler.SBN_CHNG_OK,
                                     tempFile.getAbsolutePath() );
                                 // write object to the stream
                                 InitAppUtil.writeObjectToStream( confirmedSub, tempFile );
                             } else {
                                 retHeader = bfHandler.createMsgHdr(
-                                    BaltradFrameHandler.BF_MIME_MULTIPART,
+                                    BaltradFrameHandler.MIME_MULTIPART,
                                     InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                                    BaltradFrameHandler.BF_MSG_SUBSCRIPTION_CHANGE_FAILURE,
+                                    BaltradFrameHandler.SBN_CHNG_FAIL,
                                     tempFile.getAbsolutePath() );
                                 // write object to the stream
                                 InitAppUtil.writeObjectToStream( subs, tempFile );
@@ -384,7 +384,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         // incoming channel subscription change confirmation - success
 
                         if( bfHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.BF_MSG_SUBSCRIPTION_CHANGE_SUCCESS ) ) {
+                                BaltradFrameHandler.SBN_CHNG_OK ) ) {
                             FileItemStream fileItem = iterator.next();
                             InputStream fileStream = fileItem.openStream();
                             // write subscription change request to temporary file
@@ -406,7 +406,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         // incoming channel subscription change confirmation - failure
 
                         if( bfHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.BF_MSG_SUBSCRIPTION_CHANGE_FAILURE ) ) {
+                                BaltradFrameHandler.SBN_CHNG_FAIL ) ) {
                             FileItemStream fileItem = iterator.next();
                             InputStream fileStream = fileItem.openStream();
                             // write subscription change request to temporary file
@@ -428,7 +428,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         // channel synchronization request
 
                         if( bfHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.BF_MSG_CHANNEL_SYNCHRO_REQUEST ) ) {
+                                BaltradFrameHandler.CHNL_SYNC_RQST ) ) {
                             FileItemStream fileItem = iterator.next();
                             InputStream fileStream = fileItem.openStream();
                             // write subscription object to temporary file
@@ -462,9 +462,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             bfHandler.setUrl( bfHandler.getSenderNodeAddress( header ) );
                             // prepare the return message header
                             String retHeader = bfHandler.createObjectHdr(
-                                    BaltradFrameHandler.BF_MIME_MULTIPART,
+                                    BaltradFrameHandler.MIME_MULTIPART,
                                     InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                                    BaltradFrameHandler.BF_MSG_CHANNEL_SYNCHRO_RESPONSE,
+                                    BaltradFrameHandler.CHNL_SYNC_RSPNS,
                                     tempFile.getAbsolutePath() );
                             BaltradFrame baltradFrame =
                                     new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
@@ -476,7 +476,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         // channel synchronization response
 
                         if( bfHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.BF_MSG_CHANNEL_SYNCHRO_RESPONSE ) ) {
+                                BaltradFrameHandler.CHNL_SYNC_RSPNS ) ) {
                             FileItemStream fileItem = iterator.next();
                             InputStream fileStream = fileItem.openStream();
                             // write subscription object to temporary file
@@ -495,7 +495,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     // incoming data frame
 
                     if( bfHandler.getContentType( header ).equals(
-                            BaltradFrameHandler.BF_FILE ) ) {
+                            BaltradFrameHandler.FILE ) ) {
                         logManager.addEntry( new Date(), LogManager.MSG_INFO,
                             "New data frame received from " + bfHandler.getSenderNodeName( header )
                             + ": " + bfHandler.getFileName( header ) );
@@ -535,7 +535,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         // create data frame
                                         bfHandler.setUrl( user.getNodeAddress() );
                                         String retHeader = bfHandler.createDataHdr(
-                                            BaltradFrameHandler.BF_MIME_MULTIPART,
+                                            BaltradFrameHandler.MIME_MULTIPART,
                                             InitAppUtil.getNodeName(),
                                             remoteSubs.get( i ).getChannelName(), cFile.name() );
                                         BaltradFrame baltradFrame = new BaltradFrame( retHeader,

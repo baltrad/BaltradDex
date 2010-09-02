@@ -146,10 +146,10 @@ public class RemoteChannelController extends MultiActionController {
             InitAppUtil.writeObjectToStream( getSelectedChannels(), tempFile );
             // prepare frame
             BaltradFrameHandler bfHandler = new BaltradFrameHandler( getSenderNodeAddress() );
-            String hdrStr = bfHandler.createObjectHdr( BaltradFrameHandler.BF_MIME_MULTIPART,
+            String hdrStr = bfHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
                 InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
                 frameDispatcherController.getLocalUserName(),
-                BaltradFrameHandler.BF_MSG_CHANNEL_SUBSCRIPTION_REQUEST,
+                BaltradFrameHandler.CHNL_SBN_RQST,
                 tempFile.getAbsolutePath() );
             BaltradFrame baltradFrame = new BaltradFrame( hdrStr, tempFile.getAbsolutePath() );
             // handle the frame

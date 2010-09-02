@@ -101,7 +101,7 @@ public class SaveConfigurationController extends SimpleFormController {
      */
     @Override
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
-            Object command, BindException errors) {
+            Object command, BindException errors ) {
         Configuration conf = ( Configuration )command;
         try {
             configurationManager.saveConfiguration( conf );

@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Data channel subscription page
-Created on : Jun 24, 2010, 8:55:52 AM
+Document   : Node connection management page
+Created on : Aug 31, 2010, 12:52:37 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
@@ -29,19 +29,19 @@ Author     : szewczenko
 
 <%@ page import="java.util.List" %>
 <%
-    // Check if list of available subscriptions is not empty
-    List avSubs = ( List )request.getAttribute( "subscriptions" );
-    if( avSubs == null || avSubs.size() <= 0 ) {
-        request.getSession().setAttribute( "av_subs_status", 0 );
+    // Check if list of available node connections is not empty
+    List avConns = ( List )request.getAttribute( "node_connections" );
+    if( avConns == null || avConns.size() <= 0 ) {
+        request.getSession().setAttribute( "av_node_cons_status", 0 );
     } else {
-        request.getSession().setAttribute( "av_subs_status", 1 );
+        request.getSession().setAttribute( "av_node_cons_status", 1 );
     }
 %>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Manage subscribed channels</title>
+    <title>Manage node connections</title>
 </head>
 
 <body>
@@ -54,53 +54,39 @@ Author     : szewczenko
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Manage subscribed channels</h1>
+                        <h1>Manage node connections</h1>
                         <br/>
                         <c:choose>
-                            <c:when test="${av_subs_status == 1}">
+                            <c:when test="${av_node_cons_status == 1}">
                             <h2>
                                 <p>
-                                Click on a check box to select subscribed channel for removal.
+                                Click on a check box to select node connection for removal.
                                 </p>
                             </h2>
-                            <form action="showRemovedSubscriptions.htm">
-                                <display:table name="subscriptions" id="subscription" defaultsort="1"
-                                    requestURI="selectRemoveSubscriptions.htm" cellpadding="0"
-                                    cellspacing="2" export="false" class="tableborder">
-                                    <display:column sortable="true" title="Channel name"
-                                        sortProperty="channelName" paramId="channelName"
-                                        paramProperty="channelName"
-                                        class="tdcenter" value="${subscription.channelName}">
-                                    </display:column>
-
-                                    <display:column sortable="true" title="Operator"
-                                        sortProperty="operatorName" paramId=""
-                                        paramProperty="operatorName" class="tdcenter"
-                                        value="${subscription.operatorName}">
+                            <form action="showSelectedNodeConnections.htm">
+                                <display:table name="node_connections" id="connection"
+                                    defaultsort="1" requestURI="showNodeConnections.htm"
+                                    cellpadding="0" cellspacing="2" export="false"
+                                    class="tableborder">
+                                    <display:column sortable="true" title="Connection name"
+                                        sortProperty="connectionName" paramId="connectionName"
+                                        paramProperty="connectionName"
+                                        class="tdcenter" value="${connection.connectionName}">
                                     </display:column>
                                     <display:column sortable="true" title="Node address"
-                                        sortProperty="nodeAddress" paramId="" 
+                                        sortProperty="nodeAddress" paramId="nodeAddress"
                                         paramProperty="nodeAddress" class="tdcenter"
-                                        value="${subscription.nodeAddress}">
+                                        value="${connection.nodeAddress}">
                                     </display:column>
-                                    <c:choose>
-                                        <c:when test="${subscription.selected == true}">
-                                            <display:column sortable="false" 
-                                                title="Subscription" class="tdcenter-green"
-                                                value="Active">
-                                            </display:column>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <display:column sortable="false" 
-                                                title="Subscription"
-                                                class="tdcenter-red" value="Inactive">
-                                            </display:column>
-                                        </c:otherwise>
-                                    </c:choose>
+                                    <display:column sortable="true" title="User name"
+                                        sortProperty="userName" paramId="userName"
+                                        paramProperty="userName" class="tdcenter"
+                                        value="${connection.userName}">
+                                    </display:column>
                                     <display:column sortable="false" title="Remove"
                                         class="tdcheck"> <input type="checkbox"
-                                        name="selected_channels"
-                                        value="${subscription.channelName}"/>
+                                        name="selected_node_connections"
+                                        value="${connection.id}"/>
                                     </display:column>
                                 </display:table>
                             <div id="table-footer">
@@ -110,7 +96,7 @@ Author     : szewczenko
                             </c:when>
                             <c:otherwise>
                                 <div id="message-box">
-                                    List of subscribed channels is currently empty.
+                                    List of node connections is currently empty.
                                 </div>
                                 <div id="table-footer">
                                     <form action="adminControls.htm">

@@ -26,6 +26,7 @@ import eu.baltrad.dex.util.HibernateUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
+import org.hibernate.Query;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class NodeConnectionManager {
      *
      * @return List containing all registered node connections
      */
-    public List getAllConnections() {
+    public List getConnections() {
         List connections = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
@@ -126,7 +127,7 @@ public class NodeConnectionManager {
     public void removeConnection( int id ) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
-	    session.beginTransaction();
+	session.beginTransaction();
         try {
             session.delete( session.load( NodeConnection.class, new Integer( id ) ) );
             session.getTransaction().commit();
@@ -134,6 +135,26 @@ public class NodeConnectionManager {
             session.getTransaction().rollback();
             throw e;
         }
+    }
+    /**
+     * Removes all node connections.
+     *
+     * @return Number of removed records
+     */
+    public int removeConnections() {
+        int res = 0;
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+	session.beginTransaction();
+        try {
+            Query query = session.createQuery( "DELETE FROM NodeConnection" );
+            res = query.executeUpdate();
+            session.getTransaction().commit();
+        } catch( HibernateException e ) {
+            session.getTransaction().rollback();
+            throw e;
+        }
+        return res;
     }
 }
 //--------------------------------------------------------------------------------------------------

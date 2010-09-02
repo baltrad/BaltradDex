@@ -76,7 +76,7 @@ Author     : szewczenko
                                     <tr class="even">
                                         <td class="left">Subscribed channels</td>
                                         <td class="right">
-                                            <a href="selectRemoveSubscriptions.htm">Remove</a>
+                                            <a href="selectRemoveSubscriptions.htm">Show</a>
                                         </td>
                                     </tr>
                                     <tr class="odd">
@@ -95,7 +95,7 @@ Author     : szewczenko
                                     <tr class="odd">
                                         <td class="left">Node connections</td>
                                         <td class="right">
-                                            <a href="removeNodeConnection.htm">Remove</a>
+                                            <a href="showNodeConnections.htm">Show</a>
                                         </td>
                                     </tr>
                                 </table>

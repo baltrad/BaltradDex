@@ -67,7 +67,8 @@ public class RemoveChannelController extends MultiActionController {
      * @param response Http response
      * @return Models and view containing list of all available channels
      */
-    public ModelAndView showLocalChannels( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView showLocalChannels( HttpServletRequest request,
+            HttpServletResponse response ) {
         List channels = channelManager.getChannels();
         return new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
     }

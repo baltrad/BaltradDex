@@ -45,12 +45,12 @@ public class BaltradFrame extends MultipartEntity {
     // XML element / document encoding
     private static final String XML_ENCODING = "UTF-8";
     // XML elements / available MIME types
-    public static final String BF_MIME_MULTIPART = "multipart/form-data";
+    public static final String MIME_MULTIPART = "multipart/form-data";
     // Character set
-    private static final Charset BF_CHARSET = Charset.forName( XML_ENCODING );
+    private static final Charset CHARSET = Charset.forName( XML_ENCODING );
     // Multipart message parts identifiers
-    public static final String BF_XML_PART = "<baltrad_frame_xml/>";
-    public static final String BF_FILE_PART = "<baltrad_frame_file/>";
+    public static final String XML_PART = "<bf_xml/>";
+    public static final String FILE_PART = "<bf_file/>";
 //---------------------------------------------------------------------------------------- Variables
     // Log manager
     private LogManager logManager = new LogManager();
@@ -68,14 +68,14 @@ public class BaltradFrame extends MultipartEntity {
     public BaltradFrame( String xmlHdrStr, String absFilePath ) {
         try {
             // Create XML string header using given encoding
-            StringBody sbXMLHeader = new StringBody( xmlHdrStr, BF_MIME_MULTIPART, BF_CHARSET );
+            StringBody sbXMLHeader = new StringBody( xmlHdrStr, MIME_MULTIPART, CHARSET );
             // Create file content body
             File f = new File( absFilePath );
-            ContentBody cbFile = new FileBody( f, BF_MIME_MULTIPART );
+            ContentBody cbFile = new FileBody( f, MIME_MULTIPART );
             // Add XML header string
-            this.addPart( BF_XML_PART, sbXMLHeader );
+            this.addPart( XML_PART, sbXMLHeader );
             // Add file body content
-            this.addPart( BF_FILE_PART, cbFile );
+            this.addPart( FILE_PART, cbFile );
         } catch( UnsupportedEncodingException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Unsupported encoding " +
                     "type: " + e.getMessage() );
@@ -89,9 +89,9 @@ public class BaltradFrame extends MultipartEntity {
     public BaltradFrame( String xmlHdrStr ) {
         try {
             // Create XML string header using given encoding
-            StringBody sbXMLHeader = new StringBody( xmlHdrStr, BF_MIME_MULTIPART, BF_CHARSET );
+            StringBody sbXMLHeader = new StringBody( xmlHdrStr, MIME_MULTIPART, CHARSET );
             // Add XML header string
-            this.addPart( BF_XML_PART, sbXMLHeader );
+            this.addPart( XML_PART, sbXMLHeader );
         } catch( UnsupportedEncodingException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Unsupported encoding " +
                     "type: " + e.getMessage() );

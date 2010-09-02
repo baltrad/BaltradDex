@@ -121,6 +121,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="selectRemoveSubscriptions.htm">subscriptionController</prop>
                 <prop key="showRemovedSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSubscriptionRemovalStatus.htm">subscriptionController</prop>
+                <prop key="showNodeConnections.htm">nodeConnectionController</prop>
+                <prop key="showSelectedNodeConnections.htm">nodeConnectionController</prop>
+                <prop key="showRemovedNodeConnections.htm">nodeConnectionController</prop>
             </props>
         </property>
     </bean>
@@ -654,6 +657,19 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!--
+        Node connection controller.
+    -->
+    <bean name="nodeConnectionController"
+        class="eu.baltrad.dex.core.controller.NodeConnectionController">
+        <property name="nodeConnectionManager">
+            <ref bean="nodeConnectionManager" />
+        </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
+
+    <!--
         Message resources.
     -->
     <bean id="messageSource"
@@ -737,7 +753,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="timeoutmanager" class="eu.baltrad.beast.rules.timer.TimeoutManager" autowire="byType"/>
 
     <!-- Nice to have a cron-like scheduler -->
-    <bean id="beastscheduler" class="eu.baltrad.beast.scheduler.BeastScheduler" autowire="byType"/>
+    <!--bean id="beastscheduler" class="eu.baltrad.beast.scheduler.BeastScheduler" autowire="byType"/-->
 
     <!-- and the file catalog -->
     <bean id="fc" class="eu.baltrad.fc.FileCatalog">

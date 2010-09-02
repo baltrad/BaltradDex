@@ -71,7 +71,7 @@ public class ConnectToNodeController extends SimpleFormController {
     @Override
     protected HashMap referenceData( HttpServletRequest request ) throws Exception {
         HashMap model = new HashMap();
-        model.put( NODE_LIST, nodeConnectionManager.getAllConnections() );
+        model.put( NODE_LIST, nodeConnectionManager.getConnections() );
         return model;
     }
     /**
@@ -100,12 +100,12 @@ public class ConnectToNodeController extends SimpleFormController {
         // prepare channel request frame holding user name, password and node address
         // this frame will be validated and authenticated upon reception
 
-        String hdrStr = bfHandler.createMsgHdr( BaltradFrameHandler.BF_MIME_MULTIPART,
+        String hdrStr = bfHandler.createMsgHdr( BaltradFrameHandler.MIME_MULTIPART,
                 MessageDigestUtil.createHash( nodeConn.getUserName() ),
                 MessageDigestUtil.createHash( nodeConn.getPassword() ),
                 InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                BaltradFrameHandler.BF_MSG_REQUEST,
-                BaltradFrameHandler.BF_MSG_CHANNEL_LISTING_REQUEST );
+                BaltradFrameHandler.REQUEST,
+                BaltradFrameHandler.CHNL_LIST_RQST );
         // set local user name in frame dispatcher
         frameDispatcherController.setLocalUserName( nodeConn.getUserName() );
         BaltradFrame baltradFrame = new BaltradFrame( hdrStr );

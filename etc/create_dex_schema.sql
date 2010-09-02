@@ -129,7 +129,7 @@ CREATE SEQUENCE node_connection_id_seq;
 CREATE TABLE dex_node_connections
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('node_connection_id_seq'),
-    name VARCHAR(64) NOT NULL,
+    name VARCHAR(64) NOT NULL UNIQUE,
     address VARCHAR(64) NOT NULL,
     user_name VARCHAR(64) NOT NULL,
     password VARCHAR(32) NOT NULL,

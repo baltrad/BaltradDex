@@ -92,7 +92,7 @@ Author     : szewczenko
                             </c:when>
                             <c:otherwise>
                                 <div id="message-box">
-                                    Please check select channels to be removed from .
+                                    Please select channels to be removed from subscription list.
                                 </div>
                                 <div id="table-footer">
                                     <div id="table-footer-rightcol">

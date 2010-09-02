@@ -68,77 +68,78 @@ public class BaltradFrameHandler {
     // XML element / document encoding
     private static final String XML_ENCODING = "UTF-8";
     // XML element / root node
-    private static final String BF_ROOT_ELEM = "baltrad_frame";
+    private static final String ROOT_ELEM = "baltrad_frame";
     // XML element / header node
-    private static final String BF_HEADER = "header";
+    private static final String HDR = "header";
     // XML element / MIME type attribute
-    private static final String BF_MIME_TYPE = "mimetype";
+    private static final String MIME_TYPE = "mimetype";
 
     // XML elements / available MIME types
-    public static final String BF_MIME_MULTIPART = "multipart/form-data";
-    public static final String BF_MIME_APPLICATION = "application/octet-stream";
-    public static final String BF_MIME_TEXT = "text/plain";
-    public static final String BF_MIME_TEXT_XML = "text/xml";
+    public static final String MIME_MULTIPART = "multipart/form-data";
+    public static final String MIME_APPLICATION = "application/octet-stream";
+    public static final String MIME_TEXT = "text/plain";
+    public static final String MIME_TEXT_XML = "text/xml";
     
     // XML element / user name attribute
-    private static final String BF_USER_NAME = "user_name";
+    private static final String USR_NAME = "user_name";
     // XML element / user's password attribute
-    private static final String BF_PASSWD = "passwd";
+    private static final String PASSWD = "passwd";
     // XML element / sender node address
-    private static final String BF_SENDER_NODE_ADDRESS = "sender_node_address";
+    private static final String SNDR_ADDR = "sender_node_address";
     // XML element / sender node name
-    private static final String BF_SENDER_NODE_NAME = "sender_node_name";
+    private static final String SNDR_NAME = "sender_node_name";
 
     // XML element / content node
-    private static final String BF_CONTENT = "content";
+    private static final String CONTENT = "content";
     // XML element / content type
-    private static final String BF_CONTENT_TYPE = "type";
+    private static final String CONTENT_TYPE = "type";
 
     // frame content identifiers
     // XML element / message content frame
-    public static final String BF_MSG = "message";
+    public static final String MSG = "message";
     // XML element / file content frame
-    public static final String BF_FILE = "file";
+    public static final String FILE = "file";
     // XML element / object content frame
-    public static final String BF_OBJECT = "object";
+    public static final String OBJECT = "object";
 
     // XML element / message type attribute
-    private static final String BF_MSG_CLASS = "class";
+    private static final String MSG_CLASS = "class";
     // XML elements / message type attribute values
-    public static final String BF_MSG_INFO = "INFO";
-    public static final String BF_MSG_WRN = "WARNING";
-    public static final String BF_MSG_ERR = "ERROR";
-    public static final String BF_MSG_REQUEST = "REQUEST";
+    public static final String INFO = "INFO";
+    public static final String WARNING = "WARNING";
+    public static final String ERROR = "ERROR";
+    public static final String REQUEST = "REQUEST";
+
+    // Baltrad communication signals
 
     // channel list request string
-    public static final String BF_MSG_CHANNEL_LISTING_REQUEST = "channel_list_request";
+    public static final String CHNL_LIST_RQST = "_chnl_list_rqst_";
     // channel list object identifier
-    public static final String BF_MSG_CHANNELS_LIST = "channels_list";
+    public static final String CHNL_LIST = "_chnl_list_";
     // channel synchronization request
-    public static final String BF_MSG_CHANNEL_SYNCHRO_REQUEST = "channel_synchronization_request";
+    public static final String CHNL_SYNC_RQST = "_chnl_sync_rqst_";
     // channel synchronization response
-    public static final String BF_MSG_CHANNEL_SYNCHRO_RESPONSE = "channel_synchronization_response";
+    public static final String CHNL_SYNC_RSPNS = "_chnl_sync_rspns_";
     // channel subscription request
-    public static final String BF_MSG_CHANNEL_SUBSCRIPTION_REQUEST = "channel_subscription_request";
-    // channel subscription request
-    public static final String BF_MSG_CHANNEL_SUBSCRIPTION_CONFIRMATION =
-            "channel_subscription_confirmation";
+    public static final String CHNL_SBN_RQST = "_chnl_sbn_rqst_";
+    // channel subscription confirmation
+    public static final String CHNL_SBN_CFN = "_chnl_sbn_cfn_";
     // channel subscription change request
-    public static final String BF_MSG_SUBSCRIPTION_CHANGE_REQUEST = "subscription_change_request";
+    public static final String SBN_CHNG_RQST = "_sbn_chng_rqst_";
     // channel subscription change success message
-    public static final String BF_MSG_SUBSCRIPTION_CHANGE_SUCCESS = "subscription_change_success";
+    public static final String SBN_CHNG_OK = "_sbn_chng_ok_";
     // channel subscription change failure message
-    public static final String BF_MSG_SUBSCRIPTION_CHANGE_FAILURE = "subscription_change_failure";
+    public static final String SBN_CHNG_FAIL = "_sbn_chng_fail_";
 
     // XML element / message text attribute
-    private static final String BF_MSG_TEXT = "text";    
+    private static final String MSG_TEXT = "text";
     
     // XML element / relative file name attribute
-    private static final String BF_FILE_NAME = "name";
+    private static final String FILE_NAME = "name";
     // XML element / data channel attribute
-    private static final String BF_CHANNEL_NAME = "channel";
+    private static final String CHNL_NAME = "channel";
     // Character set
-    private static final Charset BF_CHARSET = Charset.forName( XML_ENCODING );
+    private static final Charset CHARSET = Charset.forName( XML_ENCODING );
 //---------------------------------------------------------------------------------------- Variables
     // Receiver's URL address
     private String url;
@@ -195,25 +196,25 @@ public class BaltradFrameHandler {
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.newDocument();
             // Create document root
-            Element root = doc.createElement( BF_ROOT_ELEM );
+            Element root = doc.createElement( ROOT_ELEM );
             doc.appendChild( root );
             // Header definition tag
-            Element header = doc.createElement( BF_HEADER );
+            Element header = doc.createElement( HDR );
             // MIME content-type identifier
-            header.setAttribute( BF_MIME_TYPE, mimeType );
+            header.setAttribute( MIME_TYPE, mimeType );
             // set user name
-            header.setAttribute( BF_USER_NAME, userName );
+            header.setAttribute( USR_NAME, userName );
             // set password
-            header.setAttribute( BF_PASSWD, passwd );
+            header.setAttribute( PASSWD, passwd );
             // set sender node name
-            header.setAttribute( BF_SENDER_NODE_NAME, nodeName );
+            header.setAttribute( SNDR_NAME, nodeName );
             root.appendChild( header );
             // File object definition tag
-            Element content = doc.createElement( BF_CONTENT );
-            content.setAttribute( BF_CONTENT_TYPE, BF_FILE );
-            content.setAttribute( BF_FILE_NAME, absFilePath.substring( 
+            Element content = doc.createElement( CONTENT );
+            content.setAttribute( CONTENT_TYPE, FILE );
+            content.setAttribute( FILE_NAME, absFilePath.substring(
                     absFilePath.lastIndexOf( File.separator ) + 1, absFilePath.length() ) );
-            content.setAttribute( BF_CHANNEL_NAME, channel );
+            content.setAttribute( CHNL_NAME, channel );
             root.appendChild( content );
         } catch( ParserConfigurationException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "XML parser error:"
@@ -239,21 +240,21 @@ public class BaltradFrameHandler {
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.newDocument();
             // Create document root
-            Element root = doc.createElement( BF_ROOT_ELEM );
+            Element root = doc.createElement( ROOT_ELEM );
             doc.appendChild( root );
             // Header definition tag
-            Element header = doc.createElement( BF_HEADER );
+            Element header = doc.createElement( HDR );
             // MIME content-type identifier
-            header.setAttribute( BF_MIME_TYPE, mimeType );
+            header.setAttribute( MIME_TYPE, mimeType );
             // set sender node name
-            header.setAttribute( BF_SENDER_NODE_NAME, nodeName );
+            header.setAttribute( SNDR_NAME, nodeName );
             root.appendChild( header );
             // File object definition tag
-            Element content = doc.createElement( BF_CONTENT );
-            content.setAttribute( BF_CONTENT_TYPE, BF_FILE );
-            content.setAttribute( BF_FILE_NAME, absFilePath.substring(
+            Element content = doc.createElement( CONTENT );
+            content.setAttribute( CONTENT_TYPE, FILE );
+            content.setAttribute( FILE_NAME, absFilePath.substring(
                     absFilePath.lastIndexOf( File.separator ) + 1, absFilePath.length() ) );
-            content.setAttribute( BF_CHANNEL_NAME, channel );
+            content.setAttribute( CHNL_NAME, channel );
             root.appendChild( content );
         } catch( ParserConfigurationException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "XML parser error:"
@@ -282,26 +283,26 @@ public class BaltradFrameHandler {
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.newDocument();
             // Create document root
-            Element root = doc.createElement( BF_ROOT_ELEM );
+            Element root = doc.createElement( ROOT_ELEM );
             doc.appendChild( root );
             // Header definition tag
-            Element header = doc.createElement( BF_HEADER );
+            Element header = doc.createElement( HDR );
             // MIME content-type identifier
-            header.setAttribute( BF_MIME_TYPE, mimeType );
+            header.setAttribute( MIME_TYPE, mimeType );
             // set user name
-            header.setAttribute( BF_USER_NAME, userName );
+            header.setAttribute( USR_NAME, userName );
             // set password
-            header.setAttribute( BF_PASSWD, passwd );
+            header.setAttribute( PASSWD, passwd );
             // set sender node address
-            header.setAttribute( BF_SENDER_NODE_ADDRESS, nodeAddress );
+            header.setAttribute( SNDR_ADDR, nodeAddress );
             // set sender node name
-            header.setAttribute( BF_SENDER_NODE_NAME, nodeName );
+            header.setAttribute( SNDR_NAME, nodeName );
             root.appendChild( header );
             // Message object definition tag
-            Element content = doc.createElement( BF_CONTENT );
-            content.setAttribute( BF_CONTENT_TYPE, BF_MSG );
-            content.setAttribute( BF_MSG_CLASS, msgClass );
-            content.setAttribute( BF_MSG_TEXT, msgText );
+            Element content = doc.createElement( CONTENT );
+            content.setAttribute( CONTENT_TYPE, MSG );
+            content.setAttribute( MSG_CLASS, msgClass );
+            content.setAttribute( MSG_TEXT, msgText );
             root.appendChild( content );
         } catch( ParserConfigurationException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "XML parser error:"
@@ -328,22 +329,22 @@ public class BaltradFrameHandler {
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.newDocument();
             // Create document root
-            Element root = doc.createElement( BF_ROOT_ELEM );
+            Element root = doc.createElement( ROOT_ELEM );
             doc.appendChild( root );
             // Header definition tag
-            Element header = doc.createElement( BF_HEADER );
+            Element header = doc.createElement( HDR );
             // MIME content-type identifier
-            header.setAttribute( BF_MIME_TYPE, mimeType );
+            header.setAttribute( MIME_TYPE, mimeType );
             // set sender node address
-            header.setAttribute( BF_SENDER_NODE_ADDRESS, nodeAddress );
+            header.setAttribute( SNDR_ADDR, nodeAddress );
             // set sender node name
-            header.setAttribute( BF_SENDER_NODE_NAME, nodeName );
+            header.setAttribute( SNDR_NAME, nodeName );
             root.appendChild( header );
             // Message object definition tag
-            Element content = doc.createElement( BF_CONTENT );
-            content.setAttribute( BF_CONTENT_TYPE, BF_MSG );
-            content.setAttribute( BF_MSG_CLASS, msgClass );
-            content.setAttribute( BF_MSG_TEXT, msgText );
+            Element content = doc.createElement( CONTENT );
+            content.setAttribute( CONTENT_TYPE, MSG );
+            content.setAttribute( MSG_CLASS, msgClass );
+            content.setAttribute( MSG_TEXT, msgText );
             root.appendChild( content );
         } catch( ParserConfigurationException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "XML parser error:"
@@ -370,21 +371,21 @@ public class BaltradFrameHandler {
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.newDocument();
             // Create document root
-            Element root = doc.createElement( BF_ROOT_ELEM );
+            Element root = doc.createElement( ROOT_ELEM );
             doc.appendChild( root );
             // Header definition tag
-            Element header = doc.createElement( BF_HEADER );
+            Element header = doc.createElement( HDR );
             // MIME content-type identifier
-            header.setAttribute( BF_MIME_TYPE, mimeType );
+            header.setAttribute( MIME_TYPE, mimeType );
             // set sender node addressheader
-            header.setAttribute( BF_SENDER_NODE_ADDRESS, nodeAddress );
+            header.setAttribute( SNDR_ADDR, nodeAddress );
             // set sender node name
-            header.setAttribute( BF_SENDER_NODE_NAME, nodeName );
+            header.setAttribute( SNDR_NAME, nodeName );
             root.appendChild( header );
             // Message object definition tag
-            Element content = doc.createElement( BF_CONTENT );
-            content.setAttribute( BF_CONTENT_TYPE, BF_OBJECT );
-            content.setAttribute( BF_MSG_TEXT, msgText );
+            Element content = doc.createElement( CONTENT );
+            content.setAttribute( CONTENT_TYPE, OBJECT );
+            content.setAttribute( MSG_TEXT, msgText );
             root.appendChild( content );
         } catch( ParserConfigurationException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "XML parser error:"
@@ -412,23 +413,23 @@ public class BaltradFrameHandler {
             DocumentBuilder builder = factory.newDocumentBuilder();
             doc = builder.newDocument();
             // Create document root
-            Element root = doc.createElement( BF_ROOT_ELEM );
+            Element root = doc.createElement( ROOT_ELEM );
             doc.appendChild( root );
             // Header definition tag
-            Element header = doc.createElement( BF_HEADER );
+            Element header = doc.createElement( HDR );
             // MIME content-type identifier
-            header.setAttribute( BF_MIME_TYPE, mimeType );
+            header.setAttribute( MIME_TYPE, mimeType );
             // set sender node addressheader
-            header.setAttribute( BF_SENDER_NODE_ADDRESS, nodeAddress );
+            header.setAttribute( SNDR_ADDR, nodeAddress );
             // set sender node name
-            header.setAttribute( BF_SENDER_NODE_NAME, nodeName );
+            header.setAttribute( SNDR_NAME, nodeName );
             // set local user name
-            header.setAttribute( BF_USER_NAME, localUserName );
+            header.setAttribute( USR_NAME, localUserName );
             root.appendChild( header );
             // Message object definition tag
-            Element content = doc.createElement( BF_CONTENT );
-            content.setAttribute( BF_CONTENT_TYPE, BF_OBJECT );
-            content.setAttribute( BF_MSG_TEXT, msgText );
+            Element content = doc.createElement( CONTENT );
+            content.setAttribute( CONTENT_TYPE, OBJECT );
+            content.setAttribute( MSG_TEXT, msgText );
             root.appendChild( content );
         } catch( ParserConfigurationException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "XML parser error:"
@@ -505,8 +506,8 @@ public class BaltradFrameHandler {
      * @return Message MIME type
      */
     public String getMimeType( String xmlHdrStr ) {
-        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), BF_HEADER,
-                BF_MIME_TYPE );
+        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), HDR,
+                MIME_TYPE );
     }
     /**
      * Method gets frame content type
@@ -515,8 +516,8 @@ public class BaltradFrameHandler {
      * @return Frame content type
      */
     public String getContentType( String xmlHdrStr ) {
-        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), BF_CONTENT,
-                BF_CONTENT_TYPE );
+        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), CONTENT,
+                CONTENT_TYPE );
     }
     /**
      * Method gets user name.
@@ -525,8 +526,8 @@ public class BaltradFrameHandler {
      * @return User name
      */
     public String getUserName( String xmlHdrStr ) {
-        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), BF_HEADER,
-                BF_USER_NAME );
+        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), HDR,
+                USR_NAME );
     }
     /**
      * Method gets user's password.
@@ -535,8 +536,8 @@ public class BaltradFrameHandler {
      * @return User's password
      */
     public String getPassword( String xmlHdrStr ) {
-        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), BF_HEADER,
-                BF_PASSWD );
+        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), HDR,
+                PASSWD );
     }
     /**
      * Gets sender node address.
@@ -545,8 +546,8 @@ public class BaltradFrameHandler {
      * @return Sender node address
      */
     public String getSenderNodeAddress( String xmlHdrStr ) {
-        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), BF_HEADER,
-                BF_SENDER_NODE_ADDRESS );
+        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), HDR,
+                SNDR_ADDR );
     }
     /**
      * Gets sender node name.
@@ -555,8 +556,8 @@ public class BaltradFrameHandler {
      * @return Sender node name
      */
     public String getSenderNodeName( String xmlHdrStr ) {
-        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), BF_HEADER,
-                BF_SENDER_NODE_NAME );
+        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), HDR,
+                SNDR_NAME );
     }
     /**
      * Method gets data channel name.
@@ -565,8 +566,8 @@ public class BaltradFrameHandler {
      * @return Data channel name
      */
     public String getChannel( String xmlHdrStr ) {
-        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), BF_CONTENT,
-                BF_CHANNEL_NAME );
+        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), CONTENT,
+                CHNL_NAME );
     }
     /**
      * Method gets data file name.
@@ -575,8 +576,8 @@ public class BaltradFrameHandler {
      * @return Data file name
      */
     public String getFileName( String xmlHdrStr ) {
-        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), BF_CONTENT,
-                BF_FILE_NAME );
+        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), CONTENT,
+                FILE_NAME );
     }
     /**
      * Method gets message type.
@@ -585,8 +586,8 @@ public class BaltradFrameHandler {
      * @return Message type identifier
      */
     public String getMessageClass( String xmlHdrStr ) {
-        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), BF_CONTENT,
-                BF_MSG_CLASS );
+        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), CONTENT,
+                MSG_CLASS );
     }
     /**
      * Method gets message text.
@@ -595,8 +596,8 @@ public class BaltradFrameHandler {
      * @return Message text
      */
     public String getMessageText( String xmlHdrStr ) {
-        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), BF_CONTENT,
-                BF_MSG_TEXT );
+        return getXMLHeaderElement( stringToXMLDocument( xmlHdrStr ), CONTENT,
+                MSG_TEXT );
     }
     /**
      * Method gets receiver's URL address.
