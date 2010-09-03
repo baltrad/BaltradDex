@@ -67,6 +67,18 @@ Author     : szewczenko
                                         <form:errors path="command.wmoNumber" cssClass="errors"/>
                                     </td>
                                 </tr>
+                                <tr class="even">
+                                    <td class="left">Users allowed</td>
+                                    <td class="right">
+                                        <select name="TEST">
+                                            <c:forEach items="${users}" var="user">
+                                                <option>
+                                                    <c:out value="${user.name}"/>
+                                                </option>
+                                            </c:forEach>
+                                        </select>
+                                    </td>
+                                </tr>
                             </table>
                             <div id="table-footer-rightcol">
                                 <input type="submit" value="Submit" name="submit_button"/>

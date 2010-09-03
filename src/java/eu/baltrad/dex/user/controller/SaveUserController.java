@@ -81,7 +81,7 @@ public class SaveUserController extends SimpleFormController {
     @Override
     protected HashMap referenceData( HttpServletRequest request ) throws Exception {
         HashMap model = new HashMap();
-        model.put( ROLES, userManager.getAllRoles() );
+        model.put( ROLES, userManager.getRoles() );
         return model;
     }
     /**

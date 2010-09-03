@@ -23,14 +23,14 @@ Author     : szewczenko
 
 -- drop tables if exist ----------------------------------------------------------------
 
-DROP TABLE IF EXISTS dex_subscriptions;
-DROP TABLE IF EXISTS dex_delivery_register;
-DROP TABLE IF EXISTS dex_users;
-DROP TABLE IF EXISTS dex_roles;
-DROP TABLE IF EXISTS dex_messages;
-DROP TABLE IF EXISTS dex_channels;
-DROP TABLE IF EXISTS dex_node_connections;
-DROP TABLE IF EXISTS dex_node_configuration;
+DROP TABLE IF EXISTS dex_subscriptions CASCADE;
+DROP TABLE IF EXISTS dex_delivery_register CASCADE;
+DROP TABLE IF EXISTS dex_users CASCADE;
+DROP TABLE IF EXISTS dex_roles CASCADE;
+DROP TABLE IF EXISTS dex_messages CASCADE;
+DROP TABLE IF EXISTS dex_channels CASCADE;
+DROP TABLE IF EXISTS dex_node_connections CASCADE;
+DROP TABLE IF EXISTS dex_node_configuration CASCADE;
 
 DROP SEQUENCE IF EXISTS log_entry_id_seq;
 DROP SEQUENCE IF EXISTS channel_id_seq;

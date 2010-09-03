@@ -59,41 +59,6 @@ public class ChannelManager {
         }
         return channels;
     }
-
-
-
-    /**
-     * Method creates list of available data channels.
-     *
-     * @return List of all available data channels.
-     *
-    public List getChannels( List userSubscriptions ) {
-        List channelsList = null;
-
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            channelsList = session.createQuery(
-                    "FROM Channel channel ORDER BY channel.wmoNumber" ).list();
-            session.getTransaction().commit();
-        }
-        catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        }
-        // Check for data channels selected by the currently signed user
-        for( int i = 0; i < channelsList.size(); i++ ) {
-            Channel channel = ( Channel )channelsList.get( i );
-            for( int j = 0; j < userSubscriptions.size(); j++ ) {
-                Subscription subscription = ( Subscription )userSubscriptions.get( j );
-                if( subscription.getChannelId() == channel.getId() ) {
-                    channel.setSelected( true );
-                } 
-            }
-        }
-        return channelsList;
-    }*/
     /**
      * Method returns data channel identified by a given name.
      *

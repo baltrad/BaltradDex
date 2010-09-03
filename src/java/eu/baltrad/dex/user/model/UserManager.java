@@ -129,7 +129,7 @@ public class UserManager {
      *
      * @return List of available roles
      */
-    public List getAllRoles() {
+    public List getRoles() {
         List roles = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
@@ -175,7 +175,7 @@ public class UserManager {
      *  
      * @return List containing all registered users
      */
-    public List getAllUsers() {
+    public List getUsers() {
         List users = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();

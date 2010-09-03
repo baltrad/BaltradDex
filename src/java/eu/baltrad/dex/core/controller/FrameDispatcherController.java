@@ -76,8 +76,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private DeliveryRegisterManager deliveryRegisterManager;
     // Reference to file catalog object
     private FileCatalog fileCatalog;
-    // Reference to file catalog connector object
-    private FileCatalogConnector fileCatalogConnector;
     // remote channel listing
     private List channelListing;
     // confirmed subscription list

@@ -49,7 +49,7 @@ public class EditUserController implements Controller {
 //------------------------------------------------------------------------------------------ Methods
      public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
-         List users = userManager.getAllUsers();
+         List users = userManager.getUsers();
          return new ModelAndView( getSuccessView(), MODEL_KEY, users );
      }
      /**

@@ -1,15 +1,29 @@
-/*
- * BaltradNode :: Radar data exchange and communication system
- * Remote Sensing Department, Institute of Meteorology and Water Management
- * Maciej Szewczykowski, 2010
- *
- * maciej.szewczykowski@imgw.pl
- */
+/***************************************************************************************************
+*
+* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+*
+* This file is part of the BaltradDex software.
+*
+* BaltradDex is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* BaltradDex is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+*
+***************************************************************************************************/
 
 package eu.baltrad.dex.channel.controller;
 
 import eu.baltrad.dex.channel.model.ChannelManager;
 import eu.baltrad.dex.channel.model.Channel;
+import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.log.model.LogManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,18 +34,23 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
 
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Controller class registers new channel in the system or modifies existing data channel.
  *
- * @author szewczenko
+ * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @version 0.1.6
+ * @since 0.1.6
  */
 public class SaveChannelController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
     public static final String CHANNEL_ID = "id";
+    public static final String USERS = "users";
     public static final String MSG = "message";
 //---------------------------------------------------------------------------------------- Variables
     private ChannelManager channelManager;
+    private UserManager userManager;
     private LogManager logManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -41,6 +60,7 @@ public class SaveChannelController extends SimpleFormController {
      * @param request HttpServletRequest
      * @return Channel class object
      */
+    @Override
     protected Object formBackingObject( HttpServletRequest request ) {
         Channel channel = null;
         if( request.getParameter( CHANNEL_ID ) != null
@@ -53,6 +73,19 @@ public class SaveChannelController extends SimpleFormController {
         return channel;
     }
     /**
+     * Returns HashMap holding list of registered users.
+     *
+     * @param request HttpServletRequest
+     * @return HashMap holding list of users
+     * @throws Exception
+     */
+    @Override
+    protected HashMap referenceData( HttpServletRequest request ) throws Exception {
+        HashMap model = new HashMap();
+        model.put( USERS, userManager.getUsers() );
+        return model;
+    }
+    /**
      * Saves Channel object
      *
      * @param request HttpServletRequest
@@ -61,6 +94,7 @@ public class SaveChannelController extends SimpleFormController {
      * @param errors Errors object
      * @return ModelAndView object
      */
+    @Override
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors) throws Exception {
         Channel channel = ( Channel )command;
@@ -85,6 +119,18 @@ public class SaveChannelController extends SimpleFormController {
     public void setChannelManager( ChannelManager channelManager ) {
         this.channelManager = channelManager;
     }
+    /**
+     * Method gets reference to user manager object.
+     *
+     * @return Reference to user manager object
+     */
+    public UserManager getUserManager() { return userManager; }
+    /**
+     * Method sets reference to user manager object.
+     *
+     * @param userManager Reference to user manager object
+     */
+    public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
     /**
      * Method gets reference to LogManager class instance.
      *

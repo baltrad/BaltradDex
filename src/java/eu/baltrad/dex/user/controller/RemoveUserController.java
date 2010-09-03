@@ -69,7 +69,7 @@ public class RemoveUserController extends MultiActionController {
      * @return Model and view containing list of all user accounts registered in the system
      */
     public ModelAndView showUsers( HttpServletRequest request, HttpServletResponse response ) {
-        List users = userManager.getAllUsers();
+        List users = userManager.getUsers();
         User signedUser = ( User )ApplicationSecurityManager.getUser( request );
         for( int i = 0; i < users.size(); i++ ) {
             User user = ( User )users.get( i );
@@ -97,7 +97,7 @@ public class RemoveUserController extends MultiActionController {
             }
             modelAndView = new ModelAndView( SELECTED_USERS_VIEW, SELECTED_USERS_KEY, users );
         } else {
-            List users = userManager.getAllUsers();
+            List users = userManager.getUsers();
             User signedUser = ( User )ApplicationSecurityManager.getUser( request );
             for( int i = 0; i < users.size(); i++ ) {
                 User user = ( User )users.get( i );

@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Page displaying subscription status
-Created on : Jun 24, 2010, 8:57:42 AM
+Document   : Node connection removal status page
+Created on : Sep 1, 2010, 9:25:05 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
@@ -30,7 +30,7 @@ Author     : szewczenko
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Subscription confirmation</title>
+    <title>Data channel removal status</title>
 </head>
 
 <body>
@@ -43,17 +43,19 @@ Author     : szewczenko
             <div class="inner">
                 <div class="float-wrap">
                     <div id="main">
-                        <h1>Subscription confirmation</h1>
+                        <h1>Node connection removal status</h1>
                         <br/>
                         <div id="message-box">
-                            Your subscription request is now submitted.
-                            Click OK to go back to subscription selection page.
+                            <c:if test="${not empty message}">
+                                <c:out value="${message}" />
+                                <c:set var="message" value="" scope="session" />
+                            </c:if>
                         </div>
-                        <div id="table-footer-rightcol">
-                            <form action="showSubscriptions.htm">
+                        <form action="showNodeConnections.htm">
+                            <div id="table-footer-rightcol">
                                 <input type="submit" value="OK" name="submit_button"/>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                     <div id="left">
                         <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>

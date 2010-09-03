@@ -522,6 +522,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="channelManager">
             <ref bean="channelManager"/>
         </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
         <property name="logManager">
             <ref bean="logManager"/>
         </property>
