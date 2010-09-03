@@ -408,6 +408,19 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             war="file:${dist.dir}/BaltradDex.war"/>
   </target>
 
+  <target name="hudson" depends="compile,prepare-testdb,execute.test"/>
+
+  <target name="prepare-testdb">
+    <sql classpath="${lib.dir}/${db.jar}"
+         driver="${db.driver}"
+         url="${db.url}"
+         userid="${db.user}"
+         password="${db.pwd}" >
+      <transaction src="${etc.dir}/drop_dex_schema.sql"/>
+      <transaction src="${etc.dir}/create_dex_schema.sql"/>
+    </sql>
+  </target>
+
   <!-- From apache-tomcat user manual for using the ant-manager task -->
   <target name="context-status">
     <property name="running" value="${mgr.path}:running"/>
