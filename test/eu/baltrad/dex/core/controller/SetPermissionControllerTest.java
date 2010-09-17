@@ -43,8 +43,7 @@ public class SetPermissionControllerTest extends TestCase {
     private static User testUser;
     private static Channel testChannel;
 //------------------------------------------------------------------------------------------ Methods
-    @Override
-    public void setUp() throws Exception {
+    public void testInit() {
         testUser = userManager.getUserByName( "admin" );
         testChannel = new Channel( "test_channel", "666" );
         ChannelPermission perm = new ChannelPermission( testChannel.getId(), testUser.getId() );
