@@ -44,12 +44,10 @@ public class SetPermissionControllerTest extends TestCase {
     private static Channel testChannel;
 //------------------------------------------------------------------------------------------ Methods
     public void testInit() {
-        testUser = userManager.getUserByID( 0 );
-        testChannel = channelManager.getChannel( 0 );
+        testUser = new User( "testUser", "user", "nameHash", "passwd", "passwd", "address", "company",
+                "country", "city", "666", "street", "666", "666-666", "email" );
+        testChannel = new Channel( "testChannel", "666" );
         ChannelPermission perm = new ChannelPermission( testChannel.getId(), testUser.getId() );
-
-        
-
         assertNotNull( testUser );
         assertNotNull( testChannel );
         assertNotNull( perm );
