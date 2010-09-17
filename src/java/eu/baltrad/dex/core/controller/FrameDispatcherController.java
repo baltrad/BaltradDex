@@ -139,8 +139,17 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 
                                 // process channel listing request
 
-                                // create a list of available channels
+                                // create a list of channels that user is allowed to subscribe
+
+                                ///!!! to be implemented
+
+
                                 List channels = channelManager.getChannels();
+
+
+
+
+
                                 // write list to temporary file
                                 File tempFile = InitAppUtil.createTempFile(
                                         new File( InitAppUtil.getLocalTempDir() ) );

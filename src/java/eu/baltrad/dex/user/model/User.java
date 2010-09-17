@@ -51,6 +51,7 @@ public class User {
     private String number;
     private String phone;
     private String email;
+    private boolean selected;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Default constructor.
@@ -308,5 +309,17 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+    /**
+     * Gets user selection toggle state.
+     *
+     * @return User selection toggle state
+     */
+    public boolean getSelected() { return selected; }
+    /**
+     * Sets user selection toggle state.
+     *
+     * @param selected User selection toggle state
+     */
+    public void setSelected( boolean selected ) { this.selected = selected; }
 }
 //--------------------------------------------------------------------------------------------------

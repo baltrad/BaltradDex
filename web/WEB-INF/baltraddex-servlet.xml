@@ -124,6 +124,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="showNodeConnections.htm">nodeConnectionController</prop>
                 <prop key="showSelectedNodeConnections.htm">nodeConnectionController</prop>
                 <prop key="showRemovedNodeConnections.htm">nodeConnectionController</prop>
+                <prop key="setPermission.htm">setPermissionController</prop>
             </props>
         </property>
     </bean>
@@ -564,6 +565,31 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
     </bean>
 
+    <!--
+        Set channel permission controller
+    -->
+    <bean id="setPermissionController"
+        class="eu.baltrad.dex.channel.controller.SetPermissionController">
+        <property name="successView">
+            <value>redirect:editLocalChannel.htm</value>
+        </property>
+        <property name="formView">
+            <value>setPermission</value>
+        </property>
+        <property name="sessionForm">
+            <value>false</value>
+        </property>
+        <property name="commandClass">
+            <value>eu.baltrad.dex.channel.model.Channel</value>
+        </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+        <property name="channelManager">
+            <ref bean="channelManager" />
+        </property>
+    </bean>
+    
     <!--
         Connect to node controller
     -->

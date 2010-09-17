@@ -21,13 +21,10 @@
 
 package eu.baltrad.dex.channel.controller;
 
-import eu.baltrad.dex.channel.model.ChannelManager;
-import eu.baltrad.dex.channel.model.Channel;
-import eu.baltrad.dex.channel.model.ChannelPermission;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.log.model.LogManager;
-import java.util.ArrayList;
+import eu.baltrad.dex.channel.model.ChannelManager;
+import eu.baltrad.dex.channel.model.ChannelPermission;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,89 +33,99 @@ import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
 
-import java.util.Date;
-import java.util.List;
 import java.util.HashMap;
+import java.util.List;
 
 /**
- * Controller class registers new channel in the system or modifies existing data channel.
+ * Controller class sets permission for a given data channel.
  *
  * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
  * @version 0.1.6
  * @since 0.1.6
  */
-public class SaveChannelController extends SimpleFormController {
+public class SetPermissionController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
-    public static final String CHANNEL_ID = "id";
-    public static final String USERS = "users";
-    public static final String MSG = "message";
+    private static final String CHANNEL_ID = "id";
+    private static final String USERS = "users";
+    private static final String SELECTED_USERS_KEY = "selected_users";
 //---------------------------------------------------------------------------------------- Variables
-    private ChannelManager channelManager;
     private UserManager userManager;
-    private LogManager logManager;
+    private ChannelManager channelManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Fetches Channel object with a given CHANNEL_ID passed as request parameter,
-     * or creates new Channel instance in case CHANNEL_ID is not set in request.
+     * Returns HashMap holding a list of all users. If user is allowed to use a given data channel
      *
      * @param request HttpServletRequest
-     * @return Channel class object
-     */
-    @Override
-    protected Object formBackingObject( HttpServletRequest request ) {
-        Channel channel = null;
-        if( request.getParameter( CHANNEL_ID ) != null
-                && request.getParameter( CHANNEL_ID ).trim().length() > 0 ) {
-            channel = channelManager.getChannel( Integer.parseInt(
-                    request.getParameter( CHANNEL_ID ) ) );
-        } else {
-            channel = new Channel();
-        }
-        return channel;
-    }
-    /**
-     * Returns HashMap holding list of registered users.
-     *
-     * @param request HttpServletRequest
-     * @return HashMap holding list of users
+     * @return HashMap holding list of all users
      * @throws Exception
      */
     @Override
     protected HashMap referenceData( HttpServletRequest request ) throws Exception {
-        HashMap model = new HashMap();
-        if( request.getParameter( CHANNEL_ID ) != null
-                && !request.getParameter( CHANNEL_ID ).isEmpty() ) {
-            List< ChannelPermission > channelPermissions = channelManager.getChannelPermission(
-                Integer.parseInt( request.getParameter( CHANNEL_ID ) ) );
-            List< User > users = new ArrayList< User >();
-            for( int i = 0; i < channelPermissions.size(); i++ ) {
-                User user = userManager.getUserByID( channelPermissions.get( i ).getUserId() );
-                users.add( user );
+        List< User > users = userManager.getUsers();
+        List< ChannelPermission > channelPermissions = channelManager.getChannelPermission(
+                Integer.parseInt( ( String )request.getSession().getAttribute( CHANNEL_ID ) ) );
+        for( int i = 0; i < users.size(); i++ ) {
+            int j = 0;
+            while( j < channelPermissions.size() ) {
+                if( users.get( i ).getId() == channelPermissions.get( j ).getUserId() ) {
+                    users.get( i ).setSelected( true );
+                    break;
+                } else {
+                    users.get( i ).setSelected( false );
+                }
+                j++;    
             }
-            model.put( USERS, users );
-            // set session attribute in order to define channel permissions
-            request.getSession().setAttribute( CHANNEL_ID, request.getParameter( CHANNEL_ID ) );
         }
+        HashMap model = new HashMap();
+        model.put( USERS, users );
         return model;
     }
     /**
-     * Saves Channel object
+     * Submits selected permission set.
      *
      * @param request HttpServletRequest
      * @param response HttpServletResponse
-     * @param command Command object
-     * @param errors Errors object
+     * @param command Command class
+     * @param errors Errors
      * @return ModelAndView object
+     * @throws Exception
      */
     @Override
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors) throws Exception {
-        Channel channel = ( Channel )command;
-        channelManager.addChannel( channel );
-        request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
-                "message.addchannel.savesuccess" ) );
-        logManager.addEntry( new Date(), LogManager.MSG_WRN, "Data channel saved: " +
-                channel.getChannelName() );
+        int channelId = Integer.parseInt( ( String )request.getSession().getAttribute( CHANNEL_ID ) );
+        String[] selUsers = request.getParameterValues( SELECTED_USERS_KEY );
+        List< User > users = userManager.getUsers();
+        int selSize = 0;
+        if( selUsers != null ) {
+            selSize = selUsers.length;
+        }
+        for( int i = 0; i < users.size(); i++ ) {
+            User user = users.get( i );
+            int j = 0;
+            boolean selected = false;
+            while( j < selSize ) {
+                int userId = Integer.parseInt( selUsers[ j ] );
+                if( userId == user.getId() ) {
+                    selected = true;
+                }
+                j++;
+            }
+            if( selected ) {
+                ChannelPermission channelPermission = channelManager.getChannelPermission(
+                    channelId, user.getId() );
+                if( channelPermission == null ) {
+                    channelManager.addChannelPermission( new ChannelPermission( channelId,
+                            user.getId() ) );
+                }
+            } else {
+                ChannelPermission channelPermission = channelManager.getChannelPermission(
+                    channelId, user.getId() );
+                if( channelPermission != null ) {
+                    channelManager.removeChannelPermission( channelId, user.getId() );
+                }
+            }
+        }
         return new ModelAndView( getSuccessView() );
     }
     /**
@@ -147,17 +154,6 @@ public class SaveChannelController extends SimpleFormController {
      * @param userManager Reference to user manager object
      */
     public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
+
 }
 //--------------------------------------------------------------------------------------------------

@@ -18,31 +18,18 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
-Document   : Hibernate mapping file for User class object
-Created on : Jun 25, 2010, 2:06:02 PM
+Document   : Hibernate mapping file for ChannelPermission class
+Created on : Sep 14, 2010, 1:06:43 PM
 Author     : szewczenko
 -->
 <hibernate-mapping>
-  <class name="eu.baltrad.dex.user.model.User" table="dex_users">
+  <class name="eu.baltrad.dex.channel.model.ChannelPermission" table="dex_channel_permissions">
     <id column="id" name="id">
       <generator class="sequence">
-        <param name="sequence">user_id_seq</param>
+        <param name="sequence">channel_permission_id_seq</param>
       </generator>
     </id>
-    <property column="name" name="name"/>
-    <property column="name_hash" name="nameHash"/>
-    <property column="password" name="password"/>
-    <property column="role_name" name="roleName"/>
-    <property column="ret_password" name="retPassword"/>
-    <property column="node_address" name="nodeAddress"/>
-    <property column="factory" name="factory"/>
-    <property column="country" name="country"/>
-    <property column="city" name="city"/>
-    <property column="city_code" name="cityCode"/>
-    <property column="street" name="street"/>
-    <property column="number" name="number"/>
-    <property column="phone" name="phone"/>
-    <property column="email" name="email"/>
-    <property column="selected" name="selected"/>
+    <property column="channel_id" name="channelId"/>
+    <property column="user_id" name="userId"/>
   </class>
 </hibernate-mapping>

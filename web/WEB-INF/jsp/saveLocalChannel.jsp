@@ -67,18 +67,21 @@ Author     : szewczenko
                                         <form:errors path="command.wmoNumber" cssClass="errors"/>
                                     </td>
                                 </tr>
+                                <c:if test="${command.channelName != null}">
                                 <tr class="even">
                                     <td class="left">Users allowed</td>
                                     <td class="right">
-                                        <select name="TEST">
+                                        <select>
                                             <c:forEach items="${users}" var="user">
                                                 <option>
                                                     <c:out value="${user.name}"/>
                                                 </option>
                                             </c:forEach>
                                         </select>
+                                        <a href="setPermission.htm">Set</a>
                                     </td>
                                 </tr>
+                                </c:if>
                             </table>
                             <div id="table-footer-rightcol">
                                 <input type="submit" value="Submit" name="submit_button"/>

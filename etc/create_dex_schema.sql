@@ -25,6 +25,7 @@ Author     : szewczenko
 
 DROP TABLE IF EXISTS dex_subscriptions;
 DROP TABLE IF EXISTS dex_delivery_register;
+DROP TABLE IF EXISTS dex_channel_permissions CASCADE;
 DROP TABLE IF EXISTS dex_users;
 DROP TABLE IF EXISTS dex_roles;
 DROP TABLE IF EXISTS dex_messages;
@@ -39,6 +40,7 @@ DROP SEQUENCE IF EXISTS subscription_id_seq;
 DROP SEQUENCE IF EXISTS delivery_register_id_seq;
 DROP SEQUENCE IF EXISTS node_connection_id_seq;
 DROP SEQUENCE IF EXISTS configuration_id_seq;
+DROP SEQUENCE IF EXISTS channel_permission_id_seq;
 
 -- create tables -----------------------------------------------------------------------------------
 
@@ -69,6 +71,7 @@ CREATE TABLE dex_users
     number VARCHAR(12) NOT NULL,
     phone VARCHAR(32) NOT NULL,
     email VARCHAR(64) NOT NULL,
+    selected BOOLEAN DEFAULT false,
     PRIMARY KEY (id)
 );
 
@@ -93,6 +96,17 @@ CREATE TABLE dex_channels
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('channel_id_seq'),
     name VARCHAR(32) NOT NULL,
     wmo_number VARCHAR(16),
+    PRIMARY KEY (id)
+);
+
+-- channel_permission_id_seq -----------------------------------------------------------------------
+CREATE SEQUENCE channel_permission_id_seq;
+-- dex_channel_permissions -------------------------------------------------------------------------
+CREATE TABLE dex_channel_permissions
+(
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('channel_permission_id_seq'),
+    channel_id INT NOT NULL REFERENCES dex_channels (id),
+    user_id INT NOT NULL REFERENCES dex_users (id),
     PRIMARY KEY (id)
 );
 

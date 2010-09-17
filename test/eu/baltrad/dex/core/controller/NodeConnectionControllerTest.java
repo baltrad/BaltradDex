@@ -32,12 +32,11 @@ import java.util.List;
  * Node connection controller test class.
  *
  * @author szewczenko
- * @version 1.0
- * @since 1.0
+ * @version 1.6
+ * @since 1.6
  */
 public class NodeConnectionControllerTest extends TestCase {
-
-//--------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------ Methods
     @Override
     public void setUp() throws Exception {
         NodeConnection nodeConn = new NodeConnection( "baltrad.imgw.pl",
@@ -82,6 +81,5 @@ public class NodeConnectionControllerTest extends TestCase {
         
         assertTrue( res > 0 );
     }
-
 }
 //--------------------------------------------------------------------------------------------------

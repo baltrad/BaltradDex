@@ -21,70 +21,68 @@
 
 package eu.baltrad.dex.channel.model;
 
-import java.io.Serializable;
-
 /**
- * Class implements data channel object.
+ * Class implements data channel permission object.
  *
  * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
- * @version 0.1.6
- * @since 0.1.6
+ * @version 1.6
+ * @since 1.6
  */
-public class Channel implements Serializable {
+public class ChannelPermission {
 //---------------------------------------------------------------------------------------- Variables
     private int id;
-    private String channelName;
-    private String wmoNumber;
+    private int channelId;
+    private int userId;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Default constructor
+     * Default constructor.
      */
-    public Channel() {}
+    public ChannelPermission() {}
     /**
-     * Constructor setting field values.
+     * Constructor sets field values.
      *
-     * @param channelName Channel name
-     * @param wmoNumber Channel WMO number
+     * @param channelId Channel ID
+     * @param userId User ID
      */
-    public Channel( String channelName, String wmoNumber ) {
-        this.channelName = channelName;
-        this.wmoNumber = wmoNumber;
+    public ChannelPermission( int channelId, int userId ) {
+        this.channelId = channelId;
+        this.userId= userId;
     }
     /**
-     * Method gets data channel id.
+     * Gets object ID.
      *
-     * @return Data channel id
+     * @return Channel permission object ID
      */
     public int getId() { return id; }
     /**
-     * Method sets data channel id.
+     * Sets object ID.
      *
-     * @param id Data channel id
+     * @param id Channel permission object ID
      */
     public void setId( int id ) { this.id = id; }
     /**
-     * Method gets data channel name.
+     * Gets channel ID.
      *
-     * @return Data channel name
+     * @return Channel ID
      */
-    public String getChannelName() { return channelName; }
+    public int getChannelId() { return channelId; }
     /**
-     * Method sets data channel name.
+     * Sets channel ID.
      *
-     * @param name Data channel name
+     * @param channelId Channel ID
      */
-    public void setChannelName( String channelName ) { this.channelName = channelName; }
+    public void setChannelId( int channelId ) { this.channelId = channelId; }
     /**
-     * Method gets data channel's WMO number.
+     * Gets user ID.
      *
-     * @return Data channel's WMO number
+     * @return User ID
      */
-    public String getWmoNumber() { return wmoNumber; }
+    public int getUserId() { return userId; }
     /**
-     * Method sets data channel's WMO number.
+     * Sets user ID.
      *
-     * @param wmoNumber Data channel's WMO number
+     * @param userId the userId to set
      */
-    public void setWmoNumber( String wmoNumber ) { this.wmoNumber = wmoNumber; }
+    public void setUserId(int userId) { this.userId = userId; }
 }
 //--------------------------------------------------------------------------------------------------

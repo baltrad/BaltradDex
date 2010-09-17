@@ -34,12 +34,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="dist.dir" value="${root.dir}/dist"/>
   <property name="build.dir" value="build"/>
   <property name="build.web.dir" value="${build.dir}/web"/>
-  <property name="build.metainf.dir" value="${build.web.dir}/META-INF" />
-  <property name="build.webinf.dir" value="${build.web.dir}/WEB-INF" />
+  <property name="build.metainf.dir" value="${build.web.dir}/META-INF"/>
+  <property name="build.webinf.dir" value="${build.web.dir}/WEB-INF"/>
   <property name="build.jsp.dir" value="${build.webinf.dir}/jsp"/>
   <property name="build.classes.dir" value="${build.webinf.dir}/classes"/>
   <property name="build.lib.dir" value="${build.webinf.dir}/lib"/>
   <property name="build.test.dir" value="${build.dir}/test" />
+  <property name="test.data.dir" value="test-data" />
 
   <property name="compile.debug" value="true"/>
   <property name="compile.includeAntRuntime" value="no"/>
@@ -129,7 +130,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <mkdir dir="${build.lib.dir}"/>
     <delete dir="${dist.dir}"/>
     <mkdir dir="${dist.dir}"/>
-
+    
     <!-- copy libraries -->
     <copy todir="${build.lib.dir}">
       <fileset dir="lib/dom4j">
@@ -242,6 +243,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="**/*.properties"/>
       </fileset>
     </copy>
+
+    <copy todir="${build.test.dir}">
+      <fileset dir="${test.data.dir}"/>
+    </copy>
+
   </target>
 
   <!-- compile source files -->

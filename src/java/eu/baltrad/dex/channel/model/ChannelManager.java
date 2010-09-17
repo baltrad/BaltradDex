@@ -26,6 +26,7 @@ import eu.baltrad.dex.util.HibernateUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.Session;
+import org.hibernate.Query;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -157,6 +158,96 @@ public class ChannelManager {
             session.delete( session.load( Channel.class, new Integer( id ) ) );
             session.getTransaction().commit();
         } catch( HibernateException e ) {
+            session.getTransaction().rollback();
+            throw e;
+        }
+    }
+    /**
+     * Gets permission for a given channel and a given user.
+     *
+     * @param channelId Channel ID
+     * @param userId User ID
+     * @return ChannelPermission object
+     * @throws HibernateException
+     */
+    public ChannelPermission getChannelPermission( int channelId, int userId ) throws HibernateException {
+        ChannelPermission channelPermission = null;
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        try {
+            channelPermission = ( ChannelPermission )session.createQuery(
+                "FROM ChannelPermission WHERE " + "channelId = ? AND userId = ?"
+                ).setInteger( 0, channelId ).setInteger( 1, userId ).uniqueResult();
+            session.getTransaction().commit();
+        } catch ( HibernateException e ) {
+            session.getTransaction().rollback();
+            throw e;
+        }
+        return channelPermission;
+    }
+    /**
+     * Gets permissions for a channel identified by a given ID.
+     *
+     * @param channelId Channel ID
+     * @return List of permissions for a given channel
+     * @throws HibernateException
+     */
+    public List getChannelPermission( int channelId ) throws HibernateException {
+        List< ChannelPermission > channelPermissions = new ArrayList< ChannelPermission >();
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+	    session.beginTransaction();
+        try {
+            channelPermissions = session.createQuery(
+                    "FROM ChannelPermission WHERE channelId = ?" ).setInteger(
+                    0, channelId ).list();
+            session.getTransaction().commit();
+        } catch( HibernateException e ) {
+            session.getTransaction().rollback();
+            throw e;
+        }
+        return channelPermissions;
+    }
+    /**
+     * Adds channel permission object to the database.
+     *
+     * @param channelPermission Channel permission object
+     * @throws HibernateException
+     */
+    public void addChannelPermission( ChannelPermission channelPermission )
+            throws HibernateException {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        try {
+            session.saveOrUpdate( channelPermission );
+            session.getTransaction().commit();
+        } catch ( HibernateException e ) {
+            session.getTransaction().rollback();
+            throw e;
+        }
+    }
+    /**
+     * Removes channel permission.
+     *
+     * @param channelId Channel ID
+     * @param userId User ID
+     * @throws HibernateException
+     */
+    public void removeChannelPermission( int channelId, int userId ) throws HibernateException {
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        try {
+            String hql = "DELETE FROM ChannelPermission WHERE channel_id = :channelId "
+                    + "AND user_id = :userId";
+            Query query = session.createQuery( hql );
+            query.setInteger( "channelId", channelId );
+            query.setInteger( "userId", userId );
+            query.executeUpdate();
+            session.getTransaction().commit();
+        } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
         }
