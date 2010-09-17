@@ -55,7 +55,7 @@ public class SetPermissionControllerTest extends TestCase {
         assertEquals( perm.getUserId(), testUser.getId() );
     }
 
-    /*public void testAddPermission() {
+    public void testAddPermission() {
         channelManager.addChannel( testChannel );
         channelManager.addChannelPermission( new ChannelPermission( testChannel.getId(),
                 testUser.getId() ) );
@@ -71,6 +71,6 @@ public class SetPermissionControllerTest extends TestCase {
         channelManager.removeChannelPermission( testChannel.getId(), testUser.getId() );
         
         assertNull( channelManager.getChannelPermission( testChannel.getId(), testUser.getId() ) );
-    }*/
+    }
 }
 //--------------------------------------------------------------------------------------------------
