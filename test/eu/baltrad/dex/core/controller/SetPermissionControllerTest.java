@@ -45,7 +45,7 @@ public class SetPermissionControllerTest extends TestCase {
 //------------------------------------------------------------------------------------------ Methods
     public void testInit() {
         testUser = userManager.getUserByID( 0 );
-        testChannel = new Channel( "test_channel", "666" );
+        testChannel = channelManager.getChannel( 0 );
         ChannelPermission perm = new ChannelPermission( testChannel.getId(), testUser.getId() );
 
         
