@@ -29,6 +29,8 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.log.model.LogManager;
 import java.util.ArrayList;
 
+import org.hibernate.HibernateException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -51,7 +53,8 @@ public class SaveChannelController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
     public static final String CHANNEL_ID = "id";
     public static final String USERS = "users";
-    public static final String MSG = "message";
+    private static final String OK_MSG_KEY = "ok_message";
+    private static final String ERROR_MSG_KEY = "error_message";
 //---------------------------------------------------------------------------------------- Variables
     private ChannelManager channelManager;
     private UserManager userManager;
@@ -114,11 +117,19 @@ public class SaveChannelController extends SimpleFormController {
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors) throws Exception {
         Channel channel = ( Channel )command;
-        channelManager.addChannel( channel );
-        request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
-                "message.addchannel.savesuccess" ) );
-        logManager.addEntry( new Date(), LogManager.MSG_WRN, "Data channel saved: " +
-                channel.getChannelName() );
+        try {
+            channelManager.addChannel( channel );
+            request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
+                "message.addradar.savesuccess" ) );
+            logManager.addEntry( new Date(), LogManager.MSG_WRN, "Saved local radar station " +
+                channel.getChannelName() + "." );
+        } catch( HibernateException e ) {
+            request.getSession().removeAttribute( OK_MSG_KEY );
+            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
+                "message.addradar.savefail" ) );
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Saved local radar station " +
+                channel.getChannelName() + "." );
+        }
         return new ModelAndView( getSuccessView() );
     }
     /**

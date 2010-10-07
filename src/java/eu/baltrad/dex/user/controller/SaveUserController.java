@@ -47,8 +47,9 @@ import java.util.Date;
 public class SaveUserController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
     public static final String USER_ID = "id";
-    public static final String MSG = "message";
     public static final String ROLES = "roles";
+    private static final String OK_MSG_KEY = "ok_message";
+    private static final String ERROR_MSG_KEY = "error_message";
 //---------------------------------------------------------------------------------------- Variables
     private UserManager userManager;
     private LogManager logManager;
@@ -99,13 +100,16 @@ public class SaveUserController extends SimpleFormController {
         User user = ( User )command;
         try {
             userManager.addUser( user );
-            request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
+            request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.savesuccess" ) );
             logManager.addEntry( new Date(), LogManager.MSG_WRN, "User account saved: " +
                 user.getName() );
         } catch( HibernateException e ) {
-            request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
+            request.getSession().removeAttribute( OK_MSG_KEY );
+            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.nameexists" ) );
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to save user account: "
+                    + user.getName() + "." );
             errors.reject( "message.adduser.nameexists" );
         }
         return new ModelAndView( getSuccessView() );

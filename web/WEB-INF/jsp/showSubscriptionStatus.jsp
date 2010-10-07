@@ -16,56 +16,64 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Page displaying subscription status
-Created on : Jun 24, 2010, 8:57:42 AM
+Document   : Remote radar subscription operation status
+Created on : Oct 1, 2010, 11:47 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-                                                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
 
-<%@ include file="/WEB-INF/jsp/include.jsp" %>
+<%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Subscription confirmation</title>
-</head>
-
-<body>
-    <div id="container">
-        <div id="header"></div>
-        <div id="nav">
-            <script type="text/javascript" src="includes/navigation.js"></script>
-        </div>
-        <div class="outer">
-            <div class="inner">
-                <div class="float-wrap">
-                    <div id="main">
-                        <h1>Subscription confirmation</h1>
-                        <br/>
-                        <div id="message-box">
-                            Your subscription request is now submitted.
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+        <title>Baltrad | Subscriptions</title>
+    </head>
+    <body>
+        <div id="container">
+            <div id="header">
+                <script type="text/javascript" src="includes/header.js"></script>
+            </div>
+            <div id="content">
+                <div id="left">
+                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+                </div>
+                <div id="right">
+                    <div id="page-title">
+                        <div class="left">
+                            Subscription management
+                        </div>
+                        <div class="right">
+                        </div>
+                    </div>
+                    <div class="message">
+                        <div class="icon">
+                            <img src="includes/images/icons/circle-check.png"
+                                 alt="request_failure"/>
+                        </div>
+                        <div class="text">
+                            Your subscription request has been successfully submitted.
                             Click OK to go back to subscription selection page.
                         </div>
-                        <div id="table-footer-rightcol">
+                    </div>
+                    <div class="footer">
+                        <div class="right">
                             <form action="showSubscriptions.htm">
-                                <input type="submit" value="OK" name="submit_button"/>
+                                <button class="rounded" type="submit">
+                                    <span>OK</span>
+                                </button>
                             </form>
                         </div>
                     </div>
-                    <div id="left">
-                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
-                    </div>
-                    <div class="clear"></div>
                 </div>
-                <div class="clear"></div>
+                <div id="clear"></div>
             </div>
         </div>
-    </div>
-    <div id="footer">
-        <script type="text/javascript" src="includes/footer.js"></script>
-    </div>
-</body>
+        <div id="footer">
+            <script type="text/javascript" src="includes/footer.js"></script>
+        </div>
+    </body>
 </html>

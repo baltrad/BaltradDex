@@ -16,49 +16,49 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Edit data channel page
-Created on : Jun 22, 2010, 11:57:02 AM
+Document   : Edit local radar station
+Created on : Oct 5, 2010, 11:41 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-                                                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
 
-<%@ include file="/WEB-INF/jsp/include.jsp" %>
+<%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Modify local data channel</title>
-</head>
-
-<body>
-    <div id="container">
-        <div id="header"></div>
-        <div id="nav">
-            <script type="text/javascript" src="includes/navigation.js"></script>
-        </div>
-        <div class="outer">
-            <div class="inner">
-                <div class="float-wrap">
-                    <div id="main">
-                        <h1>Modify local data channel</h1>
-                        <br/>
-                        <h2>
-                            <p>
-                            Click on data channel ID to modify selected channel.
-                            </p>
-                        </h2>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+        <title>Baltrad | Edit radar</title>
+    </head>
+    <body>
+        <div id="container">
+            <div id="header">
+                <script type="text/javascript" src="includes/header.js"></script>
+            </div>
+            <div id="content">
+                <div id="left">
+                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+                </div>
+                <div id="right">
+                    <div id="page-title">
+                        <div class="left">
+                            Edit local radar station
+                        </div>
+                        <div class="right">
+                        </div>
+                    </div>
+                    <div id="text-box">
+                        List of local radar stations. Click on station name in order to
+                        modify radar settings.
+                    </div>
+                    <div id="table">
                         <display:table name="registered_channels" id="channel" defaultsort="1"
-                            cellpadding="0" cellspacing="2" export="false" class="tableborder"
-                            pagesize="10">
-                            <display:column sortable="true" title="ID" href="saveLocalChannel.htm"
-                                sortProperty="id" class="tdcenter" paramProperty="id"
-                                paramId="id" value="${channel.id}">
-                            </display:column>
-                            <display:column sortable="true" title="Channel name" 
-                                sortProperty="channelName" class="tdcenter"
+                            cellpadding="0" cellspacing="2" export="false" class="tableborder">
+                            <display:column sortable="true" title="Radar station"
+                                href="saveLocalChannel.htm" sortProperty="channelName"
+                                class="tdcenter" paramProperty="id" paramId="id"
                                 value="${channel.channelName}">
                             </display:column>
                             <display:column sortable="true" title="WMO number"
@@ -66,23 +66,22 @@ Author     : szewczenko
                                 value="${channel.wmoNumber}">
                             </display:column>
                         </display:table>
-                        <div id="table-footer">
-                            <form action="adminControls.htm">
-                                <input type="submit" value="Back" name="admin_button"/>
-                            </form>
+                        <div class="footer">
+                            <div class="right">
+                                <form action="configuration.htm">
+                                    <button class="rounded" type="submit">
+                                        <span>Back</span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                    <div id="left">
-                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
-                    </div>
-                    <div class="clear"></div>
                 </div>
-                <div class="clear"></div>
+                <div id="clear"></div>
             </div>
         </div>
-    </div>
-    <div id="footer">
-        <script type="text/javascript" src="includes/footer.js"></script>
-    </div>
-</body>
+        <div id="footer">
+            <script type="text/javascript" src="includes/footer.js"></script>
+        </div>
+    </body>
 </html>

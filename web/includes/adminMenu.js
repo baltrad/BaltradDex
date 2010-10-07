@@ -22,21 +22,37 @@
 /*
  * System administrator's menu
  */
-document.write( "<a href=\"welcome.htm\">Home</a>" );
-document.write( "<br>" );
-document.write( "<a href=\"localChannels.htm\">Local</a>" );
-document.write( "<a href=\"connectToNode.htm\">Connect</a>" );
+
+document.write( "<div class=\"menu\">" );
+
+document.write( "<div class=\"group\">Local node</div>" );
+
+document.write( "<a href=\"home.htm\">Home</a>" );
+document.write( "<a href=\"radars.htm\">Radars</a>" );
+document.write( "<a href=\"log.htm\">System messages</a>" );
+
+document.write( "<div class=\"separator\"></div>" );
+
+document.write( "<div class=\"group\">Data Exchange</div>" );
+
+document.write( "<a href=\"connectToNode.htm\">Connect to node</a>" );
 document.write( "<a href=\"showSubscriptions.htm\">Subscriptions</a>" );
-document.write( "<a href=\"log.htm\">Messages</a>" );
-document.write( "<a href=\"credits.htm\">Credits</a>" );
-document.write( "<br>" );
-document.write( "<a href=\"adminControls.htm\">Administration</a>" );
-document.write( "<br>" );
+
+document.write( "<div class=\"separator\"></div>" );
+
+document.write( "<div class=\"group\">Data Processing</div>" );
+
 document.write( "<a href=\"adaptors.htm\">Adaptors</a>" );
 document.write( "<a href=\"showroutes.htm\">Routes</a>" );
 document.write( "<a href=\"showschedule.htm\">Schedule</a>" );
-document.write( "<br>" );
-document.write( "<a href=\"signout.htm\">Logout</a>" );
-document.write( "<br>" );
 
+document.write( "<div class=\"separator\"></div>" );
 
+document.write( "<div class=\"group\">Administration</div>" );
+
+document.write( "<a href=\"configuration.htm\">Configuration</a>" );
+document.write( "<a href=\"nodeProperties.htm\">Node properties</a>" );
+
+document.write( "<div class=\"separator\"></div>" );
+
+document.write( "</div>" );

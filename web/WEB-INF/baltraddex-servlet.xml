@@ -41,9 +41,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="mappings">
             <props>
-                <prop key="welcome.htm">urlFilenameController</prop>
-                <prop key="localChannels.htm">channelController</prop>
-                <prop key="dataFromChannel.htm">channelDataController</prop>
+                <prop key="home.htm">urlFilenameController</prop>
+                <prop key="radars.htm">channelController</prop>
+                <prop key="radarData.htm">channelDataController</prop>
                 <prop key="credits.htm">urlFilenameController</prop>
             </props>
         </property>
@@ -61,9 +61,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="mappings">
             <props>
                 <prop key="connectToNode.htm">connectToNodeController</prop>
-                <prop key="showRemoteChannels.htm">remoteChannelController</prop>
-                <prop key="showSelectedRemoteChannels.htm">remoteChannelController</prop>
-                <prop key="showRemoteChannelSelectionStatus.htm">remoteChannelController</prop>
+                <prop key="remoteRadars.htm">remoteChannelController</prop>
+                <prop key="selectedRemoteRadars.htm">remoteChannelController</prop>
+                <prop key="subscribedRemoteRadars.htm">remoteChannelController</prop>
                 <prop key="download.htm">downloadController</prop>
                 <prop key="showSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSelectedSubscriptions.htm">subscriptionController</prop>
@@ -101,8 +101,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="mappings">
             <props>
-                <prop key="adminControls.htm">urlFilenameController</prop>
-                <prop key="adminConfig.htm">saveConfigurationController</prop>
+                <prop key="configuration.htm">urlFilenameController</prop>
+                <prop key="nodeProperties.htm">saveConfigurationController</prop>
                 <prop key="clearmessages.htm">urlFilenameController</prop>
                 <prop key="confirmclearmessages.htm">clrMsgsController</prop>
                 <prop key="showregister.htm">showRegController</prop>
@@ -111,11 +111,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="saveUser.htm">saveUserController</prop>
                 <prop key="editUser.htm">editUserController</prop>
                 <prop key="showUsers.htm">removeUserController</prop>
+                <prop key="saveUserStatus">urlFilenameController</prop>
                 <prop key="showSelectedUsers.htm">removeUserController</prop>
                 <prop key="showRemovedUsers.htm">removeUserController</prop>
                 <prop key="saveLocalChannel.htm">saveChannelController</prop>
                 <prop key="editLocalChannel.htm">editChannelController</prop>
                 <prop key="showLocalChannels.htm">removeChannelController</prop>
+                <prop key="saveRadarStatus">urlFilenameController</prop>
                 <prop key="showSelectedLocalChannels.htm">removeChannelController</prop>
                 <prop key="showRemovedLocalChannels.htm">removeChannelController</prop>
                 <prop key="selectRemoveSubscriptions.htm">subscriptionController</prop>
@@ -135,8 +137,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
         <property name="mappings">
             <props>
-                <prop key="signin.htm">signInController</prop>
-                <prop key="signout.htm">signOutController</prop>
+                <prop key="login.htm">loginController</prop>
+                <prop key="logout.htm">logoutController</prop>
                 <prop key="dispatch.htm">frameDispatcherController</prop>
             </props>
         </property>
@@ -200,34 +202,33 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         The signin controller.
     -->
-    <bean name="signInController" class="eu.baltrad.dex.auth.controller.SignInController">
+    <bean name="loginController" class="eu.baltrad.dex.auth.controller.LoginController">
         <property name="sessionForm">
             <value>true</value>
 	</property>
 	<property name="formView">
-            <value>signin</value>
+            <value>login</value>
         </property>
         <property name="userManager">
             <ref bean="userManager"/>
         </property>
         <property name="successView">
-            <value>redirect:welcome.htm</value>
+            <value>redirect:home.htm</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.user.model.User</value>
         </property>
         <property name="validator">
-            <ref bean="signInValidator"/>
+            <ref bean="loginValidator"/>
         </property>
     </bean>
 
     <!--
-        The signout controller.
+        Logout controller.
     -->
-    <bean name="signOutController"
-        class="eu.baltrad.dex.auth.controller.SignOutController">
+    <bean name="logoutController" class="eu.baltrad.dex.auth.controller.LogoutController">
         <property name="successView">
-            <value>redirect:signin.htm</value>
+            <value>redirect:login.htm</value>
         </property>
      </bean>
 
@@ -250,7 +251,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="channelManager" />
         </property>
         <property name="successView">
-            <value>localChannels</value>
+            <value>radars</value>
         </property>
     </bean>
 
@@ -263,7 +264,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="dataManager" />
         </property>
         <property name="successView">
-            <value>dataFromChannel</value>
+            <value>radarData</value>
         </property>
     </bean>
 
@@ -315,7 +316,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="downloadController" class="eu.baltrad.dex.channel.controller.DownloadController">
         <property name="successView">
-            <value>dataFromChannel</value>
+            <value>radarData</value>
         </property>
         <property name="logManager">
             <ref bean="logManager"/>
@@ -382,7 +383,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Sign in validator.
     -->
-    <bean name="signInValidator" class="eu.baltrad.dex.auth.util.SignInValidator"/>
+    <bean name="loginValidator" class="eu.baltrad.dex.auth.util.LoginValidator"/>
 
     <!--
         User manager.
@@ -456,7 +457,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="saveUserController" class="eu.baltrad.dex.user.controller.SaveUserController">
         <property name="successView">
-            <value>redirect:adminControls.htm</value>
+            <value>saveUserStatus</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.user.model.User</value>
@@ -498,6 +499,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="userManager">
             <ref bean="userManager" />
         </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
     </bean>
 
     <!--
@@ -506,7 +510,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="saveChannelController" 
         class="eu.baltrad.dex.channel.controller.SaveChannelController">
         <property name="successView">
-            <value>redirect:adminControls.htm</value>
+            <value>saveRadarStatus</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.channel.model.Channel</value>
@@ -563,6 +567,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="channelManager">
             <ref bean="channelManager" />
         </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
     </bean>
 
     <!--
@@ -599,7 +606,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <value>eu.baltrad.dex.core.model.NodeConnection</value>
         </property>
         <property name="successView">
-            <value>redirect:showRemoteChannels.htm</value>
+            <value>redirect:remoteRadars.htm</value>
         </property>
         <property name="nodeConnectionManager">
             <ref bean="nodeConnectionManager" />
@@ -666,7 +673,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="configurationManager"/>
         </property>
         <property name="successView">
-            <value>redirect:adminConfig.htm</value>
+            <value>redirect:nodeProperties.htm</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.config.model.Configuration</value>
@@ -678,7 +685,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <value>false</value>
         </property>
         <property name="formView">
-            <value>adminConfig</value>
+            <value>nodeProperties</value>
         </property>
         <property name="logManager">
             <ref bean="logManager"/>

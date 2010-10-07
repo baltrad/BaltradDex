@@ -49,7 +49,8 @@ public class NodeConnectionController extends MultiActionController {
     // model keys
     private static final String SHOW_CONN_MODEL = "node_connections";
     private static final String SHOW_SEL_CONN_MODEL = "selected_node_connections";
-    public static final String MSG = "message";
+    private static final String OK_MSG_KEY = "ok_message";
+    private static final String ERROR_MSG_KEY = "error_message";
     // view names
     private static final String SHOW_CONN_VIEW = "showNodeConnections";
     private static final String SHOW_SEL_CONN_VIEW = "showSelectedNodeConnections";
@@ -110,17 +111,19 @@ public class NodeConnectionController extends MultiActionController {
         for( int i = 0; i < getSelectedConns().size(); i++ ) {
             try {
                 nodeConnectionManager.removeConnection( getSelectedConns().get( i ).getId() );
+                request.getSession().setAttribute( OK_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removeconnection.success" ) );
                 logManager.addEntry( new Date(), LogManager.MSG_INFO, "Removed node connection: "
                         + getSelectedConns().get( i ).getConnectionName() );
             } catch( HibernateException e ) {
-                request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
+                request.getSession().removeAttribute( OK_MSG_KEY );
+                request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeconnection.fail" ) );
                 logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove node "
                         + "connection: " + e.getMessage() );
             }
         }
-        request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
-                "message.removeconnection.success" ) );
         return new ModelAndView( SHOW_REM_CONN_VIEW );
     }
     /**

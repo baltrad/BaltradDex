@@ -19,551 +19,610 @@
 *
 ***************************************************************************************************/
 
-/* 
-    General properties
-*/
+/*
+ * reset margins and padding
+ */
 * {
-    padding: 0;
-    margin: 0;
-    border: 0;
+     margin: 0;
+     padding: 0;
 }
-body, html {
+/*
+ * global styles
+ */
+html, body {
+    height: 100%;
+    overflow: inherit;
     font-family: Verdana, Arial, Tahoma, sans-serif;
-    background-color: #CACACA;
-    text-align: center; /* centers the design in old IE versions */
-    height: 100%;
     font-size: small;
+    background: white;
 }
+/* input fields */
+input, password {
+    border: 1px solid #2d76ae;
+    -webkit-border-radius: 4px; /* Safari, Chrome */
+    -khtml-border-radius: 4px;    /* Konqueror */
+    -moz-border-radius: 4px; /* Firefox */
+    border-radius: 4px;
+}
+/* buttons */
+button {
+    border: 0 none;
+    cursor: pointer;
+    padding: 0 15px 0 0;
+    text-align: center;
+    height: 30px;
+    line-height: 30px;
+    width: auto;
+}
+button.rounded {
+    background: transparent url( "images/btn_right.png" ) no-repeat scroll right top;
+    clear: left;
+}
+button span {
+    display: block;
+    padding: 0 0 0 15px;
+    position: relative;
+    white-space: nowrap;
+    height: 30px;
+    line-height: 30px;
+}
+button.rounded span {
+    background: transparent url( "images/btn_left.png" ) no-repeat scroll left top;
+    color: #FFFFFF;
+}
+button.rounded:hover {
+    background-position: 100% -30px;
+}
+button.rounded:hover span {
+    background-position: 0% -30px;
+}
+button::-moz-focus-inner {
+    border: none;
+}
+
 /*
-    Hyperlinks
-*/
-a:link {
-    color:#003097;
-}
-a:visited {
-    color:#003097;
-}
-a:hover {
-    color:#99CC66;
-    text-decoration:underline;
-}
-/*
-    Headers
-*/
-h1 {
-    font-size:1.6em;
-    border-bottom: 2px solid #91ACC1;
-}
-h2 {
-    font-size:14px;
-}
-h3 {
-    font-size:12px;
-}
-h1, h2, h3 {
-    color: #003399;
-}
-h2 p {
-    margin: 16px 0 16px 0;
-}
-/* 
-    Clear container
-*/
-.clear { 
-    clear: both;
-}
-/* 
-    Main container
-*/
+ * main container
+ */
 #container {
-    width: 1024px;
-    margin: 0 auto;
     min-height: 100%;
-    text-align: left;
+    width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+    background-image: url("images/faux-columns_1024x14.png");
     background-repeat: repeat-y;
-    background-image: url("images/baltrad-faux-1024x6.png");
 }
-#signin-container {
-    width: 1024px;
-    margin: 0 auto;
-    min-height: 100%;
-    background-color:#EEEEEE;
-}
-/* IE min-height hack */
-* html #container #signin-container {
+* html #container {
     height: 100%;
 }
-/* 
-    Header section
-*/
+
+/*
+ * actual page contant
+ */
+#content {
+    padding-bottom: 30px;
+}
+
+/*
+ * header
+ */
 #header {
-    height: 106px;
-    background-color: #FFFFFF;
-    background-repeat: no-repeat;
-    background-image: url("images/baltrad-header-1024x100.png");
+    height: 88px;
 }
-/* 
-    Navigation bar
-*/
-#nav {
-    padding: 4px 4px 4px 12px;
-    color: #003399;
-    background-color: #99CC66;
-}
-.outer {
-    padding-left: 200px;
-}
-* html .outer {
-    padding-right: 120px;
-}
-.inner {
-    width: 595px;
-    padding-bottom: 54px; /* same height as footer*/
-}
-.signin-inner {
-    width: 595px;
-    padding-bottom: 54px; /* same height as footer*/
-}
-* html .inner .signin-inner{
-    width: 100%;
-}
-.float-wrap {
+#header .logo {
+    width: 236px;
+    height: 88px;
     float: left;
-    width: 1024px;
-    margin-left: -200px; /* same value as .outer padding-left but with negative value */
+    clear: left;
+    background-image: url("images/logo_234x88_shadow.png");
 }
-.signin-float-wrap {
+#header .banner {
+    width: 788px;
+    height: 88px;
     float: left;
-    width: 1024px;
+    clear: right;
+    background-image: url("images/banner_788x88_shadow.png");
 }
-/* 
-    Main workspace area
-*/
-#main {
+.help {
     float: right;
-    width: 776px;
-    margin: 12px 12px 54px 12px;
+    margin-right: 32px;
+    margin-top: 32px;
+    font-size: small;
+    color: white;
 }
-#signin-main {
-    float: left;
+#header .help a {
+    color: white;
+    text-decoration: none;
+}
+#header .help a:hover {
+    color: #2d76ae;
+    text-decoration: underline;
+}
+
+/*
+ * footer
+ */
+#footer {
+    height: 30px;
     width: 1024px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: -30px;
+    margin-bottom: 0px;
+    /*margin: -30px auto 0;*/
+    background: #2d76ae;
 }
-* html #main #signin-main {
-    position: relative;  
+#footer .menu {
+    width: 284px;
+    color: white;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 4px;
 }
-* html #left {
-    position: relative;  /*** IE needs this  ***/
+#footer .menu a {
+    color: white;
+    text-decoration: none;
 }
-* html #right {
-    position: relative;  /*** IE needs this  ***/
-    margin-right: -120px; /*** IE gets this margin. ***/
+#footer .menu a:hover {
+    text-decoration: underline;
+    color: #99cc66;
 }
-/* 
-    Left column with main menu
+
+/*
+ * hidden div
+ */
+#clear {
+    clear: both;
+    width: 100%;
+    color: white;
+    margin-bottom: 30px;
+}
+
+/*
+ * left column
 */
 #left {
-    float: left;
-    width: 200px;
-    padding-top: 12px;
-    margin: 0px 12px 54px 0px;
-    min-height:100%;
-}
-#left a {
-    display: block;
     position: relative;
-    left: 12px;
-    clear: right;
-    padding: 5px;
-    margin-bottom: 6px;
-    background: /*#E0DCDC*/#CACACA;
-    border: 1px solid #EEEEEE;
-    font-size: 13px;
+    width: 236px;
+    float:left;
+    clear: left;
+}
+#left .menu {
+    padding: 32px 12px 12px 12px;
+}
+#left .menu > .group {
     font-weight: bold;
-    text-decoration: none;
+    font-size: 1.2em;
     color: #003298;
+    padding-left: 12px;
+    clear: both;
+    padding-bottom: 4px;
 }
-#left a:link {
-    color:#003097;
+#left .menu > .separator {
+    width: 100%;
+    position: relative;
+    float: left;
+    clear: both;
+    border-bottom: 1px solid #A7A7A7;
+    margin-top: 12px;
+    margin-bottom: 12px;
+
 }
-#left a:visited {
-    color:#003097;
+#left .menu a {
+    width: 70%;
+    position: relative;
+    float: left;
+    clear: both;
+    left: 32px;
+    padding: 2px;
+    font-weight: bold;
+    color: #2d76ae;
+    text-decoration: none;
+    border: 1px solid white;
 }
-#left a:hover {
-    color:#99CC66;
-    text-decoration:underline;
-    background:white;
+#left .menu a:hover {
+    color: #99CC66;
+    border: 1px solid #99CC66;
 }
-/* 
-    Footer section
-*/
-#footer {
-    width: 1024px;
-    height: 54px;
-    margin: 0 auto;
-    margin-top: -54px;
-    color: #FFFFFF;
-    background-image: url("images/baltrad-footer-1024x54.png");
+
+/*
+ * right column
+ */
+#right {
+    position: relative;
+    float: left;
+    width: 724px;
+    padding-top: 12px;
+    padding-left: 32px;
+    padding-right: 32px;
 }
-#footer .leftcol {
-    margin: 16px 0 0 16px;
+
+/*
+ * page title
+ */
+#page-title {
+    font-size: 1.5em;
+    color: #2d76ae;
+    border-bottom: 1px solid #2d76ae;
+    float: left;
+    width: 100%;
+}
+#page-title .left {
     float: left;
 }
-#footer .midcol {
-    margin: 16px 16px 0 16px;
+#page-title .right {
     float: right;
 }
-#footer .rightcol {
-    margin: 4px 8px 0 0;
-    float: right;
-}
+
 /*
-    Welcome page
-*/
-#welcome {
-    border-bottom: 2px solid #91ACC1;
-    margin-bottom: 18px;
+ * text box
+ */
+#text-box {
+    width: 100%;
+    position: relative;
+    float: left;
+    clear: right;
+    padding-top: 12px;
 }
-/* 
-    Signin screen
-*/
-#signin-box {
-    position:relative;
-    width:56%;
-    height:248px;
-    margin-left:auto;
-    margin-right:auto;
-    margin-top:12%;
-    margin-bottom:12%;
-    font-size:14px;
-    text-align:center;
-    color:#083B9F;
-    border:6px solid #89B8DC;
-    background: #C9DEEF;
-}
-#signin-welcome {
-    display:block;
-    padding:10px;
-    color:#083B9F;
-    font-size:16px;
-    font-weight:bold;
-    text-align:center;
-    border-bottom:6px solid #89B8DC;
-}
-#signin-info {
-    padding:6px;
-}
-#signin-operator {
-    font-weight:bold;
-    font-size:18px;
-}
-#signin-form {
-    display:block;
-    position:relative;
-    margin-left:auto;
-    margin-right:auto;
-    padding:6px;
-    width:70%;
-}
-#signin-form-leftcol {
-    padding:4px;
-    float:left;
-    text-align:right;
-    margin-right:12px;
-    clear:left;
-}
-#signin-form-rightcol {
-    padding:4px;
-    float:left;
-    clear:right;
-}
-#signin-form-elem {
-    padding:4px;
-    height:1.6em;
-}
-#signin-submit {
-    padding: 4px;
-    margin-right: 12px;
-    float: right;
-    clear: both;
-}
-#signin-box input {
-    border: 1px solid #7F7F7F;
-}
-/* 
-    Tables - displaytag
-*/
-thead {
-    text-align: center;
+#text-box .title {
     font-size: 1.1em;
-    color: #003399;
+    padding-bottom: 12px;
+}
+
+/*
+ * login form
+ */
+#login {
+    float: left;
+    clear: right;
+    left: 20%;
+    position: relative;
+    width: 100%;
+    padding-top: 42px;
+    text-align: center;
+}
+form > .left {
+    position: relative;
+    float: left;
+    margin-right: 8px;
+    color: #2d76ae;
+    font-weight: bold;
+    font-size: 1.1em;
+    text-align: right;
+}
+form > .left > .row, form > .right > .row {
+    height: 28px;
+}
+form > .right {
+    position: relative;
+    float: left;
+}
+form > .top {
+    position: relative;
+    clear: both;
+    margin-bottom: 8px;
+    right: 20%;
+}
+form > .bottom {
+    position: relative;
+    clear: both;
+    right: 20%;
+    padding-top: 18px;
+}
+
+/*
+ * separator
+ */
+#separator {
+    width: 100%;
+    float: left;
+    clear: left;
+    margin-top: 60px;
+    border-bottom: 1px solid #2d76ae;
+}
+
+/*
+ * messages section
+ */
+#messages {
+    margin-bottom: 12px;
+}
+
+/*
+ * tables
+ */
+#table {
+    width: 100%;
+    float: left;
+    clear: both;
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+.footer {
+    width: 100%;
+    position: relative;
+    float: left;
+    clear: both;
+    text-align: right;
+    border-top: 1px solid #2d76ae;
+    margin-top: 24px;
+}
+.footer > .right {
+    padding-top: 12px;
 }
 .tableborder {
-    width:100%;
-    background-color: #CACACA;
+    width: 100%;
     font-size: small;
 }
-.even {
-    background-color: #D3E4EC;
-}
-.odd {
-    background-color: #EEEEEE;
-}
-.tdcenter {
-    padding: 4px 4px 4px 8px;
-    border: 1px solid #91ACC1;
-}
-#logtable td {
+thead a, thead th {
+    height: 32px;
+    font-size: 1.1em;
+    font-weight: normal;
+    color: white;
+    border: 1px solid #2d76ae;
+    background: #2d76ae;
     padding: 2px 4px 2px 4px;
-    border: 1px solid #91ACC1;
+    font-family: Verdana, Arial, Tahoma, sans-serif;
 }
-.log-cell-info {
-    text-align: center;
+thead a {
+    text-decoration: underline;
 }
-.log-cell-msg-info {
-    text-align: left;
-    padding-left: 4px;
+thead a:hover {
+    border: 1px solid white;
+    background: #99CC66;
+    text-decoration: none;
 }
-.log-cell-wrn {
-    text-align: center;
-    background-color:#FFE9AD;
+thead tr:hover {
+    background: #EEF4F7;
 }
-.log-cell-msg-wrn {
-    text-align: left;
-    padding-left: 4px;
-    background-color:#FFE9AD;
+tr:hover {
+    background: #99CC66;
 }
-.log-cell-err {
-    text-align: center;
-    background-color:#FF806C;
+tr {
+    background: #EEF4F7;
 }
-.log-cell-msg-err {
-    text-align: left;
-    padding-left: 4px;
-    background-color:#FF806C;
+.tdcenter, .tdcheck, .tdred, .tdgreen {
+    padding: 4px 4px 4px 4px;
+}
+.tdred {
+    color: #EB0100;
+}
+.tdgreen {
+    color: #588D25;
+}
+.tdcenter a {
+    color: #003298;
+    padding: 1px 2px 1px 2px;
+    text-decoration: underline;
+}
+.tdcenter a:hover {
+    color: white;
 }
 .tdcheck {
     text-align: center;
-    border: 1px solid #91ACC1;
 }
 .tdhidden {
-    display:none;
-    visibility:hidden;
+    visibility: hidden;
+    display: none;
 }
-/*.tdcenter {
-    text-align:center;
-    padding:6px;
+.message {
+    width: 100%;
+    position: relative;
+    float: left;
+    clear: both;
+    margin-top: 24px;
+}
+.message > .icon {
+    width: 64px;
+    float: left;
+    clear: left;
+}
+.message > .text {
+    width: 624px;
+    float: left;
+    clear: right;
+    color: #2d76ae;
+    font-size: 1.1em;
+    padding-top: 16px;
+    padding-left: 32px;
+}
+#table > .header {
+    width: 100%;
+    position: relative;
+    float: left;
+    clear: right;
+    background: #2d76ae;
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+#table > .header > .title {
+    font-size: 1.2em;
+    color: white;
+    padding: 6px;
+}
+#table > form > .left {
+    position: relative;
+    float: left;
+    clear: left;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+#table > form > .right {
+    position: relative;
+    float: left;
+    clear: right;
+}
+#table > form > .right > .row > select {
+    width: 200px;
+}
+#table > form > .right > .row, #table > form > .left > .row {
+    height: 26px;
+    font-family: Verdana, Arial, Tahoma, sans-serif;
+    font-size: small;
+    font-weight: normal;
+    color: black;
 }
 
-.tdcenter a {
-    font-size:12px;
-}
-.tableborder a {
-    font-size:13px;
-}*/
 /*
-    Tables - other
-*/
-table {
+ * Node properties page
+ */
+#table > .props > form > .right > .row > input {
+    width: 360px;
+}
+#table > .props > form > .right > .row > select {
+    width: 200px;
+}
+
+/*
+ * Node configuration page
+ */
+#table > .config {
     width: 100%;
-    /*background-color: #CACACA;*/
+    float: left;
 }
-td {
-    padding: 4px 4px 4px 8px;
-    border: 1px solid #91ACC1;
+#table > .config > .left {
+    float: left;
+    clear: left;
 }
-tr .right {
-    width: 60%;
+#table > .config > .middle {
+    float: left;
 }
-.right input {
-    width: 60%;
-    border: 1px solid #91ACC1;
+#table > .config > .right {
+    float: left;
+    clear: right;
 }
-.right select {
-    width: 60%;
-    border: 1px solid #91ACC1;
+.left > .tile > .icon {
+    float: left;
+    clear: left;
 }
-.right a {
-    margin-left: 10px;
-    margin-right: 10px;
+.left > .tile > .header {
+    float: left;
+    clear: right;
 }
-caption {
-    text-align: center;
-    font-size: 1.1em;
-    font-weight: bolder;
-    padding: 8px;
-    color: #003399;
-    background-color: #CACACA;
-}
-/*
-    Table footer
-*/
-#table-footer {
-    display: block;
-    float: right;
+.left > .tile > .text {
+    float: left;
     clear: both;
-    padding: 12px;
-    font-size: 1.1em;
-    font-weight: bold;
 }
-#table-footer-leftcol, #table-footer-rightcol {
+.middle > .tile > .icon {
+    float: left;
+    clear: left;
+}
+.middle > .tile > .header {
+    float: left;
+    clear: right;
+}
+.middle > .tile > .text {
+    float: left;
+    clear: both;
+}
+.right > .tile > .icon {
+    float: left;
+    clear: left;
+}
+.right > .tile > .header {
+    float: left;
+    clear: right;
+}
+.right > .tile > .text {
+    float: left;
+    clear: both;
+}
+.tile {
+    height: 158px;
     display: block;
-    position: relative;
-    float: right;
-    padding: 12px;
+    padding: 4px;
 }
-#table-footer input {
-    border: 1px solid #7F7F7F;
-    width: 100px;
-}
-#table-footer-leftcol input, #table-footer-rightcol input {
-    border: 1px solid #7F7F7F;
-    width: 100px;
-}
-/*
-    Message box
-*/
-div#message-box {
-    border: 2px solid #99CC66;
-    margin-top: 12px;
-    padding: 10px;
-}
-div#message-text {
-    color: #99CC66;
-    padding: 12px;
+.tile > .header {
+    font-weight: bold;
     font-size: 1.2em;
+    color: #003298;
+    text-align: center;
+    padding: 25px 0px 12px 0px;
+    border-bottom: 1px solid #2d76ae;
 }
+.tile > .icon {
+    padding: 8px 4px 0px 4px;
+}
+.tile > .text > .row {
+    position: relative;
+    float: left;
+    clear: both;
+    font-weight: bold;
+    padding: 0px 2px 2px 70px;
+}
+.tile > .text > .row > a {
+    color: #2d76ae;
+    text-decoration: underline;
+    padding: 2px;
+}
+.tile > .text > .row > a:hover {
+    color: #99CC66;
+    text-decoration: none;
+}
+
 /*
-    Form elements
-*/
+ * error messages
+ */
 .errors {
     color: red;
 }
 /*
-    Welcome page columns
-*/
-.welcome-leftcol {
-    font-size: 13px;
+ * messages table
+ */
+#logtable td {
+    padding: 2px 4px 2px 4px;
 }
-.welcome-rightcol {
-    font-size: 14px;
-    font-weight: bold;
-    color: #003399;
+#logtable .warning {
+    color: #003197;
 }
-/*
-    Input field areas
-*/
-.user-input {
-    padding: 12px;
-    display: block;
-    /*background: #CACACA;*/
-}
-.tdcenter-red {
-    padding: 4px 4px 4px 8px;
-    border: 1px solid #91ACC1;
+#logtable .error {
     color: red;
 }
-.tdcenter-green {
-    padding: 4px 4px 4px 8px;
-    border: 1px solid #91ACC1;
-    color: #99CC66;
-}
-/*
-    Tabbed control panel layout
-*/
-div.tabs {
-    position: relative;
-}
-div.active-rtab, div.active-ltab, div.inactive-rtab, div.inactive-ltab {
-    font-size: 14px;
-    font-weight: bold;
-    border: 1px solid #91ACC1;
-    color:#003097;
-    border-bottom: 1px solid #EEEEEE;
-    display: inline;
-    padding: 6px;
-    position: relative;
-    z-index: 2;
-}
-div.active-rtab {
-    right: 1px;
-}
-div.inactive-rtab, div.inactive-ltab {
-    background: #CACACA;
-    border-bottom: 1px solid #91ACC1;
-}
-div.inactive-rtab {
-    right: 1px;
-}
-div.active-rtab:hover, div.active-ltab:hover, div.inactive-rtab:hover, div.inactive-ltab:hover {
-    background: white;
-}
-div.active-rtab > a, div.active-ltab > a, div.inactive-rtab > a, div.inactive-ltab > a {
-    text-decoration: none;
-}
-div.controls, div.config {
-    border: 1px solid #91ACC1;
-    padding: 6px;
-    position: absolute;
-    display: block;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 1;
-    overflow: auto;
-    top: 24px;
-}
-div.controls {
-    min-height: 264px;
-}
-div.config {
-    min-height: 344px;
-}
-
-
-
 
 /*
-    Tabbed control panel
+ * Beast GUI
  */
-/*div.tabs {
-    min-height: 400px;		 No height: can grow if :target doesn't work 
-    position: relative;		 Establish a containing block 
-    line-height: 1;		 Easier to calculate with 
-    z-index: 0;			 So that we can put other things behind 
-}
-div.tabs > div {
-    display: inline;
-}
-div.tabs > div > a {
-    font-size: 14px;
+.beast-error {
     font-weight: bold;
-    background: #EEEEEE;		 Active tabs are light gray 
-    padding: 6px;		
-    border: 1px solid #91ACC1;
-    border-bottom: 1px solid #EEEEEE;  Visually connect tab and tab body 
+    color: red;
 }
-div.tabs > div:not(:target) > a {
-    border-bottom: none;		 Make the bottom border disappear 
-    background: #CACACA;		 Inactive tabs are dark gray 
+.form-content {
+  width:98%;
+  padding: 6px;
+  margin: 2px;
+  background-color: #CACACA;
 }
-div.tabs > div:target > a,	 Apply to the targeted item or... 
-:target #config > a {		 ... to the default item 
-    border-bottom: 1px solid #EEEEEE;  Visually connect tab and tab body 
+.form-content ul {
+  padding:2px;
+  margin:2px;
+  list-style:none;
+  overflow:auto;
 }
-div.tabs > div > div {
-  background: #EEEEEE;		 Light gray 
-  z-index: -2;			 Behind, because the borders overlap 
-  left: 0; top: 22px;		 The top needs some calculation... 
-  bottom: 0; right: 0;		 Other sides flush with containing block 
-  overflow: auto;		 Scroll bar if needed 
-  padding: 6px;		 Looks better 
-  border: 1px solid #91ACC1;
+.form-content ul li {
+  padding:2px;
+  margin:2px;
 }
-div.tabs > div:not(:target) > div {  Protect CSS1 & CSS2 browsers 
-  position: absolute;		 All these DIVs overlap 
+.form-content ul li span {
+  float:left;
+  width:5em;
+  text-align:left;
+  padding-right:30px;
+  font-weight:bold;
 }
-div.tabs > div:target > div, :target #config > div {
-  position: absolute;		 All these DIVs overlap 
-  z-index: -1;			 Raise it above the others 
+.adaptorerror {
+  font-weight:bold;
+  color:#c80000;
 }
-*/
+.routererror {
+  font-weight:bold;
+  color:#c80000;
+}
+.routedefinition {
+  font-size:100%;
+  float:left;
+  width:100%;
+  height:400px;
+}
+.scheduleerror {
+  font-weight:bold;
+  color:#c80000;
+}

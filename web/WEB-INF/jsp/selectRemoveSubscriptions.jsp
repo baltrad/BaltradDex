@@ -16,17 +16,16 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Data channel subscription page
-Created on : Jun 24, 2010, 8:55:52 AM
+Document   : Remove subscribed radar station
+Created on : Oct 5, 2010, 2:01 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-                                                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
 
-<%@ include file="/WEB-INF/jsp/include.jsp" %>
-
+<%@include file="/WEB-INF/jsp/include.jsp"%>
+<%@ page import="java.util.List" %>
 <%@ page import="java.util.List" %>
 <%
     // Check if list of available subscriptions is not empty
@@ -38,102 +37,111 @@ Author     : szewczenko
     }
 %>
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Manage subscribed channels</title>
-</head>
-
-<body>
-    <div id="container">
-        <div id="header"></div>
-        <div id="nav">
-            <script type="text/javascript" src="includes/navigation.js"></script>
-        </div>
-        <div class="outer">
-            <div class="inner">
-                <div class="float-wrap">
-                    <div id="main">
-                        <h1>Manage subscribed channels</h1>
-                        <br/>
-                        <c:choose>
-                            <c:when test="${av_subs_status == 1}">
-                            <h2>
-                                <p>
-                                Click on a check box to select subscribed channel for removal.
-                                </p>
-                            </h2>
-                            <form action="showRemovedSubscriptions.htm">
-                                <display:table name="subscriptions" id="subscription" defaultsort="1"
-                                    requestURI="selectRemoveSubscriptions.htm" cellpadding="0"
-                                    cellspacing="2" export="false" class="tableborder">
-                                    <display:column sortable="true" title="Channel name"
-                                        sortProperty="channelName" paramId="channelName"
-                                        paramProperty="channelName"
-                                        class="tdcenter" value="${subscription.channelName}">
-                                    </display:column>
-
-                                    <display:column sortable="true" title="Operator"
-                                        sortProperty="operatorName" paramId=""
-                                        paramProperty="operatorName" class="tdcenter"
-                                        value="${subscription.operatorName}">
-                                    </display:column>
-                                    <display:column sortable="true" title="Node address"
-                                        sortProperty="nodeAddress" paramId="" 
-                                        paramProperty="nodeAddress" class="tdcenter"
-                                        value="${subscription.nodeAddress}">
-                                    </display:column>
-                                    <c:choose>
-                                        <c:when test="${subscription.selected == true}">
-                                            <display:column sortable="false" 
-                                                title="Subscription" class="tdcenter-green"
-                                                value="Active">
-                                            </display:column>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <display:column sortable="false" 
-                                                title="Subscription"
-                                                class="tdcenter-red" value="Inactive">
-                                            </display:column>
-                                        </c:otherwise>
-                                    </c:choose>
-                                    <display:column sortable="false" title="Remove"
-                                        class="tdcheck"> <input type="checkbox"
-                                        name="selected_channels"
-                                        value="${subscription.channelName}"/>
-                                    </display:column>
-                                </display:table>
-                            <div id="table-footer">
-                                <input type="submit" value="Submit" name="submitButton"/>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+        <title>Baltrad | Remove subscription</title>
+    </head>
+    <body>
+        <div id="container">
+            <div id="header">
+                <script type="text/javascript" src="includes/header.js"></script>
+            </div>
+            <div id="content">
+                <div id="left">
+                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+                </div>
+                <div id="right">
+                    <div id="page-title">
+                        <div class="left">
+                            Remove subscribed radar station
+                        </div>
+                        <div class="right">
+                        </div>
+                    </div>
+                    <c:choose>
+                        <c:when test="${av_subs_status == 1}">
+                            <div id="text-box">
+                                Select subscribed radar stations to be removed.
                             </div>
-                            </form>
-                            </c:when>
-                            <c:otherwise>
-                                <div id="message-box">
-                                    List of subscribed channels is currently empty.
+                            <div id="table">
+                                <form action="showRemovedSubscriptions.htm">
+                                    <display:table name="subscriptions" id="subscription" 
+                                        defaultsort="1" requestURI="selectRemoveSubscriptions.htm"
+                                        cellpadding="0" cellspacing="2" export="false"
+                                        class="tableborder">
+                                        <display:column sortable="true" title="Channel name"
+                                            sortProperty="channelName" paramId="channelName"
+                                            paramProperty="channelName"
+                                            class="tdcenter" value="${subscription.channelName}">
+                                        </display:column>
+
+                                        <display:column sortable="true" title="Operator"
+                                            sortProperty="operatorName" paramId=""
+                                            paramProperty="operatorName" class="tdcenter"
+                                            value="${subscription.operatorName}">
+                                        </display:column>
+                                        <c:choose>
+                                            <c:when test="${subscription.selected == true}">
+                                                <display:column sortable="false" title="Status"
+                                                    class="tdgreen" value="Active">
+                                                </display:column>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <display:column sortable="false" title="Status"
+                                                    class="tdred" value="Inactive">
+                                                </display:column>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <display:column sortable="false" title="Remove"
+                                            class="tdcheck"> <input type="checkbox"
+                                            name="selected_channels"
+                                            value="${subscription.channelName}"/>
+                                        </display:column>
+                                    </display:table>
+                                    <div class="footer">
+                                        <div class="right">
+                                            <button class="rounded" type="button"
+                                                onclick="window.location='configuration.htm'">
+                                                <span>Back</span>
+                                            </button>
+                                            <button class="rounded" type="submit">
+                                                <span>Submit</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="message">
+                                <div class="icon">
+                                    <img src="includes/images/icons/circle-alert.png"
+                                         alt="no_radars"/>
                                 </div>
-                                <div id="table-footer">
-                                    <form action="adminControls.htm">
-                                        <input type="submit" value="Back" name="admin_button"/>
+                                <div class="text">
+                                    No subscribed radar stations have been found.
+                                </div>
+                            </div>
+                            <div class="footer">
+                                <div class="right">
+                                    <form action="configuration.htm">
+                                        <button class="rounded" type="submit">
+                                            <span>OK</span>
+                                        </button>
                                     </form>
                                 </div>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
-                    <div id="left">
-                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
-                    </div>
-                    <div class="clear"></div>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
-                <div class="clear"></div>
+                <div id="clear"></div>
             </div>
         </div>
-    </div>
-    <div id="footer">
-        <script type="text/javascript" src="includes/footer.js"></script>
-    </div>
-</body>
+        <div id="footer">
+            <script type="text/javascript" src="includes/footer.js"></script>
+        </div>
+    </body>
 </html>
-
-
 

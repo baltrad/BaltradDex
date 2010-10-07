@@ -16,49 +16,49 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Page displaying selected data channels
-Created on : Jun 22, 2010, 11:57:02 AM
+Document   : Remove local radar station
+Created on : Oct 5, 2010, 12:59 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-                                                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
 
-<%@ include file="/WEB-INF/jsp/include.jsp" %>
+<%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Remove data channel</title>
-</head>
-
-<body>
-    <div id="container">
-        <div id="header"></div>
-        <div id="nav">
-            <script type="text/javascript" src="includes/navigation.js"></script>
-        </div>
-        <div class="outer">
-            <div class="inner">
-                <div class="float-wrap">
-                    <div id="main">
-                        <h1>Remove data channel</h1>
-                        <br/>
-                        <h2>
-                            <p>
-                            Warning: The following data channels will be removed from the system:
-                            </p>
-                        </h2>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+        <title>Baltrad | Remove radar</title>
+    </head>
+    <body>
+        <div id="container">
+            <div id="header">
+                <script type="text/javascript" src="includes/header.js"></script>
+            </div>
+            <div id="content">
+                <div id="left">
+                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+                </div>
+                <div id="right">
+                    <div id="page-title">
+                        <div class="left">
+                            Remove local radar station
+                        </div>
+                        <div class="right">
+                        </div>
+                    </div>
+                    <div id="text-box">
+                        Warning: The following local radar station(s) will be removed
+                        from the system.
+                    </div>
+                    <div id="table">
                         <form method="post" action="showRemovedLocalChannels.htm">
                             <display:table name="channels" id="channel" defaultsort="1"
                                 requestURI="showSelectedLocalChannels.htm" cellpadding="0"
-                                cellspacing="2" export="false" class="tableborder" pagesize="10">
-                                <display:column sortProperty="id" sortable="true"
-                                    title="ID" class="tdcenter">
-                                    <fmt:formatNumber value="${channel.id}" pattern="00" />
-                                </display:column>
-                                <display:column sortable="true" title="Channel name"
+                                cellspacing="2" export="false" class="tableborder">
+                                <display:column sortable="true" title="Radar station"
                                     sortProperty="channelName" class="tdcenter"
                                     value="${channel.channelName}">
                                 </display:column>
@@ -66,32 +66,30 @@ Author     : szewczenko
                                     sortProperty="wmoNumber" class="tdcenter"
                                     value="${channel.wmoNumber}">
                                 </display:column>
-                                <display:column class="tdhidden">
+                                <display:column class="tdhidden" headerClass="tdhidden">
                                     <input type="checkbox" name="removed_channels"
                                            value="${channel.id}" checked/>
                                 </display:column>
                             </display:table>
-                            <div id="table-footer-rightcol">
-                                <input type="submit" value="Submit" name="submitButton"/>
-                            </div>
-                        </form>
-                        <form action="showLocalChannels.htm">
-                            <div id="table-footer-leftcol">
-                                <input type="submit" value="Back" name="submitButton"/>
+                            <div class="footer">
+                                <div class="right">
+                                    <button class="rounded" type="button"
+                                        onclick="history.go(-1);">
+                                        <span>Back</span>
+                                    </button>
+                                    <button class="rounded" type="submit">
+                                        <span>Submit</span>
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
-                    <div id="left">
-                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
-                    </div>
-                    <div class="clear"></div>
                 </div>
-                <div class="clear"></div>
+                <div id="clear"></div>
             </div>
         </div>
-    </div>
-    <div id="footer">
-        <script type="text/javascript" src="includes/footer.js"></script>
-    </div>
-</body>
+        <div id="footer">
+            <script type="text/javascript" src="includes/footer.js"></script>
+        </div>
+    </body>
 </html>

@@ -44,7 +44,9 @@ import java.util.Date;
  */
 public class ClrRegController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
-    private static final String MODEL_KEY = "operation_status";
+    private static final String OK_MSG_KEY = "ok_message";
+    private static final String ERROR_MSG_KEY = "error_message";
+    private static final String DELETED_ENTRIES_KEY = "deleted_entries";
 //---------------------------------------------------------------------------------------- Variables
     private String successView;
     private LogManager logManager;
@@ -61,16 +63,22 @@ public class ClrRegController implements Controller {
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
-        String msg = null;
+        String msg = "";
+        int deletedEntries = 0;
         try {
-            int deletedEntries = deliveryRegisterManager.deleteAllEntries();
+            deletedEntries = deliveryRegisterManager.deleteAllEntries();
             msg = "Successfully deleted " + Integer.toString( deletedEntries ) + " entries.";
-            logManager.addEntry( new Date(), LogManager.MSG_WRN, "All records have been deleted\n" +
-                " from data delivery register" );
-        } catch( HibernateException e) {
-            msg = "Error while clearing data delivery register: <br/>" + e.getMessage();
+            request.getSession().setAttribute( OK_MSG_KEY, msg );
+            logManager.addEntry( new Date(), LogManager.MSG_WRN, "Deleted all records"
+                    + " from data delivery register." );
+        } catch( HibernateException e ) {
+            request.getSession().removeAttribute( OK_MSG_KEY );
+            msg = "Failed to delete records from data delivery register." + e.getMessage();
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to delete records"
+                    + " from data delivery register" );
         }
-        return new ModelAndView( getSuccessView(), MODEL_KEY, msg );
+        return new ModelAndView( getSuccessView(), DELETED_ENTRIES_KEY, deletedEntries );
     }
     /**
      * Method returns reference to success view name string.

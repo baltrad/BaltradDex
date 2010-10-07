@@ -34,49 +34,56 @@ Author     : szewczenko
     <body>
         <div id="logtable">
             <display:table name="log_entry_list" id="logEntry" defaultsort="1" requestURI="log.htm"
-                cellpadding="0" cellspacing="2" export="false" class="tableborder" sort="page"
-                defaultorder="descending">
+                cellpadding="0" cellspacing="2" export="false" class="tableborder">
                 <%! String cell_style = ""; %>
-                <%! String cell_msg_style = ""; %>
                 <c:choose>
                     <c:when test="${logEntry.type == 'INFO'}">
                         <%
-                            cell_style = "log-cell-info";
-                            cell_msg_style = "log-cell-msg-info";
+                            cell_style = "info";
                         %>
                     </c:when>
                     <c:when test="${logEntry.type == 'WARNING'}">
                         <%
-                            cell_style = "log-cell-wrn";
-                            cell_msg_style = "log-cell-msg-wrn";
+                            cell_style = "warning";
                         %>
                     </c:when>
                     <c:when test="${logEntry.type == 'ERROR'}">
                         <% 
-                            cell_style = "log-cell-err";
-                            cell_msg_style = "log-cell-msg-err";
+                            cell_style = "error";
                         %>
                     </c:when>
                 </c:choose>
-                <display:column sortProperty="id" sortable="true"
-                    title="ID" class="<%= cell_style %>">
-                    <fmt:formatNumber value="${logEntry.id}" pattern="00" />
+                <display:column sortable="false" title="Date" paramId="date" paramProperty="date"
+                    class="<%= cell_style %>" value="${logEntry.date}">
                 </display:column>
-                <display:column sortable="true" title="Date" sortProperty="date"
-                paramId="date" paramProperty="date" class="<%= cell_style %>"
-                    value="${logEntry.date}">
+                <display:column sortable="false" title="Time" paramId="time" paramProperty="time"
+                    class="<%= cell_style %>" value="${logEntry.time}">
                 </display:column>
-                <display:column sortable="true" title="Time" sortProperty="time"
-                    paramId="time" paramProperty="time" class="<%= cell_style %>"
-                    value="${logEntry.time}">
-                </display:column>
-                <display:column sortable="true" title="Type" sortProperty="type"
-                    paramId="type" paramProperty="type" class="<%= cell_style %>"
-                    value="${logEntry.type}">
-                </display:column>
-                <display:column sortable="true" title="Message"
-                    sortProperty="message" paramId="message" paramProperty="message"
-                    class="<%= cell_msg_style %>" value="${logEntry.message}">
+                <c:choose>
+                    <c:when test="${logEntry.type == 'ERROR'}">
+                        <display:column sortable="false" paramId="type" paramProperty="type"
+                            class="tdcheck">
+                            <img src="includes/images/red_bulb.png"
+                                 alt="green_bulb"/>
+                        </display:column>
+                    </c:when>
+                    <c:when test="${logEntry.type == 'WARNING'}">
+                        <display:column sortable="false" paramId="type" paramProperty="type"
+                            class="tdcheck">
+                            <img src="includes/images/blue_bulb.png"
+                                 alt="blue_bulb"/>
+                        </display:column>
+                    </c:when>
+                    <c:otherwise>
+                        <display:column sortable="false" paramId="type" paramProperty="type"
+                            class="tdcheck">
+                            <img src="includes/images/green_bulb.png"
+                                 alt="red_bulb"/>
+                        </display:column>
+                    </c:otherwise>
+                </c:choose>
+                <display:column sortable="false" title="Message" paramId="message"
+                    paramProperty="message" class="<%= cell_style %>" value="${logEntry.message}">
                 </display:column>
             </display:table>
         </div>

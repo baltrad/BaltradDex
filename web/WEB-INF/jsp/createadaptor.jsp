@@ -1,90 +1,63 @@
-<%--
-Copyright (C) 2009-2010 Swedish Meteorological and Hydrological Institute, SMHI,
+<%--------------------------------------------------------------------------------------------------
+Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
 
-This file is part of the baltrad dex.
+This file is part of the BaltradDex software.
 
-baltrad dex is free software: you can redistribute it and/or modify
+BaltradDex is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-baltrad dex is distributed in the hope that it will be useful,
+BaltradDex is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
-along with the baltrad dex library.  If not, see <http://www.gnu.org/licenses/>.
--------------------------------------------------------------------
+along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+----------------------------------------------------------------------------------------------------
 Create adaptors
 @date 2010-03-23
 @author Anders Henja
---%>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-                                                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+--------------------------------------------------------------------------------------------------%>
 
-<%@ include file="/WEB-INF/jsp/include.jsp" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
+
+<%@include file="/WEB-INF/jsp/include.jsp"%>
+
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
-<style type="text/css">
-.form-content {
-  width:98%;
-  padding: 6px;
-  margin: 2px;
-  background-color: #CACACA;
-}
 
-.form-content ul {
-  padding:2px;
-  margin:2px;
-  list-style:none;
-  overflow:auto;
-}
-
-.form-content ul li {
-  padding:2px;
-  margin:2px;
-}
-
-.form-content ul li span {
-  float:left;
-  width:5em;
-  text-align:left;	
-  padding-right:30px;
-  font-weight:bold;
-}
-
-.adaptorerror {
-  font-weight:bold;
-  color:#c80000;
-};
-
-</style>
-
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Create adaptor</title>
-</head>
-
-<body>
-    <div id="container">
-        <div id="header"></div>
-        <div id="nav">
-            <script type="text/javascript" src="includes/navigation.js"></script>
-        </div>
-        <div class="outer">
-            <div class="inner">
-                <div class="float-wrap">
-                    <div id="main">
-                        <h1>Create adaptor</h1>
-                          <br/>
-                          <h2>
-                            Create an adaptor. Depending on type of adaptor, different choices will
-                            be available. However, right now, you are only able to choose XMLRPC.
-                          </h2>
-                          <div class="form-content">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+        <title>Baltrad | Create adaptor</title>
+    </head>
+    <body>
+        <div id="container">
+            <div id="header">
+                <script type="text/javascript" src="includes/header.js"></script>
+            </div>
+            <div id="content">
+                <div id="left">
+                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+                </div>
+                <div id="right">
+                    <div id="page-title">
+                        <div class="left">
+                            Create adaptor
+                        </div>
+                        <div class="right">
+                        </div>
+                    </div>
+                    <div id="text-box">
+                        Create an adaptor. Depending on type of adaptor, different choices will
+                        be available. However, right now, you are only able to choose XMLRPC.
+                    </div>
+                    <div id="table">
+                        <div class="props">
                             <form name="createAdaptorForm" action="createadaptor.htm">
                               <%
                                 List<String> types = (List<String>)request.getAttribute("types");
@@ -101,44 +74,59 @@ Create adaptors
                                   timeoutstr = "" + timeout;
                                 }
                               %>
-                              <ul>
-                                <li><span>Name:</span> <input size="50" type="text" name="name" value="<%=name%>"/></li>
-                                <li><span>Type:</span> <select name="type">
-                                <%
-                                  for (String adtype : types) {
-                                    String selected = "";
-                                    if (adtype.equals(type)) {
-                                      selected = "selected";
-                                    }
-                                %>
-                                    <option value="<%=adtype%>" <%=selected%>><%=adtype%></option>
-                                <%
-                                  }
-                                %>
-                                </select></li>
-                                <li><span>URI:</span> <input size="50" type="text" name="uri" value="<%=uri%>"/></li>
-                                <li><span>Timeout:</span> <input size="10" type="text" name="timeout" value="<%=timeoutstr%>"/></li>
-                              </ul>
-                              <div id="table-footer">
-                                <input type="submit" value="Add" name="submitButton"/>
+
+                              <div class="left">
+                                  <div class="row">Name</div>
+                                  <div class="row">Type</div>
+                                  <div class="row">URI</div>
+                                  <div class="row">Timeout</div>
                               </div>
+                              <div class="right">
+                                  <div class="row">
+                                      <input size="50" type="text" name="name" value="<%=name%>"/>
+                                  </div>
+                                  <div class="row">
+                                      <select name="type">
+                                        <%
+                                          for (String adtype : types) {
+                                            String selected = "";
+                                            if (adtype.equals(type)) {
+                                              selected = "selected";
+                                            }
+                                        %>
+                                            <option value="<%=adtype%>" <%=selected%>><%=adtype%>
+                                            </option>
+                                        <%
+                                          }
+                                        %>
+                                      </select>
+                                  </div>
+                                  <div class="row">
+                                      <input type="text" name="uri" value="<%=uri%>"/>
+                                  </div>
+                                  <div class="row">
+                                      <input type="text" name="timeout" value="<%=timeoutstr%>"/>
+                                  </div>
+                              </div> 
+                              <div class="footer">
+                                    <div class="right">
+                                        <button class="rounded" type="submit">
+                                            <span>Add</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </form>
-                          </div>
-                          <%if (request.getAttribute("emessage") != null) {%>
-                            <span class="adaptorerror"><%=request.getAttribute("emessage")%></span>
-                          <%}%>
-                    </div>
-                    <div id="left">
-                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
-                    </div>
-                    <div class="clear"></div>
+                        </div>
+                      </div>
+                      <%if (request.getAttribute("emessage") != null) {%>
+                          <div class="beast-error"><%=request.getAttribute("emessage")%></div>
+                      <%}%>
                 </div>
-                <div class="clear"></div>
+                <div id="clear"></div>
             </div>
         </div>
-    </div>
-    <div id="footer">
-        <script type="text/javascript" src="includes/footer.js"></script>
-    </div>
-</body>
+        <div id="footer">
+            <script type="text/javascript" src="includes/footer.js"></script>
+        </div>
+    </body>
 </html>

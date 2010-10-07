@@ -23,6 +23,7 @@ package eu.baltrad.dex.channel.controller;
 
 import eu.baltrad.dex.channel.model.ChannelManager;
 import eu.baltrad.dex.channel.model.Channel;
+import eu.baltrad.dex.log.model.LogManager;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -35,6 +36,7 @@ import org.hibernate.HibernateException;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Multi action controller handling data channel removal functionality.
@@ -49,7 +51,8 @@ public class RemoveChannelController extends MultiActionController {
     private static final String SHOW_CHANNELS_KEY = "channels";
     private static final String SELECTED_CHANNELS_KEY = "selected_channels";
     private static final String REMOVED_CHANNELS_KEY = "removed_channels";
-    private static final String HIBERNATE_ERRORS_KEY = "hibernate_errors";
+    private static final String OK_MSG_KEY = "ok_message";
+    private static final String ERROR_MSG_KEY = "error_message";
     // view names
     private static final String SHOW_CHANNELS_VIEW = "showLocalChannels";
     private static final String SELECTED_CHANNELS_VIEW = "showSelectedLocalChannels";
@@ -59,6 +62,8 @@ public class RemoveChannelController extends MultiActionController {
     private ChannelManager channelManager;
     // Name resolver
     private PropertiesMethodNameResolver nameResolver;
+    // Log manager
+    private LogManager logManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Shows all available channels.
@@ -105,16 +110,27 @@ public class RemoveChannelController extends MultiActionController {
     public ModelAndView showRemovedLocalChannels( HttpServletRequest request,
             HttpServletResponse response ) {
         String[] channelIds = request.getParameterValues( REMOVED_CHANNELS_KEY );
-        List< String > errorMsgs = new ArrayList< String >();
+        String channelName = "";
         for( int i = 0; i < channelIds.length; i++ ) {
             try {
+                Channel channel = channelManager.getChannel( Integer.parseInt( channelIds[ i ] ) );
+                channelName = channel.getChannelName();
                 channelManager.removeChannel( Integer.parseInt( channelIds[ i ] ) );
+                request.getSession().setAttribute( OK_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removeradar.removesuccess" ) );
+                logManager.addEntry( new Date(), LogManager.MSG_WRN, "Local radar station "
+                        + channelName + " removed from the system.");
             } catch( HibernateException e ) {
-                errorMsgs.add( "Data access exception while removing data channel " +
-                        "(Channel ID: " + channelIds[ i ] + ")" );
+                request.getSession().removeAttribute( OK_MSG_KEY );
+                request.getSession().setAttribute( ERROR_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removeradar.removefail" ) );
+                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove local radar"
+                        + " station " + channelName + "." );
             }
         }
-        return new ModelAndView( REMOVED_CHANNELS_VIEW, HIBERNATE_ERRORS_KEY, errorMsgs );
+        return new ModelAndView( REMOVED_CHANNELS_VIEW );
     }
     /**
      * Gets reference to name resolver object.
@@ -144,5 +160,17 @@ public class RemoveChannelController extends MultiActionController {
     public void setChannelManager( ChannelManager channelManager ) {
         this.channelManager = channelManager;
     }
+     /**
+     * Method gets reference to LogManager class instance.
+     *
+     * @return Reference to LogManager class instance
+     */
+    public LogManager getLogManager() { return logManager; }
+    /**
+     * Method sets reference to LogManager class instance.
+     *
+     * @param logManager Reference to LogManager class instance
+     */
+    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

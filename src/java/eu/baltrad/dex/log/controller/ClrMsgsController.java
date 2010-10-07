@@ -43,7 +43,8 @@ import java.util.Date;
  */
 public class ClrMsgsController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
-    private static final String MODEL_KEY = "operation_status";
+    private static final String OK_MSG_KEY = "ok_message";
+    private static final String ERROR_MSG_KEY = "error_message";
 //---------------------------------------------------------------------------------------- Variables
     private String successView;
     private LogManager logManager;
@@ -59,16 +60,21 @@ public class ClrMsgsController implements Controller {
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
-        String msg = null;
         try {
             int deletedEntries = logManager.deleteAllEntries();
-            msg = "Successfully deleted " + Integer.toString( deletedEntries ) + " message(s).";
-            logManager.addEntry( new Date(), LogManager.MSG_WRN, "All messages have been deleted\n" +
-                    " from the stack" );
+            String msg = "Successfully deleted " + Integer.toString( deletedEntries ) 
+                    + " message(s).";
+            request.getSession().setAttribute( OK_MSG_KEY, msg );
+            logManager.addEntry( new Date(), LogManager.MSG_WRN, "User removed all system "
+                    + "messages." );
         } catch( HibernateException e ) {
-            msg = "Error while clearing message stack: <br/>" + e.getMessage();
+            String msg = "Failed to remove system messages:" + e.getMessage();
+            request.getSession().removeAttribute( OK_MSG_KEY );
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            logManager.addEntry( new Date(), LogManager.MSG_WRN, "Failed to remove system "
+                    + "messages." );
         }
-        return new ModelAndView( getSuccessView(), MODEL_KEY, msg );
+        return new ModelAndView( getSuccessView() );
     }
     /**
      * Method returns reference to success view name string.

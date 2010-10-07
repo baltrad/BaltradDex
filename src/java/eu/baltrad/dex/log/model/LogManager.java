@@ -20,6 +20,7 @@ import org.hibernate.Criteria;
 
 import java.util.List;
 import java.util.Date;
+import java.util.Collections;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -36,6 +37,7 @@ public class LogManager {
     public final static String MSG_INFO = "INFO";
     public final static String MSG_WRN = "WARNING";
     public final static String MSG_ERR = "ERROR";
+    public final static int LOG_ENTRY_LIST_SIZE = 12;
 
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -55,6 +57,7 @@ public class LogManager {
             session.getTransaction().rollback();
             throw e;
         }
+        Collections.sort( logEntries, Collections.reverseOrder() );
         return logEntries;
     }
     /**
@@ -105,6 +108,7 @@ public class LogManager {
             session.getTransaction().rollback();
             throw e;
         }
+        Collections.sort( logEntries, Collections.reverseOrder() );
         return logEntries;
     }
     /**

@@ -17,115 +17,122 @@ You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
 Document   : Connect to remote node page
-Created on : Jun 24, 2010, 2:16:34 PM
+Created on : Sep 24, 2010, 2:46 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-                                                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
 
-<%@ include file="/WEB-INF/jsp/include.jsp" %>
+<%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Connect to node</title>
-</head>
-
-<body>
-    <div id="container">
-        <div id="header"></div>
-        <div id="nav">
-            <script type="text/javascript" src="includes/navigation.js"></script>
-        </div>
-        <div class="outer">
-            <div class="inner">
-                <div class="float-wrap">
-                    <div id="main">
-                        <h1>Connect to node</h1>
-                        <br/>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+        <title>Baltrad | Connect to node</title>
+    </head>
+    <body>
+        <div id="container">
+            <div id="header">
+                <script type="text/javascript" src="includes/header.js"></script>
+            </div>
+            <div id="content">
+                <div id="left">
+                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+                </div>
+                <div id="right">
+                    <div id="page-title">
+                        <div class="left">
+                            Connect to remote node
+                        </div>
+                        <div class="right">
+                        </div>
+                    </div>
+                    <div id="text-box">
+                        Select registered node connection or define new connection in order
+                        to access data at the remote node.
+                    </div>
+                    <div id="table">
+                        <div class="header">
+                            <div class="title">
+                                Select registered node connection
+                            </div>
+                        </div>
                         <form method="post">
-                            <table>
-                                <h2>
-                                    <br/>
-                                    Select registered node to connect:
-                                    <div class="user-input">
-                                        <tr>
-                                        <td class="left">Select node</td>
-                                        <td class="right">
-                                            <spring:bind path="command.connectionName">
-                                            <select name='<c:out value="${status.expression}"/>'>
-                                            <c:forEach items="${connection_list}" var="connection">
-                                            <option value='<c:out value="${connection.connectionName}"/>'
-                                                <c:if test="${connection.connectionName == status.value}">
-                                                    SELECTED</c:if>>
-                                                    <c:out value="${connection.connectionName}"/>
-                                            </option>
-                                            </c:forEach>
-                                            </select>
-                                            </spring:bind>
-                                            <form:errors path="command.connectionName"
-                                                         cssClass="errors"/>
-                                        </td>
-                                        </tr>
-                                    </div>
-                                </h2>
-                            </table>   
-                                 <div id="table-footer-rightcol">
-                                    <input type="submit" value="Connect" name="submit_button"/>
+                            <div class="left">
+                                <div class="row">
+                                    Select node connection
                                 </div>
+                            </div>
+                            <div class="right">
+                                <div class="row">
+                                    <spring:bind path="command.connectionName">
+                                    <select name='<c:out value="${status.expression}"/>'>
+                                    <c:forEach items="${connection_list}" var="connection">
+                                    <option value='<c:out value="${connection.connectionName}"/>'
+                                        <c:if test="${connection.connectionName == status.value}">
+                                            SELECTED</c:if>>
+                                            <c:out value="${connection.connectionName}"/>
+                                    </option>
+                                    </c:forEach>
+                                    </select>
+                                    </spring:bind>
+                                    <form:errors path="command.connectionName" cssClass="errors"/>
+                                </div>
+                            </div>
+                            <div class="footer">
+                                <div class="right">
+                                    <button class="rounded" type="submit">
+                                        <span>Connect</span>
+                                    </button>
+                                </div>
+                            </div>
                         </form>
-                                <div class="clear"></div>
+                        <div class="header">
+                            <div class="title">
+                                Define new connection
+                            </div>
+                        </div>
+
                         <form method="post">
-                            <table>
-                                <h2>
-                                    <br/>
-                                    Define new connection:
-                                    <div class="user-input">
-                                        <tr>
-                                            <td class="left">Node address</td>
-                                            <td class="right">
-                                                <form:input path="command.nodeAddress"/>
-                                                <form:errors path="command.nodeAddress"
-                                                             cssClass="errors"/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                        <td class="left">User name</td>
-                                            <td class="right">
-                                                <form:input path="command.userName"/>
-                                                <form:errors path="command.userName"
-                                                             cssClass="errors"/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                        <td class="left">Password</td>
-                                            <td class="right">
-                                                <form:password path="command.password"/>
-                                                <form:errors path="command.password"
-                                                             cssClass="errors"/>
-                                            </td>
-                                        </tr>
-                                    </div>
-                                </h2>
-                            </table>
-                            <div id="table-footer-rightcol">
-                                <input type="submit" value="Connect" name="submit_button"/>
+                            <div class="left">
+                                <div class="row">Node Address</div>
+                                <div class="row">User Name</div>
+                                <div class="row">Password</div>
+                            </div>
+                            <div class="right">
+                                <div class="row">
+                                    <form:input path="command.nodeAddress"/>
+                                    <form:errors path="command.nodeAddress"
+                                                 cssClass="errors"/>
+                                </div>
+                                <div class="row">
+                                    <form:input path="command.userName"/>
+                                    <form:errors path="command.userName"
+                                                 cssClass="errors"/>
+                                </div>
+                                <div class="row">
+                                    <form:password path="command.password"/>
+                                    <form:errors path="command.password"
+                                                 cssClass="errors"/>
+                                </div>
+                            </div>
+                            <div class="footer">
+                                <div class="right">
+                                    <button class="rounded" type="submit">
+                                        <span>Connect</span>
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
-                    <div id="left">
-                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
-                    </div>
-                    <div class="clear"></div>
                 </div>
-                <div class="clear"></div>
+                <div id="clear"></div>
             </div>
         </div>
-    </div>
-    <div id="footer">
-        <script type="text/javascript" src="includes/footer.js"></script>
-    </div>
-</body>
+        <div id="footer">
+            <script type="text/javascript" src="includes/footer.js"></script>
+        </div>
+    </body>
 </html>

@@ -51,15 +51,14 @@ import java.util.Date;
 public class RemoteChannelController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Constants
     // model keys
-    private static final String REMOTE_CHANNELS_KEY = "channels";
-    private static final String SELECTED_CHANNELS_KEY = "selected_channels";
-    private static final String SUBSCRIBED_CHANNELS_KEY = "subscribed_channels";
+    private static final String REMOTE_RADARS_KEY = "channels";
+    private static final String SELECTED_REMOTE_RADARS_KEY = "selected_channels";
+    private static final String SUBSCRIBED_REMOTE_RADARS_KEY = "subscribed_channels";
     private static final String SENDER_NODE_NAME_KEY = "sender_node_name";
     // view names
-    private static final String SHOW_CHANNELS_VIEW = "showRemoteChannels";
-    private static final String SHOW_SELECTED_CHANNELS_VIEW = "showSelectedRemoteChannels";
-    private static final String SHOW_CHANNEL_SELECTION_STATUS_VIEW =
-            "showRemoteChannelSelectionStatus";
+    private static final String REMOTE_RADARS_VIEW = "remoteRadars";
+    private static final String SELECTED_REMOTE_RADARS_VIEW = "selectedRemoteRadars";
+    private static final String SUBSCRIBED_REMOTE_RADARS_VIEW = "subscribedRemoteRadars";
 //---------------------------------------------------------------------------------------- Variables
     private FrameDispatcherController frameDispatcherController;
     private SubscriptionManager subscriptionManager;
@@ -86,7 +85,7 @@ public class RemoteChannelController extends MultiActionController {
      * @param response HTTP servlet response
      * @return ModelAndView object holding list of data channels available at a given node
      */
-    public ModelAndView showRemoteChannels( HttpServletRequest request,
+    public ModelAndView remoteRadars( HttpServletRequest request,
             HttpServletResponse response ) {
         // set remote channel list
         setRemoteChannels( frameDispatcherController.getChannelListing() );
@@ -100,7 +99,7 @@ public class RemoteChannelController extends MultiActionController {
         frameDispatcherController.resetRemoteNodeAddress();
         // set sender node name
         request.setAttribute( SENDER_NODE_NAME_KEY, getSenderNodeName() );
-        return new ModelAndView( SHOW_CHANNELS_VIEW, REMOTE_CHANNELS_KEY, getRemoteChannels() );
+        return new ModelAndView( REMOTE_RADARS_VIEW, REMOTE_RADARS_KEY, getRemoteChannels() );
     }
     /**
      * Creates list of data channels selected by the user
@@ -109,10 +108,10 @@ public class RemoteChannelController extends MultiActionController {
      * @param response HTTP servlet response
      * @return ModelAndView object holding list of data channels selected by the user
      */
-    public ModelAndView showSelectedRemoteChannels( HttpServletRequest request,
+    public ModelAndView selectedRemoteRadars( HttpServletRequest request,
             HttpServletResponse response ) {
         // get selected channels based on the checkbox values
-        String[] selChannelNames = request.getParameterValues( SELECTED_CHANNELS_KEY );
+        String[] selChannelNames = request.getParameterValues( SELECTED_REMOTE_RADARS_KEY );
         // check if selected channel list is not empty
         if( selChannelNames != null ) {
             selectedChannels = new ArrayList();
@@ -127,7 +126,7 @@ public class RemoteChannelController extends MultiActionController {
         }
         // set sender node name
         request.setAttribute( SENDER_NODE_NAME_KEY, getSenderNodeName() );
-        return new ModelAndView( SHOW_SELECTED_CHANNELS_VIEW, SELECTED_CHANNELS_KEY,
+        return new ModelAndView( SELECTED_REMOTE_RADARS_VIEW, SELECTED_REMOTE_RADARS_KEY,
                 selectedChannels );
     }
     /**
@@ -137,7 +136,7 @@ public class RemoteChannelController extends MultiActionController {
      * @param response HTTP servlet response
      * @return
      */
-    public ModelAndView showRemoteChannelSelectionStatus( HttpServletRequest request,
+    public ModelAndView subscribedRemoteRadars( HttpServletRequest request,
             HttpServletResponse response ) {
         // prepare subscription request
         try {
@@ -182,7 +181,7 @@ public class RemoteChannelController extends MultiActionController {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while adding remote " +
                     "channels to subscription list: " + e.getMessage() );
         }
-        return new ModelAndView( SHOW_CHANNEL_SELECTION_STATUS_VIEW, SUBSCRIBED_CHANNELS_KEY,
+        return new ModelAndView( SUBSCRIBED_REMOTE_RADARS_VIEW, SUBSCRIBED_REMOTE_RADARS_KEY,
                 getSubscribedChannels() );
     }
     /**

@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
  * @version 1.0
  * @since 1.0
  */
-public class LogEntry {
+public class LogEntry implements Comparable< LogEntry >{
 //------------------------------------------------------------------------------------------- Fields
     private int id;
     private String date;
@@ -122,5 +122,26 @@ public class LogEntry {
      * @param message Log entry message
      */
     public void setMessage( String message ) { this.message = message; }
+    /**
+     * Method implementing comparable interface. Sorts log entries based on and time.
+     *
+     * @param s Subscription
+     * @return 0 if objects are equal
+     */
+    public int compareTo( LogEntry logEntry ) {
+        int dateCmp = getDate().compareTo( logEntry.getDate() );
+        int timeCmp = getTime().compareTo( logEntry.getTime() );
+        int res = 0;
+        if( ( dateCmp < 0 && timeCmp < 0 ) || ( dateCmp == 0 && timeCmp < 0 ) ) {
+            res = -1;
+        }
+         if( dateCmp == 0 && timeCmp == 0 ) {
+            res = 0;
+        }
+        if( ( dateCmp > 0 && timeCmp > 0 ) || ( dateCmp == 0 && timeCmp > 0 ) ) {
+            res = 1;
+        }
+        return res;
+    }
 }
 //--------------------------------------------------------------------------------------------------

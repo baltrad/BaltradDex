@@ -22,12 +22,15 @@
 /*
  * Users's menu
  */
-document.write( "<a href=\"welcome.htm\">Home</a>" );
-document.write( "<br>" );
-document.write( "<a href=\"localChannels.htm\">Local</a>" );
-document.write( "<a href=\"credits.htm\">Credits</a>" );
-document.write( "<br>" );
-document.write( "<a href=\"signout.htm\">Logout</a>" );
-document.write( "<br>" );
+document.write( "<div class=\"menu\">" );
+
+document.write( "<div class=\"group\">Local node</div>" );
+
+document.write( "<a href=\"home.htm\">Home</a>" );
+document.write( "<a href=\"radars.htm\">Radars</a>" );
+
+document.write( "<div class=\"separator\"></div>" );
+
+document.write( "</div>" );
 
 

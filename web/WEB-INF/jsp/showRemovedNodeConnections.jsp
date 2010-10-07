@@ -16,58 +16,83 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Node connection removal status page
-Created on : Sep 1, 2010, 9:25:05 AM
+Document   : Remove node connection
+Created on : Oct 6, 2010, 1:35 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-                                                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+   "http://www.w3.org/TR/html4/loose.dtd">
 
-<%@ include file="/WEB-INF/jsp/include.jsp" %>
+<%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Data channel removal status</title>
-</head>
-
-<body>
-    <div id="container">
-        <div id="header"></div>
-        <div id="nav">
-            <script type="text/javascript" src="includes/navigation.js"></script>
-        </div>
-        <div class="outer">
-            <div class="inner">
-                <div class="float-wrap">
-                    <div id="main">
-                        <h1>Node connection removal status</h1>
-                        <br/>
-                        <div id="message-box">
-                            <c:if test="${not empty message}">
-                                <c:out value="${message}" />
-                                <c:set var="message" value="" scope="session" />
-                            </c:if>
-                        </div>
-                        <form action="showNodeConnections.htm">
-                            <div id="table-footer-rightcol">
-                                <input type="submit" value="OK" name="submit_button"/>
-                            </div>
-                        </form>
-                    </div>
-                    <div id="left">
-                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
-                    </div>
-                    <div class="clear"></div>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+        <title>Baltrad | Remove connection</title>
+    </head>
+    <body>
+        <div id="container">
+            <div id="header">
+                <script type="text/javascript" src="includes/header.js"></script>
+            </div>
+            <div id="content">
+                <div id="left">
+                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
                 </div>
-                <div class="clear"></div>
+                <div id="right">
+                    <div id="page-title">
+                        <div class="left">
+                            Remove node connection
+                        </div>
+                        <div class="right">
+                        </div>
+                    </div>
+                    <div id="text-box">
+                        <c:choose>
+                            <c:when test="${not empty ok_message}">
+                                <div class="message">
+                                    <div class="icon">
+                                        <img src="includes/images/icons/circle-check.png"
+                                             alt="remove_ok"/>
+                                    </div>
+                                    <div class="text">
+                                        <c:out value="${ok_message}"/>
+                                        <c:set var="ok_message" value="" scope="session"/>
+                                    </div>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="message">
+                                    <div class="icon">
+                                        <img src="includes/images/icons/circle-delete.png"
+                                             alt="remove_error"/>
+                                    </div>
+                                    <div class="text">
+                                        <c:out value="${error_message}"/>
+                                        <c:set var="error_message" value="" scope="session"/>
+                                    </div>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <div class="footer">
+                        <div class="right">
+                            <form action="showNodeConnections.htm">
+                                <button class="rounded" type="submit">
+                                    <span>OK</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div id="clear"></div>
             </div>
         </div>
-    </div>
-    <div id="footer">
-        <script type="text/javascript" src="includes/footer.js"></script>
-    </div>
-</body>
+        <div id="footer">
+            <script type="text/javascript" src="includes/footer.js"></script>
+        </div>
+    </body>
 </html>
+

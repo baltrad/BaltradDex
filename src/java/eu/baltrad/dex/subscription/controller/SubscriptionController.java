@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
+import java.io.IOException;
 
 import java.util.Date;
 import java.util.List;
@@ -59,8 +60,8 @@ public class SubscriptionController extends MultiActionController {
     private static final String SELECTED_CHANNELS_KEY = "selected_channels";
     private static final String SELECTED_SUBSCRIPTIONS_KEY = "selected_subscriptions";
     private static final String REQUEST_STATUS_KEY = "request_status";
-    // hibernate errors
-    private static final String HIBERNATE_ERRORS_KEY = "hibernate_errors";
+    private static final String OK_MSG_KEY = "ok_message";
+    private static final String ERROR_MSG_KEY = "error_message";
     // view names
     private static final String SHOW_SUBSCRIPTIONS_VIEW = "showSubscriptions";
     private static final String SELECTED_SUBSCRIPTIONS_VIEW = "showSelectedSubscriptions";
@@ -68,6 +69,7 @@ public class SubscriptionController extends MultiActionController {
     private static final String REMOVE_SUBSCRIPTIONS_VIEW = "selectRemoveSubscriptions";
     private static final String SELECT_REMOVE_SUBSCRIPTION_VIEW = "showRemovedSubscriptions";
     private static final String SUBSCRIPTION_REMOVAL_STATUS_VIEW = "showSubscriptionRemovalStatus";
+    private static final String REDIRECT_VIEW = "selectRemoveSubscriptions.htm";
 
 //---------------------------------------------------------------------------------------- Variables
     private ChannelManager channelManager;
@@ -252,10 +254,16 @@ public class SubscriptionController extends MultiActionController {
             HttpServletResponse response ) {
         // get the list of channels selected for subscription by the user
         String[] selChannels = request.getParameterValues( SELECTED_CHANNELS_KEY );
-        List< Subscription > currentSubs = new ArrayList< Subscription >();
-        // make sure the list of selected channels is not null
-        if( selChannels != null ) {
-            request.setAttribute( REQUEST_STATUS_KEY, 1 );
+        ModelAndView modelAndView = null;
+        if( selChannels == null ) {
+            try {
+                response.sendRedirect( REDIRECT_VIEW );
+            } catch( IOException e ) {
+                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while redirecting "
+                        + "to " + REDIRECT_VIEW + ": " + e.getMessage() );
+            }
+        } else {
+            List< Subscription > currentSubs = new ArrayList< Subscription >();
             // create subscription list based on chosen channels
             for( int i = 0; i < selChannels.length; i++ ) {
                 Subscription subs = subscriptionManager.getSubscription( selChannels[ i ],
@@ -264,13 +272,12 @@ public class SubscriptionController extends MultiActionController {
                     currentSubs.add( subs );
                 }
             }
-        } else {
-            request.setAttribute( REQUEST_STATUS_KEY, 0 );
+            // write the list to class variable
+            setRemovedSubscriptions( currentSubs );
+            modelAndView =  new ModelAndView( SELECT_REMOVE_SUBSCRIPTION_VIEW,
+                    SELECTED_SUBSCRIPTIONS_KEY, currentSubs );
         }
-        // write the list to class variable
-        setRemovedSubscriptions( currentSubs );
-        return new ModelAndView( SELECT_REMOVE_SUBSCRIPTION_VIEW, SELECTED_SUBSCRIPTIONS_KEY,
-                currentSubs );
+        return modelAndView;
     }
     /**
      * Removes selected subscriptions.
@@ -281,19 +288,22 @@ public class SubscriptionController extends MultiActionController {
      */
     public ModelAndView showSubscriptionRemovalStatus( HttpServletRequest request,
             HttpServletResponse response ) {
-        List< String > errorMsgs = new ArrayList<String>();
         for( int i = 0; i < getRemovedSubscriptions().size(); i++ ) {
             try {
                 subscriptionManager.removeSubscription(
                     getRemovedSubscriptions().get( i ).getChannelName(),
                     Subscription.LOCAL_SUBSCRIPTION );
+                request.getSession().setAttribute( OK_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removesubscription.removesuccess" ) );
             } catch( HibernateException e ) {
-                errorMsgs.add( "Data access exception while removing subscription " +
-                     "(Channel name: " + getRemovedSubscriptions().get( i ).getChannelName() + ")" );
+                request.getSession().removeAttribute( OK_MSG_KEY );
+                request.getSession().setAttribute( ERROR_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removesubscription.removefail" ) );
             }
         }
-        return new ModelAndView( SUBSCRIPTION_REMOVAL_STATUS_VIEW, HIBERNATE_ERRORS_KEY,
-                errorMsgs );
+        return new ModelAndView( SUBSCRIPTION_REMOVAL_STATUS_VIEW );
     }
     /**
      * Method returns reference to data channel manager object.

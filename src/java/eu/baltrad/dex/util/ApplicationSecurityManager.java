@@ -37,8 +37,8 @@ public class ApplicationSecurityManager {
     // Session user attribute
     private static final String USER = "user";
     // Redirect views
-    public static final String SIGNIN_PAGE_REDIRECT = "signin.htm";
-    public static final String WELCOME_PAGE_REDIRECT = "welcome.htm";
+    public static final String SIGNIN_PAGE_REDIRECT = "login.htm";
+    public static final String WELCOME_PAGE_REDIRECT = "home.htm";
 //---------------------------------------------------------------------------------------- Variables
     private static UserManager userManager = new UserManager();
 //------------------------------------------------------------------------------------------ Methods
@@ -55,10 +55,15 @@ public class ApplicationSecurityManager {
             return false;
         } else {
             String formUserName = formUser.getName().trim();
-            String dbUserName = dbUser.getName().trim();
             String formUserPassword = MessageDigestUtil.createHash( formUser.getPassword().trim() );
+            String formUserEmail = formUser.getEmail().trim();
+
+            String dbUserName = dbUser.getName().trim();
             String dbUserPassword = dbUser.getPassword().trim();
-            if( formUserName.equals( dbUserName ) && formUserPassword.equals( dbUserPassword ) ) {
+            String dbUserEmail = dbUser.getEmail().trim();
+
+            if( formUserName.equals( dbUserName ) && formUserPassword.equals( dbUserPassword )
+                    && formUserEmail.equals( dbUserEmail ) ) {
                 return true;
             } else {
                 return false;
@@ -75,16 +80,19 @@ public class ApplicationSecurityManager {
      * @return True if users are the same, false otherwise
      */
     public static boolean authenticateSessionUser( User sessionUser, User dbUser ) {
-
         if( sessionUser == null || dbUser == null ) {
             return false;
         } else {
             String sessionUserName = sessionUser.getName().trim();
-            String dbUserName = dbUser.getName().trim();
             String sessionUserPassword = sessionUser.getPassword().trim();
+            String sessionUserEmail = sessionUser.getEmail().trim();
+
+            String dbUserName = dbUser.getName().trim();
             String dbUserPassword = dbUser.getPassword().trim();
+            String dbUserEmail = dbUser.getEmail().trim();
+
             if( sessionUserName.equals( dbUserName ) && sessionUserPassword.equals(
-                    dbUserPassword ) ) {
+                    dbUserPassword ) && sessionUserEmail.equals( dbUserEmail ) ) {
                 return true;
             } else {
                 return false;

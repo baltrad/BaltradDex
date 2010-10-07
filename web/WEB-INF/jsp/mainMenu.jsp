@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : System main menu
+Document   : Main menu
 Created on : Jun 22, 2010, 1:14:59 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>

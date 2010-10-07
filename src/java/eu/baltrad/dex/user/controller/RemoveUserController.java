@@ -23,6 +23,7 @@ package eu.baltrad.dex.user.controller;
 
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
+import eu.baltrad.dex.log.model.LogManager;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
 
 import org.springframework.web.servlet.ModelAndView;
@@ -36,6 +37,7 @@ import org.hibernate.HibernateException;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Multi-action controller handling user account removal functionality.
@@ -50,7 +52,9 @@ public class RemoveUserController extends MultiActionController {
     private static final String SHOW_USERS_KEY = "users";
     private static final String SELECTED_USERS_KEY = "selected_users";
     private static final String REMOVED_USERS_KEY = "removed_users";
-    private static final String HIBERNATE_ERRORS_KEY = "hibernate_errors";
+    private static final String OK_MSG_KEY = "ok_message";
+    private static final String ERROR_MSG_KEY = "error_message";
+
     // view names
     private static final String SHOW_USERS_VIEW = "showUsers";
     private static final String SELECTED_USERS_VIEW = "showSelectedUsers";
@@ -60,6 +64,8 @@ public class RemoveUserController extends MultiActionController {
     private UserManager userManager;
     // Name resolver
     private PropertiesMethodNameResolver nameResolver;
+    // Log manager
+    private LogManager logManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Gets list of all registered users except for currently signed user.
@@ -119,16 +125,28 @@ public class RemoveUserController extends MultiActionController {
     public ModelAndView showRemovedUsers( HttpServletRequest request,
             HttpServletResponse response ) {
         String[] userIds = request.getParameterValues( REMOVED_USERS_KEY );
-        List< String > errorMsgs = new ArrayList< String >();
+        String userName = "";
         for( int i = 0; i < userIds.length; i++ ) {
             try {
+                User user = userManager.getUserByID( Integer.parseInt( userIds[ i ] ) );
+                userName = user.getName();
                 userManager.removeUser( Integer.parseInt( userIds[ i ] ) );
+                request.getSession().setAttribute( OK_MSG_KEY, 
+                        getMessageSourceAccessor().getMessage(
+                        "message.removeuser.removesuccess" ) );
+                logManager.addEntry( new Date(), LogManager.MSG_WRN, "User account " + userName
+                        + " removed from the system" );
+
             } catch( HibernateException e ) {
-                errorMsgs.add( "Data access exception while removing user account " +
-                        "(User ID: " + userIds[ i ] + ")" );
+                request.getSession().removeAttribute( OK_MSG_KEY );
+                request.getSession().setAttribute( ERROR_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removeuser.removefail" ) );
+                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove user "
+                        + "account " + userName + "." );
             }
         }
-        return new ModelAndView( REMOVED_USERS_VIEW, HIBERNATE_ERRORS_KEY, errorMsgs );
+        return new ModelAndView( REMOVED_USERS_VIEW );
     }
     /**
      * Gets reference to name resolver object.
@@ -156,5 +174,17 @@ public class RemoveUserController extends MultiActionController {
      * @param userManager Reference to user manager object
      */
     public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
+    /**
+     * Method gets reference to LogManager class instance.
+     *
+     * @return Reference to LogManager class instance
+     */
+    public LogManager getLogManager() { return logManager; }
+    /**
+     * Method sets reference to LogManager class instance.
+     *
+     * @param logManager Reference to LogManager class instance
+     */
+    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

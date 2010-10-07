@@ -62,10 +62,12 @@ public class User {
      * 
      * @param name User name
      * @param password User password
+     * @param email User email address
      */
-    public User( String name, String password ) {
+    public User( String name, String password, String email ) {
         this.name = name;
         this.password = password;
+        this.email = email;
     }
     /**
      * Constructor creates user object with field values provided as parameters.
