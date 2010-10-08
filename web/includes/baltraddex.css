@@ -266,6 +266,45 @@ button::-moz-focus-inner {
 #text-box .title {
     font-size: 1.1em;
     padding-bottom: 12px;
+    color: #2d76ae;
+}
+/*
+ * status box
+ */
+#status-box {
+    width: 100%;
+    float: left;
+    clear: right;
+    padding: 12px 0px 12px 0px;
+}
+#status-box .bottom {
+    width: 100%;
+    float: left;
+    clear: right;
+    font-size: 1.1em;
+    color: #2d76ae;
+    border-bottom: 1px solid #2d76ae;
+}
+#status-box .icon {
+    width: 64px;
+    height: 64px;
+    float: left;
+}
+#status-box .text {
+    height: 64px;
+    float: left;
+    font-size: 1.1em;
+    color: #2d76ae;
+    padding-top: 20px;
+}
+#status-box .message {
+    width: 100%;
+    float: left;
+    clear: right;
+    padding-left: 8px;
+}
+#status-box .message li {
+    margin-left: 12px;
 }
 
 /*
@@ -460,6 +499,32 @@ tr {
     font-size: small;
     font-weight: normal;
     color: black;
+}
+#status-table {
+    width: 100%;
+    float: left;
+    clear: both;
+    padding-bottom: 8px;
+}
+/*
+ * status tables
+ */
+#status-table thead th, #status-table thead a {
+    height: 24px;
+    font-size: 1em;
+    font-weight: normal;
+    color: #003298;
+    border: 1px solid #2d76ae;
+    background: white;
+    padding: 1px;
+    font-family: Verdana, Arial, Tahoma, sans-serif;
+}
+#status-table thead a {
+    border: none;
+}
+#status-table thead a:hover {
+    color: #99CC66;
+    text-decoration: none;
 }
 
 /*

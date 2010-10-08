@@ -26,6 +26,18 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
+<jsp:useBean id="initAppUtil" scope="session" class="eu.baltrad.dex.util.InitAppUtil">
+</jsp:useBean>
+<jsp:useBean id="securityManager" scope="session"
+             class="eu.baltrad.dex.util.ApplicationSecurityManager"></jsp:useBean>
+
+<%
+    User user = ( User )securityManager.getUser( request );
+    String userName = user.getName();
+    String nodeName = initAppUtil.getNodeName();
+    String operator = initAppUtil.getOrgName();
+%>
+
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -51,14 +63,109 @@ Author     : szewczenko
                         </div>
                     </div>
                     <div id="text-box">
-                        Welcome to Baltrad Data Exchange System!
+                        <div class="title">
+                            Welcome to Baltrad Radar Data Exchange & Processing System!
+                        </div>
                     </div>
-
-
-
-
-
-
+                    <div id="text-box">
+                        Baltrad is running on <%=nodeName%> operated by <%=operator%>.
+                    </div>
+                    <div id="text-box">
+                        You are logged in as user <%=userName%>.
+                    </div>
+                    <div id="status-box">
+                        <div class="bottom">
+                            Data exchange status
+                        </div>
+                    </div>
+                    <div id="status-box">
+                        <div class="icon">
+                            <img src="includes/images/icons/arrow-down.png" alt="remote_radars"/>
+                        </div>
+                        <div class="text">
+                            Incoming data | Subscribed remote radar stations
+                        </div>
+                        <c:choose>
+                            <c:when test="${not empty local_subscriptions}">
+                                <div id="status-table">
+                                    <display:table name="local_subscriptions" id="local_sub"
+                                        defaultsort="1" cellpadding="0" cellspacing="2" export="false"
+                                        class="tableborder" requestURI="home.htm">
+                                        <display:column sortable="true" title="Radar station"
+                                            sortProperty="channelName" paramId="channelName"
+                                            paramProperty="channelName"
+                                            class="tdcenter" value="${local_sub.channelName}">
+                                        </display:column>
+                                        <display:column sortable="true" title="Operator"
+                                            sortProperty="operatorName" paramId="operatorName"
+                                            paramProperty="operatorName" class="tdcenter"
+                                            value="${local_sub.operatorName}">
+                                        </display:column>
+                                        <c:choose>
+                                            <c:when test="${local_sub.selected == true}">
+                                                <display:column sortable="false" title="Status"
+                                                    class="tdcheck">
+                                                    <img src="includes/images/green_bulb.png"
+                                                         alt="green_bulb"/>
+                                                </display:column>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <display:column sortable="false" title="Status"
+                                                    class="tdcheck">
+                                                    <img src="includes/images/red_bulb.png"
+                                                         alt="red_bulb"/>
+                                                </display:column>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </display:table>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="message">
+                                    <li type="circle">
+                                        You currently have no peer radar stations subscribed.
+                                    </li>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <div id="status-box">
+                        <div class="icon">
+                            <img src="includes/images/icons/arrow-up.png" alt="remote_radars"/>
+                        </div>
+                        <div class="text">
+                            Outgoing data | Local radar stations subscribed by the users
+                        </div>
+                        <c:choose>
+                            <c:when test="${not empty remote_subscriptions}">
+                                <div id="status-table">
+                                    <display:table name="remote_subscriptions" id="remote_sub"
+                                        defaultsort="1" cellpadding="0" cellspacing="2" export="false"
+                                        class="tableborder" requestURI="home.htm">
+                                        <display:column sortable="true" title="Radar station"
+                                            sortProperty="channelName" paramId="channelName"
+                                            paramProperty="channelName"
+                                            class="tdcenter" value="${remote_sub.channelName}">
+                                        </display:column>
+                                        <display:column sortable="true" title="User name"
+                                            sortProperty="userName" paramId="userName"
+                                            paramProperty="userName"
+                                            class="tdcenter" value="${remote_sub.userName}">
+                                        </display:column>
+                                    </display:table>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="message">
+                                    <li type="circle">
+                                        Local radar stations are currently not subscribed
+                                        by your peers.
+                                    </li>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                    <div class="footer"></div>
                 </div>
                 <div id="clear"></div>
             </div>
@@ -68,111 +175,3 @@ Author     : szewczenko
         </div>
     </body>
 </html>
-
-
-
-
-<%--!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-                                                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB">
-
-<%@ include file="/WEB-INF/jsp/include.jsp" %>
-
-<jsp:useBean id="initAppUtil" scope="session" class="eu.baltrad.dex.util.InitAppUtil">
-</jsp:useBean>
-
-<jsp:useBean id="securityManager" scope="session" class="eu.baltrad.dex.util.ApplicationSecurityManager">
-</jsp:useBean>
-
-<%
-    User user = ( User )securityManager.getUser( request );
-    String userName = user.getName();
-%>
-
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-    <title>Home</title>
-</head>
-
-<body>
-    <div id="container">
-        <div id="header"></div>
-        <div id="nav">
-            <script type="text/javascript" src="includes/navigation.js"></script>
-        </div>
-        <div class="outer">
-            <div class="inner">
-                <div class="float-wrap">
-
-                    <div id="main">
-                        <div id="welcome">
-                            <h1>Welcome to the Baltrad Data Exchange System!</h1>
-                            <br/>
-                            <h2>
-                                <p>
-                                You are signed in as user <% out.println( userName + "."); %>
-                                </p>
-                                <p>
-                                Use the system functionality to browse and download data or establish
-                                operational data exchange links by subscribing to the desired data
-                                channel.
-                                </p>
-                                <p>
-                                Following is the detailed information about this node.
-                                </p>
-                            </h2>
-                        </div>
-                        <table>
-                            <tr class="even">
-                                <td class="welcome-leftcol">Node name</td>
-                                <td class="welcome-rightcol">
-                                    <% out.println( initAppUtil.getNodeName() ); %>
-                                </td>
-                            </tr>
-                            <tr class="odd">
-                                <td class="welcome-leftcol">Node type</td>
-                                <td class="welcome-rightcol">
-                                    <% out.println( initAppUtil.getNodeType() ); %>
-                                </td>
-                            </tr>
-                            <tr class="even">
-                                <td class="welcome-leftcol">Organization name</td>
-                                <td class="welcome-rightcol">
-                                    <% out.println( initAppUtil.getOrgName() ); %>
-                                </td>
-                            </tr>
-                            <tr class="odd">
-                                <td class="welcome-leftcol">Address</td>
-                                <td class="welcome-rightcol">
-                                    <% out.println( initAppUtil.getOrgAddress() ); %>
-                                </td>
-                            </tr>
-                            <tr class="even">
-                                <td class="welcome-leftcol">Time zone</td>
-                                <td class="welcome-rightcol">
-                                    <% out.println( initAppUtil.getTimeZone() ); %>
-                                </td>
-                            </tr>
-                            <tr class="odd">
-                                <td class="welcome-leftcol">Node administrator's email</td>
-                                <td class="welcome-rightcol">
-                                    <% out.println( initAppUtil.getAdminEmail() ); %>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div id="left">
-                        <%@ include file="/WEB-INF/jsp/mainMenu.jsp"%>
-                    </div>          
-                    <div class="clear"></div>
-                </div>
-                <div class="clear"></div>
-            </div>
-        </div>
-    </div>
-    <div id="footer">
-        <script type="text/javascript" src="includes/footer.js"></script>
-    </div>
-</body>
-</html --%>

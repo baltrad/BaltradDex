@@ -41,7 +41,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="mappings">
             <props>
-                <prop key="home.htm">urlFilenameController</prop>
+                <prop key="home.htm">statusController</prop>
                 <prop key="radars.htm">channelController</prop>
                 <prop key="radarData.htm">channelDataController</prop>
                 <prop key="credits.htm">urlFilenameController</prop>
@@ -198,6 +198,18 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean id="urlFilenameController"
           class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
+
+    <!--
+        Status / home page controller
+    -->
+    <bean id="statusController" class="eu.baltrad.dex.subscription.controller.StatusController">
+        <property name="subscriptionManager">
+            <ref bean="subscriptionManager"/>
+        </property>
+        <property name="successView">
+            <value>home</value>
+        </property>
+    </bean>
 
     <!--
         The signin controller.
