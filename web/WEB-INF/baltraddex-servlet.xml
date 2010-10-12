@@ -801,7 +801,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="timeoutmanager" class="eu.baltrad.beast.rules.timer.TimeoutManager" autowire="byType"/>
 
     <!-- Nice to have a cron-like scheduler -->
-    <!--bean id="beastscheduler" class="eu.baltrad.beast.scheduler.BeastScheduler" autowire="byType"/-->
+    <bean id="beastscheduler" class="eu.baltrad.beast.scheduler.BeastScheduler" autowire="byType"/>
 
     <!-- and the file catalog -->
     <bean id="fc" class="eu.baltrad.fc.FileCatalog">
@@ -822,5 +822,4 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="showRoutesController" class="eu.baltrad.beastui.web.controller.ShowRoutesController" autowire="byType" />
     
     <bean id="schedulerController" class="eu.baltrad.beastui.web.controller.SchedulerController" autowire="byType" />
-    
 </beans>
