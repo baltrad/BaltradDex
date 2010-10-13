@@ -37,6 +37,9 @@ import eu.baltrad.dex.util.FileCatalogConnector;
 
 import eu.baltrad.fc.FileCatalog;
 
+import eu.baltrad.beast.manager.IBltMessageManager;
+import eu.baltrad.beast.message.mo.BltDataMessage;
+
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -76,6 +79,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private DeliveryRegisterManager deliveryRegisterManager;
     // Reference to file catalog object
     private FileCatalog fileCatalog;
+    // Beast message manager
+    private IBltMessageManager messageManager;
     // remote channel listing
     private List channelListing;
     // confirmed subscription list
@@ -518,6 +523,10 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         }
                         eu.baltrad.fc.oh5.File cFile = fileCatalog.catalog(
                                 tempFile.getAbsolutePath() );
+                        BltDataMessage message = new BltDataMessage();
+                        message.setFile( cFile );
+                        messageManager.manage( message );
+
                         InitAppUtil.deleteFile( tempFile.getAbsolutePath() );
 
                         // send data to subscribers
@@ -795,6 +804,20 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public void setDeliveryRegisterManager( DeliveryRegisterManager deliveryRegisterManager ) {
         this.deliveryRegisterManager = deliveryRegisterManager;
+    }
+    /**
+     * Gets reference to Beast's Message Manager object.
+     *
+     * @return Reference to Best's Message Manager object
+     */
+    public IBltMessageManager getMessageManager() { return messageManager; }
+    /**
+     * Sets reference to Beast's Message Manager object.
+     *
+     * @param messageManager Reference to Beast's Message Manager object
+     */
+    public void setMessageManager( IBltMessageManager messageManager ) {
+        this.messageManager = messageManager;
     }
 }
 //--------------------------------------------------------------------------------------------------

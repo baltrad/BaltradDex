@@ -383,6 +383,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="deliveryRegisterManager">
             <ref bean="deliveryRegisterManager"/>
         </property>
+        <property name="messageManager">
+            <ref bean="bltmanager"/>
+        </property>
     </bean>
 
     <!-- Frame handler -->

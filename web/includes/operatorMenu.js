@@ -39,6 +39,14 @@ document.write( "<a href=\"showSubscriptions.htm\">Subscriptions</a>" );
 
 document.write( "<div class=\"separator\"></div>" );
 
+document.write( "<div class=\"group\">Data Processing</div>" );
+
+document.write( "<a href=\"adaptors.htm\">Adaptors</a>" );
+document.write( "<a href=\"showroutes.htm\">Routes</a>" );
+document.write( "<a href=\"showschedule.htm\">Schedule</a>" );
+
+document.write( "<div class=\"separator\"></div>" );
+
 document.write( "</div>" );
 
 

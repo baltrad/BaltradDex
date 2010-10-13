@@ -148,8 +148,10 @@ button::-moz-focus-inner {
     margin-right: auto;
     margin-top: -30px;
     margin-bottom: 0px;
-    /*margin: -30px auto 0;*/
-    background: #2d76ae;
+    background: #2d76ae; /* for non-css3 browsers */
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#98CBFF', endColorstr='#003399'); /* for IE */
+    background: -webkit-gradient(linear, left top, left bottom, from(#98CBFF), to(#003399)); /* for webkit browsers */
+    background: -moz-linear-gradient(top,  #98CBFF,  #003399); /* for firefox 3.6+ */
 }
 #footer .menu {
     width: 284px;
@@ -392,21 +394,26 @@ form > .bottom {
     width: 100%;
     font-size: small;
 }
-thead a, thead th {
-    height: 32px;
+thead th {
+    height: 28px;
     font-size: 1.1em;
     font-weight: normal;
-    color: white;
-    border: 1px solid #2d76ae;
-    background: #2d76ae;
     padding: 2px 4px 2px 4px;
     font-family: Verdana, Arial, Tahoma, sans-serif;
+    color: white;
+    background: #2d76ae;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#98CBFF', endColorstr='#4F7BD8');
+    background: -webkit-gradient(linear, left top, left bottom, from(#98CBFF), to(#4F7BD8));
+    background: -moz-linear-gradient(top,  #98CBFF,  #4F7BD8);
 }
 thead a {
     text-decoration: underline;
+    padding: 2px;
+    font-size: 1.1em;
+    font-weight: normal;
+    color: white;
 }
 thead a:hover {
-    border: 1px solid white;
     background: #99CC66;
     text-decoration: none;
 }
@@ -469,9 +476,12 @@ tr {
     position: relative;
     float: left;
     clear: right;
-    background: #2d76ae;
     margin-top: 24px;
     margin-bottom: 24px;
+    background: #2d76ae;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#98CBFF', endColorstr='#4F7BD8');
+    background: -webkit-gradient(linear, left top, left bottom, from(#98CBFF), to(#4F7BD8));
+    background: -moz-linear-gradient(top,  #98CBFF,  #4F7BD8);
 }
 #table > .header > .title {
     font-size: 1.2em;
