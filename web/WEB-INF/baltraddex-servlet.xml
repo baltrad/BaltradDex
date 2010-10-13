@@ -794,7 +794,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
         <property name="interceptors">
             <list>
-                <ref bean="adminHttpRequestInterceptor"/>
+                <ref bean="operatorHttpRequestInterceptor"/>
             </list>
         </property>
     </bean>
