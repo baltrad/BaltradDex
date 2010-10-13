@@ -89,8 +89,8 @@ Author     : szewczenko
                             <c:when test="${not empty local_subscriptions}">
                                 <div id="status-table">
                                     <display:table name="local_subscriptions" id="local_sub"
-                                        defaultsort="1" cellpadding="0" cellspacing="2" export="false"
-                                        class="tableborder" requestURI="home.htm">
+                                        defaultsort="1" cellpadding="0" cellspacing="2" 
+                                        export="false" class="tableborder" requestURI="home.htm">
                                         <display:column sortable="true" title="Radar station"
                                             sortProperty="channelName" paramId="channelName"
                                             paramProperty="channelName"
@@ -140,8 +140,8 @@ Author     : szewczenko
                             <c:when test="${not empty remote_subscriptions}">
                                 <div id="status-table">
                                     <display:table name="remote_subscriptions" id="remote_sub"
-                                        defaultsort="1" cellpadding="0" cellspacing="2" export="false"
-                                        class="tableborder" requestURI="home.htm">
+                                        defaultsort="1" cellpadding="0" cellspacing="2" 
+                                        export="false" class="tableborder" requestURI="home.htm">
                                         <display:column sortable="true" title="Radar station"
                                             sortProperty="channelName" paramId="channelName"
                                             paramProperty="channelName"
@@ -158,8 +158,8 @@ Author     : szewczenko
                             <c:otherwise>
                                 <div class="message">
                                     <li type="circle">
-                                        Local radar stations are currently not subscribed
-                                        by your peers.
+                                        Your local radar stations are currently not subscribed
+                                        by peers.
                                     </li>
                                 </div>
                             </c:otherwise>

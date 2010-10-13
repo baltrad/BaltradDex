@@ -588,7 +588,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         bfHandler.handleBF( baltradFrame );
     }
     /**
-     * Autheticates incoming frame by verifying user name and password encoded in frame header
+     * Autheticates incoming frame by verifying user name and password encoded in frame header.
+     * WARNING: Only users belonging to groups ADMIN and PEER are authorized to exchange data.
      *
      * @param header Frame header
      * @return True once a frame is successfully authenticated, false otherwise
@@ -598,7 +599,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         String passwd = bfHandler.getPassword( header );
         User user = userManager.getUserByNameHash( userNameHash );
         if( user != null && user.getNameHash().equals( userNameHash )
-                && user.getPassword().equals( passwd ) ) return true;
+            && user.getPassword().equals( passwd ) && ( user.getRoleName().equals( User.ROLE_ADMIN )
+            || user.getRoleName().equals( User.ROLE_PEER ) ) ) return true;
         else
             return false;
     }

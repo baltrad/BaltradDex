@@ -45,6 +45,8 @@ public class ApplicationSecurityManager {
     /**
      * Method authenticates user based on credentials provided in the login form.
      * Credentials are compared with corresponding user record in the database.
+     * WARNING: Only users belonging to group ADMIN, OPERATOR and USER are allowed to log in
+     * to local node.
      *
      * @param formUser Current user signin in
      * @param dbUser User in the database
@@ -63,7 +65,10 @@ public class ApplicationSecurityManager {
             String dbUserEmail = dbUser.getEmail().trim();
 
             if( formUserName.equals( dbUserName ) && formUserPassword.equals( dbUserPassword )
-                    && formUserEmail.equals( dbUserEmail ) ) {
+                    && formUserEmail.equals( dbUserEmail ) && (
+                    dbUser.getRoleName().equals( User.ROLE_ADMIN ) ||
+                    dbUser.getRoleName().equals( User.ROLE_OPERATOR ) ||
+                    dbUser.getRoleName().equals( User.ROLE_USER ) ) ) {
                 return true;
             } else {
                 return false;
