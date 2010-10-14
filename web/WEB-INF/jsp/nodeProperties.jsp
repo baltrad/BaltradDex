@@ -121,7 +121,40 @@ Author     : szewczenko
                                                      cssClass="errors"/>
                                     </div>
                                 </div>
-                                <div id="message-text">
+
+
+                                <div id="text-box">
+                                    <c:choose>
+                                        <c:when test="${not empty ok_message}">
+                                            <div class="message">
+                                                <div class="icon">
+                                                    <img src="includes/images/icons/circle-check.png"
+                                                         alt="remove_ok"/>
+                                                </div>
+                                                <div class="text">
+                                                    <c:out value="${ok_message}"/>
+                                                    <c:set var="ok_message" value="" scope="session"/>
+                                                </div>
+                                            </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:if test="${not empty error_message}">
+                                                <div class="message">
+                                                    <div class="icon">
+                                                        <img src="includes/images/icons/circle-delete.png"
+                                                             alt="remove_error"/>
+                                                    </div>
+                                                    <div class="text">
+                                                        <c:out value="${error_message}"/>
+                                                        <c:set var="error_message" value="" scope="session"/>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>
+
+                                <%--div id="message-text">
                                     <c:if test="${not empty message}">
                                         <div class="message">
                                             <div class="icon">
@@ -134,7 +167,8 @@ Author     : szewczenko
                                             </div>
                                         </div>
                                     </c:if>
-                                </div>
+                                </div--%>
+
                                 <div class="footer">
                                     <div class="right">
                                         <button class="rounded" type="submit">

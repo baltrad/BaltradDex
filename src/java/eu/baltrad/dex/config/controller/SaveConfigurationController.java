@@ -52,7 +52,8 @@ public class SaveConfigurationController extends SimpleFormController {
     public static final String NODE_TYPES = "node_types";
     public static final String PRIMARY_NODE = "Primary";
     public static final String BACKUP_NODE = "Backup";
-    public static final String MSG = "message";
+    private static final String OK_MSG_KEY = "ok_message";
+    private static final String ERROR_MSG_KEY = "error_message";
 //---------------------------------------------------------------------------------------- Variables
     private ConfigurationManager configurationManager;
     private LogManager logManager;
@@ -105,14 +106,19 @@ public class SaveConfigurationController extends SimpleFormController {
         Configuration conf = ( Configuration )command;
         try {
             configurationManager.saveConfiguration( conf );
-            request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
-                "message.saveconf.savesuccess" ) );
             // read modified configuration
             InitAppUtil.initApp();
-            logManager.addEntry( new Date(), LogManager.MSG_WRN, "System configuration saved" );
+            request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
+                    "message.saveconf.savesuccess" ) );
+            logManager.addEntry( new Date(), LogManager.MSG_WRN, 
+                    getMessageSourceAccessor().getMessage( "message.saveconf.savesuccess" ) );
         } catch( HibernateException e ) {
-            request.getSession().setAttribute( MSG, getMessageSourceAccessor().getMessage(
-                "message.saveconf.savefail" ) );
+            request.getSession().removeAttribute( OK_MSG_KEY );
+            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
+                        "message.saveconf.savefail" ) );
+            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                    getMessageSourceAccessor().getMessage( "message.saveconf.savefail" )
+                    + ": " + e.getMessage() );
             errors.reject( "message.saveconf.savefail" ); 
         }
         return new ModelAndView( getSuccessView() );
