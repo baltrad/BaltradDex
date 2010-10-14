@@ -80,7 +80,7 @@ Modifies a groovy route
                                 </div>
                                 <div class="right">
                                     <div class="row">
-                                        <input type="text" name="name" value="<%=name%>"/>
+                                        <input type="text" name="name" value="<%=name%>" disabled/>
                                         <input type="hidden" name="name" value="<%=name%>"/>
                                     </div>
                                     <div class="row">
@@ -113,10 +113,10 @@ Modifies a groovy route
                                 </div>
                                 <div class="footer">
                                     <div class="right">
-                                        <button class="rounded" type="submit">
+                                        <button class="rounded" name="submitButton" type="submit" value="Modify">
                                             <span>Modify</span>
                                         </button>
-                                        <button class="rounded" type="submit">
+                                        <button class="rounded" name="submitButton" type="submit" value="Delete">
                                             <span>Delete</span>
                                         </button>
                                     </div>
