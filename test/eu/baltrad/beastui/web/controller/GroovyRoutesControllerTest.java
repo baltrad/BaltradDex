@@ -381,7 +381,7 @@ public class GroovyRoutesControllerTest extends TestCase {
     String result = classUnderTest.showRoute(model, name, null, null, null, null, null, "Delete");
     
     verify();
-    assertEquals("redirect:routes.htm", result);
+    assertEquals("redirect:showroutes.htm", result);
   }
 
   public void testShowRoute_delete_failed() {
