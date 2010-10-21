@@ -816,6 +816,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- and the abstraction of the catalog -->
     <bean id="catalog" class="eu.baltrad.beast.db.Catalog" autowire="byType" />
 
+    <!-- utilities when working with rules -->
+    <bean id="ruleutil" class="eu.baltrad.beast.rules.util.RuleUtilities" autowire="byType"/>
+    
     <!-- And we should have an application context to get hold of relevant managers -->
     <bean id="managercontext" class="eu.baltrad.beast.ManagerContext" autowire="byType" />
   

@@ -68,6 +68,7 @@ Creates a composite route
                                         String author = (String)request.getAttribute("author");
                                         Boolean active = (Boolean)request.getAttribute("active");
                                         String description = (String)request.getAttribute("description");
+                                        Boolean byscan = (Boolean)request.getAttribute("byscan");
                                         List<String> recipients = (List<String>)request.getAttribute("recipients");
                                         String areaid = (String)request.getAttribute("areaid");
                                         Integer interval = (Integer)request.getAttribute("interval");
@@ -75,11 +76,13 @@ Creates a composite route
                                         List<String> sources = (List<String>)request.getAttribute("sources");
 
                                         String activestr = (active == true)?"checked":"";
+                                        String byscanstr = (byscan == true)?"checked":"";
                                     %>
                                     <div class="row">Name</div>
                                     <div class="row">Author</div>
                                     <div class="row">Active</div>
                                     <div class="row">Description</div>
+                                    <div class="row">Scan based</div>
                                     <div class="row">Recipients</div>
                                     <div class="row">Areaid</div>
                                     <div class="row">Interval</div>
@@ -98,6 +101,9 @@ Creates a composite route
                                     </div>
                                     <div class="row">
                                         <input type="text" name="description" value="<%=description%>"/>
+                                    </div>
+                                    <div class="row">
+                                        <input type="checkbox" name="byscan" <%=byscanstr%>/>
                                     </div>
                                     <div class="row">
                                         <select multiple size="4" name="recipients">
@@ -133,7 +139,7 @@ Creates a composite route
                                         </select>
                                     </div>
                                     <div class="row">
-                                        <input type="text" name="timeout" value="<%=timeout%>" disabled/>
+                                        <input type="text" name="timeout" value="<%=timeout%>"/>
                                     </div>
                                     <div class="row">
                                         <select multiple size="6" name="sources">
