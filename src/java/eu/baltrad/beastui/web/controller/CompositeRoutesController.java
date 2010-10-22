@@ -37,7 +37,9 @@ import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.composite.CompositingRule;
 
 /**
- * Manages the composite routes and routing rules.
+ * Manages the composite routes and routing rules. Both scan based composites
+ * and volume based composites are possible to generate but it is not
+ * possible to combine them both.
  * 
  * @author Anders Henja
  */
@@ -93,7 +95,21 @@ public class CompositeRoutesController {
     this.template = template;
   }
   
-  
+  /**
+   * Handles create route requests 
+   * @param model the model
+   * @param name the name of the route
+   * @param author the author
+   * @param active if route is active or not
+   * @param description the description of this route
+   * @param recipients the recipients
+   * @param byscan if composite should affect scans or volumes
+   * @param areaid the composite area to be generated
+   * @param interval the interval
+   * @param timeout the timeout
+   * @param sources the sources this rule should affect
+   * @return a jsp page string or redirect
+   */
   @RequestMapping("/compositeroute_create.htm")
   public String createRoute(
       Model model,
@@ -152,6 +168,21 @@ public class CompositeRoutesController {
         recipients, byscan, areaid, interval, timeout, sources, emessage);
   }
   
+  /**
+   * Supports modification of a routing rule
+   * @param model the model
+   * @param name the name of the route
+   * @param author the author
+   * @param active if route is active or not
+   * @param description the description of this route
+   * @param recipients the recipients
+   * @param byscan if composite should affect scans or volumes
+   * @param areaid the composite area to be generated
+   * @param interval the interval
+   * @param timeout the timeout
+   * @param sources the sources this rule should affect
+   * @return a jsp page string or redirect
+   */
   @RequestMapping("/compositeroute_show.htm")
   public String showRoute(
       Model model,
