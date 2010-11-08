@@ -37,6 +37,11 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.util.Date;
 
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
+
 /**
  * Utility class used to initialize application on startup.
  *
@@ -274,7 +279,7 @@ public class InitAppUtil {
             byte[] bytes = new byte[ 1024 ];
             int len;
             while( ( len = is.read( bytes ) ) > 0 ) {
-                fos.write( bytes, 0, len);
+                fos.write( bytes, 0, len );
             }
             is.close();
             fos.close();

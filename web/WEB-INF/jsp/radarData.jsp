@@ -70,7 +70,7 @@ Author     : szewczenko
                             </div>
                             <div id="table">
                                 <display:table name="data_from_channel" id="data" defaultsort="1"
-                                    requestURI="dataFromChannel.htm" cellpadding="0" cellspacing="2"
+                                    requestURI="radarData.htm" cellpadding="0" cellspacing="2"
                                     export="false" class="tableborder" pagesize="10" sort="list"
                                     defaultorder="descending">
                                     <display:column sortProperty="date" sortable="true"

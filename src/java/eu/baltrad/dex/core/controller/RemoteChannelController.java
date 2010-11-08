@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.core.controller;
 
-import eu.baltrad.dex.frame.model.BaltradFrameHandler;
-import eu.baltrad.dex.frame.model.BaltradFrame;
+import eu.baltrad.frame.model.BaltradFrameHandler;
+import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.dex.channel.model.Channel;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;

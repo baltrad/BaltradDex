@@ -1,30 +1,45 @@
-/*
- * BaltradNode :: Radar data exchange and communication system
- * Remote Sensing Department, Institute of Meteorology and Water Management
- * Maciej Szewczykowski, 2009
- *
- * maciej.szewczykowski@imgw.pl
- */
+/***************************************************************************************************
+*
+* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+*
+* This file is part of the BaltradDex software.
+*
+* BaltradDex is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* BaltradDex is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+*
+***************************************************************************************************/
 
 package eu.baltrad.dex.log.model;
 
+import java.io.Serializable;
 import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 /**
- * Class implements log message object.
+ * Class implements system message object.
  *
- * @author szewczenko
+ * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
  * @version 1.0
  * @since 1.0
  */
-public class LogEntry implements Comparable< LogEntry >{
+public class LogEntry implements Serializable, Comparable< LogEntry > {
 //------------------------------------------------------------------------------------------- Fields
+    // Log entry ID
     private int id;
-    private String date;
-    private String time;
+    // Object representing current date / log entry timestamp
+    private Date timeStamp;
+    // Log entry type
     private String type;
+    // Actual message text
     private String message;
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -32,31 +47,14 @@ public class LogEntry implements Comparable< LogEntry >{
      */
     public LogEntry() {}
     /**
-     * Constructor.
+     * Constructor initializes log entry object.
      *
-     * @param date Log entry date
-     * @param time Log entry time
-     * @param type Log entry type
-     * @param message Log entry message
+     * @param timeStamp Object representing current date
+     * @param type Type of a log entry
+     * @param message Actual log entry text
      */
-    public LogEntry( String date, String time, String type, String message ) {
-        this.date = date;
-        this.time = time;
-        this.type = type;
-        this.message = message;
-    }
-    /**
-     * Constructor.
-     *
-     * @param date Date object
-     * @param type Log entry type
-     * @param message Log entry message
-     */
-    public LogEntry( Date date, String type, String message ) {
-        DateFormat dfDate = new SimpleDateFormat( "yyyy/MM/dd" );
-        DateFormat dfTime = new SimpleDateFormat( "HH:mm:ss" );
-        this.date = dfDate.format( date );
-        this.time = dfTime.format( date );
+    public LogEntry( Date timeStamp, String type, String message ) {
+        this.timeStamp = timeStamp;
         this.type = type;
         this.message = message;
     }
@@ -73,31 +71,17 @@ public class LogEntry implements Comparable< LogEntry >{
      */
     public void setId( int id ) { this.id = id; }
     /**
-     * Method gets log entry date.
+     * Gets timestamp of a log entry.
      *
-     * @return Log entry date
+     * @return Timestamp of a log entry
      */
-    public String getDate() { return date; }
+    public Date getTimeStamp() { return timeStamp; }
     /**
-     * Method sets log entry date.
+     * Sets timestamp of a log entry.
      *
-     * @param date Log entry date
+     * @param Timestamp of a log entry.
      */
-    public void setDate( String date ) { this.date = date; }
-
-    /**
-     * Method gets log entry time.
-     *
-     * @return Log entry time
-     */
-    public String getTime() { return time; }
-
-    /**
-     * Method sets log entry time.
-     *
-     * @param time Log entry time
-     */
-    public void setTime( String time ) { this.time = time; }
+    public void setTimeStamp( Date timeStamp ) { this.timeStamp = timeStamp; }
     /**
      * Method gets the type of log entry.
      *
@@ -123,25 +107,13 @@ public class LogEntry implements Comparable< LogEntry >{
      */
     public void setMessage( String message ) { this.message = message; }
     /**
-     * Method implementing comparable interface. Sorts log entries based on and time.
+     * Method implementing comparable interface. Allows to sort log entries based on date and time.
      *
-     * @param s Subscription
-     * @return 0 if objects are equal
+     * @param Log entry to compare with current entry
+     * @return 0 if objects are equal, 1 if current entry is later than compared entry, -1 otherwise
      */
     public int compareTo( LogEntry logEntry ) {
-        int dateCmp = getDate().compareTo( logEntry.getDate() );
-        int timeCmp = getTime().compareTo( logEntry.getTime() );
-        int res = 0;
-        if( ( dateCmp < 0 && timeCmp < 0 ) || ( dateCmp == 0 && timeCmp < 0 ) ) {
-            res = -1;
-        }
-         if( dateCmp == 0 && timeCmp == 0 ) {
-            res = 0;
-        }
-        if( ( dateCmp > 0 && timeCmp > 0 ) || ( dateCmp == 0 && timeCmp > 0 ) ) {
-            res = 1;
-        }
-        return res;
+        return -this.getTimeStamp().compareTo( logEntry.getTimeStamp() );
     }
 }
 //--------------------------------------------------------------------------------------------------

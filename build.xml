@@ -139,9 +139,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="lib/hibernate">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="lib/httpclient">
-        <include name="*.jar"/>
-      </fileset>
       <fileset dir="lib/jakarta-commons">
         <include name="*.jar"/>
       </fileset>
@@ -175,14 +172,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="lib/catalina-ant">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="lib/xerces">
+      <fileset dir="lib/baltrad-frame">
         <include name="*.jar"/>
       </fileset>
       <fileset dir="lib">
         <include name="postgresql-8.4-701.jdbc4.jar"/>
         <include name="apache-mime4j-0.6.jar"/>
       </fileset>
-      <!-- Also, include nessecary libs from beast-lib -->
+      <!-- Also, include neccesary libs from beast-lib -->
       <fileset dir="${beast.path}/libs">
         <include name="commons-dbcp.jar"/>
         <include name="commons-pool.jar"/>
@@ -370,7 +367,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
          url="${db.url}"
          userid="${db.user}" 
          password="${db.pwd}" >
-      <transaction src="${etc.dir}/insert_dex_data.sql"/>
+    <transaction src="${etc.dir}/insert_dex_data.sql"/>
     </sql>
   </target>
 

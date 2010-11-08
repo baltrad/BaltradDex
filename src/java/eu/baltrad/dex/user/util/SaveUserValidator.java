@@ -83,10 +83,10 @@ public class SaveUserValidator implements Validator {
             errors.rejectValue( "password", "error.field.passwd.tooshort" );
         }
         // validate node address
-        if( user.getNodeAddress().trim().length() > 0
+        /*if( user.getNodeAddress().trim().length() > 0
                 && !WebUtil.validateWebAddress( user.getNodeAddress() ) ) {
             errors.rejectValue( "nodeAddress", "error.field.nodeaddress.invalid" );
-        }
+        }*/
         // validate email address
         if( user.getEmail().trim().length() > 0 && !WebUtil.validateEmailAddress( user.getEmail() ) ) {
             errors.rejectValue( "email", "error.field.email.invalid" );

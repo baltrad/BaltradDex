@@ -26,6 +26,7 @@ Author     : szewczenko
 <!html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB"/>
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
@@ -33,7 +34,7 @@ Author     : szewczenko
     </head>
     <body>
         <div id="logtable">
-            <display:table name="log_entry_list" id="logEntry" defaultsort="1" requestURI="log.htm"
+            <display:table name="log_entry_list" id="logEntry" defaultsort="0" requestURI="log.htm"
                 cellpadding="0" cellspacing="2" export="false" class="tableborder">
                 <%! String cell_style = ""; %>
                 <c:choose>
@@ -53,11 +54,13 @@ Author     : szewczenko
                         %>
                     </c:when>
                 </c:choose>
-                <display:column sortable="false" title="Date" paramId="date" paramProperty="date"
-                    class="<%= cell_style %>" value="${logEntry.date}">
+                <display:column sortable="false" title="Date" paramId="timeStamp" 
+                    paramProperty="timeStamp" class="<%= cell_style %>"
+                    value="${fn:substring(logEntry.timeStamp, 0, 10)}">
                 </display:column>
-                <display:column sortable="false" title="Time" paramId="time" paramProperty="time"
-                    class="<%= cell_style %>" value="${logEntry.time}">
+                <display:column sortable="false" title="Time" paramId="timeStamp"
+                    paramProperty="timeStamp" class="<%= cell_style %>"
+                    value="${fn:substring(logEntry.timeStamp, 10, 19)}">
                 </display:column>
                 <c:choose>
                     <c:when test="${logEntry.type == 'ERROR'}">

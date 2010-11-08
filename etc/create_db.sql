@@ -5,8 +5,8 @@ DROP USER IF EXISTS baltrad;
 CREATE USER baltrad WITH PASSWORD 'baltrad';   
 
 -- create database
-DROP DATABASE IF EXISTS baltrad_db;
-CREATE DATABASE baltrad_db
+DROP DATABASE IF EXISTS baltrad;
+CREATE DATABASE baltrad
   WITH OWNER = baltrad
        ENCODING = 'UTF8'
        LC_COLLATE = 'en_US.UTF-8'

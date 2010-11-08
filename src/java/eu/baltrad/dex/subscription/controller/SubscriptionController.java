@@ -25,8 +25,8 @@ import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.channel.model.ChannelManager;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
 import eu.baltrad.dex.core.controller.FrameDispatcherController;
-import eu.baltrad.dex.frame.model.BaltradFrame;
-import eu.baltrad.dex.frame.model.BaltradFrameHandler;
+import eu.baltrad.frame.model.BaltradFrame;
+import eu.baltrad.frame.model.BaltradFrameHandler;
 import eu.baltrad.dex.log.model.LogManager;
 import eu.baltrad.dex.util.InitAppUtil;
 
