@@ -29,8 +29,7 @@ Author     : szewczenko
         <param name="sequence">log_entry_id_seq</param>
       </generator>
     </id>
-    <property column="date" name="date"/>
-    <property column="time" name="time"/>
+    <property column="timestamp" name="timeStamp"/>
     <property column="type" name="type"/>
     <property column="message" name="message"/>
   </class>

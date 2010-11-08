@@ -388,13 +388,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
     </bean>
 
-    <!-- Frame handler -->
-    <bean name="baltradFrameHandler" class="eu.baltrad.dex.frame.model.BaltradFrameHandler">
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
-    </bean>
-
     <!--
         Sign in validator.
     -->

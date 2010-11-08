@@ -23,8 +23,8 @@ package eu.baltrad.dex.core.controller;
 
 import eu.baltrad.dex.core.model.NodeConnection;
 import eu.baltrad.dex.core.model.NodeConnectionManager;
-import eu.baltrad.dex.frame.model.BaltradFrame;
-import eu.baltrad.dex.frame.model.BaltradFrameHandler;
+import eu.baltrad.frame.model.BaltradFrame;
+import eu.baltrad.frame.model.BaltradFrameHandler;
 import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.InitAppUtil;
 

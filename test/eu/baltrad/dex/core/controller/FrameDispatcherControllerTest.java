@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.core.controller;
 
-import eu.baltrad.dex.frame.model.BaltradFrame;
-import eu.baltrad.dex.frame.model.BaltradFrameHandler;
+import eu.baltrad.frame.model.BaltradFrame;
+import eu.baltrad.frame.model.BaltradFrameHandler;
 
 import junit.framework.TestCase;
 
@@ -39,32 +39,33 @@ public class FrameDispatcherControllerTest extends TestCase {
 //---------------------------------------------------------------------------------------- Variables
     private static BaltradFrameHandler bltFrameHandler = new BaltradFrameHandler();
     private static String xmlHdr = null;
+    private static BaltradFrame baltradFrame = null;
 //------------------------------------------------------------------------------------------ Methods
 
     public void testInit() {
-        bltFrameHandler.setUrl( "http://localhost:8084/BaltradDex/dispatch.htm" );
+        bltFrameHandler.setUrl( "http://172.31.50.150:8084/BaltradDex/dispatch.htm" );
         assertNotNull( bltFrameHandler );
-        assertEquals( bltFrameHandler.getUrl(), "http://localhost:8084/BaltradDex/dispatch.htm" );
+        assertEquals( bltFrameHandler.getUrl(), "http://172.31.50.150:8084/BaltradDex/dispatch.htm" );
     }
     
     public void testPrepareFrame() {
         xmlHdr = bltFrameHandler.createDataHdr( BaltradFrameHandler.MIME_MULTIPART,
-                "TestNode", "TestChannel", "leg1.h5" );
+                "TestNode", "Legionowo", "test.h5" );
         assertEquals( bltFrameHandler.getMimeType( xmlHdr ), BaltradFrameHandler.MIME_MULTIPART );
         assertEquals( bltFrameHandler.getSenderNodeName( xmlHdr ), "TestNode" );
         assertEquals( bltFrameHandler.getChannel( xmlHdr ), "TestChannel" );
-        assertEquals( bltFrameHandler.getFileName( xmlHdr ), "leg1.h5" );
+        assertEquals( bltFrameHandler.getFileName( xmlHdr ), "test.h5" );
         assertEquals( bltFrameHandler.getContentType( xmlHdr ), "file" );
     }
 
     public void testInjection() {
-        File f = new File( "leg1.h5" );
+        File f = new File( "test.h5" );
         
         assertNotNull( f );
         assertNotNull( xmlHdr );
 
-        BaltradFrame baltradFrame = new BaltradFrame( xmlHdr, f.getAbsolutePath() );
-
+        baltradFrame = new BaltradFrame( xmlHdr, f.getAbsolutePath() );
+        
         try {
             bltFrameHandler.handleBF( baltradFrame );
         } catch( Exception e ) {

@@ -56,7 +56,8 @@ Author     : szewczenko
                         <div id="logtable">
                             <display:table name="full_log_entry_list" id="logEntry"
                                 requestURI="journal.htm" cellpadding="0" cellspacing="2"
-                                export="false" class="tableborder" pagesize="10" sort="list">
+                                export="false" class="tableborder" pagesize="10"
+                                defaultsort="0">
                                 <%! String cell_style = ""; %>
                                 <c:choose>
                                     <c:when test="${logEntry.type == 'INFO'}">
@@ -75,13 +76,13 @@ Author     : szewczenko
                                         %>
                                     </c:when>
                                 </c:choose>
-                                <display:column sortable="true" title="Date" sortProperty="date"
-                                paramId="date" paramProperty="date" class="<%= cell_style %>"
-                                    value="${logEntry.date}">
+                                <display:column sortable="false" title="Date" paramId="timeStamp"
+                                    paramProperty="timeStamp" class="<%= cell_style %>"
+                                    value="${fn:substring(logEntry.timeStamp, 0, 10)}">
                                 </display:column>
-                                <display:column sortable="true" title="Time" sortProperty="time"
-                                    paramId="time" paramProperty="time" class="<%= cell_style %>"
-                                    value="${logEntry.time}">
+                                <display:column sortable="false" title="Time" paramId="timeStamp"
+                                    paramProperty="timeStamp" class="<%= cell_style %>"
+                                    value="${fn:substring(logEntry.timeStamp, 10, 19)}">
                                 </display:column>
                                 <c:choose>
                                     <c:when test="${logEntry.type == 'ERROR'}">

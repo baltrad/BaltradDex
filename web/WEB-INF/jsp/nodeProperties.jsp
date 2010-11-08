@@ -121,8 +121,6 @@ Author     : szewczenko
                                                      cssClass="errors"/>
                                     </div>
                                 </div>
-
-
                                 <div id="text-box">
                                     <c:choose>
                                         <c:when test="${not empty ok_message}">
@@ -153,22 +151,6 @@ Author     : szewczenko
                                         </c:otherwise>
                                     </c:choose>
                                 </div>
-
-                                <%--div id="message-text">
-                                    <c:if test="${not empty message}">
-                                        <div class="message">
-                                            <div class="icon">
-                                                <img src="includes/images/icons/circle-check.png"
-                                                     alt="save_success"/>
-                                            </div>
-                                            <div class="text">
-                                                <c:out value="${message}"/>
-                                                <c:set var="message" value="" scope="session"/>
-                                            </div>
-                                        </div>
-                                    </c:if>
-                                </div--%>
-
                                 <div class="footer">
                                     <div class="right">
                                         <button class="rounded" type="submit">

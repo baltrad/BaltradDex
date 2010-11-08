@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.core.controller;
 
-import eu.baltrad.dex.frame.model.BaltradFrame;
-import eu.baltrad.dex.frame.model.BaltradFrameHandler;
+import eu.baltrad.frame.model.BaltradFrame;
+import eu.baltrad.frame.model.BaltradFrameHandler;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.channel.model.ChannelManager;
@@ -291,7 +291,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                         }
-
                         // incoming channel subscription confirmation
 
                         if( bfHandler.getMessageText( header ).equals(
@@ -346,6 +345,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 // add remote subscription
                                 subscriptionManager.addSubscription( s );
                                 confirmedSub = s;
+                                //@
+                                confirmedSub.setSelected( true );
                                 logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                     "User " + s.getUserName() + " subscribed to "
                                     + s.getChannelName() );
@@ -512,21 +513,22 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             "New data frame received from " + bfHandler.getSenderNodeName( header )
                             + ": " + bfHandler.getFileName( header ) );
                         // write data to the temporary file
-                        File tempFile = InitAppUtil.createTempFile( 
+                        File tempFile = InitAppUtil.createTempFile(
                                 new File( InitAppUtil.getLocalTempDir() ) );
                         FileItemStream fileItem = iterator.next();
                         InputStream fileStream = fileItem.openStream();
                         InitAppUtil.saveFile( fileStream, tempFile );
+                        
                         // save data in the catalogue
                         if( fileCatalog == null ) {
                             fileCatalog = FileCatalogConnector.connect();
                         }
                         eu.baltrad.fc.oh5.File cFile = fileCatalog.catalog(
                                 tempFile.getAbsolutePath() );
+                        //
                         BltDataMessage message = new BltDataMessage();
                         message.setFile( cFile );
                         messageManager.manage( message );
-
                         InitAppUtil.deleteFile( tempFile.getAbsolutePath() );
 
                         // send data to subscribers
@@ -579,7 +581,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     "Frame dispatcher error: " + e.getMessage() );
         } catch( IOException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
-                    "Frame dispatcher error: " + e.getMessage() );
+                    " Frame dispatcher error: " + e.getMessage() );
         } catch( Exception e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e.getMessage() );

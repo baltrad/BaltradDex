@@ -1,10 +1,23 @@
-/*
- * BaltradNode :: Radar data exchange and communication system
- * Remote Sensing Department, Institute of Meteorology and Water Management
- * Maciej Szewczykowski, 2009
- *
- * maciej.szewczykowski@imgw.pl
- */
+/***************************************************************************************************
+*
+* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+*
+* This file is part of the BaltradDex software.
+*
+* BaltradDex is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* BaltradDex is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+*
+***************************************************************************************************/
 
 package eu.baltrad.dex.log.model;
 
@@ -21,13 +34,11 @@ import org.hibernate.Criteria;
 import java.util.List;
 import java.util.Date;
 import java.util.Collections;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 /**
- * Class implementing log handling functionality.
+ * Class implements system message manager.
  *
- * @author szewczenko
+ * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
  * @version 1.0
  * @since 1.0
  */
@@ -57,7 +68,7 @@ public class LogManager {
             session.getTransaction().rollback();
             throw e;
         }
-        Collections.sort( logEntries, Collections.reverseOrder() );
+        Collections.sort( logEntries );
         return logEntries;
     }
     /**
@@ -73,7 +84,7 @@ public class LogManager {
         session.beginTransaction();
         try {
             logEntries = session.createQuery( "FROM LogEntry WHERE id = ?" ).setString(
-                                                                                0, rank ).list();
+                    0, rank ).list();
             session.getTransaction().commit();
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
@@ -108,7 +119,7 @@ public class LogManager {
             session.getTransaction().rollback();
             throw e;
         }
-        Collections.sort( logEntries, Collections.reverseOrder() );
+        Collections.sort( logEntries );
         return logEntries;
     }
     /**
@@ -136,11 +147,7 @@ public class LogManager {
      * @param message Log entry message
      */
     public void addEntry( Date date, String type, String message ) {
-
-        DateFormat dfDate = new SimpleDateFormat( "yyyy/MM/dd" );
-        DateFormat dfTime = new SimpleDateFormat( "HH:mm:ss" );
-        LogEntry logEntry = new LogEntry( dfDate.format( date ), dfTime.format( date ),
-                                                                                type, message );
+        LogEntry logEntry = new LogEntry( date, type, message );
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
