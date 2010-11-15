@@ -167,7 +167,7 @@ public class AdaptorsController {
     logger.debug("createAdaptor(Model,..)");
 
     List<String> types = manager.getAvailableTypes();
-
+    
     if (op != null && op.equals("Add")) {
       try {
         IAdaptorConfiguration conf = manager.createConfiguration(type, name);

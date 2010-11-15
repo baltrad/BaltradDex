@@ -18,7 +18,7 @@ import eu.baltrad.beast.router.IRouterManager;
 public class CompositeRoutesControllerTest extends TestCase {
   private static interface MethodMocker {
     public String viewCreateRoute(Model model, String name, String author,
-        Boolean active, String description, List<String> recipients,
+        Boolean active, String description, List<String> recipients, Boolean byscan,
         String areaid, Integer interval, Integer timeout, List<String> sources, String emessage);
     
     public List<String> getSources();
@@ -48,9 +48,9 @@ public class CompositeRoutesControllerTest extends TestCase {
     
     classUnderTest = new CompositeRoutesController() {
       protected String viewCreateRoute(Model model, String name, String author,
-          Boolean active, String description, List<String> recipients,
+          Boolean active, String description, List<String> recipients, Boolean byscan,
           String areaid, Integer interval, Integer timeout, List<String> sources, String emessage) {
-        return method.viewCreateRoute(model, name, author, active, description, recipients, areaid,
+        return method.viewCreateRoute(model, name, author, active, description, recipients, byscan, areaid,
             interval, timeout, sources, emessage);
       }
       protected List<String> getSources() {
@@ -93,11 +93,11 @@ public class CompositeRoutesControllerTest extends TestCase {
     adaptors.add("A");
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
-    method.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null);
+    method.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null);
     methodControl.setReturnValue("somestring");
     replay();
     
-    String result = classUnderTest.createRoute(model, null, null, null,
+    String result = classUnderTest.createRoute(model, null, null, null, null,
         null, null, null, null, null, null);
 
     verify();
@@ -115,7 +115,7 @@ public class CompositeRoutesControllerTest extends TestCase {
 
     replay();
 
-    String result = classUnderTest.createRoute(model, null, null, null,
+    String result = classUnderTest.createRoute(model, null, null, null, null,
         null, null, null, null, null, null);
 
     verify();
@@ -130,6 +130,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     Boolean active = true;
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
+    Boolean byscan = new Boolean(false);
     String areaid = "xyz";
     Integer interval = 10;
     Integer timeout = 10000;
@@ -139,12 +140,12 @@ public class CompositeRoutesControllerTest extends TestCase {
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
     
-    method.viewCreateRoute(model, name, author, active, description, recipients, areaid, interval, timeout, sources, emessage);
+    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, areaid, interval, timeout, sources, emessage);
     methodControl.setReturnValue("somestring");
     
     replay();
     String result = classUnderTest.createRoute(model, name, author, active, description,
-        recipients, areaid, interval, timeout, sources);
+        recipients, byscan, areaid, interval, timeout, sources);
     
     verify();
     assertEquals("somestring", result);
@@ -159,6 +160,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     Boolean active = true;
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
+    Boolean byscan = new Boolean(false);
     String areaid = null;
     Integer interval = 10;
     Integer timeout = 10000;
@@ -168,12 +170,12 @@ public class CompositeRoutesControllerTest extends TestCase {
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
     
-    method.viewCreateRoute(model, name, author, active, description, recipients, areaid, interval, timeout, sources, emessage);
+    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, areaid, interval, timeout, sources, emessage);
     methodControl.setReturnValue("somestring");
     
     replay();
     String result = classUnderTest.createRoute(model, name, author, active, description,
-        recipients, areaid, interval, timeout, sources);
+        recipients, byscan, areaid, interval, timeout, sources);
     
     verify();
     assertEquals("somestring", result);
@@ -188,6 +190,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     Boolean active = true;
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
+    Boolean byscan = new Boolean(false);
     String areaid = "area";
     Integer interval = 10;
     Integer timeout = 10000;
@@ -197,12 +200,12 @@ public class CompositeRoutesControllerTest extends TestCase {
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
     
-    method.viewCreateRoute(model, name, author, active, description, recipients, areaid, interval, timeout, sources, emessage);
+    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, areaid, interval, timeout, sources, emessage);
     methodControl.setReturnValue("somestring");
     
     replay();
     String result = classUnderTest.createRoute(model, name, author, active, description,
-        recipients, areaid, interval, timeout, sources);
+        recipients, byscan, areaid, interval, timeout, sources);
     
     verify();
     assertEquals("somestring", result);
@@ -218,6 +221,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     Boolean active = true;
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
+    Boolean byscan = new Boolean(false);
     String areaid = "blt_lambert";
     Integer interval = 10;
     Integer timeout = 10000;
@@ -247,6 +251,8 @@ public class CompositeRoutesControllerTest extends TestCase {
     modelControl.setReturnValue(null);
     model.addAttribute("recipients", recipients);
     modelControl.setReturnValue(null);
+    model.addAttribute("byscan", byscan);
+    modelControl.setReturnValue(null);
     model.addAttribute("areaid", areaid);
     modelControl.setReturnValue(null);
     model.addAttribute("interval", interval);
@@ -269,7 +275,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     
     replay();
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
-        recipients, areaid, interval, timeout, sources, emessage);
+        recipients, byscan, areaid, interval, timeout, sources, emessage);
     verify();
     assertEquals("compositeroute_create", result);
   }
@@ -284,6 +290,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     Boolean active = true;
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
+    Boolean byscan = new Boolean(false);
     String areaid = "blt_lambert";
     Integer interval = 10;
     Integer timeout = 10000;
@@ -313,6 +320,8 @@ public class CompositeRoutesControllerTest extends TestCase {
     modelControl.setReturnValue(null);
     model.addAttribute("recipients", recipients);
     modelControl.setReturnValue(null);
+    model.addAttribute("byscan", byscan);
+    modelControl.setReturnValue(null);
     model.addAttribute("areaid", areaid);
     modelControl.setReturnValue(null);
     model.addAttribute("interval", interval);
@@ -337,7 +346,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     
     replay();
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
-        recipients, areaid, interval, timeout, sources, emessage);
+        recipients, byscan, areaid, interval, timeout, sources, emessage);
     verify();
     assertEquals("compositeroute_create", result);
   }

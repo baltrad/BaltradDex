@@ -110,7 +110,7 @@ Create adaptors
                               </div> 
                               <div class="footer">
                                     <div class="right">
-                                        <button class="rounded" type="submit">
+                                        <button class="rounded" name="submitButton" type="submit" value="Add">
                                             <span>Add</span>
                                         </button>
                                     </div>

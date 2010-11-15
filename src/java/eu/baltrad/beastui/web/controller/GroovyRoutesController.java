@@ -151,7 +151,7 @@ public class GroovyRoutesController {
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
-        return "redirect:routes.htm";
+        return "redirect:showroutes.htm";
       } catch (Throwable t) {
         return viewShowRoutes(model, "Failed to delete \"" + name + "\"");
       }

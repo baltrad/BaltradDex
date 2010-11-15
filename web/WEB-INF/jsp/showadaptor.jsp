@@ -102,10 +102,10 @@ List of adaptors
                                 </div>
                                 <div class="footer">
                                     <div class="right">
-                                        <button class="rounded" type="submit">
+                                        <button class="rounded" name="submitButton" type="submit" value="Modify">
                                             <span>Modify</span>
                                         </button>
-                                        <button class="rounded" type="submit">
+                                        <button class="rounded" name="submitButton" type="submit" value="Delete">
                                             <span>Delete</span>
                                         </button>
                                     </div>

@@ -94,10 +94,10 @@ List of routes
                             </display:table>
                             <div class="footer">
                                 <div class="right">
-                                    <button class="rounded" type="submit">
+                                    <button class="rounded" name="submitButton" type="submit" value="Script">
                                         <span>Script</span>
                                     </button>
-                                    <button class="rounded" type="submit">
+                                    <button class="rounded" name="submitButton" type="submit" value="Composite">
                                         <span>Composite</span>
                                     </button>
                                 </div>
