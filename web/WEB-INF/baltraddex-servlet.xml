@@ -816,7 +816,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- and the file catalog -->
     <bean id="fc" class="eu.baltrad.fc.FileCatalog">
   	    <constructor-arg value="${database.uri}" />
-            <constructor-arg value="${storage.dir}" />
+            <!--constructor-arg value="${storage.dir}" /-->
             <constructor-arg value="/tmp" />
     </bean>
     

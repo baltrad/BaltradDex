@@ -530,11 +530,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         // create file entry
                         FileEntry fileEntry = fileCatalog.store(
                                 tempFile.getAbsolutePath() );
-
-
-
-
-
+                        
 
                         // Interface with the Beast framework
                         BltDataMessage message = new BltDataMessage();

@@ -154,7 +154,7 @@ button::-moz-focus-inner {
     background: -moz-linear-gradient(top,  #98CBFF,  #003399); /* for firefox 3.6+ */
 }
 #footer .menu {
-    width: 284px;
+    width: 312px;
     color: white;
     margin-left: auto;
     margin-right: auto;
