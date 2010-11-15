@@ -50,10 +50,10 @@ public class FrameDispatcherControllerTest extends TestCase {
     
     public void testPrepareFrame() {
         xmlHdr = bltFrameHandler.createDataHdr( BaltradFrameHandler.MIME_MULTIPART,
-                "TestNode", "Legionowo", "test.h5" );
+                "TestNode", "TestRadar", "test.h5" );
         assertEquals( bltFrameHandler.getMimeType( xmlHdr ), BaltradFrameHandler.MIME_MULTIPART );
         assertEquals( bltFrameHandler.getSenderNodeName( xmlHdr ), "TestNode" );
-        assertEquals( bltFrameHandler.getChannel( xmlHdr ), "TestChannel" );
+        assertEquals( bltFrameHandler.getChannel( xmlHdr ), "TestRadar" );
         assertEquals( bltFrameHandler.getFileName( xmlHdr ), "test.h5" );
         assertEquals( bltFrameHandler.getContentType( xmlHdr ), "file" );
     }
