@@ -36,6 +36,7 @@ import eu.baltrad.dex.register.model.DeliveryRegisterManager;
 import eu.baltrad.dex.util.FileCatalogConnector;
 
 import eu.baltrad.fc.FileCatalog;
+import eu.baltrad.fc.db.FileEntry;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;
@@ -519,15 +520,25 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         InputStream fileStream = fileItem.openStream();
                         InitAppUtil.saveFile( fileStream, tempFile );
                         
+
+
+
                         // save data in the catalogue
                         if( fileCatalog == null ) {
                             fileCatalog = FileCatalogConnector.connect();
                         }
-                        eu.baltrad.fc.oh5.File cFile = fileCatalog.catalog(
+                        // create file entry
+                        FileEntry fileEntry = fileCatalog.store(
                                 tempFile.getAbsolutePath() );
-                        //
+
+
+
+
+
+
+                        // Interface with the Beast framework
                         BltDataMessage message = new BltDataMessage();
-                        message.setFile( cFile );
+                        message.setFileEntry( fileEntry );
                         messageManager.manage( message );
                         InitAppUtil.deleteFile( tempFile.getAbsolutePath() );
 
@@ -546,23 +557,32 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     // get local user
                                     User user = userManager.getUserByName(
                                             remoteSubs.get( i ).getUserName() );
+
+
                                     // check data status in data delivery register
                                     DeliveryRegisterEntry dre = deliveryRegisterManager.getEntry(
-                                            user.getId(), cFile.name() );
+                                            user.getId(), fileEntry.hashCode() );
+
+
+
                                     if( dre == null ) {
                                         // create data frame
                                         bfHandler.setUrl( user.getNodeAddress() );
+
                                         String retHeader = bfHandler.createDataHdr(
                                             BaltradFrameHandler.MIME_MULTIPART,
                                             InitAppUtil.getNodeName(),
-                                            remoteSubs.get( i ).getChannelName(), cFile.name() );
+                                            remoteSubs.get( i ).getChannelName(), /*cFile.name()*/
+                                            tempFile.getName() );
+
+
                                         BaltradFrame baltradFrame = new BaltradFrame( retHeader,
-                                                cFile.path() );
+                                                /*cFile.path()*/ tempFile.getAbsolutePath() );
                                         // process the frame
                                         bfHandler.handleBF( baltradFrame );
                                         // add entry to the data delivery register
                                         dre = new DeliveryRegisterEntry( user.getId(),
-                                                cFile.name() );
+                                                fileEntry.hashCode() );
                                         deliveryRegisterManager.addEntry( dre );
                                         logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                             "Sending data from " + 

@@ -30,66 +30,63 @@ package eu.baltrad.dex.data.model;
  */
 public class Data {
 //---------------------------------------------------------------------------------------- Variables
-    private long id;
-    private String channelName;
+    private String uuid;
     private String path;
+    private String timeStamp;
+    private String radarName;
     private String date;
     private String time;
+    private String type;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Default constructor
+     * Default constructor.
      */
     public Data(){}
     /**
-     * Constructor sets field values.
+     * Constructor.
      *
-     * @param path Absolute data file path
-     * @param id File index in the database
-     * @param channelName Channel name
-     * @param date Date
-     * @param time Time
+     * @param uuid Data file's identity string
+     * @param path Data file's absolute path
+     * @param timeStamp Data file's time stamp
+     * @param radarName Radar station name
+     * @param date Date string
+     * @param time Time string
+     * @param type Radar data type
      */
-    public Data( String path, long id, String channelName, String date, String time ) {
+    public Data( String uuid, String path, String timeStamp, String radarName, String date,
+            String time, String type ) {
+        this.uuid = uuid;
         this.path = path;
-        this.id = id;
-        this.channelName = channelName;
+        this.timeStamp = timeStamp;
+        this.radarName = radarName;
         this.date = date;
         this.time = time;
+        this.type = type;
     }
     /**
-     * Constructor setting file id and channel name.
+     * Method gets file's identity string.
      *
-     * @param id File index in the database
-     * @param channelName Channel name
+     * @return File's identity string
      */
-    public Data( long id, String channelName ) {
-        this.id = id;
-        this.channelName = channelName;
-    }
+    public String getUuid() { return uuid; }
     /**
-     * Method gets data id.
+     * Method sets file's identity string.
      *
-     * @return Data id
+     * @param uuid File's identity string
      */
-    public long getId() { return id; }
+    public void setUuid( String uuid ) { this.uuid = uuid; }
     /**
-     * Method sets data id.
+     * Gets radar station name.
      *
-     * @param id Data id
+     * @return Radar station name
      */
-    public void setId( long id ) { this.id = id; }
+    public String getRadarName() { return radarName; }
     /**
-     * Method gets channel name.
+     * Sets radar station name.
      *
-     * @return Channel name
+     * @param radarName Radar station name
      */
-    public String getChannelName() { return channelName; }
-    /**
-     * Method sets channel name.
-     *
-     * @param channelName Channel name
-     */
-    public void setChannelName( String channelName ) { this.channelName = channelName; }
+    public void setRadarName( String radarName ) { this.radarName = radarName; }
     /**
      * Method gets file's path.
      *
@@ -126,5 +123,29 @@ public class Data {
      * @param time Time
      */
     public void setTime( String time ) { this.time = time; }
+    /**
+     * Gets data file's time stamp.
+     *
+     * @return Data file's time stamp
+     */
+    public String getTimeStamp() { return timeStamp; }
+    /**
+     * Sets data file's time stamp.
+     *
+     * @param timeStamp Data file's time stamp
+     */
+    public void setTimeStamp( String timeStamp ) { this.timeStamp = timeStamp; }
+    /**
+     * Gets data type.
+     *
+     * @return Data type
+     */
+    public String getType() { return type; }
+    /**
+     * Sets data type.
+     *
+     * @param type Data type
+     */
+    public void setType( String type ) { this.type = type; }
 }
 //--------------------------------------------------------------------------------------------------

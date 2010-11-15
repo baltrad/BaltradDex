@@ -132,7 +132,7 @@ CREATE TABLE dex_delivery_register
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('delivery_register_id_seq'),
     user_id INT NOT NULL REFERENCES dex_users (id),
-    file_name VARCHAR(128) NOT NULL,
+    hash_code INT NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -159,7 +159,7 @@ CREATE TABLE dex_node_configuration
     address VARCHAR(128) NOT NULL,
     org_name VARCHAR(128) NOT NULL,
     org_address VARCHAR(128) NOT NULL,
-    time_zone VARCHAR(16) NOT NULL,
+    time_zone VARCHAR(128) NOT NULL,
     temp_dir VARCHAR(32) NOT NULL,
     email VARCHAR(32) NOT NULL,
     PRIMARY KEY (id)

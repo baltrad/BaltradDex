@@ -79,11 +79,17 @@ Author     : szewczenko
                                     <display:column sortProperty="time" sortable="true"
                                         title="Time" class="tdcenter" value="${data.time}">
                                     </display:column>
-                                    <display:column sortProperty="path" sortable="true"
-                                        paramId="path" paramProperty="path" title="File name"
-                                        class="tdcenter" href="download.htm"
-                                        value="${fn:substring(data.path, fn:length(data.path) -
-                                                 44, fn:length(data.path))}">
+                                    <display:column sortProperty="object" sortable="true"
+                                        title="Data type" class="tdcenter" value="${data.type}">
+                                    </display:column>
+                                    <display:column sortable="false" title="Details"
+                                        paramId="uuid" paramProperty="uuid"
+                                        class="tdcheck" href="fileDetails.htm" value="View">
+                                    </display:column>
+                                    <display:column sortProperty="path" sortable="false"
+                                        paramId="path" paramProperty="path" title="File"
+                                        class="tdcheck" href="download.htm"
+                                        value="Download">
                                     </display:column>
                                 </display:table>
                             </div>

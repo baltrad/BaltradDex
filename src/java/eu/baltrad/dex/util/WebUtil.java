@@ -52,7 +52,9 @@ public class WebUtil {
      */
     public static boolean validateWebAddress( String webAddress ) {
         if( webAddress == null ) return false;
-        return hasProtocolAndDomain( webAddress );
+        return webAddress.startsWith( HTTP_PREFIX );
+        // uncomment when nodes have FQDNs
+        //return hasProtocolAndDomain( webAddress );
     }
     /**
      * Checks if an email address has valid name and domain.

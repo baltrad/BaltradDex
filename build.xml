@@ -56,7 +56,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
   <property name="install.prefix" value="/opt/baltrad"/>
 
-  <property name="baltrad.db.path" value="/opt/baltrad/db-devel" />
+  <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
   <property name="beast.path" value="/opt/baltrad/beast" />
   <available file="${baltrad.db.path}/java/jbrfc.jar" property="jbrfc.jar.available" />
   <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
@@ -206,6 +206,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="includes/**/*.png" />
         <include name="includes/**/*.gif" />
         <include name="includes/**/*.jpg" />
+        <include name="includes/**/*.txt" />
       </fileset>
       
       <fileset dir="${etc.dir}">

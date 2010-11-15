@@ -73,15 +73,11 @@ Author     : szewczenko
                                     </div>
                                     <div class="row">
                                         <spring:bind path="command.nodeType">
-                                            <select name='<c:out value=
-                                                   "${status.expression}"/>'>
-                                                <c:forEach items="${node_types}"
-                                                           var="type">
-                                                    <option value='<c:out value=
-                                                           "${type}"/>'
-                                                        <c:if test="${type ==
-                                                                      status.value}">
-                                                            SELECTED</c:if>>
+                                            <select name='<c:out value="${status.expression}"/>'>
+                                                <c:forEach items="${node_types}" var="type">
+                                                    <option value='<c:out value="${type}"/>'
+                                                        <c:if test="${type == status.value}">
+                                                                SELECTED</c:if>>
                                                             <c:out value="${type}"/>
                                                     </option>
                                                 </c:forEach>
@@ -106,7 +102,18 @@ Author     : szewczenko
                                                      cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.timeZone"/>
+                                        <spring:bind path="command.timeZone">
+                                            <select name='<c:out value=
+                                                   "${status.expression}"/>'>
+                                                <c:forEach items="${time_zones}" var="zone">
+                                                    <option value='<c:out value="${zone}"/>'
+                                                        <c:if test="${zone == status.value}">
+                                                                SELECTED</c:if>>
+                                                            <c:out value="${zone}"/>
+                                                    </option>
+                                                </c:forEach>
+                                            </select>
+                                        </spring:bind>
                                         <form:errors path="command.timeZone"
                                                      cssClass="errors"/>
                                     </div>

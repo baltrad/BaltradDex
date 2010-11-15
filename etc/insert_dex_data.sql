@@ -56,4 +56,4 @@ INSERT INTO dex_channels (name, wmo_number) VALUES ('Legionowo', '12374'),
 INSERT INTO dex_node_configuration (name, type, address, org_name, org_address, time_zone, temp_dir,
     email ) VALUES('baltrad.imgw.pl', 'Primary', 'http://172.30.9.171:8084/BaltradDex/dispatch.htm',
     'Institute of Meteorology and Water Management', '01-673 Warsaw, Podleśna 61, Poland',
-    'GMT + 01:00', 'temp', 'admin@baltrad.imgw.pl');
+    'Europe/Warsaw UTC+01', 'temp', 'admin@baltrad.imgw.pl');

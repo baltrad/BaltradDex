@@ -24,6 +24,7 @@ package eu.baltrad.dex.config.controller;
 import eu.baltrad.dex.config.model.Configuration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.util.InitAppUtil;
+import eu.baltrad.dex.util.ServletContextUtil;
 import eu.baltrad.dex.log.model.LogManager;
 
 import org.springframework.web.servlet.mvc.SimpleFormController;
@@ -34,6 +35,10 @@ import org.hibernate.HibernateException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +55,8 @@ import java.util.Date;
 public class SaveConfigurationController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
     public static final String NODE_TYPES = "node_types";
+    public static final String TIME_ZONES = "time_zones";
+    private static final String TZ_FILE = "includes/timezones_eu.txt";
     public static final String PRIMARY_NODE = "Primary";
     public static final String BACKUP_NODE = "Backup";
     private static final String OK_MSG_KEY = "ok_message";
@@ -85,10 +92,25 @@ public class SaveConfigurationController extends SimpleFormController {
     @Override
     protected HashMap referenceData( HttpServletRequest request ) throws Exception {
         HashMap model = new HashMap();
+        // node types
         List< String > nodeTypes = new ArrayList< String >();
         nodeTypes.add( PRIMARY_NODE );
         nodeTypes.add( BACKUP_NODE );
+        // time zones
+        List< String > timeZones = new ArrayList< String >();
+        try {
+            String tzFile = ServletContextUtil.getServletContextPath() + TZ_FILE;
+            BufferedReader br = new BufferedReader( new FileReader( tzFile ) );
+            String strLine;
+            while( ( strLine = br.readLine() ) != null ) {
+                timeZones.add( strLine );
+            }
+        } catch( IOException e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to load time zones"
+                    + " from file: " + e.getMessage() );
+        }
         model.put( NODE_TYPES, nodeTypes );
+        model.put( TIME_ZONES, timeZones );
         return model;
     }
     /**

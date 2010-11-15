@@ -69,11 +69,11 @@ public class SaveConfigurationValidator implements Validator {
                 < MIN_FIELD_LENGTH ) {
             errors.rejectValue( "nodeName", "error.field.name.tooshort" );
         }
-        // validate node address - uncomment when nodes have FQDNs
-        /*if( conf.getNodeAddress().trim().length() > 0
+        // validate node address
+        if( conf.getNodeAddress().trim().length() > 0
                 && !WebUtil.validateWebAddress( conf.getNodeAddress() ) ) {
             errors.rejectValue( "nodeAddress", "error.field.nodeaddress.invalid" );
-        }*/
+        }
         // validate email address
         if( conf.getAdminEmail().trim().length() > 0 && !WebUtil.validateEmailAddress(
                 conf.getAdminEmail() ) ) {

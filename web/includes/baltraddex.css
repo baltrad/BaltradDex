@@ -488,14 +488,14 @@ tr {
     color: white;
     padding: 6px;
 }
-#table > form > .left {
+#table > form > .left, #table > .left {
     position: relative;
     float: left;
     clear: left;
     padding-left: 24px;
     padding-right: 24px;
 }
-#table > form > .right {
+#table > form > .right, #table > .right {
     position: relative;
     float: left;
     clear: right;
@@ -503,7 +503,8 @@ tr {
 #table > form > .right > .row > select {
     width: 200px;
 }
-#table > form > .right > .row, #table > form > .left > .row {
+#table > form > .right > .row, #table > form > .left > .row, 
+        #table > .left > .row, #table > .right > .row {
     height: 26px;
     font-family: Verdana, Arial, Tahoma, sans-serif;
     font-size: small;
@@ -536,6 +537,15 @@ tr {
     color: #99CC66;
     text-decoration: none;
 }
+/*
+ * File details table and probably other tables too
+ */
+#table > .left > .row {
+    color: #2d76ae;
+    font-weight: bold;
+    font-size: 1.1em;
+    text-align: right;
+}
 
 /*
  * Node properties page
@@ -544,7 +554,7 @@ tr {
     width: 360px;
 }
 #table > .props > form > .right > .row > select {
-    width: 200px;
+    width: 240px;
 }
 
 /*

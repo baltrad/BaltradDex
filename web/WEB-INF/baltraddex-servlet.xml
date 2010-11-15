@@ -44,6 +44,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="home.htm">statusController</prop>
                 <prop key="radars.htm">channelController</prop>
                 <prop key="radarData.htm">channelDataController</prop>
+                <prop key="fileDetails.htm">fileDetailsController</prop>
                 <prop key="credits.htm">urlFilenameController</prop>
             </props>
         </property>
@@ -277,6 +278,19 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="successView">
             <value>radarData</value>
+        </property>
+    </bean>
+
+    <!--
+        Data from data channel controller.
+    -->
+    <bean name="fileDetailsController"
+        class="eu.baltrad.dex.data.controller.FileDetailsController">
+        <property name="dataManager">
+            <ref bean="dataManager" />
+        </property>
+        <property name="successView">
+            <value>fileDetails</value>
         </property>
     </bean>
 
@@ -802,7 +816,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- and the file catalog -->
     <bean id="fc" class="eu.baltrad.fc.FileCatalog">
   	    <constructor-arg value="${database.uri}" />
-            <!--constructor-arg value="${storage.dir}" /-->
+            <constructor-arg value="${storage.dir}" />
             <constructor-arg value="/tmp" />
     </bean>
     

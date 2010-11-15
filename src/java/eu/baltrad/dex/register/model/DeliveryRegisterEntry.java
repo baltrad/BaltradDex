@@ -30,9 +30,12 @@ package eu.baltrad.dex.register.model;
  */
 public class DeliveryRegisterEntry {
 //---------------------------------------------------------------------------------------- Variables
+    // Record ID
     private int id;
+    // User ID
     private int userId;
-    private String fileName;
+    // File's hash code
+    private int hashCode;
 //------------------------------------------------------------------------------------------ Methods    
     /**
      * Default constructor
@@ -42,11 +45,11 @@ public class DeliveryRegisterEntry {
      * Constructor sets field values.
      *
      * @param userId User id
-     * @param fileName File name
+     * @param hashCode File's hash code
      */
-    public DeliveryRegisterEntry( int userId, String fileName ) {
+    public DeliveryRegisterEntry( int userId, int hashCode ) {
         this.userId = userId;
-        this.fileName = fileName;
+        this.hashCode = hashCode;
     }
     /**
      * Method returns register entry id.
@@ -73,16 +76,16 @@ public class DeliveryRegisterEntry {
      */
     public void setUserId( int userId ) { this.userId = userId; }
     /**
-     * Method returns file name.
+     * Method returns file's hash code.
      *
-     * @return File name
+     * @return File's hash code
      */
-    public String getFileName() { return fileName; }
+    public int getHashCode() { return hashCode; }
     /**
-     * Method sets file name.
+     * Method sets file's hash code.
      *
-     * @param fileName File name
+     * @param hashCode File's hash code
      */
-    public void setFileName( String fileName ) { this.fileName = fileName; }
+    public void setHashCode( int hashCode ) { this.hashCode = hashCode; }
 }
 //--------------------------------------------------------------------------------------------------

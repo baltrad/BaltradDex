@@ -19,10 +19,12 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.channel.controller;
+package eu.baltrad.dex.data.controller;
 
 import eu.baltrad.dex.data.model.DataManager;
+import eu.baltrad.dex.data.model.Data;
 import eu.baltrad.dex.util.FileCatalogConnector;
+
 import eu.baltrad.fc.FileCatalog;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,66 +34,62 @@ import javax.servlet.ServletException;
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.List;
 import java.io.IOException;
 
 /**
- * Implemens functionality allowing for listing products available for a given data channel.
+ * Implements functionality allowing for accessing detailed information about radar data file.
  *
  * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
  * @version 0.1.6
  * @since 0.1.6
  */
-public class ChannelDataController implements Controller {
+public class FileDetailsController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
-    public static final String MAP_KEY = "data_from_channel";
-    public static final String CHANNEL_NAME = "channelName";
+    private static final String FC_FILE_UUID = "uuid";
+    private static final String FILE_DETAILS = "file_details";
 //---------------------------------------------------------------------------------------- Variables
     private DataManager dataManager;
     private static FileCatalog fc;
     private String successView;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Method handles http request
+     * Handles HTTP request.
      *
-     * @param request Http request
-     * @param response Http response
-     * @return Model and view
-     * @throws javax.servlet.ServletException
-     * @throws java.io.IOException
+     * @param request HTTP request
+     * @param response HTTP response
+     * @return ModelAndView object
+     * @throws ServletException 
+     * @throws IOException
      */
-    public ModelAndView handleRequest( HttpServletRequest request,
-            HttpServletResponse response )
+    public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
-        String channelName = request.getParameter( CHANNEL_NAME );
-        // Initialize file catalog if null
+        String uuid = request.getParameter( FC_FILE_UUID );
         if( fc == null ) {
             fc = FileCatalogConnector.connect();
         }
-        List dataList = dataManager.getDataByRadar( fc, channelName );
-        return new ModelAndView( getSuccessView(), MAP_KEY, dataList );
-        
+        Data data = dataManager.getDataByID( fc, uuid );
+        return new ModelAndView( getSuccessView(), FILE_DETAILS, data );
     }
     /**
-     * Method returns reference to data manager object.
+     * Gets reference to data manager object.
      *
      * @return Reference to data manager object
      */
     public DataManager getDataManager() { return dataManager; }
     /**
-     * Method sets reference to data manager object.
+     * Sets reference to data manager object.
      *
      * @param Reference to data manager object
      */
     public void setDataManager( DataManager dataManager ) { this.dataManager = dataManager; }
     /**
-     * Method returns reference to success view name string.
+     * Gets reference to success view name string.
      *
      * @return Reference to success view name string
      */
     public String getSuccessView() { return successView; }
     /**
-     * Method sets reference to success view name string.
+     * Sets reference to success view name string.
      *
      * @param Reference to success view name string
      */

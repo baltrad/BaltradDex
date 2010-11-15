@@ -24,8 +24,9 @@ package eu.baltrad.dex.data.model;
 import eu.baltrad.fc.FileCatalog;
 
 import eu.baltrad.fc.expr.ExpressionFactory;
-import eu.baltrad.fc.Query;
-import eu.baltrad.fc.ResultSet;
+import eu.baltrad.fc.db.FileQuery;
+import eu.baltrad.fc.db.FileResult;
+import eu.baltrad.fc.db.FileEntry;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -39,72 +40,68 @@ import java.util.ArrayList;
  */
 public class DataManager {
 //---------------------------------------------------------------------------------------- Constants
-    private static final String FC_ID_ATTR = "file:id";
-    private static final String FC_PATH_ATTR = "file:path";
     private static final String FC_SRC_PLC_ATTR = "what/source:PLC";
-    private static final String FC_DATE_ATTR = "what/date";
-    private static final String FC_TIME_ATTR = "what/time";
+    private static final String FC_FILE_UUID = "file:uuid";
     private static final String FC_DATE_STR = "yyyy/MM/dd";
     private static final String FC_TIME_STR = "HH:mm:ss";
+    private static final String FC_DATE_TIME_STR = "yyyy/MM/dd, HH:mm:ss";
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Method queries file catalog for all files coming from a given data channel.
+     * Method queries file catalog for all files coming from a given radar station.
      *
-     * @param fileCatalog File catalog instance
-     * @param channelName Data channel name
-     * @return List containing data from a given data channel
+     * @param fc File catalog instance
+     * @param radarName Radar station name
+     * @return List containing data from a given radar station
      */
-    public List getDataFromChannel( FileCatalog fileCatalog, String channelName ) {
-        // Query the file catalog
+    public List< Data > getDataByRadar( FileCatalog fc, String radarName ) {
         ExpressionFactory xpr = new ExpressionFactory();
-        Query q = fileCatalog.query();
-        // path
-        q.fetch( xpr.attribute( FC_PATH_ATTR ) );
-        // file id
-        q.fetch( xpr.attribute( FC_ID_ATTR ) );
-        // date
-        q.fetch( xpr.attribute( FC_DATE_ATTR ) );
-        // time
-        q.fetch( xpr.attribute( FC_TIME_ATTR ) );
+        FileQuery q = fc.query_file();
         // filter the query with a given channel name
-        q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( channelName ) ) );
-        ResultSet r = q.execute();
-        List dataList = new ArrayList();
+        q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( radarName ) ) );
+        FileResult r = q.execute();
+        List< Data > dataList = new ArrayList<Data>();
         while( r.next() ) {
-            Data data = new Data( r.string( 0 ), r.int64_( 1 ), channelName,
-                    r.date( 2 ).to_string( FC_DATE_STR ), r.time( 3 ).to_string( FC_TIME_STR ) );
+            FileEntry fileEntry = r.entry();
+            Data data = new Data(
+                fileEntry.uuid(),
+                fc.storage().store( fc.database().entry_by_uuid( fileEntry.uuid() ) ),
+                fileEntry.stored_at().to_string( FC_DATE_TIME_STR ), radarName,
+                fileEntry.what_date().to_string( FC_DATE_STR ),
+                fileEntry.what_time().to_string( FC_TIME_STR ),
+                fileEntry.what_object() );
             dataList.add( data );
         }
         // delete the result set
         r.delete();
-        // return the result set
         return dataList;
     }
     /**
-     * Method fetches data record with a given ID.
+     * Method queries file catalog for a file entry with a given identity string.
      *
-     * @param fileCatalog File catalog instance
-     * @param dataId Data record ID
-     * @return Data record with a given ID
+     * @param fc File catalog instance
+     * @param uuid File entry's identity string
+     * @return File entry with a given ID
      */
-    public Data getDataById( FileCatalog fileCatalog, long dataId ) {
-        // Query the file catalog
-        Data data = null;
+    public Data getDataByID( FileCatalog fc, String uuid ) {
         ExpressionFactory xpr = new ExpressionFactory();
-        Query q = fileCatalog.query();
-        // file id
-        q.fetch( xpr.attribute( FC_ID_ATTR ) );
-        // channel name
-        q.fetch( xpr.attribute( FC_SRC_PLC_ATTR ) );
-        // filter the query with a given data id
-        q.filter( xpr.attribute( FC_ID_ATTR ).eq( xpr.int64_( dataId ) ) );
-        ResultSet r = q.execute();
+        FileQuery q = fc.query_file();
+        // filter the query with a given file identity string
+        q.filter( xpr.attribute( FC_FILE_UUID ).eq( xpr.string( uuid ) ) );
+        FileResult r = q.execute();
+        Data data = null;
         while( r.next() ) {
-            data = new Data( r.int64_( 0 ), r.string( 1 ) );
+            FileEntry fileEntry = r.entry();
+            data = new Data(
+                fileEntry.uuid(),
+                fc.storage().store( fc.database().entry_by_uuid( fileEntry.uuid() ) ),
+                fileEntry.stored_at().to_string( FC_DATE_TIME_STR ),
+                fileEntry.what_source(),
+                fileEntry.what_date().to_string( FC_DATE_STR ),
+                fileEntry.what_time().to_string( FC_TIME_STR ),
+                fileEntry.what_object() );
         }
         // delete the result set
         r.delete();
-        // return the result record
         return data;
     }
 }
