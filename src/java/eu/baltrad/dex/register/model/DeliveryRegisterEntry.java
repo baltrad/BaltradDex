@@ -34,8 +34,8 @@ public class DeliveryRegisterEntry {
     private int id;
     // User ID
     private int userId;
-    // File's hash code
-    private int hashCode;
+    // File's identity string
+    private String uuid;
 //------------------------------------------------------------------------------------------ Methods    
     /**
      * Default constructor
@@ -45,11 +45,11 @@ public class DeliveryRegisterEntry {
      * Constructor sets field values.
      *
      * @param userId User id
-     * @param hashCode File's hash code
+     * @param uuid File's identity string
      */
-    public DeliveryRegisterEntry( int userId, int hashCode ) {
+    public DeliveryRegisterEntry( int userId, String uuid ) {
         this.userId = userId;
-        this.hashCode = hashCode;
+        this.uuid = uuid;
     }
     /**
      * Method returns register entry id.
@@ -76,16 +76,16 @@ public class DeliveryRegisterEntry {
      */
     public void setUserId( int userId ) { this.userId = userId; }
     /**
-     * Method returns file's hash code.
+     * Method returns file's identity string.
      *
-     * @return File's hash code
+     * @return File's identity string
      */
-    public int getHashCode() { return hashCode; }
+    public String getUuid() { return uuid; }
     /**
-     * Method sets file's hash code.
+     * Method sets file's identity string.
      *
-     * @param hashCode File's hash code
+     * @param uuid File's identity string
      */
-    public void setHashCode( int hashCode ) { this.hashCode = hashCode; }
+    public void setUuid( String uuid ) { this.uuid = uuid; }
 }
 //--------------------------------------------------------------------------------------------------

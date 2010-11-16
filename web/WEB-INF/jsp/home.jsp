@@ -83,7 +83,7 @@ Author     : szewczenko
                             <img src="includes/images/icons/arrow-down.png" alt="remote_radars"/>
                         </div>
                         <div class="text">
-                            Incoming data | Subscribed remote radar stations
+                            Incoming data | Subscribed radars
                         </div>
                         <c:choose>
                             <c:when test="${not empty local_subscriptions}">
@@ -123,7 +123,7 @@ Author     : szewczenko
                             <c:otherwise>
                                 <div class="message">
                                     <li type="circle">
-                                        You currently have no peer radar stations subscribed.
+                                        You currently have no radar stations subscribed.
                                     </li>
                                 </div>
                             </c:otherwise>
@@ -134,7 +134,7 @@ Author     : szewczenko
                             <img src="includes/images/icons/arrow-up.png" alt="remote_radars"/>
                         </div>
                         <div class="text">
-                            Outgoing data | Local radar stations subscribed by the users
+                            Outgoing data | Local radars subscribed by peers
                         </div>
                         <c:choose>
                             <c:when test="${not empty remote_subscriptions}">

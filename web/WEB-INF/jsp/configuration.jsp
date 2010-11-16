@@ -100,7 +100,7 @@ Author     : szewczenko
                                                      alt="local_channels"/>
                                     </div>
                                     <div class="header">
-                                        Local Radars
+                                        Radars
                                     </div>
                                     <div class="text">
                                         <div class="row">
@@ -136,11 +136,16 @@ Author     : szewczenko
                                                      alt="subscribed_channels"/>
                                     </div>
                                     <div class="header">
-                                        Subscribed Radars
+                                        Subscriptions
                                     </div>
                                     <div class="text">
                                         <div class="row">
-                                            <a href="selectRemoveSubscriptions.htm">Remove</a>
+                                            <a href="selectRemoveSubscriptions.htm">
+                                                Subscribed radars</a>
+                                        </div>
+                                        <div class="row">
+                                            <a href="showPeersSubscriptions.htm">
+                                                Peer's subscriptions</a>
                                         </div>
                                     </div>
                                 </div>

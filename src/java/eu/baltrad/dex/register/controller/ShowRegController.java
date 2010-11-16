@@ -8,7 +8,6 @@
 
 package eu.baltrad.dex.register.controller;
 
-import eu.baltrad.dex.register.model.DeliveryRegisterRecord;
 import eu.baltrad.dex.register.model.DeliveryRegisterEntry;
 import eu.baltrad.dex.register.model.DeliveryRegisterManager;
 import eu.baltrad.dex.data.model.Data;
@@ -59,7 +58,7 @@ public class ShowRegController implements Controller {
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
         List drEntries = deliveryRegisterManager.getAllEntries();
-        List<DeliveryRegisterRecord> drRecords = new ArrayList<DeliveryRegisterRecord>();
+        //List<DeliveryRegisterRecord> drRecords = new ArrayList<DeliveryRegisterRecord>();
         if( fileCatalog == null ) {
             fileCatalog = fcConnector.connect();
         }
@@ -80,7 +79,7 @@ public class ShowRegController implements Controller {
 
             
         }
-        return new ModelAndView( getSuccessView(), MODEL_KEY, drRecords );
+        return new ModelAndView( getSuccessView()/*, MODEL_KEY, drRecords*/ );
     }
     /**
      * Method returns reference to success view name string.

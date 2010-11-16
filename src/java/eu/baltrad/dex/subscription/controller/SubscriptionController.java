@@ -71,6 +71,12 @@ public class SubscriptionController extends MultiActionController {
     private static final String SUBSCRIPTION_REMOVAL_STATUS_VIEW = "showSubscriptionRemovalStatus";
     private static final String REDIRECT_VIEW = "selectRemoveSubscriptions.htm";
 
+    private static final String SHOW_PEERS_SUBSCRIPTIONS_VIEW = "showPeersSubscriptions";
+    private static final String SHOW_SELECTED_PEERS_SUBSCRIPTIONS_VIEW =
+                                                                "showSelectedPeersSubscriptions";
+    private static final String SHOW_REMOVED_PEERS_SUBSCRIPTIONS_VIEW =
+                                                                "showRemovedPeersSubscriptions";
+
 //---------------------------------------------------------------------------------------- Variables
     private ChannelManager channelManager;
     private SubscriptionManager subscriptionManager;
@@ -80,6 +86,8 @@ public class SubscriptionController extends MultiActionController {
     private List< Subscription > changedSubscriptions;
     // removed subscriptions
     private List< Subscription > removedSubscriptions;
+    // removed peers subscriptions
+    private List< Subscription > removedPeersSubscriptions;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Shows list of all subscriptions.
@@ -306,6 +314,82 @@ public class SubscriptionController extends MultiActionController {
         return new ModelAndView( SUBSCRIPTION_REMOVAL_STATUS_VIEW );
     }
     /**
+     * Creates list of subscriptions made by peers.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @return ModelAndView holding list peers subscriptions
+     */
+    public ModelAndView showPeersSubscriptions( HttpServletRequest request,
+            HttpServletResponse response ) {
+        List subscriptions = subscriptionManager.getSubscriptionsByType(
+                Subscription.REMOTE_SUBSCRIPTION );
+        return new ModelAndView( SHOW_PEERS_SUBSCRIPTIONS_VIEW, SHOW_SUBSCRIPTIONS_KEY,
+                subscriptions );
+    }
+    /**
+     * Creates list of peers subscriptions selected for removal.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @return ModelAndView holding list of peers subscriptions selected for removal
+     */
+    public ModelAndView showSelectedPeersSubscriptions( HttpServletRequest request,
+            HttpServletResponse response ) {
+        // get the list of channels selected for subscription by the user
+        String[] selChannels = request.getParameterValues( SELECTED_CHANNELS_KEY );
+        ModelAndView modelAndView = null;
+        if( selChannels == null ) {
+            try {
+                response.sendRedirect( SHOW_PEERS_SUBSCRIPTIONS_VIEW + ".htm" );
+            } catch( IOException e ) {
+                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while redirecting "
+                        + "to " + SHOW_PEERS_SUBSCRIPTIONS_VIEW + ": " + e.getMessage() );
+            }
+        } else {
+            List< Subscription > currentSubs = new ArrayList< Subscription >();
+            // create subscription list based on chosen channels
+            for( int i = 0; i < selChannels.length; i++ ) {
+                Subscription subs = subscriptionManager.getSubscription( selChannels[ i ],
+                        Subscription.REMOTE_SUBSCRIPTION );
+                if( subs != null ) {
+                    currentSubs.add( subs );
+                }
+            }
+            // write the list to class variable
+            setRemovedPeersSubscriptions( currentSubs );
+            modelAndView =  new ModelAndView( SHOW_SELECTED_PEERS_SUBSCRIPTIONS_VIEW,
+                    SELECTED_SUBSCRIPTIONS_KEY, currentSubs );
+        }
+        return modelAndView;
+    }
+    /**
+     * Removes selected subscriptions made by peers.
+     *
+     * @param request HTTP request
+     * @param response HTTP response
+     * @return ModelAndView
+     */
+    public ModelAndView showRemovedPeersSubscriptions( HttpServletRequest request,
+            HttpServletResponse response ) {
+        for( int i = 0; i < getRemovedPeersSubscriptions().size(); i++ ) {
+            try {
+                subscriptionManager.removeSubscription(
+                    getRemovedPeersSubscriptions().get( i ).getChannelName(),
+                    Subscription.REMOTE_SUBSCRIPTION );
+                request.getSession().setAttribute( OK_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removesubscription.removesuccess" ) );
+            } catch( HibernateException e ) {
+                request.getSession().removeAttribute( OK_MSG_KEY );
+                request.getSession().setAttribute( ERROR_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removesubscription.removefail" ) );
+            }
+        }
+        return new ModelAndView( SHOW_REMOVED_PEERS_SUBSCRIPTIONS_VIEW );
+    }
+    /**
      * Method returns reference to data channel manager object.
      *
      * @return Reference to data channel manager object
@@ -389,6 +473,20 @@ public class SubscriptionController extends MultiActionController {
      */
     public void setRemovedSubscriptions( List< Subscription > removedSubscriptions ) {
         this.removedSubscriptions = removedSubscriptions;
+    }
+    /**
+     * Gets a list of removed peers' subscriptions.
+     *
+     * @return List of removed peers' subscriptions
+     */
+    public List< Subscription > getRemovedPeersSubscriptions() { return removedPeersSubscriptions; }
+    /**
+     * Sets a list of removed peers' subscriptions.
+     *
+     * @param removedPeersSubscriptions List of removed peers' subscriptions
+     */
+    public void setRemovedPeersSubscriptions( List< Subscription > removedPeersSubscriptions ) {
+        this.removedPeersSubscriptions = removedPeersSubscriptions;
     }
 }
 //--------------------------------------------------------------------------------------------------

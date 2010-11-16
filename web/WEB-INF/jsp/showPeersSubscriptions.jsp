@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Remove subscribed radar station
-Created on : Oct 5, 2010, 2:01 PM
+Document   : Page shows subscriptions made by peers
+Created on : Nov 16, 2010, 12:08 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
@@ -54,7 +54,7 @@ Author     : szewczenko
                 <div id="right">
                     <div id="page-title">
                         <div class="left">
-                            Remove subscribed radar station
+                            Remove peer's subscription
                         </div>
                         <div class="right">
                         </div>
@@ -62,11 +62,11 @@ Author     : szewczenko
                     <c:choose>
                         <c:when test="${av_subs_status == 1}">
                             <div id="text-box">
-                                Select subscribed radar stations to be removed.
+                                Select peer's subscription to be removed.
                             </div>
                             <div id="table">
-                                <form action="showRemovedSubscriptions.htm">
-                                    <display:table name="subscriptions" id="subscription" 
+                                <form action="showSelectedPeersSubscriptions.htm">
+                                    <display:table name="subscriptions" id="subscription"
                                         defaultsort="1" requestURI="selectRemoveSubscriptions.htm"
                                         cellpadding="0" cellspacing="2" export="false"
                                         class="tableborder">
@@ -75,24 +75,11 @@ Author     : szewczenko
                                             paramProperty="channelName"
                                             class="tdcenter" value="${subscription.channelName}">
                                         </display:column>
-
-                                        <display:column sortable="true" title="Operator"
-                                            sortProperty="operatorName" paramId=""
-                                            paramProperty="operatorName" class="tdcenter"
-                                            value="${subscription.operatorName}">
+                                        <display:column sortable="true" title="User name"
+                                            sortProperty="userName" paramId="userName"
+                                            paramProperty="userName" class="tdcenter"
+                                            value="${subscription.userName}">
                                         </display:column>
-                                        <c:choose>
-                                            <c:when test="${subscription.selected == true}">
-                                                <display:column sortable="false" title="Status"
-                                                    class="tdgreen" value="Active">
-                                                </display:column>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <display:column sortable="false" title="Status"
-                                                    class="tdred" value="Inactive">
-                                                </display:column>
-                                            </c:otherwise>
-                                        </c:choose>
                                         <display:column sortable="false" title="Remove"
                                             class="tdcheck"> <input type="checkbox"
                                             name="selected_channels"
@@ -120,7 +107,7 @@ Author     : szewczenko
                                          alt="no_radars"/>
                                 </div>
                                 <div class="text">
-                                    No subscribed radar stations have been found.
+                                    No peer's subscriptions have been found.
                                 </div>
                             </div>
                             <div class="footer">
@@ -143,4 +130,3 @@ Author     : szewczenko
         </div>
     </body>
 </html>
-

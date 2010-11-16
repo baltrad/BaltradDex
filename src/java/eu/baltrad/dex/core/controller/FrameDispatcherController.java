@@ -556,7 +556,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                                     // check data status in data delivery register
                                     DeliveryRegisterEntry dre = deliveryRegisterManager.getEntry(
-                                            user.getId(), fileEntry.hashCode() );
+                                            user.getId(), fileEntry.uuid() );
 
 
 
@@ -577,7 +577,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         bfHandler.handleBF( baltradFrame );
                                         // add entry to the data delivery register
                                         dre = new DeliveryRegisterEntry( user.getId(),
-                                                fileEntry.hashCode() );
+                                                fileEntry.uuid() );
                                         deliveryRegisterManager.addEntry( dre );
                                         logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                             "Sending data from " + 

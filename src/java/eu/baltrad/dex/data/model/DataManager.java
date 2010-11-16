@@ -64,7 +64,7 @@ public class DataManager {
             FileEntry fileEntry = r.entry();
             Data data = new Data(
                 fileEntry.uuid(),
-                fc.storage().store( fc.database().entry_by_uuid( fileEntry.uuid() ) ),
+                fc.storage().store( fileEntry ),
                 fileEntry.stored_at().to_string( FC_DATE_TIME_STR ), radarName,
                 fileEntry.what_date().to_string( FC_DATE_STR ),
                 fileEntry.what_time().to_string( FC_TIME_STR ),
@@ -93,7 +93,7 @@ public class DataManager {
             FileEntry fileEntry = r.entry();
             data = new Data(
                 fileEntry.uuid(),
-                fc.storage().store( fc.database().entry_by_uuid( fileEntry.uuid() ) ),
+                fc.storage().store( fileEntry ),
                 fileEntry.stored_at().to_string( FC_DATE_TIME_STR ),
                 fileEntry.what_source(),
                 fileEntry.what_date().to_string( FC_DATE_STR ),

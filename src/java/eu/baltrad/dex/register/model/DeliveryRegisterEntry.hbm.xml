@@ -30,6 +30,6 @@ Author     : szewczenko
       </generator>
     </id>
     <property column="user_id" name="userId"/>
-    <property column="hash_code" name="hashCode"/>
+    <property column="uuid" name="uuid"/>
   </class>
 </hibernate-mapping>

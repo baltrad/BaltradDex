@@ -132,7 +132,7 @@ CREATE TABLE dex_delivery_register
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('delivery_register_id_seq'),
     user_id INT NOT NULL REFERENCES dex_users (id),
-    hash_code INT NOT NULL,
+    uuid VARCHAR(128) NOT NULL,
     PRIMARY KEY (id)
 );
 

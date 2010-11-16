@@ -43,10 +43,10 @@ public class DeliveryRegisterManager {
      * Method retrieves single entry from data delivery register.
      * 
      * @param userId User id
-     * @param hashCode File's hash code
+     * @param uuid File's identity string
      * @return Single entry from data delivery register
      */
-    public DeliveryRegisterEntry getEntry( int userId, int hashCode ) {
+    public DeliveryRegisterEntry getEntry( int userId, String uuid ) {
         DeliveryRegisterEntry deliveryRegisterEntry = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
@@ -54,8 +54,8 @@ public class DeliveryRegisterManager {
         try {
             deliveryRegisterEntry = ( DeliveryRegisterEntry )session.createQuery(
                     "FROM DeliveryRegisterEntry" + " WHERE userId = ?" +
-                    " AND hashCode = ?" ).setInteger( 0, userId ).setInteger(
-                    1, hashCode ).uniqueResult();
+                    " AND hashCode = ?" ).setInteger( 0, userId ).setString(
+                    1, uuid ).uniqueResult();
             session.getTransaction().commit();
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
