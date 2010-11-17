@@ -91,7 +91,7 @@ public class SaveChannelController extends SimpleFormController {
         HashMap model = new HashMap();
         if( request.getParameter( CHANNEL_ID ) != null
                 && !request.getParameter( CHANNEL_ID ).isEmpty() ) {
-            List< ChannelPermission > channelPermissions = channelManager.getChannelPermission(
+            List< ChannelPermission > channelPermissions = channelManager.getPermissionByChannel(
                 Integer.parseInt( request.getParameter( CHANNEL_ID ) ) );
             List< User > users = new ArrayList< User >();
             for( int i = 0; i < channelPermissions.size(); i++ ) {

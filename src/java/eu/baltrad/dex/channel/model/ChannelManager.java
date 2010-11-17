@@ -170,7 +170,8 @@ public class ChannelManager {
      * @return ChannelPermission object
      * @throws HibernateException
      */
-    public ChannelPermission getChannelPermission( int channelId, int userId ) throws HibernateException {
+    public ChannelPermission getPermission( int channelId, int userId )
+            throws HibernateException {
         ChannelPermission channelPermission = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
@@ -187,14 +188,39 @@ public class ChannelManager {
         return channelPermission;
     }
     /**
-     * Gets permissions for a channel identified by a given ID.
+     * Gets channel permissions for user with a given ID.
      *
-     * @param channelId Channel ID
+     * @param userId User ID
+     * @return List of permissions for a given user
+     * @throws HibernateException
+     */
+    public List<ChannelPermission> getPermissionByUser( int userId )
+            throws HibernateException {
+        List<ChannelPermission> channelPermissions = new ArrayList<ChannelPermission>();
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+	    session.beginTransaction();
+        try {
+            channelPermissions = session.createQuery(
+                    "FROM ChannelPermission WHERE userId = ?" ).setInteger(
+                    0, userId ).list();
+            session.getTransaction().commit();
+        } catch( HibernateException e ) {
+            session.getTransaction().rollback();
+            throw e;
+        }
+        return channelPermissions;
+    }
+    /**
+     * Gets channel permissions for user with a given ID.
+     *
+     * @param userId User ID
      * @return List of permissions for a given channel
      * @throws HibernateException
      */
-    public List getChannelPermission( int channelId ) throws HibernateException {
-        List< ChannelPermission > channelPermissions = new ArrayList< ChannelPermission >();
+    public List<ChannelPermission> getPermissionByChannel( int channelId )
+            throws HibernateException {
+        List<ChannelPermission> channelPermissions = new ArrayList<ChannelPermission>();
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
 	    session.beginTransaction();
@@ -215,7 +241,7 @@ public class ChannelManager {
      * @param channelPermission Channel permission object
      * @throws HibernateException
      */
-    public void addChannelPermission( ChannelPermission channelPermission )
+    public void addPermission( ChannelPermission channelPermission )
             throws HibernateException {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
@@ -235,7 +261,7 @@ public class ChannelManager {
      * @param userId User ID
      * @throws HibernateException
      */
-    public void removeChannelPermission( int channelId, int userId ) throws HibernateException {
+    public void removePermission( int channelId, int userId ) throws HibernateException {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();

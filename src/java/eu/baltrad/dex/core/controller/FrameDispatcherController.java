@@ -34,6 +34,7 @@ import eu.baltrad.dex.subscription.model.SubscriptionManager;
 import eu.baltrad.dex.register.model.DeliveryRegisterEntry;
 import eu.baltrad.dex.register.model.DeliveryRegisterManager;
 import eu.baltrad.dex.util.FileCatalogConnector;
+import eu.baltrad.dex.channel.model.ChannelPermission;
 
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.db.FileEntry;
@@ -137,7 +138,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                         if( bfHandler.getMessageText( header ).equals(
                                 BaltradFrameHandler.CHNL_LIST_RQST ) ) {
-                            if( authenticateFrame( header ) ) {
+                            // user ID set upon authentication
+                            int userId;
+                            if( ( userId = authenticateFrame( header ) ) != 0 ) {
                                 logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                     "Channel listing request received from user " +
                                      getUserName( bfHandler.getUserName( header ) ) + " ("
@@ -146,15 +149,14 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 // process channel listing request
 
                                 // create a list of channels that user is allowed to subscribe
-
-                                ///!!! to be implemented
-
-
-                                List channels = channelManager.getChannels();
-
-
-
-
+                                List<ChannelPermission> perms = 
+                                        channelManager.getPermissionByUser( userId );
+                                // channels allowed to be used by a given user
+                                List<Channel> channels = new ArrayList<Channel>();
+                                for( int i = 0; i < perms.size(); i++ ) {
+                                    ChannelPermission perm = perms.get( i );
+                                    channels.add( channelManager.getChannel( perm.getChannelId() ) );
+                                }
 
                                 // write list to temporary file
                                 File tempFile = InitAppUtil.createTempFile(
@@ -618,17 +620,17 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * WARNING: Only users belonging to groups ADMIN and PEER are authorized to exchange data.
      *
      * @param header Frame header
-     * @return True once a frame is successfully authenticated, false otherwise
+     * @return User ID once a frame is successfully authenticated, 0 otherwise
      */
-    public boolean authenticateFrame( String header ) {
+    public int authenticateFrame( String header ) {
         String userNameHash = bfHandler.getUserName( header );
         String passwd = bfHandler.getPassword( header );
         User user = userManager.getUserByNameHash( userNameHash );
         if( user != null && user.getNameHash().equals( userNameHash )
             && user.getPassword().equals( passwd ) && ( user.getRoleName().equals( User.ROLE_ADMIN )
-            || user.getRoleName().equals( User.ROLE_PEER ) ) ) return true;
+            || user.getRoleName().equals( User.ROLE_PEER ) ) ) return user.getId();
         else
-            return false;
+            return 0;
     }
     /**
      * Gets user name matching a given user name hash

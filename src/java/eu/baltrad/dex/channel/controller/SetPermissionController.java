@@ -62,7 +62,7 @@ public class SetPermissionController extends SimpleFormController {
     @Override
     protected HashMap referenceData( HttpServletRequest request ) throws Exception {
         List< User > users = userManager.getUsers();
-        List< ChannelPermission > channelPermissions = channelManager.getChannelPermission(
+        List< ChannelPermission > channelPermissions = channelManager.getPermissionByChannel(
                 Integer.parseInt( ( String )request.getSession().getAttribute( CHANNEL_ID ) ) );
         for( int i = 0; i < users.size(); i++ ) {
             int j = 0;
@@ -112,17 +112,17 @@ public class SetPermissionController extends SimpleFormController {
                 j++;
             }
             if( selected ) {
-                ChannelPermission channelPermission = channelManager.getChannelPermission(
+                ChannelPermission channelPermission = channelManager.getPermission(
                     channelId, user.getId() );
                 if( channelPermission == null ) {
-                    channelManager.addChannelPermission( new ChannelPermission( channelId,
+                    channelManager.addPermission( new ChannelPermission( channelId,
                             user.getId() ) );
                 }
             } else {
-                ChannelPermission channelPermission = channelManager.getChannelPermission(
+                ChannelPermission channelPermission = channelManager.getPermission(
                     channelId, user.getId() );
                 if( channelPermission != null ) {
-                    channelManager.removeChannelPermission( channelId, user.getId() );
+                    channelManager.removePermission( channelId, user.getId() );
                 }
             }
         }

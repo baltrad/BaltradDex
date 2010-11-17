@@ -96,8 +96,8 @@ Author     : szewczenko
                             <div class="middle">
                                 <div class="tile">
                                     <div class="icon">
-                                        <img src="includes/images/icons/arrow-up.png"
-                                                     alt="local_channels"/>
+                                        <img src="includes/images/icons/radar.png"
+                                                     alt="local_radars"/>
                                     </div>
                                     <div class="header">
                                         Radars
@@ -132,8 +132,8 @@ Author     : szewczenko
                             <div class="right">
                                 <div class="tile">
                                     <div class="icon">
-                                        <img src="includes/images/icons/arrow-down.png"
-                                                     alt="subscribed_channels"/>
+                                        <img src="includes/images/icons/subscription.png"
+                                                     alt="subscribed_radars"/>
                                     </div>
                                     <div class="header">
                                         Subscriptions
