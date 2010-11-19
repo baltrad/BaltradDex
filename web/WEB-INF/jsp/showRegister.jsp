@@ -28,7 +28,7 @@ Author     : szewczenko
 <%@ page import="java.util.List" %>
 <%
     // get delivery register
-    List deliveryRegister = ( List )request.getAttribute( "register_records" );
+    List deliveryRegister = ( List )request.getAttribute( "register_entries" );
     if( deliveryRegister == null || deliveryRegister.size() <= 0 ) {
         request.getSession().setAttribute( "register_status", 0 );
     } else {
@@ -62,27 +62,36 @@ Author     : szewczenko
                     <c:choose>
                         <c:when test="${register_status == 1}">
                             <div id="text-box">
-                                Data delivery register listing.
+                                Data delivery register.
                             </div>
                             <div id="table">
-                                <display:table name="register_records" id="registerRecord" defaultsort="1"
-                                    requestURI="showregister.htm" cellpadding="0" cellspacing="2"
+                                <display:table name="register_entries" id="entry" defaultsort="1"
+                                    requestURI="showRegister.htm" cellpadding="0" cellspacing="2"
                                     export="false" class="tableborder" pagesize="12">
-                                    <display:column sortProperty="dataId" sortable="true"
-                                        title="Data ID" class="tdcenter">
-                                        <fmt:formatNumber value="${registerRecord.dataId}" pattern="00" />
+                                    <display:column sortable="true" sortProperty="timeStamp"
+                                        title="Date" paramId="timeStamp"
+                                        paramProperty="timeStamp" class="tdcheck"
+                                        value="${fn:substring(entry.timeStamp, 0, 10)}">
                                     </display:column>
-                                    <display:column sortable="true" title="Source data channel"
-                                        sortProperty="channelName" class="tdcenter"
-                                        value="${registerRecord.channelName}">
+                                    <display:column sortable="true" sortProperty="timeStamp"
+                                        title="Time" paramId="timeStamp"
+                                        paramProperty="timeStamp" class="tdcheck"
+                                        value="${fn:substring(entry.timeStamp, 10, 19)}">
                                     </display:column>
-                                    <display:column sortable="true" title="User ID" sortProperty="userId"
-                                        class="tdcenter">
-                                        <fmt:formatNumber value="${registerRecord.userId}" pattern="00" />
+                                    <display:column sortable="true" sortProperty="userName"
+                                        title="Recipient" paramId="userName"
+                                        paramProperty="userName" class="tdcheck"
+                                        value="${entry.userName}">
                                     </display:column>
-                                    <display:column sortable="true" title="Receiver address"
-                                        sortProperty="receiverAddress" class="tdcenter"
-                                        value="${registerRecord.receiverAddress}">
+                                    <display:column sortable="true" sortProperty="uuid"
+                                        title="File identity string" paramId="uuid"
+                                        paramProperty="uuid" class="tdcenter"
+                                        value="${entry.uuid}">
+                                    </display:column>
+                                    <display:column sortable="true" sortProperty="deliveryStatus"
+                                        title="Status" paramId="deliveryStatus"
+                                        paramProperty="deliveryStatus" class="tdcheck"
+                                        value="${entry.deliveryStatus}">
                                     </display:column>
                                 </display:table>
                             </div>

@@ -85,10 +85,10 @@ Author     : szewczenko
                                     </div>
                                     <div class="text">
                                         <div class="row">
-                                            <a href="showregister.htm">Show</a>
+                                            <a href="showRegister.htm">Show</a>
                                         </div>
                                         <div class="row">
-                                            <a href="clearregister.htm">Clear</a>
+                                            <a href="clearRegister.htm">Clear</a>
                                         </div>
                                     </div>
                                 </div>

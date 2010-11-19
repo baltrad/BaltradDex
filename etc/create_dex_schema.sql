@@ -133,6 +133,9 @@ CREATE TABLE dex_delivery_register
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('delivery_register_id_seq'),
     user_id INT NOT NULL REFERENCES dex_users (id),
     uuid VARCHAR(128) NOT NULL,
+    user_name VARCHAR(32) NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
+    status VARCHAR(16) NOT NULL,
     PRIMARY KEY (id)
 );
 

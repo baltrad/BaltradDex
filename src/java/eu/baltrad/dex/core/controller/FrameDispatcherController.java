@@ -38,6 +38,8 @@ import eu.baltrad.dex.channel.model.ChannelPermission;
 
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.db.FileEntry;
+import eu.baltrad.fc.DuplicateEntry;
+import eu.baltrad.fc.FileCatalogError;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;
@@ -80,7 +82,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private LogManager logManager;
     private DeliveryRegisterManager deliveryRegisterManager;
     // Reference to file catalog object
-    private FileCatalog fileCatalog;
+    private FileCatalog fc;
     // Beast message manager
     private IBltMessageManager messageManager;
     // remote channel listing
@@ -151,8 +153,10 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 // create a list of channels that user is allowed to subscribe
                                 List<ChannelPermission> perms = 
                                         channelManager.getPermissionByUser( userId );
+
                                 // channels allowed to be used by a given user
                                 List<Channel> channels = new ArrayList<Channel>();
+                                //List<Channel> channels = channelManager.getChannels();
                                 for( int i = 0; i < perms.size(); i++ ) {
                                     ChannelPermission perm = perms.get( i );
                                     channels.add( channelManager.getChannel( perm.getChannelId() ) );
@@ -521,27 +525,29 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         FileItemStream fileItem = iterator.next();
                         InputStream fileStream = fileItem.openStream();
                         InitAppUtil.saveFile( fileStream, tempFile );
-                        
 
-
-
-                        // save data in the catalogue
-                        if( fileCatalog == null ) {
-                            fileCatalog = FileCatalogConnector.connect();
+                        // save data in the catalog
+                        FileEntry fileEntry = null;
+                        try {
+                            if( fc == null ) {
+                                fc = FileCatalogConnector.connect();
+                            }
+                            fileEntry = fc.store( tempFile.getAbsolutePath() );
+                            // Interface with the Beast framework
+                            BltDataMessage message = new BltDataMessage();
+                            message.setFileEntry( fileEntry );
+                            messageManager.manage( message );
+                        } catch( DuplicateEntry e ) {
+                            throw e;
+                        } catch( FileCatalogError e ) {
+                            throw e;
                         }
-                        // create file entry
-                        FileEntry fileEntry = fileCatalog.store(
-                                tempFile.getAbsolutePath() );
-
-                        // Interface with the Beast framework
-                        BltDataMessage message = new BltDataMessage();
-                        message.setFileEntry( fileEntry );
-                        messageManager.manage( message );
+                        // delete temp file
                         InitAppUtil.deleteFile( tempFile.getAbsolutePath() );
 
                         // send data to subscribers
                         
-                        List< Subscription > remoteSubs = 
+                        List <Subscription> remoteSubs =
                                 subscriptionManager.getSubscriptionsByType(
                                 Subscription.REMOTE_SUBSCRIPTION );
                         if( remoteSubs != null ) {
@@ -555,38 +561,33 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     User user = userManager.getUserByName(
                                             remoteSubs.get( i ).getUserName() );
 
+                                    // create data frame
+                                    bfHandler.setUrl( user.getNodeAddress() );
 
-                                    // check data status in data delivery register
-                                    DeliveryRegisterEntry dre = deliveryRegisterManager.getEntry(
-                                            user.getId(), fileEntry.uuid() );
+                                    String retHeader = bfHandler.createDataHdr(
+                                        BaltradFrameHandler.MIME_MULTIPART,
+                                        InitAppUtil.getNodeName(),
+                                        remoteSubs.get( i ).getChannelName(), /*cFile.name()*/
+                                        tempFile.getName() );
 
+                                    BaltradFrame baltradFrame = new BaltradFrame( retHeader,
+                                            /*cFile.path()*/ tempFile.getAbsolutePath() );
 
+                                    // process the frame
+                                    int res = bfHandler.handleBF( baltradFrame );
+                                    String status = ( ( res == 0 ) ? "SUCCESS" : "FAILURE" );
+                                    // add entry to the data delivery register
+                                    DeliveryRegisterEntry dre = new DeliveryRegisterEntry( user.getId(),
+                                        fileEntry.uuid(), user.getName(), new Date(), status );
 
-                                    if( dre == null ) {
-                                        // create data frame
-                                        bfHandler.setUrl( user.getNodeAddress() );
+                                    deliveryRegisterManager.addEntry( dre );
 
-                                        String retHeader = bfHandler.createDataHdr(
-                                            BaltradFrameHandler.MIME_MULTIPART,
-                                            InitAppUtil.getNodeName(),
-                                            remoteSubs.get( i ).getChannelName(), /*cFile.name()*/
-                                            tempFile.getName() );
-
-
-                                        BaltradFrame baltradFrame = new BaltradFrame( retHeader,
-                                                /*cFile.path()*/ tempFile.getAbsolutePath() );
-                                        // process the frame
-                                        bfHandler.handleBF( baltradFrame );
-                                        // add entry to the data delivery register
-                                        dre = new DeliveryRegisterEntry( user.getId(),
-                                                fileEntry.uuid() );
-                                        deliveryRegisterManager.addEntry( dre );
-                                        logManager.addEntry( new Date(), LogManager.MSG_INFO,
-                                            "Sending data from " + 
-                                            remoteSubs.get( i ).getChannelName() + " to user "
-                                            + user.getName() + ": "
-                                            + bfHandler.getFileName( retHeader) );
-                                    }
+                                    logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                                        "Sending data from " +
+                                        remoteSubs.get( i ).getChannelName() + " to user "
+                                        + user.getName() + ": "
+                                        + bfHandler.getFileName( retHeader) );
+                                    
                                 }
                             }
                         }
@@ -596,9 +597,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         } catch( FileUploadException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e.getMessage() );
+        } catch( DuplicateEntry e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                    "Duplicate entry error: " + e.getMessage() );
+        } catch( FileCatalogError e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                    "File catalog error: " + e.getMessage() );
         } catch( IOException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
-                    " Frame dispatcher error: " + e.getMessage() );
+                    "Frame dispatcher error: " + e.getMessage() );
         } catch( Exception e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e.getMessage() );

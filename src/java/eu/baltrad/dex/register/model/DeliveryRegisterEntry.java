@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.register.model;
 
+import java.util.Date;
+
 /**
  * Class implements data delivery register entry.
  *
@@ -36,6 +38,12 @@ public class DeliveryRegisterEntry {
     private int userId;
     // File's identity string
     private String uuid;
+    // Recipient / user name
+    private String userName;
+    // Date of delivery / delivery timestamp
+    private Date timeStamp;
+    // Delivery status
+    private String deliveryStatus;
 //------------------------------------------------------------------------------------------ Methods    
     /**
      * Default constructor
@@ -46,10 +54,17 @@ public class DeliveryRegisterEntry {
      *
      * @param userId User id
      * @param uuid File's identity string
+     * @param userName Recipient's name / user name
+     * @param timeStamp Delivery timestamp
+     * @param deliveryStatus Delivery status tells whether user received a delivery
      */
-    public DeliveryRegisterEntry( int userId, String uuid ) {
+    public DeliveryRegisterEntry( int userId, String uuid, String userName, Date timeStamp,
+            String deliveryStatus ) {
         this.userId = userId;
         this.uuid = uuid;
+        this.userName = userName;
+        this.timeStamp = timeStamp;
+        this.deliveryStatus = deliveryStatus;
     }
     /**
      * Method returns register entry id.
@@ -87,5 +102,41 @@ public class DeliveryRegisterEntry {
      * @param uuid File's identity string
      */
     public void setUuid( String uuid ) { this.uuid = uuid; }
+    /**
+     * Gets user name.
+     *
+     * @return User name
+     */
+    public String getUserName() { return userName; }
+    /**
+     * Sets user name.
+     *
+     * @param userName User name
+     */
+    public void setUserName( String userName ) { this.userName = userName; }
+    /**
+     * Gets delivery timestamp.
+     *
+     * @return Delivery timestamp
+     */
+    public Date getTimeStamp() { return timeStamp; }
+    /**
+     * Sets delivery timestamp.
+     *
+     * @param timeStamp Delivery timeStamp
+     */
+    public void setTimeStamp( Date timeStamp ) { this.timeStamp = timeStamp; }
+    /**
+     * Gets delivery status.
+     *
+     * @return Delivery status
+     */
+    public String getDeliveryStatus() { return deliveryStatus; }
+    /**
+     * Sets delivery status.
+     *
+     * @param deliveryStatus Selivery status
+     */
+    public void setDeliveryStatus( String deliveryStatus ) { this.deliveryStatus = deliveryStatus; }
 }
 //--------------------------------------------------------------------------------------------------

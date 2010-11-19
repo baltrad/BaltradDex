@@ -106,30 +106,36 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="nodeProperties.htm">saveConfigurationController</prop>
                 <prop key="clearmessages.htm">urlFilenameController</prop>
                 <prop key="confirmclearmessages.htm">clrMsgsController</prop>
-                <prop key="showregister.htm">showRegController</prop>
-                <prop key="clearregister.htm">urlFilenameController</prop>
-                <prop key="confirmclearregister.htm">clrRegController</prop>
+
+                <prop key="showRegister.htm">registerController</prop>
+                <prop key="clearRegister.htm">registerController</prop>
+                <prop key="showClearRegisterStatus.htm">registerController</prop>
+
                 <prop key="saveUser.htm">saveUserController</prop>
                 <prop key="editUser.htm">editUserController</prop>
                 <prop key="showUsers.htm">removeUserController</prop>
                 <prop key="saveUserStatus">urlFilenameController</prop>
                 <prop key="showSelectedUsers.htm">removeUserController</prop>
                 <prop key="showRemovedUsers.htm">removeUserController</prop>
+
                 <prop key="saveLocalChannel.htm">saveChannelController</prop>
                 <prop key="editLocalChannel.htm">editChannelController</prop>
                 <prop key="showLocalChannels.htm">removeChannelController</prop>
                 <prop key="saveRadarStatus">urlFilenameController</prop>
                 <prop key="showSelectedLocalChannels.htm">removeChannelController</prop>
                 <prop key="showRemovedLocalChannels.htm">removeChannelController</prop>
+
                 <prop key="selectRemoveSubscriptions.htm">subscriptionController</prop>
                 <prop key="showRemovedSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSubscriptionRemovalStatus.htm">subscriptionController</prop>
                 <prop key="showPeersSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSelectedPeersSubscriptions.htm">subscriptionController</prop>
                 <prop key="showRemovedPeersSubscriptions.htm">subscriptionController</prop>
+
                 <prop key="showNodeConnections.htm">nodeConnectionController</prop>
                 <prop key="showSelectedNodeConnections.htm">nodeConnectionController</prop>
                 <prop key="showRemovedNodeConnections.htm">nodeConnectionController</prop>
+
                 <prop key="setPermission.htm">setPermissionController</prop>
             </props>
         </property>
@@ -434,9 +440,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!--
-        View register controller - displays data delivery register
+        Register controller - handles data delivery register
     -->
-    <bean name="showRegController" class="eu.baltrad.dex.register.controller.ShowRegController">
+    <bean name="registerController" class="eu.baltrad.dex.register.controller.RegisterController">
         <property name="successView">
             <value>showregister</value>
         </property>
@@ -448,20 +454,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="dataManager">
             <ref bean="dataManager" />
-        </property>
-    </bean>
-    <!--
-        Clear register controller - deletes records from data delivery register table
-    -->
-    <bean name="clrRegController" class="eu.baltrad.dex.register.controller.ClrRegController">
-        <property name="successView">
-            <value>confirmclearregister</value>
-        </property>
-         <property name="deliveryRegisterManager">
-            <ref bean="deliveryRegisterManager"/>
-        </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
         </property>
     </bean>
 

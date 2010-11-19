@@ -54,7 +54,7 @@ public class DeliveryRegisterManager {
         try {
             deliveryRegisterEntry = ( DeliveryRegisterEntry )session.createQuery(
                     "FROM DeliveryRegisterEntry" + " WHERE userId = ?" +
-                    " AND hashCode = ?" ).setInteger( 0, userId ).setString(
+                    " AND uuid = ?" ).setInteger( 0, userId ).setString(
                     1, uuid ).uniqueResult();
             session.getTransaction().commit();
         } catch( HibernateException e ) {
@@ -68,8 +68,8 @@ public class DeliveryRegisterManager {
      *
      * @return List object containing all available delivery register entries
      */
-    public List getAllEntries() {
-        List regEntries = null;
+    public List<DeliveryRegisterEntry> getRegister() {
+        List<DeliveryRegisterEntry> regEntries = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -81,6 +81,26 @@ public class DeliveryRegisterManager {
             throw e;
         }
         return regEntries;
+    }
+    /**
+     * Gets number of entries in data delivery register.
+     *
+     * @return Number of entries stored in data delivery register
+     */
+    public int getNumberOfEntries() {
+        List<DeliveryRegisterEntry> regEntries = null;
+        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        try {
+            regEntries = session.createQuery( "FROM DeliveryRegisterEntry" ).list();
+            session.getTransaction().commit();
+        } catch( HibernateException e ) {
+            session.getTransaction().rollback();
+            throw e;
+        }
+        // return number of entries
+        return ( regEntries != null ) ? regEntries.size() : 0;
     }
     /**
      * Method adds an entry to data delivery register.

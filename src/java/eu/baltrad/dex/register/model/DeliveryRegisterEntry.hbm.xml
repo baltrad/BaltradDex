@@ -29,7 +29,10 @@ Author     : szewczenko
         <param name="sequence">delivery_register_id_seq</param>
       </generator>
     </id>
-    <property column="user_id" name="userId"/>
-    <property column="uuid" name="uuid"/>
+    <property column="user_id" name="userId" />
+    <property column="uuid" name="uuid" />
+    <property column="user_name" name="userName" />
+    <property column="timestamp" name="timeStamp" />
+    <property column="status" name="deliveryStatus" />
   </class>
 </hibernate-mapping>

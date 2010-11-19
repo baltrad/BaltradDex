@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Data delivery register
-Created on : Oct 6, 2010, 10:49 AM
+Document   : Clear data delivery register
+Created on : Nov 19, 2010, 12:57 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
@@ -30,7 +30,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Delivery register</title>
+        <title>Baltrad | Clear register</title>
     </head>
     <body>
         <div id="container">
@@ -50,22 +50,41 @@ Author     : szewczenko
                         </div>
                     </div>
                     <div id="text-box">
-                        Click OK button in order to delete all entries from
-                        the register.
+                        <c:choose>
+                            <c:when test="${deleted_entries == 0}">
+                                <div class="message">
+                                    <div class="icon">
+                                        <img src="includes/images/icons/circle-delete.png"
+                                             alt="clear_error"/>
+                                    </div>
+                                    <div class="text">
+                                        Failed to delete entries from data delivery register.
+                                    </div>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="message">
+                                    <div class="icon">
+                                        <img src="includes/images/icons/circle-check.png"
+                                             alt="clear_ok"/>
+                                    </div>
+                                    <div class="text">
+                                        Deleted ${deleted_entries} entry/entries from
+                                        data delivery register.
+                                    </div>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
-                    <form action="confirmclearregister.htm">
-                        <div class="footer">
-                            <div class="right">
-                                <button class="rounded" type="button"
-                                    onclick="window.location='configuration.htm'">
-                                    <span>Back</span>
-                                </button>
+                    <div class="footer">
+                        <div class="right">
+                            <form action="configuration.htm">
                                 <button class="rounded" type="submit">
                                     <span>OK</span>
                                 </button>
-                            </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 </div>
                 <div id="clear"></div>
             </div>
