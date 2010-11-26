@@ -18,14 +18,10 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 ------------------------------------------------------------------------*/
 package eu.baltrad.beastui.web.controller;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +31,7 @@ import eu.baltrad.beast.adaptor.IBltAdaptorManager;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.composite.CompositingRule;
+import eu.baltrad.beast.rules.util.IRuleUtilities;
 
 /**
  * Manages the composite routes and routing rules. Both scan based composites
@@ -56,9 +53,9 @@ public class CompositeRoutesController {
   private IBltAdaptorManager adaptormanager = null;
 
   /**
-   * The jdbc template for the time beeing
+   * The rule utilities
    */
-  private SimpleJdbcOperations template = null;
+  private IRuleUtilities utilities = null;
   
   /**
    * Default constructor
@@ -91,8 +88,8 @@ public class CompositeRoutesController {
    * @param template the jdbc operations to set
    */
   @Autowired
-  public void setJdbcTemplate(SimpleJdbcOperations template) {
-    this.template = template;
+  public void setRuleUtilities(IRuleUtilities utils) {
+    this.utilities = utils;
   }
   
   /**
@@ -241,7 +238,7 @@ public class CompositeRoutesController {
       Boolean active, String description, List<String> recipients, Boolean byscan,
       String areaid, Integer interval, Integer timeout, List<String> sources, String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
-    model.addAttribute("sourceids", getSources());
+    model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
     model.addAttribute("adaptors", adaptors);
     model.addAttribute("name", (name == null) ? "" : name);
@@ -278,7 +275,7 @@ public class CompositeRoutesController {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     
     model.addAttribute("adaptors", adaptors);
-    model.addAttribute("sourceids", getSources());
+    model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
     
     model.addAttribute("name", (name == null) ? "" : name);
@@ -369,22 +366,6 @@ public class CompositeRoutesController {
     
     return viewShowRoute(model, name, author, active, description,
         newrecipients,byscan, area, interval, timeout, sources, null);
-  }
-
-  
-  protected List<String> getSources() {
-    ParameterizedRowMapper<String> mapper = createSourceMapper();
-    return template.query("select bs.node_id from bdb_source_radars bsr, bdb_sources bs where bsr.id=bs.id",
-        mapper);
-  }
-  
-  protected ParameterizedRowMapper<String> createSourceMapper() {
-    return new ParameterizedRowMapper<String>() {
-      @Override
-      public String mapRow(ResultSet rs, int rn) throws SQLException {
-        return rs.getString("node_id");
-      }
-    };
   }
   
   protected List<Integer> getIntervals() {
