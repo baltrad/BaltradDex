@@ -542,9 +542,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         } catch( FileCatalogError e ) {
                             throw e;
                         }
-                        // delete temp file
-                        InitAppUtil.deleteFile( tempFile.getAbsolutePath() );
-
+                        
                         // send data to subscribers
                         
                         List <Subscription> remoteSubs =
@@ -567,11 +565,11 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     String retHeader = bfHandler.createDataHdr(
                                         BaltradFrameHandler.MIME_MULTIPART,
                                         InitAppUtil.getNodeName(),
-                                        remoteSubs.get( i ).getChannelName(), /*cFile.name()*/
-                                        tempFile.getName() );
+                                        remoteSubs.get( i ).getChannelName(),
+                                        fileEntry.uuid() + ".h5" );
 
                                     BaltradFrame baltradFrame = new BaltradFrame( retHeader,
-                                            /*cFile.path()*/ tempFile.getAbsolutePath() );
+                                            tempFile.getAbsolutePath() );
 
                                     // process the frame
                                     int res = bfHandler.handleBF( baltradFrame );
@@ -587,10 +585,12 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         remoteSubs.get( i ).getChannelName() + " to user "
                                         + user.getName() + ": "
                                         + bfHandler.getFileName( retHeader) );
-                                    
                                 }
                             }
                         }
+                        // delete temp file
+                        InitAppUtil.deleteFile( tempFile.getAbsolutePath() );
+
                     }
                 }
              }

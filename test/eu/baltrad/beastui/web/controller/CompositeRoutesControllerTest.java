@@ -230,7 +230,7 @@ public class CompositeRoutesControllerTest extends TestCase {
 
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptornames);
-    utilities.getRadarSources();
+    //utilities.getRadarSources();
     utilitiesControl.setReturnValue(sourceids);
     method.getIntervals();
     methodControl.setReturnValue(intervals);
@@ -297,7 +297,7 @@ public class CompositeRoutesControllerTest extends TestCase {
 
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptornames);
-    utilities.getRadarSources();
+    //utilities.getRadarSources();
     utilitiesControl.setReturnValue(sourceids);
     method.getIntervals();
     methodControl.setReturnValue(intervals);
