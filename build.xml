@@ -44,7 +44,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="compile.debug" value="true"/>
   <property name="compile.includeAntRuntime" value="no"/>
   <property name="compile.optimize" value="true"/>
-  <property name="tomcat.dir" value="/opt/baltrad/third_party/tomcat"/>
+  <!--property name="tomcat.dir" value="/opt/baltrad/third_party/tomcat"/-->
   
   <!-- You can override properties in this file -->
   <property file="develop.properties" />  
@@ -180,6 +180,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="lib/proj4">
         <include name="*.jar"/>
       </fileset>
+
+
+
+      <fileset dir="lib/jhdf">
+        <include name="*.jar"/>
+      </fileset>
+
+
+
       <fileset dir="lib">
         <include name="postgresql-8.4-701.jdbc4.jar"/>
         <include name="apache-mime4j-0.6.jar"/>
@@ -202,6 +211,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </copy>
 
     <!-- copy HDF5 java libraries into tomcat library directory -->
+    
     <!--copy todir="${tomcat.dir}/lib">
         <fileset dir="lib/jhdf">
             <include name="*.jar"/>
