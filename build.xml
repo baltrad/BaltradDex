@@ -202,11 +202,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </copy>
 
     <!-- copy HDF5 java libraries into tomcat library directory -->
-    <copy todir="${tomcat.dir}/lib">
+    <!--copy todir="${tomcat.dir}/lib">
         <fileset dir="lib/jhdf">
             <include name="*.jar"/>
         </fileset>
-    </copy>
+    </copy-->
 
     <!-- copy web interface files -->
     <copy todir="${build.web.dir}">
