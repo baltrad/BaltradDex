@@ -97,9 +97,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fileset dir="${beast.path}/bin">
       <include name="*.jar"/>
     </fileset>
-    <fileset dir="${tomcat.dir}/lib">
+    <!--fileset dir="${tomcat.dir}/lib">
       <include name="*.jar"/>
-    </fileset>
+    </fileset-->
   </path>
 
   <!-- path for testing -->
