@@ -572,7 +572,11 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         } catch( FileCatalogError e ) {
                             throw e;
                         }
+<<<<<<< HEAD
                        
+=======
+                        
+>>>>>>> 267bfec03c831b6b5d02595ad976116e9bd5296a
                         // send data to subscribers
                         
                         List <Subscription> remoteSubs =
@@ -623,7 +627,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         remoteSubs.get( i ).getChannelName() + " to user "
                                         + user.getName() + ": "
                                         + bfHandler.getFileName( retHeader) );
-                                    
                                 }
                             }
                         }

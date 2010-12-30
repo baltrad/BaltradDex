@@ -1,19 +1,16 @@
 package eu.baltrad.beastui.web.controller;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
 import eu.baltrad.beast.router.IRouterManager;
+import eu.baltrad.beast.rules.util.IRuleUtilities;
 
 public class CompositeRoutesControllerTest extends TestCase {
   private static interface MethodMocker {
@@ -31,6 +28,8 @@ public class CompositeRoutesControllerTest extends TestCase {
   private IRouterManager manager = null;
   private MockControl adaptorControl = null;
   private IBltAdaptorManager adaptorManager = null;
+  private MockControl utilitiesControl = null;
+  private IRuleUtilities utilities = null;
   private MockControl modelControl = null;
   private Model model = null;
   private MockControl methodControl = null;
@@ -41,6 +40,8 @@ public class CompositeRoutesControllerTest extends TestCase {
     manager = (IRouterManager) managerControl.getMock();
     adaptorControl = MockControl.createControl(IBltAdaptorManager.class);
     adaptorManager = (IBltAdaptorManager) adaptorControl.getMock();
+    utilitiesControl = MockControl.createControl(IRuleUtilities.class);
+    utilities = (IRuleUtilities)utilitiesControl.getMock();
     modelControl = MockControl.createControl(Model.class);
     model = (Model) modelControl.getMock();
     methodControl = MockControl.createControl(MethodMocker.class);
@@ -52,9 +53,6 @@ public class CompositeRoutesControllerTest extends TestCase {
           String areaid, Integer interval, Integer timeout, List<String> sources, String emessage) {
         return method.viewCreateRoute(model, name, author, active, description, recipients, byscan, areaid,
             interval, timeout, sources, emessage);
-      }
-      protected List<String> getSources() {
-        return method.getSources();
       }
       protected List<Integer> getIntervals() {
         return method.getIntervals();
@@ -77,6 +75,7 @@ public class CompositeRoutesControllerTest extends TestCase {
   private void replay() {
     managerControl.replay();
     adaptorControl.replay();
+    utilitiesControl.replay();
     modelControl.replay();
     methodControl.replay();
   }
@@ -84,6 +83,7 @@ public class CompositeRoutesControllerTest extends TestCase {
   private void verify() {
     managerControl.verify();
     adaptorControl.verify();
+    utilitiesControl.verify();
     modelControl.verify();
     methodControl.verify();
   }
@@ -230,8 +230,8 @@ public class CompositeRoutesControllerTest extends TestCase {
 
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptornames);
-    method.getSources();
-    methodControl.setReturnValue(sourceids);
+    utilities.getRadarSources();
+    utilitiesControl.setReturnValue(sourceids);
     method.getIntervals();
     methodControl.setReturnValue(intervals);
 
@@ -263,15 +263,13 @@ public class CompositeRoutesControllerTest extends TestCase {
     modelControl.setReturnValue(null);
     
     classUnderTest = new CompositeRoutesController() {
-      protected List<String> getSources() {
-        return method.getSources();
-      }
       protected List<Integer> getIntervals() {
         return method.getIntervals();
       }      
     };
     classUnderTest.setAdaptorManager(adaptorManager);
     classUnderTest.setManager(manager);
+    classUnderTest.setRuleUtilities(utilities);
     
     replay();
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
@@ -299,8 +297,8 @@ public class CompositeRoutesControllerTest extends TestCase {
 
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptornames);
-    method.getSources();
-    methodControl.setReturnValue(sourceids);
+    utilities.getRadarSources();
+    utilitiesControl.setReturnValue(sourceids);
     method.getIntervals();
     methodControl.setReturnValue(intervals);
 
@@ -334,49 +332,18 @@ public class CompositeRoutesControllerTest extends TestCase {
     modelControl.setReturnValue(null);
     
     classUnderTest = new CompositeRoutesController() {
-      protected List<String> getSources() {
-        return method.getSources();
-      }
       protected List<Integer> getIntervals() {
         return method.getIntervals();
       }      
     };
     classUnderTest.setAdaptorManager(adaptorManager);
     classUnderTest.setManager(manager);
+    classUnderTest.setRuleUtilities(utilities);
     
     replay();
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
         recipients, byscan, areaid, interval, timeout, sources, emessage);
     verify();
     assertEquals("compositeroute_create", result);
-  }
-
-  public void testGetSources() {
-    final ParameterizedRowMapper<String> mapper = new ParameterizedRowMapper<String>() {
-      public String mapRow(ResultSet arg0, int arg1) throws SQLException {return null;}
-    };
-    List<String> sources = new ArrayList<String>();
-    
-    MockControl jdbcControl = MockControl.createControl(SimpleJdbcOperations.class);
-    SimpleJdbcOperations jdbc = (SimpleJdbcOperations)jdbcControl.getMock();
-    
-    jdbc.query("select bs.node_id from bdb_source_radars bsr, bdb_sources bs where bsr.id=bs.id",
-        mapper);
-    jdbcControl.setMatcher(MockControl.ARRAY_MATCHER);
-    jdbcControl.setReturnValue(sources);
-
-    classUnderTest = new CompositeRoutesController() {
-      protected ParameterizedRowMapper<String> createSourceMapper() {
-        return mapper;
-      }
-    };
-    classUnderTest.setJdbcTemplate(jdbc);
-    
-    jdbcControl.replay();
-    
-    List<String> result = classUnderTest.getSources();
-    
-    jdbcControl.verify();
-    assertSame(sources, result);
   }
 }
