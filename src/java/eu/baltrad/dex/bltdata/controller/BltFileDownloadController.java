@@ -19,7 +19,7 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.channel.controller;
+package eu.baltrad.dex.bltdata.controller;
 
 import eu.baltrad.dex.log.model.LogManager;
 import eu.baltrad.dex.user.model.User;
@@ -47,7 +47,7 @@ import java.util.Date;
  * @version 1.0
  * @since 1.0
  */
-public class DownloadController implements Controller {
+public class BltFileDownloadController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
     public static final String FILE_PATH = "path";
 //---------------------------------------------------------------------------------------- Variables

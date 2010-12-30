@@ -81,7 +81,7 @@ public class StatusController implements Controller {
      *
      * @param subscriptionManager Reference to SubscriptionManager object
      */
-    public void setSubscriptionManager(SubscriptionManager subscriptionManager) {
+    public void setSubscriptionManager( SubscriptionManager subscriptionManager ) {
         this.subscriptionManager = subscriptionManager;
     }
     /**

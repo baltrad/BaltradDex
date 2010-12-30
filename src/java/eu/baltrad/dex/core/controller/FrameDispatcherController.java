@@ -35,6 +35,8 @@ import eu.baltrad.dex.register.model.DeliveryRegisterEntry;
 import eu.baltrad.dex.register.model.DeliveryRegisterManager;
 import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.channel.model.ChannelPermission;
+import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
+import eu.baltrad.dex.core.model.NodeConnection;
 
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.db.FileEntry;
@@ -65,6 +67,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 
+
 /**
  * Class implements frame dispatching controller. This controller handles all incoming and outgoing
  * BaltradFrames according to the single point of entry rule.
@@ -74,6 +77,23 @@ import java.util.Date;
  * @since 0.1.6
  */
 public class FrameDispatcherController extends HttpServlet implements Controller {
+//---------------------------------------------------------------------------------------- Constants
+    // path to HDF5 dataset used to generate image thumb
+    private static final String H5_THUMB_DATASET_PATH = "/dataset1/data1/data";
+    // path to HDF5 metadata group used to generate image thumb
+    private static final String H5_THUMB_GROUP_PATH = "/dataset1/where";
+    // image thumb size
+    private static final int THUMB_IMAGE_SIZE = 64;
+    // range rings distance
+    private static final short THUMB_RANGE_RINGS_DISTANCE = 0;
+    // range mask line stroke
+    private static final float THUMB_RANGE_MASK_STROKE = 6.0f;
+    // range rings color string
+    private static final String THUMB_RANGE_RINGS_COLOR = "#FFFFFF";
+    // range mask color string
+    private static final String THUMB_RANGE_MASK_COLOR = "#FFFFFF";
+    // image file extension
+    private static final String IMAGE_FILE_EXT = ".png";
 //---------------------------------------------------------------------------------------- Variables
     private BaltradFrameHandler bfHandler;
     private UserManager userManager;
@@ -81,6 +101,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private SubscriptionManager subscriptionManager;
     private LogManager logManager;
     private DeliveryRegisterManager deliveryRegisterManager;
+    private BltDataProcessorController bltDataProcessorController;
     // Reference to file catalog object
     private FileCatalog fc;
     // Beast message manager
@@ -533,6 +554,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 fc = FileCatalogConnector.connect();
                             }
                             fileEntry = fc.store( tempFile.getAbsolutePath() );
+
+                            // create image thumb
+                            bltDataProcessorController.createImage( tempFile.getAbsolutePath(),
+                                H5_THUMB_DATASET_PATH, H5_THUMB_GROUP_PATH, THUMB_IMAGE_SIZE,
+                                THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE,
+                                THUMB_RANGE_RINGS_COLOR, THUMB_RANGE_MASK_COLOR,
+                                FileCatalogConnector.getThumbsStorageDirectory()
+                                + File.separator + fileEntry.uuid() + IMAGE_FILE_EXT );
+                                
                             // Interface with the Beast framework
                             BltDataMessage message = new BltDataMessage();
                             message.setFileEntry( fileEntry );
@@ -542,9 +572,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         } catch( FileCatalogError e ) {
                             throw e;
                         }
-                        // delete temp file
-                        InitAppUtil.deleteFile( tempFile.getAbsolutePath() );
-
+                       
                         // send data to subscribers
                         
                         List <Subscription> remoteSubs =
@@ -562,23 +590,31 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                             remoteSubs.get( i ).getUserName() );
 
                                     // create data frame
-                                    bfHandler.setUrl( user.getNodeAddress() );
-
+                                    bfHandler.setUrl(  NodeConnection.HTTP_PREFIX +
+                                        user.getShortAddress() + NodeConnection.PORT_SEPARATOR +
+                                        user.getPortNumber() + NodeConnection.ADDRESS_SEPARATOR +
+                                        NodeConnection.APP_CONTEXT +
+                                        NodeConnection.ADDRESS_SEPARATOR +
+                                        NodeConnection.ENTRY_ADDRESS );
+                                   
                                     String retHeader = bfHandler.createDataHdr(
                                         BaltradFrameHandler.MIME_MULTIPART,
                                         InitAppUtil.getNodeName(),
-                                        remoteSubs.get( i ).getChannelName(), /*cFile.name()*/
-                                        tempFile.getName() );
+                                        remoteSubs.get( i ).getChannelName(),
+                                        fileEntry.uuid() + ".h5" );
 
                                     BaltradFrame baltradFrame = new BaltradFrame( retHeader,
-                                            /*cFile.path()*/ tempFile.getAbsolutePath() );
+                                            tempFile.getAbsolutePath() );
 
                                     // process the frame
                                     int res = bfHandler.handleBF( baltradFrame );
-                                    String status = ( ( res == 0 ) ? "SUCCESS" : "FAILURE" );
+                                    String status = 
+                                            ( ( res == 0 ) ? DeliveryRegisterEntry.MSG_SUCCESS :
+                                                DeliveryRegisterEntry.MSG_FAILURE );
                                     // add entry to the data delivery register
-                                    DeliveryRegisterEntry dre = new DeliveryRegisterEntry( user.getId(),
-                                        fileEntry.uuid(), user.getName(), new Date(), status );
+                                    DeliveryRegisterEntry dre = new DeliveryRegisterEntry( 
+                                            user.getId(), fileEntry.uuid(), user.getName(),
+                                            new Date(), status );
 
                                     deliveryRegisterManager.addEntry( dre );
 
@@ -591,6 +627,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 }
                             }
                         }
+                        // delete temp file
+                        InitAppUtil.deleteFile( tempFile.getAbsolutePath() );
+
                     }
                 }
              }
@@ -844,6 +883,23 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public void setMessageManager( IBltMessageManager messageManager ) {
         this.messageManager = messageManager;
+    }
+    /**
+     * Gets reference to BltDataProcessorController object.
+     *
+     * @return Reference to BltDataProcessorController object
+     */
+    public BltDataProcessorController getBltDataProcessorController() {
+        return bltDataProcessorController;
+    }
+    /**
+     * Sets reference to BltDataProcessorController object.
+     *
+     * @param bltDataProcessorController Reference to BltDataProcessorController object
+     */
+    public void setBltDataProcessorController(
+            BltDataProcessorController bltDataProcessorController ) {
+        this.bltDataProcessorController = bltDataProcessorController;
     }
 }
 //--------------------------------------------------------------------------------------------------

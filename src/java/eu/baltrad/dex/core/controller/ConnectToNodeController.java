@@ -94,8 +94,12 @@ public class ConnectToNodeController extends SimpleFormController {
         } else {
             nodeConn = formConn;
         }
+        nodeConn.setFullAddress( NodeConnection.HTTP_PREFIX + nodeConn.getShortAddress() +
+            NodeConnection.PORT_SEPARATOR + nodeConn.getPortNumber() +
+            NodeConnection.ADDRESS_SEPARATOR + NodeConnection.APP_CONTEXT +
+            NodeConnection.ADDRESS_SEPARATOR + NodeConnection.ENTRY_ADDRESS );
         // prepare BaltradFrame
-        BaltradFrameHandler bfHandler = new BaltradFrameHandler( nodeConn.getNodeAddress() );
+        BaltradFrameHandler bfHandler = new BaltradFrameHandler( nodeConn.getFullAddress() );
 
         // prepare channel request frame holding user name, password and node address
         // this frame will be validated and authenticated upon reception

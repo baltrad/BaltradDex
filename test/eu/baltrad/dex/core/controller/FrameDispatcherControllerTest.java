@@ -13,7 +13,7 @@
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU Lesser General Public License for more details.
-*
+*   
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
@@ -50,24 +50,52 @@ public class FrameDispatcherControllerTest extends TestCase {
     
     public void testPrepareFrame() {
         xmlHdr = bltFrameHandler.createDataHdr( BaltradFrameHandler.MIME_MULTIPART,
-                "TestNode", "Legionowo", "test.h5" );
+                "TestNode", "Arlanda", "arlanda.h5" );
         assertEquals( bltFrameHandler.getMimeType( xmlHdr ), BaltradFrameHandler.MIME_MULTIPART );
         assertEquals( bltFrameHandler.getSenderNodeName( xmlHdr ), "TestNode" );
-        assertEquals( bltFrameHandler.getChannel( xmlHdr ), "Legionowo" );
-        assertEquals( bltFrameHandler.getFileName( xmlHdr ), "test.h5" );
+        assertEquals( bltFrameHandler.getChannel( xmlHdr ), "Arlanda" );
+        assertEquals( bltFrameHandler.getFileName( xmlHdr ), "arlanda.h5" );
         assertEquals( bltFrameHandler.getContentType( xmlHdr ), "file" );
     }
 
     public void testInjection() {
-        File f = new File( "test.h5" );
-        
-        assertNotNull( f );
-        assertNotNull( xmlHdr );
+        File f1 = new File( "arlanda.h5" );
+        BaltradFrame frame1 = new BaltradFrame( bltFrameHandler.createDataHdr(
+            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Arlanda", "arlanda.h5" ),
+            f1.getAbsolutePath() );
+        /*
+        File f2 = new File( "test2.h5" );
+        BaltradFrame frame2 = new BaltradFrame( bltFrameHandler.createDataHdr(
+            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Legionowo", "test2.h5" ),
+            f2.getAbsolutePath() );
 
-        baltradFrame = new BaltradFrame( xmlHdr, f.getAbsolutePath() );
+        File f3 = new File( "test3.h5" );
+        BaltradFrame frame3 = new BaltradFrame( bltFrameHandler.createDataHdr(
+            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Legionowo", "test3.h5" ),
+            f3.getAbsolutePath() );
+
+        File f4 = new File( "test4.h5" );
+        BaltradFrame frame4 = new BaltradFrame( bltFrameHandler.createDataHdr(
+            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Legionowo", "test4.h5" ),
+            f4.getAbsolutePath() );
+
+        File f5 = new File( "test5.h5" );
+        BaltradFrame frame5 = new BaltradFrame( bltFrameHandler.createDataHdr(
+            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Legionowo", "test5.h5" ),
+            f5.getAbsolutePath() );
         
+        File f6 = new File( "arlanda.h5" );
+        BaltradFrame frame6 = new BaltradFrame( bltFrameHandler.createDataHdr(
+            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Arlanda", "arlanda.h5" ),
+            f6.getAbsolutePath() );
+        */
         try {
-            bltFrameHandler.handleBF( baltradFrame );
+            bltFrameHandler.handleBF( frame1 );
+            /*bltFrameHandler.handleBF( frame2 );
+            bltFrameHandler.handleBF( frame3 );
+            bltFrameHandler.handleBF( frame4 );
+            bltFrameHandler.handleBF( frame5 );
+            bltFrameHandler.handleBF( frame6 );*/
         } catch( Exception e ) {
             System.out.println( "Frame handler error: " + e.getMessage() );
         }

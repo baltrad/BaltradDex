@@ -34,7 +34,8 @@ Author     : szewczenko
     <property column="password" name="password"/>
     <property column="role_name" name="roleName"/>
     <property column="ret_password" name="retPassword"/>
-    <property column="node_address" name="nodeAddress"/>
+    <property column="short_address" name="shortAddress"/>
+    <property column="port" name="portNumber"/>
     <property column="factory" name="factory"/>
     <property column="country" name="country"/>
     <property column="city" name="city"/>

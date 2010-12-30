@@ -26,6 +26,7 @@ import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.ServletContextUtil;
 import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.core.model.NodeConnection;
 
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
@@ -77,8 +78,9 @@ public class SaveConfigurationController extends SimpleFormController {
         conf = configurationManager.getConfiguration( ConfigurationManager.CONF_REC_ID );
         if( conf == null ) {
             conf = new Configuration( "Short node name", PRIMARY_NODE,
-                    "Full node address", "Your organization name", "Your organization address",
-                    "Local time zone", "Temporary directory", "Node administrator's email" );
+                    "Short node address", "8084", "Host organization name", "Host organization " +
+                    "address", "Local time zone", "Temporary directory", "Node administrator's " +
+                    "email" );
         }
         return conf;
     }
@@ -126,6 +128,11 @@ public class SaveConfigurationController extends SimpleFormController {
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors ) {
         Configuration conf = ( Configuration )command;
+        // set node's full address
+        conf.setFullAddress( NodeConnection.HTTP_PREFIX + conf.getShortAddress() +
+            NodeConnection.PORT_SEPARATOR + conf.getPortNumber() +
+            NodeConnection.ADDRESS_SEPARATOR + NodeConnection.APP_CONTEXT +
+            NodeConnection.ADDRESS_SEPARATOR + NodeConnection.ENTRY_ADDRESS );
         try {
             configurationManager.saveConfiguration( conf );
             // read modified configuration

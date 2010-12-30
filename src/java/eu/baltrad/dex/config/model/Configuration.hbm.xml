@@ -31,7 +31,8 @@ Author     : szewczenko
     </id>
     <property column="name" name="nodeName"/>
     <property column="type" name="nodeType"/>
-    <property column="address" name="nodeAddress"/>
+    <property column="short_address" name="shortAddress"/>
+    <property column="port" name="portNumber"/>
     <property column="org_name" name="orgName"/>
     <property column="org_address" name="orgAddress"/>
     <property column="time_zone" name="timeZone"/>

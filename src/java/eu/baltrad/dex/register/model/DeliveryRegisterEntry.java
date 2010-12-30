@@ -31,6 +31,9 @@ import java.util.Date;
  * @since 0.1.6
  */
 public class DeliveryRegisterEntry {
+//---------------------------------------------------------------------------------------- Constants
+    public static final String MSG_SUCCESS = "SUCCESS";
+    public static final String MSG_FAILURE = "FAILURE";
 //---------------------------------------------------------------------------------------- Variables
     // Record ID
     private int id;

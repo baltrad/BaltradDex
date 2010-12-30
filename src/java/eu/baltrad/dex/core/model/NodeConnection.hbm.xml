@@ -30,7 +30,8 @@ Author     : szewczenko
       </generator>
     </id>
     <property column="name" name="connectionName"/>
-    <property column="address" name="nodeAddress"/>
+    <property column="short_address" name="shortAddress"/>
+    <property column="port" name="portNumber"/>
     <property column="user_name" name="userName"/>
     <property column="password" name="password"/>
   </class>

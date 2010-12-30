@@ -32,13 +32,29 @@ import java.io.Serializable;
  * @since 0.1.6
  */
 public class NodeConnection implements Serializable {
+//---------------------------------------------------------------------------------------- Constants
+    // HTTP protocol prefix
+    public static final String HTTP_PREFIX = "http://";
+    // Application context
+    public static final String APP_CONTEXT = "BaltradDex";
+    // Relative entry point address
+    public static final String ENTRY_ADDRESS = "dispatch.htm";
+    // Address separator
+    public static final String ADDRESS_SEPARATOR = "/";
+    // Port separator
+    public static final String PORT_SEPARATOR = ":";
 //---------------------------------------------------------------------------------------- Variables
     // Connection id
     private int id;
     // Connection name
     private String connectionName;
-    // Node address
-    private String nodeAddress;
+    // Short node address, e.g. baltrad.imgw.pl (without port name and other stuff)
+    private String shortAddress;
+    // Full node address, e.g. http://baltrad.imgw.pl:8084/BaltradDex/dispatch.htm
+    private String fullAddress;
+    // Port number
+    private String portNumber;
+    // Full address of node's entry point
     // User's name on the remote node
     private String userName;
     // User's password on the remote node
@@ -51,12 +67,15 @@ public class NodeConnection implements Serializable {
     /**
      * Constructor sets node address, user name and password field values.
      *
-     * @param nodeAddress Node address
+     * @param shortAddress Node's short address
+     * @param portNumber Port number
      * @param userName User's name
      * @param password User's password
      */
-    public NodeConnection( String nodeAddress, String userName, String password ) {
-        this.nodeAddress = nodeAddress;
+    public NodeConnection( String shortAddress, String portNumber, String userName,
+            String password ) {
+        this.shortAddress = shortAddress;
+        this.portNumber = portNumber;
         this.userName = userName;
         this.password = password;
     }
@@ -64,14 +83,16 @@ public class NodeConnection implements Serializable {
      * Constructor sets all field values.
      *
      * @param connectionName Connection name
-     * @param nodeAddress Node address
+     * @param shortAddress Node's short address
+     * @param portNumber Port number
      * @param userName User's name
      * @param password User's password
      */
-    public NodeConnection( String connectionName, String nodeAddress, String userName,
-            String password ) {
+    public NodeConnection( String connectionName, String shortAddress, String portNumber,
+            String userName, String password ) {
         this.connectionName = connectionName;
-        this.nodeAddress = nodeAddress;
+        this.shortAddress = shortAddress;
+        this.portNumber = portNumber;
         this.userName = userName;
         this.password = password;
     }
@@ -100,17 +121,41 @@ public class NodeConnection implements Serializable {
      */
     public void setConnectionName( String connectionName ) { this.connectionName = connectionName; }
     /**
-     * Gets node address.
+     * Gets node's short address.
      *
-     * @return Node address
+     * @return Node's short address
      */
-    public String getNodeAddress() { return nodeAddress; }
+    public String getShortAddress() { return shortAddress; }
     /**
-     * Sets node address.
+     * Sets node's short address.
      *
-     * @param nodeAddress Node address
+     * @param shortAddress Node's short address
      */
-    public void setNodeAddress( String nodeAddress ) { this.nodeAddress = nodeAddress; }
+    public void setShortAddress( String shortAddress ) { this.shortAddress = shortAddress; }
+    /**
+     * Gets node's full address.
+     *
+     * @return Node's full address
+     */
+    public String getFullAddress() { return fullAddress; }
+    /**
+     * Sets node's full address.
+     *
+     * @param fullAddress Node's full address
+     */
+    public void setFullAddress( String fullAddress ) { this.fullAddress = fullAddress; }
+    /**
+     * Gets port number.
+     *  
+     * @return Port number
+     */
+    public String getPortNumber() { return portNumber; }
+    /**
+     * Sets port number.
+     *
+     * @param portNumber Port number to set
+     */
+    public void setPortNumber( String portNumber ) { this.portNumber = portNumber; }
     /**
      * Gets user name.
      *

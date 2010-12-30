@@ -60,7 +60,7 @@ Author     : szewczenko
                                     <div class="row">Password</div>
                                     <div class="row">Retype password</div>
                                     <div class="row">Role</div>
-                                    <div class="row">Node HTTP address</div>
+                                    <div class="row">Node address</div>
                                     <div class="row">Organization</div>
                                     <div class="row">Country</div>
                                     <div class="row">City</div>
@@ -97,8 +97,12 @@ Author     : szewczenko
                                         <form:errors path="command.roleName" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.nodeAddress"/>
-                                        <form:errors path="command.nodeAddress" cssClass="errors"/>
+                                        <div class="row-elem">
+                                            http://<form:input path="command.shortAddress"
+                                            cssClass="shortAddress"/>:<form:input
+                                            path="command.portNumber" cssClass="portNumber"/>
+                                        </div>
+                                        <form:errors path="command.fullAddress" cssClass="errors"/>
                                     </div>
                                     <div class="row">
                                         <form:input path="command.factory"/>

@@ -62,6 +62,8 @@ public class SubscriptionController extends MultiActionController {
     private static final String REQUEST_STATUS_KEY = "request_status";
     private static final String OK_MSG_KEY = "ok_message";
     private static final String ERROR_MSG_KEY = "error_message";
+    // used when user tries to remove active subscription
+    private static final String REMOVE_ACTIVE_SUBSCRIPTION_ERROR = "active_subscription";
     // view names
     private static final String SHOW_SUBSCRIPTIONS_VIEW = "showSubscriptions";
     private static final String SELECTED_SUBSCRIPTIONS_VIEW = "showSelectedSubscriptions";
@@ -76,7 +78,6 @@ public class SubscriptionController extends MultiActionController {
                                                                 "showSelectedPeersSubscriptions";
     private static final String SHOW_REMOVED_PEERS_SUBSCRIPTIONS_VIEW =
                                                                 "showRemovedPeersSubscriptions";
-
 //---------------------------------------------------------------------------------------- Variables
     private ChannelManager channelManager;
     private SubscriptionManager subscriptionManager;
@@ -271,19 +272,41 @@ public class SubscriptionController extends MultiActionController {
                         + "to " + REDIRECT_VIEW + ": " + e.getMessage() );
             }
         } else {
-            List< Subscription > currentSubs = new ArrayList< Subscription >();
-            // create subscription list based on chosen channels
+            // determines whether user has selected an active subscription
+            boolean isActive = false;
             for( int i = 0; i < selChannels.length; i++ ) {
                 Subscription subs = subscriptionManager.getSubscription( selChannels[ i ],
                         Subscription.LOCAL_SUBSCRIPTION );
-                if( subs != null ) {
-                    currentSubs.add( subs );
+                if( subs.getSelected() ) {
+                    isActive = true;
                 }
             }
-            // write the list to class variable
-            setRemovedSubscriptions( currentSubs );
-            modelAndView =  new ModelAndView( SELECT_REMOVE_SUBSCRIPTION_VIEW,
-                    SELECTED_SUBSCRIPTIONS_KEY, currentSubs );
+            // user is not allowed to remove active subscription
+            if( isActive ) {
+                try {
+                    request.getSession().setAttribute( REMOVE_ACTIVE_SUBSCRIPTION_ERROR,
+                        getMessageSourceAccessor().getMessage(
+                        "error.removesubscription.activesubscription" ) );
+                    response.sendRedirect( REDIRECT_VIEW );
+                } catch( IOException e ) {
+                    logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while redirecting "
+                            + "to " + REDIRECT_VIEW + ": " + e.getMessage() );
+                }
+            } else {
+                List< Subscription > currentSubs = new ArrayList< Subscription >();
+                // create subscription list based on chosen channels
+                for( int i = 0; i < selChannels.length; i++ ) {
+                    Subscription subs = subscriptionManager.getSubscription( selChannels[ i ],
+                            Subscription.LOCAL_SUBSCRIPTION );
+                    if( subs != null ) {
+                        currentSubs.add( subs );
+                    }
+                }
+                // write the list to class variable
+                setRemovedSubscriptions( currentSubs );
+                modelAndView =  new ModelAndView( SELECT_REMOVE_SUBSCRIPTION_VIEW,
+                        SELECTED_SUBSCRIPTIONS_KEY, currentSubs );
+            }
         }
         return modelAndView;
     }

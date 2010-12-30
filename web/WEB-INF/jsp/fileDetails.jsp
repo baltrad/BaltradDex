@@ -26,11 +26,31 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@ page import="eu.baltrad.dex.data.model.Data" %>
+<%@ page import="eu.baltrad.dex.bltdata.model.BltFile" %>
+<%@ page import="eu.baltrad.dex.bltdata.model.BltDataset" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="java.io.File" %>
+<%@ page import="java.text.SimpleDateFormat" %>
 
 <%
-    Data data = ( Data )request.getAttribute( "file_details" );
+    HashMap model = ( HashMap )request.getAttribute( "file_details" );
+    BltFile bltFile = ( BltFile )model.get( "blt_file" );
+    List<BltDataset> bltDatasets = ( List )model.get( "blt_datasets" );
+    request.setAttribute( "blt_datasets", bltDatasets );
+
+    String uuid = bltFile.getUuid();
+    String fileName = bltFile.getPath().substring( bltFile.getPath().lastIndexOf( File.separator )
+            + 1, bltFile.getPath().length() );
+    String source = bltFile.getRadarName();
+    SimpleDateFormat dateTimeFormat = new SimpleDateFormat( "MMM d, yyyy HH:mm:ss" );
+    String storageTime = dateTimeFormat.format( bltFile.getStorageTime() );
+    SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
+    SimpleDateFormat timeFormat = new SimpleDateFormat( "HH:mm:ss" );
+    String dateStr = dateFormat.format( bltFile.getTimeStamp() );
+    String timeStr = timeFormat.format( bltFile.getTimeStamp() );
+    String type = bltFile.getType();
 %>
 
 <html>
@@ -63,7 +83,7 @@ Author     : szewczenko
                         <div class="left">
                             <div class="row">File entry ID</div>
                             <div class="row">File name</div>
-                            <div class="row">Stored at</div>
+                            <div class="row">Storage time</div>
                             <div class="row">Source</div>
                             <div class="row">Date</div>
                             <div class="row">Time</div>
@@ -71,30 +91,84 @@ Author     : szewczenko
                         </div>
                         <div class="right">
                             <div class="row">
-                                <% out.println( data.getUuid() ); %>
+                                <%=uuid%>
                             </div>
                             <div class="row">
-                                <% out.println( data.getPath().substring(
-                                    data.getPath().lastIndexOf( File.separator ) + 1,
-                                    data.getPath().length() ) ); %>
+                                <%=fileName%>
                             </div>
                             <div class="row">
-                                <% out.println( data.getTimeStamp() ); %>
+                                <%=storageTime%>
                             </div>
                             <div class="row">
-                                <% out.println( data.getRadarName() ); %>
+                                <%=source%>
                             </div>
                             <div class="row">
-                                <% out.println( data.getDate() ); %>
+                                <%=dateStr%>
                             </div>
                             <div class="row">
-                                <% out.println( data.getTime() ); %>
+                                <%=timeStr%>
                             </div>
                             <div class="row">
-                                <% out.println( data.getType() ); %>
+                                <%=type%>
                             </div>
                         </div>
-                    </div>    
+                    </div>
+                    <div id="page-title">
+                        <div class="left">
+                            Data preview
+                        </div>
+                        <div class="right">
+                        </div>
+                    </div>
+                    <c:choose>
+                        <c:when test="${not empty blt_datasets}">
+                            <div id="text-box">
+                                Click on selected image to preview data from a given dataset.
+                            </div>
+                            <div id="image-thumbs">
+                                <c:forEach var="dataset" items="${blt_datasets}">
+                                    <div id="thumb">
+                                        <div class="image">
+                                            <c:url var="imagePreviewURL" value="imagePreview.htm">
+                                                <c:param name="file_uuid"
+                                                        value="<%=bltFile.getUuid()%>" />
+                                                <c:param name="dataset_path"
+                                                        value="${dataset.name}"/>
+                                                <c:param name="dataset_where"
+                                                        value="${dataset.where}"/>
+                                                <c:param name="dataset_quantity"
+                                                        value="${dataset.quantity}"/>
+                                                <c:param name="dataset_width"
+                                                        value="${dataset.width}"/>
+                                                <c:param name="lat0" value="${dataset.lat0}"/>
+                                                <c:param name="lon0" value="${dataset.lon0}"/>
+                                                <c:param name="llLat" value="${dataset.llLat}"/>
+                                                <c:param name="llLon" value="${dataset.llLon}"/>
+                                                <c:param name="urLat" value="${dataset.urLat}"/>
+                                                <c:param name="urLon" value="${dataset.urLon}"/>
+                                            </c:url>
+                                            <a href="#" onClick="window.open(
+                                                    '<c:out value="${imagePreviewURL}"/>',
+                                                    'mywindow','width=${dataset.width},\n\
+                                                    height=${dataset.height}, left=100, top=100,\n\
+                                                    screenX=100, screenY=100')">
+                                                <img src="${dataset.thumbPath}" alt="no_thumb"/>
+                                            </a>
+                                        </div>
+                                        <div class="caption">
+                                            <c:out value="${dataset.elevationAngle}"></c:out>&deg;
+                                            <c:out value="${dataset.quantity}"></c:out>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div id="text-box">
+                                No image thumbs found.
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                     <div class="footer">
                         <div class="right">
                             <form action="radars.htm">

@@ -24,6 +24,7 @@ package eu.baltrad.dex.util;
 import eu.baltrad.dex.log.model.LogManager;
 import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.config.model.Configuration;
+import eu.baltrad.dex.core.model.NodeConnection;
 
 import org.hibernate.HibernateException;
 
@@ -36,11 +37,6 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.util.Date;
-
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 
 /**
  * Utility class used to initialize application on startup.
@@ -93,8 +89,12 @@ public class InitAppUtil {
                     + " from database: " + e.getMessage() );
         }
         if( conf != null ) {
+            // reconstruct node's full address
+            setNodeAddress( NodeConnection.HTTP_PREFIX + conf.getShortAddress() +
+                    NodeConnection.PORT_SEPARATOR + conf.getPortNumber() +
+                    NodeConnection.ADDRESS_SEPARATOR + NodeConnection.APP_CONTEXT +
+                    NodeConnection.ADDRESS_SEPARATOR + NodeConnection.ENTRY_ADDRESS );
             setNodeName( conf.getNodeName() );
-            setNodeAddress( conf.getNodeAddress() );
             setNodeType( conf.getNodeType() );
             setOrgName( conf.getOrgName() );
             setOrgAddress( conf.getOrgAddress() );

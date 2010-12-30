@@ -435,12 +435,12 @@ tr {
 .tdgreen {
     color: #588D25;
 }
-.tdcenter a {
+.tdcenter a, .tdcheck a {
     color: #003298;
     padding: 1px 2px 1px 2px;
     text-decoration: underline;
 }
-.tdcenter a:hover {
+.tdcenter a:hover, .tdcheck a:hover  {
     color: white;
 }
 .tdcheck {
@@ -449,6 +449,15 @@ tr {
 .tdhidden {
     visibility: hidden;
     display: none;
+}
+.tdimage {
+    text-align: center;
+}
+.tdimage img {
+    border: none;
+}
+.tdimage img:hover {
+    background: white;
 }
 .message {
     width: 100%;
@@ -507,7 +516,6 @@ tr {
         #table > .left > .row, #table > .right > .row {
     height: 26px;
     font-family: Verdana, Arial, Tahoma, sans-serif;
-    font-size: small;
     font-weight: normal;
     color: black;
 }
@@ -550,12 +558,39 @@ tr {
 /*
  * Node properties page
  */
+#table > .props > form > .left {
+    margin-right: 22px;
+}
 #table > .props > form > .right > .row > input {
-    width: 360px;
+    width: 320px;
 }
 #table > .props > form > .right > .row > select {
     width: 240px;
 }
+
+/*
+ * Input fields on connect to node, node properties and save user account page
+ */
+.connectToNode {
+    color: #2d76ae;
+    font-weight: bold;
+}
+.nodeAddress {
+    width: 140px;
+}
+.portNumber {
+    width: 40px;
+}
+.row-elem {
+    color: #2d76ae;
+    font-weight: bold;
+    float: left;
+    margin-right: 6px;
+}
+.userName, .passwd {
+    width: 280px;
+}
+
 
 /*
  * Node configuration page
@@ -664,6 +699,74 @@ tr {
 }
 
 /*
+ * Image thumbs
+ */
+#image-thumbs {
+    width: 100%;
+    float: left;
+    margin-top: 12px;
+}
+#image-thumbs > #thumb {
+    float: left;
+    margin: 4px;
+}
+#image-thumbs > #thumb .caption {
+    text-align: center;
+}
+#image-thumbs > #thumb > .image > a > img {
+    border: none;
+}
+#image-thumbs > #thumb > .image > a > img:hover {
+    background: #CECECE;
+}
+
+/*
+ * Data preview with Google Maps
+ */
+#map_canvas {
+    height: 90%;
+}
+#map-toolbar {
+    width: 100%;
+    height: 10%;
+    text-align: center;
+    background: #A7A7A7;
+}
+#map-toolbar .center {
+    width: 340px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 8px;
+}
+#map-toolbar .left {
+    float: left;
+}
+#map-toolbar .right {
+    float: right;
+}
+.slider {
+    position: relative;
+    width: 180px;
+    font-size: 12px;
+    height: 30px;
+    background: #EEE;
+    border: 1px solid #84B752;
+}
+.slider .handle {
+    position: absolute;
+    width: 60px;
+    height: 30px;
+    background: #84B752;
+    color: #FFFFFF;
+    line-height: 30px;
+    text-align: center;
+    cursor: pointer;
+}
+.slider .handle:hover {
+    background: #5E9626;
+}
+
+/*
  * Beast GUI
  */
 .beast-error {
@@ -671,7 +774,7 @@ tr {
     color: red;
 }
 .form-content {
-  width:98%;
+  width: 98%;
   padding: 6px;
   margin: 2px;
   background-color: #CACACA;

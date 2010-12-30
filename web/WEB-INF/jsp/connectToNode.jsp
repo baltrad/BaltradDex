@@ -62,7 +62,9 @@ Author     : szewczenko
                         <form method="post">
                             <div class="left">
                                 <div class="row">
-                                    Select node connection
+                                    <div class="connectToNode">
+                                        Select node connection
+                                    </div>
                                 </div>
                             </div>
                             <div class="right">
@@ -94,26 +96,40 @@ Author     : szewczenko
                                 Define new connection
                             </div>
                         </div>
-
                         <form method="post">
                             <div class="left">
-                                <div class="row">Node Address</div>
-                                <div class="row">User Name</div>
-                                <div class="row">Password</div>
+                                <div class="row">
+                                    <div class="connectToNode">
+                                        Node Address
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="connectToNode">
+                                        User Name
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="connectToNode">
+                                        Password
+                                    </div>
+                                </div>
                             </div>
                             <div class="right">
                                 <div class="row">
-                                    <form:input path="command.nodeAddress"/>
-                                    <form:errors path="command.nodeAddress"
-                                                 cssClass="errors"/>
+                                    <div class="row-elem">
+                                        http://<form:input path="command.shortAddress"
+                                        cssClass="shortAddress"/>:<form:input
+                                        path="command.portNumber" cssClass="portNumber"/>
+                                    </div>
+                                    <form:errors path="command.fullAddress" cssClass="errors"/>
                                 </div>
                                 <div class="row">
-                                    <form:input path="command.userName"/>
+                                    <form:input path="command.userName" cssClass="userName"/>
                                     <form:errors path="command.userName"
                                                  cssClass="errors"/>
                                 </div>
                                 <div class="row">
-                                    <form:password path="command.password"/>
+                                    <form:password path="command.password" cssClass="passwd"/>
                                     <form:errors path="command.password"
                                                  cssClass="errors"/>
                                 </div>

@@ -19,10 +19,11 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.data.model;
+package eu.baltrad.dex.bltdata.model;
+
+import eu.baltrad.dex.util.FileCatalogConnector;
 
 import eu.baltrad.fc.FileCatalog;
-
 import eu.baltrad.fc.expr.ExpressionFactory;
 import eu.baltrad.fc.db.FileQuery;
 import eu.baltrad.fc.db.FileResult;
@@ -30,6 +31,11 @@ import eu.baltrad.fc.db.FileEntry;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 
 /**
  * Data manager class implementing data handling functionality.
@@ -38,13 +44,17 @@ import java.util.ArrayList;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class DataManager {
+public class BltFileManager {
 //---------------------------------------------------------------------------------------- Constants
     private static final String FC_SRC_PLC_ATTR = "what/source:PLC";
     private static final String FC_FILE_UUID = "file:uuid";
     private static final String FC_DATE_STR = "yyyy/MM/dd";
     private static final String FC_TIME_STR = "HH:mm:ss";
-    private static final String FC_DATE_TIME_STR = "yyyy/MM/dd, HH:mm:ss";
+    // image file extension
+    private static final String IMAGE_FILE_EXT = ".png";
+//---------------------------------------------------------------------------------------- Variables
+    private static SimpleDateFormat format = new SimpleDateFormat( FC_DATE_STR + " " +
+            FC_TIME_STR );
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Method queries file catalog for all files coming from a given radar station.
@@ -53,27 +63,34 @@ public class DataManager {
      * @param radarName Radar station name
      * @return List containing data from a given radar station
      */
-    public List< Data > getDataByRadar( FileCatalog fc, String radarName ) {
+    public List< BltFile > getDataByRadar( FileCatalog fc, String radarName ) {
         ExpressionFactory xpr = new ExpressionFactory();
         FileQuery q = fc.query_file();
         // filter the query with a given channel name
         q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( radarName ) ) );
         FileResult r = q.execute();
-        List< Data > dataList = new ArrayList<Data>();
+        List< BltFile > bltFiles = new ArrayList<BltFile>();
         while( r.next() ) {
-            FileEntry fileEntry = r.entry();
-            Data data = new Data(
-                fileEntry.uuid(),
-                fc.storage().store( fileEntry ),
-                fileEntry.stored_at().to_string( FC_DATE_TIME_STR ), radarName,
-                fileEntry.what_date().to_string( FC_DATE_STR ),
-                fileEntry.what_time().to_string( FC_TIME_STR ),
-                fileEntry.what_object() );
-            dataList.add( data );
+            try {
+                FileEntry fileEntry = r.entry();
+                BltFile bltFile = new BltFile(
+                    fileEntry.uuid(), fc.storage().store( fileEntry ),
+                    format.parse( fileEntry.what_date().to_string( FC_DATE_STR ) + " " +
+                        fileEntry.what_time().to_string( FC_TIME_STR ) ) ,
+                    format.parse( fileEntry.stored_at().to_string( FC_DATE_STR + " " +
+                        FC_TIME_STR ) ), radarName, fileEntry.what_object(),
+                    FileCatalogConnector.getThumbsStorageFolder() + File.separator +
+                    fileEntry.uuid() + IMAGE_FILE_EXT );
+                bltFiles.add( bltFile );
+            } catch( ParseException e ) {
+                System.err.println( "Error while parsing file's timestamp: " + e.getMessage() );
+            }
         }
         // delete the result set
         r.delete();
-        return dataList;
+        // sort data list
+        Collections.sort( bltFiles );
+        return bltFiles;
     }
     /**
      * Method queries file catalog for a file entry with a given identity string.
@@ -82,27 +99,31 @@ public class DataManager {
      * @param uuid File entry's identity string
      * @return File entry with a given ID
      */
-    public Data getDataByID( FileCatalog fc, String uuid ) {
+    public BltFile getDataByID( FileCatalog fc, String uuid ) {
         ExpressionFactory xpr = new ExpressionFactory();
         FileQuery q = fc.query_file();
         // filter the query with a given file identity string
         q.filter( xpr.attribute( FC_FILE_UUID ).eq( xpr.string( uuid ) ) );
         FileResult r = q.execute();
-        Data data = null;
+        BltFile bltFile = null;
         while( r.next() ) {
+            try {
             FileEntry fileEntry = r.entry();
-            data = new Data(
-                fileEntry.uuid(),
-                fc.storage().store( fileEntry ),
-                fileEntry.stored_at().to_string( FC_DATE_TIME_STR ),
-                fileEntry.what_source(),
-                fileEntry.what_date().to_string( FC_DATE_STR ),
-                fileEntry.what_time().to_string( FC_TIME_STR ),
-                fileEntry.what_object() );
+            bltFile = new BltFile(
+                fileEntry.uuid(), fc.storage().store( fileEntry ),
+                format.parse( fileEntry.what_date().to_string( FC_DATE_STR ) + " " +
+                    fileEntry.what_time().to_string( FC_TIME_STR ) ),
+                format.parse( fileEntry.stored_at().to_string( FC_DATE_STR + " " + FC_TIME_STR ) ),
+                fileEntry.what_source(), fileEntry.what_object(),
+                FileCatalogConnector.getThumbsStorageFolder() + File.separator + fileEntry.uuid() +
+                IMAGE_FILE_EXT );
+            } catch( ParseException e ) {
+                System.err.println( "Error while parsing file's timestamp: " + e.getMessage() );
+            }
         }
         // delete the result set
         r.delete();
-        return data;
+        return bltFile;
     }
 }
 //--------------------------------------------------------------------------------------------------
