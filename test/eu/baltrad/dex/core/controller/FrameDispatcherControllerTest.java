@@ -43,9 +43,9 @@ public class FrameDispatcherControllerTest extends TestCase {
 //------------------------------------------------------------------------------------------ Methods
 
     public void testInit() {
-        bltFrameHandler.setUrl( "http://172.31.50.150:8084/BaltradDex/dispatch.htm" );
+        bltFrameHandler.setUrl( "http://localhost:8084/BaltradDex/dispatch.htm" );
         assertNotNull( bltFrameHandler );
-        assertEquals( bltFrameHandler.getUrl(), "http://172.31.50.150:8084/BaltradDex/dispatch.htm" );
+        assertEquals( bltFrameHandler.getUrl(), "http://localhost:8084/BaltradDex/dispatch.htm" );
     }
     
     public void testPrepareFrame() {
