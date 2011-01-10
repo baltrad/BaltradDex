@@ -44,7 +44,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="compile.debug" value="true"/>
   <property name="compile.includeAntRuntime" value="no"/>
   <property name="compile.optimize" value="true"/>
-  <!--property name="tomcat.dir" value="/opt/baltrad/third_party/tomcat"/-->
+  <property name="javahdf.path" value="/opt/hdf-java" />
   
   <!-- You can override properties in this file -->
   <property file="develop.properties" />  
@@ -60,10 +60,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <available file="${baltrad.db.path}/java/jbrfc.jar" property="jbrfc.jar.available" />
   <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
   <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
+  <available file="${javahdf.path}/lib/jhdf5.jar" property="javahdf.lib.available" />
 
   <fail unless="jbrfc.jar.available" message="baltrad.db.path must specify the installation dir of baltrad-db" />
   <fail unless="beast.jar.available" message="beast.path must specify the installation dir of beast" />
   <fail unless="beast.libs.available" message="beast.path must specify the installation dir of beast" />
+  <fail unless="javahdf.lib.available" message="javahdf.path must specify the installation dir of hdf-java" />
+
 
   <!-- Configure ant tasks for tomcat deployment -->
   <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"
@@ -97,9 +100,23 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fileset dir="${beast.path}/bin">
       <include name="*.jar"/>
     </fileset>
-    <!--fileset dir="${tomcat.dir}/lib">
+    
+    <!--fileset dir="/opt/apache-tomcat-6.0.26/lib">
       <include name="*.jar"/>
     </fileset-->
+
+    <fileset dir="${javahdf.path}/lib">
+      <include name="jhdf5.jar"/>
+    </fileset>
+    <fileset dir="${javahdf.path}/lib">
+      <include name="jhdf5obj.jar"/>
+    </fileset>
+    <fileset dir="${javahdf.path}/lib">
+      <include name="jhdf.jar"/>
+    </fileset>
+    <fileset dir="${javahdf.path}/lib">
+      <include name="jhdfobj.jar"/>
+    </fileset>
   </path>
 
   <!-- path for testing -->
@@ -181,13 +198,18 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="*.jar"/>
       </fileset>
 
-
-
-      <fileset dir="lib/jhdf">
-        <include name="*.jar"/>
+      <fileset dir="${javahdf.path}/lib">
+        <include name="jhdf5.jar"/>
       </fileset>
-
-
+      <fileset dir="${javahdf.path}/lib">
+        <include name="jhdf5obj.jar"/>
+      </fileset>
+      <fileset dir="${javahdf.path}/lib">
+        <include name="jhdf.jar"/>
+      </fileset>
+      <fileset dir="${javahdf.path}/lib">
+        <include name="jhdfobj.jar"/>
+      </fileset>
 
       <fileset dir="lib">
         <include name="postgresql-8.4-701.jdbc4.jar"/>
@@ -209,14 +231,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="*.jar"/>
       </fileset>
     </copy>
-
-    <!-- copy HDF5 java libraries into tomcat library directory -->
-    
-    <!--copy todir="${tomcat.dir}/lib">
-        <fileset dir="lib/jhdf">
-            <include name="*.jar"/>
-        </fileset>
-    </copy-->
 
     <!-- copy web interface files -->
     <copy todir="${build.web.dir}">

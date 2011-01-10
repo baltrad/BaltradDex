@@ -50,8 +50,7 @@ INSERT INTO dex_users (name, name_hash, role_name, password, short_address, port
 
 INSERT INTO dex_channels (name, wmo_number) VALUES ('Legionowo', '12374'),
     ('Świdwin', '12220'), ('Brzuchania', '12568'), ('Pastewnik', '12544'),
-    ('Rzeszów', '12579'), ('Ramża', '12514'), ('Poznań', '12331'), ('Gdańsk', '12151'),
-    ('Arlanda', '12121');
+    ('Rzeszów', '12579'), ('Ramża', '12514'), ('Poznań', '12331'), ('Gdańsk', '12151');
 
 INSERT INTO dex_node_configuration (name, type, short_address, port, org_name, org_address,
     time_zone, temp_dir, email ) VALUES('baltrad.imgw.pl', 'Primary', 'localhost', '8084',

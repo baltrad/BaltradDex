@@ -554,6 +554,22 @@ tr {
     font-size: 1.1em;
     text-align: right;
 }
+/*
+ * Log preview table on login page
+ */
+#log-preview-table {
+    width: 100%;
+    float: left;
+    clear: both;
+}
+#log-preview-table tr {
+    background: white;
+}
+#log-preview-table .tdcenter {
+    padding: 0px 2px 0px 2px;
+    color: #B7B7B7;
+    font-size: 0.8em;
+}
 
 /*
  * Node properties page
@@ -813,4 +829,15 @@ tr {
 .scheduleerror {
   font-weight:bold;
   color:#c80000;
+}
+
+/*
+ * Common style for all tooltips
+ */
+.tooltip {
+    background-color: #FFFFF0;
+    border: solid 1px gray;
+    text-align: center;
+    filter: alpha(Opacity=65);
+    opacity: 0.65;
 }

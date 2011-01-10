@@ -52,6 +52,7 @@ document.write( "<div class=\"group\">Administration</div>" );
 
 document.write( "<a href=\"configuration.htm\">Configuration</a>" );
 document.write( "<a href=\"nodeProperties.htm\">Node properties</a>" );
+document.write( "<a href=\"configureDataSource.htm\">Data source test</a>" );
 
 document.write( "<div class=\"separator\"></div>" );
 
