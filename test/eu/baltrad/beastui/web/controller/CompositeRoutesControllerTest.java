@@ -211,7 +211,6 @@ public class CompositeRoutesControllerTest extends TestCase {
     assertEquals("somestring", result);
   }
   
-/*
   public void testViewCreateRoute() throws Exception {
     List<String> adaptornames = new ArrayList<String>();
     List<String> sourceids = new ArrayList<String>();
@@ -231,7 +230,7 @@ public class CompositeRoutesControllerTest extends TestCase {
 
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptornames);
-    //utilities.getRadarSources();
+    utilities.getRadarSources();
     utilitiesControl.setReturnValue(sourceids);
     method.getIntervals();
     methodControl.setReturnValue(intervals);
@@ -298,7 +297,7 @@ public class CompositeRoutesControllerTest extends TestCase {
 
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptornames);
-    //utilities.getRadarSources();
+    utilities.getRadarSources();
     utilitiesControl.setReturnValue(sourceids);
     method.getIntervals();
     methodControl.setReturnValue(intervals);
@@ -347,5 +346,4 @@ public class CompositeRoutesControllerTest extends TestCase {
     verify();
     assertEquals("compositeroute_create", result);
   }
-*/
 }

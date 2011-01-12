@@ -238,7 +238,7 @@ public class CompositeRoutesController {
       Boolean active, String description, List<String> recipients, Boolean byscan,
       String areaid, Integer interval, Integer timeout, List<String> sources, String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
-    //model.addAttribute("sourceids", utilities.getRadarSources());
+    model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
     model.addAttribute("adaptors", adaptors);
     model.addAttribute("name", (name == null) ? "" : name);
@@ -275,7 +275,7 @@ public class CompositeRoutesController {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     
     model.addAttribute("adaptors", adaptors);
-    //model.addAttribute("sourceids", utilities.getRadarSources());
+    model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
     
     model.addAttribute("name", (name == null) ? "" : name);
