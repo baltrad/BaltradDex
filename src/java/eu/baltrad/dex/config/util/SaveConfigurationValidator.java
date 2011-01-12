@@ -58,7 +58,6 @@ public class SaveConfigurationValidator implements Validator {
         Configuration conf = ( Configuration )command;
         if( conf == null ) return;
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "nodeName", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "nodeAddress", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "orgName", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "orgAddress", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "timeZone", "error.field.required" );
@@ -70,14 +69,24 @@ public class SaveConfigurationValidator implements Validator {
             errors.rejectValue( "nodeName", "error.field.name.tooshort" );
         }
         // validate node address
-        if( conf.getNodeAddress().trim().length() > 0
-                && !WebUtil.validateWebAddress( conf.getNodeAddress() ) ) {
-            errors.rejectValue( "nodeAddress", "error.field.nodeaddress.invalid" );
+        boolean isValidPortNumber = false;
+        try {
+            int port = Integer.parseInt( conf.getPortNumber() );
+            isValidPortNumber = true;
+        } catch( NumberFormatException e ) {
+            isValidPortNumber = false;
+        } catch( Exception e ) {
+            isValidPortNumber = false;
+        }
+        if( conf.getShortAddress().isEmpty() || conf.getPortNumber().isEmpty() ||
+                !isValidPortNumber ) {
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "fullAddress",
+                "error.address.invalid" );
         }
         // validate email address
         if( conf.getAdminEmail().trim().length() > 0 && !WebUtil.validateEmailAddress(
                 conf.getAdminEmail() ) ) {
-            errors.rejectValue( "adminEmail", "error.field.email.invalid" );
+            errors.rejectValue( "adminEmail", "error.address.invalid" );
         }
     }
 }

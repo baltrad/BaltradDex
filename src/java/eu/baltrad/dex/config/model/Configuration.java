@@ -30,14 +30,27 @@ package eu.baltrad.dex.config.model;
  */
 public class Configuration {
 //---------------------------------------------------------------------------------------- Variables
+    // Record ID
     private int id;
+    // Node name, e.g. baltrad.imgw.pl
     private String nodeName;
+    // Node type - primary / backup
     private String nodeType;
-    private String nodeAddress;
+    // Short node address, e.g. baltrad.imgw.pl (without port name and other stuff)
+    private String shortAddress;
+    // Full node address, e.g. http://baltrad.imgw.pl:8084/BaltradDex/dispatch.htm
+    private String fullAddress;
+    // Port number
+    private String portNumber;
+    // Host organization name
     private String orgName;
+    // Host organization address
     private String orgAddress;
+    // Host time zone
     private String timeZone;
+    // Temporary directory
     private String tempDir;
+    // Administrator's email
     private String adminEmail;
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -49,19 +62,21 @@ public class Configuration {
      *
      * @param nodeName Short node name
      * @param nodeType Node type (primary or backup node)
-     * @param nodeAddress Full address of the node pointing to frame dispatcher
+     * @param shortAddress Node's short address
+     * @param portNumber Port number
      * @param orgName Host organization name
      * @param orgAddress Host organization address
      * @param timeZone Local time zone
      * @param tempDir Temporary directory
      * @param adminEmail Node administrator's email
      */
-    public Configuration( String nodeName, String nodeType, String nodeAddress,
+    public Configuration( String nodeName, String nodeType, String shortAddress, String portNumber,
             String orgName, String orgAddress, String timeZone, String tempDir,
             String adminEmail ) {
         this.nodeName = nodeName;
         this.nodeType = nodeType;
-        this.nodeAddress = nodeAddress;
+        this.shortAddress = shortAddress;
+        this.portNumber = portNumber;
         this.orgName = orgName;
         this.orgAddress = orgAddress;
         this.timeZone = timeZone;
@@ -105,17 +120,41 @@ public class Configuration {
      */
     public void setNodeType( String nodeType ) { this.nodeType = nodeType; }
     /**
-     * Gets address of a node.
+     * Gets node's short address.
      *
-     * @return Address of a node
+     * @return Node's short address
      */
-    public String getNodeAddress() { return nodeAddress; }
+    public String getShortAddress() { return shortAddress; }
     /**
-     * Sets address of a node.
+     * Sets node's short address.
      *
-     * @param nodeAddress Address of a node
+     * @param shortAddress Node's short address
      */
-    public void setNodeAddress( String nodeAddress ) { this.nodeAddress = nodeAddress; }
+    public void setShortAddress( String shortAddress ) { this.shortAddress = shortAddress; }
+    /**
+     * Gets node's full address.
+     *
+     * @return Node's full address
+     */
+    public String getFullAddress() { return fullAddress; }
+    /**
+     * Sets node's full address.
+     *
+     * @param fullAddress Node's full address
+     */
+    public void setFullAddress( String fullAddress ) { this.fullAddress = fullAddress; }
+    /**
+     * Gets port number.
+     *
+     * @return Port number
+     */
+    public String getPortNumber() { return portNumber; }
+    /**
+     * Sets port number.
+     *
+     * @param portNumber Port number to set
+     */
+    public void setPortNumber( String portNumber ) { this.portNumber = portNumber; }
     /**
      * Gets host organization name.
      *

@@ -42,7 +42,12 @@ public class User {
     private String roleName;
     private String password;
     private String retPassword;
-    private String nodeAddress;
+    // Short node address, e.g. baltrad.imgw.pl (without port name and other stuff)
+    private String shortAddress;
+    // Full node address, e.g. http://baltrad.imgw.pl:8084/BaltradDex/dispatch.htm
+    private String fullAddress;
+    // Port number
+    private String portNumber;
     private String factory;
     private String country;
     private String city;
@@ -77,7 +82,8 @@ public class User {
      * @param roleName User role name
      * @param password Password
      * @param retPassword Password repeated
-     * @param nodeAddress User's local node address
+     * @param shortAddress User node's short address
+     * @param portNumber Port number
      * @param factory Name of the organization
      * @param country Country
      * @param city City
@@ -88,14 +94,15 @@ public class User {
      * @param email Contact email
      */
     public User( String name, String nameHash, String roleName, String password, String retPassword,
-            String nodeAddress, String factory, String country, String city, String cityCode,
-            String street, String number, String phone, String email ) {
+            String shortAddress, String portNumber, String factory, String country, String city,
+            String cityCode, String street, String number, String phone, String email ) {
         this.name = name;
         this.nameHash = nameHash;
         this.roleName = roleName;
         this.password = password;
         this.retPassword = retPassword;
-        this.nodeAddress = nodeAddress;
+        this.shortAddress = shortAddress;
+        this.portNumber = portNumber;
         this.factory = factory;
         this.country = country;
         this.city = city;
@@ -138,7 +145,6 @@ public class User {
     public String getName() {
         return name;
     }
-
     /**
      * Method sets user name.
      *
@@ -188,18 +194,42 @@ public class User {
     public void setRetPassword(String retPassword) {
         this.retPassword = retPassword;
     }
-    /**
-     * @return the nodeAddress
+   /**
+     * Gets node's short address.
+     *
+     * @return Node's short address
      */
-    public String getNodeAddress() {
-        return nodeAddress;
-    }
+    public String getShortAddress() { return shortAddress; }
     /**
-     * @param nodeAddress the nodeAddress to set
+     * Sets node's short address.
+     *
+     * @param shortAddress Node's short address
      */
-    public void setNodeAddress(String nodeAddress) {
-        this.nodeAddress = nodeAddress;
-    }
+    public void setShortAddress( String shortAddress ) { this.shortAddress = shortAddress; }
+    /**
+     * Gets node's full address.
+     *
+     * @return Node's full address
+     */
+    public String getFullAddress() { return fullAddress; }
+    /**
+     * Sets node's full address.
+     *
+     * @param fullAddress Node's full address
+     */
+    public void setFullAddress( String fullAddress ) { this.fullAddress = fullAddress; }
+    /**
+     * Gets port number.
+     *
+     * @return Port number
+     */
+    public String getPortNumber() { return portNumber; }
+    /**
+     * Sets port number.
+     *
+     * @param portNumber Port number to set
+     */
+    public void setPortNumber( String portNumber ) { this.portNumber = portNumber; }
     /**
      * @return the factory
      */

@@ -64,6 +64,21 @@ Author     : szewczenko
                             <div id="text-box">
                                 Select subscribed radar stations to be removed.
                             </div>
+                            <div id="text-box">
+                                <c:if test="${not empty active_subscription}">
+                                    <div class="message">
+                                        <div class="icon">
+                                            <img src="includes/images/icons/circle-delete.png"
+                                                 alt="active_subscription"/>
+                                        </div>
+                                        <div class="text">
+                                            <c:out value="${active_subscription}"/>
+                                            <c:set var="active_subscription" value=""
+                                                   scope="session"/>
+                                        </div>
+                                    </div>
+                                </c:if>
+                            </div>
                             <div id="table">
                                 <form action="showRemovedSubscriptions.htm">
                                     <display:table name="subscriptions" id="subscription" 

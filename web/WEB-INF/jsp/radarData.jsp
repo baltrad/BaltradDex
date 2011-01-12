@@ -27,12 +27,14 @@ Author     : szewczenko
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
 <%@ page import="java.util.List" %>
+<%@ page import="eu.baltrad.dex.bltdata.model.BltFile" %>
+
 <%
     // get channel name
     String name = request.getParameter( "channelName" );
     // Check if list of available subscriptions is not empty
-    List dataFromChannel = ( List )request.getAttribute( "data_from_channel" );
-    if( dataFromChannel == null || dataFromChannel.size() <= 0 ) {
+    List radarData = ( List )request.getAttribute( "data_from_radar" );
+    if( radarData == null || radarData.size() <= 0 ) {
         request.getSession().setAttribute( "data_status", 0 );
     } else {
         request.getSession().setAttribute( "data_status", 1 );
@@ -69,15 +71,16 @@ Author     : szewczenko
                                 Click on file name to download selected data file.
                             </div>
                             <div id="table">
-                                <display:table name="data_from_channel" id="data" defaultsort="1"
+                                <display:table name="data_from_radar" id="data" defaultsort="0"
                                     requestURI="radarData.htm" cellpadding="0" cellspacing="2"
-                                    export="false" class="tableborder" pagesize="10" sort="list"
-                                    defaultorder="descending">
-                                    <display:column sortProperty="date" sortable="true"
-                                        title="Date" class="tdcenter" value="${data.date}">
+                                    export="false" class="tableborder" pagesize="10">
+                                    <display:column sortable="false" title="Date" paramId="timeStamp"
+                                        paramProperty="timeStamp" class="tdcenter"
+                                        value="${data.timeStamp}" format="{0,date,yyyy-MM-dd}">
                                     </display:column>
-                                    <display:column sortProperty="time" sortable="true"
-                                        title="Time" class="tdcenter" value="${data.time}">
+                                    <display:column sortable="false" title="Time" paramId="timeStamp"
+                                        paramProperty="timeStamp" class="tdcenter"
+                                        value="${data.timeStamp}" format="{0,date,HH:mm:ss}">
                                     </display:column>
                                     <display:column sortProperty="object" sortable="true"
                                         title="Data type" class="tdcenter" value="${data.type}">
@@ -86,10 +89,10 @@ Author     : szewczenko
                                         paramId="uuid" paramProperty="uuid"
                                         class="tdcheck" href="fileDetails.htm" value="View">
                                     </display:column>
-                                    <display:column sortProperty="path" sortable="false"
-                                        paramId="path" paramProperty="path" title="File"
-                                        class="tdcheck" href="download.htm"
-                                        value="Download">
+                                    <display:column href="download.htm" paramId="path"
+                                        paramProperty="path" class="tdimage"
+                                        sortable="false" title="Download">
+                                        <img src="${data.thumbPath}" alt="no_thumb">
                                     </display:column>
                                 </display:table>
                             </div>

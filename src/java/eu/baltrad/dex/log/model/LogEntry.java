@@ -31,7 +31,7 @@ import java.util.Date;
  * @version 1.0
  * @since 1.0
  */
-public class LogEntry implements Serializable, Comparable< LogEntry > {
+public class LogEntry implements Serializable, Comparable<LogEntry> {
 //------------------------------------------------------------------------------------------- Fields
     // Log entry ID
     private int id;
@@ -57,6 +57,15 @@ public class LogEntry implements Serializable, Comparable< LogEntry > {
         this.timeStamp = timeStamp;
         this.type = type;
         this.message = message;
+    }
+    /**
+     * Method implementing comparable interface. Allows to sort log entries based on date and time.
+     *
+     * @param Log entry to compare with current entry
+     * @return 0 if objects are equal, 1 if current entry is later than compared entry, -1 otherwise
+     */
+    public int compareTo( LogEntry logEntry ) {
+        return -this.getTimeStamp().compareTo( logEntry.getTimeStamp() );
     }
     /**
      * Method gets log entry ID.
@@ -106,14 +115,5 @@ public class LogEntry implements Serializable, Comparable< LogEntry > {
      * @param message Log entry message
      */
     public void setMessage( String message ) { this.message = message; }
-    /**
-     * Method implementing comparable interface. Allows to sort log entries based on date and time.
-     *
-     * @param Log entry to compare with current entry
-     * @return 0 if objects are equal, 1 if current entry is later than compared entry, -1 otherwise
-     */
-    public int compareTo( LogEntry logEntry ) {
-        return -this.getTimeStamp().compareTo( logEntry.getTimeStamp() );
-    }
 }
 //--------------------------------------------------------------------------------------------------

@@ -22,7 +22,6 @@
 package eu.baltrad.dex.core.util;
 
 import eu.baltrad.dex.core.model.NodeConnection;
-import eu.baltrad.dex.util.WebUtil;
 
 import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
@@ -56,23 +55,26 @@ public class NodeConnectionValidator implements Validator {
         NodeConnection conn = ( NodeConnection )command;
         if( conn == null ) return;
         if( conn.getConnectionName() == null ) {
-
-            if( conn.getNodeAddress() == null &&
+            if( conn.getFullAddress() == null &&
                 conn.getUserName() == null &&
                 conn.getPassword() == null ) {
-
                 ValidationUtils.rejectIfEmptyOrWhitespace( errors, "connectionName",
                     "error.field.required" );
-
             } else {
-                if( conn.getNodeAddress().isEmpty() ) {
-                    ValidationUtils.rejectIfEmptyOrWhitespace( errors, "nodeAddress",
-                        "error.field.required" );
+                boolean isValidPortNumber = false;
+                try {
+                    int port = Integer.parseInt( conn.getPortNumber() );
+                    isValidPortNumber = true;
+                } catch( NumberFormatException e ) {
+                    isValidPortNumber = false;
+                } catch( Exception e ) {
+                    isValidPortNumber = false;
                 }
-                //if( conn.getNodeAddress().trim().length() > 0 &&
-                //        !WebUtil.validateWebAddress( conn.getNodeAddress() ) ) {
-                //    errors.rejectValue( "nodeAddress", "error.field.nodeaddress.invalid" );
-                //}
+                if( conn.getShortAddress().isEmpty() || conn.getPortNumber().isEmpty() ||
+                        !isValidPortNumber ) {
+                    ValidationUtils.rejectIfEmptyOrWhitespace( errors, "fullAddress",
+                        "error.address.invalid" );
+                }
                 if( conn.getUserName().isEmpty() ) {
                     ValidationUtils.rejectIfEmptyOrWhitespace( errors, "userName",
                         "error.field.required" );

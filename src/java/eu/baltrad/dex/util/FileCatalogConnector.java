@@ -43,13 +43,29 @@ public class FileCatalogConnector {
     private static final String PROPS_FILE_NAME = "dex.fc.properties";
     // Database URI property
     private static final String DB_URI_PROP = "database.uri";
-    // File catalog storage directory
-    private static final String STORAGE_DIR_PROP = "storage.dir";
+    // File catalog storage folder
+    private static final String DATA_STORAGE_FOLDER_PROP = "data.storage.folder";
+    // Image storage folder
+    private static final String IMAGE_STORAGE_FOLDER_PROP = "image.storage.folder";
+    // Image thumbs storage folder
+    private static final String THUMBS_STORAGE_FOLDER_PROP = "thumbs.storage.folder";
 //---------------------------------------------------------------------------------------- Variables
     // Reference to FileCatalog object
     private static FileCatalog fileCatalog;
     // Reference to LogManager object
     private LogManager logManager;
+    // Data storage folder
+    private static String dataStorageFolder;
+    // Image storage folder
+    private static String imageStorageFolder;
+    // Thumbs storage folder
+    private static String thumbsStorageFolder;
+    // Data storage directory path
+    private static String dataStorageDirectory;
+    // Image storage directory
+    private static String imageStorageDirectory;
+    // Thumbs storage directory
+    private static String thumbsStorageDirectory;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
@@ -63,23 +79,26 @@ public class FileCatalogConnector {
             Properties props = new Properties();
             if( is != null ) {
                 props.load( is );
-                String storageFolder = props.getProperty( STORAGE_DIR_PROP );
+                // get db URI
                 String dbURI = props.getProperty( DB_URI_PROP );
-                // Check if storage folder is relative or absolute path
-                String storageDir = null;
-                if( storageFolder.startsWith( File.separator ) ) {
-                    storageDir = storageFolder;
-                } else {
-                    storageDir = ServletContextUtil.getServletContextPath() + storageFolder;
-                }
-                File f = new File( storageDir );
-                if( !f.exists() ) {
-                    f.mkdirs();
-                    logManager.addEntry( new Date(), LogManager.MSG_WRN, "New storage directory " +
-                            "initialized: " + storageDir );
+                // initialize storage folders
+                dataStorageFolder = props.getProperty( DATA_STORAGE_FOLDER_PROP );
+                imageStorageFolder = props.getProperty( IMAGE_STORAGE_FOLDER_PROP );
+                thumbsStorageFolder = imageStorageFolder + File.separator
+                        + props.getProperty( THUMBS_STORAGE_FOLDER_PROP );
 
-                }
-                fileCatalog = new FileCatalog( dbURI, storageDir );
+                // create data storage directory
+                dataStorageDirectory = createDir( props.getProperty( DATA_STORAGE_FOLDER_PROP ),
+                        "New data storage directory created" );
+                // create image storage directory
+                imageStorageDirectory = createDir( props.getProperty( IMAGE_STORAGE_FOLDER_PROP ),
+                        "New image storage directory created" );
+                // create thumbs storage directory
+                thumbsStorageDirectory = createDir( thumbsStorageFolder, "New thumbs storage "
+                        + "directory created" );
+
+                // initialize file catalog
+                fileCatalog = new FileCatalog( dbURI, dataStorageDirectory );
                 logManager.addEntry( new Date(), LogManager.MSG_INFO,
                         "File catalog successfully initialized" );
             } else {
@@ -93,6 +112,32 @@ public class FileCatalogConnector {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "File catalog error: " +
                     e.getMessage() );
         }
+    }
+    /**
+     * Creates new storage directory. 
+     * 
+     * @param folder Either relative or absolute path to the folder that is to be created
+     * @param msg Message to display
+     * @return Name of the directory created
+     */
+    public String createDir( String folder, String msg ) {
+        String dir = "";
+        // Check if folder is relative or absolute path
+        if( folder.startsWith( File.separator ) ) {
+            dir = folder;
+        } else {
+            dir = ServletContextUtil.getServletContextPath() + folder;
+        }
+        File f = new File( dir );
+        if( !f.exists() ) {
+            if( f.mkdirs() ) {
+                logManager.addEntry( new Date(), LogManager.MSG_WRN, msg + ": " + dir );
+            } else {
+                logManager.addEntry( new Date(), LogManager.MSG_WRN,  "Failed to create "
+                        + "directory: " + dir );
+            }
+        }
+        return dir;
     }
     /**
      * Method initializes storage directory and connects to the database.
@@ -112,5 +157,89 @@ public class FileCatalogConnector {
      * @param fc Reference to file catalog object
      */
     public static void setFileCatalog( FileCatalog fc ) { fileCatalog = fc; }
+    /**
+     * Gets data storage folder.
+     *
+     * @return Data storage folder
+     */
+    public static String getDataStorageFolder() { return dataStorageFolder; }
+    /**
+     * Sets data storage folder.
+     *
+     * @param dataStorageFolder Data storage folder to set
+     */
+    public static void setDataStorageFolder( String _dataStorageFolder ) {
+        dataStorageFolder = _dataStorageFolder;
+    }
+    /**
+     * Gets image storage folder.
+     *
+     * @return Image storage folder
+     */
+    public static String getImageStorageFolder() { return imageStorageFolder; }
+    /**
+     * Sets image storage folder.
+     *
+     * @param imageStorageFolder Image storage folder to set
+     */
+    public static void setImageStorageFolder( String _imageStorageFolder ) {
+        imageStorageFolder = _imageStorageFolder;
+    }
+    /**
+     * Gets thumbs storage folder.
+     *
+     * @return Thumbs storage folder
+     */
+    public static String getThumbsStorageFolder() { return thumbsStorageFolder; }
+    /**
+     * Sets thumbs storage folder.
+     *
+     * @param thumbsStorageFolder Thumbs storage folder to set
+     */
+    public static void setThumbsStorageFolder( String _thumbsStorageFolder ) {
+        thumbsStorageFolder = _thumbsStorageFolder;
+    }
+    /**
+     * Gets data storage directory.
+     *
+     * @return Data storage directory
+     */
+    public static String getDataStorageDirectory() { return dataStorageDirectory; }
+    /**
+     * Sets data storage directory.
+     *
+     * @param dataStorageDirectory Data storage directory to set
+     */
+    public static void setDataStorageDirectory( String _dataStorageDirectory ) {
+        dataStorageDirectory = _dataStorageDirectory;
+    }
+    /**
+     * Gets image storage directory.
+     *
+     * @return Image storage directory
+     */
+    public static String getImageStorageDirectory() { return imageStorageDirectory; }
+    /**
+     * Sets image storage directory.
+     *
+     * @param imageStorageDirectory Image storage directory to set
+     */
+    public static void setImageStorageDirectory( String _imageStorageDirectory ) {
+        imageStorageDirectory = _imageStorageDirectory;
+    }
+    /**
+     * Gets thumbs storage directory.
+     *
+     * @return Thumbs storage directory
+     */
+    public static String getThumbsStorageDirectory() { return thumbsStorageDirectory; }
+    /**
+     * Sets thumbs storage directory.
+     *
+     * @param thumbsStorageDirectory Thumbs storage directory to set
+     */
+    public static void setThumbsStorageDirectory( String _thumbsStorageDirectory ) {
+        thumbsStorageDirectory = _thumbsStorageDirectory;
+    }
 }
 //--------------------------------------------------------------------------------------------------

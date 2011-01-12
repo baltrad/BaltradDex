@@ -32,9 +32,12 @@ Author     : szewczenko
     if( remoteChannels == null ) {
         // remote node is unavailable
         request.getSession().setAttribute( "remote_node_status", 0 );
+    } else if( remoteChannels.size() == 0 ) {
+        // remote node is available, but no permissions on radars have been set
+        request.getSession().setAttribute( "remote_node_status", 1 );
     } else {
         // remote node is available
-        request.getSession().setAttribute( "remote_node_status", 1 );
+        request.getSession().setAttribute( "remote_node_status", 2 );
     }
     // Get remote node name
     String remoteNodeName = ( String )request.getAttribute( "sender_node_name" );
@@ -69,7 +72,7 @@ Author     : szewczenko
                         </div>
                     </div>
                     <c:choose>
-                        <c:when test="${remote_node_status == 1}">
+                        <c:when test="${remote_node_status == 2}">
                             <div id="text-box">
                                 List of remote radar stations. 
                                 Subscribe a desired remote radar station by selecting
@@ -104,6 +107,21 @@ Author     : szewczenko
                                         </div>
                                     </div>
                                 </form>
+                            </div>
+                        </c:when>
+                        <c:when test="${remote_node_status == 1}">
+                            <div class="message">
+                                <div class="icon">
+                                    <img src="includes/images/icons/circle-alert.png"
+                                         alt="no_data"/>
+                                </div>
+                                <div class="text">
+                                    You have successfully connected to the remote node, but you 
+                                    don't seem to be allowed to subscribe radars at this node.
+                                    <br><br>
+                                    Ask remote node administrator to make radars available for
+                                    you to subscribe.
+                                </div>
                             </div>
                         </c:when>
                         <c:otherwise>

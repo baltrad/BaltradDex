@@ -43,9 +43,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <props>
                 <prop key="home.htm">statusController</prop>
                 <prop key="radars.htm">channelController</prop>
-                <prop key="radarData.htm">channelDataController</prop>
-                <prop key="fileDetails.htm">fileDetailsController</prop>
+                <prop key="radarData.htm">bltRadarDataController</prop>
+                <prop key="fileDetails.htm">bltFileDetailsController</prop>
                 <prop key="credits.htm">urlFilenameController</prop>
+                <prop key="imagePreview.htm">bltImagePreviewController</prop>
             </props>
         </property>
     </bean>
@@ -65,7 +66,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="remoteRadars.htm">remoteChannelController</prop>
                 <prop key="selectedRemoteRadars.htm">remoteChannelController</prop>
                 <prop key="subscribedRemoteRadars.htm">remoteChannelController</prop>
-                <prop key="download.htm">downloadController</prop>
+                <prop key="download.htm">bltFileDownloadController</prop>
                 <prop key="showSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSelectedSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSubscriptionStatus.htm">subscriptionController</prop>
@@ -137,6 +138,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="showRemovedNodeConnections.htm">nodeConnectionController</prop>
 
                 <prop key="setPermission.htm">setPermissionController</prop>
+
+                <prop key="selectRadar.htm">configureChannelController</prop>
+
             </props>
         </property>
     </bean>
@@ -280,10 +284,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Data from data channel controller.
     -->
-    <bean name="channelDataController"
-        class="eu.baltrad.dex.channel.controller.ChannelDataController">
-        <property name="dataManager">
-            <ref bean="dataManager" />
+    <bean name="bltRadarDataController"
+        class="eu.baltrad.dex.bltdata.controller.BltRadarDataController">
+        <property name="bltFileManager">
+            <ref bean="bltFileManager" />
         </property>
         <property name="successView">
             <value>radarData</value>
@@ -293,13 +297,25 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Data from data channel controller.
     -->
-    <bean name="fileDetailsController"
-        class="eu.baltrad.dex.data.controller.FileDetailsController">
-        <property name="dataManager">
-            <ref bean="dataManager" />
+    <bean name="bltFileDetailsController"
+        class="eu.baltrad.dex.bltdata.controller.BltFileDetailsController">
+        <property name="bltDataProcessor">
+            <ref bean="bltDataProcessor"/>
+        </property>
+        <property name="bltDataProjector">
+            <ref bean="bltDataProjector"/>
+        </property>
+        <property name="bltFileManager">
+            <ref bean="bltFileManager" />
+        </property>
+        <property name="bltDataProcessorController">
+            <ref bean="bltDataProcessorController"/>
         </property>
         <property name="successView">
             <value>fileDetails</value>
+        </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
         </property>
     </bean>
 
@@ -349,7 +365,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Data download controller.
     -->
-    <bean name="downloadController" class="eu.baltrad.dex.channel.controller.DownloadController">
+    <bean name="bltFileDownloadController"
+            class="eu.baltrad.dex.bltdata.controller.BltFileDownloadController">
         <property name="successView">
             <value>radarData</value>
         </property>
@@ -376,7 +393,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Data manager.
     -->
-    <bean name="dataManager" class="eu.baltrad.dex.data.model.DataManager"/>
+    <bean name="bltFileManager" class="eu.baltrad.dex.bltdata.model.BltFileManager"/>
 
     <!--
         Subscription manager.
@@ -408,6 +425,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="messageManager">
             <ref bean="bltmanager"/>
+        </property>
+        <property name="bltDataProcessorController">
+            <ref bean="bltDataProcessorController"/>
         </property>
     </bean>
 
@@ -452,8 +472,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="userManager">
             <ref bean="userManager"/>
         </property>
-        <property name="dataManager">
-            <ref bean="dataManager" />
+        <property name="bltFileManager">
+            <ref bean="bltFileManager" />
         </property>
     </bean>
 
@@ -520,6 +540,17 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="logManager"/>
         </property>
     </bean>
+
+    <!--
+        Configure data channel controller
+    -->
+    <bean name="configureChannelController"
+        class="eu.baltrad.dex.channel.controller.ConfigureChannelController">
+        <property name="channelManager">
+            <ref bean="channelManager"/>
+        </property>
+    </bean>
+
 
     <!--
         Add channel controller - registers new data channel in the system
@@ -719,6 +750,52 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="logManager">
             <ref bean="logManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Data processor model.
+    -->
+    <bean name="bltDataProcessor"
+        class="eu.baltrad.dex.bltdata.model.BltDataProcessor">
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Data projector model.
+    -->
+    <bean name="bltDataProjector"
+        class="eu.baltrad.dex.bltdata.model.BltDataProjector">
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Data processor controller.
+    -->
+    <bean name="bltDataProcessorController"
+            class="eu.baltrad.dex.bltdata.controller.BltDataProcessorController">
+        <property name="bltDataProcessor">
+            <ref bean="bltDataProcessor"/>
+        </property>
+    </bean>
+
+    <!--
+        Image preview cpontroller.
+    -->
+    <bean name="bltImagePreviewController"
+            class="eu.baltrad.dex.bltdata.controller.BltImagePreviewController">
+        <property name="successView">
+            <value>imagePreview</value>
+        </property>
+        <property name="bltDataProcessor">
+            <ref bean="bltDataProcessor"/>
+        </property>
+        <property name="bltDataProcessorController">
+            <ref bean="bltDataProcessorController"/>
         </property>
     </bean>
 

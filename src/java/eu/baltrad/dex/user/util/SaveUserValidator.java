@@ -63,7 +63,6 @@ public class SaveUserValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "retPassword", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "nodeAddress", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "factory", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "country", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "city", "error.field.required" );
@@ -83,10 +82,20 @@ public class SaveUserValidator implements Validator {
             errors.rejectValue( "password", "error.field.passwd.tooshort" );
         }
         // validate node address
-        /*if( user.getNodeAddress().trim().length() > 0
-                && !WebUtil.validateWebAddress( user.getNodeAddress() ) ) {
-            errors.rejectValue( "nodeAddress", "error.field.nodeaddress.invalid" );
-        }*/
+        boolean isValidPortNumber = false;
+        try {
+            int port = Integer.parseInt( user.getPortNumber() );
+            isValidPortNumber = true;
+        } catch( NumberFormatException e ) {
+            isValidPortNumber = false;
+        } catch( Exception e ) {
+            isValidPortNumber = false;
+        }
+        if( user.getShortAddress().isEmpty() || user.getPortNumber().isEmpty() ||
+                !isValidPortNumber ) {
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "fullAddress",
+                "error.address.invalid" );
+        }
         // validate email address
         if( user.getEmail().trim().length() > 0 && !WebUtil.validateEmailAddress( user.getEmail() ) ) {
             errors.rejectValue( "email", "error.field.email.invalid" );

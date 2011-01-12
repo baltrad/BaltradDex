@@ -23,7 +23,7 @@ package eu.baltrad.dex.register.controller;
 
 import eu.baltrad.dex.register.model.DeliveryRegisterEntry;
 import eu.baltrad.dex.register.model.DeliveryRegisterManager;
-import eu.baltrad.dex.data.model.DataManager;
+import eu.baltrad.dex.bltdata.model.BltFileManager;
 import eu.baltrad.dex.user.model.UserManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,7 +57,7 @@ public class RegisterController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Variables
     private String successView;
     private DeliveryRegisterManager deliveryRegisterManager;
-    private DataManager dataManager;
+    private BltFileManager bltFileManager;
     private UserManager userManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -142,16 +142,18 @@ public class RegisterController extends MultiActionController {
      */
     public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
     /**
-     * Method returns reference to data manager object.
+     * Method returns reference to file manager object.
      *
-     * @return Reference to data manager object
+     * @return Reference to file manager object
      */
-    public DataManager getDataManager() { return dataManager; }
+    public BltFileManager getBltFileManager() { return bltFileManager; }
     /**
-     * Method sets reference to data manager object.
+     * Method sets reference to file manager object.
      *
-     * @param Reference to data manager object
+     * @param Reference to file manager object
      */
-    public void setDataManager( DataManager dataManager ) { this.dataManager = dataManager; }
+    public void setBltFileManager( BltFileManager bltFileManager ) {
+        this.bltFileManager = bltFileManager;
+    }
 }
 //--------------------------------------------------------------------------------------------------

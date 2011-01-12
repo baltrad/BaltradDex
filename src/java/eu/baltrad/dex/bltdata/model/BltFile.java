@@ -19,49 +19,62 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.data.model;
+package eu.baltrad.dex.bltdata.model;
+
+import java.io.Serializable;
+
+import java.util.Date;
 
 /**
- * Class implements radar data object.
+ * Class implements Baltrad file object.
  *
  * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
  * @version 1.0
  * @since 1.0
  */
-public class Data {
+public class BltFile implements Serializable, Comparable<BltFile> {
 //---------------------------------------------------------------------------------------- Variables
     private String uuid;
     private String path;
-    private String timeStamp;
+    private Date timeStamp;
+    private Date storageTime;
     private String radarName;
-    private String date;
-    private String time;
     private String type;
+    private String thumbPath;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Default constructor.
      */
-    public Data(){}
+    public BltFile(){}
     /**
      * Constructor.
      *
      * @param uuid Data file's identity string
      * @param path Data file's absolute path
      * @param timeStamp Data file's time stamp
+     * @param storageTime Time when the data was stored
      * @param radarName Radar station name
-     * @param date Date string
-     * @param time Time string
      * @param type Radar data type
+     * @param thumbPath Image thumb's absolute path
      */
-    public Data( String uuid, String path, String timeStamp, String radarName, String date,
-            String time, String type ) {
+    public BltFile( String uuid, String path, Date timeStamp, Date storageTime, String radarName,
+            String type, String thumbPath ) {
         this.uuid = uuid;
         this.path = path;
         this.timeStamp = timeStamp;
+        this.storageTime = storageTime;
         this.radarName = radarName;
-        this.date = date;
-        this.time = time;
         this.type = type;
+        this.thumbPath = thumbPath;
+    }
+    /**
+     * Method implementing comparable interface. Allows to sort files based on date and time.
+     *
+     * @param File to compare with current file
+     * @return 0 if objects are equal, 1 if current file is later than compared entry, -1 otherwise
+     */
+    public int compareTo( BltFile bltFile ) {
+        return -this.getTimeStamp().compareTo( bltFile.getTimeStamp() );
     }
     /**
      * Method gets file's identity string.
@@ -100,41 +113,29 @@ public class Data {
      */
     public void setPath( String path ) { this.path = path; }
     /**
-     * Method gets date.
-     *
-     * @return Date
-     */
-    public String getDate() { return date; }
-    /**
-     * Method sets date.
-     *
-     * @param date Date
-     */
-    public void setDate( String date ) { this.date = date; }
-    /**
-     * Method gets time.
-     *
-     * @return Time
-     */
-    public String getTime() { return time; }
-    /**
-     * Method sets time.
-     *
-     * @param time Time
-     */
-    public void setTime( String time ) { this.time = time; }
-    /**
      * Gets data file's time stamp.
      *
      * @return Data file's time stamp
      */
-    public String getTimeStamp() { return timeStamp; }
+    public Date getTimeStamp() { return timeStamp; }
     /**
      * Sets data file's time stamp.
      *
      * @param timeStamp Data file's time stamp
      */
-    public void setTimeStamp( String timeStamp ) { this.timeStamp = timeStamp; }
+    public void setTimeStamp( Date timeStamp ) { this.timeStamp = timeStamp; }
+    /**
+     * Gets data file's storage time.
+     *
+     * @return Data file's storage time
+     */
+    public Date getStorageTime() { return storageTime; }
+    /**
+     * Sets data file's storage time.
+     *
+     * @param storageTime Data file's storage time
+     */
+    public void setStorageTime( Date storageTime ) { this.storageTime = storageTime; }
     /**
      * Gets data type.
      *
@@ -147,5 +148,17 @@ public class Data {
      * @param type Data type
      */
     public void setType( String type ) { this.type = type; }
+    /**
+     * Gets image thumb's absolute path.
+     *
+     * @return Image thumb's absolute path
+     */
+    public String getThumbPath() { return thumbPath; }
+    /**
+     * Sets image thumb's absolute path.
+     *
+     * @param thumbPath Image thumb's absolute path to set
+     */
+    public void setThumbPath( String thumbPath ) { this.thumbPath = thumbPath; }
 }
 //--------------------------------------------------------------------------------------------------

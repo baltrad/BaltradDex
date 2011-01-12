@@ -58,7 +58,7 @@ Author     : szewczenko
                                 <div class="left">
                                     <div class="row">Node name</div>
                                     <div class="row">Node type</div>
-                                    <div class="row">Node HTTP address</div>
+                                    <div class="row">Node address</div>
                                     <div class="row">Organization</div>
                                     <div class="row">Address</div>
                                     <div class="row">Local time zone</div>
@@ -87,9 +87,12 @@ Author     : szewczenko
                                                      cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.nodeAddress"/>
-                                        <form:errors path="command.nodeAddress"
-                                                     cssClass="errors"/>
+                                        <div class="row-elem">
+                                            http://<form:input path="command.shortAddress"
+                                            cssClass="shortAddress"/>:<form:input
+                                            path="command.portNumber" cssClass="portNumber"/>
+                                        </div>
+                                        <form:errors path="command.fullAddress" cssClass="errors"/>
                                     </div>
                                     <div class="row">
                                         <form:input path="command.orgName"/>
