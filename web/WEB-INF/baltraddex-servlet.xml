@@ -138,9 +138,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="showRemovedNodeConnections.htm">nodeConnectionController</prop>
 
                 <prop key="setPermission.htm">setPermissionController</prop>
-
-                <prop key="selectRadar.htm">configureChannelController</prop>
-
             </props>
         </property>
     </bean>
@@ -542,17 +539,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!--
-        Configure data channel controller
-    -->
-    <bean name="configureChannelController"
-        class="eu.baltrad.dex.channel.controller.ConfigureChannelController">
-        <property name="channelManager">
-            <ref bean="channelManager"/>
-        </property>
-    </bean>
-
-
-    <!--
         Add channel controller - registers new data channel in the system
     -->
     <bean name="saveChannelController" 
@@ -890,8 +876,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- and the file catalog -->
     <bean id="fc" class="eu.baltrad.fc.FileCatalog">
   	    <constructor-arg value="${database.uri}" />
-            <!--constructor-arg value="${storage.dir}" /-->
-            <constructor-arg value="/tmp" />
+        <constructor-arg value="${data.storage.folder}" />
     </bean>
     
     <!-- and the abstraction of the catalog -->

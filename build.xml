@@ -197,20 +197,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="lib/proj4">
         <include name="*.jar"/>
       </fileset>
-
-      <fileset dir="${javahdf.path}/lib">
-        <include name="jhdf5.jar"/>
-      </fileset>
-      <fileset dir="${javahdf.path}/lib">
-        <include name="jhdf5obj.jar"/>
-      </fileset>
-      <fileset dir="${javahdf.path}/lib">
-        <include name="jhdf.jar"/>
-      </fileset>
-      <fileset dir="${javahdf.path}/lib">
-        <include name="jhdfobj.jar"/>
-      </fileset>
-
       <fileset dir="lib">
         <include name="postgresql-8.4-701.jdbc4.jar"/>
         <include name="apache-mime4j-0.6.jar"/>
