@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Creates a composite route
-@date 2010-05-13
+Modifies/deletes a volume route
+@date 2011-01-05
 @author Anders Henja
 --------------------------------------------------------------------------------------------------%>
 
@@ -53,11 +53,11 @@ Creates a composite route
                         </div>
                     </div>
                     <div id="text-box">
-                        Create a Composite routing rule.
+                        Modify/delete a volume routing rule.
                     </div>
                     <div id="table">
                         <div class="props">
-                            <form name="createRouteForm" action="compositeroute_create.htm">
+                            <form name="showRouteForm" action="volumeroute_show.htm">
                                 <div class="left">
                                     <%
                                         List<String> adaptors = (List<String>)request.getAttribute("adaptors");
@@ -68,30 +68,34 @@ Creates a composite route
                                         String author = (String)request.getAttribute("author");
                                         Boolean active = (Boolean)request.getAttribute("active");
                                         String description = (String)request.getAttribute("description");
-                                        Boolean byscan = (Boolean)request.getAttribute("byscan");
+                                        Boolean ascending = (Boolean)request.getAttribute("ascending");
+                                        Double mine = (Double)request.getAttribute("mine");
+                                        Double maxe = (Double)request.getAttribute("maxe");
                                         List<String> recipients = (List<String>)request.getAttribute("recipients");
-                                        String areaid = (String)request.getAttribute("areaid");
                                         Integer interval = (Integer)request.getAttribute("interval");
                                         Integer timeout = (Integer)request.getAttribute("timeout");
                                         List<String> sources = (List<String>)request.getAttribute("sources");
 
                                         String activestr = (active == true)?"checked":"";
-                                        String byscanstr = (byscan == true)?"checked":"";
-                                    %>
+                                        String ascendingstr = (ascending == true)?"checked":"";
+                                        
+                                      %>
                                     <div class="row">Name</div>
                                     <div class="row">Author</div>
                                     <div class="row">Active</div>
                                     <div class="row">Description</div>
-                                    <div class="row">Scan based</div>
+                                    <div class="row">Ascending</div>
+                                    <div class="row">Min elevation</div>
+                                    <div class="row">Max elevation</div>
                                     <div class="row4">Recipients</div>
-                                    <div class="row">Areaid</div>
                                     <div class="row">Interval</div>
                                     <div class="row">Timeout</div>
                                     <div class="row6">Sources</div>
                                 </div>
                                 <div class="right">
                                     <div class="row">
-                                        <input type="text" name="name" value="<%=name%>"/>
+                                        <input type="text" name="name" value="<%=name%>" disabled/>
+                                        <input type="hidden" name="name" value="<%=name%>"/>
                                     </div>
                                     <div class="row">
                                         <input type="text" name="author" value="<%=author%>"/>
@@ -103,7 +107,13 @@ Creates a composite route
                                         <input type="text" name="description" value="<%=description%>"/>
                                     </div>
                                     <div class="row">
-                                        <input type="checkbox" name="byscan" <%=byscanstr%>/>
+                                        <input type="checkbox" name="ascending" <%=ascendingstr%>/>
+                                    </div>                                    
+                                    <div class="row">
+                                        <input type="text" name="mine" value="<%=mine%>"/>
+                                    </div>
+                                    <div class="row">
+                                        <input type="text" name="maxe" value="<%=maxe%>"/>
                                     </div>
                                     <div class="row4">
                                         <select multiple size="4" name="recipients">
@@ -119,9 +129,6 @@ Creates a composite route
                                           }
                                         %>
                                         </select>
-                                    </div>
-                                    <div class="row">
-                                        <input type="text" name="areaid" value="<%=areaid%>"/>
                                     </div>
                                     <div class="row">
                                         <select name="interval">
@@ -159,8 +166,11 @@ Creates a composite route
                                 </div>
                                 <div class="footer">
                                     <div class="right">
-                                        <button class="rounded" type="submit">
-                                            <span>Add</span>
+                                        <button class="rounded" name="submitButton" type="submit" value="Modify">
+                                            <span>Modify</span>
+                                        </button>
+                                        <button class="rounded" name="submitButton" type="submit" value="Delete">
+                                            <span>Delete</span>
                                         </button>
                                     </div>
                                 </div>
@@ -168,7 +178,7 @@ Creates a composite route
                         </div>
                     </div>
                     <%if (request.getAttribute("emessage") != null) {%>
-                        <div class="routererror"><%=request.getAttribute("emessage")%></div>
+                            <div class="routererror"><%=request.getAttribute("emessage")%></div>
                     <%}%>
                 </div>
                 <div id="clear"></div>

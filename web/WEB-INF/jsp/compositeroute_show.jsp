@@ -84,11 +84,11 @@ Creates a composite route
                                     <div class="row">Active</div>
                                     <div class="row">Description</div>
                                     <div class="row">Scan based</div>
-                                    <div class="row">Recipients</div>
+                                    <div class="row4">Recipients</div>
                                     <div class="row">Areaid</div>
                                     <div class="row">Interval</div>
                                     <div class="row">Timeout</div>
-                                    <div class="row">Sources</div>
+                                    <div class="row6">Sources</div>
                                 </div>
                                 <div class="right">
                                     <div class="row">
@@ -107,7 +107,7 @@ Creates a composite route
                                     <div class="row">
                                         <input type="checkbox" name="byscan" <%=byscanstr%>/>
                                     </div>                                    
-                                    <div class="row">
+                                    <div class="row4">
                                         <select multiple size="4" name="recipients">
                                         <%
                                           for (String adaptor : adaptors) {
@@ -143,7 +143,7 @@ Creates a composite route
                                     <div class="row">
                                         <input type="text" name="timeout" value="<%=timeout%>"/>
                                     </div>
-                                    <div class="row">
+                                    <div class="row6">
                                         <select multiple size="6" name="sources">
                                         <%
                                           for (String id : sourceids) {

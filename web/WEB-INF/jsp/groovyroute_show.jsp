@@ -75,7 +75,7 @@ Modifies a groovy route
                                     <div class="row">Author</div>
                                     <div class="row">Active</div>
                                     <div class="row">Description</div>
-                                    <div class="row">Recipients</div>
+                                    <div class="row4">Recipients</div>
                                     <div class="row">Script</div>
                                 </div>
                                 <div class="right">
@@ -92,7 +92,7 @@ Modifies a groovy route
                                     <div class="row">
                                         <input type="text" name="description" value="<%=description%>"/>
                                     </div>
-                                    <div class="row">
+                                    <div class="row4">
                                         <select multiple size="4" name="recipients">
                                         <%
                                           for (String adaptor : adaptors) {

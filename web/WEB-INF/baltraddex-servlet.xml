@@ -779,12 +779,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- Create the router -->
     <bean id="groovymgr" class="eu.baltrad.beast.rules.groovy.GroovyRuleManager" autowire="byType"/>
     <bean id="bltcompositemgr" class="eu.baltrad.beast.rules.composite.CompositingRuleManager" autowire="byType"/>
+    <bean id="bltvolumemgr" class="eu.baltrad.beast.rules.volume.VolumeRuleManager" autowire="byType"/>
   
     <bean id="router" class="eu.baltrad.beast.router.impl.BltRouter" autowire="byType">
         <property name="ruleManagers">
             <map>
                 <entry key="groovy" value-ref="groovymgr"/>
                 <entry key="blt_composite" value-ref="bltcompositemgr"/>
+                <entry key="blt_volume" value-ref="bltvolumemgr"/>
             </map>
         </property>
     </bean>
@@ -827,6 +829,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="adaptorsController" class="eu.baltrad.beastui.web.controller.AdaptorsController" autowire="byType" />
     <bean id="groovyRoutesController" class="eu.baltrad.beastui.web.controller.GroovyRoutesController" autowire="byType" />
     <bean id="compositeRoutesController" class="eu.baltrad.beastui.web.controller.CompositeRoutesController" autowire="byType" />
+    <bean id="volumeRoutesController" class="eu.baltrad.beastui.web.controller.VolumeRoutesController" autowire="byType" />
     <bean id="showRoutesController" class="eu.baltrad.beastui.web.controller.ShowRoutesController" autowire="byType" />
     
     <bean id="schedulerController" class="eu.baltrad.beastui.web.controller.SchedulerController" autowire="byType" />

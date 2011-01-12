@@ -81,6 +81,8 @@ public class ShowRoutesController {
       return "redirect:groovyroute_create.htm";
     } else if (operation != null && operation.equals("Composite")) {
       return "redirect:compositeroute_create.htm";
+    } else if (operation != null && operation.equals("Volume")) {
+      return "redirect:volumeroute_create.htm";
     }
     model.addAttribute("emessage", "Unknown operation: '"+operation+"'");
     return "redirect:showroutes.htm";
@@ -98,6 +100,8 @@ public class ShowRoutesController {
         result = "redirect:groovyroute_show.htm";
       } else if (type.equals("blt_composite")) {
         result = "redirect:compositeroute_show.htm";
+      } else if (type.equals("blt_volume")) {
+        result = "redirect:volumeroute_show.htm";
       }
       if (result != null) {
         model.addAttribute("name", name);

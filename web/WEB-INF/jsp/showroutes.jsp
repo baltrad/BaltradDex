@@ -80,6 +80,12 @@ List of routes
                                     class="tdcenter" value="Script">
                                   </display:column>
                                 </c:when>
+                                <c:when test="${route.ruleType == 'blt_volume'}">
+                                  <display:column sortable="true" title="Type"
+                                    sortProperty="type" paramId="type" paramProperty="type"
+                                    class="tdcenter" value="Volume">
+                                  </display:column>
+                                </c:when>
                                 <c:otherwise>
                                   <display:column sortable="true" title="Type"
                                     sortProperty="type" paramId="type" paramProperty="type"
@@ -99,6 +105,9 @@ List of routes
                                     </button>
                                     <button class="rounded" name="submitButton" type="submit" value="Composite">
                                         <span>Composite</span>
+                                    </button>
+                                    <button class="rounded" name="submitButton" type="submit" value="Volume">
+                                        <span>Volume</span>
                                     </button>
                                 </div>
                             </div>

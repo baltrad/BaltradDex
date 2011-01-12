@@ -333,6 +333,13 @@ form > .left {
 form > .left > .row, form > .right > .row {
     height: 28px;
 }
+form > .left > .row4, form > .right > .row4 {
+    height: 88px;
+}
+form > .left > .row6, form > .right > .row6 {
+    height: 118px;
+}
+
 form > .right {
     position: relative;
     float: left;
@@ -554,6 +561,20 @@ tr {
     width: 360px;
 }
 #table > .props > form > .right > .row > select {
+    width: 240px;
+}
+
+#table > .props > form > .right > .row4 > input {
+    width: 360px;
+}
+#table > .props > form > .right > .row4 > select {
+    width: 240px;
+}
+
+#table > .props > form > .right > .row6 > input {
+    width: 360px;
+}
+#table > .props > form > .right > .row6 > select {
     width: 240px;
 }
 
