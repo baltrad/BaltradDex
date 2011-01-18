@@ -12,7 +12,6 @@ import eu.baltrad.beast.adaptor.IBltAdaptorManager;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.RuleException;
-import eu.baltrad.beast.rules.groovy.GroovyRule;
 import eu.baltrad.beast.rules.volume.VolumeRule;
 
 public class VolumeRoutesControllerTest extends TestCase {

@@ -28,89 +28,187 @@ Create scheduled job
 
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
+<%@page import="eu.baltrad.beastui.web.pojo.CronEntryMapping"%>
 
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Create scheduled job</title>
-    </head>
-    <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
-            </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
-                </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
-                            Create scheduled job
-                        </div>
-                        <div class="right">
-                        </div>
-                    </div>
-                    <div id="text-box">
-                        Create a scheduled job.
-                    </div>
-                    <div id="table">
-                        <div class="props">
-                            <form name="createScheduledJobForm" action="createscheduledjob.htm">
-                                <div class="left">
-                                    <%
-                                        List<String> jobnames = (List<String>)request.getAttribute("jobnames");
-                                        String expression = (String)request.getAttribute("expression");
-                                        String jobname = (String)request.getAttribute("jobname");
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+    <title>Baltrad | Create scheduled job</title>
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
+        <script type="text/javascript" src="includes/header.js"></script>
+      </div>
+      <div id="content">
+        <div id="left">
+          <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+        </div>
+        <div id="right">
+          <div id="page-title">
+            <div class="left">Create scheduled job</div>
+            <div class="right"></div>
+          </div>
+          <div id="text-box">Create a scheduled job.</div>
+          <div id="table">
+            <div class="props">
+              <form name="createScheduledJobForm" action="createscheduledjob.htm">
+                <div class="left">
+                  <%
+                  List<String> jobnames = (List<String>)request.getAttribute("jobnames");
+                  List<CronEntryMapping> selectableSeconds = (List<CronEntryMapping>)request.getAttribute("selectableSeconds");
+                  List<CronEntryMapping> selectableMinutes = (List<CronEntryMapping>)request.getAttribute("selectableMinutes");
+                  List<CronEntryMapping> selectableHours = (List<CronEntryMapping>)request.getAttribute("selectableHours");
+                  List<CronEntryMapping> selectableDaysOfMonth = (List<CronEntryMapping>)request.getAttribute("selectableDaysOfMonth");
+                  List<CronEntryMapping> selectableMonths = (List<CronEntryMapping>)request.getAttribute("selectableMonths");
+                  List<CronEntryMapping> selectableDaysOfWeek = (List<CronEntryMapping>)request.getAttribute("selectableDaysOfWeek");
+                  List<String> seconds = (List<String>)request.getAttribute("seconds");
+                  List<String> minutes = (List<String>)request.getAttribute("minutes");
+                  List<String> hours = (List<String>)request.getAttribute("hours");
+                  List<String> daysOfMonth = (List<String>)request.getAttribute("daysOfMonth");
+                  List<String> months = (List<String>)request.getAttribute("months");
+                  List<String> daysOfWeek = (List<String>)request.getAttribute("daysOfWeek");
+                  String jobname = (String)request.getAttribute("jobname");
 
-                                        jobnames = (jobnames == null)?new ArrayList<String>():jobnames;
-                                        expression = (expression == null)?"":expression;
-                                        jobname = (jobname == null)?"":jobname;
-                                      %>
-                                    <div class="row">Expression</div>
-                                    <div class="row">Job name</div>
-                                </div>
-                                <div class="right">
-                                    <div class="row">
-                                        <input type="text" name="expression" value="<%=expression%>"/>
-                                    </div>
-                                    <div class="row">
-                                        <select name="jobname">
-                                        <%
-                                          for (String job : jobnames) {
-                                            String selected = "";
-                                            if (job.equals(jobname)) {
-                                              selected = "selected";
-                                            }
-                                        %>
-                                            <option value="<%=job%>" <%=selected%>><%=job%></option>
-                                        <%
-                                          }
-                                        %>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="footer">
-                                    <div class="right">
-                                        <button class="rounded" type="submit">
-                                            <span>Add</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <%if (request.getAttribute("emessage") != null) {%>
-                            <div class="adaptorerror"><%=request.getAttribute("emessage")%></div>
-                    <%}%>
+                  jobnames = (jobnames == null)?new ArrayList<String>():jobnames;
+                  jobname = (jobname == null)?"":jobname;
+                  %>
+                  <div class="row4">Seconds</div>
+                  <div class="row4">Minutes</div>
+                  <div class="row4">Hours</div>
+                  <div class="row4">Days of month</div>
+                  <div class="row4">Months</div>
+                  <div class="row4">Days of week</div>
+                  <div class="row">Job name</div>
                 </div>
-                <div id="clear"></div>
+                <div class="right">
+                  <div class="row4">
+                    <select multiple size="4" name="seconds">
+                      <%
+                      for (CronEntryMapping entry : selectableSeconds) {
+                        String selectstr = "";
+                        if (seconds.contains(entry.getValue())) {
+                          selectstr = "selected";
+                        }
+                      %>
+                      <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
+                      <%
+                      }
+                      %>
+                    </select>
+                  </div>
+                  <div class="row4">
+                    <select multiple size="4" name="minutes">
+                      <%
+                      for (CronEntryMapping entry : selectableMinutes) {
+                        String selectstr = "";
+                        if (minutes.contains(entry.getValue())) {
+                          selectstr = "selected";
+                        }
+                      %>
+                      <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
+                      <%
+                      }
+                      %>
+                    </select>
+                  </div>
+                  <div class="row4">
+                    <select multiple size="4" name="hours">
+                      <%
+                      for (CronEntryMapping entry : selectableHours) {
+                        String selectstr = "";
+                        if (hours.contains(entry.getValue())) {
+                          selectstr = "selected";
+                        }
+                      %>
+                      <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
+                      <%
+                      }
+                      %>
+                    </select>
+                  </div>  
+                  <div class="row4">
+                    <select multiple size="4" name="daysOfMonth">
+                      <%
+                      for (CronEntryMapping entry : selectableDaysOfMonth) {
+                        String selectstr = "";
+                        if (daysOfMonth.contains(entry.getValue())) {
+                          selectstr = "selected";
+                        }
+                      %>
+                      <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
+                      <%
+                      }
+                      %>
+                    </select>
+                  </div> 
+                  <div class="row4">
+                    <select multiple size="4" name="months">
+                      <%
+                      for (CronEntryMapping entry : selectableMonths) {
+                        String selectstr = "";
+                        if (months.contains(entry.getValue())) {
+                          selectstr = "selected";
+                        }
+                      %>
+                      <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
+                      <%
+                      }
+                      %>
+                    </select>
+                  </div>
+                  <div class="row4">
+                    <select multiple size="4" name="daysOfWeek">
+                      <%
+                      for (CronEntryMapping entry : selectableDaysOfWeek) {
+                        String selectstr = "";
+                        if (daysOfWeek.contains(entry.getValue())) {
+                          selectstr = "selected";
+                        }
+                      %>
+                      <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
+                      <%
+                      }
+                      %>
+                    </select>
+                  </div> 
+                  <div class="row">
+                    <select name="jobname">
+                      <%
+                      for (String job : jobnames) {
+                        String selected = "";
+                        if (job.equals(jobname)) {
+                          selected = "selected";
+                        }
+                      %>
+                      <option value="<%=job%>" <%=selected%>><%=job%></option>
+                      <%
+                      }
+                      %>
+                    </select>
+                  </div>
+                </div>
+                <div class="footer">
+                  <div class="right">
+                    <button class="rounded" type="submit">
+                      <span>Add</span>
+                    </button>
+                  </div>
+                </div>
+              </form>
             </div>
+          </div>
+          <%if (request.getAttribute("emessage") != null) {%>
+          <div class="adaptorerror"><%=request.getAttribute("emessage")%></div>
+          <%}%>
         </div>
-        <div id="footer">
-            <script type="text/javascript" src="includes/footer.js"></script>
-        </div>
-    </body>
+        <div id="clear"></div>
+      </div>
+    </div>
+    <div id="footer">
+      <script type="text/javascript" src="includes/footer.js"></script>
+    </div>
+  </body>
 </html>
                     
