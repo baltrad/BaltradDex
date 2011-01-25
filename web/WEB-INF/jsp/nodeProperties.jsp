@@ -62,7 +62,7 @@ Author     : szewczenko
                                     <div class="row">Organization</div>
                                     <div class="row">Address</div>
                                     <div class="row">Local time zone</div>
-                                    <div class="row">Temporary directory</div>
+                                    <div class="row">Work directory</div>
                                     <div class="row">Node administrator's email</div>
                                 </div>
                                 <div class="right">

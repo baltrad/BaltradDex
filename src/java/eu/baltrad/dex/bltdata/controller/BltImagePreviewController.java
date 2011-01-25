@@ -23,6 +23,7 @@ package eu.baltrad.dex.bltdata.controller;
 
 import eu.baltrad.dex.bltdata.model.BltDataProcessor;
 import eu.baltrad.dex.util.FileCatalogConnector;
+import eu.baltrad.dex.util.InitAppUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -97,7 +98,7 @@ public class BltImagePreviewController implements Controller {
         String urLon = request.getParameter( "urLon" );
 
         // try to load image from disk before creating a new one
-        String filePath = FileCatalogConnector.getImageStorageDirectory() + File.separator + fileUuid 
+        String filePath = InitAppUtil.getImageStorageDirectory() + File.separator + fileUuid
             + datasetPath.replaceAll( BltDataProcessor.H5_PATH_SEPARATOR, "_" ) +
             BltDataProcessor.IMAGE_FILE_EXT;
         File imageFile = new File( filePath );
@@ -112,7 +113,7 @@ public class BltImagePreviewController implements Controller {
         // reconstruct image URL
         StringBuffer requestURL = request.getRequestURL();
         String imageURL = requestURL.substring( 0, requestURL.lastIndexOf( URL_PATH_SEPARATOR )
-            + 1 ) + FileCatalogConnector.getImageStorageFolder() + URL_PATH_SEPARATOR + fileUuid
+            + 1 ) + InitAppUtil.getImageStorageFolder() + URL_PATH_SEPARATOR + fileUuid
             + datasetPath.replaceAll( BltDataProcessor.H5_PATH_SEPARATOR, "_" ) +
             BltDataProcessor.IMAGE_FILE_EXT;
 

@@ -37,6 +37,7 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.util.Date;
+import java.util.Properties;
 
 /**
  * Utility class used to initialize application on startup.
@@ -47,10 +48,16 @@ import java.util.Date;
  */
 public class InitAppUtil {
 //---------------------------------------------------------------------------------------- Constants
+    // Properties file name
+    private static final String PROPS_FILE_NAME = "dex.init.properties";
     // Temporary file prefix
     private final static String TEMP_FILE_PREFIX = "dex";
     // Temporary file suffix
     private final static String TEMP_FILE_SUFFIX = ".dat";
+    // Image storage folder
+    private static final String IMAGE_STORAGE_FOLDER_PROP = "image.storage.folder";
+    // Image thumbs storage folder
+    private static final String THUMBS_STORAGE_FOLDER_PROP = "thumbs.storage.folder";
 //---------------------------------------------------------------------------------------- Variables
     // Initialize LogManager object
     private static LogManager logManager = new LogManager();
@@ -70,8 +77,16 @@ public class InitAppUtil {
     private static String timeZone;
     // Node administrator email
     private static String adminEmail;
-    // Temporary directory
-    private static String localTempDir;
+    // Work directory
+    private static String workDir;
+    // Image storage folder
+    private static String imageStorageFolder;
+    // Thumbs storage folder
+    private static String thumbsStorageFolder;
+    // Image storage directory
+    private static String imageStorageDirectory;
+    // Thumbs storage directory
+    private static String thumbsStorageDirectory;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor performs initialization task
@@ -100,9 +115,34 @@ public class InitAppUtil {
             setOrgAddress( conf.getOrgAddress() );
             setTimeZone( conf.getTimeZone() );
             setAdminEmail( conf.getAdminEmail() );
-            setLocalTempDir( ServletContextUtil.getServletContextPath() + conf.getTempDir() );
-            // create temporary directory
-            makeDir( getLocalTempDir() );
+            // Create relative or absolute work directory
+            String tmpDir = createDir( conf.getTempDir(), "Created work directory" );
+            setWorkDir( tmpDir );
+            try {
+
+                InputStream is = InitAppUtil.class.getResourceAsStream( PROPS_FILE_NAME );
+
+
+                //FileInputStream fis = new FileInputStream( PROPS_FILE_NAME );
+                Properties props = new Properties();
+                if( is != null ) {
+                    props.load( is );
+                    imageStorageFolder = props.getProperty( IMAGE_STORAGE_FOLDER_PROP );
+                    thumbsStorageFolder = props.getProperty( THUMBS_STORAGE_FOLDER_PROP );
+                    // create image storage directory
+                    imageStorageDirectory = createDir( getWorkDir() + File.separator +
+                        imageStorageFolder, "New image storage directory created" );
+                    // create thumbs storage directory
+                    thumbsStorageDirectory = createDir( getWorkDir() + File.separator +
+                        thumbsStorageFolder, "New thumbs storage directory created" );
+                } else {
+                    logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                        "Failed to load properties file: " + PROPS_FILE_NAME );
+                }
+            } catch( Exception e ) {
+                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to initialize " + 
+                        "application: " + e.getMessage() );
+            }
             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                     "Application successfully initialized" );
         }
@@ -192,17 +232,73 @@ public class InitAppUtil {
      */
     public static void setAdminEmail( String _adminEmail ) { adminEmail = _adminEmail; }
     /**
-     * Method gets local temporary directory name.
+     * Method gets work directory name.
      *
-     * @return The name of local temporary directory
+     * @return The name of work directory
      */
-    public static String getLocalTempDir() { return localTempDir; }
+    public static String getWorkDir() { return workDir; }
     /**
-     * Method sets local temporary directory name.
+     * Method sets work directory name.
      *
-     * @param _localTempDir The name of local temporary directory
+     * @param _workDir The name of work directory
      */
-    public static void setLocalTempDir( String _localTempDir ) { localTempDir = _localTempDir; }
+    public static void setWorkDir( String _workDir ) { workDir = _workDir; }
+     /**
+     * Gets image storage folder.
+     *
+     * @return Image storage folder
+     */
+    public static String getImageStorageFolder() { return imageStorageFolder; }
+    /**
+     * Sets image storage folder.
+     *
+     * @param imageStorageFolder Image storage folder to set
+     */
+    public static void setImageStorageFolder( String _imageStorageFolder ) {
+        imageStorageFolder = _imageStorageFolder;
+    }
+    /**
+     * Gets thumbs storage folder.
+     *
+     * @return Thumbs storage folder
+     */
+    public static String getThumbsStorageFolder() { return thumbsStorageFolder; }
+    /**
+     * Sets thumbs storage folder.
+     *
+     * @param thumbsStorageFolder Thumbs storage folder to set
+     */
+    public static void setThumbsStorageFolder( String _thumbsStorageFolder ) {
+        thumbsStorageFolder = _thumbsStorageFolder;
+    }
+     /**
+     * Gets image storage directory.
+     *
+     * @return Image storage directory
+     */
+    public static String getImageStorageDirectory() { return imageStorageDirectory; }
+    /**
+     * Sets image storage directory.
+     *
+     * @param imageStorageDirectory Image storage directory to set
+     */
+    public static void setImageStorageDirectory( String _imageStorageDirectory ) {
+        imageStorageDirectory = _imageStorageDirectory;
+    }
+    /**
+     * Gets thumbs storage directory.
+     *
+     * @return Thumbs storage directory
+     */
+    public static String getThumbsStorageDirectory() { return thumbsStorageDirectory; }
+    /**
+     * Sets thumbs storage directory.
+     *
+     * @param thumbsStorageDirectory Thumbs storage directory to set
+     */
+    public static void setThumbsStorageDirectory( String _thumbsStorageDirectory ) {
+        thumbsStorageDirectory = _thumbsStorageDirectory;
+    }
     /**
      * Method extracts relative file name from absolute file path string.
      *
@@ -214,17 +310,30 @@ public class InitAppUtil {
                     absFilePath.length() );
     }
     /**
-     * Method creates new directory.
+     * Creates new storage directory.
      *
-     * @param directoryPath Path to the directory
+     * @param folder Either relative or absolute path to the folder that is to be created
+     * @param msg Message to display
+     * @return Name of the directory created
      */
-    public static void makeDir( String directoryPath ) {
-        File dir = new File( directoryPath );
-        if( !dir.exists() ) {
-            dir.mkdirs();
-            logManager.addEntry( new Date(), LogManager.MSG_INFO, "New directory created: \n"
-                    + directoryPath );
+    public static String createDir( String folder, String msg ) {
+        String dir = "";
+        // Check if folder is relative or absolute path
+        if( folder.startsWith( File.separator ) ) {
+            dir = folder;
+        } else {
+            dir = ServletContextUtil.getServletContextPath() + folder;
         }
+        File f = new File( dir );
+        if( !f.exists() ) {
+            if( f.mkdirs() ) {
+                logManager.addEntry( new Date(), LogManager.MSG_WRN, msg + ": " + dir );
+            } else {
+                logManager.addEntry( new Date(), LogManager.MSG_WRN,  "Failed to create "
+                        + "directory: " + dir );
+            }
+        }
+        return dir;
     }
     /**
      * Creates temporary file.

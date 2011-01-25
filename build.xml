@@ -44,7 +44,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="compile.debug" value="true"/>
   <property name="compile.includeAntRuntime" value="no"/>
   <property name="compile.optimize" value="true"/>
-  <!--property name="javahdf.path" value="/opt/hdf-java" /-->
+  <property name="javahdf.path" value="/opt/hdf-java"/>
   
   <!-- You can override properties in this file -->
   <property file="develop.properties" />  
@@ -60,7 +60,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <available file="${baltrad.db.path}/java/jbrfc.jar" property="jbrfc.jar.available" />
   <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
   <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
-  <available file="${javahdf.path}/lib/jhdf5.jar" property="javahdf.lib.available" />
+  <available file="${javahdf.path}/lib/jhdf5.jar" property="javahdf.lib.available"/>
 
   <fail unless="jbrfc.jar.available" message="baltrad.db.path must specify the installation dir of baltrad-db" />
   <fail unless="beast.jar.available" message="beast.path must specify the installation dir of beast" />

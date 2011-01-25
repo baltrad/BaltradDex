@@ -185,7 +185,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                                 // write list to temporary file
                                 File tempFile = InitAppUtil.createTempFile(
-                                        new File( InitAppUtil.getLocalTempDir() ) );
+                                        new File( InitAppUtil.getWorkDir() ) );
                                 // write object to stream
                                 InitAppUtil.writeObjectToStream( channels, tempFile );
                                 // set the return address
@@ -232,7 +232,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             InputStream fileStream = fileItem.openStream();
                             // write list to temporary file
                             File tempFile = InitAppUtil.createTempFile(
-                                        new File( InitAppUtil.getLocalTempDir() ) );
+                                        new File( InitAppUtil.getWorkDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
                             // retrieve channel list and save it to class field
                             List remoteChannels = ( List )InitAppUtil.readObjectFromStream( tempFile );
@@ -261,7 +261,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // write subscription request to temporary file
                             // write list to temporary file
                             File tempFile = InitAppUtil.createTempFile(
-                                        new File( InitAppUtil.getLocalTempDir() ) );
+                                        new File( InitAppUtil.getWorkDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
                             // retrieve subscription list
                             List subscribedChannels = ( List )InitAppUtil.readObjectFromStream(
@@ -301,7 +301,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                             // write list to temporary file
                             tempFile = InitAppUtil.createTempFile(
-                                    new File( InitAppUtil.getLocalTempDir() ) );
+                                    new File( InitAppUtil.getWorkDir() ) );
                             // write object to the stream
                             InitAppUtil.writeObjectToStream( confirmedChannels, tempFile );
                             // set the return address
@@ -333,7 +333,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             InputStream fileStream = fileItem.openStream();
                             // write list of confirmed subscriptions to temporary file
                             File tempFile = InitAppUtil.createTempFile(
-                                        new File( InitAppUtil.getLocalTempDir() ) );
+                                        new File( InitAppUtil.getWorkDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
                             // retrieve list of confirmed channels
                             List confirmedChannels = ( List )InitAppUtil.readObjectFromStream(
@@ -357,7 +357,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             InputStream fileStream = fileItem.openStream();
                             // write subscription change request to temporary file
                             File tempFile = InitAppUtil.createTempFile(
-                                        new File( InitAppUtil.getLocalTempDir() ) );
+                                        new File( InitAppUtil.getWorkDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
                             // retrieve subscription object
                             Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
@@ -392,7 +392,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                             // write subscription object to temporary file
                             tempFile = InitAppUtil.createTempFile(
-                                    new File( InitAppUtil.getLocalTempDir() ) );
+                                    new File( InitAppUtil.getWorkDir() ) );
                             // set the return address
                             bfHandler.setUrl( bfHandler.getSenderNodeAddress( header ) );
                              
@@ -430,7 +430,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             InputStream fileStream = fileItem.openStream();
                             // write subscription change request to temporary file
                             File tempFile = InitAppUtil.createTempFile(
-                                        new File( InitAppUtil.getLocalTempDir() ) );
+                                        new File( InitAppUtil.getWorkDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
                             // retrieve subscription object
                             Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
@@ -452,7 +452,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             InputStream fileStream = fileItem.openStream();
                             // write subscription change request to temporary file
                             File tempFile = InitAppUtil.createTempFile(
-                                        new File( InitAppUtil.getLocalTempDir() ) );
+                                        new File( InitAppUtil.getWorkDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
                             // retrieve subscription object
                             Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
@@ -474,7 +474,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             InputStream fileStream = fileItem.openStream();
                             // write subscription object to temporary file
                             File tempFile = InitAppUtil.createTempFile(
-                                        new File( InitAppUtil.getLocalTempDir() ) );
+                                        new File( InitAppUtil.getWorkDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
                             // retrieve subscription object from stream
                             Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
@@ -496,7 +496,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                             // write list to temporary file
                             tempFile = InitAppUtil.createTempFile(
-                                    new File( InitAppUtil.getLocalTempDir() ) );
+                                    new File( InitAppUtil.getWorkDir() ) );
                             // write object to the stream
                             InitAppUtil.writeObjectToStream( subs, tempFile );
                             // set the return address
@@ -522,7 +522,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             InputStream fileStream = fileItem.openStream();
                             // write subscription object to temporary file
                             File tempFile = InitAppUtil.createTempFile(
-                                        new File( InitAppUtil.getLocalTempDir() ) );
+                                        new File( InitAppUtil.getWorkDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
                             // retrieve subscription object from stream
                             Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
@@ -542,7 +542,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             + ": " + bfHandler.getFileName( header ) );
                         // write data to the temporary file
                         File tempFile = InitAppUtil.createTempFile(
-                                new File( InitAppUtil.getLocalTempDir() ) );
+                                new File( InitAppUtil.getWorkDir() ) );
                         FileItemStream fileItem = iterator.next();
                         InputStream fileStream = fileItem.openStream();
                         InitAppUtil.saveFile( fileStream, tempFile );
@@ -555,13 +555,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             }
                             fileEntry = fc.store( tempFile.getAbsolutePath() );
 
-                            // create image thumb
-                            bltDataProcessorController.createImage( tempFile.getAbsolutePath(),
-                                H5_THUMB_DATASET_PATH, H5_THUMB_GROUP_PATH, THUMB_IMAGE_SIZE,
-                                THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE,
-                                THUMB_RANGE_RINGS_COLOR, THUMB_RANGE_MASK_COLOR,
-                                FileCatalogConnector.getThumbsStorageDirectory()
-                                + File.separator + fileEntry.uuid() + IMAGE_FILE_EXT );
+                            // create image thumb - commented out for the time being
+
+
+                            //bltDataProcessorController.createImage( tempFile.getAbsolutePath(),
+                            //    H5_THUMB_DATASET_PATH, H5_THUMB_GROUP_PATH, THUMB_IMAGE_SIZE,
+                            //    THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE,
+                            //    THUMB_RANGE_RINGS_COLOR, THUMB_RANGE_MASK_COLOR,
+                            //    InitAppUtil.getThumbsStorageDirectory()
+                            //    + File.separator + fileEntry.uuid() + IMAGE_FILE_EXT );
                                 
                             // Interface with the Beast framework
                             BltDataMessage message = new BltDataMessage();

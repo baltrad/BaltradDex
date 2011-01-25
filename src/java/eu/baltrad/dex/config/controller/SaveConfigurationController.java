@@ -79,7 +79,7 @@ public class SaveConfigurationController extends SimpleFormController {
         if( conf == null ) {
             conf = new Configuration( "Short node name", PRIMARY_NODE,
                     "Short node address", "8084", "Host organization name", "Host organization " +
-                    "address", "Local time zone", "Temporary directory", "Node administrator's " +
+                    "address", "Local time zone", "temp", "Node administrator's " +
                     "email" );
         }
         return conf;

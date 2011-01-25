@@ -104,7 +104,7 @@ public class SubscriptionController extends MultiActionController {
 
         // synchronize local and remote subscriptions
         for( int i = 0; i < subscriptions.size(); i++ ) {
-            File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getLocalTempDir() ) );
+            File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getWorkDir() ) );
             InitAppUtil.writeObjectToStream( subscriptions.get( i ), tempFile );
 
             BaltradFrameHandler bfHandler = new BaltradFrameHandler(
@@ -207,7 +207,7 @@ public class SubscriptionController extends MultiActionController {
         // handle subscription change requests
         for( int i = 0; i < getChangedSubscriptions().size(); i++ ) {
             try {
-                File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getLocalTempDir() ) );
+                File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getWorkDir() ) );
                 InitAppUtil.writeObjectToStream( getChangedSubscriptions().get( i ), tempFile );
                 // prepare the frame
                 BaltradFrameHandler bfHandler = new BaltradFrameHandler(

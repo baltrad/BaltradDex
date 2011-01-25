@@ -28,6 +28,7 @@ import eu.baltrad.dex.bltdata.model.BltDataset;
 import eu.baltrad.dex.bltdata.model.BltDataProjector;
 import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.fc.FileCatalog;
 
@@ -187,7 +188,7 @@ public class BltFileDetailsController implements Controller {
             BltDataset bltDataset = new BltDataset( datasetFullNames.get( i ),
                 whereGroup, quantity_val[ 0 ], nbins_val[ 0 ] * 2, nbins_val[ 0 ] * 2, 
                 lat0_val[ 0 ], lon0_val[ 0 ], llLatLon.getY(), llLatLon.getX(), urLatLon.getY(),
-                urLatLon.getX(), elangle_val[ 0 ], FileCatalogConnector.getThumbsStorageFolder() +
+                urLatLon.getX(), elangle_val[ 0 ], InitAppUtil.getThumbsStorageFolder() +
                 File.separator + uuid + datasetFullNames.get( i ).replaceAll(
                     BltDataProcessor.H5_PATH_SEPARATOR, "_" ) + BltDataProcessor.IMAGE_FILE_EXT );
 
@@ -195,7 +196,7 @@ public class BltFileDetailsController implements Controller {
             bltDatasets.add( bltDataset );
 
             // try to load thumb from disk before creating a new one
-            String thumbPath = FileCatalogConnector.getThumbsStorageDirectory() + File.separator
+            String thumbPath = InitAppUtil.getThumbsStorageDirectory() + File.separator
                 + uuid + datasetFullNames.get( i ).replaceAll(
                     BltDataProcessor.H5_PATH_SEPARATOR, "_" )  + BltDataProcessor.IMAGE_FILE_EXT;
 

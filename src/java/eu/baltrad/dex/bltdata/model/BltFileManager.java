@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.bltdata.model;
 
-import eu.baltrad.dex.util.FileCatalogConnector;
+import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.expr.ExpressionFactory;
@@ -79,7 +79,7 @@ public class BltFileManager {
                         fileEntry.what_time().to_string( FC_TIME_STR ) ) ,
                     format.parse( fileEntry.stored_at().to_string( FC_DATE_STR + " " +
                         FC_TIME_STR ) ), radarName, fileEntry.what_object(),
-                    FileCatalogConnector.getThumbsStorageFolder() + File.separator +
+                    InitAppUtil.getThumbsStorageFolder() + File.separator +
                     fileEntry.uuid() + IMAGE_FILE_EXT );
                 bltFiles.add( bltFile );
             } catch( ParseException e ) {
@@ -115,7 +115,7 @@ public class BltFileManager {
                     fileEntry.what_time().to_string( FC_TIME_STR ) ),
                 format.parse( fileEntry.stored_at().to_string( FC_DATE_STR + " " + FC_TIME_STR ) ),
                 fileEntry.what_source(), fileEntry.what_object(),
-                FileCatalogConnector.getThumbsStorageFolder() + File.separator + fileEntry.uuid() +
+                InitAppUtil.getThumbsStorageFolder() + File.separator + fileEntry.uuid() +
                 IMAGE_FILE_EXT );
             } catch( ParseException e ) {
                 System.err.println( "Error while parsing file's timestamp: " + e.getMessage() );

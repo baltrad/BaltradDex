@@ -141,7 +141,7 @@ public class RemoteChannelController extends MultiActionController {
         // prepare subscription request
         try {
             File tempFile = InitAppUtil.createTempFile(
-                    new File( InitAppUtil.getLocalTempDir() ) );
+                    new File( InitAppUtil.getWorkDir() ) );
             InitAppUtil.writeObjectToStream( getSelectedChannels(), tempFile );
             // prepare frame
             BaltradFrameHandler bfHandler = new BaltradFrameHandler( getSenderNodeAddress() );
