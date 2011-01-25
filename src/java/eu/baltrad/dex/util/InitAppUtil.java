@@ -119,11 +119,7 @@ public class InitAppUtil {
             String tmpDir = createDir( conf.getTempDir(), "Created work directory" );
             setWorkDir( tmpDir );
             try {
-
                 InputStream is = InitAppUtil.class.getResourceAsStream( PROPS_FILE_NAME );
-
-
-                //FileInputStream fis = new FileInputStream( PROPS_FILE_NAME );
                 Properties props = new Properties();
                 if( is != null ) {
                     props.load( is );
