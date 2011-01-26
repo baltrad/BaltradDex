@@ -902,6 +902,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="groovyRoutesController" class="eu.baltrad.beastui.web.controller.GroovyRoutesController" autowire="byType" />
     <bean id="compositeRoutesController" class="eu.baltrad.beastui.web.controller.CompositeRoutesController" autowire="byType" />
     <bean id="volumeRoutesController" class="eu.baltrad.beastui.web.controller.VolumeRoutesController" autowire="byType" />
+    <bean id="bdbTrimAgeRoutesController" class="eu.baltrad.beastui.web.controller.BdbTrimAgeRoutesController" autowire="byType" />
     <bean id="showRoutesController" class="eu.baltrad.beastui.web.controller.ShowRoutesController" autowire="byType" />
     
     <bean id="schedulerController" class="eu.baltrad.beastui.web.controller.SchedulerController" autowire="byType" />

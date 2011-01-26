@@ -96,6 +96,15 @@ public class ShowRoutesControllerTest extends TestCase {
     verify();
     assertEquals("redirect:compositeroute_create.htm", result);
   }
+
+  public void testCreateRoute_BdbTrimAge() {
+    replay();
+    
+    String result = classUnderTest.createRoute(model, "BdbTrimAge");
+    
+    verify();
+    assertEquals("redirect:bdbtrimageroute_create.htm", result);
+  }
   
   public void testCreateRoute_Unknown() {
     model.addAttribute("emessage", "Unknown operation: 'Unknown'");
@@ -154,5 +163,29 @@ public class ShowRoutesControllerTest extends TestCase {
     
     assertEquals("redirect:compositeroute_show.htm", result);
   }
+
+  public void testShowRoute_BdbTrimAge() {
+    MockControl defControl = MockClassControl.createControl(RouteDefinition.class);
+    RouteDefinition def = (RouteDefinition)defControl.getMock();
+    
+    manager.getDefinition("Nisse");
+    managerControl.setReturnValue(def);
+    def.getRuleType();
+    defControl.setReturnValue("bdb_trim_age");
+    
+    model.addAttribute("name", "Nisse");
+    modelControl.setReturnValue(null);
+
+    replay();
+    defControl.replay();
+    
+    String result = classUnderTest.showRoute(model, "Nisse");
+    
+    verify();
+    defControl.verify();
+    
+    assertEquals("redirect:bdbtrimageroute_show.htm", result);
+  }
+
   
 }

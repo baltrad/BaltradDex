@@ -83,6 +83,8 @@ public class ShowRoutesController {
       return "redirect:compositeroute_create.htm";
     } else if (operation != null && operation.equals("Volume")) {
       return "redirect:volumeroute_create.htm";
+    } else if (operation != null && operation.equals("BdbTrimAge")) {
+      return "redirect:bdbtrimageroute_create.htm";
     }
     model.addAttribute("emessage", "Unknown operation: '"+operation+"'");
     return "redirect:showroutes.htm";
@@ -102,6 +104,8 @@ public class ShowRoutesController {
         result = "redirect:compositeroute_show.htm";
       } else if (type.equals("blt_volume")) {
         result = "redirect:volumeroute_show.htm";
+      } else if (type.equals("bdb_trim_age")) {
+        result = "redirect:bdbtrimageroute_show.htm";
       }
       if (result != null) {
         model.addAttribute("name", name);

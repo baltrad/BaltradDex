@@ -86,10 +86,22 @@ List of routes
                                     class="tdcenter" value="Volume">
                                   </display:column>
                                 </c:when>
+                                <c:when test="${route.ruleType == 'composite'}">
+                                  <display:column sortable="True" title="Type"
+                                    sortProperty="type" paramId="type" paramProperty="type"
+                                    class="tdcenter" value="Composite">
+                                  </display:column>
+                                </c:when>
+                                <c:when test="${route.ruleType == 'bdb_trim_age'}">
+                                  <display:column sortable="True" title="Type"
+                                    sortProperty="type" paramId="type" paramProperty="type"
+                                    class="tdcenter" value="BdbTrimAge">
+                                  </display:column>
+                                </c:when>
                                 <c:otherwise>
                                   <display:column sortable="true" title="Type"
                                     sortProperty="type" paramId="type" paramProperty="type"
-                                    class="tdcenter" value="Composite">
+                                    class="tdcenter" value="${route.ruleType}">
                                   </display:column>
                                 </c:otherwise>
                               </c:choose>
@@ -110,6 +122,11 @@ List of routes
                                         <span>Volume</span>
                                     </button>
                                 </div>
+				<div class="right">
+                                    <button class="rounded" name="submitButton" type="submit" value="BdbTrimAge">
+                                        <span>BdbTrimAge</span>
+                                    </button>
+				</div>
                             </div>
                           </form>
                         <%if (request.getAttribute("emessage") != null) {%>
