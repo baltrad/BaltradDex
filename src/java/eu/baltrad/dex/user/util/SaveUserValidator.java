@@ -98,7 +98,7 @@ public class SaveUserValidator implements Validator {
         }
         // validate email address
         if( user.getEmail().trim().length() > 0 && !WebUtil.validateEmailAddress( user.getEmail() ) ) {
-            errors.rejectValue( "email", "error.field.email.invalid" );
+            errors.rejectValue( "email", "error.address.invalid" );
         }
     }
     /**

@@ -62,7 +62,7 @@ public class BltDataProcessorControllerTest extends TestCase {
     }
 
     public void testOpenH5File() {
-        h5File = dataProcessor.openH5File( "arlanda.h5" );
+        h5File = dataProcessor.openH5File( "tallin.h5" );
         assertNotNull( h5File );
     }
 
@@ -112,7 +112,7 @@ public class BltDataProcessorControllerTest extends TestCase {
     }
 
     public void testSaveImageToFile() {
-        int res = dataProcessor.saveImageToFile( radarImage, "arlanda.png" );
+        int res = dataProcessor.saveImageToFile( radarImage, "tallin.png" );
         assertEquals( 0, res );
     }
 

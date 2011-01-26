@@ -50,18 +50,18 @@ public class FrameDispatcherControllerTest extends TestCase {
     
     public void testPrepareFrame() {
         xmlHdr = bltFrameHandler.createDataHdr( BaltradFrameHandler.MIME_MULTIPART,
-                "TestNode", "Arlanda", "arlanda.h5" );
+                "TestNode", "Tallin", "tallin.h5" );
         assertEquals( bltFrameHandler.getMimeType( xmlHdr ), BaltradFrameHandler.MIME_MULTIPART );
         assertEquals( bltFrameHandler.getSenderNodeName( xmlHdr ), "TestNode" );
-        assertEquals( bltFrameHandler.getChannel( xmlHdr ), "Arlanda" );
-        assertEquals( bltFrameHandler.getFileName( xmlHdr ), "arlanda.h5" );
+        assertEquals( bltFrameHandler.getChannel( xmlHdr ), "Tallin" );
+        assertEquals( bltFrameHandler.getFileName( xmlHdr ), "tallin.h5" );
         assertEquals( bltFrameHandler.getContentType( xmlHdr ), "file" );
     }
 
     public void testInjection() {
-        File f1 = new File( "arlanda.h5" );
+        File f1 = new File( "tallin.h5" );
         BaltradFrame frame1 = new BaltradFrame( bltFrameHandler.createDataHdr(
-            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Arlanda", "arlanda.h5" ),
+            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Tallin", "tallin.h5" ),
             f1.getAbsolutePath() );
         /*
         File f2 = new File( "test2.h5" );
