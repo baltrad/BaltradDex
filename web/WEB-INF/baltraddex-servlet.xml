@@ -838,11 +838,17 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             </list>
         </property>
     </bean>
+    
+    <!-- rule property manager-->
+    <bean id="rulepropertymanager" class="eu.baltrad.beast.rules.PropertyManager" autowire="byType"/>
 
     <!-- Create the router -->
     <bean id="groovymgr" class="eu.baltrad.beast.rules.groovy.GroovyRuleManager" autowire="byType"/>
     <bean id="bltcompositemgr" class="eu.baltrad.beast.rules.composite.CompositingRuleManager" autowire="byType"/>
     <bean id="bltvolumemgr" class="eu.baltrad.beast.rules.volume.VolumeRuleManager" autowire="byType"/>
+    <bean id="bdbtrimagemgr" class="eu.baltrad.beast.rules.bdb.BdbTrimAgeRuleManager" autowire="byType"/>
+    <bean id="bdbtrimcountmgr" class="eu.baltrad.beast.rules.bdb.BdbTrimCountRuleManager" autowire="byType"/>
+
   
     <bean id="router" class="eu.baltrad.beast.router.impl.BltRouter" autowire="byType">
         <property name="ruleManagers">
@@ -850,6 +856,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <entry key="groovy" value-ref="groovymgr"/>
                 <entry key="blt_composite" value-ref="bltcompositemgr"/>
                 <entry key="blt_volume" value-ref="bltvolumemgr"/>
+                <entry key="bdb_trim_age" value-ref="bdbtrimagemgr"/>
+                <entry key="bdb_trim_count" value-ref="bdbtrimcountmgr"/>
             </map>
         </property>
     </bean>
