@@ -78,9 +78,9 @@ Author     : szewczenko
                                             class="tdcenter" value="${connection.connectionName}">
                                         </display:column>
                                         <display:column sortable="true" title="Node address"
-                                            sortProperty="nodeAddress" paramId="nodeAddress"
-                                            paramProperty="nodeAddress" class="tdcenter"
-                                            value="${connection.nodeAddress}">
+                                            sortProperty="shortAddress" paramId="shortAddress"
+                                            paramProperty="shortAddress" class="tdcenter"
+                                            value="${connection.shortAddress}">
                                         </display:column>
                                         <display:column sortable="true" title="User account"
                                             sortProperty="userName" paramId="userName"
