@@ -59,7 +59,7 @@ public class FrameDispatcherControllerTest extends TestCase {
     }
 
     public void testInjection() {
-        File f1 = new File( "tallin.h5" );
+        File f1 = new File( "arlanda.h5" );
         BaltradFrame frame1 = new BaltradFrame( bltFrameHandler.createDataHdr(
             BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Arlanda", "arlanda.h5" ),
             f1.getAbsolutePath() );
