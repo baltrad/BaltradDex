@@ -98,6 +98,12 @@ List of routes
                                     class="tdcenter" value="BdbTrimAge">
                                   </display:column>
                                 </c:when>
+                                <c:when test="${route.ruleType == 'bdb_trim_count'}">
+                                  <display:column sortable="True" title="Type"
+                                    sortProperty="type" paramId="type" paramProperty="type"
+                                    class="tdcenter" value="BdbTrimCount">
+                                  </display:column>
+                                </c:when>
                                 <c:otherwise>
                                   <display:column sortable="true" title="Type"
                                     sortProperty="type" paramId="type" paramProperty="type"
@@ -123,6 +129,9 @@ List of routes
                                     </button>
                                 </div>
 				<div class="right">
+                                    <button class="rounded" name="submitButton" type="submit" value="BdbTrimCount">
+                                        <span>BdbTrimCount</span>
+                                    </button>
                                     <button class="rounded" name="submitButton" type="submit" value="BdbTrimAge">
                                         <span>BdbTrimAge</span>
                                     </button>

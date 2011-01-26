@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Creates a bdb_trim_age route
+Creates a bdb_trim_count route
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -48,29 +48,28 @@ Creates a bdb_trim_age route
                         </div>
                     </div>
                     <div id="text-box">
-                        This rule removes files from BDB that are older than age limit at the time of
-                        the execution of this rule. Age limit is given in <b>seconds</b>. File age is
-                        taken from /what/date and /what/time.
+                        This rule tries to keep the number of files in BDB below or equal to CountLimit.
+                        It removes the oldest files to satisfy the limit.
                         <br/><br/>
                         <b>Note that you currently have to separately schedule this rule!</b>
                     </div>
                     <div id="table">
                         <div class="props">
-                            <form name="createRouteForm" action="bdbtrimageroute_create.htm">
+                            <form name="createRouteForm" action="bdbtrimcountroute_create.htm">
                                 <div class="left">
                                     <%
                                         String name = (String)request.getAttribute("name");
                                         String author = (String)request.getAttribute("author");
                                         Boolean active = (Boolean)request.getAttribute("active");
                                         String description = (String)request.getAttribute("description");
-                                        Integer ageLimit = (Integer)request.getAttribute("ageLimit");
+                                        Integer countLimit = (Integer)request.getAttribute("countLimit");
                                         String activestr = (active == true)?"checked":"";
                                       %>
                                     <div class="row">Name</div>
                                     <div class="row">Author</div>
                                     <div class="row">Active</div>
                                     <div class="row">Description</div>
-                                    <div class="row">AgeLimit</div>
+                                    <div class="row">CountLimit</div>
                                 </div>
                                 <div class="right">
                                     <div class="row">
@@ -86,7 +85,7 @@ Creates a bdb_trim_age route
                                         <input type="text" name="description" value="<%=description%>"/>
                                     </div>
                                     <div class="row">
-                                        <input type="text" name="ageLimit" value="<%=ageLimit%>"/>
+                                        <input type="text" name="countLimit" value="<%=countLimit%>"/>
                                     </div>
                                 </div>
                                 <div class="footer">

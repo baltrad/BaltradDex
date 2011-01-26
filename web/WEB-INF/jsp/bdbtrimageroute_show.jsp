@@ -69,7 +69,7 @@ Modifies a bdb_trim_age route
                                     <div class="row">Author</div>
                                     <div class="row">Active</div>
                                     <div class="row">Description</div>
-                                    <div class="row">Script</div>
+                                    <div class="row">AgeLimit</div>
                                 </div>
                                 <div class="right">
                                     <div class="row">
