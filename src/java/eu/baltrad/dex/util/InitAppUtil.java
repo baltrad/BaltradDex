@@ -240,11 +240,16 @@ public class InitAppUtil {
      */
     public static void setWorkDir( String _workDir ) { workDir = _workDir; }
      /**
-     * Gets image storage folder.
+     * Gets image storage folder extended with base directory / work directory.
      *
      * @return Image storage folder
      */
-    public static String getImageStorageFolder() { return imageStorageFolder; }
+    public static String getImageStorageFolder() { 
+        String baseDir = getWorkDir().substring( getWorkDir().lastIndexOf( File.separator ) + 1,
+                getWorkDir().length() );
+        String imageFolder = baseDir + File.separator + imageStorageFolder;
+        return imageFolder;
+    }
     /**
      * Sets image storage folder.
      *
@@ -254,11 +259,16 @@ public class InitAppUtil {
         imageStorageFolder = _imageStorageFolder;
     }
     /**
-     * Gets thumbs storage folder.
+     * Gets thumbs storage folder extended with base directory / work directory.
      *
      * @return Thumbs storage folder
      */
-    public static String getThumbsStorageFolder() { return thumbsStorageFolder; }
+    public static String getThumbsStorageFolder() {
+        String baseDir = getWorkDir().substring( getWorkDir().lastIndexOf( File.separator ) + 1,
+                getWorkDir().length() );
+        String thumbsFolder = baseDir + File.separator + thumbsStorageFolder;
+        return thumbsFolder;
+    }
     /**
      * Sets thumbs storage folder.
      *

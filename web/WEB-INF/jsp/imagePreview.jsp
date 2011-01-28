@@ -38,11 +38,6 @@ Author     : szewczenko
     String urLat = ( String )model.get( "urLat" );
     String urLon = ( String )model.get( "urLon" );
     String radarImageURL = ( String )model.get( "image_url" );
-
-
-    System.out.println( "radar image URL: " + radarImageURL );
-
-
 %>
 
 <html>

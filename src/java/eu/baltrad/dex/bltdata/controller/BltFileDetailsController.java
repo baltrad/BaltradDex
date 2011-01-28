@@ -169,16 +169,8 @@ public class BltFileDetailsController implements Controller {
             bltDataProcessor.getH5Attribute( root, whereGroup, BltDataProcessor.H5_RSCALE_ATTR,
                     BltDataProcessor.H5_DOUBLE_ATTR );
             double[] rscale_val = ( double[] )bltDataProcessor.getDoubleAttribute().getValue();
-            
-
-
-
-
-            double range = rscale_val[ 0 ] * nbins_val[ 0 ] /* 1000*/;
-
-
-
-
+            // scale - in meters
+            double range = rscale_val[ 0 ] * nbins_val[ 0 ];
             Point2D.Double llXY = new Point2D.Double( -range, -range );
             Point2D.Double llLatLon = BltDataProjector.pointXY2Geo( llXY );
             Point2D.Double urXY = new Point2D.Double( range, range );

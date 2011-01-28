@@ -554,27 +554,24 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 fc = FileCatalogConnector.connect();
                             }
                             fileEntry = fc.store( tempFile.getAbsolutePath() );
-
-                            // create image thumb - commented out for the time being
-
-
-                            //bltDataProcessorController.createImage( tempFile.getAbsolutePath(),
-                            //    H5_THUMB_DATASET_PATH, H5_THUMB_GROUP_PATH, THUMB_IMAGE_SIZE,
-                            //    THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE,
-                            //    THUMB_RANGE_RINGS_COLOR, THUMB_RANGE_MASK_COLOR,
-                            //    InitAppUtil.getThumbsStorageDirectory()
-                            //    + File.separator + fileEntry.uuid() + IMAGE_FILE_EXT );
-                                
                             // Interface with the Beast framework
                             BltDataMessage message = new BltDataMessage();
                             message.setFileEntry( fileEntry );
                             messageManager.manage( message );
+                            // create image thumb
+                            bltDataProcessorController.createImage( tempFile.getAbsolutePath(),
+                                H5_THUMB_DATASET_PATH, H5_THUMB_GROUP_PATH, THUMB_IMAGE_SIZE,
+                                THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE,
+                                THUMB_RANGE_RINGS_COLOR, THUMB_RANGE_MASK_COLOR,
+                                InitAppUtil.getThumbsStorageDirectory()
+                                     + File.separator + fileEntry.uuid() + IMAGE_FILE_EXT );
                         } catch( DuplicateEntry e ) {
                             throw e;
                         } catch( FileCatalogError e ) {
                             throw e;
+                        } catch( Exception e ) {
+                            throw e;
                         }
-
                         // send data to subscribers
                         
                         List <Subscription> remoteSubs =
@@ -630,7 +627,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         }
                         // delete temp file
                         InitAppUtil.deleteFile( tempFile.getAbsolutePath() );
-
                     }
                 }
              }
