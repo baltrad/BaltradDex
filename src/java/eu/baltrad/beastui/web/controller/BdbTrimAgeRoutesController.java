@@ -176,7 +176,7 @@ public class BdbTrimAgeRoutesController {
    * @throws RuleException if the rule not could be created
    */
   protected BdbTrimAgeRule createRule(Integer ageLimit) {
-    BdbTrimAgeRule rule = new BdbTrimAgeRule();
+    BdbTrimAgeRule rule = (BdbTrimAgeRule)manager.createRule(BdbTrimAgeRule.TYPE);
     rule.setFileAgeLimit(ageLimit);
     return rule;
   }

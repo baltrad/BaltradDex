@@ -176,7 +176,7 @@ public class BdbTrimCountRoutesController {
    * @throws RuleException if the rule not could be created
    */
   protected BdbTrimCountRule createRule(Integer countLimit) {
-    BdbTrimCountRule rule = new BdbTrimCountRule();
+    BdbTrimCountRule rule = (BdbTrimCountRule)manager.createRule(BdbTrimCountRule.TYPE);
     rule.setFileCountLimit(countLimit);
     return rule;
   }

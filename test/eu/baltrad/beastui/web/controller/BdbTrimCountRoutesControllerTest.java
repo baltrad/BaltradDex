@@ -24,6 +24,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
+import org.easymock.classextension.MockClassControl;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.router.IRouterManager;
@@ -157,7 +158,9 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     Boolean active = true;
     String description = "some description";
     Integer countLimit = 1;
-    BdbTrimCountRule rule = new BdbTrimCountRule();
+    // BdbTrimCountRule constructor is protected so mock it
+    MockControl ruleControl = MockClassControl.createControl(BdbTrimCountRule.class);
+    BdbTrimCountRule rule = (BdbTrimCountRule)ruleControl.getMock();
     
     List<String> recipients = new ArrayList<String>();
 
@@ -183,8 +186,6 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String description = "some description";
     Integer countLimit = 1;
 
-    List<String> recipients = new ArrayList<String>();
-
     methodMock.viewCreateRoute(model, name, "nisse", true, "some description", 1, "Name must be specified.");
     methodMockControl.setReturnValue("bdbtrimcountroute_create");
 
@@ -203,8 +204,6 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     Boolean active = true;
     String description = "some description";
     Integer countLimit = 0;
-
-    List<String> recipients = new ArrayList<String>();
 
     methodMock.viewCreateRoute(model, name, author, active, description, countLimit, "count limit must be specified and greater than 0.");
     methodMockControl.setReturnValue("createroute");
@@ -225,7 +224,9 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     Boolean active = true;
     String description = "some description";
     Integer countLimit = 1;
-    BdbTrimCountRule rule = new BdbTrimCountRule();
+    // BdbTrimCountRule constructor is protected so mock it
+    MockControl ruleControl = MockClassControl.createControl(BdbTrimCountRule.class);
+    BdbTrimCountRule rule = (BdbTrimCountRule)ruleControl.getMock();
     
     List<String> recipients = new ArrayList<String>();
     methodMock.createRule(countLimit);
@@ -409,8 +410,6 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
   }
 
   public void testViewShowRoute_wEmessage() {
-    List<String> recipients = new ArrayList<String>();
-
     model.addAttribute("name", "somename");
     modelControl.setReturnValue(null);
     model.addAttribute("author", "someauthor");
@@ -441,7 +440,9 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
     Integer countLimit = 1;
-    BdbTrimCountRule rule = new BdbTrimCountRule();
+    // BdbTrimCountRule constructor is protected so mock it
+    MockControl ruleControl = MockClassControl.createControl(BdbTrimCountRule.class);
+    BdbTrimCountRule rule = (BdbTrimCountRule)ruleControl.getMock();
     RouteDefinition definition = new RouteDefinition();
     
     classUnderTest = new BdbTrimCountRoutesController() {
@@ -508,7 +509,9 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
     Integer countLimit = 1;
-    BdbTrimCountRule rule = new BdbTrimCountRule();
+    // BdbTrimCountRule constructor is protected so mock it
+    MockControl ruleControl = MockClassControl.createControl(BdbTrimCountRule.class);
+    BdbTrimCountRule rule = (BdbTrimCountRule)ruleControl.getMock();
     RouteDefinition definition = new RouteDefinition();
      
     classUnderTest = new BdbTrimCountRoutesController() {

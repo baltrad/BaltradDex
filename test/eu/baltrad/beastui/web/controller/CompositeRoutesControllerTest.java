@@ -6,10 +6,12 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
+import org.easymock.classextension.MockClassControl;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
 import eu.baltrad.beast.router.IRouterManager;
+import eu.baltrad.beast.rules.composite.CompositingRule;
 import eu.baltrad.beast.rules.util.IRuleUtilities;
 
 public class CompositeRoutesControllerTest extends TestCase {
@@ -345,5 +347,29 @@ public class CompositeRoutesControllerTest extends TestCase {
         recipients, byscan, areaid, interval, timeout, sources, emessage);
     verify();
     assertEquals("compositeroute_create", result);
+  }
+  
+  public void testCreateRule() throws Exception {
+    MockControl cruleControl = MockClassControl.createControl(CompositingRule.class);
+    CompositingRule crule = (CompositingRule)cruleControl.getMock();
+    List<String> sources = new ArrayList<String>();
+
+    manager.createRule(CompositingRule.TYPE);
+    managerControl.setReturnValue(crule);
+    crule.setArea("abc");
+    crule.setInterval(1);
+    crule.setSources(sources);
+    crule.setTimeout(2);
+    crule.setScanBased(false);
+    
+    
+    replay();
+    cruleControl.replay();
+    
+    CompositingRule result = classUnderTest.createRule("abc", 1, sources, 2, false);
+    
+    verify();
+    cruleControl.verify();
+    assertSame(crule, result);
   }
 }

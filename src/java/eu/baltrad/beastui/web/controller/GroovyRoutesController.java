@@ -272,7 +272,7 @@ public class GroovyRoutesController {
    * @throws RuleException if groovy rule not could be created from script
    */
   protected GroovyRule createRule(String script) {
-    GroovyRule rule = new GroovyRule();
+    GroovyRule rule = (GroovyRule)manager.createRule(GroovyRule.TYPE);
     rule.setScript(script);
     return rule;
   }

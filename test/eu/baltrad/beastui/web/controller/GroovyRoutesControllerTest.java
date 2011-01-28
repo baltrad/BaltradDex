@@ -24,6 +24,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
+import org.easymock.classextension.MockClassControl;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
@@ -197,7 +198,9 @@ public class GroovyRoutesControllerTest extends TestCase {
     Boolean active = true;
     String description = "some description";
     String def = "some code";
-    GroovyRule rule = new GroovyRule();
+    // GroovyRule constructor is protected so mock it
+    MockControl ruleControl = MockClassControl.createControl(GroovyRule.class);
+    GroovyRule rule = (GroovyRule)ruleControl.getMock();
     
     List<String> recipients = new ArrayList<String>();
     List<String> adaptors = new ArrayList<String>();
@@ -280,7 +283,9 @@ public class GroovyRoutesControllerTest extends TestCase {
     Boolean active = true;
     String description = "some description";
     String def = "some code";
-    GroovyRule rule = new GroovyRule();
+    // GroovyRule constructor is protected so mock it
+    MockControl ruleControl = MockClassControl.createControl(GroovyRule.class);
+    GroovyRule rule = (GroovyRule)ruleControl.getMock();
     
     List<String> recipients = new ArrayList<String>();
     List<String> adaptors = new ArrayList<String>();
@@ -529,7 +534,9 @@ public class GroovyRoutesControllerTest extends TestCase {
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
     String script = "a script";
-    GroovyRule rule = new GroovyRule();
+    // GroovyRule constructor is protected so mock it
+    MockControl ruleControl = MockClassControl.createControl(GroovyRule.class);
+    GroovyRule rule = (GroovyRule)ruleControl.getMock();
     RouteDefinition definition = new RouteDefinition();
     
     classUnderTest = new GroovyRoutesController() {
@@ -592,13 +599,16 @@ public class GroovyRoutesControllerTest extends TestCase {
   }
 
   public void testModifyRoute_failedUpdate() throws Exception {
+    // GroovyRule constructor is protected so mock it
+    MockControl ruleControl = MockClassControl.createControl(GroovyRule.class);
+    GroovyRule rule = (GroovyRule)ruleControl.getMock();
+
     String name = "A";
     String author = "B";
     boolean active = false;
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
     String script = "some def";
-    GroovyRule rule = new GroovyRule();
     RouteDefinition definition = new RouteDefinition();
      
     classUnderTest = new GroovyRoutesController() {
@@ -636,4 +646,24 @@ public class GroovyRoutesControllerTest extends TestCase {
     assertEquals("someredirect", result);
   }
   
+  public void testCreateRule() throws Exception {
+    MockControl groovyRuleControl = MockClassControl.createControl(GroovyRule.class);
+    GroovyRule groovyRule = (GroovyRule)groovyRuleControl.getMock();
+    
+    classUnderTest = new GroovyRoutesController();
+    classUnderTest.setManager(manager);
+    
+    manager.createRule(GroovyRule.TYPE);
+    managerControl.setReturnValue(groovyRule);
+    groovyRule.setScript("abc");
+
+    replay();
+    groovyRuleControl.replay();
+    
+    GroovyRule result = classUnderTest.createRule("abc");
+    
+    verify();
+    groovyRuleControl.verify();
+    assertSame(groovyRule, result);
+  }
 }

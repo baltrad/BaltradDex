@@ -379,7 +379,7 @@ public class CompositeRoutesController {
   
   protected CompositingRule createRule(String areaid, int interval,
       List<String> sources, int timeout, boolean byscan) {
-    CompositingRule rule = new CompositingRule();
+    CompositingRule rule = (CompositingRule)manager.createRule(CompositingRule.TYPE);
     rule.setArea(areaid);
     rule.setInterval(interval);
     rule.setSources(sources);

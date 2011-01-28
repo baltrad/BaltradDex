@@ -430,7 +430,7 @@ public class VolumeRoutesController {
    * @return
    */
   protected VolumeRule createRule(boolean ascending, double mine, double maxe, int interval, List<String> sources, int timeout) {
-    VolumeRule rule = new VolumeRule();
+    VolumeRule rule = (VolumeRule)manager.createRule(VolumeRule.TYPE);
     rule.setAscending(ascending);
     rule.setElevationMin(mine);
     rule.setElevationMax(maxe);

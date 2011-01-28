@@ -6,6 +6,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.easymock.MockControl;
+import org.easymock.classextension.MockClassControl;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
@@ -225,6 +226,10 @@ public class VolumeRoutesControllerTest extends TestCase {
 
   public void testCreateRoute_success() {
     RouteDefinition routedef = new RouteDefinition();
+    // Constructor for VolumeRule is protected so just mock it
+    MockControl ruleControl = MockClassControl.createControl(VolumeRule.class);
+    VolumeRule rule = (VolumeRule)ruleControl.getMock();
+    
     String name = "MyRoute";
     String author = "nisse";
     Boolean active = true;
@@ -236,7 +241,6 @@ public class VolumeRoutesControllerTest extends TestCase {
     Integer timeout = 10000;
     List<String> sources = new ArrayList<String>();
     sources.add("seang");
-    VolumeRule rule = new VolumeRule();
     
     List<String> recipients = new ArrayList<String>();
     List<String> adaptors = new ArrayList<String>();
@@ -290,6 +294,9 @@ public class VolumeRoutesControllerTest extends TestCase {
   
   public void testCreateRoute_failedCreate() {
     RouteDefinition routedef = new RouteDefinition();
+    MockControl ruleControl = MockClassControl.createControl(VolumeRule.class);
+    VolumeRule rule = (VolumeRule)ruleControl.getMock();
+    
     String name = "MyRoute";
     String author = "nisse";
     Boolean active = true;
@@ -301,7 +308,6 @@ public class VolumeRoutesControllerTest extends TestCase {
     Integer timeout = 10000;
     List<String> sources = new ArrayList<String>();
     sources.add("seang");
-    VolumeRule rule = new VolumeRule();
     
     List<String> recipients = new ArrayList<String>();
     List<String> adaptors = new ArrayList<String>();

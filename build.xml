@@ -24,6 +24,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
 <project name="BaltradDex" basedir="." default="dist">
   <description>Builds and deploys BaltradDex application</description>
+  <property file="develop.properties" />  
   <property name="root.dir" value="${basedir}"/>
   <property name="lib.dir" value="lib"/>
   <property name="extralib.dir" value="extralib"/>
@@ -47,7 +48,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="javahdf.path" value="/opt/hdf-java"/>
   
   <!-- You can override properties in this file -->
-  <property file="develop.properties" />  
   <property file="${etc.dir}/db.properties"/>
   <property file="${etc.dir}/appserver.properties"/>
 
