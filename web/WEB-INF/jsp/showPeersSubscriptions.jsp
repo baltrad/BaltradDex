@@ -67,9 +67,9 @@ Author     : szewczenko
                             <div id="table">
                                 <form action="showSelectedPeersSubscriptions.htm">
                                     <display:table name="subscriptions" id="subscription"
-                                        defaultsort="1" requestURI="selectRemoveSubscriptions.htm"
-                                        cellpadding="0" cellspacing="2" export="false"
-                                        class="tableborder">
+                                        defaultsort="0" pagesize="10" cellpadding="0" cellspacing="2"
+                                        export="false" class="tableborder"
+                                        requestURI="showPeersSubscriptions.htm">
                                         <display:column sortable="true" title="Radar station"
                                             sortProperty="channelName" paramId="channelName"
                                             paramProperty="channelName"

@@ -112,14 +112,6 @@ Author     : szewczenko
                                         <div class="row">
                                             <a href="showLocalChannels.htm">Remove</a>
                                         </div>
-
-                                        <div class="row">
-                                            <a href="selectRadar.htm">Configure channel</a>
-                                        </div>
-
-
-
-
                                     </div>
                                 </div>
                                 <div class="tile">
