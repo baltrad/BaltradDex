@@ -28,10 +28,17 @@ Author     : szewczenko
 
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
+<%@page import="eu.baltrad.dex.util.InitAppUtil"%>
 <%
     Date now = new Date();
     SimpleDateFormat format = new SimpleDateFormat( "dd MMMM yyyy, h:mm aa" );
     String dateAndTime = format.format( now );
+    String operator = InitAppUtil.getOrgName();
+    String nodeName = InitAppUtil.getNodeName();
+    String nodeType = InitAppUtil.getNodeType();
+    String address = InitAppUtil.getOrgAddress();
+    String timeZone = InitAppUtil.getTimeZone();
+    String adminEmail = InitAppUtil.getAdminEmail();
 %>
 
 <html>
@@ -39,18 +46,21 @@ Author     : szewczenko
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
         <script type="text/javascript" language="javascript" src="includes/tooltip.js"></script>
+        <title>Baltrad | Log in</title>
         <!-- tooltips -->
         <script type="text/javascript">
             var t1 = null;
             var t2 = null;
-            var l1 = "Submit your security details";
-            var l2 = "Clear input fields";
+            var t3 = null;
+            var l1 = "Enter your user name";
+            var l2 = "Enter password";
+            var l3 = "Enter your email address";
             function initTooltips() {
-                t1 = new ToolTip( "submit_btn_tooltip", false );
-                t2 = new ToolTip( "clear_btn_tooltip", false );
+                t1 = new ToolTip( "user_name_tooltip", false );
+                t2 = new ToolTip( "password_tooltip", false );
+                t3 = new ToolTip( "email_tooltip", false );
             }
         </script>
-        <title>Baltrad | Log in</title>
     </head>
     <body onload="initTooltips()">
         <div id="container">
@@ -78,6 +88,7 @@ Author     : szewczenko
                             your security details.
                         </a>
                     </div>
+                    
                     <div id="login">
                         <form method="post">
                             <div class="top">
@@ -91,23 +102,31 @@ Author     : szewczenko
                             <div class="right">
                                 <div class="row">
                                     <form:input path="command.name"/>
+                                    <div class="help-icon" onmouseover="if(t1)t1.Show(event,l1)"
+                                        onmouseout="if(t1)t1.Hide(event)">
+                                        <img src="includes/images/help-icon.png" alt="help_icon"/>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <form:password path="command.password"/>
+                                    <div class="help-icon" onmouseover="if(t2)t2.Show(event,l2)"
+                                        onmouseout="if(t2)t2.Hide(event)">
+                                        <img src="includes/images/help-icon.png" alt="help_icon"/>
+                                    </div>
                                 </div>
                                 <div class="row">
                                     <form:input path="command.email"/>
+                                    <div class="help-icon" onmouseover="if(t3)t3.Show(event,l3)"
+                                        onmouseout="if(t3)t3.Hide(event)">
+                                        <img src="includes/images/help-icon.png" alt="help_icon"/>
+                                    </div>
                                 </div>
                             </div>
                             <div class="bottom">
-                                <button class="rounded" type="submit"
-                                        onmouseover="if(t1)t1.Show(event,l1)"
-                                        onmouseout="if(t1)t1.Hide(event)">
+                                <button class="rounded" type="submit">
                                     <span>Submit</span>
                                 </button>
-                                <button class="rounded" type="reset" 
-                                        onmouseover="if(t2)t2.Show(event,l2)"
-                                        onmouseout="if(t2)t2.Hide(event)">
+                                <button class="rounded" type="reset">
                                     <span>Clear</span>
                                 </button>
                             </div>
@@ -116,55 +135,60 @@ Author     : szewczenko
                     <div id="separator"></div>
                     <div id="text-box">
                         <div class="title">
-                            Latest messages
+                            Welcome to Baltrad Data Exchange System!
                         </div>
                     </div>
-                        <div id="log-preview-table">
-                            <display:table name="log_entries" id="logEntry"
-                                requestURI="login.htm" cellpadding="0" cellspacing="2"
-                                export="false"  defaultsort="0">
-                                <%-- ! String cell_style = ""; --%>
-                                <%--c:choose>
-                                    <c:when test="${logEntry.type == 'INFO'}">
-                                        <%
-                                            cell_style = "info";
-                                        %>
-                                    </c:when>
-                                    <c:when test="${logEntry.type == 'WARNING'}">
-                                        <%
-                                            cell_style = "warning";
-                                        %>
-                                    </c:when>
-                                    <c:when test="${logEntry.type == 'ERROR'}">
-                                        <%
-                                            cell_style = "error";
-                                        %>
-                                    </c:when>
-                                </c:choose --%>
-                                <display:column sortable="false" paramId="timeStamp"
-                                    paramProperty="timeStamp" class="tdcenter"
-                                    value="${logEntry.timeStamp}" format="{0,date,yy/MM/dd}"
-                                    headerClass="tdhidden">
-                                </display:column>
-                                <display:column sortable="false" paramId="timeStamp"
-                                    paramProperty="timeStamp" class="tdcenter"
-                                    value="${logEntry.timeStamp}" format="{0,date,HH:mm:ss}"
-                                    headerClass="tdhidden">
-                                </display:column>
-                                <display:column sortable="false" paramId="message"
-                                    paramProperty="message" class="tdcenter"
-                                    value="${logEntry.message}" headerClass="tdhidden">
-                                </display:column>
-                            </display:table>
-                        </div>
-                    <div id="clear"></div>
-                </div>
+                        <div id="welcome-msg">
+                            <div class="left">
+                                <div class="row">
+                                    This node is operated by:
+                                </div>
+                                <div class="row">
+                                    Node location:
+                                </div>
+                                <div class="row">
+                                    Node name:
+                                </div>
+                                <div class="row">
+                                    Node type:
+                                </div>
+                                <div class="row">
+                                    Local time zone:
+                                </div>
+                                <div class="row">
+                                    Node administrator's e-mail:
+                                </div>
+                            </div>
+                            <div class="right">
+                                <div class="row">
+                                    <%= operator %>
+                                </div>
+                                <div class="row">
+                                    <%= address %>
+                                </div>
+                                <div class="row">
+                                    <%= nodeName %>
+                                </div>
+                                <div class="row">
+                                    <%= nodeType %>
+                                </div>
+                                <div class="row">
+                                    <%= timeZone %>
+                                </div>
+                                <div class="row">
+                                    <%= adminEmail %>
+                                </div>
+                            </div>
+                        </div>      
+                    </div>
+                <div id="clear"></div>
             </div>
         </div>
         <div id="footer">
             <script type="text/javascript" src="includes/footer.js"></script>
         </div>
-        <div id="clear_btn_tooltip" class="tooltip" style="width: 150px; height: 22px;"></div>
-        <div id="submit_btn_tooltip" class="tooltip" style="width: 150px; height: 44px;"></div>
+        <div id="user_name_tooltip" class="tooltip" style="width: 160px; height: 22px;"></div>
+        <div id="password_tooltip" class="tooltip" style="width: 160px; height: 22px;"></div>
+        <div id="email_tooltip" class="tooltip" style="width: 180px; height: 22px;"></div>
     </body>
 </html>

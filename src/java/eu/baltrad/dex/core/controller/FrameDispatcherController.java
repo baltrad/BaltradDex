@@ -411,12 +411,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     + s.getChannelName() );
                             }
 
-
-
-
-
-
-
                             // send subscription change confirmation
 
                             // write subscription object to temporary file

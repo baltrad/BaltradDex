@@ -333,13 +333,6 @@ form > .left {
 form > .left > .row, form > .right > .row {
     height: 28px;
 }
-form > .left > .row4, form > .right > .row4 {
-    height: 88px;
-}
-form > .left > .row6, form > .right > .row6 {
-    height: 118px;
-}
-
 form > .right {
     position: relative;
     float: left;
@@ -519,6 +512,7 @@ tr {
 #table > form > .right > .row > select {
     width: 200px;
 }
+
 #table > form > .right > .row, #table > form > .left > .row, 
         #table > .left > .row, #table > .right > .row {
     height: 26px;
@@ -561,21 +555,42 @@ tr {
     font-size: 1.1em;
     text-align: right;
 }
+
 /*
- * Log preview table on login page
+ * Welcome message on login page
  */
-#log-preview-table {
+#welcome-msg {
     width: 100%;
     float: left;
     clear: both;
-}
-#log-preview-table tr {
-    background: white;
-}
-#log-preview-table .tdcenter {
-    padding: 0px 2px 0px 2px;
+    background: #FFFFFF;
     color: #B7B7B7;
-    font-size: 0.8em;
+    font-size: 1.0em;
+}
+#welcome-msg > .left {
+    float: left;
+    margin-right: 18px;
+}
+#welcome-msg > .right {
+    float: left;
+    clear: right;
+}
+#welcome-msg > .left > .row, #welcome-msg > .right > .row {
+    padding-top: 1px;
+    padding-bottom: 1px;
+}
+/*
+ * Data source users configuration table
+ */
+.options {
+     float: left;
+     margin-bottom: 12px;
+     width: 260px;
+}
+.option {
+    width: 80px;
+    float: left;
+    padding: 6px;
 }
 
 /*
@@ -588,20 +603,6 @@ tr {
     width: 320px;
 }
 #table > .props > form > .right > .row > select {
-    width: 240px;
-}
-
-#table > .props > form > .right > .row4 > input {
-    width: 360px;
-}
-#table > .props > form > .right > .row4 > select {
-    width: 240px;
-}
-
-#table > .props > form > .right > .row6 > input {
-    width: 360px;
-}
-#table > .props > form > .right > .row6 > select {
     width: 240px;
 }
 
@@ -721,7 +722,11 @@ tr {
  */
 .errors {
     color: red;
+    float: right;
+    padding-left: 4px;
+    clear: right;
 }
+
 /*
  * messages table
  */
@@ -861,4 +866,9 @@ tr {
     text-align: center;
     filter: alpha(Opacity=65);
     opacity: 0.65;
+}
+.help-icon {
+    float: left;
+    padding-left: 4px;
+    padding-right: 4px;
 }

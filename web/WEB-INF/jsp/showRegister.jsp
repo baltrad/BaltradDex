@@ -25,7 +25,7 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@ page import="java.util.List" %>
+<%@page import="java.util.List" %>
 <%
     // get delivery register
     List deliveryRegister = ( List )request.getAttribute( "register_entries" );
