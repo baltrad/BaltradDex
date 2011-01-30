@@ -39,7 +39,6 @@ public class FrameDispatcherControllerTest extends TestCase {
 //---------------------------------------------------------------------------------------- Variables
     private static BaltradFrameHandler bltFrameHandler = new BaltradFrameHandler();
     private static String xmlHdr = null;
-    private static BaltradFrame baltradFrame = null;
 //------------------------------------------------------------------------------------------ Methods
 
     public void testInit() {
@@ -63,39 +62,8 @@ public class FrameDispatcherControllerTest extends TestCase {
         BaltradFrame frame1 = new BaltradFrame( bltFrameHandler.createDataHdr(
             BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Arlanda", "arlanda.h5" ),
             f1.getAbsolutePath() );
-        /*
-        File f2 = new File( "test2.h5" );
-        BaltradFrame frame2 = new BaltradFrame( bltFrameHandler.createDataHdr(
-            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Legionowo", "test2.h5" ),
-            f2.getAbsolutePath() );
-
-        File f3 = new File( "test3.h5" );
-        BaltradFrame frame3 = new BaltradFrame( bltFrameHandler.createDataHdr(
-            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Legionowo", "test3.h5" ),
-            f3.getAbsolutePath() );
-
-        File f4 = new File( "test4.h5" );
-        BaltradFrame frame4 = new BaltradFrame( bltFrameHandler.createDataHdr(
-            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Legionowo", "test4.h5" ),
-            f4.getAbsolutePath() );
-
-        File f5 = new File( "test5.h5" );
-        BaltradFrame frame5 = new BaltradFrame( bltFrameHandler.createDataHdr(
-            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Legionowo", "test5.h5" ),
-            f5.getAbsolutePath() );
-        
-        File f6 = new File( "arlanda.h5" );
-        BaltradFrame frame6 = new BaltradFrame( bltFrameHandler.createDataHdr(
-            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Arlanda", "arlanda.h5" ),
-            f6.getAbsolutePath() );
-        */
         try {
             bltFrameHandler.handleBF( frame1 );
-            /*bltFrameHandler.handleBF( frame2 );
-            bltFrameHandler.handleBF( frame3 );
-            bltFrameHandler.handleBF( frame4 );
-            bltFrameHandler.handleBF( frame5 );
-            bltFrameHandler.handleBF( frame6 );*/
         } catch( Exception e ) {
             System.out.println( "Frame handler error: " + e.getMessage() );
         }

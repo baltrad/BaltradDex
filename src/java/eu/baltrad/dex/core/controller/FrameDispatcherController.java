@@ -364,13 +364,35 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     tempFile );
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
+
                             // create new subscription object
                             Subscription s = new Subscription( subs.getUserName(),
                                     subs.getChannelName(), Subscription.REMOTE_SUBSCRIPTION );
                             // subscription object serves as confirmation
                             Subscription confirmedSub = null;
                             if( subs.getSelected() ) {
-                                // add remote subscription
+                                if( subscriptionManager.getSubscription( s.getUserName(), 
+                                    s.getChannelName(), Subscription.REMOTE_SUBSCRIPTION ) == null) {
+                                    // subscription doesn't exist in the database - add as new
+                                    // subscription
+                                    subscriptionManager.addSubscription( s );
+                                    confirmedSub = s;
+                                    //@
+                                    confirmedSub.setSelected( true );
+                                    logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                                        "User " + s.getUserName() + " subscribed to "
+                                        + s.getChannelName() );
+                                } else {
+                                    // subscription exists in the database - modify subscription
+                                    subscriptionManager.updateSubscription( s.getChannelName(),
+                                            Subscription.REMOTE_SUBSCRIPTION, true );
+                                    confirmedSub = s;
+                                    confirmedSub.setSelected( true );
+                                    logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                                        "User " + s.getUserName() + " subscribed to "
+                                        + s.getChannelName() );
+                                }
+                                /*/ add remote subscription
                                 subscriptionManager.addSubscription( s );
                                 confirmedSub = s;
                                 //@
@@ -378,6 +400,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                     "User " + s.getUserName() + " subscribed to "
                                     + s.getChannelName() );
+                                */
                             } else {
                                 // remove remote subscription
                                 subscriptionManager.removeSubscription( s.getUserName(),
@@ -387,7 +410,13 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     "User " + s.getUserName() + " cancelled subscription to "
                                     + s.getChannelName() );
                             }
-                            
+
+
+
+
+
+
+
                             // send subscription change confirmation
 
                             // write subscription object to temporary file
@@ -574,12 +603,14 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         }
                         // send data to subscribers
                         
-                        List <Subscription> remoteSubs =
+                        List<Subscription> remoteSubs =
                                 subscriptionManager.getSubscriptionsByType(
                                 Subscription.REMOTE_SUBSCRIPTION );
                         if( remoteSubs != null ) {
                             // iterate through subscriptions
                             for( int i = 0; i < remoteSubs.size(); i++ ) {
+
+                                Subscription s = remoteSubs.get( i );
                                 // check if channel name of the incoming frame equals channel name
                                 // in subscription object
                                 if( remoteSubs.get( i ).getChannelName().equals( 

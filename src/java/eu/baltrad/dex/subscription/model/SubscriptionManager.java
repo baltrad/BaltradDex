@@ -83,7 +83,7 @@ public class SubscriptionManager {
      * @param type Subscription type
      * @param selected Channel selection status - updated parameter
      */
-    public void updateSubscription( String channelName, String type, boolean selected) {
+    public void updateSubscription( String channelName, String type, boolean selected ) {
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
