@@ -153,7 +153,7 @@ public class GroovyRoutesController {
         manager.deleteDefinition(name);
         return "redirect:showroutes.htm";
       } catch (Throwable t) {
-        return viewShowRoutes(model, "Failed to delete \"" + name + "\"");
+        return viewShowRoutes(model, "Failed to delete \"" + name + "\", have you verified that there are no reffering scheduled jobs");
       }
     } else {
       String d = "";
