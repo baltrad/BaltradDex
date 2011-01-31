@@ -582,12 +582,16 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             message.setFileEntry( fileEntry );
                             messageManager.manage( message );
                             // create image thumb
+                            /*
+                             * Removed by AHE since it leaks memory and produces quite a few
+                             * messages in the system log.
                             bltDataProcessorController.createImage( tempFile.getAbsolutePath(),
                                 H5_THUMB_DATASET_PATH, H5_THUMB_GROUP_PATH, THUMB_IMAGE_SIZE,
                                 THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE,
                                 THUMB_RANGE_RINGS_COLOR, THUMB_RANGE_MASK_COLOR,
                                 InitAppUtil.getThumbsStorageDirectory()
                                      + File.separator + fileEntry.uuid() + IMAGE_FILE_EXT );
+                             */
                         } catch( DuplicateEntry e ) {
                             throw e;
                         } catch( FileCatalogError e ) {
