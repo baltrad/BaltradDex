@@ -333,7 +333,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     managerControl.setReturnValue(routeDefinition);
     manager.deleteDefinition("somename");
     managerControl.setThrowable(new RuleException());
-    methodMock.viewShowRoutes(model, "Failed to delete \"somename\"");
+    methodMock.viewShowRoutes(model, "Failed to delete \"somename\", have you verified that there are no reffering scheduled jobs");
     methodMockControl.setReturnValue("routes");
     
     replay();
