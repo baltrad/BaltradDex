@@ -66,28 +66,31 @@ public class BltDataProcessorController {
             short rangeRingsDistance, float rangeMaskStroke, String rangeRingsColor,
             String rangeMaskColor, String imageFileName ) {
         H5File h5File = bltDataProcessor.openH5File( h5FileName );
-        Group root = bltDataProcessor.getH5Root( h5File );
-        bltDataProcessor.getH5Dataset( root, datasetPath );
-        Dataset dset = bltDataProcessor.getDataset();
-        bltDataProcessor.getH5Attribute( root, groupPath, BltDataProcessor.H5_NBINS_ATTR,
-                BltDataProcessor.H5_LONG_ATTR );
-        long[] nbins = ( long[] )bltDataProcessor.getLongAttribute().getValue();
-        long nbins_val = nbins[ 0 ];
-        bltDataProcessor.getH5Attribute( root, groupPath, BltDataProcessor.H5_NRAYS_ATTR,
-                BltDataProcessor.H5_LONG_ATTR );
-        long[] nrays = ( long[] )bltDataProcessor.getLongAttribute().getValue();
-        long nrays_val = nrays[ 0 ];
-        bltDataProcessor.getH5Attribute( root, groupPath, BltDataProcessor.H5_A1GATE_ATTR,
-                BltDataProcessor.H5_LONG_ATTR );
-        long[] a1gate = ( long[] )bltDataProcessor.getLongAttribute().getValue();
-        long a1gate_val = a1gate[ 0 ];
-        Color[] colorPalette = bltDataProcessor.createColorPalette(
-                ServletContextUtil.getServletContextPath() + COLOR_PALETTE_FILE );
-        BufferedImage bi = bltDataProcessor.polarH5Dataset2Image( dset, nbins_val, nrays_val,
-                a1gate_val, imageSize, colorPalette, rangeRingsDistance, rangeMaskStroke,
-                rangeRingsColor, rangeMaskColor );
-        bltDataProcessor.saveImageToFile( bi, imageFileName );
-        bltDataProcessor.closeH5File( h5File );
+        try {
+            Group root = bltDataProcessor.getH5Root( h5File );
+            bltDataProcessor.getH5Dataset( root, datasetPath );
+            Dataset dset = bltDataProcessor.getDataset();
+            bltDataProcessor.getH5Attribute( root, groupPath, BltDataProcessor.H5_NBINS_ATTR,
+                    BltDataProcessor.H5_LONG_ATTR );
+            long[] nbins = ( long[] )bltDataProcessor.getLongAttribute().getValue();
+            long nbins_val = nbins[ 0 ];
+            bltDataProcessor.getH5Attribute( root, groupPath, BltDataProcessor.H5_NRAYS_ATTR,
+                    BltDataProcessor.H5_LONG_ATTR );
+            long[] nrays = ( long[] )bltDataProcessor.getLongAttribute().getValue();
+            long nrays_val = nrays[ 0 ];
+            bltDataProcessor.getH5Attribute( root, groupPath, BltDataProcessor.H5_A1GATE_ATTR,
+                    BltDataProcessor.H5_LONG_ATTR );
+            long[] a1gate = ( long[] )bltDataProcessor.getLongAttribute().getValue();
+            long a1gate_val = a1gate[ 0 ];
+            Color[] colorPalette = bltDataProcessor.createColorPalette(
+                    ServletContextUtil.getServletContextPath() + COLOR_PALETTE_FILE );
+            BufferedImage bi = bltDataProcessor.polarH5Dataset2Image( dset, nbins_val, nrays_val,
+                    a1gate_val, imageSize, colorPalette, rangeRingsDistance, rangeMaskStroke,
+                    rangeRingsColor, rangeMaskColor );
+            bltDataProcessor.saveImageToFile( bi, imageFileName );
+        } finally {
+            bltDataProcessor.closeH5File( h5File );
+        }
     }
     /**
      * Wrapper method creating image from a given radar data file.

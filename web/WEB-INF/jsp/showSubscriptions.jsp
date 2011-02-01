@@ -70,9 +70,8 @@ Author     : szewczenko
                             <div id="table">
                                 <form action="showSelectedSubscriptions.htm">
                                     <display:table name="subscriptions" id="subscription" 
-                                        pagesize="10" defaultsort="0" cellpadding="0"
-                                        cellspacing="2" export="false" class="tableborder"
-                                        requestURI="showSubscriptions.htm">
+                                        cellpadding="0" cellspacing="2" export="false"
+                                        class="tableborder" requestURI="showSubscriptions.htm">
                                         <display:column sortable="true" title="Radar station"
                                             href="radarData.htm" sortProperty="channelName"
                                             paramId="channelName" paramProperty="channelName"

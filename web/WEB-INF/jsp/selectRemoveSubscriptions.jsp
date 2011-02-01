@@ -82,7 +82,7 @@ Author     : szewczenko
                             <div id="table">
                                 <form action="showRemovedSubscriptions.htm">
                                     <display:table name="subscriptions" id="subscription" 
-                                        defaultsort="0" pagesize="10" cellpadding="0" cellspacing="2"
+                                        cellpadding="0" cellspacing="2"
                                         export="false" class="tableborder"
                                         requestURI="selectRemoveSubscriptions.htm">
                                         <display:column sortable="true" title="Radar station"
