@@ -22,8 +22,11 @@
 package eu.baltrad.dex.util;
 
 import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.fc.CacheDirStorage;
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileCatalogError;
+import eu.baltrad.fc.LocalStorage;
+import eu.baltrad.fc.db.Database;
 
 import java.util.Properties;
 import java.util.Date;
@@ -45,6 +48,10 @@ public class FileCatalogConnector {
     // File catalog storage folder
     private static final String DATA_STORAGE_FOLDER_PROP = "data.storage.folder";
 //---------------------------------------------------------------------------------------- Variables
+    // Reference to LocalStorage object
+    private static LocalStorage localStorage;
+    // Reference to Database object
+    private static Database database;
     // Reference to FileCatalog object
     private static FileCatalog fileCatalog;
     // Reference to LogManager object
@@ -74,7 +81,9 @@ public class FileCatalogConnector {
                 dataStorageDirectory = InitAppUtil.createDir( props.getProperty( 
                         DATA_STORAGE_FOLDER_PROP ), "New data storage directory created" );
                 // initialize file catalog
-                fileCatalog = new FileCatalog( dbURI, dataStorageDirectory );
+                localStorage = new CacheDirStorage( dataStorageDirectory );
+                database = Database.create( dbURI );
+                fileCatalog = new FileCatalog( database, localStorage );
                 logManager.addEntry( new Date(), LogManager.MSG_INFO,
                         "File catalog successfully initialized" );
             } else {

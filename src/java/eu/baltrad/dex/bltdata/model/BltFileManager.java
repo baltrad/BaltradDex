@@ -65,10 +65,10 @@ public class BltFileManager {
      */
     public List< BltFile > getDataByRadar( FileCatalog fc, String radarName ) {
         ExpressionFactory xpr = new ExpressionFactory();
-        FileQuery q = fc.query_file();
+        FileQuery q = new FileQuery();
         // filter the query with a given channel name
         q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( radarName ) ) );
-        FileResult r = q.execute();
+        FileResult r = fc.database().execute(q);
         List< BltFile > bltFiles = new ArrayList<BltFile>();
         while( r.next() ) {
             try {
@@ -101,10 +101,10 @@ public class BltFileManager {
      */
     public BltFile getDataByID( FileCatalog fc, String uuid ) {
         ExpressionFactory xpr = new ExpressionFactory();
-        FileQuery q = fc.query_file();
+        FileQuery q = new FileQuery();
         // filter the query with a given file identity string
         q.filter( xpr.attribute( FC_FILE_UUID ).eq( xpr.string( uuid ) ) );
-        FileResult r = q.execute();
+        FileResult r = fc.database().execute(q);
         BltFile bltFile = null;
         while( r.next() ) {
             try {
