@@ -57,7 +57,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
   <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
   <property name="beast.path" value="/opt/baltrad/beast" />
-  <available file="${baltrad.db.path}/java/jbrfc.jar" property="jbrfc.jar.available" />
+
+  <available file="${baltrad.db.path}/share/baltrad-db/java/jbrfc.jar" property="jbrfc.jar.available" />
   <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
   <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
   <available file="${javahdf.path}/lib/jhdf5.jar" property="javahdf.lib.available"/>
@@ -94,7 +95,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fileset dir="${extralib.dir}">
       <include name="**/*.jar"/>
     </fileset>
-    <fileset dir="${baltrad.db.path}/java">
+    <fileset dir="${baltrad.db.path}/share/baltrad-db/java">
       <include name="jbrfc.jar"/>
     </fileset>
     <fileset dir="${beast.path}/bin">
@@ -414,8 +415,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
          userid="${db.user}" 
          password="${db.pwd}" >
       <transaction src="${etc.dir}/drop_dex_schema.sql"/>
-      <transaction src="${baltrad.db.path}/sql/postgresql/drop.sql"/>
-      <transaction src="${baltrad.db.path}/sql/postgresql/create.sql"/>
+      <transaction src="${baltrad.db.path}/share/baltrad-db/sql/postgresql/drop.sql"/>
+      <transaction src="${baltrad.db.path}/share/baltrad-db/sql/postgresql/create.sql"/>
       <transaction src="${beast.path}/sql/drop_db.sql"/>
       <transaction src="${beast.path}/sql/create_db.sql"/>
       <transaction src="${etc.dir}/create_dex_schema.sql"/>
