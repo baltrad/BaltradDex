@@ -107,16 +107,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </fileset-->
 
     <fileset dir="${javahdf.path}/lib">
-      <include name="jhdf5.jar"/>
-    </fileset>
-    <fileset dir="${javahdf.path}/lib">
-      <include name="jhdf5obj.jar"/>
-    </fileset>
-    <fileset dir="${javahdf.path}/lib">
-      <include name="jhdf.jar"/>
-    </fileset>
-    <fileset dir="${javahdf.path}/lib">
-      <include name="jhdfobj.jar"/>
+      <include name="*.jar"/>
     </fileset>
   </path>
 
