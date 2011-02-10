@@ -57,6 +57,8 @@ public class ChannelManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return channels;
     }
@@ -78,6 +80,8 @@ public class ChannelManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return channel;
     }
@@ -99,6 +103,8 @@ public class ChannelManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return channel;
     }
@@ -113,17 +119,21 @@ public class ChannelManager {
         if( channelNames != null ) {
             SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
             Session session = sessionFactory.openSession();
-            for( int i = 0; i < channelNames.length; i++ ) {
-                session.beginTransaction();
-                try {
-                    Channel channel = ( Channel )session.createQuery( "FROM Channel WHERE " +
-                            " channelName = ?" ).setString( 0, channelNames[ i ] ).uniqueResult();
-                    session.getTransaction().commit();
-                    channelIds.add( channel.getId() );
-                } catch( HibernateException e ) {
-                    session.getTransaction().rollback();
-                    throw e;
+            try {
+                for( int i = 0; i < channelNames.length; i++ ) {
+                    session.beginTransaction();
+                    try {
+                        Channel channel = ( Channel )session.createQuery( "FROM Channel WHERE " +
+                                " channelName = ?" ).setString( 0, channelNames[ i ] ).uniqueResult();
+                        session.getTransaction().commit();
+                        channelIds.add( channel.getId() );
+                    } catch( HibernateException e ) {
+                        session.getTransaction().rollback();
+                        throw e;
+                    }
                 }
+            } finally {
+                session.close();
             }
         }
         return channelIds;
@@ -143,6 +153,8 @@ public class ChannelManager {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -160,6 +172,8 @@ public class ChannelManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -184,6 +198,8 @@ public class ChannelManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return channelPermission;
     }
@@ -208,6 +224,8 @@ public class ChannelManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return channelPermissions;
     }
@@ -232,6 +250,8 @@ public class ChannelManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return channelPermissions;
     }
@@ -252,6 +272,8 @@ public class ChannelManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -276,6 +298,8 @@ public class ChannelManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
 }

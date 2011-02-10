@@ -55,6 +55,8 @@ public class SubscriptionManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return subscriptionList;
     }
@@ -73,6 +75,8 @@ public class SubscriptionManager {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -97,6 +101,8 @@ public class SubscriptionManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -115,6 +121,8 @@ public class SubscriptionManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -138,6 +146,8 @@ public class SubscriptionManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -164,6 +174,8 @@ public class SubscriptionManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -184,6 +196,8 @@ public class SubscriptionManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return subscriptionList;
     }
@@ -207,6 +221,8 @@ public class SubscriptionManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return subs;
     }
@@ -232,6 +248,8 @@ public class SubscriptionManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return subs;
     }

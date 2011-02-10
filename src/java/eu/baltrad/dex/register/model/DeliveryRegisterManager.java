@@ -60,6 +60,8 @@ public class DeliveryRegisterManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return deliveryRegisterEntry;
     }
@@ -79,6 +81,8 @@ public class DeliveryRegisterManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return regEntries;
     }
@@ -98,6 +102,8 @@ public class DeliveryRegisterManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         // return number of entries
         return ( regEntries != null ) ? regEntries.size() : 0;
@@ -117,6 +123,8 @@ public class DeliveryRegisterManager {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -135,6 +143,8 @@ public class DeliveryRegisterManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -154,6 +164,8 @@ public class DeliveryRegisterManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return deletedEntries;
     }

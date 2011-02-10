@@ -25,7 +25,6 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.log.model.LogManager;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
-
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.validation.BindException;
 import org.springframework.web.servlet.ModelAndView;
@@ -106,7 +105,7 @@ public class LoginController extends SimpleFormController {
             ApplicationSecurityManager.setUser( request, dbUser );
             logManager.addEntry( new Date(), LogManager.MSG_INFO, "User "
                     + dbUser.getName() + " logged on" );
-        } 
+        }
         return new ModelAndView( getSuccessView() );
     }
     /**

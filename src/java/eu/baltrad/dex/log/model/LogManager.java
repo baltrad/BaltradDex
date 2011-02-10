@@ -67,6 +67,8 @@ public class LogManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         Collections.sort( logEntries );
         return logEntries;
@@ -89,6 +91,8 @@ public class LogManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return logEntries;
     }
@@ -118,6 +122,8 @@ public class LogManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         Collections.sort( logEntries );
         return logEntries;
@@ -137,6 +143,8 @@ public class LogManager {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -157,6 +165,8 @@ public class LogManager {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -175,12 +185,14 @@ public class LogManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
      * Method deletes last entry from the log entry list.
      */
-    public void deleteLastEntry() {
+    /*public void deleteLastEntry() {
         LogEntry logEntry = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
@@ -205,7 +217,7 @@ public class LogManager {
             session.getTransaction().rollback();
             throw e;
         }
-    }
+    }*/
     /**
      * Deletes all rows from log table.
      *
@@ -222,6 +234,8 @@ public class LogManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return deletedEntries;
     }

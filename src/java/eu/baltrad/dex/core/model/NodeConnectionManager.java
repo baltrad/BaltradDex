@@ -55,6 +55,8 @@ public class NodeConnectionManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return connections;
     }
@@ -77,6 +79,8 @@ public class NodeConnectionManager {
         catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return nodeConnection;
     }
@@ -99,6 +103,8 @@ public class NodeConnectionManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return nodeConnection;
     }
@@ -117,6 +123,8 @@ public class NodeConnectionManager {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -134,6 +142,8 @@ public class NodeConnectionManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -153,6 +163,8 @@ public class NodeConnectionManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return res;
     }

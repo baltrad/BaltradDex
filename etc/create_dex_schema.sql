@@ -26,7 +26,7 @@ Author     : szewczenko
 DROP TABLE IF EXISTS dex_subscriptions;
 DROP TABLE IF EXISTS dex_delivery_register;
 DROP TABLE IF EXISTS dex_channel_permissions CASCADE;
-DROP TABLE IF EXISTS dex_users;
+DROP TABLE IF EXISTS dex_users CASCADE;
 DROP TABLE IF EXISTS dex_roles;
 DROP TABLE IF EXISTS dex_messages;
 DROP TABLE IF EXISTS dex_channels;

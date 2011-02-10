@@ -58,6 +58,8 @@ public class UserManager {
         catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return user;
     }
@@ -79,6 +81,8 @@ public class UserManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return user;
     }
@@ -100,6 +104,8 @@ public class UserManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return user;
     }
@@ -121,6 +127,8 @@ public class UserManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return user;
     }
@@ -140,6 +148,8 @@ public class UserManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return roles;
     }
@@ -167,6 +177,8 @@ public class UserManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return res;
     }
@@ -186,6 +198,8 @@ public class UserManager {
         } catch ( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return users;
     }
@@ -208,6 +222,8 @@ public class UserManager {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
     /**
@@ -225,6 +241,8 @@ public class UserManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
 }

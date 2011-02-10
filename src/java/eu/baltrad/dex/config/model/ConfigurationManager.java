@@ -57,6 +57,8 @@ public class ConfigurationManager {
         } catch( HibernateException e ) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
         return conf;
     }
@@ -75,6 +77,8 @@ public class ConfigurationManager {
         } catch (HibernateException e) {
             session.getTransaction().rollback();
             throw e;
+        } finally {
+            session.close();
         }
     }
 }
