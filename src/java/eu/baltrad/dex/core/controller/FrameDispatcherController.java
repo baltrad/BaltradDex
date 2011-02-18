@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -31,20 +31,18 @@ import eu.baltrad.dex.log.model.LogManager;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
-import eu.baltrad.dex.register.model.DeliveryRegisterEntry;
-import eu.baltrad.dex.register.model.DeliveryRegisterManager;
 import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.channel.model.ChannelPermission;
 import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
-import eu.baltrad.dex.core.model.NodeConnection;
+import eu.baltrad.dex.core.util.FramePublisherManager;
+import eu.baltrad.dex.core.util.FramePublisher;
+import eu.baltrad.dex.core.util.StoreFileTask;
 
 import eu.baltrad.fc.FileCatalog;
-import eu.baltrad.fc.db.FileEntry;
 import eu.baltrad.fc.DuplicateEntry;
 import eu.baltrad.fc.FileCatalogError;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
-import eu.baltrad.beast.message.mo.BltDataMessage;
 
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
@@ -66,7 +64,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
-
 
 /**
  * Class implements frame dispatching controller. This controller handles all incoming and outgoing
@@ -100,12 +97,11 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private ChannelManager channelManager;
     private SubscriptionManager subscriptionManager;
     private LogManager logManager;
-    private DeliveryRegisterManager deliveryRegisterManager;
     private BltDataProcessorController bltDataProcessorController;
     // Reference to file catalog object
     private FileCatalog fc;
     // Beast message manager
-    private IBltMessageManager messageManager;
+    private IBltMessageManager bltMessageManager;
     // remote channel listing
     private List channelListing;
     // confirmed subscription list
@@ -118,6 +114,10 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private String remoteNodeAddress;
     // remote user name
     private String localUserName;
+    // Frame publisher manager
+    private FramePublisherManager framePublisherManager;
+    // Frame publisher object
+    private FramePublisher framePublisher;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Required by the Spring's Controller interface, wraps actual doGet method used to
@@ -562,103 +562,28 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             BaltradFrameHandler.FILE ) ) {
                         logManager.addEntry( new Date(), LogManager.MSG_INFO,
                             "New data frame received from " + bfHandler.getSenderNodeName( header )
-                            + ": " + bfHandler.getFileName( header ) );
-                        // write data to the temporary file
-                        File tempFile = InitAppUtil.createTempFile(
+                            + " / " + bfHandler.getChannel( header ) );
+                        // write data to swap file
+                        File swapFile = InitAppUtil.createTempFile(
                                 new File( InitAppUtil.getWorkDir() ) );
                         FileItemStream fileItem = iterator.next();
                         InputStream fileStream = fileItem.openStream();
-                        InitAppUtil.saveFile( fileStream, tempFile );
-
-                        // save data in the catalog
-                        FileEntry fileEntry = null;
-                        try {
-                            if( fc == null ) {
-                                fc = FileCatalogConnector.connect();
-                            }
-                            fileEntry = fc.store( tempFile.getAbsolutePath() );
-                            // Interface with the Beast framework
-                            BltDataMessage message = new BltDataMessage();
-                            message.setFileEntry( fileEntry );
-                            messageManager.manage( message );
-                            // create image thumb
-                            /*
-                             * Removed by AHE since it leaks memory and produces quite a few
-                             * messages in the system log.
-                            bltDataProcessorController.createImage( tempFile.getAbsolutePath(),
-                                H5_THUMB_DATASET_PATH, H5_THUMB_GROUP_PATH, THUMB_IMAGE_SIZE,
-                                THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE,
-                                THUMB_RANGE_RINGS_COLOR, THUMB_RANGE_MASK_COLOR,
-                                InitAppUtil.getThumbsStorageDirectory()
-                                     + File.separator + fileEntry.uuid() + IMAGE_FILE_EXT );
-                             */
-                        } catch( DuplicateEntry e ) {
-                            throw e;
-                        } catch( FileCatalogError e ) {
-                            throw e;
-                        } catch( Exception e ) {
-                            throw e;
+                        InitAppUtil.saveFile( fileStream, swapFile );
+                        // check connection to FileCatalog
+                        if( fc == null ) {
+                            fc = FileCatalogConnector.connect();
                         }
-                        // send data to subscribers
-                        
-                        List<Subscription> remoteSubs =
-                                subscriptionManager.getSubscriptionsByType(
-                                Subscription.REMOTE_SUBSCRIPTION );
-                        if( remoteSubs != null ) {
-                            // iterate through subscriptions
-                            for( int i = 0; i < remoteSubs.size(); i++ ) {
-
-                                Subscription s = remoteSubs.get( i );
-                                // check if channel name of the incoming frame equals channel name
-                                // in subscription object
-                                if( remoteSubs.get( i ).getChannelName().equals( 
-                                        bfHandler.getChannel( header ) ) ) {
-                                    // get local user
-                                    User user = userManager.getUserByName(
-                                            remoteSubs.get( i ).getUserName() );
-
-                                    // create data frame
-                                    bfHandler.setUrl(  NodeConnection.HTTP_PREFIX +
-                                        user.getShortAddress() + NodeConnection.PORT_SEPARATOR +
-                                        user.getPortNumber() + NodeConnection.ADDRESS_SEPARATOR +
-                                        NodeConnection.APP_CONTEXT +
-                                        NodeConnection.ADDRESS_SEPARATOR +
-                                        NodeConnection.ENTRY_ADDRESS );
-                                   
-                                    String retHeader = bfHandler.createDataHdr(
-                                        BaltradFrameHandler.MIME_MULTIPART,
-                                        InitAppUtil.getNodeName(),
-                                        remoteSubs.get( i ).getChannelName(),
-                                        fileEntry.uuid() + ".h5" );
-
-                                    BaltradFrame baltradFrame = new BaltradFrame( retHeader,
-                                            tempFile.getAbsolutePath() );
-
-                                    // process the frame
-                                    int res = bfHandler.handleBF( baltradFrame );
-                                    String status = 
-                                            ( ( res == 0 ) ? DeliveryRegisterEntry.MSG_SUCCESS :
-                                                DeliveryRegisterEntry.MSG_FAILURE );
-                                    // add entry to the data delivery register
-                                    DeliveryRegisterEntry dre = new DeliveryRegisterEntry( 
-                                            user.getId(), fileEntry.uuid(), user.getName(),
-                                            new Date(), status );
-
-                                    deliveryRegisterManager.addEntry( dre );
-
-                                    logManager.addEntry( new Date(), LogManager.MSG_INFO,
-                                        "Sending data from " +
-                                        remoteSubs.get( i ).getChannelName() + " to user "
-                                        + user.getName() + ": "
-                                        + bfHandler.getFileName( retHeader) );
-                                }
-                            }
-                        }
-                        // delete temp file
-                        InitAppUtil.deleteFile( tempFile.getAbsolutePath() );
+                        // create file storage task
+                        StoreFileTask sfTask = new StoreFileTask( getFramePublisherManager(),
+                                getBltMessageManager(), fc, header, swapFile );
+                        // add task to publisher
+                        framePublisher.addTask( sfTask );
                     }
                 }
-             }
+            }
+            // clean work directory from temporary files
+            InitAppUtil.cleanUpTempFiles( InitAppUtil.getWorkDir() );
+
         } catch( FileUploadException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e.getMessage() );
@@ -883,34 +808,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
     /**
-     * Method gets reference to DeliveryRegisterManager class instance.
-     *
-     * @return Reference to DeliveryRegisterManager class instance
-     */
-    public DeliveryRegisterManager getDeliveryRegisterManager() { return deliveryRegisterManager; }
-    /**
-     * Method sets reference to DeliveryRegisterManager class instance.
-     *
-     * @param deliveryRegisterManager Reference to DeliveryRegisterManager class instance
-     */
-    public void setDeliveryRegisterManager( DeliveryRegisterManager deliveryRegisterManager ) {
-        this.deliveryRegisterManager = deliveryRegisterManager;
-    }
-    /**
-     * Gets reference to Beast's Message Manager object.
-     *
-     * @return Reference to Best's Message Manager object
-     */
-    public IBltMessageManager getMessageManager() { return messageManager; }
-    /**
-     * Sets reference to Beast's Message Manager object.
-     *
-     * @param messageManager Reference to Beast's Message Manager object
-     */
-    public void setMessageManager( IBltMessageManager messageManager ) {
-        this.messageManager = messageManager;
-    }
-    /**
      * Gets reference to BltDataProcessorController object.
      *
      * @return Reference to BltDataProcessorController object
@@ -926,6 +823,52 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     public void setBltDataProcessorController(
             BltDataProcessorController bltDataProcessorController ) {
         this.bltDataProcessorController = bltDataProcessorController;
+    }
+    /**
+     * Gets reference to FramePublisherManager object.
+     *
+     * @return Reference to FramePublisherManager object
+     */
+    public FramePublisherManager getFramePublisherManager() {
+        return framePublisherManager;
+    }
+    /**
+     * Sets reference to FramePublisherManager object.
+     *
+     * @param framePublisherManager Reference to FramePublisherManager object to set
+     */
+    public void setFramePublisherManager( FramePublisherManager framePublisherManager ) {
+        this.framePublisherManager = framePublisherManager;
+    }
+    /**
+     * Gets reference to FramePublisher object
+     *
+     * @return the framePublisher
+     */
+    public FramePublisher getFramePublisher() {
+        return framePublisher;
+    }
+    /**
+     * Sets reference to FramePublisher object
+     *
+     * @param framePublisher the framePublisher to set
+     */
+    public void setFramePublisher(FramePublisher framePublisher) {
+        this.framePublisher = framePublisher;
+    }
+    /**
+     * Gets reference to Beast's IBltMessageManager object.
+     *
+     * @return Reference to Beast's IBltMessageManager object
+     */
+    public IBltMessageManager getBltMessageManager() { return bltMessageManager; }
+    /**
+     * Sets reference to Beast's IBltMessageManager object.
+     *
+     * @param bltMessageManager Reference to Beast's IBltMessageManager object
+     */
+    public void setBltMessageManager( IBltMessageManager bltMessageManager ) {
+        this.bltMessageManager = bltMessageManager;
     }
 }
 //--------------------------------------------------------------------------------------------------

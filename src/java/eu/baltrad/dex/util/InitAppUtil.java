@@ -58,6 +58,8 @@ public class InitAppUtil {
     private static final String IMAGE_STORAGE_FOLDER_PROP = "image.storage.folder";
     // Image thumbs storage folder
     private static final String THUMBS_STORAGE_FOLDER_PROP = "thumbs.storage.folder";
+    // Maximum age of temporary files in miliseconds, set to 3 minutes
+    private static final long TEMP_FILE_MAX_AGE = 180000;
 //---------------------------------------------------------------------------------------- Variables
     // Initialize LogManager object
     private static LogManager logManager = new LogManager();
@@ -362,10 +364,12 @@ public class InitAppUtil {
      *
      * @param is Input data stream
      * @param dstFileName Output file name
+     * @retunr dstFile Reference to saved file
      */
-    public static void saveFile( InputStream is, String dstFileName ) {
+    public static File saveFile( InputStream is, String dstFileName ) {
+        File dstFile = null;
         try {
-            File dstFile = new File( dstFileName );
+            dstFile = new File( dstFileName );
             FileOutputStream fos = new FileOutputStream( dstFile );
             byte[] bytes = new byte[ 1024 ];
             int len;
@@ -381,14 +385,16 @@ public class InitAppUtil {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
                     + e.getMessage() );
         }
+        return dstFile;
     }
     /**
      * Method saves data from input stream to file with a given name.
      *
      * @param is Input data stream
      * @param dstFile Output file
+     * @return dstFile Refernce to saved file
      */
-    public static void saveFile( InputStream is, File dstFile ) {
+    public static File saveFile( InputStream is, File dstFile ) {
         try {
             FileOutputStream fos = new FileOutputStream( dstFile );
             byte[] bytes = new byte[ 1024 ];
@@ -405,6 +411,7 @@ public class InitAppUtil {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
                     + e.getMessage() );
         }
+        return dstFile;
     }
     /**
      * Deletes file.
@@ -429,6 +436,28 @@ public class InitAppUtil {
         if( !f.delete() ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while deleting file: "
                     + f.getName() );
+        }
+    }
+    /**
+     * Deletes temporary files from a given directory. Files must be older than a given age.
+     *
+     * @param directory Directory where temporary files are stored
+     * @param maxAge Maximum age of temporary file
+     */
+    public static void cleanUpTempFiles( String directory ) {
+        File dir = new File( directory );
+        File[] tempFiles = dir.listFiles();
+        for( int i = 0; i < tempFiles.length; i++ ) {
+            if( tempFiles[ i ].getName().startsWith( TEMP_FILE_PREFIX ) &&
+                    tempFiles[ i ].getName().endsWith( TEMP_FILE_SUFFIX ) ) {
+                Date date = new Date();
+                long now = date.getTime();
+                long modified = tempFiles[ i ].lastModified();
+                // check if the files is older than a given age
+                if( ( now - modified ) > TEMP_FILE_MAX_AGE ) {
+                    deleteFile( tempFiles[ i ] );
+                }
+            }
         }
     }
     /**

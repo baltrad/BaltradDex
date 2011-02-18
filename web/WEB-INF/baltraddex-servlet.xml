@@ -402,6 +402,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="logManager" class="eu.baltrad.dex.log.model.LogManager"/>
 
+    <!-- FramePublisherManager -->
+    <bean name="framePublisherManager" class="eu.baltrad.dex.core.util.FramePublisherManager"/>
+
+    <!-- FramePublisher -->
+    <bean name="framePublisher" class="eu.baltrad.dex.core.util.FramePublisher"/>
+
     <!-- Frame dispatcher controller -->
     <bean name="frameDispatcherController"
         class="eu.baltrad.dex.core.controller.FrameDispatcherController">
@@ -417,14 +423,17 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="logManager">
             <ref bean="logManager"/>
         </property>
-        <property name="deliveryRegisterManager">
-            <ref bean="deliveryRegisterManager"/>
-        </property>
-        <property name="messageManager">
+        <property name="bltMessageManager">
             <ref bean="bltmanager"/>
         </property>
         <property name="bltDataProcessorController">
             <ref bean="bltDataProcessorController"/>
+        </property>
+        <property name="framePublisherManager">
+            <ref bean="framePublisherManager"/>
+        </property>
+        <property name="framePublisher">
+            <ref bean="framePublisher"/>
         </property>
     </bean>
 

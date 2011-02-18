@@ -44,7 +44,7 @@ public class SubscriptionManager {
      *
      * @return List containing all available subscriptions
      */
-    public List getSubscriptions() {
+    public List<Subscription> getSubscriptions() {
         List subscriptionList = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();
@@ -184,7 +184,7 @@ public class SubscriptionManager {
      * @param type Subscription type
      * @return List of subscriptions of a given type
      */
-    public List getSubscriptionsByType( String type ) {
+    public List<Subscription> getSubscriptionsByType( String type ) {
         List subscriptionList = null;
         SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
         Session session = sessionFactory.openSession();

@@ -92,7 +92,7 @@ Author     : szewczenko
                                     <display:column href="download.htm" paramId="path"
                                         paramProperty="path" class="tdimage"
                                         sortable="false" title="Download">
-                                        <img src="${data.thumbPath}" alt="no_thumb">
+                                        <img src="${data.thumbPath}" alt="Download">
                                     </display:column>
                                 </display:table>
                             </div>
