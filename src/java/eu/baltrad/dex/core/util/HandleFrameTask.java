@@ -21,13 +21,13 @@
 
 package eu.baltrad.dex.core.util;
 
+import eu.baltrad.dex.register.model.DeliveryRegisterManager;
+import eu.baltrad.dex.register.model.DeliveryRegisterEntry;
 import eu.baltrad.frame.model.BaltradFrameHandler;
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.core.model.NodeConnection;
 import eu.baltrad.dex.util.InitAppUtil;
-import eu.baltrad.dex.register.model.DeliveryRegisterManager;
-import eu.baltrad.dex.register.model.DeliveryRegisterEntry;
 import eu.baltrad.dex.log.model.LogManager;
 
 import eu.baltrad.fc.db.FileEntry;
@@ -44,29 +44,36 @@ import java.util.Date;
  */
 public class HandleFrameTask implements Runnable {
 //---------------------------------------------------------------------------------------- Variables
-    private String channelName;
+    private DeliveryRegisterManager deliveryRegisterManager;
+    private BaltradFrameHandler baltradFrameHandler;
+    private LogManager logManager;
     private User user;
+    private String channelName;
     private FileEntry fileEntry;
     private File fileItem;
-    private BaltradFrameHandler baltradFrameHandler;
-    private DeliveryRegisterManager deliveryRegisterManager;
-    private LogManager logManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      *
+     * @param deliveryRegisterManager References delivery register manager object
+     * @see DeliveryRegisterManager
+     * @param logManager References log manager object
+     * @see LogManager
+     * @param user User for which this task is performed
+     * @see User
      * @param channelName Data channel name
-     * @param user User object
      * @param fileEntry File catalog's file entry object
      * @param fileItem BaltradFrame file item
      */
-    public HandleFrameTask( String channelName, User user, FileEntry fileEntry, File fileItem ) {
-        this.channelName = channelName;
+    public HandleFrameTask( DeliveryRegisterManager deliveryRegisterManager, LogManager logManager, 
+            User user, String channelName, FileEntry fileEntry, File fileItem ) {
+        this.deliveryRegisterManager = deliveryRegisterManager;
+        this.logManager = logManager;
         this.user = user;
+        this.channelName = channelName;
         this.fileEntry = fileEntry;
         this.fileItem = fileItem;
-        this.logManager = new LogManager();
-        this.deliveryRegisterManager = new DeliveryRegisterManager();
+        this.baltradFrameHandler = new BaltradFrameHandler();
         this.baltradFrameHandler = new BaltradFrameHandler( NodeConnection.HTTP_PREFIX +
                 user.getShortAddress() + NodeConnection.PORT_SEPARATOR + user.getPortNumber() +
                 NodeConnection.ADDRESS_SEPARATOR + NodeConnection.APP_CONTEXT +
@@ -82,20 +89,20 @@ public class HandleFrameTask implements Runnable {
         // prepare frame
         BaltradFrame baltradFrame = new BaltradFrame( header, fileItem.getAbsolutePath() );
         // handle the frame
-        int res = baltradFrameHandler.handleBF( baltradFrame );
+        int httpStatusCode = baltradFrameHandler.handleBF( baltradFrame );
         // update data delivery register
-        String status = ( ( res == 0 ) ? DeliveryRegisterEntry.MSG_SUCCESS :
-            DeliveryRegisterEntry.MSG_FAILURE );
+        String status = ( ( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) ?
+            DeliveryRegisterEntry.MSG_SUCCESS : DeliveryRegisterEntry.MSG_FAILURE );
         DeliveryRegisterEntry drEntry = new DeliveryRegisterEntry( user.getId(), fileEntry.uuid(),
                 user.getName(), new Date(), status );
         deliveryRegisterManager.addEntry( drEntry );
-        if( res == 0 ) {
+        if( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) {
             logManager.addEntry( new Date(), LogManager.MSG_INFO, "Data from " +
                     channelName + " sent to user " + user.getName() );
         } else {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to send data " +
                     "from " + channelName + " to user " + user.getName() );
         }
-   }
+    }
 }
 //--------------------------------------------------------------------------------------------------

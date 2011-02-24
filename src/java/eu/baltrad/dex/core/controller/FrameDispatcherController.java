@@ -36,13 +36,16 @@ import eu.baltrad.dex.channel.model.ChannelPermission;
 import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 import eu.baltrad.dex.core.util.FramePublisherManager;
 import eu.baltrad.dex.core.util.FramePublisher;
-import eu.baltrad.dex.core.util.StoreFileTask;
+import eu.baltrad.dex.core.util.HandleFrameTask;
+import eu.baltrad.dex.register.model.DeliveryRegisterManager;
 
 import eu.baltrad.fc.FileCatalog;
+import eu.baltrad.fc.db.FileEntry;
 import eu.baltrad.fc.DuplicateEntry;
 import eu.baltrad.fc.FileCatalogError;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
+import eu.baltrad.beast.message.mo.BltDataMessage;
 
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
@@ -118,6 +121,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private FramePublisherManager framePublisherManager;
     // Frame publisher object
     private FramePublisher framePublisher;
+    /** References delivery register manager object @see DeliveryRegisterManager */
+    private DeliveryRegisterManager deliveryRegisterManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Required by the Spring's Controller interface, wraps actual doGet method used to
@@ -573,11 +578,61 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         if( fc == null ) {
                             fc = FileCatalogConnector.connect();
                         }
-                        // create file storage task
-                        StoreFileTask sfTask = new StoreFileTask( getFramePublisherManager(),
-                                getBltMessageManager(), fc, header, swapFile );
-                        // add task to publisher
-                        framePublisher.addTask( sfTask );
+                        try {
+                            FileEntry fileEntry = fc.store( swapFile.getAbsolutePath() );
+                            if( fileEntry == null ) {
+                                // failed to store file in File Catalog - set error code
+                                response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_500 );
+                            } else {
+                                // file successfully stored in File Catalog
+                                response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_200 );
+                                // send message to Beast Framework
+                                BltDataMessage message = new BltDataMessage();
+                                message.setFileEntry( fileEntry );
+                                bltMessageManager.manage( message );
+
+                                // deliver data to subscribers
+                                // iterate through subscriptions list to send data to subscribers
+                                List<Subscription> subs =
+                                        subscriptionManager.getSubscriptionsByType(
+                                        Subscription.REMOTE_SUBSCRIPTION );
+                                for( int i = 0; i < subs.size(); i++ ) {
+                                    if( subs.get( i ).getChannelName().equals( bfHandler.getChannel(
+                                        header ) ) ) {
+
+                                        // make sure that user exists locally
+                                        User user = userManager.getUserByName(
+                                                                      subs.get( i ).getUserName() );
+                                        String channelName = subs.get( i ).getChannelName();
+                                        // look up file item in data register - if file item doesn't 
+                                        // exist, create frame delivery task
+                                        if( getDeliveryRegisterManager().getEntry( user.getId(),
+                                                fileEntry.uuid() ) == null ) {
+
+                                            // create frame delivery task
+                                            HandleFrameTask task = new HandleFrameTask(
+                                                getDeliveryRegisterManager(), getLogManager(),
+                                                user, channelName, fileEntry, swapFile );
+
+                                            // add task to publisher manager
+                                            framePublisherManager.getFramePublisher(
+                                                    user.getName() ).addTask( task );
+                                        }
+                                    }
+                                }
+                            }
+                        }catch( DuplicateEntry e ) {
+                            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                                    "Duplicate entry error: " + e.getMessage() );
+                            // exception while storing file in FileCatalog - set error code
+                            response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_500 );
+
+                        } catch( FileCatalogError e ) {
+                            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                                    "File catalog error: " + e.getMessage() );
+                            // exception while storing file in FileCatalog - set error code
+                            response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_500 );
+                        }
                     }
                 }
             }
@@ -587,12 +642,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         } catch( FileUploadException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e.getMessage() );
-        } catch( DuplicateEntry e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
-                    "Duplicate entry error: " + e.getMessage() );
-        } catch( FileCatalogError e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
-                    "File catalog error: " + e.getMessage() );
         } catch( IOException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e.getMessage() );
@@ -869,6 +918,24 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public void setBltMessageManager( IBltMessageManager bltMessageManager ) {
         this.bltMessageManager = bltMessageManager;
+    }
+    /**
+     * Gets reference to delivery register manager object.
+     *
+     * @return Reference to delivery register manager object
+     * @see DeliveryRegisterManager
+     */
+    public DeliveryRegisterManager getDeliveryRegisterManager() {
+        return deliveryRegisterManager;
+    }
+    /**
+     * Sets reference to delivery register manager object.
+     *
+     * @param deliveryRegisterManager Reference to delivery register manager to set
+     * @see DeliveryRegisterManager
+     */
+    public void setDeliveryRegisterManager( DeliveryRegisterManager deliveryRegisterManager ) {
+        this.deliveryRegisterManager = deliveryRegisterManager;
     }
 }
 //--------------------------------------------------------------------------------------------------

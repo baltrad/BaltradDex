@@ -435,6 +435,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="framePublisher">
             <ref bean="framePublisher"/>
         </property>
+        <property name="deliveryRegisterManager">
+            <ref bean="deliveryRegisterManager"/>
+        </property>
     </bean>
 
     <!--

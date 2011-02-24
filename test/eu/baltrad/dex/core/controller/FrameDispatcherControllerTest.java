@@ -37,35 +37,46 @@ import java.io.File;
  */
 public class FrameDispatcherControllerTest extends TestCase {    
 //---------------------------------------------------------------------------------------- Variables
-    private static BaltradFrameHandler bltFrameHandler = new BaltradFrameHandler();
-    private static String xmlHdr = null;
+    private static BaltradFrameHandler handler;
+    private static File[] testFiles;
+    private static BaltradFrame[] testFrames;
 //------------------------------------------------------------------------------------------ Methods
 
     public void testInit() {
-        bltFrameHandler.setUrl( "http://localhost:8084/BaltradDex/dispatch.htm" );
-        assertNotNull( bltFrameHandler );
-        assertEquals( bltFrameHandler.getUrl(), "http://localhost:8084/BaltradDex/dispatch.htm" );
+        handler = new BaltradFrameHandler( "http://localhost:8084/BaltradDex/dispatch.htm" );
+        assertNotNull( handler );
+        assertEquals( handler.getUrl(), "http://localhost:8084/BaltradDex/dispatch.htm" );
     }
-    
-    public void testPrepareFrame() {
-        xmlHdr = bltFrameHandler.createDataHdr( BaltradFrameHandler.MIME_MULTIPART,
-                "TestNode", "Arlanda", "arlanda.h5" );
-        assertEquals( bltFrameHandler.getMimeType( xmlHdr ), BaltradFrameHandler.MIME_MULTIPART );
-        assertEquals( bltFrameHandler.getSenderNodeName( xmlHdr ), "TestNode" );
-        assertEquals( bltFrameHandler.getChannel( xmlHdr ), "Arlanda" );
-        assertEquals( bltFrameHandler.getFileName( xmlHdr ), "arlanda.h5" );
-        assertEquals( bltFrameHandler.getContentType( xmlHdr ), "file" );
+
+    public void testPrepareFiles() {
+        File dir = new File( "." );
+        testFiles = dir.listFiles();
+
+        assertTrue( testFiles.length > 0 );
+
+        testFrames = new BaltradFrame[ testFiles.length ];
+
+        assertTrue( testFrames.length > 0 );
+    }
+
+    public void testPrepareFrames() {
+        for( int i = 0; i < testFiles.length; i++ ) {
+            if( testFiles[ i ].getName().startsWith( "test" ) ) {
+                BaltradFrame frame = new BaltradFrame( handler.createDataHdr(
+                    BaltradFrameHandler.MIME_MULTIPART, "TestNode", "TestRadar",
+                    testFiles[ i ].getName() ), testFiles[ i ].getAbsolutePath() );
+                testFrames[ i ] = frame;
+            
+                assertNotNull( testFrames[ i ] );
+            }
+        }
     }
 
     public void testInjection() {
-        File f1 = new File( "arlanda.h5" );
-        BaltradFrame frame1 = new BaltradFrame( bltFrameHandler.createDataHdr(
-            BaltradFrameHandler.MIME_MULTIPART, "TestNode", "Arlanda", "arlanda.h5" ),
-            f1.getAbsolutePath() );
-        try {
-            bltFrameHandler.handleBF( frame1 );
-        } catch( Exception e ) {
-            System.out.println( "Frame handler error: " + e.getMessage() );
+        for( int i = 0; i < testFrames.length; i++ ) {
+            if( testFrames[ i ] != null ) {
+                handler.handleBF( testFrames[ i ] );
+            }
         }
     }
 
