@@ -400,7 +400,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Log manager
     -->
-    <bean name="logManager" class="eu.baltrad.dex.log.model.LogManager"/>
+    <bean name="logManager" class="eu.baltrad.dex.log.model.LogManager">
+        <property name="jdbcConnector">
+            <ref bean="jdbcConnector"/>
+        </property>
+    </bean>
 
     <!-- FramePublisherManager -->
     <bean name="framePublisherManager" class="eu.baltrad.dex.core.util.FramePublisherManager"/>
@@ -782,7 +786,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!--
-        Image preview cpontroller.
+        Image preview controller.
     -->
     <bean name="bltImagePreviewController"
             class="eu.baltrad.dex.bltdata.controller.BltImagePreviewController">
@@ -796,6 +800,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="bltDataProcessorController"/>
         </property>
     </bean>
+
+    <!--
+        JDBC connector.
+    -->
+    <bean name="jdbcConnector" class="eu.baltrad.dex.util.JDBCConnector"/>
 
     <!--
         Message resources.

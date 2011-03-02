@@ -760,6 +760,69 @@ tr {
 #logtable .error {
     color: red;
 }
+#logtable tr {
+    width:100%;
+}
+
+/* system message tables */
+
+#logtable > .hdr {
+    font-size:1.1em;
+    font-weight: bolder;
+    color:#2d76ae;
+    border-bottom: 1px solid #2d76ae;
+}
+#logtable > .hdr, #logtable > .row {
+    width:100%;
+    float:left;
+    clear:both;
+}
+#logtable > .row {
+    border-bottom:1px solid #D0E7BA;
+}
+#logtable > .row:hover {
+    background:#E2FFC6;
+}
+
+#logtable > .hdr > .date, #logtable > .row > .date {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:12%;
+}
+#logtable > .hdr > .time, #logtable > .row > .time {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:10%;
+}
+#logtable > .hdr > .flag, #logtable > .row > .flag {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:6%;
+    text-align:center;
+}
+#logtable > .hdr > .msg, #logtable > .row > .msg {
+    float:right;
+    padding:3px 0px 3px 0px;
+    width:72%;
+}
+#logtable > .hdr > .msg {
+    text-align:center; 
+}
+
+/* table control bar */
+
+#table-control {
+    width:100%;
+    color:#FFFFFF;
+    font-size:0.9em;
+}
+#table-control input {
+    background:#94C761;
+}
+#table-control .input:hover {
+    background:#6FB729;
+}
+
 
 /*
  * Image thumbs

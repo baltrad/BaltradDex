@@ -61,7 +61,7 @@ public class ClrMsgsController implements Controller {
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
         try {
-            int deletedEntries = logManager.deleteAllEntries();
+            int deletedEntries = logManager.deleteEntries();
             String msg = "Successfully deleted " + Integer.toString( deletedEntries ) 
                     + " message(s).";
             request.getSession().setAttribute( OK_MSG_KEY, msg );

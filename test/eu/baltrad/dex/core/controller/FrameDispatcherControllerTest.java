@@ -72,13 +72,15 @@ public class FrameDispatcherControllerTest extends TestCase {
         }
     }
 
-    public void testInjection() {
+    /*public void testInjection() {
         for( int i = 0; i < testFrames.length; i++ ) {
             if( testFrames[ i ] != null ) {
-                handler.handleBF( testFrames[ i ] );
+                int code = handler.handleBF( testFrames[ i ] );
+
+                assertTrue( code == 200 );
             }
         }
-    }
+    }*/
 
 }
 //--------------------------------------------------------------------------------------------------

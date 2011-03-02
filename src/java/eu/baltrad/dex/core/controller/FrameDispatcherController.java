@@ -590,8 +590,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 BltDataMessage message = new BltDataMessage();
                                 message.setFileEntry( fileEntry );
                                 bltMessageManager.manage( message );
-
-                                // deliver data to subscribers
+                                
                                 // iterate through subscriptions list to send data to subscribers
                                 List<Subscription> subs =
                                         subscriptionManager.getSubscriptionsByType(

@@ -81,7 +81,7 @@ Author     : szewczenko
                         </div>
                     </div>
                     <div id="text-box">
-                        Latest system messages. Click the button below to view full message stack.
+                        Latest system messages. Click the button below to view full system log.
                     </div>
                     <div id="table">
                         <div id="logtable">

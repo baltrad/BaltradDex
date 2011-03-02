@@ -1,14 +1,29 @@
-/*
- * BaltradDex :: Radar data exchange and communication system
- * Remote Sensing Department, Institute of Meteorology and Water Management
- * Maciej Szewczykowski, 2010
- *
- * maciej.szewczykowski@imgw.pl
- */
+/***************************************************************************************************
+*
+* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+*
+* This file is part of the BaltradDex software.
+*
+* BaltradDex is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* BaltradDex is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+*
+***************************************************************************************************/
 
 package eu.baltrad.dex.log.controller;
 
+import eu.baltrad.dex.util.ITableScroller;
 import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.LogEntry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,25 +35,27 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 import java.io.IOException;
 
-
 /**
- * Journal controller class implements system journal display functionality.
+ * Handles system messages display.
  *
- * @author szewczenko
- * @version 1.0
- * @since 1.0
+ * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @version 0.1.6
+ * @since 0.1.6
  */
-public class JournalController implements Controller {
-
+public class JournalController implements Controller, ITableScroller {
 //---------------------------------------------------------------------------------------- Constants
-    private static final String MAP_KEY = "full_log_entry_list";
+    /** Log entries map key */
+    private static final String LOG_ENTRIES = "entries";    
 //---------------------------------------------------------------------------------------- Variables
+    /** References LogManager class object */
     private LogManager logManager;
+    /** Success view name */
     private String successView;
+    /** Holds current page number, used for page scrolling */
+    private static int currentPage;
 //------------------------------------------------------------------------------------------ Methods
-
      /**
-     * Method handles http request. Returns ModelAndView object containing log entry list.
+     * Returns ModelAndView object containing log entry list.
      *
      * @param request Http request
      * @param response Http response
@@ -46,12 +63,60 @@ public class JournalController implements Controller {
      * @throws javax.servlet.ServletException
      * @throws java.io.IOException
      */
+    @Override
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
-        List logEntryList = logManager.getAllEntries();
-        return new ModelAndView( successView, MAP_KEY, logEntryList );
+        String pageNum = request.getParameter( "pagenum" );
+        List<LogEntry> entries = null;
+        if( pageNum != null ) {
+            if( pageNum.matches( ">" ) ) {
+                nextPage();
+            } else if( pageNum.matches( "<" ) ) {
+                previousPage();
+            } else {
+                int page = Integer.parseInt( pageNum );
+                setCurrentPage( page );
+            }
+            int offset = ( getCurrentPage() * LogManager.PAGE_LIMIT ) - LogManager.PAGE_LIMIT;
+            entries = logManager.getEntries( offset, LogManager.PAGE_LIMIT );
+        } else {
+            setCurrentPage( 1 );
+            entries = logManager.getEntries( 0, LogManager.PAGE_LIMIT );
+        }
+        return new ModelAndView( successView, LOG_ENTRIES, entries );
     }
-
+    /**
+     * Gets current page number.
+     *
+     * @return Current page number
+     */
+    public int getCurrentPage() { return currentPage; }
+    /**
+     * Sets current page number.
+     *
+     * @param page Current page number to set
+     */
+    public void setCurrentPage( int page ) { currentPage = page; }
+    /**
+     * Sets page number to the next page number.
+     */
+    public void nextPage() { 
+        int lastPage = ( int )Math.ceil( logManager.countEntries() / LogManager.PAGE_LIMIT );
+        if( lastPage == 0 ) {
+            ++lastPage;
+        }
+        if( getCurrentPage() != lastPage ) {
+            ++currentPage;
+        }
+    }
+    /**
+     * Sets page number to the previous page number.
+     */
+    public void previousPage() { 
+        if( getCurrentPage() != 1 ) {
+            --currentPage;
+        }
+    }
     /**
      * Method returns reference to success view name string.
      *

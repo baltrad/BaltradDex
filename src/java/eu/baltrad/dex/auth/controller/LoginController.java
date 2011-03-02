@@ -33,8 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.util.Date;
-import java.util.List;
-import java.util.HashMap;
 
 /**
  * Login controller class implementing basic user authentication functionality.
@@ -44,9 +42,6 @@ import java.util.HashMap;
  * @since 1.0
  */
 public class LoginController extends SimpleFormController {
-//---------------------------------------------------------------------------------------- Constants
-    private static final String LOG_ENTRIES_KEY = "log_entries";
-    private static final int NUMBER_OF_ENTRIES = 8;
 //---------------------------------------------------------------------------------------- Variables
     private UserManager userManager;
     private LogManager logManager = new LogManager();
@@ -68,20 +63,6 @@ public class LoginController extends SimpleFormController {
     @Override
     protected Object formBackingObject( HttpServletRequest request ) throws Exception {
         return new User();
-    }
-    /**
-     * Returnes hash map holding last log entries.
-     *
-     * @param request Http servlet request
-     * @return Hash map holding list of last log entries
-     * @throws Exception 
-     */
-    @Override
-    protected HashMap referenceData( HttpServletRequest request ) throws Exception {
-        HashMap model = new HashMap();
-        List logEntries = logManager.getLastEntries( NUMBER_OF_ENTRIES );
-        model.put( LOG_ENTRIES_KEY, logEntries );
-        return model;
     }
     /**
      * Method executed upon form submission.

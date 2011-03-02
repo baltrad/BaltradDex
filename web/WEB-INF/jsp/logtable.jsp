@@ -34,61 +34,77 @@ Author     : szewczenko
     </head>
     <body>
         <div id="logtable">
-            <display:table name="log_entry_list" id="logEntry" defaultsort="0" requestURI="log.htm"
-                cellpadding="0" cellspacing="2" export="false" class="tableborder">
-                <%! String cell_style = ""; %>
+            <div class="hdr">
+                <div class="date">
+                    Date
+                </div>
+                <div class="time">
+                    Time
+                </div>
+                <div class="flag">
+                    Flag
+                </div>
+                <div class="msg">
+                    Message
+                </div>
+            </div>
+            <c:forEach var="entry" items="${log_entry_list}">
+                <% String style = ""; %>
                 <c:choose>
-                    <c:when test="${logEntry.type == 'INFO'}">
+                    <c:when test="${entry.type == 'INFO'}">
                         <%
-                            cell_style = "info";
+                            style = "info";
                         %>
                     </c:when>
-                    <c:when test="${logEntry.type == 'WARNING'}">
+                    <c:when test="${entry.type == 'WARNING'}">
                         <%
-                            cell_style = "warning";
+                            style = "warning";
                         %>
                     </c:when>
-                    <c:when test="${logEntry.type == 'ERROR'}">
-                        <% 
-                            cell_style = "error";
+                    <c:when test="${entry.type == 'ERROR'}">
+                        <%
+                            style = "error";
                         %>
                     </c:when>
                 </c:choose>
-                <display:column sortable="false" title="Date" paramId="timeStamp" 
-                    paramProperty="timeStamp" class="<%= cell_style %>"
-                    value="${fn:substring(logEntry.timeStamp, 0, 10)}">
-                </display:column>
-                <display:column sortable="false" title="Time" paramId="timeStamp"
-                    paramProperty="timeStamp" class="<%= cell_style %>"
-                    value="${fn:substring(logEntry.timeStamp, 10, 19)}">
-                </display:column>
-                <c:choose>
-                    <c:when test="${logEntry.type == 'ERROR'}">
-                        <display:column sortable="false" paramId="type" paramProperty="type"
-                            class="tdcheck">
-                            <img src="includes/images/red_bulb.png"
-                                 alt="green_bulb"/>
-                        </display:column>
-                    </c:when>
-                    <c:when test="${logEntry.type == 'WARNING'}">
-                        <display:column sortable="false" paramId="type" paramProperty="type"
-                            class="tdcheck">
-                            <img src="includes/images/blue_bulb.png"
-                                 alt="blue_bulb"/>
-                        </display:column>
-                    </c:when>
-                    <c:otherwise>
-                        <display:column sortable="false" paramId="type" paramProperty="type"
-                            class="tdcheck">
-                            <img src="includes/images/green_bulb.png"
-                                 alt="red_bulb"/>
-                        </display:column>
-                    </c:otherwise>
-                </c:choose>
-                <display:column sortable="false" title="Message" paramId="message"
-                    paramProperty="message" class="<%= cell_style %>" value="${logEntry.message}">
-                </display:column>
-            </display:table>
+                <div class="row">
+                    <div class="date">
+                        <div class="<%=style%>">
+                            <c:out value="${fn:substring(entry.timeStamp, 0, 10)}"/>
+                        </div>
+                    </div>
+                    <div class="time">
+                        <div class="<%=style%>">
+                            <c:out value="${fn:substring(entry.timeStamp, 10, 19)}"/>
+                        </div>
+                    </div>
+                    <c:choose>
+                        <c:when test="${entry.type == 'ERROR'}">
+                            <div class="flag">
+                                <img src="includes/images/red_bulb.png"
+                                     alt="error"/>
+                            </div>
+                        </c:when>
+                        <c:when test="${entry.type == 'WARNING'}">
+                            <div class="flag">
+                                <img src="includes/images/blue_bulb.png"
+                                     alt="warn"/>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="flag">
+                                <img src="includes/images/green_bulb.png"
+                                     alt="ok"/>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                    <div class="msg">
+                        <div class="<%=style%>">
+                            <c:out value="${entry.message}"/>
+                        </div>
+                    </div>
+                </div>
+            </c:forEach>
         </div>
     </body>
 </html>

@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,19 +21,16 @@
 
 package eu.baltrad.dex.log.model;
 
-import eu.baltrad.dex.subscription.model.Subscription;
-import eu.baltrad.dex.util.HibernateUtil;
+import eu.baltrad.dex.util.JDBCConnector;
 
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.Session;
-import org.hibernate.Query;
-import org.hibernate.criterion.Projections;
-import org.hibernate.Criteria;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Collections;
 
 /**
  * Class implements system message manager.
@@ -44,200 +41,199 @@ import java.util.Collections;
  */
 public class LogManager {
 //---------------------------------------------------------------------------------------- Constants
-    // Message type strings
+    /** Informative message identifier */
     public final static String MSG_INFO = "INFO";
+    /** Warning message identifier */
     public final static String MSG_WRN = "WARNING";
+    /** Error message identifier */
     public final static String MSG_ERR = "ERROR";
-    public final static int LOG_ENTRY_LIST_SIZE = 12;
-
+    /** Log entry list size limit*/
+    public final static int PAGE_LIMIT = 12;
+//---------------------------------------------------------------------------------------- Variables
+    /** Reference to JDBCConnector class object */
+    private JDBCConnector jdbcConnector;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Method gets all available log entries.
+     * Gets reference to JDBCConnector class object
      * 
-     * @return List object containing all available log entries 
+     * @return Reference to JDBCConnector class object
+     * @see JDBCConnector
      */
-    public List getAllEntries() {
-        List logEntries = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            logEntries = session.createQuery( "FROM LogEntry" ).list();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-        Collections.sort( logEntries );
-        return logEntries;
+    public JDBCConnector getJdbcConnector() { return jdbcConnector; }
+    /**
+     * Sets reference to JDBCConnector class object.
+     *
+     * @param jdbcConnector Reference to JDBCConnector class object
+     * @see JDBCConnector
+     */
+    public void setJdbcConnector( JDBCConnector jdbcConnector ) {
+        this.jdbcConnector = jdbcConnector;
     }
     /**
-     * Method gets log entries with a given rank.
+     * Gets number of log entries stored in a table.
      *
-     * @param rank Log entry rank
-     * @return List object containing log entries with a given rank
+     * @return Number of log entries
      */
-    public List getEntriesByRank( String rank ) {
-        List logEntries = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public int countEntries() {
+        int count = 0;
         try {
-            logEntries = session.createQuery( "FROM LogEntry WHERE id = ?" ).setString(
-                    0, rank ).list();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-        return logEntries;
-    }
-    /**
-     * Method gets last log entries.
-     *
-     * @param numberOfEntries Number of log entries to retrieve
-     * @return List object containing a given number of last log entries.
-     */
-    public List getLastEntries( int numberOfEntries ) {
-        List logEntries = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            Query query = session.createQuery( "FROM LogEntry logEntry" );
-            Criteria criteria = session.createCriteria( LogEntry.class );
-            criteria.setProjection( Projections.rowCount() );
-            List list = criteria.list();
-            int rows = ( Integer )list.get( 0 );
-            if( rows > numberOfEntries ) {
-                query.setMaxResults( numberOfEntries );
-                query.setFirstResult( rows - numberOfEntries );
+            Connection conn = JDBCConnector.connect();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt. executeQuery( "SELECT count(*) FROM dex_messages" );
+            while( resultSet.next() ) {
+                count = resultSet.getInt( 1 );
             }
-            logEntries = query.list();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
+            stmt.close();
+            conn. close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to determine number of entries: " + e.getMessage() );
         }
-        Collections.sort( logEntries );
-        return logEntries;
+        return count;
     }
     /**
-     * Method adds log entry to the log entry list.
+     * Gets all entries available in the system log.
      *
-     * @param logEntry Log entry
+     * @return List of all available log entries
      */
-    public void addEntry( LogEntry logEntry ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public List<LogEntry> getEntries() {
+        List<LogEntry> entries = new ArrayList<LogEntry>();
         try {
-            session.saveOrUpdate( logEntry );
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
+            Connection conn = JDBCConnector.connect();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
+                "timestamp DESC" );
+            while( resultSet.next() ) {
+                Date timeStamp = resultSet.getTimestamp( "timestamp" );
+                String type = resultSet.getString( "type" );
+                String msg = resultSet.getString( "message" );
+                LogEntry entry = new LogEntry( timeStamp, type, msg );
+                entries.add( entry );
+            }
+            stmt.close();
+            conn. close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select log entries: " + e.getMessage() );
         }
+        return entries;
     }
     /**
-     * Method adds log entry to the log entry list.
+     * Gets given number of entries from the system log.
+     * 
+     * @param limit Number of entries to select
+     * @return List containing given number of entries
+     */
+    public List<LogEntry> getEntries( int limit ) {
+        List<LogEntry> entries = new ArrayList<LogEntry>();
+        try {
+            Connection conn = JDBCConnector.connect();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
+                "timestamp DESC LIMIT " + limit );
+            while( resultSet.next() ) {
+                Date timeStamp = resultSet.getTimestamp( "timestamp" );
+                String type = resultSet.getString( "type" );
+                String msg = resultSet.getString( "message" );
+                LogEntry entry = new LogEntry( timeStamp, type, msg );
+                entries.add( entry );
+            }
+            stmt.close();
+            conn.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select log entries: " + e.getMessage() );
+        }
+        return entries;
+    }
+    /**
+     * Gets given number of entries from the system log.
      *
-     * @param date Log entry date
+     * @param offset Number of entries to skip
+     * @param limit Number of entries to select
+     * @return List containing given number of entries
+     */
+    public List<LogEntry> getEntries( int offset, int limit ) {
+        List<LogEntry> entries = new ArrayList<LogEntry>();
+        try {
+            Connection conn = JDBCConnector.connect();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
+                "timestamp DESC OFFSET " + offset + " LIMIT " + limit );
+            while( resultSet.next() ) {
+                Date timeStamp = resultSet.getTimestamp( "timestamp" );
+                String type = resultSet.getString( "type" );
+                String msg = resultSet.getString( "message" );
+                LogEntry entry = new LogEntry( timeStamp, type, msg );
+                entries.add( entry );
+            }
+            stmt.close();
+            conn.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select log entries: " + e.getMessage() );
+        }
+        return entries;
+    }
+    /**
+     * Adds entry to the system log.
+     *
+     * @param entry Entry to add
+     * @return Number of inserted records
+     */
+    public synchronized int addEntry( LogEntry entry ) {
+        int insert = 0;
+        try {
+            Connection conn = JDBCConnector.connect();
+            Statement stmt = conn.createStatement();
+            String sql = "INSERT INTO dex_messages (timestamp, type, message) VALUES ('" +
+                    entry.getTimeStamp() + "', '" + entry.getType() + "', '" + entry.getMessage() +
+                    "');";
+            insert = stmt.executeUpdate( sql );
+            stmt.close();
+            conn.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete log entries: " + e.getMessage() );
+        }
+        return insert;
+    }
+    /**
+     * Adds entry to the system log.
+     *
+     * @param timestamp Log entry timestamp
      * @param type Log entry type
      * @param message Log entry message
+     * @return Number of inserted records
      */
-    public void addEntry( Date date, String type, String message ) {
-        LogEntry logEntry = new LogEntry( date, type, message );
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public synchronized int addEntry( Date timestamp, String type, String message ) {
+        int insert = 0;
         try {
-            session.saveOrUpdate( logEntry );
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
+            Connection conn = JDBCConnector.connect();
+            Statement stmt = conn.createStatement();
+            String sql = "INSERT INTO dex_messages (timestamp, type, message) VALUES ('" +
+                    timestamp + "', '" + type + "', '" + message + "');";
+            insert = stmt.executeUpdate( sql );
+            stmt.close();
+            conn.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete log entries: " + e.getMessage() );
         }
+        return insert;
     }
     /**
-     * Method deletes single entry from log entry list.
+     * Deletes all entries from the system log.
      *
-     * @param id Log entry ID
+     * @return Number of deleted entries
      */
-    public void deleteEntry( int id ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-	    session.beginTransaction();
+    public int deleteEntries() {
+        int delete = 0;
         try {
-            session.delete( session.load( Subscription.class, new Integer( id ) ) );
-            session.flush();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
+            Connection conn = JDBCConnector.connect();
+            Statement stmt = conn.createStatement();
+            String sql = "DELETE FROM dex_messages";
+            delete = stmt.executeUpdate( sql );
+            stmt.close();
+            conn.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete log entries: " + e.getMessage() );
         }
-    }
-    /**
-     * Method deletes last entry from the log entry list.
-     */
-    /*public void deleteLastEntry() {
-        LogEntry logEntry = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        // Get last entry
-        session.beginTransaction();
-        try {
-            logEntry = ( LogEntry )session.createQuery( "FROM LogEntry logEntry " +
-                                        "ORDER BY logEntry.id DESC LIMIT 1" ).uniqueResult();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        }
-        // Delete last entry
-        session.beginTransaction();
-        try {
-            session.delete( session.load( Subscription.class, new Integer(
-                                                                    logEntry.getId() ) ) );
-            session.flush();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        }
-    }*/
-    /**
-     * Deletes all rows from log table.
-     *
-     * @return Number of deleted records
-     */
-    public int deleteAllEntries() {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        int deletedEntries = 0;
-	    session.beginTransaction();
-        try {
-            deletedEntries = session.createQuery( "DELETE FROM LogEntry" ).executeUpdate();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-        return deletedEntries;
+        return delete;
     }
 }
 //--------------------------------------------------------------------------------------------------

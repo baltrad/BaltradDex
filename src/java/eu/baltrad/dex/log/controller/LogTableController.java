@@ -22,6 +22,7 @@
 package eu.baltrad.dex.log.controller;
 
 import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.LogEntry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,8 +61,8 @@ public class LogTableController implements Controller {
      */
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
-        List logEntryList = logManager.getLastEntries( LogManager.LOG_ENTRY_LIST_SIZE );
-        return new ModelAndView( successView, MAP_KEY, logEntryList );
+        List<LogEntry> entries = logManager.getEntries( LogManager.PAGE_LIMIT );
+        return new ModelAndView( successView, MAP_KEY, entries );
     }
 
     /**
