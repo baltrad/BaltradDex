@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -44,12 +44,13 @@ import java.util.Date;
 public class LoginController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Variables
     private UserManager userManager;
-    private LogManager logManager = new LogManager();
+    private LogManager logManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Default constructor.
      */
     public LoginController() {
+        this.logManager = new LogManager();
         logManager.addEntry( new Date(), LogManager.MSG_INFO,
                 "Baltrad Data Exchange System started" );
     }
@@ -84,8 +85,8 @@ public class LoginController extends SimpleFormController {
         if( ApplicationSecurityManager.authenticateFormUser( formUser, dbUser ) ) {
             // Set user variable for this session
             ApplicationSecurityManager.setUser( request, dbUser );
-            logManager.addEntry( new Date(), LogManager.MSG_INFO, "User "
-                    + dbUser.getName() + " logged on" );
+            logManager.addEntry( new Date(), LogManager.MSG_INFO, "User " + dbUser.getName() +
+                    " logged on" );
         }
         return new ModelAndView( getSuccessView() );
     }

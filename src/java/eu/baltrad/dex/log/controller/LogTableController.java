@@ -61,7 +61,7 @@ public class LogTableController implements Controller {
      */
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
-        List<LogEntry> entries = logManager.getEntries( LogManager.PAGE_LIMIT );
+        List<LogEntry> entries = logManager.getEntries( LogManager.ENTRIES_PER_PAGE );
         return new ModelAndView( successView, MAP_KEY, entries );
     }
 

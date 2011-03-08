@@ -49,5 +49,13 @@ public interface ITableScroller {
      * Sets current page number to the previous page.
      */
     public void previousPage();
+    /**
+     * Sets current page number to the first page.
+     */
+    public void firstPage();
+    /**
+     * Sets current page number to the last page.
+     */
+    public void lastPage();
 }
 //--------------------------------------------------------------------------------------------------

@@ -819,7 +819,7 @@ tr {
 #table-control input {
     background:#94C761;
 }
-#table-control .input:hover {
+#table-control input:hover {
     background:#6FB729;
 }
 

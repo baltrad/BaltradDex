@@ -21,14 +21,13 @@
 
 package eu.baltrad.dex.log.controller;
 
-import eu.baltrad.dex.util.JDBCConnector;
+import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.dex.log.model.LogEntry;
 import eu.baltrad.dex.log.model.LogManager;
 
 import junit.framework.TestCase;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 
 import java.util.Date;
 
@@ -41,29 +40,21 @@ import java.util.Date;
  */
 public class LogControllerTest extends TestCase {
 //---------------------------------------------------------------------------------------- Variables
-    private static JDBCConnector jdbcConn;
+    private static JDBCConnectionManager jdbcConn;
     private static Connection conn;
     private static LogManager manager;
 //------------------------------------------------------------------------------------------ Methods
     @Override
     public void setUp() {
-        jdbcConn = new JDBCConnector();
+        jdbcConn = JDBCConnectionManager.getInstance();
         assertNotNull( jdbcConn );
         manager = new LogManager();
         assertNotNull( manager );
     }
 
-    public void testOpenConnection() {
-        conn = JDBCConnector.connect();
+    public void testGetConnection() {
+        conn = jdbcConn.getConnection();
         assertNotNull( conn );
-    }
-    
-    public void testCloseConnection() {
-        try {
-            conn.close();
-        } catch( SQLException e ) {
-            fail( "Failed to close connection: " + e.getMessage() );
-        }
     }
 
     public void testInsertEntries() {

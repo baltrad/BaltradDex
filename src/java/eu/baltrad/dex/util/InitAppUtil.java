@@ -62,7 +62,7 @@ public class InitAppUtil {
     private static final long TEMP_FILE_MAX_AGE = 180000;
 //---------------------------------------------------------------------------------------- Variables
     // Initialize LogManager object
-    private static LogManager logManager = new LogManager();
+    private static LogManager logManager;
     // Initialize Configuration manager
     private static ConfigurationManager configurationManager = new ConfigurationManager();
     // Node address
@@ -93,7 +93,10 @@ public class InitAppUtil {
     /**
      * Constructor performs initialization task
      */
-    public InitAppUtil() { initApp(); }
+    public InitAppUtil() { 
+        logManager = new LogManager();
+        initApp();
+    }
     /**
      * Method initializes application by reading configuration from database.
      */

@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.log.model;
 
-import eu.baltrad.dex.util.JDBCConnector;
+import eu.baltrad.dex.util.JDBCConnectionManager;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -47,27 +47,19 @@ public class LogManager {
     public final static String MSG_WRN = "WARNING";
     /** Error message identifier */
     public final static String MSG_ERR = "ERROR";
-    /** Log entry list size limit*/
-    public final static int PAGE_LIMIT = 12;
+    /** Number of log entries per page */
+    public final static int ENTRIES_PER_PAGE = 12;
+    /** Number of pages in the scroll bar, must be an odd number >= 3 */
+    public final static int SCROLL_RANGE = 11;
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
-    private JDBCConnector jdbcConnector;
+    private JDBCConnectionManager jdbcConnectionManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Gets reference to JDBCConnector class object
-     * 
-     * @return Reference to JDBCConnector class object
-     * @see JDBCConnector
+     * Constructor gets reference to JDBCConnectionManager instance.
      */
-    public JDBCConnector getJdbcConnector() { return jdbcConnector; }
-    /**
-     * Sets reference to JDBCConnector class object.
-     *
-     * @param jdbcConnector Reference to JDBCConnector class object
-     * @see JDBCConnector
-     */
-    public void setJdbcConnector( JDBCConnector jdbcConnector ) {
-        this.jdbcConnector = jdbcConnector;
+    public LogManager() {
+        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
     }
     /**
      * Gets number of log entries stored in a table.
@@ -77,14 +69,14 @@ public class LogManager {
     public int countEntries() {
         int count = 0;
         try {
-            Connection conn = JDBCConnector.connect();
+            Connection conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet resultSet = stmt. executeQuery( "SELECT count(*) FROM dex_messages" );
             while( resultSet.next() ) {
                 count = resultSet.getInt( 1 );
             }
             stmt.close();
-            conn. close();
+            jdbcConnectionManager.returnConnection( conn );
         } catch( SQLException e ) {
             System.err.println( "Failed to determine number of entries: " + e.getMessage() );
         }
@@ -98,7 +90,7 @@ public class LogManager {
     public List<LogEntry> getEntries() {
         List<LogEntry> entries = new ArrayList<LogEntry>();
         try {
-            Connection conn = JDBCConnector.connect();
+            Connection conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
                 "timestamp DESC" );
@@ -110,7 +102,7 @@ public class LogManager {
                 entries.add( entry );
             }
             stmt.close();
-            conn. close();
+            jdbcConnectionManager.returnConnection( conn );
         } catch( SQLException e ) {
             System.err.println( "Failed to select log entries: " + e.getMessage() );
         }
@@ -125,7 +117,7 @@ public class LogManager {
     public List<LogEntry> getEntries( int limit ) {
         List<LogEntry> entries = new ArrayList<LogEntry>();
         try {
-            Connection conn = JDBCConnector.connect();
+            Connection conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
                 "timestamp DESC LIMIT " + limit );
@@ -137,7 +129,7 @@ public class LogManager {
                 entries.add( entry );
             }
             stmt.close();
-            conn.close();
+            jdbcConnectionManager.returnConnection( conn );
         } catch( SQLException e ) {
             System.err.println( "Failed to select log entries: " + e.getMessage() );
         }
@@ -153,7 +145,7 @@ public class LogManager {
     public List<LogEntry> getEntries( int offset, int limit ) {
         List<LogEntry> entries = new ArrayList<LogEntry>();
         try {
-            Connection conn = JDBCConnector.connect();
+            Connection conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
                 "timestamp DESC OFFSET " + offset + " LIMIT " + limit );
@@ -165,7 +157,7 @@ public class LogManager {
                 entries.add( entry );
             }
             stmt.close();
-            conn.close();
+            jdbcConnectionManager.returnConnection( conn );
         } catch( SQLException e ) {
             System.err.println( "Failed to select log entries: " + e.getMessage() );
         }
@@ -180,14 +172,14 @@ public class LogManager {
     public synchronized int addEntry( LogEntry entry ) {
         int insert = 0;
         try {
-            Connection conn = JDBCConnector.connect();
+            Connection conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             String sql = "INSERT INTO dex_messages (timestamp, type, message) VALUES ('" +
                     entry.getTimeStamp() + "', '" + entry.getType() + "', '" + entry.getMessage() +
                     "');";
             insert = stmt.executeUpdate( sql );
             stmt.close();
-            conn.close();
+            jdbcConnectionManager.returnConnection( conn );
         } catch( SQLException e ) {
             System.err.println( "Failed to delete log entries: " + e.getMessage() );
         }
@@ -204,13 +196,13 @@ public class LogManager {
     public synchronized int addEntry( Date timestamp, String type, String message ) {
         int insert = 0;
         try {
-            Connection conn = JDBCConnector.connect();
+            Connection conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             String sql = "INSERT INTO dex_messages (timestamp, type, message) VALUES ('" +
                     timestamp + "', '" + type + "', '" + message + "');";
             insert = stmt.executeUpdate( sql );
             stmt.close();
-            conn.close();
+            jdbcConnectionManager.returnConnection( conn );
         } catch( SQLException e ) {
             System.err.println( "Failed to delete log entries: " + e.getMessage() );
         }
@@ -224,12 +216,12 @@ public class LogManager {
     public int deleteEntries() {
         int delete = 0;
         try {
-            Connection conn = JDBCConnector.connect();
+            Connection conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             String sql = "DELETE FROM dex_messages";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-            conn.close();
+            jdbcConnectionManager.returnConnection( conn );
         } catch( SQLException e ) {
             System.err.println( "Failed to delete log entries: " + e.getMessage() );
         }

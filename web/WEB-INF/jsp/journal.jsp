@@ -33,24 +33,26 @@ Author     : szewczenko
     LogManager manager = new LogManager();
     JournalController controller = new JournalController();
     int numEntries = manager.countEntries();
-    int numPages = ( int )Math.ceil( numEntries / LogManager.PAGE_LIMIT );
+    int numPages = ( int )Math.ceil( numEntries / LogManager.ENTRIES_PER_PAGE );
     if( numPages < 1 ) {
         numPages = 1;
     }
     int currentPage = controller.getCurrentPage();
-
+    int scrollStart = ( LogManager.SCROLL_RANGE - 1 ) / 2;
     int firstPage = 1;
-    int lastPage = 3;
-    if( numPages <= 3 && currentPage <= 3 ) {
+    int lastPage = LogManager.SCROLL_RANGE;
+    if( numPages <= LogManager.SCROLL_RANGE && currentPage <= LogManager.SCROLL_RANGE ) {
         firstPage = 1;
         lastPage = numPages;
     }
-    if( numPages > 3 && currentPage > 1 && currentPage < numPages - 1 ) {
-        firstPage = currentPage - 1;
-        lastPage = currentPage + 1;
+    if( numPages > LogManager.SCROLL_RANGE && currentPage > scrollStart && currentPage < numPages
+            - scrollStart ) {
+        firstPage = currentPage - scrollStart;
+        lastPage = currentPage + scrollStart;
     }
-    if( numPages > 3 && currentPage > 1 && currentPage >= numPages - 2 ) {
-        firstPage = numPages - 2;
+    if( numPages > LogManager.SCROLL_RANGE && currentPage > scrollStart && currentPage >= numPages
+            - ( LogManager.SCROLL_RANGE - 1 ) ) {
+        firstPage = numPages - ( LogManager.SCROLL_RANGE - 1 );
         lastPage = numPages;
     }
 %>
@@ -85,6 +87,8 @@ Author     : szewczenko
                         <div id="table-control">
                             <c:set var="curPage" scope="page" value="<%=currentPage%>"/>
                             <form action="journal.htm" method="post">
+                                <input type="submit" name="pagenum" value="First">
+                                <span></span>
                                 <input type="submit" name="pagenum" value="<">
                                 <span></span>
                                 <c:forEach var="i" begin="<%=firstPage%>" end="<%=lastPage%>" 
@@ -102,6 +106,8 @@ Author     : szewczenko
                                     </c:forEach>
                                 <span></span>
                                 <input type="submit" name="pagenum" value=">">
+                                <span></span>
+                                <input type="submit" name="pagenum" value="Last">
                             </form>
                         </div>
                         <div id="logtable">

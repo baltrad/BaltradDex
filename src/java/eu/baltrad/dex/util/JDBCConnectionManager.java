@@ -22,6 +22,7 @@
 package eu.baltrad.dex.util;
 
 import java.util.Properties;
+import java.util.Vector;
 import java.io.InputStream;
 
 import java.sql.Connection;
@@ -29,13 +30,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Handles JDBC database connection.
+ * Handles JDBC connection pooling. Implemented as sigleton in order to keep control over the
+ * number of created connections.
  *
  * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
  * @version 0.1.6
  * @since 0.1.6
  */
-public class JDBCConnector {
+public class JDBCConnectionManager {
 //---------------------------------------------------------------------------------------- Constants
     /** Properties file name */
     private static final String PROPS_FILE_NAME = "dex.jdbc.properties";
@@ -47,6 +49,8 @@ public class JDBCConnector {
     private static final String USER_NAME_PROP = "jdbc.connection.username";
     /** Password */
     private static final String PASSWD_PROP = "jdbc.connection.password";
+    /** Connection pool size prop */
+    private static final String POOL_SIZE_PROP = "jdbc.connection.pool_size";
 //---------------------------------------------------------------------------------------- Variables
     /** Driver class */
     private static String driverClass;
@@ -56,11 +60,34 @@ public class JDBCConnector {
     private static String userName;
     /** Password */
     private static String passwd;
+    /** Connection pool size */
+    private static int poolSize;
+    /** Connection pool */
+    private static Vector connectionPool;
+    /** Reference to the object of this class */
+    private static JDBCConnectionManager jdbcConnectionManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Constructor
+     * Initializes object of this class in case it is null, otherwise returns existing object.
+     *
+     * @return Reference to the object of this class
      */
-    public JDBCConnector() {
+    public static synchronized JDBCConnectionManager getInstance() {
+        if( jdbcConnectionManager == null ) {
+            jdbcConnectionManager = new JDBCConnectionManager();
+        }
+        return jdbcConnectionManager;
+    }
+    /**
+     * Private constructor can be invoked by getInstance() method only.
+     */
+    private JDBCConnectionManager() {
+        init();
+    }
+    /**
+     * Reads properties from stream, loads driver and initializes connection pool.
+     */
+    private void init() {
         try {
             InputStream is = this.getClass().getResourceAsStream( PROPS_FILE_NAME );
             Properties props = new Properties();
@@ -70,9 +97,14 @@ public class JDBCConnector {
                 dbUri = props.getProperty( DB_URI_PROP );
                 userName = props.getProperty( USER_NAME_PROP );
                 passwd = props.getProperty( PASSWD_PROP );
+                poolSize = Integer.parseInt( props.getProperty( POOL_SIZE_PROP ) );
                 // load driver
                 try {
                     Class.forName( driverClass );
+                     // Initialize connection pool
+                    connectionPool = new Vector<Connection>();
+                    initializeConnectionPool();
+
                 } catch( ClassNotFoundException e ) {
                     System.out.println( "Failed to load JDBC driver: " + e.getMessage() );
                 }
@@ -82,11 +114,31 @@ public class JDBCConnector {
         }
     }
     /**
-     * Creates new connection.
-     *
-     * @return Connection object
+     * Initializes connection pool
      */
-    public static Connection connect() {
+    private void initializeConnectionPool() {
+        while( !connectionPoolInitialized() ) {
+            connectionPool.addElement( createNewConnection() );
+        }
+    }
+    /**
+     * Checks connection pool status.
+     *
+     * @return True if connection pool is initialized, false otherwise.
+     */
+    private synchronized boolean connectionPoolInitialized() {
+        if( connectionPool.size() < poolSize ) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    /**
+     * Creates new JDBC connection.
+     *
+     * @return JDBC connection
+     */
+    public Connection createNewConnection() {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection( dbUri, userName, passwd );
@@ -94,6 +146,27 @@ public class JDBCConnector {
             System.out.println( "Failed to establish JDBC connection: " + e.getMessage() );
         }
         return conn;
+    }
+    /**
+     * Gets first connection from the pool and removes the first element from the pool.
+     * 
+     * @return JDBC connection
+     */
+    public synchronized Connection getConnection() {
+        Connection connection = null;
+        if( connectionPool.size() > 0 ) {
+            connection = ( Connection )connectionPool.firstElement();
+            connectionPool.removeElementAt( 0 );
+        }
+        return connection;
+    }
+    /**
+     * Returns connection to the pool.
+     *
+     * @param connection JDBC connection to be returned to the pool
+     */
+    public synchronized void returnConnection( Connection connection ) {
+        connectionPool.addElement( connection );
     }
 }
 //--------------------------------------------------------------------------------------------------

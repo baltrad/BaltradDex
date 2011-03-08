@@ -69,19 +69,27 @@ public class JournalController implements Controller, ITableScroller {
         String pageNum = request.getParameter( "pagenum" );
         List<LogEntry> entries = null;
         if( pageNum != null ) {
-            if( pageNum.matches( ">" ) ) {
-                nextPage();
-            } else if( pageNum.matches( "<" ) ) {
-                previousPage();
+            if( pageNum.matches( "First" ) ) {
+                firstPage();
+                entries = logManager.getEntries( 0, LogManager.ENTRIES_PER_PAGE );
             } else {
-                int page = Integer.parseInt( pageNum );
-                setCurrentPage( page );
+                if( pageNum.matches( "Last" ) ) {
+                    lastPage();
+                } else if( pageNum.matches( ">" ) ) {
+                    nextPage();
+                } else if( pageNum.matches( "<" ) ) {
+                    previousPage();
+                } else {
+                    int page = Integer.parseInt( pageNum );
+                    setCurrentPage( page );
+                }
+                int offset = ( getCurrentPage() * LogManager.ENTRIES_PER_PAGE )
+                        - LogManager.ENTRIES_PER_PAGE;
+                entries = logManager.getEntries( offset, LogManager.ENTRIES_PER_PAGE );
             }
-            int offset = ( getCurrentPage() * LogManager.PAGE_LIMIT ) - LogManager.PAGE_LIMIT;
-            entries = logManager.getEntries( offset, LogManager.PAGE_LIMIT );
         } else {
             setCurrentPage( 1 );
-            entries = logManager.getEntries( 0, LogManager.PAGE_LIMIT );
+            entries = logManager.getEntries( 0, LogManager.ENTRIES_PER_PAGE );
         }
         return new ModelAndView( successView, LOG_ENTRIES, entries );
     }
@@ -101,7 +109,7 @@ public class JournalController implements Controller, ITableScroller {
      * Sets page number to the next page number.
      */
     public void nextPage() { 
-        int lastPage = ( int )Math.ceil( logManager.countEntries() / LogManager.PAGE_LIMIT );
+        int lastPage = ( int )Math.ceil( logManager.countEntries() / LogManager.ENTRIES_PER_PAGE );
         if( lastPage == 0 ) {
             ++lastPage;
         }
@@ -116,6 +124,23 @@ public class JournalController implements Controller, ITableScroller {
         if( getCurrentPage() != 1 ) {
             --currentPage;
         }
+    }
+    /**
+     * Sets page number to the first page.
+     */
+    public void firstPage() {
+        currentPage = 1;
+    }
+    /**
+     * Sets page number to the last page.
+     */
+    public void lastPage() {
+        int numEntries = logManager.countEntries();
+        int lastPage = ( int )Math.ceil( numEntries / LogManager.ENTRIES_PER_PAGE );
+        if( lastPage == 0 ) {
+            ++lastPage;
+        }
+        currentPage = lastPage;
     }
     /**
      * Method returns reference to success view name string.

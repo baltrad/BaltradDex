@@ -40,6 +40,7 @@ public class JDBCConnectionTest extends TestCase {
 //---------------------------------------------------------------------------------------- Variables
     private static Connection conn;
 //------------------------------------------------------------------------------------------ Methods
+        
     public void testLoadDriver() {
         try {
             Class.forName( "org.postgresql.Driver" );
