@@ -38,6 +38,23 @@ SELECT
     ELSE make_plpgsql()
   END;
 
+CREATE OR REPLACE FUNCTION restart_seq_with_max(table_name TEXT, column_name TEXT)
+ RETURNS BIGINT AS $$
+DECLARE
+ maxval BIGINT;
+BEGIN
+ EXECUTE 'SELECT MAX('
+         || column_name ||
+         ') FROM '
+         || table_name INTO maxval;
+ EXECUTE 'ALTER SEQUENCE '
+         || table_name || '_' || column_name || '_seq'
+         || ' RESTART WITH '
+         || maxval + 1;
+ RETURN maxval + 1;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION split_dex_node_connections_address() RETURNS VOID AS $$
 BEGIN
   PERFORM true FROM information_schema.columns
@@ -101,8 +118,10 @@ $$ LANGUAGE plpgsql;
 SELECT split_dex_node_connections_address();
 SELECT split_dex_node_configuration_address();
 SELECT split_dex_users_node_address();
+SELECT restart_seq_with_max('dex_messages', 'id');
 
 DROP FUNCTION make_plpgsql();
 DROP FUNCTION split_dex_node_configuration_address();
 DROP FUNCTION split_dex_node_connections_address();
 DROP FUNCTION split_dex_users_node_address();
+DROP FUNCTION restart_seq_with_max(TEXT, TEXT);
