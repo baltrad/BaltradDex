@@ -32,8 +32,6 @@ import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
 
-import org.hibernate.HibernateException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -41,6 +39,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -134,14 +133,14 @@ public class SaveConfigurationController extends SimpleFormController {
             NodeConnection.ADDRESS_SEPARATOR + NodeConnection.APP_CONTEXT +
             NodeConnection.ADDRESS_SEPARATOR + NodeConnection.ENTRY_ADDRESS );
         try {
-            configurationManager.saveConfiguration( conf );
+            configurationManager.saveOrUpdate( conf );
             // read modified configuration
             InitAppUtil.initApp();
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveconf.savesuccess" ) );
             logManager.addEntry( new Date(), LogManager.MSG_WRN, 
                     getMessageSourceAccessor().getMessage( "message.saveconf.savesuccess" ) );
-        } catch( HibernateException e ) {
+        } catch( SQLException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                         "message.saveconf.savefail" ) );
@@ -149,6 +148,14 @@ public class SaveConfigurationController extends SimpleFormController {
                     getMessageSourceAccessor().getMessage( "message.saveconf.savefail" )
                     + ": " + e.getMessage() );
             errors.reject( "message.saveconf.savefail" ); 
+        } catch( Exception e ) {
+            request.getSession().removeAttribute( OK_MSG_KEY );
+            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
+                        "message.saveconf.savefail" ) );
+            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                    getMessageSourceAccessor().getMessage( "message.saveconf.savefail" )
+                    + ": " + e.getMessage() );
+            errors.reject( "message.saveconf.savefail" );
         }
         return new ModelAndView( getSuccessView() );
     }

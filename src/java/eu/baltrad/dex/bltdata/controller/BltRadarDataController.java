@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -22,8 +22,8 @@
 package eu.baltrad.dex.bltdata.controller;
 
 import eu.baltrad.dex.bltdata.model.BltFileManager;
-import eu.baltrad.dex.util.FileCatalogConnector;
-import eu.baltrad.fc.FileCatalog;
+import eu.baltrad.dex.bltdata.model.BltFile;
+import eu.baltrad.dex.util.ITableScroller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,14 +42,23 @@ import java.io.IOException;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class BltRadarDataController implements Controller {
+public class BltRadarDataController implements Controller, ITableScroller {
 //---------------------------------------------------------------------------------------- Constants
-    public static final String MAP_KEY = "data_from_radar";
+    /** File entries key */
+    public static final String FILE_ENTRIES = "file_entries";
+    /** Channel name key */
     public static final String CHANNEL_NAME = "channelName";
+    /** Page number map key */
+    private static final String PAGE_NUMBER = "pagenum";
 //---------------------------------------------------------------------------------------- Variables
+    /** Reference to file manager object */
     private BltFileManager bltFileManager;
-    private static FileCatalog fc;
+    /** Success view name */
     private String successView;
+    /** Holds current page number, used for page scrolling */
+    private static int currentPage;
+    /** Holds channel name value extracted from request parameter */
+    private static String channelName;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Method handles http request
@@ -63,14 +72,106 @@ public class BltRadarDataController implements Controller {
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response )
             throws ServletException, IOException {
-        String channelName = request.getParameter( CHANNEL_NAME );
-        // Initialize file catalog if null
-        if( fc == null ) {
-            fc = FileCatalogConnector.connect();
+        // Set static channel name to be used with next requests
+        if( request.getParameter( CHANNEL_NAME ) != null &&
+                !request.getParameter( CHANNEL_NAME ).isEmpty() ) {
+            setChannelName( request.getParameter( CHANNEL_NAME ) );
         }
-        List fileList = bltFileManager.getDataByRadar( fc, channelName );
-        return new ModelAndView( getSuccessView(), MAP_KEY, fileList );
-        
+        String pageNum = request.getParameter( PAGE_NUMBER );
+        List<BltFile> fileEntries = null;
+        if( pageNum != null ) {
+            if( pageNum.matches( "First" ) ) {
+                firstPage();
+                fileEntries = bltFileManager.getFileEntries( getChannelName(), 0,
+                        BltFileManager.ENTRIES_PER_PAGE );
+            } else {
+                if( pageNum.matches( "Last" ) ) {
+                    lastPage();
+                } else if( pageNum.matches( ">" ) ) {
+                    nextPage();
+                } else if( pageNum.matches( "<" ) ) {
+                    previousPage();
+                } else {
+                    int page = Integer.parseInt( pageNum );
+                    setCurrentPage( page );
+                }
+                int offset = ( getCurrentPage() * BltFileManager.ENTRIES_PER_PAGE )
+                        - BltFileManager.ENTRIES_PER_PAGE;
+                fileEntries = bltFileManager.getFileEntries( getChannelName(), offset,
+                        BltFileManager.ENTRIES_PER_PAGE );
+            }
+        } else {
+            setCurrentPage( 1 );
+            fileEntries = bltFileManager.getFileEntries( getChannelName(), 0,
+                    BltFileManager.ENTRIES_PER_PAGE );
+        }
+        return new ModelAndView( successView, FILE_ENTRIES, fileEntries );
+    }
+    /**
+     * Gets current page number.
+     *
+     * @return Current page number
+     */
+    public int getCurrentPage() { return currentPage; }
+    /**
+     * Sets current page number.
+     *
+     * @param page Current page number to set
+     */
+    public void setCurrentPage( int page ) { currentPage = page; }
+    /**
+     * Sets page number to the next page number.
+     */
+    public void nextPage() {
+        int lastPage = ( int )Math.ceil( bltFileManager.countEntries( getChannelName() ) /
+                BltFileManager.ENTRIES_PER_PAGE );
+        if( lastPage == 0 ) {
+            ++lastPage;
+        }
+        if( getCurrentPage() != lastPage ) {
+            ++currentPage;
+        }
+    }
+    /**
+     * Sets page number to the previous page number.
+     */
+    public void previousPage() {
+        if( getCurrentPage() != 1 ) {
+            --currentPage;
+        }
+    }
+    /**
+     * Sets page number to the first page.
+     */
+    public void firstPage() {
+        currentPage = 1;
+    }
+    /**
+     * Sets page number to the last page.
+     */
+    public void lastPage() {
+        long numEntries = bltFileManager.countEntries( getChannelName() );
+        int lastPage = ( int )Math.ceil( numEntries / BltFileManager.ENTRIES_PER_PAGE );
+        if( lastPage == 0 ) {
+            ++lastPage;
+        }
+        currentPage = lastPage;
+    }
+    /**
+     * Gets data channel name.
+     *
+     * @return channelName Data channel name
+     */
+    public static String getChannelName() {
+        return channelName;
+    }
+    /**
+     * Sets data channel name.
+     *
+     * @param _channelName Data channnel name to set
+     */
+    public static void setChannelName( String _channelName ) {
+        channelName = _channelName;
     }
     /**
      * Method returns reference to file manager object.

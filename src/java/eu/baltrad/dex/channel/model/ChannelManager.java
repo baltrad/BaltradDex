@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,12 +21,12 @@
 
 package eu.baltrad.dex.channel.model;
 
-import eu.baltrad.dex.util.HibernateUtil;
+import eu.baltrad.dex.util.JDBCConnectionManager;
 
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.Session;
-import org.hibernate.Query;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -39,142 +39,195 @@ import java.util.ArrayList;
  * @since 1.0
  */
 public class ChannelManager {
-
+//---------------------------------------------------------------------------------------- Variables
+    /** Reference to JDBCConnector class object */
+    private JDBCConnectionManager jdbcConnectionManager;
 //------------------------------------------------------------------------------------------ Methods    
     /**
-     * Gets list of all registered channels.
-     *
-     * @return List containing all registered channels
+     * Constructor gets reference to JDBCConnectionManager instance.
      */
-    public List getChannels() {
-        List channels = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public ChannelManager() {
+        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+    }
+    /**
+     * Gets all data channels.
+     *
+     * @return List of all available data channels
+     */
+    public List<Channel> getChannels() {
+        Connection conn = null;
+        List<Channel> channels = new ArrayList<Channel>();
         try {
-            channels = session.createQuery( "FROM Channel" ).list();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channels" );
+            while( resultSet.next() ) {
+                int chnlId = resultSet.getInt( "id" );
+                String name = resultSet.getString( "name" );
+                String wmoNumber = resultSet.getString( "wmo_number" );
+                Channel channel = new Channel( chnlId, name, wmoNumber );
+                channels.add( channel );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select data channels: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select data channels: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
         return channels;
     }
     /**
-     * Method returns data channel identified by a given name.
+     * Gets data channel with a given name.
      *
-     * @param channelName Name of the data channel
-     * @return Data channel identified by a given name
+     * @param channelName Data channel name
+     * @return Data channel with a given name
      */
     public Channel getChannel( String channelName ) {
+        Connection conn = null;
         Channel channel = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
         try {
-            channel = ( Channel )session.createQuery( "FROM Channel WHERE channelName = "+
-                    "?" ).setString( 0, channelName ).uniqueResult();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channels WHERE" +
+                    " name = '" + channelName + "';");
+            while( resultSet.next() ) {
+                int chnlId = resultSet.getInt( "id" );
+                String name = resultSet.getString( "name" );
+                String wmoNumber = resultSet.getString( "wmo_number" );
+                channel = new Channel( chnlId, name, wmoNumber );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select data channels: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select data channels: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
         return channel;
     }
     /**
-     * Method returns data channel identified by a channel ID.
+     * Gets data channel with a given ID.
      *
      * @param id Data channel ID
-     * @return Data channel identified by channel ID
+     * @return Data channel with a given ID
      */
     public Channel getChannel( int id ) {
+        Connection conn = null;
         Channel channel = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
         try {
-            channel = ( Channel )session.createQuery( "FROM Channel WHERE id = ?").setInteger(
-                    0, id ).uniqueResult();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channels WHERE" +
+                    " id = " + id + ";" );
+            while( resultSet.next() ) {
+                int chnlId = resultSet.getInt( "id" );
+                String name = resultSet.getString( "name" );
+                String wmoNumber = resultSet.getString( "wmo_number" );
+                channel = new Channel( chnlId, name, wmoNumber );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select data channels: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select data channels: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
         return channel;
     }
     /**
-     * Method fetches IDs of the listed channels.
+     * Saves or updates data channel.
      *
-     * @param channelNames List of channels' names
-     * @return List of channel IDs
+     * @param channel Data channel
+     * @return Number of saved or updated records
+     * @throws SQLException
+     * @throws Exception
      */
-    public List getChannelIds( String[ ] channelNames ) {
-        List channelIds = new ArrayList();
-        if( channelNames != null ) {
-            SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-            Session session = sessionFactory.openSession();
-            try {
-                for( int i = 0; i < channelNames.length; i++ ) {
-                    session.beginTransaction();
-                    try {
-                        Channel channel = ( Channel )session.createQuery( "FROM Channel WHERE " +
-                                " channelName = ?" ).setString( 0, channelNames[ i ] ).uniqueResult();
-                        session.getTransaction().commit();
-                        channelIds.add( channel.getId() );
-                    } catch( HibernateException e ) {
-                        session.getTransaction().rollback();
-                        throw e;
-                    }
-                }
-            } finally {
-                session.close();
-            }
-        }
-        return channelIds;
-    }
-    /**
-     * Adds data channel to the database.
-     *
-     * @param channel Channel class object
-     */
-    public void addChannel( Channel channel ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public int saveOrUpdate( Channel channel ) throws SQLException, Exception {
+        Connection conn = null;
+        int update = 0;
         try {
-            session.saveOrUpdate( channel );
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            session.getTransaction().rollback();
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "";
+            // record does not exists, do insert
+            if( channel.getId() == 0 ) {
+                sql = "INSERT INTO dex_channels (name, wmo_number) VALUES ('" +
+                    channel.getChannelName() + "', '" + channel.getWmoNumber() + "');";
+            } else {
+                // record exists, do update
+                sql = "UPDATE dex_channels SET name = '" + channel.getChannelName() + "', " +
+                    "wmo_number = '" + channel.getWmoNumber() + "' WHERE id = " +
+                    channel.getId() + ";";
+            }
+            update = stmt.executeUpdate( sql ) ;
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to save data channel: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to save data channel: " + e.getMessage() );
             throw e;
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
+        return update;
+    }
+    /**
+     * Saves data channel.
+     *
+     * @param channel Channel class object
+     * @return Number of inserted records
+     */
+    public int addChannel( Channel channel ) {
+        Connection conn = null;
+        int insert = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "INSERT INTO dex_channels (name, wmo_number) VALUES ('" +
+                    channel.getChannelName() + "', '" + channel.getWmoNumber() + "');";
+            insert = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to save data channel: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to save data channel: " + e.getMessage() );
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return insert;
     }
     /**
      * Deletes channel with a given ID.
      *
      * @param id Channel ID
+     * @return Number of deleted records
+     * @throws SQLException
+     * @throws Exception
      */
-    public void removeChannel( int id ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-	    session.beginTransaction();
+    public int deleteChannel( int id ) throws SQLException, Exception {
+        Connection conn = null;
+        int delete = 0;
         try {
-            session.delete( session.load( Channel.class, new Integer( id ) ) );
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "DELETE FROM dex_channels WHERE id = " + id + ";";
+            delete = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete data channel: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to delete data channel: " + e.getMessage() );
             throw e;
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
+        return delete;
     }
     /**
      * Gets permission for a given channel and a given user.
@@ -182,24 +235,27 @@ public class ChannelManager {
      * @param channelId Channel ID
      * @param userId User ID
      * @return ChannelPermission object
-     * @throws HibernateException
      */
-    public ChannelPermission getPermission( int channelId, int userId )
-            throws HibernateException {
+    public ChannelPermission getPermission( int channelId, int userId ) {
+        Connection conn = null;
         ChannelPermission channelPermission = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
         try {
-            channelPermission = ( ChannelPermission )session.createQuery(
-                "FROM ChannelPermission WHERE " + "channelId = ? AND userId = ?"
-                ).setInteger( 0, channelId ).setInteger( 1, userId ).uniqueResult();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channel_permissions " +
+                    "WHERE channel_id = " + channelId + " AND user_id = " + userId + ";" );
+            while( resultSet.next() ) {
+                int chnlId = resultSet.getInt( "channel_id" );
+                int usrId = resultSet.getInt( "user_id" );
+                channelPermission = new ChannelPermission( chnlId, usrId );
+            }
+            stmt.close();
+        } catch ( SQLException e ) {
+            System.err.println( "Failed to select channel permission: " + e.getMessage() );
+        } catch ( Exception e ) {
+            System.err.println( "Failed to select channel permission: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
         return channelPermission;
     }
@@ -208,99 +264,111 @@ public class ChannelManager {
      *
      * @param userId User ID
      * @return List of permissions for a given user
-     * @throws HibernateException
      */
-    public List<ChannelPermission> getPermissionByUser( int userId )
-            throws HibernateException {
+    public List<ChannelPermission> getPermissionByUser( int userId ) {
+        Connection conn = null;
         List<ChannelPermission> channelPermissions = new ArrayList<ChannelPermission>();
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-	    session.beginTransaction();
         try {
-            channelPermissions = session.createQuery(
-                    "FROM ChannelPermission WHERE userId = ?" ).setInteger(
-                    0, userId ).list();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channel_permissions " +
+                    "WHERE user_id = " + userId + ";" );
+            while( resultSet.next() ) {
+                int chnlId = resultSet.getInt( "channel_id" );
+                int usrId = resultSet.getInt( "user_id" );
+                ChannelPermission permission = new ChannelPermission( chnlId, usrId );
+                channelPermissions.add( permission );
+            }
+            stmt.close();
+        } catch ( SQLException e ) {
+            System.err.println( "Failed to select channel permission: " + e.getMessage() );
+        } catch ( Exception e ) {
+            System.err.println( "Failed to select channel permission: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
         return channelPermissions;
     }
     /**
-     * Gets channel permissions for user with a given ID.
+     * Gets channel permissions for a data channel with a given ID.
      *
-     * @param userId User ID
-     * @return List of permissions for a given channel
-     * @throws HibernateException
+     * @param channelId Data channel ID
+     * @return List of permissions for a given data channel
      */
-    public List<ChannelPermission> getPermissionByChannel( int channelId )
-            throws HibernateException {
+    public List<ChannelPermission> getPermissionByChannel( int channelId ) {
+        Connection conn = null;
         List<ChannelPermission> channelPermissions = new ArrayList<ChannelPermission>();
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-	    session.beginTransaction();
         try {
-            channelPermissions = session.createQuery(
-                    "FROM ChannelPermission WHERE channelId = ?" ).setInteger(
-                    0, channelId ).list();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channel_permissions " +
+                    "WHERE channel_id = " + channelId + ";" );
+            while( resultSet.next() ) {
+                int chnlId = resultSet.getInt( "channel_id" );
+                int usrId = resultSet.getInt( "user_id" );
+                ChannelPermission permission = new ChannelPermission( chnlId, usrId );
+                channelPermissions.add( permission );
+            }
+            stmt.close();
+        } catch ( SQLException e ) {
+            System.err.println( "Failed to select channel permission: " + e.getMessage() );
+        } catch ( Exception e ) {
+            System.err.println( "Failed to select channel permission: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
         return channelPermissions;
     }
     /**
-     * Adds channel permission object to the database.
+     * Saves channel permission.
      *
      * @param channelPermission Channel permission object
-     * @throws HibernateException
+     * @return Number of inserted records
      */
-    public void addPermission( ChannelPermission channelPermission )
-            throws HibernateException {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public int addPermission( ChannelPermission permission ) {
+        Connection conn = null;
+        int insert = 0;
         try {
-            session.saveOrUpdate( channelPermission );
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "INSERT INTO dex_channel_permissions (channel_id, user_id) VALUES ('" +
+                    permission.getChannelId() + "', '" + permission.getUserId() + "');";
+            insert = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to save channel permission: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to save channel permission: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
+        return insert;
     }
     /**
      * Removes channel permission.
      *
      * @param channelId Channel ID
      * @param userId User ID
-     * @throws HibernateException
+     * @return Number of deleted records
      */
-    public void removePermission( int channelId, int userId ) throws HibernateException {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public int deletePermission( int channelId, int userId ) {
+        Connection conn = null;
+        int delete = 0;
         try {
-            String hql = "DELETE FROM ChannelPermission WHERE channel_id = :channelId "
-                    + "AND user_id = :userId";
-            Query query = session.createQuery( hql );
-            query.setInteger( "channelId", channelId );
-            query.setInteger( "userId", userId );
-            query.executeUpdate();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "DELETE FROM dex_channel_permissions WHERE channel_id = " +
+                    channelId + "AND user_id = " + userId + ";";
+            delete = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete channel permission: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to delete channel permission: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
+        return delete;
     }
 }
 //--------------------------------------------------------------------------------------------------

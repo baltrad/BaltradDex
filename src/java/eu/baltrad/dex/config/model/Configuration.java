@@ -60,6 +60,34 @@ public class Configuration {
     /**
      * Constructor sets class fields values.
      *
+     * @param id Configuration ID
+     * @param nodeName Short node name
+     * @param nodeType Node type (primary or backup node)
+     * @param shortAddress Node's short address
+     * @param portNumber Port number
+     * @param orgName Host organization name
+     * @param orgAddress Host organization address
+     * @param timeZone Local time zone
+     * @param tempDir Temporary directory
+     * @param adminEmail Node administrator's email
+     */
+    public Configuration( int id, String nodeName, String nodeType, String shortAddress, String portNumber,
+            String orgName, String orgAddress, String timeZone, String tempDir,
+            String adminEmail ) {
+        this.id = id;
+        this.nodeName = nodeName;
+        this.nodeType = nodeType;
+        this.shortAddress = shortAddress;
+        this.portNumber = portNumber;
+        this.orgName = orgName;
+        this.orgAddress = orgAddress;
+        this.timeZone = timeZone;
+        this.tempDir = tempDir;
+        this.adminEmail = adminEmail;
+    }
+    /**
+     * Constructor sets class fields values.
+     *
      * @param nodeName Short node name
      * @param nodeType Node type (primary or backup node)
      * @param shortAddress Node's short address

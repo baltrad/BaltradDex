@@ -94,8 +94,8 @@ CREATE SEQUENCE channel_id_seq;
 CREATE TABLE dex_channels
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('channel_id_seq'),
-    name VARCHAR(32) NOT NULL,
-    wmo_number VARCHAR(16),
+    name VARCHAR(32) UNIQUE NOT NULL,
+    wmo_number VARCHAR(16) UNIQUE,
     PRIMARY KEY (id)
 );
 

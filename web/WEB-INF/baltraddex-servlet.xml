@@ -377,11 +377,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="initAppUtil" class="eu.baltrad.dex.util.InitAppUtil"/>
 
     <!--
-        File catalog connector.
-    -->
-    <bean id="fileCatalogConnector" class="eu.baltrad.dex.util.FileCatalogConnector"/>
-
-    <!--
         Data channel manager.
     -->
     <bean name="channelManager" class="eu.baltrad.dex.channel.model.ChannelManager"/>
@@ -554,17 +549,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="saveChannelController" 
         class="eu.baltrad.dex.channel.controller.SaveChannelController">
+        <property name="formView">
+            <value>saveLocalChannel</value>
+        </property>
         <property name="successView">
             <value>saveRadarStatus</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.channel.model.Channel</value>
-        </property>
-        <property name="formView">
-            <value>saveLocalChannel</value>
-        </property>
-        <property name="validator">
-            <ref bean="saveChannelValidator"/>
         </property>
         <property name="sessionForm">
             <value>false</value>
@@ -572,6 +564,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="channelManager">
             <ref bean="channelManager"/>
         </property>
+        <property name="validator">
+            <ref bean="saveChannelValidator"/>
+        </property>     
         <property name="userManager">
             <ref bean="userManager"/>
         </property>
@@ -583,11 +578,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Add channel validator
     -->
-    <bean name="saveChannelValidator" class="eu.baltrad.dex.channel.util.SaveChannelValidator">
-        <property name="channelManager">
-            <ref bean="channelManager"/>
-        </property>
-    </bean>
+    <bean name="saveChannelValidator" class="eu.baltrad.dex.channel.util.SaveChannelValidator"/>
 
     <!--
         Edit channel controller - allows to modify data channel

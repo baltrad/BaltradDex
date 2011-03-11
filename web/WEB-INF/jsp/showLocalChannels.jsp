@@ -25,6 +25,15 @@ Author     : szewczenko
     "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+<%@ page import="java.util.List" %>
+<%
+    List channels = ( List )request.getAttribute( "channels" );
+    if( channels == null || channels.size() <= 0 ) {
+        request.getSession().setAttribute( "channels_status", 0 );
+    } else {
+        request.getSession().setAttribute( "channels_status", 1 );
+    }
+%>
 
 <html>
     <head>
@@ -49,40 +58,77 @@ Author     : szewczenko
                         <div class="right">
                         </div>
                     </div>
-                    <div id="text-box">
-                        Select radar stations to be be removed. Confirm radar removal with Submit
-                        button.
-                    </div>
-                    <div id="table">
-                        <form action="showSelectedLocalChannels.htm">
-                            <display:table name="channels" id="channel" defaultsort="1"
-                                cellpadding="0" cellspacing="2" export="false" class="tableborder">
-                                <display:column sortable="true" title="Radar station"
-                                    sortProperty="channelName" class="tdcenter"
-                                    value="${channel.channelName}">
-                                </display:column>
-                                <display:column sortable="true" title="WMO number"
-                                    sortProperty="wmoNumber" class="tdcenter"
-                                    value="${channel.wmoNumber}">
-                                </display:column>
-                                <display:column sortable="false" title="Select" class="tdcheck">
-                                    <input type="checkbox" name="selected_channels"
-                                        value="${channel.id}"/>
-                                </display:column>
-                            </display:table>
-                            <div class="footer">
-                                <div class="right">
-                                    <button class="rounded" type="button"
-                                        onclick="window.location='configuration.htm'">
-                                        <span>Back</span>
-                                    </button>
-                                    <button class="rounded" type="submit">
-                                        <span>Submit</span>
-                                    </button>
+                    <c:choose>
+                        <c:when test="${channels_status == 1}">
+                            <div id="text-box">
+                                Select radar stations to be be removed. Confirm radar removal
+                                with Submit button.
+                            </div>
+                            <form action="showSelectedLocalChannels.htm">
+                                <div id="table">
+                                    <div id="selectradars">
+                                        <div class="hdr">
+                                            <div class="station">
+                                                Radar station
+                                            </div>
+                                            <div class="wmo">
+                                                WMO number
+                                            </div>
+                                            <div class="check">
+                                                Select
+                                            </div>
+                                        </div>
+                                        <c:forEach var="channel" items="${channels}">
+                                            <div class="row">
+                                                <div class="station">
+                                                    <c:out value="${channel.channelName}"/>
+                                                </div>
+                                                <div class="wmo">
+                                                    <c:out value="${channel.wmoNumber}"/>
+                                                </div>
+                                                <div class="check">
+                                                    <input type="checkbox" name="selected_channels"
+                                                        value="${channel.id}"/>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                        <div class="footer">
+                                            <div class="right">
+                                                <button class="rounded" type="button"
+                                                    onclick="window.location='configuration.htm'">
+                                                    <span>Back</span>
+                                                </button>
+                                                <button class="rounded" type="submit">
+                                                    <span>Submit</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="message">
+                                <div class="icon">
+                                    <img src="includes/images/icons/circle-alert.png"
+                                         alt="no_radars"/>
+                                </div>
+                                <div class="text">
+                                    List of radar stations is currently empty.
+                                    Use configuration options to add new radars.
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                            <div class="footer">
+                                <div class="right">
+                                    <form action="configuration.htm">
+                                        <button class="rounded" type="submit">
+                                            <span>OK</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
                 <div id="clear"></div>
             </div>

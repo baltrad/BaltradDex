@@ -43,6 +43,18 @@ public class Channel implements Serializable {
     /**
      * Constructor setting field values.
      *
+     * @param id Channel ID
+     * @param channelName Channel name
+     * @param wmoNumber Channel WMO number
+     */
+    public Channel( int id, String channelName, String wmoNumber ) {
+        this.id = id;
+        this.channelName = channelName;
+        this.wmoNumber = wmoNumber;
+    }
+    /**
+     * Constructor setting field values.
+     *
      * @param channelName Channel name
      * @param wmoNumber Channel WMO number
      */

@@ -32,7 +32,7 @@ Author     : szewczenko
 <%
     LogManager manager = new LogManager();
     JournalController controller = new JournalController();
-    int numEntries = manager.countEntries();
+    long numEntries = manager.countEntries();
     int numPages = ( int )Math.ceil( numEntries / LogManager.ENTRIES_PER_PAGE );
     if( numPages < 1 ) {
         numPages = 1;

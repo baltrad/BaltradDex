@@ -53,38 +53,46 @@ Author     : szewczenko
                         Warning: The following local radar station(s) will be removed
                         from the system.
                     </div>
-                    <div id="table">
-                        <form method="post" action="showRemovedLocalChannels.htm">
-                            <display:table name="channels" id="channel" defaultsort="1"
-                                requestURI="showSelectedLocalChannels.htm" cellpadding="0"
-                                cellspacing="2" export="false" class="tableborder">
-                                <display:column sortable="true" title="Radar station"
-                                    sortProperty="channelName" class="tdcenter"
-                                    value="${channel.channelName}">
-                                </display:column>
-                                <display:column sortable="true" title="WMO number"
-                                    sortProperty="wmoNumber" class="tdcenter"
-                                    value="${channel.wmoNumber}">
-                                </display:column>
-                                <display:column class="tdhidden" headerClass="tdhidden">
-                                    <input type="checkbox" name="removed_channels"
-                                           value="${channel.id}" checked/>
-                                </display:column>
-                            </display:table>
-                            <div class="footer">
-                                <div class="right">
-                                    <button class="rounded" type="button"
-                                        onclick="history.go(-1);">
-                                        <span>Back</span>
-                                    </button>
-                                    <button class="rounded" type="submit">
-                                        <span>Submit</span>
-                                    </button>
+                    <form method="post" action="showRemovedLocalChannels.htm">
+                        <div id="table">
+                            <div id="radartable">
+                                <div class="hdr">
+                                    <div class="station">
+                                        Radar station
+                                    </div>
+                                    <div class="wmo">
+                                        WMO number
+                                    </div>
+                                </div>
+                                <c:forEach var="channel" items="${channels}">
+                                    <div class="row">
+                                        <div class="station">
+                                            <c:out value="${channel.channelName}"/>
+                                        </div>
+                                        <div class="wmo">
+                                            <c:out value="${channel.wmoNumber}"/>
+                                        </div>
+                                        <div class="tdhidden">
+                                            <input type="checkbox" name="removed_channels"
+                                                value="${channel.id}" checked/>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                                <div class="footer">
+                                    <div class="right">
+                                        <button class="rounded" type="button"
+                                            onclick="history.go(-1);">
+                                            <span>Back</span>
+                                        </button>
+                                        <button class="rounded" type="submit">
+                                            <span>Submit</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
-                </div>
+                        </div>
+                    </form>
+                 </div>
                 <div id="clear"></div>
             </div>
         </div>

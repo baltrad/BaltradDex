@@ -123,7 +123,16 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private FramePublisher framePublisher;
     /** References delivery register manager object @see DeliveryRegisterManager */
     private DeliveryRegisterManager deliveryRegisterManager;
+    /** Reference to FileCatalogConnector */
+    private FileCatalogConnector fileCatalogConnector;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor gets reference to FileCatalogConnector instance.
+     */
+    public FrameDispatcherController() {
+        this.fileCatalogConnector = FileCatalogConnector.getInstance();
+        this.fc = fileCatalogConnector.getFileCatalog();
+    }
     /**
      * Required by the Spring's Controller interface, wraps actual doGet method used to
      * handle incoming and outgoing frames.
@@ -574,10 +583,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         FileItemStream fileItem = iterator.next();
                         InputStream fileStream = fileItem.openStream();
                         InitAppUtil.saveFile( fileStream, swapFile );
-                        // check connection to FileCatalog
-                        if( fc == null ) {
-                            fc = FileCatalogConnector.connect();
-                        }
+                        
                         try {
                             FileEntry fileEntry = fc.store( swapFile.getAbsolutePath() );
                             if( fileEntry == null ) {

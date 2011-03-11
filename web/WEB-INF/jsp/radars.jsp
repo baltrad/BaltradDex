@@ -25,6 +25,15 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+<%@ page import="java.util.List" %>
+<%
+    List channels = ( List )request.getAttribute( "channels" );
+    if( channels == null || channels.size() <= 0 ) {
+        request.getSession().setAttribute( "channels_status", 0 );
+    } else {
+        request.getSession().setAttribute( "channels_status", 1 );
+    }
+%>
 
 <html>
     <head>
@@ -49,34 +58,68 @@ Author     : szewczenko
                         <div class="right">
                         </div>
                     </div>
-                    <div id="text-box">
-                        List of local radar stations. Click on the station name in order to view
-                        data set available for this station.
-                    </div>
-                    <div id="table">
-                        <display:table name="channels" id="dataChannel" defaultsort="1"
-                            requestURI="radars.htm" cellpadding="0" cellspacing="2"
-                            export="false" class="tableborder">
-                            <display:column sortable="true" title="Radar station"
-                                href="radarData.htm" sortProperty="channelName"
-                                paramId="channelName" paramProperty="channelName" class="tdcenter"
-                                value="${dataChannel.channelName}">
-                            </display:column>
-                            <display:column sortable="true" title="WMO number"
-                                sortProperty="wmoNumber" class="tdcenter"
-                                value="${dataChannel.wmoNumber}">
-                            </display:column>
-                        </display:table>
-                        <div class="footer">
-                            <div class="right">
-                                <form action="home.htm">
-                                    <button class="rounded" type="submit">
-                                        <span>Home</span>
-                                    </button>
-                                </form>
+                    <c:choose>
+                        <c:when test="${channels_status == 1}">
+                            <div id="text-box">
+                                List of local radar stations. Click on the station name in order
+                                to view data set available for this station.
                             </div>
-                        </div>
-                    </div>
+                            <div id="table">
+                                <div id="radartable">
+                                    <div class="hdr">
+                                        <div class="station">
+                                            Radar station
+                                        </div>
+                                        <div class="wmo">
+                                            WMO number
+                                        </div>
+                                    </div>
+                                    <c:forEach var="channel" items="${channels}">
+                                        <div class="row">
+                                            <div class="station">
+                                                <a href="radarData.htm?channelName=${channel.channelName}">
+                                                    <c:out value="${channel.channelName}"/>
+                                                </a>
+                                            </div>
+                                            <div class="wmo">
+                                                <c:out value="${channel.wmoNumber}"/>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                    <div class="footer">
+                                        <div class="right">
+                                            <form action="home.htm">
+                                                <button class="rounded" type="submit">
+                                                    <span>Home</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="message">
+                                <div class="icon">
+                                    <img src="includes/images/icons/circle-alert.png"
+                                         alt="no_radars"/>
+                                </div>
+                                <div class="text">
+                                    List of radar stations is currently empty.
+                                    Use configuration options to add new radars.
+                                </div>
+                            </div>
+                            <div class="footer">
+                                <div class="right">
+                                    <form action="home.htm">
+                                        <button class="rounded" type="submit">
+                                            <span>OK</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
                 <div id="clear"></div>
             </div>

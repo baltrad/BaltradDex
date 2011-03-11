@@ -751,9 +751,6 @@ tr {
 /*
  * messages table
  */
-#logtable td {
-    padding: 2px 4px 2px 4px;
-}
 #logtable .warning {
     color: #003197;
 }
@@ -764,23 +761,28 @@ tr {
     width:100%;
 }
 
-/* system message tables */
+/* general table properties */
 
-#logtable > .hdr {
+#logtable > .hdr, #radartable > .hdr, #selectradars > .hdr, #selectusers > .hdr,
+        #producttable > .hdr {
     font-size:1.1em;
     font-weight: bolder;
     color:#2d76ae;
     border-bottom: 1px solid #2d76ae;
 }
-#logtable > .hdr, #logtable > .row {
+#logtable > .hdr, #logtable > .row, #radartable > .hdr, #radartable > .row,
+        #selectradars > .hdr, #selectradars > .row, #selectusers > .hdr, #selectusers > .row,
+        #producttable > .hdr, #producttable > .row {
     width:100%;
     float:left;
     clear:both;
 }
-#logtable > .row {
+#logtable > .row, #radartable > .row, #selectradars > .row, #selectusers > .row,
+        #producttable > .row {
     border-bottom:1px solid #D0E7BA;
 }
-#logtable > .row:hover {
+#logtable > .row:hover, #radartable > .row:hover, #selectradars > .row:hover,
+        #selectusers > .row:hover, #producttable > .row:hover {
     background:#E2FFC6;
 }
 
@@ -808,6 +810,92 @@ tr {
 #logtable > .hdr > .msg {
     text-align:center; 
 }
+#radartable > .hdr > .station, #radartable > .row > .station {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width: 50%;
+}
+#radartable > .hdr > .wmo, #radartable > .row > .wmo {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width: 50%;
+}
+#radartable a, #producttable a {
+    color:#2d76ae;
+    text-decoration:underline;
+    cursor:pointer
+}
+#radartable a:hover, #producttable a:hover {
+    text-decoration:none;
+    font-weight:bolder; 
+}
+#selectradars > .hdr > .station, #selectradars > .row > .station {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width: 40%;
+}
+#selectradars > .hdr > .wmo, #selectradars > .row > .wmo {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width: 40%;
+}
+#selectradars > .hdr > .check, #selectradars > .row > .check {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width: 20%;
+    text-align:center;
+}
+#selectusers > .hdr > .user, #selectusers > .row > .user {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:40%;
+}
+#selectusers > .hdr > .role, #selectusers > .row > .role {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:40%;
+}
+#selectusers > .hdr > .check, #selectusers > .row > .check {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:20%;
+    text-align:center;
+}
+
+#producttable > .hdr > .date, #producttable > .row > .date {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:20%;
+}
+#producttable > .hdr > .time, #producttable > .row > .time {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:20%;
+}
+#producttable > .hdr > .type, #producttable > .row > .type {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:20%;
+}
+#producttable > .hdr > .details, #producttable > .row > .details {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:20%;
+}
+#producttable > .hdr > .download, #producttable > .row > .download {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:20%;
+}
+#producttable > .row > .download > a > img {
+    border:none;
+    background:none;
+}
+
+
+
+
+
 
 /* table control bar */
 

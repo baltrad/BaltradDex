@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.bltdata.model;
 
+import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.fc.FileCatalog;
@@ -28,6 +29,8 @@ import eu.baltrad.fc.expr.ExpressionFactory;
 import eu.baltrad.fc.db.FileQuery;
 import eu.baltrad.fc.db.FileResult;
 import eu.baltrad.fc.db.FileEntry;
+import eu.baltrad.fc.db.AttributeQuery;
+import eu.baltrad.fc.db.AttributeResult;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -46,29 +49,69 @@ import java.text.ParseException;
  */
 public class BltFileManager {
 //---------------------------------------------------------------------------------------- Constants
+    /** HDF5 source key */
     private static final String FC_SRC_PLC_ATTR = "what/source:PLC";
+    /** File UUID key */
     private static final String FC_FILE_UUID = "file:uuid";
+    /** Date format string */
     private static final String FC_DATE_STR = "yyyy/MM/dd";
+    /** Time format string */
     private static final String FC_TIME_STR = "HH:mm:ss";
-    // image file extension
+    /** Image file extension */
     private static final String IMAGE_FILE_EXT = ".png";
+    /** Number of file entries per page */
+    public final static int ENTRIES_PER_PAGE = 12;
+    /** Number of pages in the scroll bar, must be an odd number >= 3 */
+    public final static int SCROLL_RANGE = 11;
 //---------------------------------------------------------------------------------------- Variables
+    /** Date and time format string */
     private static SimpleDateFormat format = new SimpleDateFormat( FC_DATE_STR + " " +
             FC_TIME_STR );
+    /** Reference to FileCatalogConnector object */
+    private FileCatalogConnector fileCatalogConnector;
+    /** Reference to FileCatalog object */
+    private FileCatalog fc;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Method queries file catalog for all files coming from a given radar station.
+     * Constructor gets reference to FileCatalogConnector instance.
+     */
+    public BltFileManager() {
+        this.fileCatalogConnector = FileCatalogConnector.getInstance();
+        this.fc = fileCatalogConnector.getFileCatalog();
+    }
+    /**
+     * Counts file entries from a given data channel.
      *
-     * @param fc File catalog instance
-     * @param radarName Radar station name
+     * @param dataChannel Data channel name
+     * @return Number of file entries.
+     */
+    public long countEntries( String dataChannel ) {
+        AttributeQuery q = new AttributeQuery();
+        ExpressionFactory xpr = new ExpressionFactory();
+        q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( dataChannel ) ) );
+        q.fetch( "fileCount", xpr.count( xpr.attribute( "file:uuid" ) ) );
+        AttributeResult r = fc.database().execute( q );
+        r.next();
+        long count = r.int64_( "fileCount" );
+        r.delete();
+        return count;
+    }
+    /**
+     * Gets files from a given data channel.
+     *
+     * @param dataChannel Data channel name
      * @return List containing data from a given radar station
      */
-    public List< BltFile > getDataByRadar( FileCatalog fc, String radarName ) {
+    public List<BltFile> getFileEntries( String dataChannel, int offset, int limit ) {
         ExpressionFactory xpr = new ExpressionFactory();
         FileQuery q = new FileQuery();
+        // set offset and limit
+        q.limit( limit );
+        q.skip( offset );
+        //q.order_by( someField, FileQuery.SortDir.DESC );
         // filter the query with a given channel name
-        q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( radarName ) ) );
-        FileResult r = fc.database().execute(q);
+        q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( dataChannel ) ) );
+        FileResult r = fc.database().execute( q );
         List< BltFile > bltFiles = new ArrayList<BltFile>();
         while( r.next() ) {
             try {
@@ -78,7 +121,7 @@ public class BltFileManager {
                     format.parse( fileEntry.what_date().to_string( FC_DATE_STR ) + " " +
                         fileEntry.what_time().to_string( FC_TIME_STR ) ) ,
                     format.parse( fileEntry.stored_at().to_string( FC_DATE_STR + " " +
-                        FC_TIME_STR ) ), radarName, fileEntry.what_object(),
+                        FC_TIME_STR ) ), dataChannel, fileEntry.what_object(),
                     InitAppUtil.getThumbsStorageFolder() + File.separator +
                     fileEntry.uuid() + IMAGE_FILE_EXT );
                 bltFiles.add( bltFile );
@@ -93,18 +136,17 @@ public class BltFileManager {
         return bltFiles;
     }
     /**
-     * Method queries file catalog for a file entry with a given identity string.
+     * Gets file entry with a given identity string.
      *
-     * @param fc File catalog instance
      * @param uuid File entry's identity string
      * @return File entry with a given ID
      */
-    public BltFile getDataByID( FileCatalog fc, String uuid ) {
+    public BltFile getFileEntry( String uuid ) {
         ExpressionFactory xpr = new ExpressionFactory();
         FileQuery q = new FileQuery();
         // filter the query with a given file identity string
         q.filter( xpr.attribute( FC_FILE_UUID ).eq( xpr.string( uuid ) ) );
-        FileResult r = fc.database().execute(q);
+        FileResult r = fc.database().execute( q );
         BltFile bltFile = null;
         while( r.next() ) {
             try {

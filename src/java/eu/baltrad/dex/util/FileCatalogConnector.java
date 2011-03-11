@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -33,38 +33,58 @@ import java.util.Date;
 import java.io.InputStream;
 
 /**
- * Utility class implementing FileCatalog connection functionality.
+ * Provides connection to FileCatalog. Implemented as sigleton in order to keep control over the
+ * number of created connections.
  *
  * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
- * @version 1.0
- * @since 1.0
+ * @version 0.1.0
+ * @since 0.1.0
  */
 public class FileCatalogConnector {
 //---------------------------------------------------------------------------------------- Constants
-    // Properties file name
+    /** Properties file name */
     private static final String PROPS_FILE_NAME = "dex.fc.properties";
-    // Database URI property
+    /** Database URI property */
     private static final String DB_URI_PROP = "database.uri";
-    // File catalog storage folder
+    /** File catalog storage folder */
     private static final String DATA_STORAGE_FOLDER_PROP = "data.storage.folder";
 //---------------------------------------------------------------------------------------- Variables
-    // Reference to LocalStorage object
+    /** Reference to LocalStorage object **/
     private static LocalStorage localStorage;
-    // Reference to Database object
+    /** Reference to Database object */
     private static Database database;
-    // Reference to FileCatalog object
+    /** Reference to FileCatalog object */
     private static FileCatalog fileCatalog;
-    // Reference to LogManager object
+    /** Reference to LogManager object */
     private LogManager logManager;
-    // Data storage folder
+    /** Data storage folder */
     private static String dataStorageFolder;
-    // Data storage directory path
+    /** Data storage directory path */
     private static String dataStorageDirectory;
+    /** Reference to the object of this class */
+    private static FileCatalogConnector fileCatalogConnector;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Constructor.
+     * Initializes object of this class in case it is null, otherwise returns existing object.
+     *
+     * @return Reference to the object of this class
      */
-    public FileCatalogConnector() {
+    public static synchronized FileCatalogConnector getInstance() {
+        if( fileCatalogConnector == null ) {
+            fileCatalogConnector = new FileCatalogConnector();
+        }
+        return fileCatalogConnector;
+    }
+    /**
+     * Private constructor can be invoked by getInstance() method only.
+     */
+    private FileCatalogConnector() {
+        init();
+    }
+    /**
+     * Reads properties from stream and initializes FileCatalog.
+     */
+    public void init() {
         // Initialize LogManager
         this.logManager = new LogManager();
         // Initialize FileCatalog
@@ -99,23 +119,11 @@ public class FileCatalogConnector {
         }
     }
     /**
-     * Method initializes storage directory and connects to the database.
-     *
-     * @return Reference to FileCatalog object
-     */
-    public static FileCatalog connect() { return fileCatalog; }
-    /**
      * Method gets reference to FileCatalog object.
      *
      * @return Reference to FileCatalog object
      */
-    public static FileCatalog getFileCatalog() { return fileCatalog; }
-    /**
-     * Method sets reference to FileCatalog object.
-     *
-     * @param fc Reference to file catalog object
-     */
-    public static void setFileCatalog( FileCatalog fc ) { fileCatalog = fc; }
+    public synchronized FileCatalog getFileCatalog() { return fileCatalog; }
     /**
      * Gets data storage folder.
      *

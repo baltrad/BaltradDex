@@ -52,47 +52,56 @@ Author     : szewczenko
                     <div id="text-box">
                         Select users allowed to subscribe to this radar station.
                     </div>
-                    <div id="table">
-                        <form method="post">
-                            <display:table name="users" id="user" defaultsort="1"
-                                cellpadding="0" cellspacing="2" export="false" class="tableborder">
-                                <display:column sortable="true" title="User name"
-                                    sortProperty="name" class="tdcenter"
-                                    value="${user.name}">
-                                </display:column>
-                                <display:column sortable="true" title="Role" sortProperty="role"
-                                    class="tdcenter" value="${user.roleName}">
-                                </display:column>
-                                <c:choose>
-                                    <c:when test="${user.selected == true}">
-                                        <display:column sortable="false" title="Select"
-                                            class="tdcheck">
-                                            <input type="checkbox" name="selected_users"
-                                                value="${user.id}" checked/>
-                                        </display:column>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <display:column sortable="false" title="Select"
-                                            class="tdcheck">
-                                            <input type="checkbox" name="selected_users"
-                                                value="${user.id}"/>
-                                        </display:column>
-                                    </c:otherwise>
-                                </c:choose>
-                            </display:table>
-                            <div class="footer">
-                                <div class="right">
-                                    <button class="rounded" type="button"
-                                        onclick="history.go(-1);">
-                                        <span>Back</span>
-                                    </button>
-                                    <button class="rounded" type="submit">
-                                        <span>Submit</span>
-                                    </button>
+                    <form method="post">
+                        <div id="table">
+                            <div id="selectusers">
+                                <div class="hdr">
+                                    <div class="user">
+                                        User name
+                                    </div>
+                                    <div class="role">
+                                        Role
+                                    </div>
+                                    <div class="check">
+                                        Select
+                                    </div>
+                                </div>
+                                <c:forEach var="user" items="${users}">
+                                    <div class="row">
+                                        <div class="user">
+                                            <c:out value="${user.name}"/>
+                                        </div>
+                                        <div class="role">
+                                            <c:out value="${user.roleName}"/>
+                                        </div>
+                                        <div class="check">
+                                            <c:choose>
+                                                <c:when test="${user.selected == true}">
+                                                    <input type="checkbox" name="selected_users"
+                                                        value="${user.id}" checked/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <input type="checkbox" name="selected_users"
+                                                        value="${user.id}"/>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                                <div class="footer">
+                                    <div class="right">
+                                        <button class="rounded" type="button"
+                                            onclick="history.go(-1);">
+                                            <span>Back</span>
+                                        </button>
+                                        <button class="rounded" type="submit">
+                                            <span>Submit</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
                 <div id="clear"></div>
             </div>

@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -27,9 +27,6 @@ import eu.baltrad.dex.channel.model.ChannelPermission;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.log.model.LogManager;
-import java.util.ArrayList;
-
-import org.hibernate.HibernateException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,8 +35,10 @@ import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -51,7 +50,7 @@ import java.util.HashMap;
  */
 public class SaveChannelController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
-    public static final String CHANNEL_ID = "id";
+    public static final String CHANNEL_ID = "channelId";
     public static final String USERS = "users";
     private static final String OK_MSG_KEY = "ok_message";
     private static final String ERROR_MSG_KEY = "error_message";
@@ -68,11 +67,11 @@ public class SaveChannelController extends SimpleFormController {
      * @return Channel class object
      */
     @Override
-    protected Object formBackingObject( HttpServletRequest request ) {
+    protected Object formBackingObject( HttpServletRequest request ) throws Exception {
         Channel channel = null;
         if( request.getParameter( CHANNEL_ID ) != null
                 && request.getParameter( CHANNEL_ID ).trim().length() > 0 ) {
-            channel = channelManager.getChannel( Integer.parseInt(
+            channel = channelManager.getChannel( Integer.parseInt( 
                     request.getParameter( CHANNEL_ID ) ) );
         } else {
             channel = new Channel();
@@ -105,7 +104,7 @@ public class SaveChannelController extends SimpleFormController {
         return model;
     }
     /**
-     * Saves Channel object
+     * Saves Channel object.
      *
      * @param request HttpServletRequest
      * @param response HttpServletResponse
@@ -118,16 +117,22 @@ public class SaveChannelController extends SimpleFormController {
             Object command, BindException errors) throws Exception {
         Channel channel = ( Channel )command;
         try {
-            channelManager.addChannel( channel );
+            channelManager.saveOrUpdate( channel );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savesuccess" ) );
             logManager.addEntry( new Date(), LogManager.MSG_WRN, "Saved local radar station " +
                 channel.getChannelName() + "." );
-        } catch( HibernateException e ) {
+        } catch( SQLException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savefail" ) );
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Saved local radar station " +
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to save radar station " +
+                channel.getChannelName() + "." );
+        } catch( Exception e ) {
+            request.getSession().removeAttribute( OK_MSG_KEY );
+            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
+                "message.addradar.savefail" ) );
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to save radar station " +
                 channel.getChannelName() + "." );
         }
         return new ModelAndView( getSuccessView() );

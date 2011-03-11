@@ -45,7 +45,9 @@ import java.io.IOException;
 public class JournalController implements Controller, ITableScroller {
 //---------------------------------------------------------------------------------------- Constants
     /** Log entries map key */
-    private static final String LOG_ENTRIES = "entries";    
+    private static final String LOG_ENTRIES = "entries";
+    /** Page number map key */
+    private static final String PAGE_NUMBER = "pagenum";
 //---------------------------------------------------------------------------------------- Variables
     /** References LogManager class object */
     private LogManager logManager;
@@ -66,7 +68,7 @@ public class JournalController implements Controller, ITableScroller {
     @Override
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
-        String pageNum = request.getParameter( "pagenum" );
+        String pageNum = request.getParameter( PAGE_NUMBER );
         List<LogEntry> entries = null;
         if( pageNum != null ) {
             if( pageNum.matches( "First" ) ) {
@@ -135,7 +137,7 @@ public class JournalController implements Controller, ITableScroller {
      * Sets page number to the last page.
      */
     public void lastPage() {
-        int numEntries = logManager.countEntries();
+        long numEntries = logManager.countEntries();
         int lastPage = ( int )Math.ceil( numEntries / LogManager.ENTRIES_PER_PAGE );
         if( lastPage == 0 ) {
             ++lastPage;

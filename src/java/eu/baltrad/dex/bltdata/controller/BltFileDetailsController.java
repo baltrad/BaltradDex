@@ -101,11 +101,8 @@ public class BltFileDetailsController implements Controller {
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
         String uuid = request.getParameter( FC_FILE_UUID );
-        if( fc == null ) {
-            fc = FileCatalogConnector.connect();
-        }
         // get file from the database
-        BltFile bltFile = bltFileManager.getDataByID( fc, uuid );
+        BltFile bltFile = bltFileManager.getFileEntry( uuid );
         // open file from storage dir
         String filePath = FileCatalogConnector.getDataStorageDirectory() + File.separator + uuid 
                 + BltDataProcessor.H5_FILE_EXT;

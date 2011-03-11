@@ -45,7 +45,7 @@ import java.util.List;
  */
 public class SetPermissionController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
-    private static final String CHANNEL_ID = "id";
+    private static final String CHANNEL_ID = "channelId";
     private static final String USERS = "users";
     private static final String SELECTED_USERS_KEY = "selected_users";
 //---------------------------------------------------------------------------------------- Variables
@@ -61,8 +61,8 @@ public class SetPermissionController extends SimpleFormController {
      */
     @Override
     protected HashMap referenceData( HttpServletRequest request ) throws Exception {
-        List< User > users = userManager.getUsers();
-        List< ChannelPermission > channelPermissions = channelManager.getPermissionByChannel(
+        List<User> users = userManager.getUsers();
+        List<ChannelPermission> channelPermissions = channelManager.getPermissionByChannel(
                 Integer.parseInt( ( String )request.getSession().getAttribute( CHANNEL_ID ) ) );
         for( int i = 0; i < users.size(); i++ ) {
             int j = 0;
@@ -122,7 +122,7 @@ public class SetPermissionController extends SimpleFormController {
                 ChannelPermission channelPermission = channelManager.getPermission(
                     channelId, user.getId() );
                 if( channelPermission != null ) {
-                    channelManager.removePermission( channelId, user.getId() );
+                    channelManager.deletePermission( channelId, user.getId() );
                 }
             }
         }

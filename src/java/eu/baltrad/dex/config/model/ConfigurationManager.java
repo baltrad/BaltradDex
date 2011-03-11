@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,11 +21,12 @@
 
 package eu.baltrad.dex.config.model;
 
-import eu.baltrad.dex.util.HibernateUtil;
+import eu.baltrad.dex.util.JDBCConnectionManager;
 
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.Session;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Class implemens configuration object handling functionality.
@@ -36,50 +37,102 @@ import org.hibernate.Session;
  */
 public class ConfigurationManager {
 //---------------------------------------------------------------------------------------- Constants
-    // static record ID
+    /** configuration record ID */
     public static final int CONF_REC_ID = 1;
+//---------------------------------------------------------------------------------------- Variables
+    /** Reference to JDBCConnector class object */
+    private JDBCConnectionManager jdbcConnectionManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Fetches first record from Configuration table
-     * 
-     * @param id ID of the first record in the table
-     * @return Configuration object
+     * Constructor gets reference to JDBCConnectionManager instance.
+     */
+    public ConfigurationManager() {
+        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+    }
+    /**
+     * Gets configuration record with a given ID.
+     *
+     * @param id Record ID
+     * @return Configuration object with a given ID
      */
     public Configuration getConfiguration( int id ) {
+        Connection conn = null;
         Configuration conf = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
         try {
-            conf = ( Configuration )session.createQuery( 
-                "FROM Configuration WHERE id = ?" ).setInteger( 0, id ).uniqueResult();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_node_configuration WHERE" +
+                    " id = " + id + ";" );
+            while( resultSet.next() ) {
+                int confId = resultSet.getInt( "id" );
+                String name = resultSet.getString( "name" );
+                String type = resultSet.getString( "type" );
+                String address = resultSet.getString( "short_address" );
+                String port = resultSet.getString( "port" );
+                String orgName = resultSet.getString( "org_name" );
+                String orgAddress = resultSet.getString( "org_address" );
+                String timeZone = resultSet.getString( "time_zone" );
+                String workDir = resultSet.getString( "temp_dir" );
+                String adminEmail = resultSet.getString( "email" );
+                conf = new Configuration( confId, name, type, address, port, orgName, orgAddress,
+                        timeZone, workDir, adminEmail );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select configuration: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select configuration: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
         return conf;
     }
     /**
-     * Saves configuration record in the databse.
+     * Saves or updates configuration.
      *
-     * @param conf Configuration class object
+     * @param conf Configuration object
+     * @return Number of saved or updated records
+     * @throws SQLException
+     * @throws Exception
      */
-    public void saveConfiguration( Configuration conf ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public int saveOrUpdate( Configuration conf ) throws SQLException, Exception {
+        Connection conn = null;
+        int update = 0;
         try {
-            session.saveOrUpdate( conf );
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            session.getTransaction().rollback();
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "";
+            // record does not exists, do insert
+            if( conf.getId() == 0 ) {
+                sql = "INSERT INTO dex_node_configuration (name, type, short_address, port, " +
+                    "org_name, org_address, time_zone, temp_dir, email) VALUES ('" +
+                    conf.getNodeName() + "', '" + conf.getNodeType() + "', '" +
+                    conf.getShortAddress() + "', '" + conf.getPortNumber() + "', '" +
+                    conf.getOrgName() + "', '" + conf.getOrgAddress() + "', '" +
+                    conf.getTimeZone() + "', '" + conf.getTempDir() + "', '" +
+                    conf.getAdminEmail() + "');";
+            } else {
+                // record exists, do update
+                sql = "UPDATE dex_node_configuration SET name = '" + conf.getNodeName() + "', " +
+                    "type = '" + conf.getNodeType() + "', short_address = '" +
+                    conf.getShortAddress() + "', port = '" + conf.getPortNumber() + "', " +
+                    "org_name = '" + conf.getOrgName() + "', org_address = '" +
+                    conf.getOrgAddress() + "', time_zone = '" + conf.getTimeZone() + "', " + 
+                    "temp_dir = '" + conf.getTempDir() + "', email = '" + 
+                    conf.getAdminEmail() + "' WHERE id = " + conf.getId() + ";";
+            }
+            update = stmt.executeUpdate( sql ) ;
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to save configuration: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to save configuration: " + e.getMessage() );
             throw e;
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
+        return update;
     }
 }
 //--------------------------------------------------------------------------------------------------

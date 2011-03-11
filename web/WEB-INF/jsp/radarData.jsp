@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -26,18 +26,50 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@ page import="java.util.List" %>
-<%@ page import="eu.baltrad.dex.bltdata.model.BltFile" %>
+<%@page import="java.util.List" %>
+<%@page import="eu.baltrad.dex.bltdata.model.BltFile" %>
+<%@page import="eu.baltrad.dex.bltdata.model.BltFileManager" %>
+<%@page import="eu.baltrad.dex.bltdata.controller.BltRadarDataController"%>
 
 <%
-    // get channel name
-    String name = request.getParameter( "channelName" );
+    // determine channel name
+    String name = null;
+    if( request.getParameter( "channelName" ) != null ) {
+        name = request.getParameter( "channelName" );
+    } else {
+        name = BltRadarDataController.getChannelName();
+    }
     // Check if list of available subscriptions is not empty
-    List radarData = ( List )request.getAttribute( "data_from_radar" );
+    List radarData = ( List )request.getAttribute( "file_entries" );
     if( radarData == null || radarData.size() <= 0 ) {
         request.getSession().setAttribute( "data_status", 0 );
     } else {
         request.getSession().setAttribute( "data_status", 1 );
+    }
+    BltFileManager manager = new BltFileManager();
+    BltRadarDataController controller = new BltRadarDataController();
+    long numEntries = manager.countEntries( BltRadarDataController.getChannelName() );
+    int numPages = ( int )Math.ceil( numEntries / BltFileManager.ENTRIES_PER_PAGE );
+    if( numPages < 1 ) {
+        numPages = 1;
+    }
+    int currentPage = controller.getCurrentPage();
+    int scrollStart = ( BltFileManager.SCROLL_RANGE - 1 ) / 2;
+    int firstPage = 1;
+    int lastPage = BltFileManager.SCROLL_RANGE;
+    if( numPages <= BltFileManager.SCROLL_RANGE && currentPage <= BltFileManager.SCROLL_RANGE ) {
+        firstPage = 1;
+        lastPage = numPages;
+    }
+    if( numPages > BltFileManager.SCROLL_RANGE && currentPage > scrollStart &&
+            currentPage < numPages - scrollStart ) {
+        firstPage = currentPage - scrollStart;
+        lastPage = currentPage + scrollStart;
+    }
+    if( numPages > BltFileManager.SCROLL_RANGE && currentPage > scrollStart &&
+            currentPage >= numPages - ( BltFileManager.SCROLL_RANGE - 1 ) ) {
+        firstPage = numPages - ( BltFileManager.SCROLL_RANGE - 1 );
+        lastPage = numPages;
     }
 %>
 
@@ -71,30 +103,76 @@ Author     : szewczenko
                                 Click on file name to download selected data file.
                             </div>
                             <div id="table">
-                                <display:table name="data_from_radar" id="data" defaultsort="0"
-                                    requestURI="radarData.htm" cellpadding="0" cellspacing="2"
-                                    export="false" class="tableborder" pagesize="10">
-                                    <display:column sortable="false" title="Date" paramId="timeStamp"
-                                        paramProperty="timeStamp" class="tdcenter"
-                                        value="${data.timeStamp}" format="{0,date,yyyy-MM-dd}">
-                                    </display:column>
-                                    <display:column sortable="false" title="Time" paramId="timeStamp"
-                                        paramProperty="timeStamp" class="tdcenter"
-                                        value="${data.timeStamp}" format="{0,date,HH:mm:ss}">
-                                    </display:column>
-                                    <display:column sortProperty="object" sortable="true"
-                                        title="Data type" class="tdcenter" value="${data.type}">
-                                    </display:column>
-                                    <display:column sortable="false" title="Details"
-                                        paramId="uuid" paramProperty="uuid"
-                                        class="tdcheck" href="fileDetails.htm" value="View">
-                                    </display:column>
-                                    <display:column href="download.htm" paramId="path"
-                                        paramProperty="path" class="tdimage"
-                                        sortable="false" title="Download">
-                                        <img src="${data.thumbPath}" alt="Download">
-                                    </display:column>
-                                </display:table>
+                                <div id="table-control">
+                                <c:set var="curPage" scope="page" value="<%=currentPage%>"/>
+                                    <form action="radarData.htm" method="post">
+                                        <input type="submit" name="pagenum" value="First">
+                                        <span></span>
+                                        <input type="submit" name="pagenum" value="<">
+                                        <span></span>
+                                        <c:forEach var="i" begin="<%=firstPage%>" end="<%=lastPage%>"
+                                                   step="1" varStatus ="status">
+                                                <c:choose>
+                                                    <c:when test="${curPage == i}">
+                                                        <input style="background:#FFFFFF" type="submit"
+                                                               name="pagenum" value="${i}">
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <input type="submit" name="pagenum" value="${i}">
+                                                    </c:otherwise>
+                                                </c:choose>
+
+                                            </c:forEach>
+                                        <span></span>
+                                        <input type="submit" name="pagenum" value=">">
+                                        <span></span>
+                                        <input type="submit" name="pagenum" value="Last">
+                                    </form>
+                                </div>
+                                <div id="producttable">
+                                    <div class="hdr">
+                                        <div class="date">
+                                            Date
+                                        </div>
+                                        <div class="time">
+                                            Time
+                                        </div>
+                                        <div class="type">
+                                            Type
+                                        </div>
+                                        <div class="details">
+                                            Details
+                                        </div>
+                                        <div class="download">
+                                            Download
+                                        </div>
+                                    </div>
+                                    <c:forEach var="entry" items="${file_entries}">
+                                        <div class="row">
+                                            <div class="date">
+                                                <fmt:formatDate pattern="yyyy-MM-dd"
+                                                    value="${entry.timeStamp}"/>
+                                            </div>
+                                            <div class="date">
+                                                <fmt:formatDate pattern="HH:mm:ss"
+                                                    value="${entry.timeStamp}"/>
+                                            </div>
+                                            <div class="type">
+                                                <c:out value="${entry.type}"></c:out>
+                                            </div>
+                                            <div class="details">
+                                                <a href="fileDetails.htm?uuid=${entry.uuid}">
+                                                    <c:out value="Show"/>
+                                                </a>
+                                            </div>
+                                            <div class="download">
+                                                <a href="download.htm?path=${entry.path}">
+                                                    <img src="${entry.thumbPath}" alt="Download"/>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                </div>
                             </div>
                         </c:when>
                         <c:otherwise>
@@ -112,8 +190,7 @@ Author     : szewczenko
                     <div class="footer">
                         <div class="right">
                             <form action="radars.htm">
-                                <button class="rounded" type="button"
-                                    onclick="history.go(-1);">
+                                <button class="rounded" type="submit">
                                     <span>Back</span>
                                 </button>
                             </form>

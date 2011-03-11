@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -32,8 +32,7 @@ import org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResol
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hibernate.HibernateException;
-
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
@@ -115,13 +114,20 @@ public class RemoveChannelController extends MultiActionController {
             try {
                 Channel channel = channelManager.getChannel( Integer.parseInt( channelIds[ i ] ) );
                 channelName = channel.getChannelName();
-                channelManager.removeChannel( Integer.parseInt( channelIds[ i ] ) );
+                channelManager.deleteChannel( Integer.parseInt( channelIds[ i ] ) );
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removesuccess" ) );
                 logManager.addEntry( new Date(), LogManager.MSG_WRN, "Local radar station "
                         + channelName + " removed from the system.");
-            } catch( HibernateException e ) {
+            } catch( SQLException e ) {
+                request.getSession().removeAttribute( OK_MSG_KEY );
+                request.getSession().setAttribute( ERROR_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removeradar.removefail" ) );
+                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove local radar"
+                        + " station " + channelName + "." );
+            } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(

@@ -1,10 +1,23 @@
-/*
- * BaltradNode :: Radar data exchange and communication system
- * Remote Sensing Department, Institute of Meteorology and Water Management
- * Maciej Szewczykowski, 2010
- *
- * maciej.szewczykowski@imgw.pl
- */
+/***************************************************************************************************
+*
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+*
+* This file is part of the BaltradDex software.
+*
+* BaltradDex is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* BaltradDex is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+*
+***************************************************************************************************/
 
 package eu.baltrad.dex.channel.util;
 
@@ -13,18 +26,15 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
 import eu.baltrad.dex.channel.model.Channel;
-import eu.baltrad.dex.channel.model.ChannelManager;
 
 /**
  * Validator class used to validate add channel form input.
  *
- * @author szewczenko
- * @version 1.0
- * @since 1.0
+ * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @version 0.1.6
+ * @since 0.1.6
  */
 public class SaveChannelValidator implements Validator {
-//---------------------------------------------------------------------------------------- Variables
-    private ChannelManager channelManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Declares classes supported by this validator.
@@ -46,20 +56,6 @@ public class SaveChannelValidator implements Validator {
         if( channel == null ) return;
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "channelName", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "wmoNumber", "error.field.required" );
-    }
-    /**
-     * Method returns reference to data channel manager object.
-     *
-     * @return Reference to data channel manager object
-     */
-    public ChannelManager getChannelManager() { return channelManager; }
-    /**
-     * Method sets reference to data channel manager object.
-     *
-     * @param Reference to data channel manager object
-     */
-    public void setChannelManager( ChannelManager channelManager ) {
-        this.channelManager = channelManager;
     }
 }
 //--------------------------------------------------------------------------------------------------
