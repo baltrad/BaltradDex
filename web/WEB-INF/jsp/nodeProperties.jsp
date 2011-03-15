@@ -25,6 +25,7 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+<%@page import="eu.baltrad.dex.util.InitAppUtil"%>
 
 <html>
     <head>
@@ -57,6 +58,7 @@ Author     : szewczenko
                             <form method="post">
                                 <div class="left">
                                     <div class="row">Node name</div>
+                                    <div class="row">Node version</div>
                                     <div class="row">Node type</div>
                                     <div class="row">Node address</div>
                                     <div class="row">Organization</div>
@@ -70,6 +72,9 @@ Author     : szewczenko
                                         <form:input path="command.nodeName"/>
                                         <form:errors path="command.nodeName"
                                                      cssClass="errors"/>
+                                    </div>
+                                    <div class="row">
+                                        <%= InitAppUtil.getNodeVersion() %>
                                     </div>
                                     <div class="row">
                                         <spring:bind path="command.nodeType">
