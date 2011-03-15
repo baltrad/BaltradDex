@@ -52,14 +52,11 @@ Author     : szewczenko
         <script type="text/javascript">
             var t1 = null;
             var t2 = null;
-            var t3 = null;
             var l1 = "Enter your user name";
             var l2 = "Enter password";
-            var l3 = "Enter your email address";
             function initTooltips() {
                 t1 = new ToolTip( "user_name_tooltip", false );
                 t2 = new ToolTip( "password_tooltip", false );
-                t3 = new ToolTip( "email_tooltip", false );
             }
         </script>
     </head>
@@ -98,7 +95,6 @@ Author     : szewczenko
                             <div class="left">
                                 <div class="row">User Name</div>
                                 <div class="row">Password</div>
-                                <div class="row">Email Address</div>
                             </div>
                             <div class="right">
                                 <div class="row">
@@ -112,13 +108,6 @@ Author     : szewczenko
                                     <form:password path="command.password"/>
                                     <div class="help-icon" onmouseover="if(t2)t2.Show(event,l2)"
                                         onmouseout="if(t2)t2.Hide(event)">
-                                        <img src="includes/images/help-icon.png" alt="help_icon"/>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <form:input path="command.email"/>
-                                    <div class="help-icon" onmouseover="if(t3)t3.Show(event,l3)"
-                                        onmouseout="if(t3)t3.Hide(event)">
                                         <img src="includes/images/help-icon.png" alt="help_icon"/>
                                     </div>
                                 </div>
@@ -196,6 +185,5 @@ Author     : szewczenko
         </div>
         <div id="user_name_tooltip" class="tooltip" style="width: 160px; height: 22px;"></div>
         <div id="password_tooltip" class="tooltip" style="width: 160px; height: 22px;"></div>
-        <div id="email_tooltip" class="tooltip" style="width: 180px; height: 22px;"></div>
     </body>
 </html>
