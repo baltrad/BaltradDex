@@ -21,8 +21,10 @@
 
 package eu.baltrad.dex.core.util;
 
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,17 +40,29 @@ public class FramePublisher {
     private static final int KEEP_ALIVE_TIME = 60;
 //---------------------------------------------------------------------------------------- Variables
     // ThreadPoolExectutor object
-    private static ThreadPoolExecutor executor;
+    private ThreadPoolExecutor executor;
     // Task queue
-    private static ArrayBlockingQueue<Runnable> queue;
+    private ArrayBlockingQueue<Runnable> queue;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor
      */
     public FramePublisher() {
         queue = new ArrayBlockingQueue<Runnable>( POOL_SIZE );
-        executor = new ThreadPoolExecutor( POOL_SIZE, POOL_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-                queue );
+        // use single thread to execute the tasks. We might raise the maximum a bit, to handle
+        // concurrent transfers.
+        executor = new ThreadPoolExecutor( 1, 1, KEEP_ALIVE_TIME, TimeUnit.SECONDS, queue );
+        executor.setThreadFactory(
+            new ThreadFactory() {
+                @Override
+                public Thread newThread(Runnable r) {
+                    Thread t = Executors.defaultThreadFactory().newThread(r);
+                    t.setDaemon(true);
+                    return t;
+                }
+            });
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardOldestPolicy());
+        executor.prestartCoreThread();
     }
     /**
      * Adds and executes task.
