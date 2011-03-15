@@ -65,7 +65,7 @@ public class BltFileManager {
     public final static int SCROLL_RANGE = 11;
 //---------------------------------------------------------------------------------------- Variables
     /** Date and time format string */
-    private static SimpleDateFormat format = new SimpleDateFormat( FC_DATE_STR + "T" +
+    private static SimpleDateFormat format = new SimpleDateFormat( FC_DATE_STR + "'T'" +
             FC_TIME_STR );
     /** Reference to FileCatalogConnector object */
     private FileCatalogConnector fileCatalogConnector;
@@ -76,6 +76,7 @@ public class BltFileManager {
      * Constructor gets reference to FileCatalogConnector instance.
      */
     public BltFileManager() {
+        System.out.println("BltFileManager()");
         this.fileCatalogConnector = FileCatalogConnector.getInstance();
         this.fc = fileCatalogConnector.getFileCatalog();
     }
@@ -119,7 +120,7 @@ public class BltFileManager {
                 BltFile bltFile = new BltFile(
                     fileEntry.uuid(), fc.storage().store( fileEntry ),
                     format.parse( fileEntry.what_date().to_iso_string() + "T" +
-                                  fileEntry.what_time().to_iso_string()),
+                                  fileEntry.what_time().to_iso_string() ),
                     format.parse( fileEntry.stored_at().to_iso_string() ),
                     dataChannel, fileEntry.what_object(),
                     InitAppUtil.getThumbsStorageFolder() + File.separator +
