@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -79,54 +79,63 @@ Author     : szewczenko
                                     </div>
                                 </c:if>
                             </div>
-                            <div id="table">
                                 <form action="showRemovedSubscriptions.htm">
-                                    <display:table name="subscriptions" id="subscription" 
-                                        cellpadding="0" cellspacing="2"
-                                        export="false" class="tableborder"
-                                        requestURI="selectRemoveSubscriptions.htm">
-                                        <display:column sortable="true" title="Radar station"
-                                            sortProperty="channelName" paramId="channelName"
-                                            paramProperty="channelName"
-                                            class="tdcenter" value="${subscription.channelName}">
-                                        </display:column>
-
-                                        <display:column sortable="true" title="Operator"
-                                            sortProperty="operatorName" paramId=""
-                                            paramProperty="operatorName" class="tdcenter"
-                                            value="${subscription.operatorName}">
-                                        </display:column>
-                                        <c:choose>
-                                            <c:when test="${subscription.selected == true}">
-                                                <display:column sortable="false" title="Status"
-                                                    class="tdgreen" value="Active">
-                                                </display:column>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <display:column sortable="false" title="Status"
-                                                    class="tdred" value="Inactive">
-                                                </display:column>
-                                            </c:otherwise>
-                                        </c:choose>
-                                        <display:column sortable="false" title="Remove"
-                                            class="tdcheck"> <input type="checkbox"
-                                            name="selected_channels"
-                                            value="${subscription.channelName}"/>
-                                        </display:column>
-                                    </display:table>
-                                    <div class="footer">
-                                        <div class="right">
-                                            <button class="rounded" type="button"
-                                                onclick="window.location='configuration.htm'">
-                                                <span>Back</span>
-                                            </button>
-                                            <button class="rounded" type="submit">
-                                                <span>Submit</span>
-                                            </button>
+                                    <div id="table">
+                                        <div id="subscriptions">
+                                            <div class="table-hdr">
+                                                <div class="station">
+                                                    Radar station
+                                                </div>
+                                                <div class="operator">
+                                                    Operator
+                                                </div>
+                                                <div class="active">
+                                                    Active
+                                                </div>
+                                                <div class="check">
+                                                    Select
+                                                </div>
+                                            </div>
+                                            <c:forEach var="sub" items="${subscriptions}">
+                                                <div class="table-row">
+                                                    <div class="station">
+                                                        <c:out value="${sub.channelName}"/>
+                                                    </div>
+                                                    <div class="operator">
+                                                        <c:out value="${sub.operatorName}"/>
+                                                    </div>
+                                                    <div class="active">
+                                                    <c:choose>
+                                                        <c:when test="${sub.active == true}">
+                                                            <img src="includes/images/green_bulb.png"
+                                                                 alt="active"/>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <img src="includes/images/red_bulb.png"
+                                                                 alt="deactivated"/>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                    </div>
+                                                    <div class="check">
+                                                        <input type="checkbox" name="selected_channels"
+                                                            value="${sub.channelName}"/>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                            <div class="footer">
+                                                <div class="right">
+                                                    <button class="rounded" type="button"
+                                                        onclick="window.location='configuration.htm'">
+                                                        <span>Back</span>
+                                                    </button>
+                                                    <button class="rounded" type="submit">
+                                                        <span>Submit</span>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
-                            </div>
                         </c:when>
                         <c:otherwise>
                             <div class="message">

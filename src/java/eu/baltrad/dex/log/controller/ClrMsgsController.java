@@ -29,8 +29,8 @@ import javax.servlet.ServletException;
 
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
-import org.hibernate.HibernateException;
 
+import java.sql.SQLException;
 import java.io.IOException;
 import java.util.Date;
 
@@ -67,7 +67,13 @@ public class ClrMsgsController implements Controller {
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             logManager.addEntry( new Date(), LogManager.MSG_WRN, "User removed all system "
                     + "messages." );
-        } catch( HibernateException e ) {
+        } catch( SQLException e ) {
+            String msg = "Failed to remove system messages:" + e.getMessage();
+            request.getSession().removeAttribute( OK_MSG_KEY );
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            logManager.addEntry( new Date(), LogManager.MSG_WRN, "Failed to remove system "
+                    + "messages." );
+        } catch( Exception e ) {
             String msg = "Failed to remove system messages:" + e.getMessage();
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );

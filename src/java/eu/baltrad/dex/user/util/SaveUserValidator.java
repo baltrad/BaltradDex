@@ -62,7 +62,7 @@ public class SaveUserValidator implements Validator {
         if( user == null ) return;
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "retPassword", "error.field.required" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "confirmPassword", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "factory", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "country", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "city", "error.field.required" );
@@ -72,9 +72,9 @@ public class SaveUserValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "phone", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", "error.field.required" );
         // validate password
-        if( !errors.hasFieldErrors( "password" ) && !errors.hasFieldErrors( "retPassword" ) ) {
-            if( !user.getPassword().trim().equals( user.getRetPassword().trim() ) ) {
-                errors.rejectValue( "retPassword", "error.field.passwd.mismatch" );
+        if( !errors.hasFieldErrors( "password" ) && !errors.hasFieldErrors( "confirmPassword" ) ) {
+            if( !user.getPassword().trim().equals( user.getConfirmPassword().trim() ) ) {
+                errors.rejectValue( "confirmPassword", "error.field.passwd.mismatch" );
             }      
         }
         if( user.getPassword().trim().length() > 0 && user.getPassword().trim().length() 

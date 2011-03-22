@@ -402,39 +402,18 @@ form > .bottom {
     width: 100%;
     font-size: small;
 }
-thead th {
-    height: 28px;
-    font-size: 1.1em;
-    font-weight: normal;
-    padding: 2px 4px 2px 4px;
-    font-family: Verdana, Arial, Tahoma, sans-serif;
-    color: white;
-    background: #2d76ae;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#98CBFF', endColorstr='#4F7BD8');
-    background: -webkit-gradient(linear, left top, left bottom, from(#98CBFF), to(#4F7BD8));
-    background: -moz-linear-gradient(top,  #98CBFF,  #4F7BD8);
-}
-thead a {
-    text-decoration: underline;
-    padding: 2px;
-    font-size: 1.1em;
-    font-weight: normal;
-    color: white;
-}
-thead a:hover {
-    background: #99CC66;
-    text-decoration: none;
-}
-thead tr:hover {
-    background: #EEF4F7;
-}
+
+
+
+
+
 tr:hover {
     background: #99CC66;
 }
 tr {
     background: #EEF4F7;
 }
-.tdcenter, .tdcheck, .tdred, .tdgreen {
+.tdcenter, .tdcheck {
     padding: 4px 4px 4px 4px;
 }
 .tdred {
@@ -467,6 +446,11 @@ tr {
 .tdimage img:hover {
     background: white;
 }
+
+
+
+
+
 .message {
     width: 100%;
     position: relative;
@@ -490,20 +474,17 @@ tr {
 }
 #table > .header {
     width: 100%;
-    position: relative;
     float: left;
     clear: right;
     margin-top: 24px;
     margin-bottom: 24px;
-    background: #2d76ae;
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#98CBFF', endColorstr='#4F7BD8');
-    background: -webkit-gradient(linear, left top, left bottom, from(#98CBFF), to(#4F7BD8));
-    background: -moz-linear-gradient(top,  #98CBFF,  #4F7BD8);
 }
 #table > .header > .title {
-    font-size: 1.2em;
-    color: white;
+    font-size: 1.1em;
+    color: #2d76ae;
+    font-weight: bold;
     padding: 6px;
+    border-bottom: 1px solid #2d76ae;
 }
 #table > form > .left, #table > .left {
     position: relative;
@@ -527,32 +508,6 @@ tr {
     font-family: Verdana, Arial, Tahoma, sans-serif;
     font-weight: normal;
     color: black;
-}
-#status-table {
-    width: 100%;
-    float: left;
-    clear: both;
-    padding-bottom: 8px;
-}
-/*
- * status tables
- */
-#status-table thead th, #status-table thead a {
-    height: 24px;
-    font-size: 1em;
-    font-weight: normal;
-    color: #003298;
-    border: 1px solid #2d76ae;
-    background: white;
-    padding: 1px;
-    font-family: Verdana, Arial, Tahoma, sans-serif;
-}
-#status-table thead a {
-    border: none;
-}
-#status-table thead a:hover {
-    color: #99CC66;
-    text-decoration: none;
 }
 /*
  * File details table and probably other tables too
@@ -632,7 +587,6 @@ tr {
  */
 .connectToNode {
     color: #2d76ae;
-    font-weight: bold;
 }
 .nodeAddress {
     width: 140px;
@@ -648,6 +602,17 @@ tr {
 }
 .userName, .passwd {
     width: 280px;
+}
+.connect-footer {
+    width:100%;
+    float:left;
+    clear:both;
+    text-align:right;
+}
+.connect {
+    float:right;
+    clear:right;
+    text-align:right;
 }
 
 
@@ -763,138 +728,266 @@ tr {
 
 /* general table properties */
 
-#logtable > .hdr, #radartable > .hdr, #selectradars > .hdr, #selectusers > .hdr,
-        #producttable > .hdr {
+.table-hdr {
     font-size:1.1em;
     font-weight: bolder;
     color:#2d76ae;
     border-bottom: 1px solid #2d76ae;
 }
-#logtable > .hdr, #logtable > .row, #radartable > .hdr, #radartable > .row,
-        #selectradars > .hdr, #selectradars > .row, #selectusers > .hdr, #selectusers > .row,
-        #producttable > .hdr, #producttable > .row {
+.table-hdr, .table-row {
     width:100%;
     float:left;
     clear:both;
 }
-#logtable > .row, #radartable > .row, #selectradars > .row, #selectusers > .row,
-        #producttable > .row {
+.table-row {
     border-bottom:1px solid #D0E7BA;
 }
-#logtable > .row:hover, #radartable > .row:hover, #selectradars > .row:hover,
-        #selectusers > .row:hover, #producttable > .row:hover {
+.table-row:hover {
     background:#E2FFC6;
 }
 
-#logtable > .hdr > .date, #logtable > .row > .date {
+#logtable > .table-hdr > .date, #logtable > .table-row > .date {
     float:left;
     padding:3px 0px 3px 0px;
     width:12%;
 }
-#logtable > .hdr > .time, #logtable > .row > .time {
+#logtable > .table-hdr > .time, #logtable > .table-row > .time {
     float:left;
     padding:3px 0px 3px 0px;
     width:10%;
 }
-#logtable > .hdr > .flag, #logtable > .row > .flag {
+#logtable > .table-hdr > .flag, #logtable > .table-row > .flag {
     float:left;
     padding:3px 0px 3px 0px;
     width:6%;
     text-align:center;
 }
-#logtable > .hdr > .msg, #logtable > .row > .msg {
+#logtable > .table-hdr > .msg, #logtable > .table-row > .msg {
     float:right;
     padding:3px 0px 3px 0px;
     width:72%;
 }
-#logtable > .hdr > .msg {
+#logtable > .table-hdr > .msg {
     text-align:center; 
 }
-#radartable > .hdr > .station, #radartable > .row > .station {
+#radartable > .table-hdr > .station, #radartable > .table-row > .station,
+        #radartable > .table-hdr > .wmo, #radartable > .table-row > .wmo {
     float:left;
     padding:3px 0px 3px 0px;
     width: 50%;
 }
-#radartable > .hdr > .wmo, #radartable > .row > .wmo {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width: 50%;
-}
-#radartable a, #producttable a {
+#radartable a, #producttable a, #edituser a {
     color:#2d76ae;
     text-decoration:underline;
     cursor:pointer
 }
-#radartable a:hover, #producttable a:hover {
+#radartable a:hover, #producttable a:hover, #edituser a:hover {
     text-decoration:none;
     font-weight:bolder; 
 }
-#selectradars > .hdr > .station, #selectradars > .row > .station {
+#selectradars > .table-hdr > .station, #selectradars > .table-row > .station,
+        #selectradars > .table-hdr > .wmo, #selectradars > .table-row > .wmo {
     float:left;
     padding:3px 0px 3px 0px;
     width: 40%;
 }
-#selectradars > .hdr > .wmo, #selectradars > .row > .wmo {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width: 40%;
-}
-#selectradars > .hdr > .check, #selectradars > .row > .check {
+#selectradars > .table-hdr > .check, #selectradars > .table-row > .check {
     float:left;
     padding:3px 0px 3px 0px;
     width: 20%;
     text-align:center;
 }
-#selectusers > .hdr > .user, #selectusers > .row > .user {
+#selectusers > .table-hdr > .user, #selectusers > .table-row > .user,
+        #selectusers > .table-hdr > .role, #selectusers > .table-row > .role {
     float:left;
     padding:3px 0px 3px 0px;
     width:40%;
 }
-#selectusers > .hdr > .role, #selectusers > .row > .role {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:40%;
-}
-#selectusers > .hdr > .check, #selectusers > .row > .check {
+#selectusers > .table-hdr > .check, #selectusers > .table-row > .check {
     float:left;
     padding:3px 0px 3px 0px;
     width:20%;
     text-align:center;
 }
-
-#producttable > .hdr > .date, #producttable > .row > .date {
+#producttable > .table-hdr > .date, #producttable > .table-row > .date,
+        #producttable > .table-hdr > .time, #producttable > .table-row > .time,
+        #producttable > .table-hdr > .type, #producttable > .table-row > .type,
+        #producttable > .table-hdr > .details, #producttable > .table-row > .details,
+        #producttable > .table-hdr > .download, #producttable > .table-row > .download {
     float:left;
     padding:3px 0px 3px 0px;
     width:20%;
 }
-#producttable > .hdr > .time, #producttable > .row > .time {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:20%;
-}
-#producttable > .hdr > .type, #producttable > .row > .type {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:20%;
-}
-#producttable > .hdr > .details, #producttable > .row > .details {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:20%;
-}
-#producttable > .hdr > .download, #producttable > .row > .download {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:20%;
-}
-#producttable > .row > .download > a > img {
+#producttable > .table-row > .download > a > img {
     border:none;
     background:none;
 }
-
-
-
-
+#showusers > .table-hdr > .name, #showusers > .table-hdr > .role,
+        #showusers > .table-hdr > .factory, #showusers > .table-row > .name,
+        #showusers > .table-row > .role, #showusers > .table-row > .factory {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width: 30%;
+}
+#showusers > .table-hdr > .check, #showusers > .table-row > .check {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:10%;
+    text-align:center;
+}
+#removeusers > .table-hdr > .name, #removeusers > .table-hdr > .role,
+        #removeusers > .table-hdr > .factory, #removeusers > .table-row > .name,
+        #removeusers > .table-row > .role, #removeusers > .table-row > .factory {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width: 33%;
+}
+#edituser > .table-hdr > .name, #edituser > .table-hdr > .role,
+        #edituser > .table-hdr > .factory, #edituser > .table-row > .name,
+        #edituser > .table-row > .role, #edituser > .table-row > .factory {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width: 33%;
+}
+#selectconnections > .table-hdr > .name, #selectconnections > .table-row > .name,
+        #selectconnections > .table-hdr > .address, #selectconnections > .table-row > .address,
+        #selectconnections > .table-hdr > .user, #selectconnections > .table-row > .user {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:30%;
+}
+#selectconnections > .table-hdr > .check, #selectconnections > .table-row > .check {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:10%;
+    text-align:center;
+}
+#selectedconnections > .table-hdr > .name, #selectedconnections > .table-row > .name,
+        #selectedconnections > .table-hdr > .address, #selectedconnections > .table-row > .address,
+        #selectedconnections > .table-hdr > .user, #selectedconnections > .table-row > .user {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:33%;
+}
+#subscriptions > .table-hdr > .station, #subscriptions > .table-row > .station,
+#subscriptions > .table-hdr > .operator, #subscriptions > .table-row > .operator {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:35%;
+}
+#subscriptions > .table-hdr > .synkronized, #subscriptions > .table-row > .synkronized {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:20%;
+    text-align:center;
+}
+#subscriptions > .table-hdr > .active, #subscriptions > .table-row > .active {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:10%;
+    text-align:center;
+}
+#subscriptions > .table-hdr > .check, #subscriptions > .table-row > .check {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:20%;
+    text-align:center;
+}
+#selectedsubscriptions > .table-hdr > .station, #selectedsubscriptions > .table-row > .station,
+#selectedsubscriptions > .table-hdr > .operator, #selectedsubscriptions > .table-row > .operator {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:40%;
+}
+#selectedsubscriptions > .table-hdr > .request, #selectedsubscriptions > .table-row > .request {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:20%;
+    text-align:center;
+}
+#statustable > .table-hdr > .station, #statustable > .table-row > .station,
+        #statustable > .table-hdr > .operator, #statustable > .table-row > .operator,
+        #statustable > .table-hdr > .user, #statustable > .table-row > .user {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:40%;
+}
+#statustable > .table-hdr > .active, #statustable > .table-row > .active {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:20%;
+    text-align:center;
+}
+#peersubscriptions > .table-hdr > .station, #peersubscriptions > .table-row > .station,
+#peersubscriptions > .table-hdr > .user, #peersubscriptions > .table-row > .user {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:45%;
+}
+#peersubscriptions > .table-hdr > .check, #peersubscriptions > .table-row > .check {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:10%;
+    text-align:center;
+}
+#selectedpeersubscriptions > .table-hdr > .station, #selectedpeersubscriptions > .table-row > 
+        .station, #selectedpeersubscriptions > .table-hdr > .user, #selectedpeersubscriptions >
+        .table-row > .user {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:50%;
+}
+#register > .table-hdr > .date, #register > .table-row > .date {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:12%;
+}
+#register > .table-hdr > .time, #register > .table-row > .time {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:10%;
+}
+#register > .table-hdr > .recipient, #register > .table-row > .recipient {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:20%;
+    text-align:center;
+}
+#register > .table-hdr > .uuid, #register > .table-row > .uuid {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:40%;
+}
+#register > .table-hdr > .status, #register > .table-row > .status {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:18%;
+    text-align:center;
+}
+#adaptor > .table-hdr > .name, #adaptor > .table-row > .name,
+        #adaptor > .table-hdr > .type, #adaptor > .table-row > .type {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:50%;
+}
+#showschedule > .table-hdr > .id, #showschedule > .table-row > .id {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:50%;
+}
+#showroutes > .table-hdr > .active, #showroutes > .table-row > .active,
+        #showroutes > .table-hdr > .name, #showroutes > .table-row > .name,
+        #showroutes > .table-hdr > .type, #showroutes > .table-row > .type {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:15%;
+    text-align:center;
+}
+#showroutes > .table-hdr > .description, #showroutes > .table-row > .description {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:55%;
+}
 
 
 /* table control bar */

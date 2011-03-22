@@ -303,11 +303,25 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                             + localChannel.getChannelName() );
                                     } else {
                                         // add subscription
+                                        //subs = new Subscription( user.getName(),
+                                        //        localChannel.getChannelName(),
+                                        //        Subscription.REMOTE_SUBSCRIPTION );
                                         subs = new Subscription( user.getName(),
-                                                localChannel.getChannelName(),
-                                                Subscription.REMOTE_SUBSCRIPTION );
-                                        subscriptionManager.addSubscription( subs );
+                                            localChannel.getChannelName(),
+                                            InitAppUtil.getNodeAddress(),
+                                            InitAppUtil.getNodeName(),
+                                            Subscription.REMOTE_SUBSCRIPTION, false, false );
+
+
+
+
+
+                                        subscriptionManager.saveSubscription( subs );
                                         confirmedChannels.add( requestedChannel );
+
+
+
+
                                     }
                                 }
                             }
@@ -380,19 +394,31 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             InitAppUtil.deleteFile( tempFile );
 
                             // create new subscription object
+                            //Subscription s = new Subscription( subs.getUserName(),
+                            //        subs.getChannelName(), Subscription.REMOTE_SUBSCRIPTION );
+
+
                             Subscription s = new Subscription( subs.getUserName(),
-                                    subs.getChannelName(), Subscription.REMOTE_SUBSCRIPTION );
+                                    subs.getChannelName(), subs.getNodeAddress(),
+                                    subs.getOperatorName(), Subscription.REMOTE_SUBSCRIPTION,
+                                    false, false );
+
+
+
+
+
+
                             // subscription object serves as confirmation
                             Subscription confirmedSub = null;
-                            if( subs.getSelected() ) {
+                            if( subs.getActive() ) {
                                 if( subscriptionManager.getSubscription( s.getUserName(), 
                                     s.getChannelName(), Subscription.REMOTE_SUBSCRIPTION ) == null) {
                                     // subscription doesn't exist in the database - add as new
                                     // subscription
-                                    subscriptionManager.addSubscription( s );
+                                    subscriptionManager.saveSubscription( s );
                                     confirmedSub = s;
                                     //@
-                                    confirmedSub.setSelected( true );
+                                    confirmedSub.setActive( true );
                                     logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                         "User " + s.getUserName() + " subscribed to "
                                         + s.getChannelName() );
@@ -401,7 +427,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     subscriptionManager.updateSubscription( s.getChannelName(),
                                             Subscription.REMOTE_SUBSCRIPTION, true );
                                     confirmedSub = s;
-                                    confirmedSub.setSelected( true );
+                                    confirmedSub.setActive( true );
                                     logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                         "User " + s.getUserName() + " subscribed to "
                                         + s.getChannelName() );
@@ -417,7 +443,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 */
                             } else {
                                 // remove remote subscription
-                                subscriptionManager.removeSubscription( s.getUserName(),
+                                subscriptionManager.deleteSubscription( s.getUserName(),
                                         s.getChannelName(), s.getType() );
                                 confirmedSub = s;
                                 logManager.addEntry( new Date(), LogManager.MSG_INFO,
@@ -474,7 +500,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     tempFile );
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
-                            String selected = subs.getSelected() ? "Subscribed" : "Unsubscribed";
+                            String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
                             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                 "Remote node " + bfHandler.getSenderNodeName( header )
                                 + " changed your subscription status for " + subs.getChannelName()
@@ -496,7 +522,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     tempFile );
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
-                            String selected = subs.getSelected() ? "Subscribed" : "Unsubscribed";
+                            String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
                             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                                 "Remote node " + bfHandler.getSenderNodeName( header )  +
                                 " failed to change your subscription status for "
@@ -599,7 +625,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 
                                 // iterate through subscriptions list to send data to subscribers
                                 List<Subscription> subs =
-                                        subscriptionManager.getSubscriptionsByType(
+                                        subscriptionManager.getSubscriptions(
                                         Subscription.REMOTE_SUBSCRIPTION );
                                 for( int i = 0; i < subs.size(); i++ ) {
                                     if( subs.get( i ).getChannelName().equals( bfHandler.getChannel(
@@ -647,12 +673,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         } catch( FileUploadException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e.getMessage() );
+            e.printStackTrace();
         } catch( IOException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e.getMessage() );
+            e.printStackTrace();
         } catch( Exception e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e.getMessage() );
+            e.printStackTrace();
         }
     }
     /**

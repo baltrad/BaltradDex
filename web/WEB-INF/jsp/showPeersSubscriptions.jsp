@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -64,41 +64,49 @@ Author     : szewczenko
                             <div id="text-box">
                                 Select peer's subscription to be removed.
                             </div>
-                            <div id="table">
                                 <form action="showSelectedPeersSubscriptions.htm">
-                                    <display:table name="subscriptions" id="subscription"
-                                        cellpadding="0" cellspacing="2"
-                                        export="false" class="tableborder"
-                                        requestURI="showPeersSubscriptions.htm">
-                                        <display:column sortable="true" title="Radar station"
-                                            sortProperty="channelName" paramId="channelName"
-                                            paramProperty="channelName"
-                                            class="tdcenter" value="${subscription.channelName}">
-                                        </display:column>
-                                        <display:column sortable="true" title="User name"
-                                            sortProperty="userName" paramId="userName"
-                                            paramProperty="userName" class="tdcenter"
-                                            value="${subscription.userName}">
-                                        </display:column>
-                                        <display:column sortable="false" title="Remove"
-                                            class="tdcheck"> <input type="checkbox"
-                                            name="selected_channels"
-                                            value="${subscription.channelName}"/>
-                                        </display:column>
-                                    </display:table>
-                                    <div class="footer">
-                                        <div class="right">
-                                            <button class="rounded" type="button"
-                                                onclick="window.location='configuration.htm'">
-                                                <span>Back</span>
-                                            </button>
-                                            <button class="rounded" type="submit">
-                                                <span>Submit</span>
-                                            </button>
+                                    <div id="table">
+                                        <div id="peersubscriptions">
+                                            <div class="table-hdr">
+                                                <div class="station">
+                                                    Radar station
+                                                </div>
+                                                <div class="user">
+                                                    User name
+                                                </div>
+                                                <div class="check">
+                                                    Select
+                                                </div>
+                                            </div>
+                                            <c:forEach var="sub" items="${subscriptions}">
+                                                <div class="table-row">
+                                                    <div class="station">
+                                                        <c:out value="${sub.channelName}"/>
+                                                    </div>
+                                                    <div class="user">
+                                                        <c:out value="${sub.userName}"/>
+                                                    </div>
+                                                    <div class="check">
+                                                        <input type="checkbox"
+                                                            name="selected_channels"
+                                                            value="${sub.channelName}"/>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                            <div class="footer">
+                                                <div class="right">
+                                                    <button class="rounded" type="button"
+                                                        onclick="window.location='configuration.htm'">
+                                                        <span>Back</span>
+                                                    </button>
+                                                    <button class="rounded" type="submit">
+                                                        <span>Submit</span>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
-                            </div>
                         </c:when>
                         <c:otherwise>
                             <div class="message">

@@ -32,8 +32,7 @@ import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
 
-import org.hibernate.HibernateException;
-
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Date;
 
@@ -46,7 +45,7 @@ import java.util.Date;
  */
 public class SaveUserController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
-    public static final String USER_ID = "id";
+    public static final String USER_ID = "userId";
     public static final String ROLES = "roles";
     private static final String OK_MSG_KEY = "ok_message";
     private static final String ERROR_MSG_KEY = "error_message";
@@ -66,7 +65,7 @@ public class SaveUserController extends SimpleFormController {
         User user = null;
         if( request.getParameter( USER_ID ) != null
                 && request.getParameter( USER_ID ).trim().length() > 0 ) {
-            user = userManager.getUserByID( Integer.parseInt( request.getParameter( USER_ID ) ) );
+            user = userManager.getUserById( Integer.parseInt( request.getParameter( USER_ID ) ) );
         } else {
             user = new User();
         }
@@ -99,12 +98,19 @@ public class SaveUserController extends SimpleFormController {
             Object command, BindException errors) {
         User user = ( User )command;
         try {
-            userManager.addUser( user );
+            userManager.saveOrUpdate( user );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.savesuccess" ) );
             logManager.addEntry( new Date(), LogManager.MSG_WRN, "User account saved: " +
                 user.getName() );
-        } catch( HibernateException e ) {
+        } catch( SQLException e ) {
+            request.getSession().removeAttribute( OK_MSG_KEY );
+            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
+                "message.adduser.nameexists" ) );
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to save user account: "
+                    + user.getName() + "." );
+            errors.reject( "message.adduser.nameexists" );
+        } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.nameexists" ) );

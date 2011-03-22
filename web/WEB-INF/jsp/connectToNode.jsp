@@ -50,20 +50,20 @@ Author     : szewczenko
                         </div>
                     </div>
                     <div id="text-box">
-                        Select registered node connection or define new connection in order
+                        Select existing node connection or define new connection in order
                         to access data at the remote node.
                     </div>
                     <div id="table">
                         <div class="header">
                             <div class="title">
-                                Select registered node connection
+                                Select existing connection
                             </div>
                         </div>
                         <form method="post">
                             <div class="left">
                                 <div class="row">
                                     <div class="connectToNode">
-                                        Select node connection
+                                        Select connection
                                     </div>
                                 </div>
                             </div>
@@ -83,7 +83,7 @@ Author     : szewczenko
                                     <form:errors path="command.connectionName" cssClass="errors"/>
                                 </div>
                             </div>
-                            <div class="footer">
+                            <div class="connect-footer">
                                 <div class="right">
                                     <button class="rounded" type="submit">
                                         <span>Connect</span>
@@ -134,7 +134,7 @@ Author     : szewczenko
                                                  cssClass="errors"/>
                                 </div>
                             </div>
-                            <div class="footer">
+                            <div class="connect-footer">
                                 <div class="right">
                                     <button class="rounded" type="submit">
                                         <span>Connect</span>

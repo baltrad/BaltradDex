@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,14 +21,16 @@
 
 package eu.baltrad.dex.register.model;
 
-import eu.baltrad.dex.subscription.model.Subscription;
-import eu.baltrad.dex.util.HibernateUtil;
+import eu.baltrad.dex.util.JDBCConnectionManager;
 
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.Session;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Class implements data delivery register handling functionality..
@@ -38,136 +40,227 @@ import java.util.List;
  * @since 0.1.6
  */
 public class DeliveryRegisterManager {
+//---------------------------------------------------------------------------------------- Constants
+    /** Number of file entries per page */
+    public final static int ENTRIES_PER_PAGE = 12;
+    /** Number of pages in the scroll bar, must be an odd number >= 3 */
+    public final static int SCROLL_RANGE = 11;
+//---------------------------------------------------------------------------------------- Variables
+    /** Reference to JDBCConnector class object */
+    private JDBCConnectionManager jdbcConnectionManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Method retrieves single entry from data delivery register.
-     * 
+     * Constructor gets reference to JDBCConnectionManager instance.
+     */
+    public DeliveryRegisterManager() {
+        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+    }
+    /**
+     * Gets number of delivery register entries stored in a table.
+     *
+     * @return Number of delivery register entries
+     */
+    public long countEntries() {
+        Connection conn = null;
+        long count = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt. executeQuery( "SELECT count(*) FROM dex_delivery_register;"
+                    );
+            while( resultSet.next() ) {
+                count = resultSet.getLong( 1 );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to determine number of delivery register entries: " + 
+                    e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to determine number of delivery register entries: " + 
+                    e.getMessage() );
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return count;
+    }
+    /**
+     * Gets unique delivery register entry identified by user's ID and file's UUID.
+     *
      * @param userId User id
      * @param uuid File's identity string
      * @return Single entry from data delivery register
      */
     public DeliveryRegisterEntry getEntry( int userId, String uuid ) {
-        DeliveryRegisterEntry deliveryRegisterEntry = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+        Connection conn = null;
+        DeliveryRegisterEntry entry = null;
         try {
-            deliveryRegisterEntry = ( DeliveryRegisterEntry )session.createQuery(
-                    "FROM DeliveryRegisterEntry" + " WHERE userId = ?" +
-                    " AND uuid = ?" ).setInteger( 0, userId ).setString(
-                    1, uuid ).uniqueResult();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_delivery_register " +
+                    "WHERE user_id = " + userId + " AND uuid = '" + uuid + "';" );
+            while( resultSet.next() ) {
+                int entryId = resultSet.getInt( "id" );
+                int entryUserId = resultSet.getInt( "user_id" );
+                String entryUuid = resultSet.getString( "uuid" );
+                String userName = resultSet.getString( "user_name" );
+                Date timestamp = resultSet.getTimestamp( "timestamp" );
+                String status = resultSet.getString( "status" );
+                entry = new DeliveryRegisterEntry( entryId, entryUserId, entryUuid, userName,
+                        timestamp, status );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select delivery register entry: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select delivery register entry: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
-        return deliveryRegisterEntry;
+        return entry;
     }
     /**
-     * Method gets all available elivery register entries.
+     * Gets complete delivery register.
      *
-     * @return List object containing all available delivery register entries
+     * @return Full data delivery register
      */
-    public List<DeliveryRegisterEntry> getRegister() {
-        List<DeliveryRegisterEntry> regEntries = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public List<DeliveryRegisterEntry> getEntries() {
+        Connection conn = null;
+        List<DeliveryRegisterEntry> entries = new ArrayList<DeliveryRegisterEntry>();
         try {
-            regEntries = session.createQuery( "FROM DeliveryRegisterEntry" ).list();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_delivery_register" );
+            while( resultSet.next() ) {
+                int entryId = resultSet.getInt( "id" );
+                int entryUserId = resultSet.getInt( "user_id" );
+                String entryUuid = resultSet.getString( "uuid" );
+                String userName = resultSet.getString( "user_name" );
+                Date timestamp = resultSet.getTimestamp( "timestamp" );
+                String status = resultSet.getString( "status" );
+                DeliveryRegisterEntry entry = new DeliveryRegisterEntry( entryId, entryUserId,
+                        entryUuid, userName, timestamp, status );
+                entries.add( entry );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to fetch delivery register: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to fetch delivery register: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
-        return regEntries;
+        return entries;
     }
     /**
-     * Gets number of entries in data delivery register.
+     * Gets given number of entries from the data delivery register.
      *
-     * @return Number of entries stored in data delivery register
+     * @param offset Number of entries to skip
+     * @param limit Number of entries to select
+     * @return List containing given number of entries
      */
-    public int getNumberOfEntries() {
-        List<DeliveryRegisterEntry> regEntries = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public List<DeliveryRegisterEntry> getEntries( int offset, int limit ) {
+        Connection conn = null;
+        List<DeliveryRegisterEntry> entries = new ArrayList<DeliveryRegisterEntry>();
         try {
-            regEntries = session.createQuery( "FROM DeliveryRegisterEntry" ).list();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_delivery_register " +
+                    "ORDER BY timestamp DESC OFFSET " + offset + " LIMIT " + limit );
+            while( resultSet.next() ) {
+                int entryId = resultSet.getInt( "id" );
+                int entryUserId = resultSet.getInt( "user_id" );
+                String entryUuid = resultSet.getString( "uuid" );
+                String userName = resultSet.getString( "user_name" );
+                Date timestamp = resultSet.getTimestamp( "timestamp" );
+                String status = resultSet.getString( "status" );
+                DeliveryRegisterEntry entry = new DeliveryRegisterEntry( entryId, entryUserId,
+                        entryUuid, userName, timestamp, status );
+                entries.add( entry );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select data delivery register entries: " +
+                    e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select data delivery register entries: " +
+                    e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
-        // return number of entries
-        return ( regEntries != null ) ? regEntries.size() : 0;
+        return entries;
     }
     /**
-     * Method adds an entry to data delivery register.
+     * Adds entry to the delivery register.
      *
-     * @param dataDeliveryRegister Data delivery register entry
+     * @param entry Entry to add
+     * @return Number of inserted records
      */
-    public void addEntry( DeliveryRegisterEntry deliveryRegisterEntry ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public synchronized int addEntry( DeliveryRegisterEntry entry ) {
+        Connection conn = null;
+        int insert = 0;
         try {
-            session.saveOrUpdate( deliveryRegisterEntry );
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "INSERT INTO dex_delivery_register(user_id, uuid, user_name, timestamp," +
+                    " status) VALUES ('" + entry.getUserId() + "', '" + entry.getUuid() + "', '" +
+                    entry.getUserName() + "', '" + entry.getTimeStamp() + "', '" +
+                    entry.getDeliveryStatus() + "');";
+            insert = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to insert delivery register entries: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to insert delivery register entries: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
+        return insert;
     }
     /**
-     * Method deletes given entry from data delivery register.
+     * Deletes delivery register entry with a given ID.
      *
-     * @param id Register entry ID
+     * @return Number of deleted entries
      */
-    public void deleteEntry( int id ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-	    session.beginTransaction();
+    public int deleteEntry( int id ) {
+        Connection conn = null;
+        int delete = 0;
         try {
-            session.delete( session.load( Subscription.class, new Integer( id ) ) );
-            session.flush();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "DELETE FROM dex_delivery_register WHERE id = " + id + ";";
+            delete = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete delivery register entry: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to delete delivery register entry: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
+        return delete;
     }
     /**
-     * Deletes all rows from data delivery register table.
+     * Deletes all entries from the delivery register.
      *
-     * @return Number of deleted records
+     * @return Number of deleted entries
      */
-    public int deleteAllEntries() {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        int deletedEntries = 0;
-	    session.beginTransaction();
+    public int deleteEntries() {
+        Connection conn = null;
+        int delete = 0;
         try {
-            deletedEntries = session.createQuery(
-                    "DELETE FROM DeliveryRegisterEntry" ).executeUpdate();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "DELETE FROM dex_delivery_register;";
+            delete = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete delivery register entries: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to delete delivery register entries: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
-        return deletedEntries;
+        return delete;
     }
 }
 //--------------------------------------------------------------------------------------------------

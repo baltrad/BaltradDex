@@ -59,50 +59,58 @@ Author     : szewczenko
                                 Please confirm your subscription request.
                             </div>
                             <div id="table-content">
-                                <div id="table">
-                                    <form action="showSubscriptionStatus.htm">
-                                        <display:table name="selected_subscriptions"
-                                            id="subscription" defaultsort="1" requestURI="submit.htm"
-                                            export="false" cellpadding="0" cellspacing="2"
-                                            class="tableborder">
-                                            <display:column sortable="true" title="Radar station"
-                                                sortProperty="channelName"
-                                                paramProperty="channelName" class="tdcenter"
-                                                value="${subscription.channelName}">
-                                            </display:column>
-                                            <display:column sortable="true" title="Operator"
-                                                sortProperty="operatorName"
-                                                paramProperty="operatorName" class="tdcenter"
-                                                value="${subscription.operatorName}">
-                                            </display:column>
-                                            <c:choose>
-                                                <c:when test="${subscription.selected == true}">
-                                                    <display:column sortable="false"
-                                                        title="Request" class="tdgreen"
-                                                        value="Activate">
-                                                    </display:column>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <display:column sortable="false"
-                                                        title="Request" class="tdred"
-                                                        value="Deactivate">
-                                                    </display:column>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </display:table>
-                                        <div class="footer">
-                                            <div class="right">
-                                                <button class="rounded" type="button"
-                                                    onclick="window.location='showSubscriptions.htm'">
-                                                    <span>Back</span>
-                                                </button>
-                                                <button class="rounded" type="submit">
-                                                    <span>Submit</span>
-                                                </button>
+                                <form action="showSubscriptionStatus.htm">
+                                    <div id="table">
+                                        <div id="selectedsubscriptions">
+                                            <div class="table-hdr">
+                                                <div class="station">
+                                                    Radar station
+                                                </div>
+                                                <div class="operator">
+                                                    Operator
+                                                </div>
+                                                <div class="request">
+                                                    Request
+                                                </div>
+                                            </div>
+                                            <c:forEach var="sub" items="${selected_subscriptions}">
+                                                <div class="table-row">
+                                                    <div class="station">
+                                                        <c:out value="${sub.channelName}"/>
+                                                    </div>
+                                                    <div class="operator">
+                                                        <c:out value="${sub.operatorName}"/>
+                                                    </div>
+                                                    <div class="request">
+                                                        <c:choose>
+                                                            <c:when test="${sub.active == true}">
+                                                                <div class="tdgreen">
+                                                                    <c:out value="Activate"/>
+                                                                </div>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <div class="tdred">
+                                                                    <c:out value="Deactivate"/>
+                                                                </div>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                            <div class="footer">
+                                                <div class="right">
+                                                    <button class="rounded" type="button"
+                                                        onclick="window.location='showSubscriptions.htm'">
+                                                        <span>Back</span>
+                                                    </button>
+                                                    <button class="rounded" type="submit">
+                                                        <span>Submit</span>
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
-                                    </form>
-                                </div>
+                                    </div>
+                                </form>
                             </div>
                         </c:when>
                         <c:when test="${request_status == 2}">

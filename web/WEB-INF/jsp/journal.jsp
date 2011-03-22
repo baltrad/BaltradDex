@@ -87,7 +87,7 @@ Author     : szewczenko
                         <div id="table-control">
                             <c:set var="curPage" scope="page" value="<%=currentPage%>"/>
                             <form action="journal.htm" method="post">
-                                <input type="submit" name="pagenum" value="First">
+                                <input type="submit" name="pagenum" value="<<">
                                 <span></span>
                                 <input type="submit" name="pagenum" value="<">
                                 <span></span>
@@ -107,11 +107,11 @@ Author     : szewczenko
                                 <span></span>
                                 <input type="submit" name="pagenum" value=">">
                                 <span></span>
-                                <input type="submit" name="pagenum" value="Last">
+                                <input type="submit" name="pagenum" value=">>">
                             </form>
                         </div>
                         <div id="logtable">
-                            <div class="hdr">
+                            <div class="table-hdr">
                                 <div class="date">
                                     Date
                                 </div>
@@ -144,7 +144,7 @@ Author     : szewczenko
                                         %>
                                     </c:when>
                                 </c:choose>
-                                <div class="row">
+                                <div class="table-row">
                                     <div class="date">
                                         <div class="<%=style%>">
                                             <c:out value="${fn:substring(entry.timeStamp, 0, 10)}"/>

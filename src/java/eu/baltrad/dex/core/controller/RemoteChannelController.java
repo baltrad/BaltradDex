@@ -174,7 +174,7 @@ public class RemoteChannelController extends MultiActionController {
                         frameDispatcherController.getLocalUserName(),
                         channel.getChannelName(), getSenderNodeAddress(), getSenderNodeName(),
                         Subscription.LOCAL_SUBSCRIPTION, true, true );
-                    subscriptionManager.addSubscription( subs );
+                    subscriptionManager.saveSubscription( subs );
                 }
             }
         } catch( Exception e ) {

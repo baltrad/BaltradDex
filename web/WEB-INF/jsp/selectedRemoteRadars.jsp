@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -76,30 +76,41 @@ Author     : szewczenko
                             </div>
                             <div id="table">
                                 <form action="subscribedRemoteRadars.htm">
-                                    <display:table name="selected_channels" id="channel"
-                                        defaultsort="1" requestURI="selectedRemoteRadars.htm"
-                                        cellpadding="0" cellspacing="2" export="false"
-                                        class="tableborder">
-                                        <display:column sortable="true" title="Radar station"
-                                            sortProperty="channelName" paramId="channelName"
-                                            paramProperty="channelName" class="tdcenter"
-                                            value="${channel.channelName}">
-                                        </display:column>
-                                        <display:column sortable="true" title="WMO number"
-                                            sortProperty="wmoNumber" paramId="wmoNumber"
-                                            paramProperty="wmoNumber"
-                                            class="tdcenter" value="${channel.wmoNumber}">
-                                        </display:column>
-                                    </display:table>
-                                    <div class="footer">
-                                        <div class="right">
-                                            <button class="rounded" type="button"
-                                                onclick="window.location='connectToNode.htm'">
-                                                <span>Back</span>
-                                            </button>
-                                            <button class="rounded" type="submit">
-                                                <span>Submit</span>
-                                            </button>
+                                    <div id="table">
+                                        <div id="radartable">
+                                            <div class="table-hdr">
+                                                <div class="station">
+                                                    Radar station
+                                                </div>
+                                                <div class="wmo">
+                                                    WMO number
+                                                </div>
+                                            </div>
+                                            <c:forEach var="channel" items="${selected_channels}">
+                                                <div class="table-row">
+                                                    <div class="station">
+                                                        <c:out value="${channel.channelName}"/>
+                                                    </div>
+                                                    <div class="wmo">
+                                                        <c:out value="${channel.wmoNumber}"/>
+                                                    </div>
+                                                    <div class="tdhidden">
+                                                        <input type="checkbox" name="removed_channels"
+                                                            value="${channel.id}" checked/>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                            <div class="footer">
+                                                <div class="right">
+                                                    <button class="rounded" type="button"
+                                                        onclick="window.location='connectToNode.htm'">
+                                                        <span>Back</span>
+                                                    </button>
+                                                    <button class="rounded" type="submit">
+                                                        <span>Submit</span>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>

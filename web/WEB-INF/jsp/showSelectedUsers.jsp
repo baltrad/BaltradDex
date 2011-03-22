@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -52,40 +52,51 @@ Author     : szewczenko
                     <div id="text-box">
                         Warning: The following user account(s) will be removed from the system.
                     </div>
-                    <div id="table">
-                        <form method="post" action="showRemovedUsers.htm">
-                            <display:table name="selected_users" id="user" defaultsort="1"
-                                requestURI="showSelectedUsers.htm" cellpadding="0" cellspacing="2"
-                                export="false" class="tableborder">
-                                <display:column sortable="true" title="User name"
-                                    sortProperty="name" class="tdcenter"
-                                    value="${user.name}">
-                                </display:column>
-                                <display:column sortable="true" title="Role" sortProperty="role"
-                                    class="tdcenter" value="${user.roleName}">
-                                </display:column>
-                                <display:column sortable="true" title="Organization"
-                                    sortProperty="factory" class="tdcenter"
-                                    value="${user.factory}">
-                                </display:column>
-                                <display:column class="tdhidden" headerClass="tdhidden">
-                                    <input type="checkbox" name="removed_users"
-                                           value="${user.id}" checked/>
-                                </display:column>
-                            </display:table>
-                            <div class="footer">
-                                <div class="right">
-                                    <button class="rounded" type="button"
-                                        onclick="history.go(-1);">
-                                        <span>Back</span>
-                                    </button>
-                                    <button class="rounded" type="submit">
-                                        <span>Submit</span>
-                                    </button>
+                    <form method="post" action="showRemovedUsers.htm">
+                        <div id="table">
+                            <div id="removeusers">
+                                <div class="table-hdr">
+                                    <div class="name">
+                                        User name
+                                    </div>
+                                    <div class="role">
+                                        Role
+                                    </div>
+                                    <div class="factory">
+                                        Organization
+                                    </div>
+                                </div>
+                                <c:forEach var="user" items="${selected_users}">
+                                    <div class="table-row">
+                                        <div class="name">
+                                           <c:out value="${user.name}"/>
+                                        </div>
+                                        <div class="role">
+                                            <c:out value="${user.roleName}"/>
+                                        </div>
+                                        <div class="factory">
+                                            <c:out value="${user.factory}"/>
+                                        </div>
+                                        <div class="tdhidden">
+                                            <input type="checkbox" name="removed_users"
+                                                value="${user.id}" checked/>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                                <div class="footer">
+                                    <div class="right">
+                                        <button class="rounded" type="button"
+                                            onclick="history.go(-1);">
+                                            <span>Back</span>
+                                        </button>
+                                        <button class="rounded" type="submit">
+                                            <span>Submit</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
                 <div id="clear"></div>
             </div>

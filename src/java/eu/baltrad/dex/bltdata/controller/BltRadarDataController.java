@@ -80,12 +80,12 @@ public class BltRadarDataController implements Controller, ITableScroller {
         String pageNum = request.getParameter( PAGE_NUMBER );
         List<BltFile> fileEntries = null;
         if( pageNum != null ) {
-            if( pageNum.matches( "First" ) ) {
+            if( pageNum.matches( "<<" ) ) {
                 firstPage();
                 fileEntries = bltFileManager.getFileEntries( getChannelName(), 0,
                         BltFileManager.ENTRIES_PER_PAGE );
             } else {
-                if( pageNum.matches( "Last" ) ) {
+                if( pageNum.matches( ">>" ) ) {
                     lastPage();
                 } else if( pageNum.matches( ">" ) ) {
                     nextPage();

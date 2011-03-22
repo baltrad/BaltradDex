@@ -55,7 +55,7 @@ public class ConfigurationManager {
      * @param id Record ID
      * @return Configuration object with a given ID
      */
-    public Configuration getConfiguration( int id ) {
+    public Configuration getConfiguration( int id ) throws SQLException, Exception {
         Connection conn = null;
         Configuration conf = null;
         try {
@@ -80,8 +80,10 @@ public class ConfigurationManager {
             stmt.close();
         } catch( SQLException e ) {
             System.err.println( "Failed to select configuration: " + e.getMessage() );
+            throw e;
         } catch( Exception e ) {
             System.err.println( "Failed to select configuration: " + e.getMessage() );
+            throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }

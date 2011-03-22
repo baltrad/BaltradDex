@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -53,37 +53,42 @@ Author     : szewczenko
                         Warning: The following subscribed radar station(s) will be removed
                         from the system.
                     </div>
-                    <div id="table">
                         <form method="post" action="showSubscriptionRemovalStatus.htm">
-                            <display:table name="selected_subscriptions"
-                                id="subscription" defaultsort="1" requestURI="submit.htm"
-                                export="false" cellpadding="0" cellspacing="2"
-                                class="tableborder">
-                                <display:column sortable="true" title="Radar station"
-                                    sortProperty="channelName"
-                                    paramProperty="channelName" class="tdcenter"
-                                    value="${subscription.channelName}">
-                                </display:column>
-                                <display:column sortable="true" title="Operator"
-                                    sortProperty="operatorName"
-                                    paramProperty="operatorName" class="tdcenter"
-                                    value="${subscription.operatorName}">
-                                </display:column>
-                            </display:table>
-                            <div class="footer">
-                                <div class="right">
-                                    <button class="rounded" type="button"
-                                        onclick="history.go(-1);">
-                                        <span>Back</span>
-                                    </button>
-                                    <button class="rounded" type="submit">
-                                        <span>Submit</span>
-                                    </button>
+                            <div id="table">
+                                <div id="subscriptions">
+                                    <div class="table-hdr">
+                                        <div class="station">
+                                            Radar station
+                                        </div>
+                                        <div class="operator">
+                                            Operator
+                                        </div>
+                                    </div>
+                                    <c:forEach var="sub" items="${selected_subscriptions}">
+                                        <div class="table-row">
+                                            <div class="station">
+                                                <c:out value="${sub.channelName}"/>
+                                            </div>
+                                            <div class="operator">
+                                                <c:out value="${sub.operatorName}"/>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                    <div class="footer">
+                                        <div class="right">
+                                            <button class="rounded" type="button"
+                                                onclick="history.go(-1);">
+                                                <span>Back</span>
+                                            </button>
+                                            <button class="rounded" type="submit">
+                                                <span>Submit</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </form>
                     </div>
-                </div>
                 <div id="clear"></div>
             </div>
         </div>

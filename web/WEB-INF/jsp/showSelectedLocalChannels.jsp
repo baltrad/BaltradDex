@@ -56,7 +56,7 @@ Author     : szewczenko
                     <form method="post" action="showRemovedLocalChannels.htm">
                         <div id="table">
                             <div id="radartable">
-                                <div class="hdr">
+                                <div class="table-hdr">
                                     <div class="station">
                                         Radar station
                                     </div>
@@ -65,7 +65,7 @@ Author     : szewczenko
                                     </div>
                                 </div>
                                 <c:forEach var="channel" items="${channels}">
-                                    <div class="row">
+                                    <div class="table-row">
                                         <div class="station">
                                             <c:out value="${channel.channelName}"/>
                                         </div>

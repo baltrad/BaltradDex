@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,14 +21,16 @@
 
 package eu.baltrad.dex.user.model;
 
-import eu.baltrad.dex.util.HibernateUtil;
+import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.dex.util.MessageDigestUtil;
 
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.Session;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * User manager class implementing user object handling functionality.
@@ -38,212 +40,293 @@ import java.util.List;
  * @since 1.0
  */
 public class UserManager {
+//---------------------------------------------------------------------------------------- Variables
+    /** Reference to JDBCConnector class object */
+    private JDBCConnectionManager jdbcConnectionManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Method retrieves user with a given userID from the database.
-     *
-     * @param id User id
-     * @return User object
+     * Constructor gets reference to JDBCConnectionManager instance.
      */
-    public User getUserByID( int id ) {
+    public UserManager() {
+        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+    }
+    /**
+     * Gets user with a given ID.
+     *
+     * @param id User ID
+     * @return User with a given ID
+     */
+    public User getUserById( int id ) {
+        Connection conn = null;
         User user = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
         try {
-            user = ( User )session.createQuery(
-                    "FROM User WHERE id = ?" ).setInteger( 0, id ).uniqueResult();
-            session.getTransaction().commit();
-        }
-        catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-        return user;
-    }
-    /**
-     * Method retrieves user with a given name from the database.
-     *
-     * @param name User name
-     * @return User object
-     */
-    public User getUserByName( String name ) {
-        User user = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            user = ( User )session.createQuery(
-                    "FROM User WHERE name = ?" ).setString( 0, name ).uniqueResult();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-        return user;
-    }
-    /**
-     * Method retrieves user with a given name hash.
-     *
-     * @param nameHash User name hash
-     * @return User object
-     */
-    public User getUserByNameHash( String nameHash ) throws HibernateException {
-        User user = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            user = ( User )session.createQuery(
-                    "FROM User WHERE nameHash = ?" ).setString( 0, nameHash ).uniqueResult();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-        return user;
-    }
-    /**
-     * Method retrieves user based on associated node address.
-     *
-     * @param nodeAddress
-     * @return User object
-     */
-    public User getUserByNodeAddress( String nodeAddress ) throws HibernateException {
-        User user = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            user = ( User )session.createQuery(
-                    "FROM User WHERE nodeAddress = ?" ).setString( 0, nodeAddress ).uniqueResult();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-        return user;
-    }
-    /**
-     * Gets all roles defined in the system.
-     *
-     * @return List of available roles
-     */
-    public List getRoles() {
-        List roles = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            roles = session.createQuery( "FROM Role" ).list();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-        return roles;
-    }
-    /**
-     * Checks if user with a given name exists in the database.
-     *
-     * @param name User name
-     * @return True if user exists, false otherwise
-     */
-    public boolean userExists( String name ) {
-        boolean res = false;
-        List users = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            users = session.createQuery( "FROM User" ).list();
-            session.getTransaction().commit();
-            for( int i = 0; i < users.size(); i++ ) {
-                User user = ( User )users.get( i );
-                if( user.getName().equals( name ) ) {
-                    res = true;
-                }
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_users WHERE" +
+                    " id = " + id + ";" );
+            while( resultSet.next() ) {
+                int userId = resultSet.getInt( "id" );
+                String name = resultSet.getString( "name" );
+                String nameHash = resultSet.getString( "name_hash" );
+                String role = resultSet.getString( "role_name" );
+                String passwd = resultSet.getString( "password" );
+                String address = resultSet.getString( "short_address" );
+                String port = resultSet.getString( "port" );
+                String factory = resultSet.getString( "factory" );
+                String country = resultSet.getString( "country" );
+                String city = resultSet.getString( "city" );
+                String cityCode = resultSet.getString( "city_code" );
+                String street = resultSet.getString( "street" );
+                String number = resultSet.getString( "number" );
+                String phone = resultSet.getString( "phone" );
+                String email = resultSet.getString( "email" );
+                user = new User( userId, name, nameHash, role, passwd, address, port, factory,
+                        country, city, cityCode, street, number, phone, email );
             }
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select user: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select user: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
-        return res;
+        return user;
     }
     /**
-     * Gets list of all registered users.
-     *  
-     * @return List containing all registered users
+     * Gets user with a given name.
+     *
+     * @param name User name
+     * @return User with a given name
      */
-    public List getUsers() {
-        List users = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public User getUserByName( String userName ) {
+        Connection conn = null;
+        User user = null;
         try {
-            users = session.createQuery( "FROM User" ).list();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_users WHERE" +
+                    " name = '" + userName + "';" );
+            while( resultSet.next() ) {
+                int userId = resultSet.getInt( "id" );
+                String name = resultSet.getString( "name" );
+                String nameHash = resultSet.getString( "name_hash" );
+                String role = resultSet.getString( "role_name" );
+                String passwd = resultSet.getString( "password" );
+                String address = resultSet.getString( "short_address" );
+                String port = resultSet.getString( "port" );
+                String factory = resultSet.getString( "factory" );
+                String country = resultSet.getString( "country" );
+                String city = resultSet.getString( "city" );
+                String cityCode = resultSet.getString( "city_code" );
+                String street = resultSet.getString( "street" );
+                String number = resultSet.getString( "number" );
+                String phone = resultSet.getString( "phone" );
+                String email = resultSet.getString( "email" );
+                user = new User( userId, name, nameHash, role, passwd, address, port, factory,
+                        country, city, cityCode, street, number, phone, email );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select user: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select user: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return user;
+    }
+    /**
+     * Gets user with a given name hash.
+     *
+     * @param userNameHash User name hash
+     * @return User with a given name hash
+     */
+    public User getUserByNameHash( String userNameHash ) {
+        Connection conn = null;
+        User user = null;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_users WHERE" +
+                    " name_hash = '" + userNameHash + "';" );
+            while( resultSet.next() ) {
+                int userId = resultSet.getInt( "id" );
+                String name = resultSet.getString( "name" );
+                String nameHash = resultSet.getString( "name_hash" );
+                String role = resultSet.getString( "role_name" );
+                String passwd = resultSet.getString( "password" );
+                String address = resultSet.getString( "short_address" );
+                String port = resultSet.getString( "port" );
+                String factory = resultSet.getString( "factory" );
+                String country = resultSet.getString( "country" );
+                String city = resultSet.getString( "city" );
+                String cityCode = resultSet.getString( "city_code" );
+                String street = resultSet.getString( "street" );
+                String number = resultSet.getString( "number" );
+                String phone = resultSet.getString( "phone" );
+                String email = resultSet.getString( "email" );
+                user = new User( userId, name, nameHash, role, passwd, address, port, factory,
+                        country, city, cityCode, street, number, phone, email );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select user: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select user: " + e.getMessage() );
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return user;
+    }
+    /**
+     * Gets all users.
+     *
+     * @return List of all registered users
+     */
+    public List<User> getUsers() {
+        Connection conn = null;
+        List<User> users = new ArrayList<User>();
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_users" );
+            while( resultSet.next() ) {
+                int userId = resultSet.getInt( "id" );
+                String name = resultSet.getString( "name" );
+                String nameHash = resultSet.getString( "name_hash" );
+                String role = resultSet.getString( "role_name" );
+                String passwd = resultSet.getString( "password" );
+                String address = resultSet.getString( "short_address" );
+                String port = resultSet.getString( "port" );
+                String factory = resultSet.getString( "factory" );
+                String country = resultSet.getString( "country" );
+                String city = resultSet.getString( "city" );
+                String cityCode = resultSet.getString( "city_code" );
+                String street = resultSet.getString( "street" );
+                String number = resultSet.getString( "number" );
+                String phone = resultSet.getString( "phone" );
+                String email = resultSet.getString( "email" );
+                User user = new User( userId, name, nameHash, role, passwd, address, port, factory,
+                        country, city, cityCode, street, number, phone, email );
+                users.add( user );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select data channels: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select data channels: " + e.getMessage() );
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
         }
         return users;
     }
     /**
-     * Adds user to the database.
+     * Gets all roles.
      *
-     * @param user User class object
+     * @return List of all roles defined in the system
      */
-    public void addUser( User user ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public List<Role> getRoles() {
+        Connection conn = null;
+        List<Role> roles = new ArrayList<Role>();
         try {
-            // encrypt passwords
-            user.setNameHash( MessageDigestUtil.createHash( user.getName() ) );
-            user.setPassword( MessageDigestUtil.createHash( user.getPassword() ) );
-            user.setRetPassword( MessageDigestUtil.createHash( user.getRetPassword() ) );
-            session.saveOrUpdate( user );
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_roles" );
+            while( resultSet.next() ) {
+                int roleId = resultSet.getInt( "id" );
+                String roleName = resultSet.getString( "role" );
+                Role role = new Role( roleId, roleName );
+                roles.add( role );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select user role: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select user role: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
+        return roles;
     }
     /**
-     * Deletes user with a given ID.
+     * Saves or updates user account.
      *
-     * @param id User ID
+     * @param user User account
+     * @return Number of saved or updated records
+     * @throws SQLException
+     * @throws Exception
      */
-    public void removeUser( int id ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-	    session.beginTransaction();
+    public int saveOrUpdate( User user ) throws SQLException, Exception {
+        Connection conn = null;
+        int update = 0;
         try {
-            session.delete( session.load( User.class, new Integer( id ) ) );
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "";
+            // record does not exists, do insert
+            if( user.getId() == 0 ) {
+                sql = "INSERT INTO dex_users (name, name_hash, role_name, password, " +
+                    "short_address, port, factory, country, city, city_code, street, number, " +
+                    "phone, email ) VALUES ('" + user.getName() + "', '" + 
+                    MessageDigestUtil.createHash( user.getName() ) + "', '" +
+                    user.getRoleName() + "', '" + MessageDigestUtil.createHash( user.getPassword() )
+                    + "', '" + user.getShortAddress() + "', '" + user.getPortNumber() + "', '" +
+                    user.getFactory() + "', '" + user.getCountry() + "', '" + user.getCity() +
+                    "', '" + user.getCityCode() + "', '" + user.getStreet() + "', '" +
+                    user.getNumber() + "', '" + user.getPhone() + "', '" + user.getEmail() + "');";
+            } else {
+                // record exists, do update
+                sql = "UPDATE dex_users SET name = '" + user.getName() + "', name_hash = '" +
+                    user.getNameHash() + "', role_name = '" + user.getRoleName() + "', " +
+                    "password = '" + user.getPassword() + "', short_address = '" +
+                    user.getShortAddress() + "', port = '" + user.getPortNumber() +
+                    "', factory = '" + user.getFactory() + "', country = '" + user.getCountry() +
+                    "', city = '" + user.getCity() + "', city_code = '" + user.getCityCode() +
+                    "', street = '" + user.getStreet() + "', number = '" + user.getNumber() +
+                    "', phone = '" + user.getPhone() + "', email = '" + user.getEmail() +
+                    "' WHERE id = '" + user.getId() + "';";
+            }
+            update = stmt.executeUpdate( sql ) ;
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to save user account: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to save user account: " + e.getMessage() );
             throw e;
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
+        return update;
+    }
+    /**
+     * Deletes user account with a given ID.
+     *
+     * @param id User account ID
+     * @return Number of deleted records
+     * @throws SQLException
+     * @throws Exception
+     */
+    public int deleteUser( int id ) throws SQLException, Exception {
+        Connection conn = null;
+        int delete = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "DELETE FROM dex_users WHERE id = " + id + ";";
+            delete = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete user account: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to delete user account: " + e.getMessage() );
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return delete;
     }
 }
 //--------------------------------------------------------------------------------------------------

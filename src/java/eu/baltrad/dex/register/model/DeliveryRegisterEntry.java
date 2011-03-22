@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -63,6 +63,25 @@ public class DeliveryRegisterEntry {
      */
     public DeliveryRegisterEntry( int userId, String uuid, String userName, Date timeStamp,
             String deliveryStatus ) {
+        this.userId = userId;
+        this.uuid = uuid;
+        this.userName = userName;
+        this.timeStamp = timeStamp;
+        this.deliveryStatus = deliveryStatus;
+    }
+    /**
+     * Constructor sets field values.
+     *
+     * @param id Entry ID
+     * @param userId User id
+     * @param uuid File's identity string
+     * @param userName Recipient's name / user name
+     * @param timeStamp Delivery timestamp
+     * @param deliveryStatus Delivery status tells whether user received a delivery
+     */
+    public DeliveryRegisterEntry( int id, int userId, String uuid, String userName, Date timeStamp,
+            String deliveryStatus ) {
+        this.id = id;
         this.userId = userId;
         this.uuid = uuid;
         this.userName = userName;

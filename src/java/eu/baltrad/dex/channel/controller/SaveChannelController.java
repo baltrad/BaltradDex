@@ -94,7 +94,7 @@ public class SaveChannelController extends SimpleFormController {
                 Integer.parseInt( request.getParameter( CHANNEL_ID ) ) );
             List< User > users = new ArrayList< User >();
             for( int i = 0; i < channelPermissions.size(); i++ ) {
-                User user = userManager.getUserByID( channelPermissions.get( i ).getUserId() );
+                User user = userManager.getUserById( channelPermissions.get( i ).getUserId() );
                 users.add( user );
             }
             model.put( USERS, users );

@@ -115,13 +115,42 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION upgrade_dex_schema() RETURNS VOID AS $$
+BEGIN
+    BEGIN
+        ALTER TABLE dex_users DROP COLUMN ret_password;
+  	EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Column dex_users.ret_password does not exist';
+    END;
+    BEGIN
+        ALTER TABLE dex_users DROP COLUMN selected;
+  	EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Column dex_users.ret_selected does not exist';
+    END;
+    BEGIN
+        ALTER TABLE dex_users ALTER COLUMN name_hash SET UNIQUE;
+  	EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Column dex_users.name_hash does not exist';
+    END;
+    BEGIN
+        ALTER TABLE dex_subscriptions RENAME COLUMN selected TO active;
+  	EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Column dex_subcriptions.selected does not exist';
+    END;
+END;
+$$ LANGUAGE plpgsql;
+
+
 SELECT split_dex_node_connections_address();
 SELECT split_dex_node_configuration_address();
 SELECT split_dex_users_node_address();
 SELECT restart_seq_with_max('dex_messages', 'id');
+SELECT upgrade_dex_schema();
 
 DROP FUNCTION make_plpgsql();
 DROP FUNCTION split_dex_node_configuration_address();
 DROP FUNCTION split_dex_node_connections_address();
 DROP FUNCTION split_dex_users_node_address();
 DROP FUNCTION restart_seq_with_max(TEXT, TEXT);
+DROP FUNCTION upgrade_dex_schema();

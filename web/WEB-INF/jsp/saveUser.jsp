@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -58,7 +58,7 @@ Author     : szewczenko
                                 <div class="left">
                                     <div class="row">User name</div>
                                     <div class="row">Password</div>
-                                    <div class="row">Retype password</div>
+                                    <div class="row">Confirm password</div>
                                     <div class="row">Role</div>
                                     <div class="row">Node address</div>
                                     <div class="row">Organization</div>
@@ -80,8 +80,8 @@ Author     : szewczenko
                                         <form:errors path="command.password" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:password path="command.retPassword"/>
-                                        <form:errors path="command.retPassword" cssClass="errors"/>
+                                        <form:password path="command.confirmPassword"/>
+                                        <form:errors path="command.confirmPassword" cssClass="errors"/>
                                     </div>
                                     <div class="row">
                                         <spring:bind path="command.roleName">

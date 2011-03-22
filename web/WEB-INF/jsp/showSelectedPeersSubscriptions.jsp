@@ -53,36 +53,41 @@ Author     : szewczenko
                         Warning: The following peer's subscription(s) will be removed
                         from the system.
                     </div>
-                    <div id="table">
-                        <form method="post" action="showRemovedPeersSubscriptions.htm">
-                            <display:table name="selected_subscriptions"
-                                id="subscription" defaultsort="1" requestURI="submit.htm"
-                                export="false" cellpadding="0" cellspacing="2"
-                                class="tableborder">
-                                <display:column sortable="true" title="Radar station"
-                                    sortProperty="channelName"
-                                    paramProperty="channelName" class="tdcenter"
-                                    value="${subscription.channelName}">
-                                </display:column>
-                                <display:column sortable="true" title="User name"
-                                    sortProperty="userName"
-                                    paramProperty="userName" class="tdcenter"
-                                    value="${subscription.userName}">
-                                </display:column>
-                            </display:table>
-                            <div class="footer">
-                                <div class="right">
-                                    <button class="rounded" type="button"
-                                        onclick="history.go(-1);">
-                                        <span>Back</span>
-                                    </button>
-                                    <button class="rounded" type="submit">
-                                        <span>Submit</span>
-                                    </button>
+                    <form method="post" action="showRemovedPeersSubscriptions.htm">
+                        <div id="table">
+                            <div id="selectedpeersubscriptions">
+                                <div class="table-hdr">
+                                    <div class="station">
+                                        Radar station
+                                    </div>
+                                    <div class="user">
+                                        User name
+                                    </div>
+                                </div>
+                                <c:forEach var="sub" items="${selected_subscriptions}">
+                                    <div class="table-row">
+                                        <div class="station">
+                                            <c:out value="${sub.channelName}"/>
+                                        </div>
+                                        <div class="user">
+                                            <c:out value="${sub.userName}"/>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                                <div class="footer">
+                                    <div class="right">
+                                        <button class="rounded" type="button"
+                                            onclick="history.go(-1);">
+                                            <span>Back</span>
+                                        </button>
+                                        <button class="rounded" type="submit">
+                                            <span>Submit</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>  
+                    </form>
                 </div>
                 <div id="clear"></div>
             </div>

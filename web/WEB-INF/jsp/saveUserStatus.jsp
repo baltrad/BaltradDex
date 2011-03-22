@@ -79,7 +79,7 @@ Author     : szewczenko
                     </div>
                     <div class="footer">
                         <div class="right">
-                            <form action="showUsers.htm">
+                            <form action="editUser.htm">
                                 <button class="rounded" type="submit">
                                     <span>OK</span>
                                 </button>

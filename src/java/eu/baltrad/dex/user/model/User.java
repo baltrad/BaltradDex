@@ -41,7 +41,7 @@ public class User {
     private String nameHash;
     private String roleName;
     private String password;
-    private String retPassword;
+    private String confirmPassword;
     // Short node address, e.g. baltrad.imgw.pl (without port name and other stuff)
     private String shortAddress;
     // Full node address, e.g. http://baltrad.imgw.pl:8084/BaltradDex/dispatch.htm
@@ -56,7 +56,7 @@ public class User {
     private String number;
     private String phone;
     private String email;
-    private boolean selected;
+    private boolean checked;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Default constructor.
@@ -67,21 +67,20 @@ public class User {
      * 
      * @param name User name
      * @param password User password
-     * @param email User email address
      */
-    public User( String name, String password, String email ) {
+    public User( String name, String password ) {
         this.name = name;
         this.password = password;
-        this.email = email;
     }
     /**
      * Constructor creates user object with field values provided as parameters.
      *
+     * @param id User ID
      * @param name User name
-     * @param nameHash Name hash
+     * @param nameHash User name hash
      * @param roleName User role name
      * @param password Password
-     * @param retPassword Password repeated
+     * @param confirmPassword Password confirmed
      * @param shortAddress User node's short address
      * @param portNumber Port number
      * @param factory Name of the organization
@@ -93,14 +92,16 @@ public class User {
      * @param phone Phone number
      * @param email Contact email
      */
-    public User( String name, String nameHash, String roleName, String password, String retPassword,
-            String shortAddress, String portNumber, String factory, String country, String city,
-            String cityCode, String street, String number, String phone, String email ) {
+    public User( int id, String name, String nameHash, String roleName, String password,
+            String confirmPassword, String shortAddress, String portNumber, String factory,
+            String country, String city, String cityCode, String street, String number,
+            String phone, String email ) {
+        this.id = id;
         this.name = name;
         this.nameHash = nameHash;
         this.roleName = roleName;
         this.password = password;
-        this.retPassword = retPassword;
+        this.confirmPassword = confirmPassword;
         this.shortAddress = shortAddress;
         this.portNumber = portNumber;
         this.factory = factory;
@@ -112,7 +113,44 @@ public class User {
         this.phone = phone;
         this.email = email;
     }
-
+    /**
+     * Constructor creates user object with field values provided as parameters.
+     *
+     * @param id User ID
+     * @param name User name
+     * @param nameHash User name hash
+     * @param roleName User role name
+     * @param password Password
+     * @param shortAddress User node's short address
+     * @param portNumber Port number
+     * @param factory Name of the organization
+     * @param country Country
+     * @param city City
+     * @param cityCode City code
+     * @param street Street name
+     * @param number Address number
+     * @param phone Phone number
+     * @param email Contact email
+     */
+    public User( int id, String name, String nameHash, String roleName, String password, String shortAddress,
+            String portNumber, String factory, String country, String city, String cityCode,
+            String street, String number, String phone, String email ) {
+        this.id = id;
+        this.name = name;
+        this.nameHash = nameHash;
+        this.roleName = roleName;
+        this.password = password;
+        this.shortAddress = shortAddress;
+        this.portNumber = portNumber;
+        this.factory = factory;
+        this.country = country;
+        this.city = city;
+        this.cityCode = cityCode;
+        this.street = street;
+        this.number = number;
+        this.phone = phone;
+        this.email = email;
+    }
     /**
      * Method gets user id.
      *
@@ -153,19 +191,6 @@ public class User {
     public void setName( String name ) {
         this.name = name;
     }
-    /**
-     * @return the nameHash
-     */
-    public String getNameHash() {
-        return nameHash;
-    }
-
-    /**
-     * @param nameHash the nameHash to set
-     */
-    public void setNameHash(String nameHash) {
-        this.nameHash = nameHash;
-    }
 
     /**
      * @return the password
@@ -179,20 +204,6 @@ public class User {
      */
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    /**
-     * @return the password
-     */
-    public String getRetPassword() {
-        return retPassword;
-    }
-
-    /**
-     * @param password the password to set
-     */
-    public void setRetPassword(String retPassword) {
-        this.retPassword = retPassword;
     }
    /**
      * Gets node's short address.
@@ -341,17 +352,47 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
+
     /**
-     * Gets user selection toggle state.
-     *
-     * @return User selection toggle state
+     * @return the confirmPassword
      */
-    public boolean getSelected() { return selected; }
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
     /**
-     * Sets user selection toggle state.
-     *
-     * @param selected User selection toggle state
+     * @param confirmPassword the confirmPassword to set
      */
-    public void setSelected( boolean selected ) { this.selected = selected; }
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
+    }
+
+    /**
+     * @return the nameHash
+     */
+    public String getNameHash() {
+        return nameHash;
+    }
+
+    /**
+     * @param nameHash the nameHash to set
+     */
+    public void setNameHash(String nameHash) {
+        this.nameHash = nameHash;
+    }
+
+    /**
+     * @return the checked
+     */
+    public boolean isChecked() {
+        return checked;
+    }
+
+    /**
+     * @param checked the checked to set
+     */
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
 }
 //--------------------------------------------------------------------------------------------------

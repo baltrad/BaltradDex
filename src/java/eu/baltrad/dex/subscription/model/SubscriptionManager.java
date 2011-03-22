@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,14 +21,15 @@
 
 package eu.baltrad.dex.subscription.model;
 
-import eu.baltrad.dex.util.HibernateUtil;
+import eu.baltrad.dex.util.JDBCConnectionManager;
 
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.Session;
-import org.hibernate.Query;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Subscription manager inplementing subscription handling functionality.
@@ -38,221 +39,320 @@ import java.util.List;
  * @since 1.0
  */
 public class SubscriptionManager {
+//---------------------------------------------------------------------------------------- Variables
+    /** Reference to JDBCConnector class object */
+    private JDBCConnectionManager jdbcConnectionManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Method gets all available subscriptions.
+     * Constructor gets reference to JDBCConnectionManager instance.
+     */
+    public SubscriptionManager() {
+        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+    }
+    /**
+     * Gets all existing subscriptions.
      *
-     * @return List containing all available subscriptions
+     * @return List of all existing subscriptions
      */
     public List<Subscription> getSubscriptions() {
-        List subscriptionList = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+        Connection conn = null;
+        List<Subscription> subs = new ArrayList<Subscription>();
         try {
-            subscriptionList = session.createQuery( "FROM Subscription" ).list();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_subscriptions" );
+            while( resultSet.next() ) {
+                int subId = resultSet.getInt( "id" );
+                String userName = resultSet.getString( "user_name" );
+                String channelName = resultSet.getString( "channel_name" );
+                String nodeAddress = resultSet.getString( "node_address" );
+                String operator = resultSet.getString( "operator_name" );
+                String type = resultSet.getString( "type" );
+                boolean active = resultSet.getBoolean( "active" );
+                boolean synkronized = resultSet.getBoolean( "synkronized" );
+                Subscription sub = new Subscription( subId, userName, channelName, nodeAddress,
+                        operator, type, active, synkronized );
+                subs.add( sub );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
-        return subscriptionList;
-    }
-    /**
-     * Method saves subscription in the database.
-     *
-     * @param subscription Subscription object
-     */
-    public void addSubscription( Subscription subscription ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            session.saveOrUpdate( subscription );
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-    }
-    /**
-     * Selects subscription by channel name and type, updates subscription object
-     * and saves it int the database.
-     *
-     * @param channelName Channel name
-     * @param type Subscription type
-     * @param selected Channel selection status - updated parameter
-     */
-    public void updateSubscription( String channelName, String type, boolean selected ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            Subscription subs = ( Subscription )session.createQuery(
-                    "FROM Subscription WHERE channelName = ? AND type = ?" ).setString( 0,
-                    channelName ).setString( 1, type ).uniqueResult();
-            subs.setSelected( selected );
-            session.update( subs );
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-    }
-    /**
-     * Method removes subscription from the database.
-     *
-     * @param id Subscription ID
-     */
-    public void removeSubscription( int id ) throws HibernateException {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-	    session.beginTransaction();
-        try {
-            session.delete( session.load( Subscription.class, new Integer( id ) ) );
-            session.flush();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-    }
-    /**
-     * Method removes subscription identified by a given user name, channel name and type.
-     *
-     * @param channelName Channel name
-     * @param type Subscription type
-     */
-    public void removeSubscription( String channelName, String type ) throws HibernateException {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            String hql = "DELETE FROM Subscription WHERE channel_name = :channelName "
-                    + "AND type = :type";
-            Query query = session.createQuery( hql );
-            query.setString( "channelName", channelName );
-            query.setString( "type", type );
-            query.executeUpdate();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-    }
-    /**
-     * Method removes subscription identified by a given user name, channel name and type.
-     *
-     * @param userName User name
-     * @param channelName Channel name
-     * @param type Subscription type
-     */
-    public void removeSubscription( String userName, String channelName, String type )
-            throws HibernateException {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            String hql = "DELETE FROM Subscription WHERE user_name = :userName AND " +
-                    "channel_name = :channelName AND type = :type";
-            Query query = session.createQuery( hql );
-            query.setString( "userName", userName );
-            query.setString( "channelName", channelName );
-            query.setString( "type", type );
-            query.executeUpdate();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
+        return subs;
     }
     /**
      * Gets subsciptions by type.
      *
-     * @param type Subscription type
+     * @param subscriptionType Subscription type
      * @return List of subscriptions of a given type
      */
-    public List<Subscription> getSubscriptionsByType( String type ) {
-        List subscriptionList = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public List<Subscription> getSubscriptions( String subscriptionType ) {
+        Connection conn = null;
+        List<Subscription> subs = new ArrayList<Subscription>();
         try {
-            subscriptionList = session.createQuery(
-                    "FROM Subscription WHERE type = ?" ).setString( 0, type ).list();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_subscriptions " +
+                    "WHERE type = '" + subscriptionType + "';" );
+            while( resultSet.next() ) {
+                int subId = resultSet.getInt( "id" );
+                String userName = resultSet.getString( "user_name" );
+                String channelName = resultSet.getString( "channel_name" );
+                String nodeAddress = resultSet.getString( "node_address" );
+                String operator = resultSet.getString( "operator_name" );
+                String type = resultSet.getString( "type" );
+                boolean active = resultSet.getBoolean( "active" );
+                boolean synkronized = resultSet.getBoolean( "synkronized" );
+                Subscription sub = new Subscription( subId, userName, channelName, nodeAddress,
+                        operator, type, active, synkronized );
+                subs.add( sub );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
-        return subscriptionList;
+        return subs;
     }
     /**
      * Gets unique subsciption identified by data channel name and subscription type.
      *
      * @param channelName Channel name
-     * @param type Subscription type
+     * @param subscriptionType Subscription type
      * @return Subscription object
      */
-    public Subscription getSubscription( String channelName, String type ) {
-        Subscription subs = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public Subscription getSubscription( String channelName, String subscriptionType ) {
+        Connection conn = null;
+        Subscription sub = null;
         try {
-            subs = ( Subscription )session.createQuery(
-                    "FROM Subscription WHERE channelName = ? AND type = ?" ).setString( 0, 
-                    channelName ).setString( 1, type ).uniqueResult();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_subscriptions " +
+                    "WHERE channel_name = '" + channelName + "' AND type = '" +
+                    subscriptionType + "';" );
+            while( resultSet.next() ) {
+                int subId = resultSet.getInt( "id" );
+                String userName = resultSet.getString( "user_name" );
+                String channel = resultSet.getString( "channel_name" );
+                String nodeAddress = resultSet.getString( "node_address" );
+                String operator = resultSet.getString( "operator_name" );
+                String type = resultSet.getString( "type" );
+                boolean active = resultSet.getBoolean( "active" );
+                boolean synkronized = resultSet.getBoolean( "synkronized" );
+                sub = new Subscription( subId, userName, channel, nodeAddress,
+                        operator, type, active, synkronized );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
-        return subs;
+        return sub;
     }
     /**
      * Gets unique subsciption identified by user name, data channel name and subscription type.
      *
      * @param userName User name
      * @param channelName Channel name
-     * @param type Subscription type
+     * @param subscriptionType Subscription type
      * @return Subscription object
      */
-    public Subscription getSubscription( String userName, String channelName, String type ) {
-        Subscription subs = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public Subscription getSubscription( String userName, String channelName,
+            String subscriptionType ) {
+        Connection conn = null;
+        Subscription sub = null;
         try {
-            subs = ( Subscription )session.createQuery(
-                    "FROM Subscription WHERE userName = ? AND channelName = ? " + 
-                    "AND type = ?" ).setString( 0, userName ).setString( 1,
-                    channelName ).setString( 2, type ).uniqueResult();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_subscriptions " +
+                    "WHERE channel_name = '" + channelName + "' AND type = '" +
+                    subscriptionType + "';" );
+            while( resultSet.next() ) {
+                int subId = resultSet.getInt( "id" );
+                String user = resultSet.getString( "user_name" );
+                String channel = resultSet.getString( "channel_name" );
+                String nodeAddress = resultSet.getString( "node_address" );
+                String operator = resultSet.getString( "operator_name" );
+                String type = resultSet.getString( "type" );
+                boolean active = resultSet.getBoolean( "active" );
+                boolean synkronized = resultSet.getBoolean( "synkronized" );
+                sub = new Subscription( subId, user, channel, nodeAddress, operator, type, active,
+                        synkronized );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return sub;
+    }
+    /**
+     * Saves subscription object.
+     *
+     * @param sub Subscription to be saved
+     * @return Number of inserted records
+     * @throws SQLException
+     * @throws Exception
+     */
+    public int saveSubscription( Subscription sub ) throws SQLException, Exception {
+        Connection conn = null;
+        int insert = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "INSERT INTO dex_subscriptions (user_name, channel_name, node_address, " + 
+                    "operator_name, type, active, synkronized ) VALUES ('" + sub.getUserName() +
+                    "', '" + sub.getChannelName() + "', '" + sub.getNodeAddress() + "', '" +
+                    sub.getOperatorName() + "', '" + sub.getType() + "', '" + sub.getActive() +
+                    "', '" + sub.getSynkronized() + "');";
+            insert = stmt.executeUpdate( sql ) ;
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to save node connection: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to save node connection: " + e.getMessage() );
             throw e;
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
-        return subs;
+        return insert;
     }
+    /**
+     * Updates subscription object.
+     *
+     * @param sub Subscription to be saved
+     * @return Number of inserted records
+     * @throws SQLException
+     * @throws Exception
+     */
+    public int updateSubscription( String channelName, String subscriptionType, boolean active )
+            throws SQLException, Exception {
+        Connection conn = null;
+        int update = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "UPDATE dex_subscriptions SET active = " + active  + " WHERE " +
+                    "channel_name = '" + channelName + "' AND type = '" + subscriptionType + "';";
+            update = stmt.executeUpdate( sql ) ;
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to save node connection: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to save node connection: " + e.getMessage() );
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return update;
+    }
+    /**
+     * Deletes subscription with a given ID.
+     *
+     * @param id Subscription ID
+     * @return Number of deleted records
+     * @throws SQLException
+     * @throws Exception
+     */
+    public int deleteSubscription( int id ) throws SQLException, Exception {
+        Connection conn = null;
+        int delete = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "DELETE FROM dex_subscriptions WHERE id = " + id + ";";
+            delete = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete subscription: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to delete subscription: " + e.getMessage() );
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return delete;
+    }
+    /**
+     * Deletes subscription identified by a given channel name and type.
+     *
+     * @param channelName Name of subscribed cannel
+     * @param subscriptionType Subscription type
+     * @return Number of deleted records
+     * @throws SQLException
+     * @throws Exception
+     */
+    public int deleteSubscription( String channelName, String subscriptionType )
+            throws SQLException, Exception {
+        Connection conn = null;
+        int delete = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "DELETE FROM dex_subscriptions WHERE channel_name = '" +
+                    channelName + "' AND type = '" + subscriptionType + "';";
+            delete = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete subscription: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to delete subscription: " + e.getMessage() );
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return delete;
+    }
+    /**
+     * Deletes subscription identified by a given user name, channel name and type.
+     *
+     * @param userName Name of the subscriber
+     * @param channelName Name of subscribed cannel
+     * @param subscriptionType Subscription type
+     * @return Number of deleted records
+     * @throws SQLException
+     * @throws Exception
+     */
+    public int deleteSubscription( String userName, String channelName, String subscriptionType )
+            throws SQLException, Exception {
+        Connection conn = null;
+        int delete = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "DELETE FROM dex_subscriptions WHERE user_name = '" + userName + 
+                    "' AND channel_name = '" + channelName + "' AND type = '" + subscriptionType +
+                    "';";
+            delete = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete subscription: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to delete subscription: " + e.getMessage() );
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return delete;
+    } 
     /**
      * Compares two subscription lists based on chosen subscription field values.
      *
@@ -270,7 +370,7 @@ public class SubscriptionManager {
                         !s1.get( i ).getNodeAddress().equals( s2.get( i ).getNodeAddress() ) ||
                         !s1.get( i ).getOperatorName().equals( s2.get( i ).getOperatorName() ) ||
                         !s1.get( i ).getType().equals( s2.get( i ).getType() ) ||
-                        s1.get( i ).getSelected() != s2.get( i ).getSelected() ) {
+                        s1.get( i ).getActive() != s2.get( i ).getActive() ) {
                     res = false;
                 }
             }
@@ -289,7 +389,7 @@ public class SubscriptionManager {
         if( !s1.getChannelName().equals( s2.getChannelName() ) ||
                 !s1.getNodeAddress().equals( s2.getNodeAddress() ) ||
                 !s1.getOperatorName().equals( s2.getOperatorName() ) ||
-                !s1.getType().equals( s2.getType() ) || s1.getSelected() != s2.getSelected() ) {
+                !s1.getType().equals( s2.getType() ) || s1.getActive() != s2.getActive() ) {
             res = false;
         }
         return res;

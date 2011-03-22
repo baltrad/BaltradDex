@@ -66,7 +66,7 @@ Author     : szewczenko
                             </div>
                             <div id="table">
                                 <div id="radartable">
-                                    <div class="hdr">
+                                    <div class="table-hdr">
                                         <div class="station">
                                             Radar station
                                         </div>
@@ -75,7 +75,7 @@ Author     : szewczenko
                                         </div>
                                     </div>
                                     <c:forEach var="channel" items="${registered_channels}">
-                                        <div class="row">
+                                        <div class="table-row">
                                             <div class="station">
                                                 <a href="saveLocalChannel.htm?channelId=${channel.id}">
                                                     <c:out value="${channel.channelName}"/>

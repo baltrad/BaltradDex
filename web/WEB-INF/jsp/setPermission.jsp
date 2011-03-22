@@ -55,7 +55,7 @@ Author     : szewczenko
                     <form method="post">
                         <div id="table">
                             <div id="selectusers">
-                                <div class="hdr">
+                                <div class="table-hdr">
                                     <div class="user">
                                         User name
                                     </div>
@@ -67,7 +67,7 @@ Author     : szewczenko
                                     </div>
                                 </div>
                                 <c:forEach var="user" items="${users}">
-                                    <div class="row">
+                                    <div class="table-row">
                                         <div class="user">
                                             <c:out value="${user.name}"/>
                                         </div>
@@ -76,7 +76,7 @@ Author     : szewczenko
                                         </div>
                                         <div class="check">
                                             <c:choose>
-                                                <c:when test="${user.selected == true}">
+                                                <c:when test="${user.checked == true}">
                                                     <input type="checkbox" name="selected_users"
                                                         value="${user.id}" checked/>
                                                 </c:when>

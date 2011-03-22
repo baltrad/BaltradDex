@@ -60,15 +60,12 @@ public class ApplicationSecurityManager {
         } else {
             String formUserName = formUser.getName().trim();
             String formUserPassword = MessageDigestUtil.createHash( formUser.getPassword().trim() );
-            String formUserEmail = formUser.getEmail().trim();
 
             String dbUserName = dbUser.getName().trim();
             String dbUserPassword = dbUser.getPassword().trim();
-            String dbUserEmail = dbUser.getEmail().trim();
 
-            if( formUserName.equals( dbUserName ) && formUserPassword.equals( dbUserPassword )
-                    && formUserEmail.equals( dbUserEmail ) && (
-                    dbUser.getRoleName().equals( User.ROLE_ADMIN ) ||
+            if( formUserName.equals( dbUserName ) && formUserPassword.equals( dbUserPassword ) && 
+                    ( dbUser.getRoleName().equals( User.ROLE_ADMIN ) ||
                     dbUser.getRoleName().equals( User.ROLE_OPERATOR ) ||
                     dbUser.getRoleName().equals( User.ROLE_USER ) ) ) {
                 return true;
@@ -92,14 +89,12 @@ public class ApplicationSecurityManager {
         } else {
             String sessionUserName = sessionUser.getName().trim();
             String sessionUserPassword = sessionUser.getPassword().trim();
-            String sessionUserEmail = sessionUser.getEmail().trim();
 
             String dbUserName = dbUser.getName().trim();
             String dbUserPassword = dbUser.getPassword().trim();
-            String dbUserEmail = dbUser.getEmail().trim();
 
             if( sessionUserName.equals( dbUserName ) && sessionUserPassword.equals(
-                    dbUserPassword ) && sessionUserEmail.equals( dbUserEmail ) ) {
+                    dbUserPassword ) ) {
                 return true;
             } else {
                 return false;

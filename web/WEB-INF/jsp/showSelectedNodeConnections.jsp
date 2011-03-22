@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -52,41 +52,47 @@ Author     : szewczenko
                     <div id="text-box">
                         Warning: The following node connection(s) will be removed from the system.
                     </div>
-                    <div id="table">
-                        <form method="post" action="showRemovedNodeConnections.htm">
-                            <display:table name="selected_node_connections" id="connection"
-                                defaultsort="1" requestURI="showNodeConnections.htm"
-                                cellpadding="0" cellspacing="2" export="false"
-                                class="tableborder">
-                                <display:column sortable="true" title="Connection"
-                                    sortProperty="connectionName" paramId="connectionName"
-                                    paramProperty="connectionName"
-                                    class="tdcenter" value="${connection.connectionName}">
-                                </display:column>
-                                <display:column sortable="true" title="Node address"
-                                    sortProperty="nodeAddress" paramId="nodeAddress"
-                                    paramProperty="nodeAddress" class="tdcenter"
-                                    value="${connection.nodeAddress}">
-                                </display:column>
-                                <display:column sortable="true" title="User account"
-                                    sortProperty="userName" paramId="userName"
-                                    paramProperty="userName" class="tdcenter"
-                                    value="${connection.userName}">
-                                </display:column>
-                            </display:table>
-                            <div class="footer">
-                                <div class="right">
-                                    <button class="rounded" type="button"
-                                        onclick="history.go(-1);">
-                                        <span>Back</span>
-                                    </button>
-                                    <button class="rounded" type="submit">
-                                        <span>Submit</span>
-                                    </button>
+                    <form method="post" action="showRemovedNodeConnections.htm">
+                        <div id="table">
+                            <div id="selectedconnections">
+                                <div class="table-hdr">
+                                    <div class="name">
+                                        Name
+                                    </div>
+                                    <div class="address">
+                                        Address
+                                    </div>
+                                    <div class="user">
+                                        User name
+                                    </div>
+                                </div>
+                                <c:forEach var="conn" items="${selected_node_connections}">
+                                    <div class="table-row">
+                                        <div class="name">
+                                            <c:out value="${conn.connectionName}"/>
+                                        </div>
+                                        <div class="address">
+                                            <c:out value="${conn.shortAddress}"/>
+                                        </div>
+                                        <div class="user">
+                                            <c:out value="${conn.userName}"/>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                                <div class="footer">
+                                    <div class="right">
+                                        <button class="rounded" type="button"
+                                            onclick="history.go(-1);">
+                                            <span>Back</span>
+                                        </button>
+                                        <button class="rounded" type="submit">
+                                            <span>Submit</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
                 <div id="clear"></div>
             </div>

@@ -53,21 +53,29 @@ List of adaptors
                         List of adaptors. Press on adaptor name to modify/delete or press
                         Create to create a new adaptor.
                     </div>
-                    <div id="table">
-                        <form name="createAdaptorForm" action="createadaptor.htm">
-                            <display:table name="adaptors" id="adaptor" defaultsort="1"
-                                requestURI="adaptors.htm" cellpadding="5" cellspacing="0"
-                                export="false" class="tableborder">
-                              <display:column sortable="true" title="Name"
-                                  sortProperty="name" href="showadaptor.htm" paramId="name"
-                                  paramProperty="name" class="tdcenter" value="${adaptor.name}">
-                              </display:column>
-                              <display:column sortable="true" title="Type"
-                                  sortProperty="type" paramId="type" paramProperty="type"
-                                  class="tdcenter" value="${adaptor.type}">
-                              </display:column>
-                            </display:table>
-                            <div class="footer">
+                    <form name="createAdaptorForm" action="createadaptor.htm">
+                        <div id="table">
+                            <div id="adaptors">
+                                <div class="table-hdr">
+                                    <div class="name">
+                                        Name
+                                    </div>
+                                    <div class="type">
+                                        Type
+                                    </div>
+                                </div>
+                                <c:forEach var="adaptor" items="${adaptors}">
+                                    <div class="table-row">
+                                        <div class="name">
+                                            <c:out value="${adaptor.name}"/>
+                                        </div>
+                                        <div class="type">
+                                            <c:out value="${adaptor.type}"/>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                              <div class="footer">
                                 <div class="right">
                                     <button class="rounded" type="button" onclick="history.go(-1);">
                                         <span>Back</span>
@@ -77,11 +85,11 @@ List of adaptors
                                     </button>
                                 </div>
                             </div>
-                        </form>
-                        <%if (request.getAttribute("emessage") != null) {%>
-                        <div class="beast-error"><%=request.getAttribute("emessage")%></div>
-                        <%}%>
-                    </div>
+                        </div>
+                    </form>
+                    <%if (request.getAttribute("emessage") != null) {%>
+                    <div class="beast-error"><%=request.getAttribute("emessage")%></div>
+                    <%}%>
                 </div>
                 <div id="clear"></div>
             </div>

@@ -26,8 +26,7 @@ import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.config.model.Configuration;
 import eu.baltrad.dex.core.model.NodeConnection;
 
-import org.hibernate.HibernateException;
-
+import java.sql.SQLException;
 import java.io.File;
 import java.io.InputStream;
 import java.io.FileInputStream;
@@ -104,7 +103,10 @@ public class InitAppUtil {
         Configuration conf = null;
         try {
             conf = configurationManager.getConfiguration( ConfigurationManager.CONF_REC_ID );
-        } catch( HibernateException e ) {
+        } catch( SQLException e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while reading configuration"
+                    + " from database: " + e.getMessage() );
+        } catch( Exception e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while reading configuration"
                     + " from database: " + e.getMessage() );
         }

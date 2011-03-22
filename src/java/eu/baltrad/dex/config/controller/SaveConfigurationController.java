@@ -74,7 +74,15 @@ public class SaveConfigurationController extends SimpleFormController {
     @Override
     protected Object formBackingObject( HttpServletRequest request ) {
         Configuration conf = null;
-        conf = configurationManager.getConfiguration( ConfigurationManager.CONF_REC_ID );
+        try {
+            conf = configurationManager.getConfiguration( ConfigurationManager.CONF_REC_ID );
+        } catch( SQLException e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while reading configuration"
+                    + " from database: " + e.getMessage() );
+        } catch( Exception e ) {
+            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while reading configuration"
+                    + " from database: " + e.getMessage() );
+        }
         if( conf == null ) {
             conf = new Configuration( "Short node name", PRIMARY_NODE,
                     "Short node address", "8084", "Host organization name", "Host organization " +

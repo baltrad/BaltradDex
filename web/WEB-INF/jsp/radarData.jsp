@@ -106,7 +106,7 @@ Author     : szewczenko
                                 <div id="table-control">
                                 <c:set var="curPage" scope="page" value="<%=currentPage%>"/>
                                     <form action="radarData.htm" method="post">
-                                        <input type="submit" name="pagenum" value="First">
+                                        <input type="submit" name="pagenum" value="<<">
                                         <span></span>
                                         <input type="submit" name="pagenum" value="<">
                                         <span></span>
@@ -126,11 +126,11 @@ Author     : szewczenko
                                         <span></span>
                                         <input type="submit" name="pagenum" value=">">
                                         <span></span>
-                                        <input type="submit" name="pagenum" value="Last">
+                                        <input type="submit" name="pagenum" value=">>">
                                     </form>
                                 </div>
                                 <div id="producttable">
-                                    <div class="hdr">
+                                    <div class="table-hdr">
                                         <div class="date">
                                             Date
                                         </div>
@@ -148,7 +148,7 @@ Author     : szewczenko
                                         </div>
                                     </div>
                                     <c:forEach var="entry" items="${file_entries}">
-                                        <div class="row">
+                                        <div class="table-row">
                                             <div class="date">
                                                 <fmt:formatDate pattern="yyyy-MM-dd"
                                                     value="${entry.timeStamp}"/>

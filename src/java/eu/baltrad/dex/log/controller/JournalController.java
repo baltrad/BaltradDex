@@ -71,11 +71,11 @@ public class JournalController implements Controller, ITableScroller {
         String pageNum = request.getParameter( PAGE_NUMBER );
         List<LogEntry> entries = null;
         if( pageNum != null ) {
-            if( pageNum.matches( "First" ) ) {
+            if( pageNum.matches( "<<" ) ) {
                 firstPage();
                 entries = logManager.getEntries( 0, LogManager.ENTRIES_PER_PAGE );
             } else {
-                if( pageNum.matches( "Last" ) ) {
+                if( pageNum.matches( ">>" ) ) {
                     lastPage();
                 } else if( pageNum.matches( ">" ) ) {
                     nextPage();

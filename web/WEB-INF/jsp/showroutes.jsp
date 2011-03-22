@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -52,96 +52,101 @@ List of routes
                     <div id="text-box">
                         List of routes. Create or choose a route.
                     </div>
-                    <div id="table">
-                        <form name="createRouteForm" action="createroute.htm">
-                            <display:table name="routes" id="route" defaultsort="1"
-                                requestURI="showroutes.htm" cellpadding="5" cellspacing="0"
-                                export="false" class="tableborder">
-                              <c:choose>
-                                <c:when test="${route.active == true}">
-                                  <display:column sortable="false" title="Active" class="tdcenter">
-                                    <img src="includes/images/green_bulb.png" width="12" height="12"/>
-                                  </display:column>
-                                </c:when>
-                                <c:otherwise>
-                                  <display:column sortable="false" title="Active" class="tdcenter">
-                                    <img src="includes/images/red_bulb.png" width="12" height="12"/>
-                                  </display:column>
-                                </c:otherwise>
-                              </c:choose>
-                              <display:column sortable="true" title="Name"
-                                sortProperty="name" href="showroute.htm" paramId="name" paramProperty="name"
-                                class="tdcenter" value="${route.name}">
-                              </display:column>
-                              <c:choose>
-                                <c:when test="${route.ruleType == 'groovy'}">
-                                  <display:column sortable="true" title="Type"
-                                    sortProperty="type" paramId="type" paramProperty="type"
-                                    class="tdcenter" value="Script">
-                                  </display:column>
-                                </c:when>
-                                <c:when test="${route.ruleType == 'blt_volume'}">
-                                  <display:column sortable="true" title="Type"
-                                    sortProperty="type" paramId="type" paramProperty="type"
-                                    class="tdcenter" value="Volume">
-                                  </display:column>
-                                </c:when>
-                                <c:when test="${route.ruleType == 'composite'}">
-                                  <display:column sortable="True" title="Type"
-                                    sortProperty="type" paramId="type" paramProperty="type"
-                                    class="tdcenter" value="Composite">
-                                  </display:column>
-                                </c:when>
-                                <c:when test="${route.ruleType == 'bdb_trim_age'}">
-                                  <display:column sortable="True" title="Type"
-                                    sortProperty="type" paramId="type" paramProperty="type"
-                                    class="tdcenter" value="BdbTrimAge">
-                                  </display:column>
-                                </c:when>
-                                <c:when test="${route.ruleType == 'bdb_trim_count'}">
-                                  <display:column sortable="True" title="Type"
-                                    sortProperty="type" paramId="type" paramProperty="type"
-                                    class="tdcenter" value="BdbTrimCount">
-                                  </display:column>
-                                </c:when>
-                                <c:otherwise>
-                                  <display:column sortable="true" title="Type"
-                                    sortProperty="type" paramId="type" paramProperty="type"
-                                    class="tdcenter" value="${route.ruleType}">
-                                  </display:column>
-                                </c:otherwise>
-                              </c:choose>
-                              <display:column sortable="true" title="Description"
-                                sortProperty="description" paramId="description" paramProperty="description"
-                                class="tdcenter" value="${route.description}">
-                              </display:column>
-                            </display:table>
+                    <form name="createRouteForm" action="createroute.htm">
+                        <div id="table">
+                            <div id="showroutes">
+                                <div class="table-hdr">
+                                    <div class="active">
+                                        Active
+                                    </div>
+                                    <div class="name">
+                                        Name
+                                    </div>
+                                    <div class="type">
+                                        Type
+                                    </div>
+                                    <div class="description">
+                                        Description
+                                    </div>
+                                </div>
+                                <c:forEach var="route" items="${routes}">
+                                    <div class="table-row">
+                                        <div class="active">
+                                            <c:choose>
+                                                <c:when test="${route.active == true}">
+                                                    <img src="includes/images/green_bulb.png"
+                                                         width="12" height="12"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <img src="includes/images/red_bulb.png"
+                                                         width="12" height="12"/>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                        <div class="name">
+                                            <a href="showroute.htm?name=${route.name}">
+                                                <c:out value="${route.name}"/>
+                                            </a>
+                                        </div>
+                                        <div class="type">
+                                            <c:choose>
+                                                <c:when test="${route.ruleType == 'groovy'}">
+                                                    <c:out value="Script"/>
+                                                </c:when>
+                                                <c:when test="${route.ruleType == 'blt_volume'}">
+                                                    <c:out value="Volume"/>
+                                                </c:when>
+                                                <c:when test="${route.ruleType == 'composite'}">
+                                                  <c:out value="Composite"/>
+                                                </c:when>
+                                                <c:when test="${route.ruleType == 'bdb_trim_age'}">
+                                                    <c:out value="BdbTrimAge"/>
+                                                </c:when>
+                                                <c:when test="${route.ruleType == 'bdb_trim_count'}">
+                                                    <c:out value="BdbTrimCount"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <c:out value="${route.ruleType}"/>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                        <div class="description">
+                                            <c:out value="${route.description}"/>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
                             <div class="footer">
                                 <div class="right">
-                                    <button class="rounded" name="submitButton" type="submit" value="Script">
+                                    <button class="rounded" name="submitButton" type="submit"
+                                            value="Script">
                                         <span>Script</span>
                                     </button>
-                                    <button class="rounded" name="submitButton" type="submit" value="Composite">
+                                    <button class="rounded" name="submitButton" type="submit"
+                                            value="Composite">
                                         <span>Composite</span>
                                     </button>
-                                    <button class="rounded" name="submitButton" type="submit" value="Volume">
+                                    <button class="rounded" name="submitButton" type="submit"
+                                            value="Volume">
                                         <span>Volume</span>
                                     </button>
                                 </div>
 				<div class="right">
-                                    <button class="rounded" name="submitButton" type="submit" value="BdbTrimCount">
+                                    <button class="rounded" name="submitButton" type="submit"
+                                            value="BdbTrimCount">
                                         <span>BdbTrimCount</span>
                                     </button>
-                                    <button class="rounded" name="submitButton" type="submit" value="BdbTrimAge">
+                                    <button class="rounded" name="submitButton" type="submit"
+                                            value="BdbTrimAge">
                                         <span>BdbTrimAge</span>
                                     </button>
 				</div>
                             </div>
-                          </form>
-                        <%if (request.getAttribute("emessage") != null) {%>
-                            <div class="routerrerror"><%=request.getAttribute("emessage")%></div>
-                        <%}%>
-                    </div>
+                        </div>
+                      </form>
+                    <%if (request.getAttribute("emessage") != null) {%>
+                        <div class="routerrerror"><%=request.getAttribute("emessage")%></div>
+                    <%}%>
                 </div>
                 <div id="clear"></div>
             </div>

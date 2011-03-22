@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -25,14 +25,44 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@page import="java.util.List" %>
+
+<%@page import="eu.baltrad.dex.register.model.DeliveryRegisterManager"%>
+<%@page import="eu.baltrad.dex.register.controller.RegisterController"%>
+<%@page import="java.util.List"%>
+
 <%
     // get delivery register
-    List deliveryRegister = ( List )request.getAttribute( "register_entries" );
+    List deliveryRegister = ( List )request.getAttribute( "entries" );
     if( deliveryRegister == null || deliveryRegister.size() <= 0 ) {
         request.getSession().setAttribute( "register_status", 0 );
     } else {
         request.getSession().setAttribute( "register_status", 1 );
+    }
+    DeliveryRegisterManager manager = new DeliveryRegisterManager();
+    RegisterController controller = new RegisterController();
+    long numEntries = manager.countEntries();
+    int numPages = ( int )Math.ceil( numEntries / DeliveryRegisterManager.ENTRIES_PER_PAGE );
+    if( numPages < 1 ) {
+        numPages = 1;
+    }
+    int currentPage = controller.getCurrentPage();
+    int scrollStart = ( DeliveryRegisterManager.SCROLL_RANGE - 1 ) / 2;
+    int firstPage = 1;
+    int lastPage = DeliveryRegisterManager.SCROLL_RANGE;
+    if( numPages <= DeliveryRegisterManager.SCROLL_RANGE && currentPage <=
+            DeliveryRegisterManager.SCROLL_RANGE ) {
+        firstPage = 1;
+        lastPage = numPages;
+    }
+    if( numPages > DeliveryRegisterManager.SCROLL_RANGE && currentPage > scrollStart &&
+            currentPage < numPages - scrollStart ) {
+        firstPage = currentPage - scrollStart;
+        lastPage = currentPage + scrollStart;
+    }
+    if( numPages > DeliveryRegisterManager.SCROLL_RANGE && currentPage > scrollStart &&
+            currentPage >= numPages - ( DeliveryRegisterManager.SCROLL_RANGE - 1 ) ) {
+        firstPage = numPages - ( DeliveryRegisterManager.SCROLL_RANGE - 1 );
+        lastPage = numPages;
     }
 %>
 
@@ -65,35 +95,70 @@ Author     : szewczenko
                                 Data delivery register.
                             </div>
                             <div id="table">
-                                <display:table name="register_entries" id="entry" defaultsort="1"
-                                    requestURI="showRegister.htm" cellpadding="0" cellspacing="2"
-                                    export="false" class="tableborder" pagesize="12">
-                                    <display:column sortable="true" sortProperty="timeStamp"
-                                        title="Date" paramId="timeStamp"
-                                        paramProperty="timeStamp" class="tdcheck"
-                                        value="${fn:substring(entry.timeStamp, 0, 10)}">
-                                    </display:column>
-                                    <display:column sortable="true" sortProperty="timeStamp"
-                                        title="Time" paramId="timeStamp"
-                                        paramProperty="timeStamp" class="tdcheck"
-                                        value="${fn:substring(entry.timeStamp, 10, 19)}">
-                                    </display:column>
-                                    <display:column sortable="true" sortProperty="userName"
-                                        title="Recipient" paramId="userName"
-                                        paramProperty="userName" class="tdcheck"
-                                        value="${entry.userName}">
-                                    </display:column>
-                                    <display:column sortable="true" sortProperty="uuid"
-                                        title="File identity string" paramId="uuid"
-                                        paramProperty="uuid" class="tdcenter"
-                                        value="${entry.uuid}">
-                                    </display:column>
-                                    <display:column sortable="true" sortProperty="deliveryStatus"
-                                        title="Status" paramId="deliveryStatus"
-                                        paramProperty="deliveryStatus" class="tdcheck"
-                                        value="${entry.deliveryStatus}">
-                                    </display:column>
-                                </display:table>
+                                <div id="table-control">
+                                    <c:set var="curPage" scope="page" value="<%=currentPage%>"/>
+                                    <form action="showRegister.htm" method="post">
+                                        <input type="submit" name="pagenum" value="<<">
+                                        <span></span>
+                                        <input type="submit" name="pagenum" value="<">
+                                        <span></span>
+                                        <c:forEach var="i" begin="<%=firstPage%>" end="<%=lastPage%>"
+                                                   step="1" varStatus ="status">
+                                                <c:choose>
+                                                    <c:when test="${curPage == i}">
+                                                        <input style="background:#FFFFFF" type="submit"
+                                                               name="pagenum" value="${i}">
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <input type="submit" name="pagenum" value="${i}">
+                                                    </c:otherwise>
+                                                </c:choose>
+
+                                            </c:forEach>
+                                        <span></span>
+                                        <input type="submit" name="pagenum" value=">">
+                                        <span></span>
+                                        <input type="submit" name="pagenum" value=">>">
+                                    </form>
+                                </div>
+                                <div id="register">
+                                    <div class="table-hdr">
+                                        <div class="date">
+                                            Date
+                                        </div>
+                                        <div class="time">
+                                            Time
+                                        </div>
+                                        <div class="recipient">
+                                            Recipient
+                                        </div>
+                                        <div class="uuid">
+                                            File signature
+                                        </div>
+                                        <div class="status">
+                                            Delivery status
+                                        </div>
+                                    </div>
+                                    <c:forEach var="entry" items="${entries}">
+                                        <div class="table-row">
+                                            <div class="date">
+                                                <c:out value="${fn:substring(entry.timeStamp, 0, 10)}"/>
+                                            </div>
+                                            <div class="time">
+                                                <c:out value="${fn:substring(entry.timeStamp, 10, 19)}"/>
+                                            </div>
+                                            <div class="recipient">
+                                                <c:out value="${entry.userName}"/>
+                                            </div>
+                                            <div class="uuid">
+                                                <c:out value="${entry.uuid}"/>
+                                            </div>
+                                            <div class="status">
+                                                <c:out value="${entry.deliveryStatus}"/>
+                                            </div> 
+                                        </div>
+                                    </c:forEach>
+                                </div>
                             </div>
                         </c:when>
                         <c:otherwise>

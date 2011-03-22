@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -87,37 +87,42 @@ Author     : szewczenko
                         </div>
                         <c:choose>
                             <c:when test="${not empty local_subscriptions}">
-                                <div id="status-table">
-                                    <display:table name="local_subscriptions" id="local_sub"
-                                        defaultsort="1" cellpadding="0" cellspacing="2" 
-                                        export="false" class="tableborder" requestURI="home.htm">
-                                        <display:column sortable="true" title="Radar station"
-                                            sortProperty="channelName" paramId="channelName"
-                                            paramProperty="channelName"
-                                            class="tdcenter" value="${local_sub.channelName}">
-                                        </display:column>
-                                        <display:column sortable="true" title="Operator"
-                                            sortProperty="operatorName" paramId="operatorName"
-                                            paramProperty="operatorName" class="tdcenter"
-                                            value="${local_sub.operatorName}">
-                                        </display:column>
-                                        <c:choose>
-                                            <c:when test="${local_sub.selected == true}">
-                                                <display:column sortable="false" title="Status"
-                                                    class="tdcheck">
-                                                    <img src="includes/images/green_bulb.png"
-                                                         alt="green_bulb"/>
-                                                </display:column>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <display:column sortable="false" title="Status"
-                                                    class="tdcheck">
-                                                    <img src="includes/images/red_bulb.png"
-                                                         alt="red_bulb"/>
-                                                </display:column>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </display:table>
+                                <div id="table">
+                                    <div id="statustable">
+                                        <div class="table-hdr">
+                                            <div class="station">
+                                                Radar station
+                                            </div>
+                                            <div class="operator">
+                                                Operator
+                                            </div>
+                                            <div class="active">
+                                                Active
+                                            </div>
+                                        </div>
+                                        <c:forEach var="sub" items="${local_subscriptions}">
+                                            <div class="table-row">
+                                                <div class="station">
+                                                    <c:out value="${sub.channelName}"/>
+                                                </div>
+                                                <div class="operator">
+                                                    <c:out value="${sub.operatorName}"/>
+                                                </div>
+                                                <div class="active">
+                                                <c:choose>
+                                                    <c:when test="${sub.active == true}">
+                                                        <img src="includes/images/green_bulb.png"
+                                                            alt="active"/>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <img src="includes/images/red_bulb.png"
+                                                            alt="deactivated"/>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                    </div>
                                 </div>
                             </c:when>
                             <c:otherwise>
@@ -138,21 +143,27 @@ Author     : szewczenko
                         </div>
                         <c:choose>
                             <c:when test="${not empty remote_subscriptions}">
-                                <div id="status-table">
-                                    <display:table name="remote_subscriptions" id="remote_sub"
-                                        defaultsort="1" cellpadding="0" cellspacing="2" 
-                                        export="false" class="tableborder" requestURI="home.htm">
-                                        <display:column sortable="true" title="Radar station"
-                                            sortProperty="channelName" paramId="channelName"
-                                            paramProperty="channelName"
-                                            class="tdcenter" value="${remote_sub.channelName}">
-                                        </display:column>
-                                        <display:column sortable="true" title="User name"
-                                            sortProperty="userName" paramId="userName"
-                                            paramProperty="userName"
-                                            class="tdcenter" value="${remote_sub.userName}">
-                                        </display:column>
-                                    </display:table>
+                                <div id="table">
+                                    <div id="statustable">
+                                        <div class="table-hdr">
+                                            <div class="station">
+                                                Radar station
+                                            </div>
+                                            <div class="user">
+                                                User name
+                                            </div>
+                                        </div>
+                                        <c:forEach var="sub" items="${remote_subscriptions}">
+                                            <div class="table-row">
+                                                <div class="station">
+                                                    <c:out value="${sub.channelName}"/>
+                                                </div>
+                                                <div class="user">
+                                                    <c:out value="${sub.userName}"/>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                    </div>
                                 </div>
                             </c:when>
                             <c:otherwise>

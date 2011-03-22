@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -67,63 +67,67 @@ Author     : szewczenko
                                 radar station.
                                 Click on radar name in order to browse data from this radar.
                             </div>
-                            <div id="table">
-                                <form action="showSelectedSubscriptions.htm">
-                                    <display:table name="subscriptions" id="subscription" 
-                                        cellpadding="0" cellspacing="2" export="false"
-                                        class="tableborder" requestURI="showSubscriptions.htm">
-                                        <display:column sortable="true" title="Radar station"
-                                            href="radarData.htm" sortProperty="channelName"
-                                            paramId="channelName" paramProperty="channelName"
-                                            class="tdcenter" value="${subscription.channelName}">
-                                        </display:column>
-                                         <c:choose>
-                                            <c:when test="${subscription.synkronized == true}">
-                                                <display:column sortable="false"
-                                                    title="Status" class="tdcheck">
-                                                    <img src="includes/images/green_bulb.png"
-                                                         alt="green_bulb"/>
-                                                </display:column>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <display:column sortable="false"
-                                                    title="Status" class="tdcheck">
-                                                    <img src="includes/images/red_bulb.png"
-                                                         alt="red_bulb"/>
-                                                </display:column>
-                                            </c:otherwise>
-                                        </c:choose>
-                                        <display:column sortable="true" title="Operator"
-                                            sortProperty="operatorName" paramId=""
-                                            paramProperty="operatorName" class="tdcenter"
-                                            value="${subscription.operatorName}">
-                                        </display:column>
-                                        <c:choose>
-                                            <c:when test="${subscription.selected == true}">
-                                                <display:column sortable="false"
-                                                    title="Subscription" class="tdcheck">
-                                                    <input type="checkbox" name="selected_channels"
-                                                    value="${subscription.channelName}" checked/>
-                                                </display:column>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <display:column sortable="false"
-                                                    title="Subscription" class="tdcheck">
-                                                    <input type="checkbox" name="selected_channels"
-                                                    value="${subscription.channelName}"/>
-                                                </display:column>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </display:table>
-                                    <div class="footer">
-                                        <div class="right">
-                                            <button class="rounded" type="submit">
-                                                <span>Submit</span>
-                                            </button>
+                            <form action="showSelectedSubscriptions.htm">
+                                <div id="table">
+                                    <div id="subscriptions">
+                                        <div class="table-hdr">
+                                            <div class="station">
+                                                Radar station
+                                            </div>
+                                            <div class="operator">
+                                                Operator
+                                            </div>
+                                            <div class="synkronized">
+                                                Channel status
+                                            </div>
+                                            <div class="active">
+                                                Active
+                                            </div>
+                                        </div>
+                                        <c:forEach var="sub" items="${subscriptions}">
+                                            <div class="table-row">
+                                                <div class="station">
+                                                    <c:out value="${sub.channelName}"/>
+                                                </div>
+                                                <div class="operator">
+                                                    <c:out value="${sub.operatorName}"/>
+                                                </div>
+                                                <div class="synkronized">
+                                                <c:choose>
+                                                    <c:when test="${sub.synkronized == true}">
+                                                        <img src="includes/images/green_bulb.png"
+                                                                 alt="active"/>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <img src="includes/images/red_bulb.png"
+                                                                 alt="deactivated"/>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                                </div>
+                                                <div class="active">
+                                                <c:choose>
+                                                    <c:when test="${sub.active == true}">
+                                                        <input type="checkbox" name="selected_channels"
+                                                            value="${sub.channelName}" checked/>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <input type="checkbox" name="selected_channels"
+                                                            value="${sub.channelName}"/>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                        <div class="footer">
+                                            <div class="right">
+                                                <button class="rounded" type="submit">
+                                                    <span>Submit</span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         </c:when>
                         <c:otherwise>
                             <div class="message">

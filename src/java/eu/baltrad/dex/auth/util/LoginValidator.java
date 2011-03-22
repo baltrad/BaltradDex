@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -62,9 +62,7 @@ public class LoginValidator implements Validator {
         User dbUser = userManager.getUserByName( formUser.getName() );
         String userName = formUser.getName().trim();
         String password = formUser.getPassword().trim();
-        String email = formUser.getEmail().trim();
-        if( userName == null || password == null || email == null || userName.isEmpty()
-                || password.isEmpty() || email.isEmpty() ||
+        if( userName == null || password == null || userName.isEmpty() || password.isEmpty() ||
                 ApplicationSecurityManager.authenticateFormUser( formUser, dbUser ) == false ) {
             errors.rejectValue( "name", "error.login.invalid" );
         }

@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -78,36 +78,44 @@ Author     : szewczenko
                                 Subscribe a desired remote radar station by selecting
                                 a corresponding check box.
                             </div>
-                            <div id="table">
-                                <form action="selectedRemoteRadars.htm">
-                                    <display:table name="channels" id="channel" defaultsort="1"
-                                        requestURI="remoteRadars.htm" cellpadding="0" 
-                                        cellspacing="2" export="false" class="tableborder">
-                                        <display:column sortable="true" title="Radar station"
-                                            sortProperty="channelName" paramId="channelName"
-                                            paramProperty="channelName" class="tdcenter"
-                                            value="${channel.channelName}">
-                                        </display:column>
-                                        <display:column sortable="true" title="WMO number"
-                                            sortProperty="wmoNumber" paramId="wmoNumber"
-                                            paramProperty="wmoNumber"
-                                            class="tdcenter" value="${channel.wmoNumber}">
-                                        </display:column>
-                                        <display:column sortable="false" title="Select"
-                                            class="tdcheck"><input type="checkbox" 
-                                               name="selected_channels"
-                                               value="${channel.channelName}"/>
-                                        </display:column>
-                                    </display:table>
-                                    <div class="footer">
-                                        <div class="right">
-                                            <button class="rounded" type="submit">
-                                                <span>Submit</span>
-                                            </button>
+                            <form action="selectedRemoteRadars.htm">
+                                <div id="table">
+                                    <div id="selectradars">
+                                        <div class="table-hdr">
+                                            <div class="station">
+                                                Radar station
+                                            </div>
+                                            <div class="wmo">
+                                                WMO number
+                                            </div>
+                                            <div class="check">
+                                                Select
+                                            </div>
+                                        </div>
+                                        <c:forEach var="channel" items="${channels}">
+                                            <div class="table-row">
+                                                <div class="station">
+                                                    <c:out value="${channel.channelName}"/>
+                                                </div>
+                                                <div class="wmo">
+                                                    <c:out value="${channel.wmoNumber}"/>
+                                                </div>
+                                                <div class="check">
+                                                    <input type="checkbox" name="selected_channels"
+                                                        value="${channel.channelName}"/>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                        <div class="footer">
+                                            <div class="right">
+                                                <button class="rounded" type="submit">
+                                                    <span>Submit</span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </form>
-                            </div>
+                                </div>
+                            </form>
                         </c:when>
                         <c:when test="${remote_node_status == 1}">
                             <div class="message">

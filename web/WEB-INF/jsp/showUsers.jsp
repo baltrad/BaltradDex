@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -25,6 +25,15 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+<%@page import="java.util.List" %>
+<%
+    List users = ( List )request.getAttribute( "users" );
+    if( users == null || users.size() <= 0 ) {
+        request.getSession().setAttribute( "users_status", 0 );
+    } else {
+        request.getSession().setAttribute( "users_status", 1 );
+    }
+%>
 
 <html>
     <head>
@@ -49,44 +58,83 @@ Author     : szewczenko
                         <div class="right">
                         </div>
                     </div>
-                    <div id="text-box">
-                        Select user accounts to be be removed. Confirm account removal with Submit
-                        button.
-                    </div>
-                    <div id="table">
-                        <form action="showSelectedUsers.htm">
-                            <display:table name="users" id="user" defaultsort="1"
-                                requestURI="showUsers.htm" cellpadding="0" cellspacing="2"
-                                export="false" class="tableborder">
-                                <display:column sortable="true" title="User name"
-                                    sortProperty="name" class="tdcenter"
-                                    value="${user.name}">
-                                </display:column>
-                                <display:column sortable="true" title="Role" sortProperty="role"
-                                    class="tdcenter" value="${user.roleName}">
-                                </display:column>
-                                <display:column sortable="true" title="Organization"
-                                    sortProperty="factory" class="tdcenter"
-                                    value="${user.factory}">
-                                </display:column>
-                                <display:column sortable="false" title="Select" class="tdcheck">
-                                    <input type="checkbox" name="selected_users"
-                                        value="${user.id}"/>
-                                </display:column>
-                            </display:table>
-                            <div class="footer">
-                                <div class="right">
-                                    <button class="rounded" type="button"
-                                        onclick="window.location='configuration.htm'">
-                                        <span>Back</span>
-                                    </button>
-                                    <button class="rounded" type="submit">
-                                        <span>Submit</span>
-                                    </button>
+                    <c:choose>
+                        <c:when test="${users_status == 1}">
+                            <div id="text-box">
+                                Select user accounts to be be removed. Confirm account removal
+                                with Submit button.
+                            </div>
+                            <form action="showSelectedUsers.htm">
+                                <div id="table">
+                                    <div id="showusers">
+                                        <div class="table-hdr">
+                                            <div class="name">
+                                                User name
+                                            </div>
+                                            <div class="role">
+                                                Role
+                                            </div>
+                                            <div class="factory">
+                                                Organization
+                                            </div>
+                                            <div class="check">
+                                                Select
+                                            </div>
+                                        </div>
+                                        <c:forEach var="user" items="${users}">
+                                            <div class="table-row">
+                                                <div class="name">
+                                                   <c:out value="${user.name}"/>
+                                                </div>
+                                                <div class="role">
+                                                    <c:out value="${user.roleName}"/>
+                                                </div>
+                                                <div class="factory">
+                                                    <c:out value="${user.factory}"/>
+                                                </div>
+                                                <div class="check">
+                                                    <input type="checkbox" name="selected_users"
+                                                        value="${user.id}"/>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                        <div class="footer">
+                                            <div class="right">
+                                                <button class="rounded" type="button"
+                                                    onclick="window.location='configuration.htm'">
+                                                    <span>Back</span>
+                                                </button>
+                                                <button class="rounded" type="submit">
+                                                    <span>Submit</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="message">
+                                <div class="icon">
+                                    <img src="includes/images/icons/circle-alert.png"
+                                         alt="no_radars"/>
+                                </div>
+                                <div class="text">
+                                    No user accounts found. Use configuration options to add
+                                    new user accounts.
                                 </div>
                             </div>
-                        </form>
-                    </div>
+                            <div class="footer">
+                                <div class="right">
+                                    <form action="configuration.htm">
+                                        <button class="rounded" type="submit">
+                                            <span>OK</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
                 <div id="clear"></div>
             </div>

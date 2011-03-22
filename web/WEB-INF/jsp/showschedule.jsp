@@ -52,16 +52,27 @@ List of adaptors
                     <div id="text-box">
                         Schedule. Press job to modify/delete or press Create to create a new job.
                     </div>
-                    <div id="table">
-                        <form name="createJobForm" action="createscheduledjob.htm">
-                            <display:table name="schedule" id="job" defaultsort="1"
-                                requestURI="schedule.htm" cellpadding="5" cellspacing="0"
-                                export="false" class="tableborder">
-                              <display:column sortable="true" title="Id"
-                                  sortProperty="id" href="showscheduledjob.htm" paramId="id" paramProperty="id"
-                                  class="tdcenter" value="${job.id}">
-                              </display:column>
-                                <!--
+                    <form name="createJobForm" action="createscheduledjob.htm">
+                        <div id="table">
+                            <div id="showschedule">
+                                <div class="table-hdr">
+                                    <div class="id">
+                                        Id
+                                    </div>
+                                </div>
+                                <c:forEach var="job" items="${schedule}">
+                                    <div class="table-row">
+                                        <div class="id">
+                                            <c:out value="${job.id}"/>
+                                            <a href="showscheduledjob.htm?id=${job.id}">
+                                                <c:out value="${job.id}"/>
+                                            </a>
+
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                            <%--
                               <display:column sortable="true" title="Cron"
                                   sortProperty="type" paramId="expression" paramProperty="expression"
                                   class="tdcenter" value="${job.expression}">
@@ -71,8 +82,7 @@ List of adaptors
                                   sortProperty="type" paramId="name" paramProperty="name"
                                   class="tdcenter" value="${job.name}">
                               </display:column>
-                                -->
-                            </display:table>
+                            --%>
                             <div class="footer">
                                 <div class="right">
                                     <button class="rounded" type="submit">
@@ -80,11 +90,11 @@ List of adaptors
                                     </button>
                                 </div>
                             </div>
+                            </div>
                           </form>
-                        <%if (request.getAttribute("emessage") != null) {%>
-                            <div class="scheduleerror"><%=request.getAttribute("emessage")%></div>
-                        <%}%>
-                    </div>
+                    <%if (request.getAttribute("emessage") != null) {%>
+                        <div class="scheduleerror"><%=request.getAttribute("emessage")%></div>
+                    <%}%>
                 </div>
                 <div id="clear"></div>
             </div>

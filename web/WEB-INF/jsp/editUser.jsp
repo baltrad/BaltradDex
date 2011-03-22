@@ -25,6 +25,15 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+<%@ page import="java.util.List" %>
+<%
+    List users = ( List )request.getAttribute( "registered_users" );
+    if( users == null || users.size() <= 0 ) {
+        request.getSession().setAttribute( "users_status", 0 );
+    } else {
+        request.getSession().setAttribute( "users_status", 1 );
+    }
+%>
 
 <html>
     <head>
@@ -49,36 +58,74 @@ Author     : szewczenko
                         <div class="right">
                         </div>
                     </div>
-                    <div id="text-box">
-                        List of user accounts. Click on user name in order to
-                        modify account settings.
-                    </div>
-                    <div id="table">
-                        <display:table name="registered_users" id="user" defaultsort="1"
-                            requestURI="showUsers.htm" cellpadding="0" cellspacing="2"
-                            export="false" class="tableborder">
-                            <display:column sortable="true" sortProperty="name" title="User name"
-                                paramId="id" paramProperty="id" href="saveUser.htm" class="tdcenter"
-                                value="${user.name}">
-                            </display:column>
-                            <display:column sortable="true" title="Role" sortProperty="role"
-                                class="tdcenter" value="${user.roleName}">
-                            </display:column>
-                            <display:column sortable="true" title="Organization"
-                                sortProperty="factory" class="tdcenter"
-                                value="${user.factory}">
-                            </display:column>
-                        </display:table>
-                        <div class="footer">
-                            <div class="right">
-                                <form action="configuration.htm">
-                                    <button class="rounded" type="submit">
-                                        <span>Back</span>
-                                    </button>
-                                </form>
+                    <c:choose>
+                        <c:when test="${users_status == 1}">
+                            <div id="text-box">
+                                List of user accounts. Click on user name in order to
+                                modify account settings.
                             </div>
-                        </div>
-                    </div>
+                            <div id="table">
+                                <div id="edituser">
+                                    <div class="table-hdr">
+                                        <div class="name">
+                                            User name
+                                        </div>
+                                        <div class="role">
+                                            Role
+                                        </div>
+                                        <div class="factory">
+                                            Organization
+                                        </div>
+                                    </div>
+                                    <c:forEach var="user" items="${registered_users}">
+                                        <div class="table-row">
+                                            <div class="name">
+                                                <a href="saveUser.htm?userId=${user.id}">
+                                                    <c:out value="${user.name}"/>
+                                                </a>
+                                            </div>
+                                            <div class="role">
+                                                <c:out value="${user.roleName}"/>
+                                            </div>
+                                            <div class="factory">
+                                                <c:out value="${user.factory}"/>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                    <div class="footer">
+                                        <div class="right">
+                                            <form action="configuration.htm">
+                                                <button class="rounded" type="submit">
+                                                    <span>Back</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="message">
+                                <div class="icon">
+                                    <img src="includes/images/icons/circle-alert.png"
+                                         alt="no_radars"/>
+                                </div>
+                                <div class="text">
+                                    No user accounts found. Use configuration options to add
+                                    new user accounts.
+                                </div>
+                            </div>
+                            <div class="footer">
+                                <div class="right">
+                                    <form action="configuration.htm">
+                                        <button class="rounded" type="submit">
+                                            <span>OK</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
                 <div id="clear"></div>
             </div>

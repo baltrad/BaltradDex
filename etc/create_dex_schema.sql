@@ -1,5 +1,5 @@
 /***************************************************************************************************
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -58,10 +58,9 @@ CREATE TABLE dex_users
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('user_id_seq'),
     name VARCHAR(64) NOT NULL UNIQUE,
-    name_hash VARCHAR(32) NOT NULL,
+    name_hash VARCHAR(32) NOT NULL UNIQUE,
     role_name VARCHAR(32) NOT NULL REFERENCES dex_roles (role),
     password VARCHAR(32) NOT NULL,
-    ret_password VARCHAR(32),
     short_address VARCHAR(64) NOT NULL,
     port VARCHAR(16) NOT NULL,
     factory VARCHAR(256) NOT NULL,
@@ -72,7 +71,6 @@ CREATE TABLE dex_users
     number VARCHAR(12) NOT NULL,
     phone VARCHAR(32) NOT NULL,
     email VARCHAR(64) NOT NULL,
-    selected BOOLEAN DEFAULT false,
     PRIMARY KEY (id)
 );
 
@@ -121,7 +119,7 @@ CREATE TABLE dex_subscriptions
     node_address VARCHAR(64),
     operator_name VARCHAR(64),
     type VARCHAR(16),
-    selected BOOLEAN DEFAULT false,
+    active BOOLEAN DEFAULT false,
     synkronized BOOLEAN DEFAULT false,
     PRIMARY KEY (id)
 );

@@ -84,6 +84,10 @@ Author     : szewczenko
                             <div class="footer">
                                 <div class="right">
                                     <form action="showClearRegisterStatus.htm">
+                                        <button class="rounded" type="button"
+                                            onclick="window.location='configuration.htm'">
+                                            <span>Back</span>
+                                        </button>
                                         <button class="rounded" type="submit">
                                             <span>OK</span>
                                         </button>

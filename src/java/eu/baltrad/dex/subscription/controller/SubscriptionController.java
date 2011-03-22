@@ -33,14 +33,12 @@ import eu.baltrad.dex.util.InitAppUtil;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
 
-import org.hibernate.HibernateException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.sql.SQLException;
 import java.io.File;
 import java.io.IOException;
-
 import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
@@ -99,7 +97,7 @@ public class SubscriptionController extends MultiActionController {
      */
     public ModelAndView showSubscriptions( HttpServletRequest request,
             HttpServletResponse response ) {
-        List< Subscription > subscriptions = subscriptionManager.getSubscriptionsByType(
+        List< Subscription > subscriptions = subscriptionManager.getSubscriptions(
                 Subscription.LOCAL_SUBSCRIPTION );
 
         // synchronize local and remote subscriptions
@@ -147,20 +145,20 @@ public class SubscriptionController extends MultiActionController {
         // get the list of channels selected for subscription by the user
         String[] selChannels = request.getParameterValues( SELECTED_CHANNELS_KEY );
         // get the list of all available channels
-        List< Subscription > currentSubs = subscriptionManager.getSubscriptionsByType(
+        List< Subscription > currentSubs = subscriptionManager.getSubscriptions(
                 Subscription.LOCAL_SUBSCRIPTION );
-        List< Subscription > selectedSubs = subscriptionManager.getSubscriptionsByType(
+        List< Subscription > selectedSubs = subscriptionManager.getSubscriptions(
                 Subscription.LOCAL_SUBSCRIPTION );
         // make sure the list of selected channels is not null
         if( selChannels != null ) {
             // create subscription list based on chosen channels
             for( int i = 0; i < selectedSubs.size(); i++ ) {
-                selectedSubs.get( i ).setSelected( false );
+                selectedSubs.get( i ).setActive( false );
                 String channelName = selectedSubs.get( i ).getChannelName();
                 int j = 0;
                 while( j < selChannels.length ) {
                     if( channelName.equals( selChannels[ j ] ) ) {
-                        selectedSubs.get( i ).setSelected( true );
+                        selectedSubs.get( i ).setActive( true );
                         break;
                     }
                     j++;
@@ -169,7 +167,7 @@ public class SubscriptionController extends MultiActionController {
         } else {
             // user submits empty list - cancells all subscriptions
             for( int i = 0; i < selectedSubs.size(); i++ ) {
-                selectedSubs.get( i ).setSelected( false );
+                selectedSubs.get( i ).setActive( false );
             }
             request.setAttribute( REQUEST_STATUS_KEY, 2 );
         }
@@ -227,7 +225,7 @@ public class SubscriptionController extends MultiActionController {
                 subscriptionManager.updateSubscription(
                         getChangedSubscriptions().get( i ).getChannelName(),
                         Subscription.LOCAL_SUBSCRIPTION,
-                        getChangedSubscriptions().get( i ).getSelected() );
+                        getChangedSubscriptions().get( i ).getActive() );
             } catch( Exception e ) {
                 logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while processing " +
                     "subscription change request for " +
@@ -248,7 +246,7 @@ public class SubscriptionController extends MultiActionController {
      */
     public ModelAndView selectRemoveSubscriptions( HttpServletRequest request,
             HttpServletResponse response ) {
-        List subscriptions = subscriptionManager.getSubscriptionsByType(
+        List subscriptions = subscriptionManager.getSubscriptions(
                 Subscription.LOCAL_SUBSCRIPTION );
         return new ModelAndView( REMOVE_SUBSCRIPTIONS_VIEW, SHOW_SUBSCRIPTIONS_KEY, subscriptions );
     }
@@ -277,7 +275,7 @@ public class SubscriptionController extends MultiActionController {
             for( int i = 0; i < selChannels.length; i++ ) {
                 Subscription subs = subscriptionManager.getSubscription( selChannels[ i ],
                         Subscription.LOCAL_SUBSCRIPTION );
-                if( subs.getSelected() ) {
+                if( subs.getActive() ) {
                     isActive = true;
                 }
             }
@@ -321,18 +319,24 @@ public class SubscriptionController extends MultiActionController {
             HttpServletResponse response ) {
         for( int i = 0; i < getRemovedSubscriptions().size(); i++ ) {
             try {
-                subscriptionManager.removeSubscription(
+                subscriptionManager.deleteSubscription(
                     getRemovedSubscriptions().get( i ).getChannelName(),
                     Subscription.LOCAL_SUBSCRIPTION );
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removesubscription.removesuccess" ) );
-            } catch( HibernateException e ) {
+            } catch( SQLException e ) {
+                request.getSession().removeAttribute( OK_MSG_KEY );
+                request.getSession().setAttribute( ERROR_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removesubscription.removefail" ) );
+            } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removesubscription.removefail" ) );
             }
+
         }
         return new ModelAndView( SUBSCRIPTION_REMOVAL_STATUS_VIEW );
     }
@@ -345,7 +349,7 @@ public class SubscriptionController extends MultiActionController {
      */
     public ModelAndView showPeersSubscriptions( HttpServletRequest request,
             HttpServletResponse response ) {
-        List subscriptions = subscriptionManager.getSubscriptionsByType(
+        List subscriptions = subscriptionManager.getSubscriptions(
                 Subscription.REMOTE_SUBSCRIPTION );
         return new ModelAndView( SHOW_PEERS_SUBSCRIPTIONS_VIEW, SHOW_SUBSCRIPTIONS_KEY,
                 subscriptions );
@@ -397,13 +401,18 @@ public class SubscriptionController extends MultiActionController {
             HttpServletResponse response ) {
         for( int i = 0; i < getRemovedPeersSubscriptions().size(); i++ ) {
             try {
-                subscriptionManager.removeSubscription(
+                subscriptionManager.deleteSubscription(
                     getRemovedPeersSubscriptions().get( i ).getChannelName(),
                     Subscription.REMOTE_SUBSCRIPTION );
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removesubscription.removesuccess" ) );
-            } catch( HibernateException e ) {
+            } catch( SQLException e ) {
+                request.getSession().removeAttribute( OK_MSG_KEY );
+                request.getSession().setAttribute( ERROR_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removesubscription.removefail" ) );
+            } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(

@@ -68,10 +68,10 @@ public class SetPermissionController extends SimpleFormController {
             int j = 0;
             while( j < channelPermissions.size() ) {
                 if( users.get( i ).getId() == channelPermissions.get( j ).getUserId() ) {
-                    users.get( i ).setSelected( true );
+                    users.get( i ).setChecked( true );
                     break;
                 } else {
-                    users.get( i ).setSelected( false );
+                    users.get( i ).setChecked( false );
                 }
                 j++;    
             }
@@ -115,7 +115,7 @@ public class SetPermissionController extends SimpleFormController {
                 ChannelPermission channelPermission = channelManager.getPermission(
                     channelId, user.getId() );
                 if( channelPermission == null ) {
-                    channelManager.addPermission( new ChannelPermission( channelId,
+                    channelManager.savePermission( new ChannelPermission( channelId,
                             user.getId() ) );
                 }
             } else {

@@ -34,7 +34,7 @@ Author     : szewczenko
     </head>
     <body>
         <div id="logtable">
-            <div class="hdr">
+            <div class="table-hdr">
                 <div class="date">
                     Date
                 </div>
@@ -67,7 +67,7 @@ Author     : szewczenko
                         %>
                     </c:when>
                 </c:choose>
-                <div class="row">
+                <div class="table-row">
                     <div class="date">
                         <div class="<%=style%>">
                             <c:out value="${fn:substring(entry.timeStamp, 0, 10)}"/>

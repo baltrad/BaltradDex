@@ -61,9 +61,9 @@ public class StatusController implements Controller {
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException {
-        List< Subscription > localSubscriptions = subscriptionManager.getSubscriptionsByType(
+        List< Subscription > localSubscriptions = subscriptionManager.getSubscriptions(
                 Subscription.LOCAL_SUBSCRIPTION );
-        List< Subscription > remoteSubscriptions = subscriptionManager.getSubscriptionsByType(
+        List< Subscription > remoteSubscriptions = subscriptionManager.getSubscriptions(
                 Subscription.REMOTE_SUBSCRIPTION );
         ModelAndView modelAndView = new ModelAndView( getSuccessView() );
         modelAndView.addObject( LOCAL_SUBSCRIPTIONS_KEY, localSubscriptions );

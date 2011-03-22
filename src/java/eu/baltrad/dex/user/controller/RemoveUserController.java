@@ -33,8 +33,7 @@ import org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResol
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.hibernate.HibernateException;
-
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
@@ -99,7 +98,7 @@ public class RemoveUserController extends MultiActionController {
         if( userIds != null ) {
             List< User > users = new ArrayList< User >();
             for( int i = 0; i < userIds.length; i++ ) {
-                users.add( userManager.getUserByID( Integer.parseInt( userIds[ i ] ) ) );
+                users.add( userManager.getUserById( Integer.parseInt( userIds[ i ] ) ) );
             }
             modelAndView = new ModelAndView( SELECTED_USERS_VIEW, SELECTED_USERS_KEY, users );
         } else {
@@ -128,16 +127,23 @@ public class RemoveUserController extends MultiActionController {
         String userName = "";
         for( int i = 0; i < userIds.length; i++ ) {
             try {
-                User user = userManager.getUserByID( Integer.parseInt( userIds[ i ] ) );
+                User user = userManager.getUserById( Integer.parseInt( userIds[ i ] ) );
                 userName = user.getName();
-                userManager.removeUser( Integer.parseInt( userIds[ i ] ) );
+                userManager.deleteUser( Integer.parseInt( userIds[ i ] ) );
                 request.getSession().setAttribute( OK_MSG_KEY, 
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removesuccess" ) );
                 logManager.addEntry( new Date(), LogManager.MSG_WRN, "User account " + userName
                         + " removed from the system" );
 
-            } catch( HibernateException e ) {
+            } catch( SQLException e ) {
+                request.getSession().removeAttribute( OK_MSG_KEY );
+                request.getSession().setAttribute( ERROR_MSG_KEY,
+                        getMessageSourceAccessor().getMessage(
+                        "message.removeuser.removefail" ) );
+                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove user "
+                        + "account " + userName + "." );
+            } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(

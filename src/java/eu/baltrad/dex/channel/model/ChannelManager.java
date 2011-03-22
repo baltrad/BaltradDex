@@ -79,19 +79,19 @@ public class ChannelManager {
         return channels;
     }
     /**
-     * Gets data channel with a given name.
+     * Gets data channel with a given ID.
      *
-     * @param channelName Data channel name
-     * @return Data channel with a given name
+     * @param id Data channel ID
+     * @return Data channel with a given ID
      */
-    public Channel getChannel( String channelName ) {
+    public Channel getChannel( int id ) {
         Connection conn = null;
         Channel channel = null;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channels WHERE" +
-                    " name = '" + channelName + "';");
+                    " id = " + id + ";" );
             while( resultSet.next() ) {
                 int chnlId = resultSet.getInt( "id" );
                 String name = resultSet.getString( "name" );
@@ -109,19 +109,19 @@ public class ChannelManager {
         return channel;
     }
     /**
-     * Gets data channel with a given ID.
+     * Gets data channel with a given name.
      *
-     * @param id Data channel ID
-     * @return Data channel with a given ID
+     * @param channelName Data channel name
+     * @return Data channel with a given name
      */
-    public Channel getChannel( int id ) {
+    public Channel getChannel( String channelName ) {
         Connection conn = null;
         Channel channel = null;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channels WHERE" +
-                    " id = " + id + ";" );
+                    " name = '" + channelName + "';");
             while( resultSet.next() ) {
                 int chnlId = resultSet.getInt( "id" );
                 String name = resultSet.getString( "name" );
@@ -175,31 +175,6 @@ public class ChannelManager {
             jdbcConnectionManager.returnConnection( conn );
         }
         return update;
-    }
-    /**
-     * Saves data channel.
-     *
-     * @param channel Channel class object
-     * @return Number of inserted records
-     */
-    public int addChannel( Channel channel ) {
-        Connection conn = null;
-        int insert = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "INSERT INTO dex_channels (name, wmo_number) VALUES ('" +
-                    channel.getChannelName() + "', '" + channel.getWmoNumber() + "');";
-            insert = stmt.executeUpdate( sql );
-            stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save data channel: " + e.getMessage() );
-        } catch( Exception e ) {
-            System.err.println( "Failed to save data channel: " + e.getMessage() );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return insert;
     }
     /**
      * Deletes channel with a given ID.
@@ -325,7 +300,7 @@ public class ChannelManager {
      * @param channelPermission Channel permission object
      * @return Number of inserted records
      */
-    public int addPermission( ChannelPermission permission ) {
+    public int savePermission( ChannelPermission permission ) {
         Connection conn = null;
         int insert = 0;
         try {

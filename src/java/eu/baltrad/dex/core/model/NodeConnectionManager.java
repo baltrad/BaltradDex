@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,14 +21,15 @@
 
 package eu.baltrad.dex.core.model;
 
-import eu.baltrad.dex.util.HibernateUtil;
+import eu.baltrad.dex.util.JDBCConnectionManager;
 
-import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
-import org.hibernate.Session;
-import org.hibernate.Query;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Node manager class implementing node connection object handling functionality.
@@ -38,135 +39,207 @@ import java.util.List;
  * @since 1.0
  */
 public class NodeConnectionManager {
+//---------------------------------------------------------------------------------------- Variables
+    /** Reference to JDBCConnector class object */
+    private JDBCConnectionManager jdbcConnectionManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Gets list of all registered connections.
-     *
-     * @return List containing all registered node connections
+     * Constructor gets reference to JDBCConnectionManager instance.
      */
-    public List getConnections() {
-        List connections = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            connections = session.createQuery( "FROM NodeConnection" ).list();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-        return connections;
+    public NodeConnectionManager() {
+        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
     }
     /**
-     * Gets node connection identified by connection id.
+     * Gets all existing node connections.
      *
-     * @param id Node connection id
-     * @return NodeConnection object
+     * @return List of all existing node connections
      */
-    public NodeConnection getConnection( int id ) {
-        NodeConnection nodeConnection = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
+    public List<NodeConnection> getConnections() {
+        Connection conn = null;
+        List<NodeConnection> nodeConns = new ArrayList<NodeConnection>();
         try {
-            nodeConnection = ( NodeConnection )session.createQuery(
-                    "FROM NodeConnection WHERE id = ?" ).setInteger( 0, id ).uniqueResult();
-            session.getTransaction().commit();
-        }
-        catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_node_connections" );
+            while( resultSet.next() ) {
+                int connId = resultSet.getInt( "id" );
+                String name = resultSet.getString( "name" );
+                String shortAddress = resultSet.getString( "short_address" );
+                String port = resultSet.getString( "port" );
+                String userName = resultSet.getString( "user_name" );
+                String passwd = resultSet.getString( "password" );
+                NodeConnection nodeConn = new NodeConnection( connId, name, shortAddress, port,
+                        userName, passwd );
+                nodeConns.add( nodeConn );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select node connections: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select node connections: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
-        return nodeConnection;
+        return nodeConns;
     }
     /**
-     * Gets node connection identified by connection name.
-     *
-     * @param connectionName Node connection name
-     * @return NodeConnection object
-     */
-    public NodeConnection getConnection( String connectionName ) {
-        NodeConnection nodeConnection = null;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            nodeConnection = ( NodeConnection )session.createQuery(
-                    "FROM NodeConnection WHERE connectionName = ?" ).setString(
-                    0, connectionName ).uniqueResult();
-            session.getTransaction().commit();
-        } catch ( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-        return nodeConnection;
-    }
-    /**
-     * Adds new connection to the database.
-     *
-     * @param nodeConnection NodeConnection class object
-     */
-    public void addConnection( NodeConnection nodeConnection ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        try {
-            session.saveOrUpdate( nodeConnection );
-            session.getTransaction().commit();
-        } catch (HibernateException e) {
-            session.getTransaction().rollback();
-            throw e;
-        } finally {
-            session.close();
-        }
-    }
-    /**
-     * Removes node connection identified by ID.
+     * Gets node connection with a given ID.
      *
      * @param id Node connection ID
+     * @return Node connection with a given ID
      */
-    public void removeConnection( int id ) {
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-	session.beginTransaction();
+    public NodeConnection getConnection( int id ) {
+        Connection conn = null;
+        NodeConnection nodeConn = null;
         try {
-            session.delete( session.load( NodeConnection.class, new Integer( id ) ) );
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
-            throw e;
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_node_connections WHERE" +
+                    " id = " + id + ";" );
+            while( resultSet.next() ) {
+                int connId = resultSet.getInt( "id" );
+                String name = resultSet.getString( "name" );
+                String shortAddress = resultSet.getString( "short_address" );
+                String port = resultSet.getString( "port" );
+                String userName = resultSet.getString( "user_name" );
+                String passwd = resultSet.getString( "password" );
+                nodeConn = new NodeConnection( connId, name, shortAddress, port, userName, passwd );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select node connections: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select node connections: " + e.getMessage() );
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
+        return nodeConn;
     }
     /**
-     * Removes all node connections.
+     * Gets node connection with a given name.
      *
-     * @return Number of removed records
+     * @param connectionName Node connection name
+     * @return Node connection with a given name
      */
-    public int removeConnections() {
-        int res = 0;
-        SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-        Session session = sessionFactory.openSession();
-	session.beginTransaction();
+    public NodeConnection getConnection( String connectionName ) {
+        Connection conn = null;
+        NodeConnection nodeConn = null;
         try {
-            Query query = session.createQuery( "DELETE FROM NodeConnection" );
-            res = query.executeUpdate();
-            session.getTransaction().commit();
-        } catch( HibernateException e ) {
-            session.getTransaction().rollback();
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_node_connections WHERE" +
+                    " name = '" + connectionName + "';" );
+            while( resultSet.next() ) {
+                int connId = resultSet.getInt( "id" );
+                String name = resultSet.getString( "name" );
+                String shortAddress = resultSet.getString( "short_address" );
+                String port = resultSet.getString( "port" );
+                String userName = resultSet.getString( "user_name" );
+                String passwd = resultSet.getString( "password" );
+                nodeConn = new NodeConnection( connId, name, shortAddress, port, userName, passwd );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select node connections: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select node connections: " + e.getMessage() );
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return nodeConn;
+    }
+    /**
+     * Saves or updates node connection.
+     *
+     * @param nodeConn Node connection
+     * @return Number of saved or updated records
+     * @throws SQLException
+     * @throws Exception
+     */
+    public int saveOrUpdate( NodeConnection nodeConn ) throws SQLException, Exception {
+        Connection conn = null;
+        int update = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "";
+            // record does not exists, do insert
+            if( nodeConn.getId() == 0 ) {
+                sql = "INSERT INTO dex_node_connections (name, short_address, port, user_name, " +
+                    "password) VALUES ('" + nodeConn.getConnectionName() + "', '" +
+                    nodeConn.getShortAddress() + "', '" + nodeConn.getPortNumber() + "', '" +
+                    nodeConn.getUserName() + "', '" + nodeConn.getPassword() + "');";
+            } else {
+                // record exists, do update
+                sql = "UPDATE dex_node_connections SET name = '" + nodeConn.getConnectionName() +
+                    "', short_address = '" + nodeConn.getShortAddress() + "', port = '" +
+                    nodeConn.getPortNumber() + "', user_name = '" + nodeConn.getUserName() + 
+                    "', password = '" + nodeConn.getPassword() + "' WHERE id = " +
+                    nodeConn.getId() + ";";
+            }
+            update = stmt.executeUpdate( sql ) ;
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to save node connection: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to save node connection: " + e.getMessage() );
             throw e;
         } finally {
-            session.close();
+            jdbcConnectionManager.returnConnection( conn );
         }
-        return res;
+        return update;
+    }
+    /**
+     * Deletes node connection with a given ID.
+     *
+     * @param id Node connection ID
+     * @return Number of deleted records
+     * @throws SQLException
+     * @throws Exception
+     */
+    public int deleteConnection( int id ) throws SQLException, Exception {
+        Connection conn = null;
+        int delete = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "DELETE FROM dex_node_connections WHERE id = " + id + ";";
+            delete = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete node connection: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to delete node connection: " + e.getMessage() );
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return delete;
+    }
+    /**
+     * Deletes all node connections.
+     *
+     * @return Number of deleted entries
+     */
+    public int deleteConnections() {
+        Connection conn = null;
+        int delete = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "DELETE FROM dex_node_connections;";
+            delete = stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to delete node connections: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to delete node connections: " + e.getMessage() );
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return delete;
     }
 }
 //--------------------------------------------------------------------------------------------------

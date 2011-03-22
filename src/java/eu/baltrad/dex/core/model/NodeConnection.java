@@ -48,7 +48,7 @@ public class NodeConnection implements Serializable {
     private int id;
     // Connection name
     private String connectionName;
-    // Short node address, e.g. baltrad.imgw.pl (without port name and other stuff)
+    // Short node address, e.g. baltrad.imgw.pl (without port name and protocol)
     private String shortAddress;
     // Full node address, e.g. http://baltrad.imgw.pl:8084/BaltradDex/dispatch.htm
     private String fullAddress;
@@ -82,14 +82,16 @@ public class NodeConnection implements Serializable {
     /**
      * Constructor sets all field values.
      *
+     * @param id Node connection ID
      * @param connectionName Connection name
      * @param shortAddress Node's short address
      * @param portNumber Port number
      * @param userName User's name
      * @param password User's password
      */
-    public NodeConnection( String connectionName, String shortAddress, String portNumber,
+    public NodeConnection( int id, String connectionName, String shortAddress, String portNumber,
             String userName, String password ) {
+        this.id = id;
         this.connectionName = connectionName;
         this.shortAddress = shortAddress;
         this.portNumber = portNumber;

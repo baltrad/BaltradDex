@@ -147,9 +147,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="lib/dom4j">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="lib/hibernate">
-        <include name="*.jar"/>
-      </fileset>
       <fileset dir="lib/jakarta-commons">
         <include name="*.jar"/>
       </fileset>
@@ -166,9 +163,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="*.jar"/>
       </fileset>
       <fileset dir="lib/j2ee">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/displaytag">
         <include name="*.jar"/>
       </fileset>
       <fileset dir="lib/jakarta-taglibs">

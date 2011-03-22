@@ -66,46 +66,55 @@ Author     : szewczenko
                                 Select node connections to be be removed. Confirm conection 
                                 removal with Submit button.
                             </div>
-                            <div id="table">
                                 <form action="showSelectedNodeConnections.htm">
-                                    <display:table name="node_connections" id="connection"
-                                        defaultsort="1" requestURI="showNodeConnections.htm"
-                                        cellpadding="0" cellspacing="2" export="false"
-                                        class="tableborder">
-                                        <display:column sortable="true" title="Connection"
-                                            sortProperty="connectionName" paramId="connectionName"
-                                            paramProperty="connectionName"
-                                            class="tdcenter" value="${connection.connectionName}">
-                                        </display:column>
-                                        <display:column sortable="true" title="Node address"
-                                            sortProperty="shortAddress" paramId="shortAddress"
-                                            paramProperty="shortAddress" class="tdcenter"
-                                            value="${connection.shortAddress}">
-                                        </display:column>
-                                        <display:column sortable="true" title="User account"
-                                            sortProperty="userName" paramId="userName"
-                                            paramProperty="userName" class="tdcenter"
-                                            value="${connection.userName}">
-                                        </display:column>
-                                        <display:column sortable="false" title="Remove"
-                                            class="tdcheck"> <input type="checkbox"
-                                            name="selected_node_connections"
-                                            value="${connection.id}"/>
-                                        </display:column>
-                                    </display:table>
-                                    <div class="footer">
-                                        <div class="right">
-                                            <button class="rounded" type="button"
-                                                onclick="window.location='configuration.htm'">
-                                                <span>Back</span>
-                                            </button>
-                                            <button class="rounded" type="submit">
-                                                <span>Submit</span>
-                                            </button>
+                                    <div id="table">
+                                        <div id="selectconnections">
+                                            <div class="table-hdr">
+                                                <div class="name">
+                                                    Name
+                                                </div>
+                                                <div class="address">
+                                                    Address
+                                                </div>
+                                                <div class="user">
+                                                    User name
+                                                </div>
+                                                <div class="check">
+                                                    Select
+                                                </div>
+                                            </div>
+                                            <c:forEach var="conn" items="${node_connections}">
+                                                <div class="table-row">
+                                                    <div class="name">
+                                                        <c:out value="${conn.connectionName}"/>
+                                                    </div>
+                                                    <div class="address">
+                                                        <c:out value="${conn.shortAddress}"/>
+                                                    </div>
+                                                    <div class="user">
+                                                        <c:out value="${conn.userName}"/>
+                                                    </div>
+                                                    <div class="check">
+                                                        <input type="checkbox"
+                                                            name="selected_node_connections"
+                                                            value="${conn.id}"/>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                            <div class="footer">
+                                                <div class="right">
+                                                    <button class="rounded" type="button"
+                                                        onclick="window.location='configuration.htm'">
+                                                        <span>Back</span>
+                                                    </button>
+                                                    <button class="rounded" type="submit">
+                                                        <span>Submit</span>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </form>
-                            </div>
                             </c:when>
                             <c:otherwise>
                                 <div class="message">

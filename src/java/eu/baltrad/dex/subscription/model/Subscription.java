@@ -41,7 +41,7 @@ public class Subscription implements Serializable, Comparable< Subscription > {
     private String nodeAddress;
     private String operatorName;
     private String type;
-    private boolean selected;
+    private boolean active;
     private boolean synkronized;
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -53,32 +53,43 @@ public class Subscription implements Serializable, Comparable< Subscription > {
      *
      * @param userName User name
      * @param channelName Channel name
-     * @param type Subscription type
-     */
-    public Subscription( String userName, String channelName, String type ) {
-        this.userName = userName;
-        this.channelName = channelName;
-        this.type = type;
-    }
-    /**
-     * Constructor creating new subscription object with given field values.
-     *
-     * @param userName User name
-     * @param channelName Channel name
      * @param nodeAddress Node address
      * @param operatorName Operator name
      * @param type Subscription type
-     * @param selected Selection toggle
+     * @param active Subscription activation toggle
      * @param synkronized Synchronization toggle
      */
     public Subscription( String userName, String channelName, String nodeAddress,
-            String operatorName, String type, boolean selected, boolean synkronized ) {
+            String operatorName, String type, boolean active, boolean synkronized ) {
         this.userName = userName;
         this.channelName = channelName;
         this.nodeAddress = nodeAddress;
         this.operatorName = operatorName;
         this.type = type;
-        this.selected = selected;
+        this.active = active;
+        this.synkronized = synkronized;
+    }
+    /**
+     * Constructor creating new subscription object with given field values.
+     *
+     * @param id Subscription ID
+     * @param userName User name
+     * @param channelName Channel name
+     * @param nodeAddress Node address
+     * @param operatorName Operator name
+     * @param type Subscription type
+     * @param active Subscription activation toggle
+     * @param synkronized Synchronization toggle
+     */
+    public Subscription( int id, String userName, String channelName, String nodeAddress,
+            String operatorName, String type, boolean active, boolean synkronized ) {
+        this.id = id;
+        this.userName = userName;
+        this.channelName = channelName;
+        this.nodeAddress = nodeAddress;
+        this.operatorName = operatorName;
+        this.type = type;
+        this.active = active;
         this.synkronized = synkronized;
     }
     /**
@@ -154,17 +165,17 @@ public class Subscription implements Serializable, Comparable< Subscription > {
      */
     public void setOperatorName( String operatorName ) { this.operatorName = operatorName; }
     /**
-     * Method gets subscription selection toggle state.
+     * Method gets subscription activation toggle state.
      *
-     * @return Channel selection toggle state
+     * @return Subscription activation toggle state
      */
-    public boolean getSelected() { return selected; }
+    public boolean getActive() { return active; }
     /**
-     * Method sets subscription selection toggle state.
+     * Method sets subscription activation toggle state.
      *
-     * @param selected Channel selection toggle state
+     * @param active Subscription activation toggle state
      */
-    public void setSelected( boolean selected ) { this.selected = selected; }
+    public void setActive( boolean active ) { this.active = active; }
     /**
      * Method gets subscription synchronization toggle state.
      *

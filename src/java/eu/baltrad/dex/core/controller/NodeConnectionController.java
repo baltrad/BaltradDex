@@ -28,11 +28,10 @@ import eu.baltrad.dex.log.model.LogManager;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
-import org.hibernate.HibernateException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
@@ -110,13 +109,19 @@ public class NodeConnectionController extends MultiActionController {
             HttpServletResponse response ) {
         for( int i = 0; i < getSelectedConns().size(); i++ ) {
             try {
-                nodeConnectionManager.removeConnection( getSelectedConns().get( i ).getId() );
+                nodeConnectionManager.deleteConnection( getSelectedConns().get( i ).getId() );
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeconnection.success" ) );
                 logManager.addEntry( new Date(), LogManager.MSG_INFO, "Removed node connection: "
                         + getSelectedConns().get( i ).getConnectionName() );
-            } catch( HibernateException e ) {
+            } catch( SQLException e ) {
+                request.getSession().removeAttribute( OK_MSG_KEY );
+                request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
+                    "message.removeconnection.fail" ) );
+                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove node "
+                        + "connection: " + e.getMessage() );
+            } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeconnection.fail" ) );
