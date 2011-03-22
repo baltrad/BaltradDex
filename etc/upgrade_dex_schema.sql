@@ -129,7 +129,7 @@ BEGIN
         WHEN OTHERS THEN RAISE NOTICE 'Column dex_users.ret_selected does not exist';
     END;
     BEGIN
-        ALTER TABLE dex_users ALTER COLUMN name_hash SET UNIQUE;
+        ALTER TABLE dex_users ADD CONSTRAINT dex_users_name_hash_key UNIQUE (name_hash);
   	EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'Column dex_users.name_hash does not exist';
     END;
