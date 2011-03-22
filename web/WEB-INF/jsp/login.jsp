@@ -35,6 +35,7 @@ Author     : szewczenko
     String dateAndTime = format.format( now );
     String operator = InitAppUtil.getOrgName();
     String nodeName = InitAppUtil.getNodeName();
+    String nodeVersion = InitAppUtil.getNodeVersion();
     String nodeType = InitAppUtil.getNodeType();
     String address = InitAppUtil.getOrgAddress();
     String timeZone = InitAppUtil.getTimeZone();
@@ -139,6 +140,9 @@ Author     : szewczenko
                                     Node name:
                                 </div>
                                 <div class="row">
+                                    Node version:
+                                </div>
+                                <div class="row">
                                     Node type:
                                 </div>
                                 <div class="row">
@@ -157,6 +161,9 @@ Author     : szewczenko
                                 </div>
                                 <div class="row">
                                     <%= nodeName %>
+                                </div>
+                                <div class="row">
+                                    <%= nodeVersion %>
                                 </div>
                                 <div class="row">
                                     <%= nodeType %>
@@ -178,6 +185,5 @@ Author     : szewczenko
         </div>
         <div id="user_name_tooltip" class="tooltip" style="width: 160px; height: 22px;"></div>
         <div id="password_tooltip" class="tooltip" style="width: 160px; height: 22px;"></div>
-        <div id="email_tooltip" class="tooltip" style="width: 180px; height: 22px;"></div>
     </body>
 </html>

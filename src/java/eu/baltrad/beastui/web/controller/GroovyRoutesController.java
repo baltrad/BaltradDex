@@ -125,6 +125,9 @@ public class GroovyRoutesController {
         return "redirect:showroutes.htm";
       } catch (Throwable t) {
         emessage = "Failed to create definition: '" + t.getMessage() + "'";
+        if (t.getCause() != null) {
+          emessage += " caused by:\n" + t.getCause().toString();
+        }
       }
     }
     return viewCreateRoute(model, name, author, active, description,
@@ -306,6 +309,9 @@ public class GroovyRoutesController {
         return "redirect:showroutes.htm";
       } catch (Throwable t) {
         emessage = "Failed to update definition: '" + t.getMessage() + "'";
+        if (t.getCause() != null) {
+          emessage += " caused by:\n" + t.getCause().toString();
+        }
       }
     }
     

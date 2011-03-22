@@ -54,9 +54,9 @@ public class BltFileManager {
     /** File UUID key */
     private static final String FC_FILE_UUID = "file:uuid";
     /** Date format string */
-    private static final String FC_DATE_STR = "yyyy/MM/dd";
+    private static final String FC_DATE_STR = "yyyyMMdd";
     /** Time format string */
-    private static final String FC_TIME_STR = "HH:mm:ss";
+    private static final String FC_TIME_STR = "HHmmss";
     /** Image file extension */
     private static final String IMAGE_FILE_EXT = ".png";
     /** Number of file entries per page */
@@ -65,7 +65,7 @@ public class BltFileManager {
     public final static int SCROLL_RANGE = 11;
 //---------------------------------------------------------------------------------------- Variables
     /** Date and time format string */
-    private static SimpleDateFormat format = new SimpleDateFormat( FC_DATE_STR + " " +
+    private static SimpleDateFormat format = new SimpleDateFormat( FC_DATE_STR + "'T'" +
             FC_TIME_STR );
     /** Reference to FileCatalogConnector object */
     private FileCatalogConnector fileCatalogConnector;
@@ -76,6 +76,7 @@ public class BltFileManager {
      * Constructor gets reference to FileCatalogConnector instance.
      */
     public BltFileManager() {
+        System.out.println("BltFileManager()");
         this.fileCatalogConnector = FileCatalogConnector.getInstance();
         this.fc = fileCatalogConnector.getFileCatalog();
     }
@@ -118,10 +119,10 @@ public class BltFileManager {
                 FileEntry fileEntry = r.entry();
                 BltFile bltFile = new BltFile(
                     fileEntry.uuid(), fc.storage().store( fileEntry ),
-                    format.parse( fileEntry.what_date().to_string( FC_DATE_STR ) + " " +
-                        fileEntry.what_time().to_string( FC_TIME_STR ) ) ,
-                    format.parse( fileEntry.stored_at().to_string( FC_DATE_STR + " " +
-                        FC_TIME_STR ) ), dataChannel, fileEntry.what_object(),
+                    format.parse( fileEntry.what_date().to_iso_string() + "T" +
+                                  fileEntry.what_time().to_iso_string() ),
+                    format.parse( fileEntry.stored_at().to_iso_string() ),
+                    dataChannel, fileEntry.what_object(),
                     InitAppUtil.getThumbsStorageFolder() + File.separator +
                     fileEntry.uuid() + IMAGE_FILE_EXT );
                 bltFiles.add( bltFile );
@@ -153,9 +154,9 @@ public class BltFileManager {
             FileEntry fileEntry = r.entry();
             bltFile = new BltFile(
                 fileEntry.uuid(), fc.storage().store( fileEntry ),
-                format.parse( fileEntry.what_date().to_string( FC_DATE_STR ) + " " +
-                    fileEntry.what_time().to_string( FC_TIME_STR ) ),
-                format.parse( fileEntry.stored_at().to_string( FC_DATE_STR + " " + FC_TIME_STR ) ),
+                format.parse( fileEntry.what_date().to_iso_string() + "T" +
+                              fileEntry.what_time().to_iso_string() ),
+                format.parse( fileEntry.stored_at().to_iso_string() ),
                 fileEntry.what_source(), fileEntry.what_object(),
                 InitAppUtil.getThumbsStorageFolder() + File.separator + fileEntry.uuid() +
                 IMAGE_FILE_EXT );

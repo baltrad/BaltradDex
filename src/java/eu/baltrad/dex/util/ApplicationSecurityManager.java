@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -64,8 +64,8 @@ public class ApplicationSecurityManager {
             String dbUserName = dbUser.getName().trim();
             String dbUserPassword = dbUser.getPassword().trim();
 
-            if( formUserName.equals( dbUserName ) && formUserPassword.equals( dbUserPassword ) && 
-                    ( dbUser.getRoleName().equals( User.ROLE_ADMIN ) ||
+            if( formUserName.equals( dbUserName ) && formUserPassword.equals( dbUserPassword ) && (
+                    dbUser.getRoleName().equals( User.ROLE_ADMIN ) ||
                     dbUser.getRoleName().equals( User.ROLE_OPERATOR ) ||
                     dbUser.getRoleName().equals( User.ROLE_USER ) ) ) {
                 return true;

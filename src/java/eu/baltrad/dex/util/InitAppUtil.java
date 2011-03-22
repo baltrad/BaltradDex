@@ -53,6 +53,8 @@ public class InitAppUtil {
     private final static String TEMP_FILE_PREFIX = "dex";
     // Temporary file suffix
     private final static String TEMP_FILE_SUFFIX = ".dat";
+    // Node version property
+    private final static String NODE_VERSION_PROP = "node.version";
     // Image storage folder
     private static final String IMAGE_STORAGE_FOLDER_PROP = "image.storage.folder";
     // Image thumbs storage folder
@@ -64,6 +66,8 @@ public class InitAppUtil {
     private static LogManager logManager;
     // Initialize Configuration manager
     private static ConfigurationManager configurationManager = new ConfigurationManager();
+    // Node version
+    private static String nodeVersion;
     // Node address
     private static String nodeAddress;
     // Node name
@@ -130,6 +134,7 @@ public class InitAppUtil {
                 Properties props = new Properties();
                 if( is != null ) {
                     props.load( is );
+                    nodeVersion = props.getProperty( NODE_VERSION_PROP );
                     imageStorageFolder = props.getProperty( IMAGE_STORAGE_FOLDER_PROP );
                     thumbsStorageFolder = props.getProperty( THUMBS_STORAGE_FOLDER_PROP );
                     // create image storage directory
@@ -150,6 +155,21 @@ public class InitAppUtil {
                     "Application successfully initialized" );
         }
     }
+    
+    /**
+     * Gets node version property.
+     *
+     * @return Node version property
+     */
+    public static String getNodeVersion() { return nodeVersion; }
+    
+    /**
+     * Sets node version property
+     *
+     * @param _nodeVersion Node version property to set
+     */
+    public static void setNodeVersion(String _nodeVersion) { nodeVersion = _nodeVersion; }
+
     /**
      * Gets node address property.
      *

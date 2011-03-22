@@ -672,7 +672,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
         } catch( FileUploadException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
-                    "Frame dispatcher error: " + e.getMessage() );
+                    "Frame dispatcher error: " + e. getMessage() );
             e.printStackTrace();
         } catch( IOException e ) {
             logManager.addEntry( new Date(), LogManager.MSG_ERR,
