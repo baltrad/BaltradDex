@@ -154,11 +154,19 @@ button::-moz-focus-inner {
     background: -moz-linear-gradient(top,  #98CBFF,  #003399); /* for firefox 3.6+ */
 }
 #footer .menu {
-    width: 312px;
+    width:1024px;
+    color:white;
+    padding-top:4px;
+    position:absolute;
+    text-align:center;
+    z-index:1;
+    /*width: 312px;
     color: white;
     margin-left: auto;
     margin-right: auto;
     padding-top: 4px;
+    position:absolute;
+    z-index:1;*/
 }
 #footer .menu a {
     color: white;
@@ -168,7 +176,17 @@ button::-moz-focus-inner {
     text-decoration: underline;
     color: #99cc66;
 }
-
+#footer .version {
+    width:1024px;
+    position:absolute;
+    text-align:right;
+    padding-top:4px;
+    color:white;
+    z-index:0;
+}
+#footer .version span {
+    padding-right:12px;
+}
 /*
  * hidden div
  */
@@ -964,8 +982,8 @@ tr {
     width:18%;
     text-align:center;
 }
-#adaptor > .table-hdr > .name, #adaptor > .table-row > .name,
-        #adaptor > .table-hdr > .type, #adaptor > .table-row > .type {
+#adaptors > .table-hdr > .name, #adaptors > .table-row > .name,
+        #adaptors > .table-hdr > .type, #adaptors > .table-row > .type {
     float:left;
     padding:3px 0px 3px 0px;
     width:50%;

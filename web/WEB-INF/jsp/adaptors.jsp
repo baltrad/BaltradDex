@@ -25,6 +25,16 @@ List of adaptors
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+<%@ page import="java.util.List" %>
+<%
+    // Check if there are adaptors available to display
+    List adaptors = ( List )request.getAttribute( "adaptors" );
+    if( adaptors == null || adaptors.size() <= 0 ) {
+        request.getSession().setAttribute( "adaptors_status", 0 );
+    } else {
+        request.getSession().setAttribute( "adaptors_status", 1 );
+    }
+%>
 
 <html>
     <head>
@@ -55,26 +65,30 @@ List of adaptors
                     </div>
                     <form name="createAdaptorForm" action="createadaptor.htm">
                         <div id="table">
-                            <div id="adaptors">
-                                <div class="table-hdr">
-                                    <div class="name">
-                                        Name
-                                    </div>
-                                    <div class="type">
-                                        Type
-                                    </div>
-                                </div>
-                                <c:forEach var="adaptor" items="${adaptors}">
-                                    <div class="table-row">
-                                        <div class="name">
-                                            <c:out value="${adaptor.name}"/>
+                            <c:choose>
+                                <c:when test="${adaptors_status == 1}">
+                                    <div id="adaptors">
+                                        <div class="table-hdr">
+                                            <div class="name">
+                                                Name
+                                            </div>
+                                            <div class="type">
+                                                Type
+                                            </div>
                                         </div>
-                                        <div class="type">
-                                            <c:out value="${adaptor.type}"/>
-                                        </div>
+                                        <c:forEach var="adaptor" items="${adaptors}">
+                                            <div class="table-row">
+                                                <div class="name">
+                                                    <c:out value="${adaptor.name}"/>
+                                                </div>
+                                                <div class="type">
+                                                    <c:out value="${adaptor.type}"/>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
                                     </div>
-                                </c:forEach>
-                            </div>
+                                </c:when>
+                            </c:choose>
                               <div class="footer">
                                 <div class="right">
                                     <button class="rounded" type="button" onclick="history.go(-1);">
@@ -95,7 +109,7 @@ List of adaptors
             </div>
         </div>
         <div id="footer">
-            <script type="text/javascript" src="includes/footer.js"></script>
+            <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>
 </html>

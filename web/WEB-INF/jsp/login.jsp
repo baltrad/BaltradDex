@@ -181,7 +181,7 @@ Author     : szewczenko
             </div>
         </div>
         <div id="footer">
-            <script type="text/javascript" src="includes/footer.js"></script>
+            <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
         <div id="user_name_tooltip" class="tooltip" style="width: 160px; height: 22px;"></div>
         <div id="password_tooltip" class="tooltip" style="width: 160px; height: 22px;"></div>

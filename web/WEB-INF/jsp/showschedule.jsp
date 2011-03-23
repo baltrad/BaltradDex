@@ -25,6 +25,16 @@ List of adaptors
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+<%@ page import="java.util.List" %>
+<%
+    // Check if there are schedules available to display
+    List schedules = ( List )request.getAttribute( "schedule" );
+    if( schedules == null || schedules.size() <= 0 ) {
+        request.getSession().setAttribute( "schedules_status", 0 );
+    } else {
+        request.getSession().setAttribute( "schedules_status", 1 );
+    }
+%>
 
 <html>
     <head>
@@ -54,35 +64,28 @@ List of adaptors
                     </div>
                     <form name="createJobForm" action="createscheduledjob.htm">
                         <div id="table">
-                            <div id="showschedule">
-                                <div class="table-hdr">
-                                    <div class="id">
-                                        Id
-                                    </div>
-                                </div>
-                                <c:forEach var="job" items="${schedule}">
-                                    <div class="table-row">
-                                        <div class="id">
-                                            <c:out value="${job.id}"/>
-                                            <a href="showscheduledjob.htm?id=${job.id}">
-                                                <c:out value="${job.id}"/>
-                                            </a>
-
+                            <c:choose>
+                                <c:when test="${schedules_status == 1}">
+                                    <div id="showschedule">
+                                        <div class="table-hdr">
+                                            <div class="id">
+                                                Id
+                                            </div>
                                         </div>
-                                    </div>
-                                </c:forEach>
-                            </div>
-                            <%--
-                              <display:column sortable="true" title="Cron"
-                                  sortProperty="type" paramId="expression" paramProperty="expression"
-                                  class="tdcenter" value="${job.expression}">
-                              </display:column>
+                                        <c:forEach var="job" items="${schedule}">
+                                            <div class="table-row">
+                                                <div class="id">
+                                                    <c:out value="${job.id}"/>
+                                                    <a href="showscheduledjob.htm?id=${job.id}">
+                                                        <c:out value="${job.id}"/>
+                                                    </a>
 
-                              <display:column sortable="true" title="Job"
-                                  sortProperty="type" paramId="name" paramProperty="name"
-                                  class="tdcenter" value="${job.name}">
-                              </display:column>
-                            --%>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                    </div>
+                                </c:when>
+                            </c:choose>
                             <div class="footer">
                                 <div class="right">
                                     <button class="rounded" type="submit">
@@ -100,7 +103,7 @@ List of adaptors
             </div>
         </div>
         <div id="footer">
-            <script type="text/javascript" src="includes/footer.js"></script>
+            <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>
 </html>

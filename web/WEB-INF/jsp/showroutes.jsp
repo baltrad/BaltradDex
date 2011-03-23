@@ -25,6 +25,16 @@ List of routes
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+<%@ page import="java.util.List" %>
+<%
+    // Check if there are routes available to display
+    List routes = ( List )request.getAttribute( "routes" );
+    if( routes == null || routes.size() <= 0 ) {
+        request.getSession().setAttribute( "routes_status", 0 );
+    } else {
+        request.getSession().setAttribute( "routes_status", 1 );
+    }
+%>
 
 <html>
     <head>
@@ -54,68 +64,72 @@ List of routes
                     </div>
                     <form name="createRouteForm" action="createroute.htm">
                         <div id="table">
-                            <div id="showroutes">
-                                <div class="table-hdr">
-                                    <div class="active">
-                                        Active
-                                    </div>
-                                    <div class="name">
-                                        Name
-                                    </div>
-                                    <div class="type">
-                                        Type
-                                    </div>
-                                    <div class="description">
-                                        Description
-                                    </div>
-                                </div>
-                                <c:forEach var="route" items="${routes}">
-                                    <div class="table-row">
-                                        <div class="active">
-                                            <c:choose>
-                                                <c:when test="${route.active == true}">
-                                                    <img src="includes/images/green_bulb.png"
-                                                         width="12" height="12"/>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <img src="includes/images/red_bulb.png"
-                                                         width="12" height="12"/>
-                                                </c:otherwise>
-                                            </c:choose>
+                            <c:choose>
+                                <c:when test="${routes_status == 1}">
+                                    <div id="showroutes">
+                                        <div class="table-hdr">
+                                            <div class="active">
+                                                Active
+                                            </div>
+                                            <div class="name">
+                                                Name
+                                            </div>
+                                            <div class="type">
+                                                Type
+                                            </div>
+                                            <div class="description">
+                                                Description
+                                            </div>
                                         </div>
-                                        <div class="name">
-                                            <a href="showroute.htm?name=${route.name}">
-                                                <c:out value="${route.name}"/>
-                                            </a>
-                                        </div>
-                                        <div class="type">
-                                            <c:choose>
-                                                <c:when test="${route.ruleType == 'groovy'}">
-                                                    <c:out value="Script"/>
-                                                </c:when>
-                                                <c:when test="${route.ruleType == 'blt_volume'}">
-                                                    <c:out value="Volume"/>
-                                                </c:when>
-                                                <c:when test="${route.ruleType == 'composite'}">
-                                                  <c:out value="Composite"/>
-                                                </c:when>
-                                                <c:when test="${route.ruleType == 'bdb_trim_age'}">
-                                                    <c:out value="BdbTrimAge"/>
-                                                </c:when>
-                                                <c:when test="${route.ruleType == 'bdb_trim_count'}">
-                                                    <c:out value="BdbTrimCount"/>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <c:out value="${route.ruleType}"/>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </div>
-                                        <div class="description">
-                                            <c:out value="${route.description}"/>
-                                        </div>
+                                        <c:forEach var="route" items="${routes}">
+                                            <div class="table-row">
+                                                <div class="active">
+                                                    <c:choose>
+                                                        <c:when test="${route.active == true}">
+                                                            <img src="includes/images/green_bulb.png"
+                                                                 width="12" height="12"/>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <img src="includes/images/red_bulb.png"
+                                                                 width="12" height="12"/>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                                <div class="name">
+                                                    <a href="showroute.htm?name=${route.name}">
+                                                        <c:out value="${route.name}"/>
+                                                    </a>
+                                                </div>
+                                                <div class="type">
+                                                    <c:choose>
+                                                        <c:when test="${route.ruleType == 'groovy'}">
+                                                            <c:out value="Script"/>
+                                                        </c:when>
+                                                        <c:when test="${route.ruleType == 'blt_volume'}">
+                                                            <c:out value="Volume"/>
+                                                        </c:when>
+                                                        <c:when test="${route.ruleType == 'composite'}">
+                                                          <c:out value="Composite"/>
+                                                        </c:when>
+                                                        <c:when test="${route.ruleType == 'bdb_trim_age'}">
+                                                            <c:out value="BdbTrimAge"/>
+                                                        </c:when>
+                                                        <c:when test="${route.ruleType == 'bdb_trim_count'}">
+                                                            <c:out value="BdbTrimCount"/>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <c:out value="${route.ruleType}"/>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                                <div class="description">
+                                                    <c:out value="${route.description}"/>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
                                     </div>
-                                </c:forEach>
-                            </div>
+                                </c:when>
+                            </c:choose>
                             <div class="footer">
                                 <div class="right">
                                     <button class="rounded" name="submitButton" type="submit"
@@ -152,7 +166,7 @@ List of routes
             </div>
         </div>
         <div id="footer">
-            <script type="text/javascript" src="includes/footer.js"></script>
+            <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>
 </html>

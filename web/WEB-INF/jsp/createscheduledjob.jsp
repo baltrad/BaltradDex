@@ -207,7 +207,7 @@ Create scheduled job
       </div>
     </div>
     <div id="footer">
-      <script type="text/javascript" src="includes/footer.js"></script>
+      <%@include file="/WEB-INF/jsp/footer.jsp"%>
     </div>
   </body>
 </html>

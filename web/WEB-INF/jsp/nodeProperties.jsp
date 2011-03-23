@@ -58,7 +58,6 @@ Author     : szewczenko
                             <form method="post">
                                 <div class="left">
                                     <div class="row">Node name</div>
-                                    <div class="row">Node version</div>
                                     <div class="row">Node type</div>
                                     <div class="row">Node address</div>
                                     <div class="row">Organization</div>
@@ -72,9 +71,6 @@ Author     : szewczenko
                                         <form:input path="command.nodeName"/>
                                         <form:errors path="command.nodeName"
                                                      cssClass="errors"/>
-                                    </div>
-                                    <div class="row">
-                                        <%= InitAppUtil.getNodeVersion() %>
                                     </div>
                                     <div class="row">
                                         <spring:bind path="command.nodeType">
@@ -181,7 +177,7 @@ Author     : szewczenko
             </div>
         </div>
         <div id="footer">
-            <script type="text/javascript" src="includes/footer.js"></script>
+            <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>
 </html>

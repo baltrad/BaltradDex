@@ -155,21 +155,18 @@ public class InitAppUtil {
                     "Application successfully initialized" );
         }
     }
-    
     /**
      * Gets node version property.
      *
      * @return Node version property
      */
     public static String getNodeVersion() { return nodeVersion; }
-    
     /**
      * Sets node version property
      *
      * @param _nodeVersion Node version property to set
      */
     public static void setNodeVersion(String _nodeVersion) { nodeVersion = _nodeVersion; }
-
     /**
      * Gets node address property.
      *
