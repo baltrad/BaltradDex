@@ -89,7 +89,8 @@ public class HandleFrameTask implements Runnable {
         // prepare frame
         BaltradFrame baltradFrame = new BaltradFrame( header, fileItem.getAbsolutePath() );
         // handle the frame
-        int httpStatusCode = baltradFrameHandler.handleBF( baltradFrame );
+        int httpStatusCode = baltradFrameHandler.handleBF( baltradFrame,
+                InitAppUtil.getConnTimeout(), InitAppUtil.getSoTimeout() );
         // update data delivery register
         String status = ( ( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) ?
             DeliveryRegisterEntry.MSG_SUCCESS : DeliveryRegisterEntry.MSG_FAILURE );

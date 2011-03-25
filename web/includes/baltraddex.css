@@ -327,17 +327,61 @@ button::-moz-focus-inner {
     margin-left: 12px;
 }
 
-/*
- * login form
- */
+/*------------------------------------------------------------------------------------ login form */
 #login {
-    float: left;
-    clear: right;
-    left: 20%;
-    position: relative;
-    width: 100%;
-    padding-top: 42px;
-    text-align: center;
+    clear:both;
+    width:360px;
+    height: 180px;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
+}
+.login-top {
+    width:100%;
+    float:left;
+    clear:both;
+    margin-top:48px;
+    margin-bottom:6px;
+}
+.login-left {
+    width:30%;
+    float:left;
+    text-align:right;
+    color: #2d76ae;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+.login-right {
+    width:70%;
+    float:left;
+}
+.login-bottom {
+    width:100%;
+    float:left;
+    clear:both;
+    text-align:center;
+    margin-top:12px;
+}
+.login-right input {
+    width:140px;
+    float:left;
+}
+.login-left .login-row {
+    padding-right:12px;
+}
+.login-row {
+    height:30px;
+}
+/*------------------------------------------------------------------------------------------------*/
+
+
+
+
+form > .left > .row4, form > .right > .row4 {
+    height: 88px;
+}
+form > .left > .row6, form > .right > .row6 {
+    height: 118px;
 }
 form > .left {
     position: relative;
@@ -351,14 +395,6 @@ form > .left {
 form > .left > .row, form > .right > .row {
     height: 28px;
 }
-form > .left > .row4, form > .right > .row4 {
-    height: 88px;
-}
-form > .left > .row6, form > .right > .row6 {
-    height: 118px;
-}
-
-
 form > .right {
     position: relative;
     float: left;

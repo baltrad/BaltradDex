@@ -89,22 +89,22 @@ Author     : szewczenko
                     
                     <div id="login">
                         <form method="post">
-                            <div class="top">
+                            <div class="login-top">
                                 <%@include file="/WEB-INF/jsp/messages.jsp"%>
                             </div>
-                            <div class="left">
-                                <div class="row">User Name</div>
-                                <div class="row">Password</div>
+                            <div class="login-left">
+                                <div class="login-row">User Name</div>
+                                <div class="login-row">Password</div>
                             </div>
-                            <div class="right">
-                                <div class="row">
+                            <div class="login-right">
+                                <div class="login-row">
                                     <form:input path="command.name"/>
                                     <div class="help-icon" onmouseover="if(t1)t1.Show(event,l1)"
                                         onmouseout="if(t1)t1.Hide(event)">
                                         <img src="includes/images/help-icon.png" alt="help_icon"/>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="login-row">
                                     <form:password path="command.password"/>
                                     <div class="help-icon" onmouseover="if(t2)t2.Show(event,l2)"
                                         onmouseout="if(t2)t2.Hide(event)">
@@ -112,7 +112,7 @@ Author     : szewczenko
                                     </div>
                                 </div>
                             </div>
-                            <div class="bottom">
+                            <div class="login-bottom">
                                 <button class="rounded" type="submit">
                                     <span>Submit</span>
                                 </button>

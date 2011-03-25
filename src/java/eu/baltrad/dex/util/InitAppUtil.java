@@ -53,6 +53,10 @@ public class InitAppUtil {
     private final static String TEMP_FILE_PREFIX = "dex";
     // Temporary file suffix
     private final static String TEMP_FILE_SUFFIX = ".dat";
+    /** HTTP connection timeout property */
+    private final static String CONN_TIMEOUT_PROP = "http.connection.timeout";
+    /** HTTP socket timeout property */
+    private final static String SO_TIMEOUT_PROP = "http.socket.timeout";
     // Node version property
     private final static String NODE_VERSION_PROP = "node.version";
     // Image storage folder
@@ -92,6 +96,10 @@ public class InitAppUtil {
     private static String imageStorageDirectory;
     // Thumbs storage directory
     private static String thumbsStorageDirectory;
+    /** HTTP connection timeout in milliseconds */
+    private static int connTimeout;
+    /** HTTP socket timeout in milliseconds */
+    private static int soTimeout;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor performs initialization task
@@ -134,6 +142,8 @@ public class InitAppUtil {
                 Properties props = new Properties();
                 if( is != null ) {
                     props.load( is );
+                    connTimeout = Integer.parseInt( props.getProperty( CONN_TIMEOUT_PROP ) );
+                    soTimeout = Integer.parseInt( props.getProperty( SO_TIMEOUT_PROP ) );
                     nodeVersion = props.getProperty( NODE_VERSION_PROP );
                     imageStorageFolder = props.getProperty( IMAGE_STORAGE_FOLDER_PROP );
                     thumbsStorageFolder = props.getProperty( THUMBS_STORAGE_FOLDER_PROP );
@@ -154,6 +164,38 @@ public class InitAppUtil {
             logManager.addEntry( new Date(), LogManager.MSG_INFO,
                     "Application successfully initialized" );
         }
+    }
+    /**
+     * Gets HTTP connection timeout.
+     *
+     * @return connTimeout HTTP connection timeout in milliseconds
+     */
+    public static int getConnTimeout() {
+        return connTimeout;
+    }
+    /**
+     * Sets HTTP connection timeout.
+     *
+     * @param _connTimeout HTTP connection timeout in milliseconds
+     */
+    public static void setConnTimeout( int _connTimeout ) {
+        connTimeout = _connTimeout;
+    }
+    /**
+     * Gets HTTP socket timeout.
+     *
+     * @return soTimeout HTTP socket timeout in milliseconds
+     */
+    public static int getSoTimeout() {
+        return soTimeout;
+    }
+    /**
+     * Sets HTTP socket timeout.
+     *
+     * @param _soTimeout HTTP socket timeout in milliseconds
+     */
+    public static void setSoTimeout( int _soTimeout ) {
+        soTimeout = _soTimeout;
     }
     /**
      * Gets node version property.

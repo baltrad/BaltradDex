@@ -213,7 +213,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 BaltradFrame baltradFrame =
                                         new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
                                 // process the frame
-                                bfHandler.handleBF( baltradFrame );
+                                bfHandler.handleBF( baltradFrame, InitAppUtil.getConnTimeout(),
+                                        InitAppUtil.getSoTimeout() );
                                 // delete temporary file
                                 InitAppUtil.deleteFile( tempFile );
                             } else {
@@ -311,17 +312,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                             InitAppUtil.getNodeAddress(),
                                             InitAppUtil.getNodeName(),
                                             Subscription.REMOTE_SUBSCRIPTION, false, false );
-
-
-
-
-
                                         subscriptionManager.saveSubscription( subs );
                                         confirmedChannels.add( requestedChannel );
-
-
-
-
                                     }
                                 }
                             }
@@ -343,7 +335,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             BaltradFrame baltradFrame =
                                     new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
                             // process the frame
-                            bfHandler.handleBF( baltradFrame );
+                            bfHandler.handleBF( baltradFrame, InitAppUtil.getConnTimeout(),
+                                        InitAppUtil.getSoTimeout() );
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                         }
@@ -402,12 +395,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     subs.getChannelName(), subs.getNodeAddress(),
                                     subs.getOperatorName(), Subscription.REMOTE_SUBSCRIPTION,
                                     false, false );
-
-
-
-
-
-
                             // subscription object serves as confirmation
                             Subscription confirmedSub = null;
                             if( subs.getActive() ) {
@@ -480,7 +467,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             BaltradFrame baltradFrame =
                                     new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
                             // process the frame
-                            bfHandler.handleBF( baltradFrame );
+                            bfHandler.handleBF( baltradFrame, InitAppUtil.getConnTimeout(),
+                                        InitAppUtil.getSoTimeout() );
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                         }
@@ -573,7 +561,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             BaltradFrame baltradFrame =
                                     new BaltradFrame( retHeader, tempFile.getAbsolutePath() );
                             // process the frame
-                            bfHandler.handleBF( baltradFrame );
+                            bfHandler.handleBF( baltradFrame, InitAppUtil.getConnTimeout(),
+                                        InitAppUtil.getSoTimeout() );
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                         }
@@ -693,7 +682,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public void doPost( HttpServletRequest request, HttpServletResponse response, 
             BaltradFrame baltradFrame ) {
-        bfHandler.handleBF( baltradFrame );
+        bfHandler.handleBF( baltradFrame, InitAppUtil.getConnTimeout(), InitAppUtil.getSoTimeout() );
     }
     /**
      * Autheticates incoming frame by verifying user name and password encoded in frame header.
