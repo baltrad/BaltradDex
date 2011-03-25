@@ -79,9 +79,8 @@ public class LoginController extends SimpleFormController {
     public ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
                                     Object command, BindException errors ) throws Exception {
         User formUser = ( User )command;
-        User dbUser = ( User )command;
         // Look for user in the database
-        dbUser = userManager.getUserByName( formUser.getName() );
+        User dbUser = userManager.getUserByName( formUser.getName() );
         if( ApplicationSecurityManager.authenticateFormUser( formUser, dbUser ) ) {
             // Set user variable for this session
             ApplicationSecurityManager.setUser( request, dbUser );

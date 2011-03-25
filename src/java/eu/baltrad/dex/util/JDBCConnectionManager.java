@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.ResultSet;
 
 /**
  * Handles JDBC connection pooling. Implemented as sigleton in order to keep control over the
@@ -51,6 +53,8 @@ public class JDBCConnectionManager {
     private static final String PASSWD_PROP = "jdbc.connection.password";
     /** Connection pool size prop */
     private static final String POOL_SIZE_PROP = "jdbc.connection.pool_size";
+    /** Test query used to validate connection */
+    private static final String TEST_QUERY = "SELECT count(*) FROM dex_users;";
 //---------------------------------------------------------------------------------------- Variables
     /** Driver class */
     private static String driverClass;
@@ -63,7 +67,7 @@ public class JDBCConnectionManager {
     /** Connection pool size */
     private static int poolSize;
     /** Connection pool */
-    private static Vector connectionPool;
+    private static Vector<Connection> connectionPool;
     /** Reference to the object of this class */
     private static JDBCConnectionManager jdbcConnectionManager;
 //------------------------------------------------------------------------------------------ Methods
@@ -155,7 +159,11 @@ public class JDBCConnectionManager {
     public synchronized Connection getConnection() {
         Connection connection = null;
         if( connectionPool.size() > 0 ) {
-            connection = ( Connection )connectionPool.firstElement();
+            connection = connectionPool.firstElement();
+            if( !validateConnection( connection ) ) {
+                recoverConnectionPool();
+                connection = connectionPool.firstElement();
+            }
             connectionPool.removeElementAt( 0 );
         }
         return connection;
@@ -167,6 +175,43 @@ public class JDBCConnectionManager {
      */
     public synchronized void returnConnection( Connection connection ) {
         connectionPool.addElement( connection );
+    }
+    /**
+     * Validates a connection.
+     *
+     * @param conn Connection to be validated
+     * @return True if connection is valid, false otherwise
+     */
+    public boolean validateConnection( Connection conn ) {
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( TEST_QUERY );
+            while( resultSet.next() ) {
+                long count = resultSet.getLong( 1 );
+            }
+            return true;
+        } catch( Exception e ) {
+            return false;
+        }
+    }
+    /**
+     * Closes existing connections and initializes connection pool.
+     */
+    public void recoverConnectionPool() {
+        for( int i = 0; i < poolSize; i++ ) {
+            if( connectionPool.get( i ) != null ) {
+                Connection c = connectionPool.get( i );
+                try {
+                    c.close();
+                } catch( SQLException e ) {
+                    System.out.println( "Failed to close invalid connection: " + e.getMessage() );
+                }
+            }
+        }
+        connectionPool.removeAllElements();
+        for( int i = 0; i < poolSize; i++ ) {
+            connectionPool.addElement( createNewConnection() );
+        }
     }
 }
 //--------------------------------------------------------------------------------------------------

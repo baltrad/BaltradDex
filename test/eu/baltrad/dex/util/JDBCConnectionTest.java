@@ -39,20 +39,22 @@ import java.sql.ResultSet;
 public class JDBCConnectionTest extends TestCase {
 //---------------------------------------------------------------------------------------- Variables
     private static Connection conn;
+    private static final String DB_DRIVER = "org.postgresql.Driver";
+    private static final String DB_URI = "jdbc:postgresql://localhost:5432/baltrad";
+    private static final String DB_USER = "baltrad";
+    private static final String DB_PASSWD = "baltrad";
 //------------------------------------------------------------------------------------------ Methods
-        
     public void testLoadDriver() {
         try {
-            Class.forName( "org.postgresql.Driver" );
+            Class.forName( DB_DRIVER );
         } catch( ClassNotFoundException e ) {
             fail( "Failed to load driver: " + e.getMessage() );
         }
     }
 
     public void testConnectJDBC() {
-        String dbURI = "jdbc:postgresql://localhost:5432/baltrad";
         try {
-            conn = DriverManager.getConnection( dbURI, "baltrad", "baltrad" );
+            conn = DriverManager.getConnection( DB_URI, DB_USER, DB_PASSWD );
             assertNotNull( conn );
         } catch( SQLException e ) {
             fail( "Failed to connect to database: " + e.getMessage() );
