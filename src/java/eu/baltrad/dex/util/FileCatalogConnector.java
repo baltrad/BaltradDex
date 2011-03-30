@@ -29,7 +29,6 @@ import eu.baltrad.fc.LocalStorage;
 import eu.baltrad.fc.db.Database;
 
 import java.util.Properties;
-import java.util.Date;
 import java.io.InputStream;
 
 /**
@@ -104,18 +103,18 @@ public class FileCatalogConnector {
                 localStorage = new CacheDirStorage( dataStorageDirectory );
                 database = Database.create( dbURI );
                 fileCatalog = new FileCatalog( database, localStorage );
-                logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                         "File catalog successfully initialized" );
             } else {
-                logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                         "Failed to load properties file: " + PROPS_FILE_NAME );
             }
         } catch( FileCatalogError e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "File catalog error: " +
-                    e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "File catalog error: " + e.getMessage() );
         } catch( Exception e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "File catalog error: " +
-                    e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "File catalog error: " + e.getMessage() );
         }
     }
     /**

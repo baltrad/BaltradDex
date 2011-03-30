@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Date;
 
 /**
  * Controller creates node connection object and sends it to the remote node.
@@ -131,11 +130,11 @@ public class ConnectToNodeController extends SimpleFormController {
                 try {
                     nodeConnectionManager.saveOrUpdate( nodeConn );
                 } catch( SQLException e ) {
-                    logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to save " +
-                            "node connection: " + e.getMessage() );
+                    logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                            "Failed to save node connection: " + e.getMessage() );
                 } catch( Exception e ) {
-                    logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to save " +
-                            "node connection: " + e.getMessage() );
+                    logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                            "Failed to save node connection: " + e.getMessage() );
                 }
             }
         }

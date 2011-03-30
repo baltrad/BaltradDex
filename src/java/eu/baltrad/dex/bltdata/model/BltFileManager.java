@@ -51,6 +51,10 @@ public class BltFileManager {
 //---------------------------------------------------------------------------------------- Constants
     /** HDF5 source key */
     private static final String FC_SRC_PLC_ATTR = "what/source:PLC";
+    /** HDF5 date attribute */
+    private static final String FC_DATE_ATTR = "what/date";
+    /** HDF5 time attribute */
+    private static final String FC_TIME_ATTR = "what/time";
     /** File UUID key */
     private static final String FC_FILE_UUID = "file:uuid";
     /** Date format string */
@@ -109,7 +113,7 @@ public class BltFileManager {
         // set offset and limit
         q.limit( limit );
         q.skip( offset );
-        //q.order_by( someField, FileQuery.SortDir.DESC );
+        q.order_by( xpr.combined_datetime( FC_DATE_ATTR, FC_TIME_ATTR ), FileQuery.SortDir.DESC );
         // filter the query with a given channel name
         q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( dataChannel ) ) );
         FileResult r = fc.database().execute( q );

@@ -43,7 +43,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Controller class creates new system configuration or modifies existing configuration.
@@ -77,11 +76,11 @@ public class SaveConfigurationController extends SimpleFormController {
         try {
             conf = configurationManager.getConfiguration( ConfigurationManager.CONF_REC_ID );
         } catch( SQLException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while reading configuration"
-                    + " from database: " + e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Error while reading configuration from database: " + e.getMessage() );
         } catch( Exception e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while reading configuration"
-                    + " from database: " + e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Error while reading configuration from database: " + e.getMessage() );
         }
         if( conf == null ) {
             conf = new Configuration( "Short node name", PRIMARY_NODE,
@@ -115,8 +114,8 @@ public class SaveConfigurationController extends SimpleFormController {
                 timeZones.add( strLine );
             }
         } catch( IOException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to load time zones"
-                    + " from file: " + e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Failed to load time zones from file: " + e.getMessage() );
         }
         model.put( NODE_TYPES, nodeTypes );
         model.put( TIME_ZONES, timeZones );
@@ -146,13 +145,13 @@ public class SaveConfigurationController extends SimpleFormController {
             InitAppUtil.initApp();
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveconf.savesuccess" ) );
-            logManager.addEntry( new Date(), LogManager.MSG_WRN, 
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
                     getMessageSourceAccessor().getMessage( "message.saveconf.savesuccess" ) );
         } catch( SQLException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                         "message.saveconf.savefail" ) );
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                     getMessageSourceAccessor().getMessage( "message.saveconf.savefail" )
                     + ": " + e.getMessage() );
             errors.reject( "message.saveconf.savefail" ); 
@@ -160,7 +159,7 @@ public class SaveConfigurationController extends SimpleFormController {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                         "message.saveconf.savefail" ) );
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                     getMessageSourceAccessor().getMessage( "message.saveconf.savefail" )
                     + ": " + e.getMessage() );
             errors.reject( "message.saveconf.savefail" );

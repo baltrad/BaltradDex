@@ -119,24 +119,9 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION upgrade_dex_schema() RETURNS VOID AS $$
 BEGIN
     BEGIN
-        ALTER TABLE dex_users DROP COLUMN ret_password;
+        ALTER TABLE dex_messages ALTER COLUMN timestamp TYPE bigint;
   	EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'Column dex_users.ret_password does not exist';
-    END;
-    BEGIN
-        ALTER TABLE dex_users DROP COLUMN selected;
-  	EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'Column dex_users.ret_selected does not exist';
-    END;
-    BEGIN
-        ALTER TABLE dex_users ADD CONSTRAINT dex_users_name_hash_key UNIQUE (name_hash);
-  	EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'Column dex_users.name_hash does not exist';
-    END;
-    BEGIN
-        ALTER TABLE dex_subscriptions RENAME COLUMN selected TO active;
-  	EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'Column dex_subcriptions.selected does not exist';
+        WHEN OTHERS THEN RAISE NOTICE 'failed to alter column "timestamp" of table "dex_messages"';
     END;
 END;
 $$ LANGUAGE plpgsql;

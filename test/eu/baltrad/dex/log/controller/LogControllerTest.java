@@ -29,8 +29,6 @@ import junit.framework.TestCase;
 
 import java.sql.Connection;
 
-import java.util.Date;
-
 /**
  * Tests log handling with direct usage of JDBC
  *
@@ -87,8 +85,8 @@ public class LogControllerTest extends TestCase {
         @Override
         public void run() {
             for( int i = 0; i < numOp; i++ ) {
-                LogEntry entry = new LogEntry( new Date(), LogManager.MSG_INFO, "Logger " +
-                        label + " entry " + i );
+                LogEntry entry = new LogEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
+                        "Logger " + label + " entry " + i );
                 manager.addEntry( entry );
             }
         }

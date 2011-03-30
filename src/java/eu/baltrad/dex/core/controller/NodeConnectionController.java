@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Multi action controller handling node connection managing.
@@ -113,20 +112,20 @@ public class NodeConnectionController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeconnection.success" ) );
-                logManager.addEntry( new Date(), LogManager.MSG_INFO, "Removed node connection: "
-                        + getSelectedConns().get( i ).getConnectionName() );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
+                    "Removed node connection: " + getSelectedConns().get( i ).getConnectionName() );
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeconnection.fail" ) );
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove node "
-                        + "connection: " + e.getMessage() );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                        "Failed to remove node connection: " + e.getMessage() );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeconnection.fail" ) );
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove node "
-                        + "connection: " + e.getMessage() );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                        "Failed to remove node connection: " + e.getMessage() );
             }
         }
         return new ModelAndView( SHOW_REM_CONN_VIEW );

@@ -39,7 +39,6 @@ import java.io.File;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Class implements remote channel list controller. 
@@ -166,7 +165,7 @@ public class RemoteChannelController extends MultiActionController {
                 Channel channel = (  Channel )getSubscribedChannels().get( i );
                 if( subscriptionManager.getSubscription( channel.getChannelName(),
                         Subscription.LOCAL_SUBSCRIPTION ) != null ) {
-                    logManager.addEntry( new Date(), LogManager.MSG_WRN,
+                    logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
                         "You have already subscribed to " + channel.getChannelName() );
                 } else {
                     // add local subscription
@@ -178,8 +177,8 @@ public class RemoteChannelController extends MultiActionController {
                 }
             }
         } catch( Exception e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while adding remote " +
-                    "channels to subscription list: " + e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Error while adding remote channels to subscription list: " + e.getMessage() );
         }
         return new ModelAndView( SUBSCRIBED_REMOTE_RADARS_VIEW, SUBSCRIBED_REMOTE_RADARS_KEY,
                 getSubscribedChannels() );

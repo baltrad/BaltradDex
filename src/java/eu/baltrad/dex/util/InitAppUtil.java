@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -100,29 +100,25 @@ public class InitAppUtil {
     private static int connTimeout;
     /** HTTP socket timeout in milliseconds */
     private static int soTimeout;
+    /** Numeric value used to determine if application was successfully initialized */
+    private static int initStatus;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor performs initialization task
      */
     public InitAppUtil() { 
         logManager = new LogManager();
-        initApp();
+        initStatus = initApp();
     }
     /**
      * Method initializes application by reading configuration from database.
+     *
+     * return
      */
-    public static void initApp() {
-        Configuration conf = null;
+    public static int initApp() {
         try {
-            conf = configurationManager.getConfiguration( ConfigurationManager.CONF_REC_ID );
-        } catch( SQLException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while reading configuration"
-                    + " from database: " + e.getMessage() );
-        } catch( Exception e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while reading configuration"
-                    + " from database: " + e.getMessage() );
-        }
-        if( conf != null ) {
+            Configuration conf = configurationManager.getConfiguration(
+                    ConfigurationManager.CONF_REC_ID );
             // reconstruct node's full address
             setNodeAddress( NodeConnection.HTTP_PREFIX + conf.getShortAddress() +
                     NodeConnection.PORT_SEPARATOR + conf.getPortNumber() +
@@ -137,33 +133,52 @@ public class InitAppUtil {
             // Create relative or absolute work directory
             String tmpDir = createDir( conf.getTempDir(), "Created work directory" );
             setWorkDir( tmpDir );
-            try {
-                InputStream is = InitAppUtil.class.getResourceAsStream( PROPS_FILE_NAME );
-                Properties props = new Properties();
-                if( is != null ) {
-                    props.load( is );
-                    connTimeout = Integer.parseInt( props.getProperty( CONN_TIMEOUT_PROP ) );
-                    soTimeout = Integer.parseInt( props.getProperty( SO_TIMEOUT_PROP ) );
-                    nodeVersion = props.getProperty( NODE_VERSION_PROP );
-                    imageStorageFolder = props.getProperty( IMAGE_STORAGE_FOLDER_PROP );
-                    thumbsStorageFolder = props.getProperty( THUMBS_STORAGE_FOLDER_PROP );
-                    // create image storage directory
-                    imageStorageDirectory = createDir( getWorkDir() + File.separator +
-                        imageStorageFolder, "New image storage directory created" );
-                    // create thumbs storage directory
-                    thumbsStorageDirectory = createDir( getWorkDir() + File.separator +
-                        thumbsStorageFolder, "New thumbs storage directory created" );
-                } else {
-                    logManager.addEntry( new Date(), LogManager.MSG_ERR,
-                        "Failed to load properties file: " + PROPS_FILE_NAME );
-                }
-            } catch( Exception e ) {
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to initialize " + 
-                        "application: " + e.getMessage() );
-            }
-            logManager.addEntry( new Date(), LogManager.MSG_INFO,
-                    "Application successfully initialized" );
+            InputStream is = InitAppUtil.class.getResourceAsStream( PROPS_FILE_NAME );
+            Properties props = new Properties();
+            props.load( is );
+            connTimeout = Integer.parseInt( props.getProperty( CONN_TIMEOUT_PROP ) );
+            soTimeout = Integer.parseInt( props.getProperty( SO_TIMEOUT_PROP ) );
+            nodeVersion = props.getProperty( NODE_VERSION_PROP );
+            imageStorageFolder = props.getProperty( IMAGE_STORAGE_FOLDER_PROP );
+            thumbsStorageFolder = props.getProperty( THUMBS_STORAGE_FOLDER_PROP );
+            // create image storage directory
+            imageStorageDirectory = createDir( getWorkDir() + File.separator +
+                imageStorageFolder, "New image storage directory created" );
+            // create thumbs storage directory
+            thumbsStorageDirectory = createDir( getWorkDir() + File.separator +
+                thumbsStorageFolder, "New thumbs storage directory created" );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
+                "Application successfully initialized" );
+            return 0;
+        } catch( SQLException e ) {
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                "Failed to initialize application: " + e.getMessage() );
+            return 1;
+        } catch( IOException e ) {
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                "Failed to initialize application: " + e.getMessage() );
+            return 1;
+        } catch( Exception e ) {
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                "Failed to initialize application: " + e.getMessage() );
+            return 1;
         }
+    }
+    /**
+     * Gets application initialization status.
+     *
+     * @return Application initialization status
+     */
+    public static int getInitStatus() {
+        return initStatus;
+    }
+    /**
+     * Sets application initialization status.
+     *
+     * @param _initStatus Application initialization status to set
+     */
+    public static void setInitStatus( int _initStatus ) {
+        initStatus = _initStatus;
     }
     /**
      * Gets HTTP connection timeout.
@@ -399,10 +414,11 @@ public class InitAppUtil {
         File f = new File( dir );
         if( !f.exists() ) {
             if( f.mkdirs() ) {
-                logManager.addEntry( new Date(), LogManager.MSG_WRN, msg + ": " + dir );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN, msg + ": "
+                        + dir );
             } else {
-                logManager.addEntry( new Date(), LogManager.MSG_WRN,  "Failed to create "
-                        + "directory: " + dir );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
+                        "Failed to create directory: " + dir );
             }
         }
         return dir;
@@ -418,8 +434,8 @@ public class InitAppUtil {
         try {
             f = File.createTempFile( TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX, tempDir );
         } catch( IOException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while creating temporary " +
-                    "file: \n" + e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Error while creating temporary file: \n" + e.getMessage() );
         }
         return f;
     }
@@ -443,11 +459,11 @@ public class InitAppUtil {
             is.close();
             fos.close();
         } catch( FileNotFoundException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
-                    + e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Error while saving file: \n" + e.getMessage() );
         } catch( IOException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
-                    + e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Error while saving file: \n" + e.getMessage() );
         }
         return dstFile;
     }
@@ -469,11 +485,11 @@ public class InitAppUtil {
             is.close();
             fos.close();
         } catch( FileNotFoundException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
-                    + e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Error while saving file: \n" + e.getMessage() );
         } catch( IOException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while saving file: \n"
-                    + e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Error while saving file: \n" + e.getMessage() );
         }
         return dstFile;
     }
@@ -487,8 +503,8 @@ public class InitAppUtil {
             File f = new File( filePath );
             f.delete();
         } catch( Exception e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while deleting file: \n"
-                    + e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Error while deleting file: \n" + e.getMessage() );
         }
     }
     /**
@@ -498,8 +514,8 @@ public class InitAppUtil {
      */
     public static void deleteFile( File f ) {
         if( !f.delete() ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while deleting file: "
-                    + f.getName() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Error while deleting file: " + f.getName() );
         }
     }
     /**
@@ -536,10 +552,10 @@ public class InitAppUtil {
             oos.writeObject( obj );
             oos.close();
         } catch( FileNotFoundException e )  {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                     "Error while writing object to stream: " + e.getMessage() );
         } catch( IOException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                     "Error while writing object to stream: " + e.getMessage() );
         }
     }
@@ -556,10 +572,10 @@ public class InitAppUtil {
             obj = ois.readObject();
             ois.close();
         } catch( ClassNotFoundException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                     "Error while reading object from stream: " + e.getMessage() );
         } catch( IOException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                     "Error while reading object from stream: " + e.getMessage() );
         }
         return obj;

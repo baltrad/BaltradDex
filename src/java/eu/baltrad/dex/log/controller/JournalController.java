@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -110,8 +110,11 @@ public class JournalController implements Controller, ITableScroller {
     /**
      * Sets page number to the next page number.
      */
-    public void nextPage() { 
+    public void nextPage() {
         int lastPage = ( int )Math.ceil( logManager.countEntries() / LogManager.ENTRIES_PER_PAGE );
+        if( ( lastPage * LogManager.ENTRIES_PER_PAGE ) < logManager.countEntries() ) {
+            ++lastPage;
+        }
         if( lastPage == 0 ) {
             ++lastPage;
         }
@@ -139,6 +142,9 @@ public class JournalController implements Controller, ITableScroller {
     public void lastPage() {
         long numEntries = logManager.countEntries();
         int lastPage = ( int )Math.ceil( numEntries / LogManager.ENTRIES_PER_PAGE );
+        if( ( lastPage * LogManager.ENTRIES_PER_PAGE ) < logManager.countEntries() ) {
+            ++lastPage;
+        }
         if( lastPage == 0 ) {
             ++lastPage;
         }

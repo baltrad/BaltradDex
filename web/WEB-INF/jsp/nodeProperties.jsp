@@ -68,7 +68,7 @@ Author     : szewczenko
                                 </div>
                                 <div class="right">
                                     <div class="row">
-                                        <form:input path="command.nodeName"/>
+                                        <form:input path="command.nodeName" cssClass="node-name"/>
                                         <form:errors path="command.nodeName"
                                                      cssClass="errors"/>
                                     </div>
@@ -88,20 +88,20 @@ Author     : szewczenko
                                                      cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <div class="row-elem">
-                                            http://<form:input path="command.shortAddress"
-                                            cssClass="shortAddress"/>:<form:input
-                                            path="command.portNumber" cssClass="portNumber"/>
-                                        </div>
+                                        <div class="protocol-prefix">http://</div>
+                                        <form:input path="command.shortAddress"
+                                            cssClass="node-address"/>
+                                        <div class="port-separator">:</div>
+                                        <form:input path="command.portNumber" cssClass="port-number"/>
                                         <form:errors path="command.fullAddress" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.orgName"/>
+                                        <form:input path="command.orgName" cssClass="org-name"/>
                                         <form:errors path="command.orgName"
                                                      cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.orgAddress"/>
+                                        <form:input path="command.orgAddress" cssClass="org-address"/>
                                         <form:errors path="command.orgAddress"
                                                      cssClass="errors"/>
                                     </div>
@@ -122,12 +122,12 @@ Author     : szewczenko
                                                      cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.tempDir"/>
+                                        <form:input path="command.tempDir" cssClass="work-dir"/>
                                         <form:errors path="command.tempDir"
                                                      cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.adminEmail"/>
+                                        <form:input path="command.adminEmail" cssClass="admin-email"/>
                                         <form:errors path="command.adminEmail"
                                                      cssClass="errors"/>
                                     </div>

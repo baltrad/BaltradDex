@@ -616,9 +616,6 @@ tr {
 #table > .props > form > .left {
     margin-right: 22px;
 }
-#table > .props > form > .right > .row > input {
-    width: 320px;
-}
 #table > .props > form > .right > .row > select {
     width: 240px;
 }
@@ -636,38 +633,79 @@ tr {
     width: 240px;
 }
 
-/*
- * Input fields on connect to node, node properties and save user account page
- */
-.connectToNode {
-    color: #2d76ae;
+/*-------------------------------------------------------------------------- Connect to node page */
+#node-connect {
+    width:100%;
 }
-.nodeAddress {
-    width: 140px;
-}
-.portNumber {
-    width: 40px;
-}
-.row-elem {
-    color: #2d76ae;
-    font-weight: bold;
-    float: left;
-    margin-right: 6px;
-}
-.userName, .passwd {
-    width: 280px;
-}
-.connect-footer {
+#node-connect .connect-header {
     width:100%;
     float:left;
     clear:both;
-    text-align:right;
+    color:#2d76ae;
+    font-size:1.1em;
+    font-weight:bolder;
+    border-bottom: 1px solid #2d76ae;
+    margin-top:24px;
 }
-.connect {
-    float:right;
+#node-connect .row {
+    width:100%;
+    float:left;
+    clear:both;
+    padding-top:12px;
+}
+#node-connect .left {
+    width:30%;
+    float:left;
+}
+#node-connect .right {
+    width:70%;
+    float:left;
     clear:right;
-    text-align:right;
 }
+#node-connect select {
+    width:220px;
+    float:left;
+}
+#node-connect button {
+    float:right;
+}
+.node-address {
+    float:left;
+}
+.protocol-prefix {
+    float:left;
+    color: #2d76ae;
+    font-weight: bold;
+}
+.port-separator {
+    float:left;
+    color: #2d76ae;
+    font-weight: bold;
+}
+.port-number {
+    width:40px;
+    float:left;
+}
+.user-name, .user-passwd {
+    float:left;
+    width:240px;
+}
+/*-------------------------------------------------------------------------- Node properties page */
+.node-name, .org-name, .org-address, .work-dir, .admin-email {
+    float:left;
+    width:280px;
+}
+/*----------------------------------------------------------------------------- User account page */
+.user-name, .user-passwd, .confirm-password, .country, .city, .city-code,
+        .street, .street-number, .phone {
+    float:left;
+    width:280px;
+}
+
+
+
+
+
 
 
 /*
@@ -762,7 +800,7 @@ tr {
  */
 .errors {
     color: red;
-    float: right;
+    float: left;
     padding-left: 4px;
     clear: right;
 }
@@ -881,7 +919,9 @@ tr {
         #showusers > .table-row > .role, #showusers > .table-row > .factory {
     float:left;
     padding:3px 0px 3px 0px;
-    width: 30%;
+    width:28%;
+    overflow:hidden;
+    margin-right:2%;
 }
 #showusers > .table-hdr > .check, #showusers > .table-row > .check {
     float:left;
@@ -894,14 +934,18 @@ tr {
         #removeusers > .table-row > .role, #removeusers > .table-row > .factory {
     float:left;
     padding:3px 0px 3px 0px;
-    width: 33%;
+    width:30%;
+    overflow:hidden;
+    margin-right:2%;
 }
 #edituser > .table-hdr > .name, #edituser > .table-hdr > .role,
         #edituser > .table-hdr > .factory, #edituser > .table-row > .name,
         #edituser > .table-row > .role, #edituser > .table-row > .factory {
     float:left;
     padding:3px 0px 3px 0px;
-    width: 33%;
+    width:30%;
+    overflow:hidden;
+    margin-right:2%;
 }
 #selectconnections > .table-hdr > .name, #selectconnections > .table-row > .name,
         #selectconnections > .table-hdr > .address, #selectconnections > .table-row > .address,
@@ -1018,29 +1062,54 @@ tr {
     width:18%;
     text-align:center;
 }
-#adaptors > .table-hdr > .name, #adaptors > .table-row > .name,
-        #adaptors > .table-hdr > .type, #adaptors > .table-row > .type {
+
+
+#adaptors > .table-hdr > .name, #adaptors > .table-row > .name {
     float:left;
     padding:3px 0px 3px 0px;
-    width:50%;
+    width:60%;
+    overflow:hidden;
+    margin-right:5%;
+}
+#adaptors > .table-hdr > .type, #adaptors > .table-row > .type {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:30%;
+    overflow:hidden;
 }
 #showschedule > .table-hdr > .id, #showschedule > .table-row > .id {
     float:left;
     padding:3px 0px 3px 0px;
     width:50%;
 }
-#showroutes > .table-hdr > .active, #showroutes > .table-row > .active,
-        #showroutes > .table-hdr > .name, #showroutes > .table-row > .name,
-        #showroutes > .table-hdr > .type, #showroutes > .table-row > .type {
+#showroutes > .table-hdr > .active, #showroutes > .table-row > .active {
     float:left;
+    width:10%;
     padding:3px 0px 3px 0px;
-    width:15%;
     text-align:center;
+    overflow:hidden;
+    margin-right:2%;
+}
+#showroutes > .table-hdr > .name, #showroutes > .table-row > .name {
+    float:left;
+    width:20%;
+    padding:3px 0px 3px 0px;
+    text-align:center;
+    overflow:hidden;
+    margin-right:2%;
+}
+#showroutes > .table-hdr > .type, #showroutes > .table-row > .type {
+    float:left;
+    width:20%;
+    padding:3px 0px 3px 0px;
+    text-align:center;
+    overflow:hidden;
+    margin-right:2%;
 }
 #showroutes > .table-hdr > .description, #showroutes > .table-row > .description {
     float:left;
     padding:3px 0px 3px 0px;
-    width:55%;
+    width:40%;
 }
 
 
@@ -1191,3 +1260,28 @@ tr {
     padding-left: 4px;
     padding-right: 4px;
 }
+
+
+
+
+
+.expandable-test {
+    width:100%;
+    float:left;
+    clear:both;
+}
+.save{
+   behavior:url(#default#savehistory);}
+a.dsphead{
+   text-decoration:none;
+   margin-left:1.5em;}
+a.dsphead:hover{
+   text-decoration:underline;}
+a.dsphead span.dspchar{
+   font-family:monospace;
+   font-weight:normal;}
+.dspcont{
+   display:none;
+   margin-left:1.5em;}
+
+

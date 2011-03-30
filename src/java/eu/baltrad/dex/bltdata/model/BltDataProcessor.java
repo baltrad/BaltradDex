@@ -30,7 +30,6 @@ import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
 
-import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -120,7 +119,7 @@ public class BltDataProcessor {
             h5File = ( H5File )fileFormat.createInstance( fileName, FileFormat.READ );
             h5File.open();
         } catch( Exception e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Exception while "
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR, "Exception while "
                     + " opening HDF5 file: " + e.getMessage() );
         }
         return h5File;
@@ -138,7 +137,7 @@ public class BltDataProcessor {
             res = 0;
         } catch( HDF5Exception hdf5e ) {
             res = 1;
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Exception while "
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR, "Exception while "
                     + " closing HDF5 file: " + hdf5e.getMessage() );
         }
         return res;
@@ -154,7 +153,7 @@ public class BltDataProcessor {
         try {
             root = ( Group )( ( DefaultMutableTreeNode )h5File.getRootNode() ).getUserObject();
         } catch( Exception e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Exception while "
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR, "Exception while "
                     + " accessing HDF5 file's root: " + e.getMessage() );
         }
         return root;

@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -44,30 +44,56 @@ import java.util.List;
  */
 public class StatusController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
-    private static final String LOCAL_SUBSCRIPTIONS_KEY = "local_subscriptions";
-    private static final String REMOTE_SUBSCRIPTIONS_KEY = "remote_subscriptions";
+    /** Users key */
+    private final static String USERS = "users";
+    /** Operators key */
+    private final static String OPERATORS = "operators";
+    /** References "operator_name" field in dex_subscriptions table */
+    private final static String OPERATOR_NAME_FIELD = "operator_name";
+    /** References "user_name" field in dex_sunscriptions table */
+    private final static String USER_NAME_FIELD = "user_name";
+    /** Local subscriprions key */
+    private static final String LOCAL_SUBSCRIPTION = "local";
+    /** Remote subscription key */
+    private static final String REMOTE_SUBSCRIPTION = "remote";
 //---------------------------------------------------------------------------------------- Variables
     private SubscriptionManager subscriptionManager;
     private String successView;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Handles HTTP request.
+     * Gets local subscriptions grouped by operators and remote subscriptions grouped by users.
      * 
      * @param request HTTP servlet request
      * @param response HTTP servlet response 
-     * @return ModelAndView holding 2 lists: local and remote subscriptions
+     * @return ModelAndView holding grouped lists of subscriptions
      * @throws ServletException
      * @throws IOException
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException {
+        /*ModelAndView modelAndView = new ModelAndView( getSuccessView() );
+        List<String> operators = subscriptionManager.getDistinct( OPERATOR_NAME_FIELD );
+        modelAndView.addObject( OPERATORS, operators );
+        List<String> users = subscriptionManager.getDistinct( USER_NAME_FIELD );
+        modelAndView.addObject( USERS, users );
+        // get local subscriptions by operator
+        for( int i = 0; i < operators.size(); i++ ) {
+            modelAndView.addObject( operators.get( i ),
+                    subscriptionManager.getSubscriptionsByOperator( operators.get( i ),
+                    LOCAL_SUBSCRIPTION ) );
+        }
+        // get remote subscriptions by user
+        for( int i = 0; i < users.size(); i++ ) {
+            modelAndView.addObject( users.get( i ), subscriptionManager.getSubscriptionsByUser(
+                    users.get( i ), REMOTE_SUBSCRIPTION ) );
+        }*/
         List< Subscription > localSubscriptions = subscriptionManager.getSubscriptions(
                 Subscription.LOCAL_SUBSCRIPTION );
         List< Subscription > remoteSubscriptions = subscriptionManager.getSubscriptions(
                 Subscription.REMOTE_SUBSCRIPTION );
         ModelAndView modelAndView = new ModelAndView( getSuccessView() );
-        modelAndView.addObject( LOCAL_SUBSCRIPTIONS_KEY, localSubscriptions );
-        modelAndView.addObject( REMOTE_SUBSCRIPTIONS_KEY, remoteSubscriptions );
+        modelAndView.addObject( LOCAL_SUBSCRIPTION, localSubscriptions );
+        modelAndView.addObject( REMOTE_SUBSCRIPTION, remoteSubscriptions );
         return modelAndView;
     }
     /**

@@ -142,7 +142,7 @@ public class JDBCConnectionManager {
      *
      * @return JDBC connection
      */
-    public Connection createNewConnection() {
+    private Connection createNewConnection() {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection( dbUri, userName, passwd );
@@ -182,7 +182,7 @@ public class JDBCConnectionManager {
      * @param conn Connection to be validated
      * @return True if connection is valid, false otherwise
      */
-    public boolean validateConnection( Connection conn ) {
+    private boolean validateConnection( Connection conn ) {
         try {
             Statement stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery( TEST_QUERY );
@@ -197,7 +197,7 @@ public class JDBCConnectionManager {
     /**
      * Closes existing connections and initializes connection pool.
      */
-    public void recoverConnectionPool() {
+    private void recoverConnectionPool() {
         for( int i = 0; i < poolSize; i++ ) {
             if( connectionPool.get( i ) != null ) {
                 Connection c = connectionPool.get( i );

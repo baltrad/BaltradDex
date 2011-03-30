@@ -50,6 +50,9 @@ Author     : szewczenko
     BltRadarDataController controller = new BltRadarDataController();
     long numEntries = manager.countEntries( BltRadarDataController.getChannelName() );
     int numPages = ( int )Math.ceil( numEntries / BltFileManager.ENTRIES_PER_PAGE );
+    if( ( numPages * BltFileManager.ENTRIES_PER_PAGE ) < numEntries ) {
+        ++numPages;
+    }
     if( numPages < 1 ) {
         numPages = 1;
     }
@@ -121,7 +124,6 @@ Author     : szewczenko
                                                         <input type="submit" name="pagenum" value="${i}">
                                                     </c:otherwise>
                                                 </c:choose>
-
                                             </c:forEach>
                                         <span></span>
                                         <input type="submit" name="pagenum" value=">">

@@ -125,6 +125,10 @@ public class BltRadarDataController implements Controller, ITableScroller {
     public void nextPage() {
         int lastPage = ( int )Math.ceil( bltFileManager.countEntries( getChannelName() ) /
                 BltFileManager.ENTRIES_PER_PAGE );
+        if( ( lastPage * BltFileManager.ENTRIES_PER_PAGE ) < bltFileManager.countEntries(
+                getChannelName() ) ) {
+            ++lastPage;
+        }
         if( lastPage == 0 ) {
             ++lastPage;
         }
@@ -152,6 +156,10 @@ public class BltRadarDataController implements Controller, ITableScroller {
     public void lastPage() {
         long numEntries = bltFileManager.countEntries( getChannelName() );
         int lastPage = ( int )Math.ceil( numEntries / BltFileManager.ENTRIES_PER_PAGE );
+        if( ( lastPage * BltFileManager.ENTRIES_PER_PAGE ) < bltFileManager.countEntries(
+                getChannelName() ) ) {
+            ++lastPage;
+        }
         if( lastPage == 0 ) {
             ++lastPage;
         }

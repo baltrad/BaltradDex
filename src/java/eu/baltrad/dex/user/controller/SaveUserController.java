@@ -34,7 +34,6 @@ import org.springframework.validation.BindException;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Date;
 
 /**
  * Controller class registers new user in the system or modifies existing user account.
@@ -101,21 +100,21 @@ public class SaveUserController extends SimpleFormController {
             userManager.saveOrUpdate( user );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.savesuccess" ) );
-            logManager.addEntry( new Date(), LogManager.MSG_WRN, "User account saved: " +
-                user.getName() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
+                "User account saved: " + user.getName() );
         } catch( SQLException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.nameexists" ) );
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to save user account: "
-                    + user.getName() + "." );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Failed to save user account: " + user.getName() + "." );
             errors.reject( "message.adduser.nameexists" );
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.nameexists" ) );
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to save user account: "
-                    + user.getName() + "." );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Failed to save user account: " + user.getName() + "." );
             errors.reject( "message.adduser.nameexists" );
         }
         return new ModelAndView( getSuccessView() );

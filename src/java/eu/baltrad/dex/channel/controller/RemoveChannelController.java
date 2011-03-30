@@ -35,7 +35,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Multi action controller handling data channel removal functionality.
@@ -118,22 +117,22 @@ public class RemoveChannelController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removesuccess" ) );
-                logManager.addEntry( new Date(), LogManager.MSG_WRN, "Local radar station "
-                        + channelName + " removed from the system.");
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
+                        "Local radar station " + channelName + " removed from the system.");
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removefail" ) );
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove local radar"
-                        + " station " + channelName + "." );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                        "Failed to remove local radar station " + channelName + "." );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removefail" ) );
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove local radar"
-                        + " station " + channelName + "." );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                        "Failed to remove local radar station " + channelName + "." );
             }
         }
         return new ModelAndView( REMOVED_CHANNELS_VIEW );

@@ -42,6 +42,36 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+
+        <meta name="save" content="history" />
+
+
+
+    
+    <noscript>
+            <style type="text/css"><!--.dspcont{display:block;}//--></style>
+        </noscript>
+        <script type="text/javascript"><!--
+            function dsp(loc){
+               if(document.getElementById){
+                  var foc=loc.firstChild;
+                  foc=loc.firstChild.innerHTML?
+                     loc.firstChild:
+                     loc.firstChild.nextSibling;
+                  foc.innerHTML=foc.innerHTML=='+'?'-':'+';
+                  foc=loc.parentNode.nextSibling.style?
+                     loc.parentNode.nextSibling:
+                     loc.parentNode.nextSibling.nextSibling;
+                  foc.style.display=foc.style.display=='block'?'none':'block';}}
+
+            if(!document.getElementById)
+               document.write('<style type="text/css"><!--\n'+
+                  '.dspcont{display:block;}\n'+
+                  '//--></style>');
+            //--></script>
+
+
+    
         <title>Baltrad | Home</title>
     </head>
     <body>
@@ -83,10 +113,37 @@ Author     : szewczenko
                             <img src="includes/images/icons/arrow-down.png" alt="remote_radars"/>
                         </div>
                         <div class="text">
-                            Incoming data | Subscribed radars
+                            Download | Data from subscribed radars
                         </div>
+
+
+                        <%--
                         <c:choose>
-                            <c:when test="${not empty local_subscriptions}">
+                            <c:when test="${not empty operators}">
+                                <c:forEach var="operator" items="${operators}">
+                                    <c:out value="${operator}"/>
+
+                                    <c:forEach var="sub" items="${operator}">
+                                        <c:out value="${sub.channelName}"/>
+                                    </c:forEach>
+
+
+
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="message">
+                                    <li type="circle">
+                                        You currently have no radar stations subscribed.
+                                    </li>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
+                        --%>
+
+
+                        <c:choose>
+                            <c:when test="${not empty local}">
                                 <div id="table">
                                     <div id="statustable">
                                         <div class="table-hdr">
@@ -100,7 +157,7 @@ Author     : szewczenko
                                                 Active
                                             </div>
                                         </div>
-                                        <c:forEach var="sub" items="${local_subscriptions}">
+                                        <c:forEach var="sub" items="${local}">
                                             <div class="table-row">
                                                 <div class="station">
                                                     <c:out value="${sub.channelName}"/>
@@ -133,16 +190,65 @@ Author     : szewczenko
                                 </div>
                             </c:otherwise>
                         </c:choose>
+
+                        <%--div class="expandable-test">
+
+                            <div class="save">
+
+                                <h1><a href="javascript:void(0)" class="dsphead"
+                                   onclick="dsp(this)">
+                                   <span class="dspchar">+</span> heading</a></h1>
+                                   <div class="dspcont">section</div>
+
+                                <h1><a href="javascript:void(0)" class="dsphead"
+                                   onclick="dsp(this)">
+                                   <span class="dspchar">+</span> heading</a></h1>
+                                   <div class="dspcont">
+
+                                      <h2><a href="javascript:void(0)" class="dsphead"
+                                         onclick="dsp(this)">
+                                         <span class="dsphead">+</span> heading</a></h2>
+                                         <div class="dspcont">section</div>
+
+                                      <h2><a href="javascript:void(0)" class="dsphead"
+                                         onclick="dsp(this)">
+                                         <span class="dspchar">+</span> heading</a></h2>
+                                         <div class="dspcont">section</div>
+                                   </div>
+                                </div>
+
+                        </div--%>
+
+
+
+
+
                     </div>
                     <div id="status-box">
                         <div class="icon">
                             <img src="includes/images/icons/arrow-up.png" alt="remote_radars"/>
                         </div>
                         <div class="text">
-                            Outgoing data | Local radars subscribed by peers
+                            Upload | Data sent to subscribers
                         </div>
+                        <%--c:choose>
+                            <c:when test="${not empty users}">
+                                <c:forEach var="user" items="${users}">
+                                    <c:out value="${user}"/>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="message">
+                                    <li type="circle">
+                                        Your local radars are currently not subscribed
+                                        by peers.
+                                    </li>
+                                </div>
+                            </c:otherwise>
+                        </c:choose--%>
+                        
                         <c:choose>
-                            <c:when test="${not empty remote_subscriptions}">
+                            <c:when test="${not empty remote}">
                                 <div id="table">
                                     <div id="statustable">
                                         <div class="table-hdr">
@@ -153,7 +259,7 @@ Author     : szewczenko
                                                 User name
                                             </div>
                                         </div>
-                                        <c:forEach var="sub" items="${remote_subscriptions}">
+                                        <c:forEach var="sub" items="${remote}">
                                             <div class="table-row">
                                                 <div class="station">
                                                     <c:out value="${sub.channelName}"/>
@@ -175,6 +281,9 @@ Author     : szewczenko
                                 </div>
                             </c:otherwise>
                         </c:choose>
+
+
+                        
                     </div>
                     <div class="footer"></div>
                 </div>

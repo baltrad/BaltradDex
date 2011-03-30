@@ -32,8 +32,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.util.Date;
-
 /**
  * Login controller class implementing basic user authentication functionality.
  *
@@ -51,7 +49,7 @@ public class LoginController extends SimpleFormController {
      */
     public LoginController() {
         this.logManager = new LogManager();
-        logManager.addEntry( new Date(), LogManager.MSG_INFO,
+        logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                 "Baltrad Data Exchange System started" );
     }
     /**
@@ -64,6 +62,11 @@ public class LoginController extends SimpleFormController {
     @Override
     protected Object formBackingObject( HttpServletRequest request ) throws Exception {
         return new User();
+
+        //User user = userManager.getUserById( 1 );
+        //return user;
+
+
     }
     /**
      * Method executed upon form submission.
@@ -84,8 +87,8 @@ public class LoginController extends SimpleFormController {
         if( ApplicationSecurityManager.authenticateFormUser( formUser, dbUser ) ) {
             // Set user variable for this session
             ApplicationSecurityManager.setUser( request, dbUser );
-            logManager.addEntry( new Date(), LogManager.MSG_INFO, "User " + dbUser.getName() +
-                    " logged on" );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO, "User " + 
+                    dbUser.getName() + " logged on" );
         }
         return new ModelAndView( getSuccessView() );
     }

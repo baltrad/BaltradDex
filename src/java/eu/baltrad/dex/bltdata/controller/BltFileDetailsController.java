@@ -48,7 +48,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Date;
 import java.awt.geom.Point2D;
 
 /**
@@ -131,8 +130,8 @@ public class BltFileDetailsController implements Controller {
             "+lon_0=" + lon0_val[ 0 ], "+ellps=" + PROJ4_ELLPS_CODE, "+a=" + EARTH_RADIUS };
         int res = BltDataProjector.initializeProjection( projParms );
         if( res == 1 ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to initialize " +
-                    "projection" );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Failed to initialize projection" );
         }
         try {
             // iterate through datasets

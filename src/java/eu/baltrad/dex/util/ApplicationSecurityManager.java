@@ -25,8 +25,6 @@ import eu.baltrad.dex.user.model.UserManager;
 
 import javax.servlet.http.HttpServletRequest;
 
-//import javax.servlet.http.HttpSession;
-
 /**
  * Class implementing session handling functionality and user authentication control.
  *

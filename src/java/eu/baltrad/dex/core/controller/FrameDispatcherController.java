@@ -66,7 +66,6 @@ import java.io.IOException;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Class implements frame dispatching controller. This controller handles all incoming and outgoing
@@ -178,7 +177,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // user ID set upon authentication
                             int userId;
                             if( ( userId = authenticateFrame( header ) ) != 0 ) {
-                                logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                                     "Channel listing request received from user " +
                                      getUserName( bfHandler.getUserName( header ) ) + " ("
                                      + bfHandler.getSenderNodeName( header ) + ")" );
@@ -218,13 +217,14 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 // delete temporary file
                                 InitAppUtil.deleteFile( tempFile );
                             } else {
-                                logManager.addEntry( new Date(), LogManager.MSG_WRN,
+                                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
                                     "Incoming frame could not be authenticated" );
                             }
                         } else {
                             // regular message frame - display message
-                            logManager.addEntry( new Date(), bfHandler.getMessageClass( header ),
-                                bfHandler.getMessageText( header ) );
+                            logManager.addEntry( System.currentTimeMillis(),
+                                    bfHandler.getMessageClass( header ),
+                                    bfHandler.getMessageText( header ) );
                         }
                     }
 
@@ -237,7 +237,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                         if( bfHandler.getMessageText( header ).equals(
                             BaltradFrameHandler.CHNL_LIST ) ) {
-                            logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                                 "Channel listing received from " + bfHandler.getSenderNodeName(
                                 header ) );
 
@@ -265,7 +265,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                         if( bfHandler.getMessageText( header ).equals(
                                 BaltradFrameHandler.CHNL_SBN_RQST ) ) {
-                            logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                                 "Channel subscription request received from " +
                                 bfHandler.getSenderNodeName( header ) );
 
@@ -299,8 +299,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     if( subscriptionManager.getSubscription( user.getName(),
                                             localChannel.getChannelName(),
                                             Subscription.REMOTE_SUBSCRIPTION ) != null ) {
-                                        logManager.addEntry( new Date(), LogManager.MSG_WRN,
-                                            "User " + user.getName() + " has already subscribed to "
+                                        logManager.addEntry( System.currentTimeMillis(),
+                                            LogManager.MSG_WRN, "User " + user.getName() +
+                                            " has already subscribed to "
                                             + localChannel.getChannelName() );
                                     } else {
                                         // add subscription
@@ -344,7 +345,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                         if( bfHandler.getMessageText( header ).equals(
                                 BaltradFrameHandler.CHNL_SBN_CFN ) ) {
-                            logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                                 "Channel subscription confirmation received from " +
                                 bfHandler.getSenderNodeName( header ) );
 
@@ -368,7 +369,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                         if( bfHandler.getMessageText( header ).equals(
                                 BaltradFrameHandler.SBN_CHNG_RQST ) ) {
-                            logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                                 "Channel subscription change request received from " +
                                 bfHandler.getSenderNodeName( header ) );
 
@@ -406,18 +407,18 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     confirmedSub = s;
                                     //@
                                     confirmedSub.setActive( true );
-                                    logManager.addEntry( new Date(), LogManager.MSG_INFO,
-                                        "User " + s.getUserName() + " subscribed to "
-                                        + s.getChannelName() );
+                                    logManager.addEntry( System.currentTimeMillis(),
+                                        LogManager.MSG_INFO, "User " + s.getUserName() +
+                                        " subscribed to " + s.getChannelName() );
                                 } else {
                                     // subscription exists in the database - modify subscription
                                     subscriptionManager.updateSubscription( s.getChannelName(),
                                             Subscription.REMOTE_SUBSCRIPTION, true );
                                     confirmedSub = s;
                                     confirmedSub.setActive( true );
-                                    logManager.addEntry( new Date(), LogManager.MSG_INFO,
-                                        "User " + s.getUserName() + " subscribed to "
-                                        + s.getChannelName() );
+                                    logManager.addEntry( System.currentTimeMillis(),
+                                        LogManager.MSG_INFO, "User " + s.getUserName() +
+                                        " subscribed to " + s.getChannelName() );
                                 }
                                 /*/ add remote subscription
                                 subscriptionManager.addSubscription( s );
@@ -433,7 +434,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 subscriptionManager.deleteSubscription( s.getUserName(),
                                         s.getChannelName(), s.getType() );
                                 confirmedSub = s;
-                                logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                                     "User " + s.getUserName() + " cancelled subscription to "
                                     + s.getChannelName() );
                             }
@@ -489,7 +490,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                             String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
-                            logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                                 "Remote node " + bfHandler.getSenderNodeName( header )
                                 + " changed your subscription status for " + subs.getChannelName()
                                 + " to: " + selected );
@@ -511,7 +512,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                             String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
-                            logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                                 "Remote node " + bfHandler.getSenderNodeName( header )  +
                                 " failed to change your subscription status for "
                                 + subs.getChannelName() + " to: " + selected );
@@ -589,7 +590,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                     if( bfHandler.getContentType( header ).equals(
                             BaltradFrameHandler.FILE ) ) {
-                        logManager.addEntry( new Date(), LogManager.MSG_INFO,
+                        logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                             "New data frame received from " + bfHandler.getSenderNodeName( header )
                             + " / " + bfHandler.getChannel( header ) );
                         // write data to swap file
@@ -642,13 +643,13 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 }
                             }
                         }catch( DuplicateEntry e ) {
-                            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                                     "Duplicate entry error: " + e.getMessage() );
                             // exception while storing file in FileCatalog - set error code
                             response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_500 );
 
                         } catch( FileCatalogError e ) {
-                            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                                     "File catalog error: " + e.getMessage() );
                             // exception while storing file in FileCatalog - set error code
                             response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_500 );
@@ -660,15 +661,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             InitAppUtil.cleanUpTempFiles( InitAppUtil.getWorkDir() );
 
         } catch( FileUploadException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e. getMessage() );
             e.printStackTrace();
         } catch( IOException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e.getMessage() );
             e.printStackTrace();
         } catch( Exception e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR,
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                     "Frame dispatcher error: " + e.getMessage() );
             e.printStackTrace();
         }

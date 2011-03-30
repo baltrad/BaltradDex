@@ -31,8 +31,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.util.Date;
-
 /**
  * Logout controller class implementing basic user authentication functionality.
  *
@@ -57,7 +55,7 @@ public class LogoutController implements Controller {
             throws Exception {
         User user = ( User )ApplicationSecurityManager.getUser( request );
         ApplicationSecurityManager.removeUser( request );
-        logManager.addEntry( new Date(), LogManager.MSG_INFO, "User " + user.getName()
+        logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO, "User " + user.getName()
                 + " logged out" );
         return new ModelAndView( getSuccessView() );
     }

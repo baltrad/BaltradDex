@@ -29,8 +29,6 @@ import com.jhlabs.map.proj.ProjectionException;
 
 import java.awt.geom.Point2D;
 
-import java.util.Date;
-
 /**
  * Encapsulates data projection functionality.
  *
@@ -56,8 +54,8 @@ public class BltDataProjector {
             proj.initialize();
             res = 0;
         } catch( ProjectionException e ) {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to initialize " +
-                    "projection: " + e.getMessage() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Failed to initialize projection: " + e.getMessage() );
             res = 1;
         }
         return res;

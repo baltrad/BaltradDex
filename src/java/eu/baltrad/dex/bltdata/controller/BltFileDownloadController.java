@@ -38,7 +38,6 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * Download controller class implementing data download functionality.
@@ -74,8 +73,8 @@ public class BltFileDownloadController implements Controller {
             try {
                 in = new BufferedInputStream( new FileInputStream( file ) );
             } catch( FileNotFoundException e ) {
-                logManager.addEntry( new Date(), LogManager.MSG_WRN, "File not found: " +
-                        e.getMessage() );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
+                        "File not found: " + e.getMessage() );
             }
             String mimeType = servletContext.getMimeType( filePath );
             response.setBufferSize( fileSize );
@@ -89,14 +88,14 @@ public class BltFileDownloadController implements Controller {
                 response.getOutputStream().flush();
                 response.getOutputStream().close();
             } catch( IOException e ) {
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error downloading file: "
-                        + e.getMessage() );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                        "Error downloading file: " + e.getMessage() );
             }
-            logManager.addEntry( new Date(), LogManager.MSG_INFO, "User " + user.getName() +
-                    " downloading file: " + file.getName() );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO, "User " +
+                    user.getName() + " downloading file: " + file.getName() );
         } else {
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Invalid file size: "
-                    + fileSize );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Invalid file size: " + fileSize );
         }
         return null;
     }

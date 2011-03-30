@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -227,8 +226,8 @@ public class SubscriptionController extends MultiActionController {
                         Subscription.LOCAL_SUBSCRIPTION,
                         getChangedSubscriptions().get( i ).getActive() );
             } catch( Exception e ) {
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while processing " +
-                    "subscription change request for " +
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                        "Error while processing subscription change request for " +
                     getChangedSubscriptions().get( i ).getOperatorName() + ", channel " +
                     getChangedSubscriptions().get( i ).getChannelName() + ": " + e.getMessage() );
             }
@@ -266,8 +265,8 @@ public class SubscriptionController extends MultiActionController {
             try {
                 response.sendRedirect( REDIRECT_VIEW );
             } catch( IOException e ) {
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while redirecting "
-                        + "to " + REDIRECT_VIEW + ": " + e.getMessage() );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                        "Error while redirecting to " + REDIRECT_VIEW + ": " + e.getMessage() );
             }
         } else {
             // determines whether user has selected an active subscription
@@ -287,8 +286,9 @@ public class SubscriptionController extends MultiActionController {
                         "error.removesubscription.activesubscription" ) );
                     response.sendRedirect( REDIRECT_VIEW );
                 } catch( IOException e ) {
-                    logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while redirecting "
-                            + "to " + REDIRECT_VIEW + ": " + e.getMessage() );
+                    logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                            "Error while redirecting to " + REDIRECT_VIEW + ": " +
+                            e.getMessage() );
                 }
             } else {
                 List< Subscription > currentSubs = new ArrayList< Subscription >();
@@ -370,8 +370,9 @@ public class SubscriptionController extends MultiActionController {
             try {
                 response.sendRedirect( SHOW_PEERS_SUBSCRIPTIONS_VIEW + ".htm" );
             } catch( IOException e ) {
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Error while redirecting "
-                        + "to " + SHOW_PEERS_SUBSCRIPTIONS_VIEW + ": " + e.getMessage() );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                        "Error while redirecting to " + SHOW_PEERS_SUBSCRIPTIONS_VIEW + ": " +
+                        e.getMessage() );
             }
         } else {
             List< Subscription > currentSubs = new ArrayList< Subscription >();

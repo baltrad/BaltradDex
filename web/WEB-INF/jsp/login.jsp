@@ -33,6 +33,7 @@ Author     : szewczenko
     Date now = new Date();
     SimpleDateFormat format = new SimpleDateFormat( "dd MMMM yyyy, h:mm aa" );
     String dateAndTime = format.format( now );
+    request.getSession().setAttribute( "init_status", InitAppUtil.getInitStatus() );
     String operator = InitAppUtil.getOrgName();
     String nodeName = InitAppUtil.getNodeName();
     String nodeVersion = InitAppUtil.getNodeVersion();
@@ -50,6 +51,7 @@ Author     : szewczenko
         <title>Baltrad | Log in</title>
         <!-- tooltips -->
         <script type="text/javascript">
+            <!--
             var t1 = null;
             var t2 = null;
             var l1 = "Enter your user name";
@@ -58,6 +60,7 @@ Author     : szewczenko
                 t1 = new ToolTip( "user_name_tooltip", false );
                 t2 = new ToolTip( "password_tooltip", false );
             }
+            -->
         </script>
     </head>
     <body onload="initTooltips()">
@@ -123,60 +126,78 @@ Author     : szewczenko
                         </form>
                     </div>
                     <div id="separator"></div>
-                    <div id="text-box">
-                        <div class="title">
-                            Welcome to Baltrad Data Exchange System!
-                        </div>
-                    </div>
-                        <div id="welcome-msg">
-                            <div class="left">
-                                <div class="row">
-                                    This node is operated by:
-                                </div>
-                                <div class="row">
-                                    Node location:
-                                </div>
-                                <div class="row">
-                                    Node name:
-                                </div>
-                                <div class="row">
-                                    Node version:
-                                </div>
-                                <div class="row">
-                                    Node type:
-                                </div>
-                                <div class="row">
-                                    Local time zone:
-                                </div>
-                                <div class="row">
-                                    Node administrator's e-mail:
+                    <c:choose>
+                        <c:when test="${ init_status == 0 }">
+                            <div id="text-box">
+                                <div class="title">
+                                    Welcome to Baltrad Data Exchange System!
                                 </div>
                             </div>
-                            <div class="right">
-                                <div class="row">
-                                    <%= operator %>
+                            <div id="welcome-msg">
+                                <div class="left">
+                                    <div class="row">
+                                        This node is operated by:
+                                    </div>
+                                    <div class="row">
+                                        Node location:
+                                    </div>
+                                    <div class="row">
+                                        Node name:
+                                    </div>
+                                    <div class="row">
+                                        Node version:
+                                    </div>
+                                    <div class="row">
+                                        Node type:
+                                    </div>
+                                    <div class="row">
+                                        Local time zone:
+                                    </div>
+                                    <div class="row">
+                                        Node administrator's e-mail:
+                                    </div>
                                 </div>
-                                <div class="row">
-                                    <%= address %>
-                                </div>
-                                <div class="row">
-                                    <%= nodeName %>
-                                </div>
-                                <div class="row">
-                                    <%= nodeVersion %>
-                                </div>
-                                <div class="row">
-                                    <%= nodeType %>
-                                </div>
-                                <div class="row">
-                                    <%= timeZone %>
-                                </div>
-                                <div class="row">
-                                    <%= adminEmail %>
+                                <div class="right">
+                                    <div class="row">
+                                        <%= operator %>
+                                    </div>
+                                    <div class="row">
+                                        <%= address %>
+                                    </div>
+                                    <div class="row">
+                                        <%= nodeName %>
+                                    </div>
+                                    <div class="row">
+                                        <%= nodeVersion %>
+                                    </div>
+                                    <div class="row">
+                                        <%= nodeType %>
+                                    </div>
+                                    <div class="row">
+                                        <%= timeZone %>
+                                    </div>
+                                    <div class="row">
+                                        <%= adminEmail %>
+                                    </div>
                                 </div>
                             </div>
-                        </div>      
-                    </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="message">
+                                <div class="icon">
+                                    <img src="includes/images/icons/circle-delete.png"
+                                         alt="remove_error"/>
+                                </div>
+                                <div class="text">
+                                    Warning: System failed to initialize. Please report this problem
+                                    to node's administrator before data exchange functionality is
+                                    used.
+                                    <c:set var="error_message" value="" scope="session"/>
+                                </div>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>    
+                </div>
                 <div id="clear"></div>
             </div>
         </div>

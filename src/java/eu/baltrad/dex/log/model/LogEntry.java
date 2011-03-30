@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -23,6 +23,7 @@ package eu.baltrad.dex.log.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.text.SimpleDateFormat;
 
 /**
  * Class implements system message object.
@@ -31,15 +32,24 @@ import java.util.Date;
  * @version 1.0
  * @since 1.0
  */
-public class LogEntry implements Serializable, Comparable<LogEntry> {
-//------------------------------------------------------------------------------------------- Fields
-    // Log entry ID
+public class LogEntry implements Serializable {
+//---------------------------------------------------------------------------------------- Constants
+    /** Date format string */
+    private final static String DATE_FORMAT = "yyyy/MM/dd";
+    /** Time format string */
+    private final static String TIME_FORMAT = "HH:mm:ss";
+//---------------------------------------------------------------------------------------- Variables
+    /** Log entry ID */
     private int id;
-    // Object representing current date / log entry timestamp
-    private Date timeStamp;
-    // Log entry type
+    /** Timestamp */
+    private long timeStamp;
+    /** Auxiliary variable storing date as string */
+    private String dateStr;
+    /** Auxiliary variable storing time as string */
+    private String timeStr;
+    /** Log entry type */
     private String type;
-    // Actual message text
+    /** Actual message text */
     private String message;
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -53,19 +63,15 @@ public class LogEntry implements Serializable, Comparable<LogEntry> {
      * @param type Type of a log entry
      * @param message Actual log entry text
      */
-    public LogEntry( Date timeStamp, String type, String message ) {
+    public LogEntry( long timeStamp, String type, String message ) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
+        SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
         this.timeStamp = timeStamp;
         this.type = type;
         this.message = message;
-    }
-    /**
-     * Method implementing comparable interface. Allows to sort log entries based on date and time.
-     *
-     * @param Log entry to compare with current entry
-     * @return 0 if objects are equal, 1 if current entry is later than compared entry, -1 otherwise
-     */
-    public int compareTo( LogEntry logEntry ) {
-        return -this.getTimeStamp().compareTo( logEntry.getTimeStamp() );
+        Date date = new Date( timeStamp );
+        this.dateStr = dateFormat.format( date );
+        this.timeStr = timeFormat.format( date );
     }
     /**
      * Method gets log entry ID.
@@ -84,13 +90,13 @@ public class LogEntry implements Serializable, Comparable<LogEntry> {
      *
      * @return Timestamp of a log entry
      */
-    public Date getTimeStamp() { return timeStamp; }
+    public long getTimeStamp() { return timeStamp; }
     /**
      * Sets timestamp of a log entry.
      *
      * @param Timestamp of a log entry.
      */
-    public void setTimeStamp( Date timeStamp ) { this.timeStamp = timeStamp; }
+    public void setTimeStamp( long timeStamp ) { this.timeStamp = timeStamp; }
     /**
      * Method gets the type of log entry.
      *
@@ -115,5 +121,37 @@ public class LogEntry implements Serializable, Comparable<LogEntry> {
      * @param message Log entry message
      */
     public void setMessage( String message ) { this.message = message; }
+    /**
+     * Gets date string.
+     *
+     * @return Date string
+     */
+    public String getDateStr() {
+        return dateStr;
+    }
+    /**
+     * Sets date string.
+     *
+     * @param dateStr Date string to set
+     */
+    public void setDateStr( String dateStr ) {
+        this.dateStr = dateStr;
+    }
+    /**
+     * Gets time string.
+     *
+     * @return Time string
+     */
+    public String getTimeStr() {
+        return timeStr;
+    }
+    /**
+     * Sets time string.
+     *
+     * @param timeStr Time string to set
+     */
+    public void setTimeStr( String timeStr ) {
+        this.timeStr = timeStr;
+    }
 }
 //--------------------------------------------------------------------------------------------------

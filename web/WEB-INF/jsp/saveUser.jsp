@@ -72,15 +72,16 @@ Author     : szewczenko
                                 </div>
                                 <div class="right">
                                     <div class="row">
-                                        <form:input path="command.name"/>
+                                        <form:input path="command.name" cssClass="user-name"/>
                                         <form:errors path="command.name" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:password path="command.password"/>
+                                        <form:password path="command.password" cssClass="user-passwd"/>
                                         <form:errors path="command.password" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:password path="command.confirmPassword"/>
+                                        <form:password path="command.confirmPassword"
+                                                       cssClass="confirm-passwd"/>
                                         <form:errors path="command.confirmPassword" cssClass="errors"/>
                                     </div>
                                     <div class="row">
@@ -97,43 +98,43 @@ Author     : szewczenko
                                         <form:errors path="command.roleName" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <div class="row-elem">
-                                            http://<form:input path="command.shortAddress"
-                                            cssClass="shortAddress"/>:<form:input
-                                            path="command.portNumber" cssClass="portNumber"/>
-                                        </div>
+                                        <div class="protocol-prefix">http://</div>
+                                        <form:input path="command.shortAddress"
+                                            cssClass="node-address"/>
+                                        <div class="port-separator">:</div>
+                                        <form:input path="command.portNumber" cssClass="port-number"/>
                                         <form:errors path="command.fullAddress" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.factory"/>
+                                        <form:input path="command.factory" cssClass="org-name"/>
                                         <form:errors path="command.factory" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.country"/>
+                                        <form:input path="command.country" cssClass="country"/>
                                         <form:errors path="command.country" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.city"/>
+                                        <form:input path="command.city" cssClass="city"/>
                                         <form:errors path="command.city" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.cityCode"/>
+                                        <form:input path="command.cityCode" cssClass="city-code"/>
                                         <form:errors path="command.cityCode" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.street"/>
+                                        <form:input path="command.street" cssClass="street"/>
                                         <form:errors path="command.street" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.number"/>
+                                        <form:input path="command.number" cssClass="street-number"/>
                                         <form:errors path="command.number" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.phone"/>
+                                        <form:input path="command.phone" cssClass="phone"/>
                                         <form:errors path="command.phone" cssClass="errors"/>
                                     </div>
                                     <div class="row">
-                                        <form:input path="command.email"/>
+                                        <form:input path="command.email" cssClass="admin-email"/>
                                         <form:errors path="command.email" cssClass="errors"/>
                                     </div>
                                 </div>

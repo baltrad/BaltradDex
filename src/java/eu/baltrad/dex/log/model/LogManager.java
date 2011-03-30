@@ -30,7 +30,6 @@ import java.sql.SQLException;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Class implements system message manager.
@@ -100,7 +99,7 @@ public class LogManager {
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
                 "timestamp DESC;" );
             while( resultSet.next() ) {
-                Date timeStamp = resultSet.getTimestamp( "timestamp" );
+                long timeStamp = resultSet.getLong( "timestamp" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
                 LogEntry entry = new LogEntry( timeStamp, type, msg );
@@ -131,7 +130,7 @@ public class LogManager {
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
                 "timestamp DESC LIMIT " + limit + ";");
             while( resultSet.next() ) {
-                Date timeStamp = resultSet.getTimestamp( "timestamp" );
+                long timeStamp = resultSet.getLong( "timestamp" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
                 LogEntry entry = new LogEntry( timeStamp, type, msg );
@@ -163,7 +162,8 @@ public class LogManager {
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
                 "timestamp DESC OFFSET " + offset + " LIMIT " + limit );
             while( resultSet.next() ) {
-                Date timeStamp = resultSet.getTimestamp( "timestamp" );
+                //Date timeStamp = resultSet.getTimestamp( "timestamp" );
+                long timeStamp = resultSet.getLong( "timestamp" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
                 LogEntry entry = new LogEntry( timeStamp, type, msg );
@@ -213,7 +213,7 @@ public class LogManager {
      * @param message Log entry message
      * @return Number of inserted records
      */
-    public synchronized int addEntry( Date timestamp, String type, String message ) {
+    public synchronized int addEntry( long timestamp, String type, String message ) {
         Connection conn = null;
         int insert = 0;
         try {

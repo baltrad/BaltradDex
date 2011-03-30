@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Multi-action controller handling user account removal functionality.
@@ -133,23 +132,23 @@ public class RemoveUserController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY, 
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removesuccess" ) );
-                logManager.addEntry( new Date(), LogManager.MSG_WRN, "User account " + userName
-                        + " removed from the system" );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
+                        "User account " + userName + " removed from the system" );
 
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removefail" ) );
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove user "
-                        + "account " + userName + "." );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                        "Failed to remove user account " + userName + "." );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removefail" ) );
-                logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to remove user "
-                        + "account " + userName + "." );
+                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                        "Failed to remove user account " + userName + "." );
             }
         }
         return new ModelAndView( REMOVED_USERS_VIEW );

@@ -36,7 +36,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
 
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -120,20 +119,20 @@ public class SaveChannelController extends SimpleFormController {
             channelManager.saveOrUpdate( channel );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savesuccess" ) );
-            logManager.addEntry( new Date(), LogManager.MSG_WRN, "Saved local radar station " +
-                channel.getChannelName() + "." );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
+                    "Saved local radar station " + channel.getChannelName() + "." );
         } catch( SQLException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savefail" ) );
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to save radar station " +
-                channel.getChannelName() + "." );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Failed to save radar station " + channel.getChannelName() + "." );
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savefail" ) );
-            logManager.addEntry( new Date(), LogManager.MSG_ERR, "Failed to save radar station " +
-                channel.getChannelName() + "." );
+            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
+                    "Failed to save radar station " + channel.getChannelName() + "." );
         }
         return new ModelAndView( getSuccessView() );
     }

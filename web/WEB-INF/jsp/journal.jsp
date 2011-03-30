@@ -34,6 +34,9 @@ Author     : szewczenko
     JournalController controller = new JournalController();
     long numEntries = manager.countEntries();
     int numPages = ( int )Math.ceil( numEntries / LogManager.ENTRIES_PER_PAGE );
+    if( ( numPages * LogManager.ENTRIES_PER_PAGE ) < numEntries ) {
+        ++numPages;
+    }
     if( numPages < 1 ) {
         numPages = 1;
     }
@@ -147,12 +150,12 @@ Author     : szewczenko
                                 <div class="table-row">
                                     <div class="date">
                                         <div class="<%=style%>">
-                                            <c:out value="${fn:substring(entry.timeStamp, 0, 10)}"/>
+                                            <c:out value="${entry.dateStr}"/>
                                         </div>
                                     </div>
                                     <div class="time">
                                         <div class="<%=style%>">
-                                            <c:out value="${fn:substring(entry.timeStamp, 10, 19)}"/>
+                                            <c:out value="${entry.timeStr}"/>
                                         </div>
                                     </div>
                                     <c:choose>

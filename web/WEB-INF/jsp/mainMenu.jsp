@@ -37,8 +37,8 @@ Author     : szewczenko
     User sessionUser = ( User )applicationSecurityManager.getUser( request );
     User dbUser = userManager.getUserByName( sessionUser.getName() );
     if( !applicationSecurityManager.authenticateSessionUser( sessionUser, dbUser ) ) {
-        logManager.addEntry( new Date(), logManager.MSG_WRN, "User failed to access " +
-                "restricted system area");
+        logManager.addEntry( System.currentTimeMillis(), logManager.MSG_WRN, "User failed to " +
+                "access restricted system area");
     } else {
         if( dbUser.getRoleName().equals( User.ROLE_ADMIN ) ) {
             request.getSession().setAttribute( "userRole", 0 );
