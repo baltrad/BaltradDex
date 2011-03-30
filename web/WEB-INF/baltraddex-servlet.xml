@@ -889,13 +889,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="beastscheduler" class="eu.baltrad.beast.scheduler.BeastScheduler" autowire="byType"/>
 
     <!-- and the file catalog -->
-    <bean id="bdb_db" class="eu.baltrad.fc.db.Database" factory-method="create">
+    <bean id="bdb_db" class="eu.baltrad.fc.db.Database" factory-method="create" destroy-method="delete">
         <constructor-arg value="${database.uri}" />
     </bean>
-    <bean id="bdb_storage" class="eu.baltrad.fc.CacheDirStorage">
+    <bean id="bdb_storage" class="eu.baltrad.fc.CacheDirStorage" destroy-method="delete">
         <constructor-arg value="${data.storage.folder}" />
     </bean>
-    <bean id="fc" class="eu.baltrad.fc.FileCatalog">
+    <bean id="fc" class="eu.baltrad.fc.FileCatalog" destroy-method="delete">
         <constructor-arg ref="bdb_db" />
         <constructor-arg ref="bdb_storage" />
     </bean>
