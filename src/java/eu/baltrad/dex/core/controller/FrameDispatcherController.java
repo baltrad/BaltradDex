@@ -308,10 +308,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         //subs = new Subscription( user.getName(),
                                         //        localChannel.getChannelName(),
                                         //        Subscription.REMOTE_SUBSCRIPTION );
-                                        subs = new Subscription( user.getName(),
-                                            localChannel.getChannelName(),
-                                            InitAppUtil.getNodeAddress(),
-                                            InitAppUtil.getNodeName(),
+                                        subs = new Subscription( System.currentTimeMillis(),
+                                            user.getName(), localChannel.getChannelName(),
+                                            InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
                                             Subscription.REMOTE_SUBSCRIPTION, false, false );
                                         subscriptionManager.saveSubscription( subs );
                                         confirmedChannels.add( requestedChannel );
@@ -392,8 +391,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             //        subs.getChannelName(), Subscription.REMOTE_SUBSCRIPTION );
 
 
-                            Subscription s = new Subscription( subs.getUserName(),
-                                    subs.getChannelName(), subs.getNodeAddress(),
+                            Subscription s = new Subscription( System.currentTimeMillis(),
+                                    subs.getUserName(), subs.getChannelName(), subs.getNodeAddress(),
                                     subs.getOperatorName(), Subscription.REMOTE_SUBSCRIPTION,
                                     false, false );
                             // subscription object serves as confirmation

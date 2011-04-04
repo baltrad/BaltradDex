@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -22,6 +22,9 @@
 package eu.baltrad.dex.subscription.model;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+
+import java.sql.Timestamp;
 
 /**
  * Class implements data channel subscription object.
@@ -32,16 +35,36 @@ import java.io.Serializable;
  */
 public class Subscription implements Serializable, Comparable< Subscription > {
 //---------------------------------------------------------------------------------------- Constants
+    /** Local subscriptions key */
     public static final String LOCAL_SUBSCRIPTION = "local";
+    /** Remote subscriptions key */
     public static final String REMOTE_SUBSCRIPTION = "remote";
+    /** Date format string */
+    private final static String DATE_FORMAT = "yyyy/MM/dd";
+    /** Time format string */
+    private final static String TIME_FORMAT = "HH:mm:ss";
 //---------------------------------------------------------------------------------------- Variables
+    /** Subscription ID */
     private int id;
+    /** Timestamp */
+    private Timestamp timeStamp;
+    /** Auxiliary variable storing date as string */
+    private String dateStr;
+    /** Auxiliary variable storing time as string */
+    private String timeStr;
+    /** Subscriber's name */
     private String userName;
+    /** Data channel name */
     private String channelName;
+    /** Node's address */
     private String nodeAddress;
+    /** Node's operator name */
     private String operatorName;
+    /** Subscription type */
     private String type;
+    /** Subscription's state determines whether subscription is active or deactivated */
     private boolean active;
+    /** Subscription's state determines whether subscription is synchronized or unsynchronized */
     private boolean synkronized;
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -51,6 +74,7 @@ public class Subscription implements Serializable, Comparable< Subscription > {
     /**
      * Constructor creating new subscription object with given field values.
      *
+     * @param time Current time in milliseconds
      * @param userName User name
      * @param channelName Channel name
      * @param nodeAddress Node address
@@ -59,8 +83,9 @@ public class Subscription implements Serializable, Comparable< Subscription > {
      * @param active Subscription activation toggle
      * @param synkronized Synchronization toggle
      */
-    public Subscription( String userName, String channelName, String nodeAddress,
+    public Subscription( long time, String userName, String channelName, String nodeAddress,
             String operatorName, String type, boolean active, boolean synkronized ) {
+        this.timeStamp = new Timestamp( time );
         this.userName = userName;
         this.channelName = channelName;
         this.nodeAddress = nodeAddress;
@@ -68,11 +93,16 @@ public class Subscription implements Serializable, Comparable< Subscription > {
         this.type = type;
         this.active = active;
         this.synkronized = synkronized;
+        SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
+        SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
+        this.dateStr = dateFormat.format( timeStamp );
+        this.timeStr = timeFormat.format( timeStamp );
     }
     /**
      * Constructor creating new subscription object with given field values.
      *
      * @param id Subscription ID
+     * @param time Current time in milliseconds
      * @param userName User name
      * @param channelName Channel name
      * @param nodeAddress Node address
@@ -81,9 +111,10 @@ public class Subscription implements Serializable, Comparable< Subscription > {
      * @param active Subscription activation toggle
      * @param synkronized Synchronization toggle
      */
-    public Subscription( int id, String userName, String channelName, String nodeAddress,
+    public Subscription( int id, long time, String userName, String channelName, String nodeAddress,
             String operatorName, String type, boolean active, boolean synkronized ) {
         this.id = id;
+        this.timeStamp = new Timestamp( time );
         this.userName = userName;
         this.channelName = channelName;
         this.nodeAddress = nodeAddress;
@@ -91,6 +122,40 @@ public class Subscription implements Serializable, Comparable< Subscription > {
         this.type = type;
         this.active = active;
         this.synkronized = synkronized;
+        SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
+        SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
+        this.dateStr = dateFormat.format( timeStamp );
+        this.timeStr = timeFormat.format( timeStamp );
+    }
+    /**
+     * Constructor creating new subscription object with given field values.
+     *
+     * @param id Subscription ID
+     * @param timeStamp Timestamp
+     * @param userName User name
+     * @param channelName Channel name
+     * @param nodeAddress Node address
+     * @param operatorName Operator name
+     * @param type Subscription type
+     * @param active Subscription activation toggle
+     * @param synkronized Synchronization toggle
+     */
+    public Subscription( int id, Timestamp timeStamp, String userName, String channelName, 
+            String nodeAddress, String operatorName, String type, boolean active,
+            boolean synkronized ) {
+        this.id = id;
+        this.timeStamp = timeStamp;
+        this.userName = userName;
+        this.channelName = channelName;
+        this.nodeAddress = nodeAddress;
+        this.operatorName = operatorName;
+        this.type = type;
+        this.active = active;
+        this.synkronized = synkronized;
+        SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
+        SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
+        this.dateStr = dateFormat.format( timeStamp );
+        this.timeStr = timeFormat.format( timeStamp );
     }
     /**
      * Method gets subscription id.
@@ -104,6 +169,42 @@ public class Subscription implements Serializable, Comparable< Subscription > {
      * @param id Dubscription id
      */
     public void setId( int id ) { this.id = id; }
+     /**
+     * Gets subscription's timestamp.
+     *
+     * @return Subscription's timestamp
+     */
+    public Timestamp getTimeStamp() { return timeStamp; }
+    /**
+     * Sets subscription's timestamp.
+     *
+     * @param Subscription's timestamp.
+     */
+    public void setTimeStamp( Timestamp timeStamp ) { this.timeStamp = timeStamp; }
+    /**
+     * Gets date string.
+     *
+     * @return Date string
+     */
+    public String getDateStr() { return dateStr; }
+    /**
+     * Sets date string.
+     *
+     * @param dateStr Date string to set
+     */
+    public void setDateStr( String dateStr ) { this.dateStr = dateStr; }
+    /**
+     * Gets time string.
+     *
+     * @return Time string
+     */
+    public String getTimeStr() { return timeStr; }
+    /**
+     * Sets time string.
+     *
+     * @param timeStr Time string to set
+     */
+    public void setTimeStr( String timeStr ) { this.timeStr = timeStr; }
     /**
      * Method gets user name.
      *

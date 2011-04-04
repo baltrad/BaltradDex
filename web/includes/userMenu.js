@@ -26,7 +26,7 @@ document.write( "<div class=\"menu\">" );
 
 document.write( "<div class=\"group\">Local node</div>" );
 
-document.write( "<a href=\"home.htm\">Home</a>" );
+document.write( "<a href=\"dataDownload.htm\">Status</a>" );
 document.write( "<a href=\"radars.htm\">Radars</a>" );
 
 document.write( "<div class=\"separator\"></div>" );

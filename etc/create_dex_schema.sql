@@ -80,7 +80,7 @@ CREATE SEQUENCE log_entry_id_seq;
 CREATE TABLE dex_messages
 (
     id SERIAL NOT NULL,
-    timestamp BIGINT NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
     type VARCHAR(12) NOT NULL,
     message TEXT NOT NULL,
     PRIMARY KEY (id)
@@ -114,6 +114,7 @@ CREATE SEQUENCE subscription_id_seq;
 CREATE TABLE dex_subscriptions
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('subscription_id_seq'),
+    timestamp TIMESTAMP NOT NULL,
     user_name VARCHAR(32),
     channel_name VARCHAR(32),
     node_address VARCHAR(64),

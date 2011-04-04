@@ -115,17 +115,40 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
 CREATE OR REPLACE FUNCTION upgrade_dex_schema() RETURNS VOID AS $$
 BEGIN
     BEGIN
-        ALTER TABLE dex_messages ALTER COLUMN timestamp TYPE bigint;
+        ALTER TABLE dex_users DROP COLUMN ret_password;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Column dex_users.ret_password does not exist';
+    END;
+    BEGIN
+        ALTER TABLE dex_users DROP COLUMN selected;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Column dex_users.selected does not exist';
+    END;
+    BEGIN
+        ALTER TABLE dex_users ADD CONSTRAINT dex_users_name_hash_key UNIQUE (name_hash);
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Column dex_users.name_hash does not exist';
+    END;
+    BEGIN
+        ALTER TABLE dex_subscriptions RENAME COLUMN selected TO active;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Column dex_subcriptions.selected does not exist';
+    END;
+    BEGIN
+        ALTER TABLE dex_subscriptions ADD COLUMN timestamp TIMESTAMP DEFAULT now();
   	EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to alter column "timestamp" of table "dex_messages"';
+        WHEN OTHERS THEN RAISE NOTICE 'failed to insert column "timestamp" into table "dex_subscriptions"';
+    END;
+    BEGIN
+	ALTER TABLE dex_subscriptions ALTER COLUMN timestamp SET NOT NULL;
+	EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to modify column "timestamp" of table "dex_subscriptions"';
     END;
 END;
 $$ LANGUAGE plpgsql;
-
 
 SELECT split_dex_node_connections_address();
 SELECT split_dex_node_configuration_address();

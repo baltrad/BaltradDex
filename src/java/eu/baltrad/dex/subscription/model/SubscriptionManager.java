@@ -28,6 +28,7 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -63,6 +64,7 @@ public class SubscriptionManager {
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_subscriptions" );
             while( resultSet.next() ) {
                 int subId = resultSet.getInt( "id" );
+                Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
                 String userName = resultSet.getString( "user_name" );
                 String channelName = resultSet.getString( "channel_name" );
                 String nodeAddress = resultSet.getString( "node_address" );
@@ -70,8 +72,8 @@ public class SubscriptionManager {
                 String type = resultSet.getString( "type" );
                 boolean active = resultSet.getBoolean( "active" );
                 boolean synkronized = resultSet.getBoolean( "synkronized" );
-                Subscription sub = new Subscription( subId, userName, channelName, nodeAddress,
-                        operator, type, active, synkronized );
+                Subscription sub = new Subscription( subId, timeStamp, userName, channelName,
+                        nodeAddress, operator, type, active, synkronized );
                 subs.add( sub );
             }
             stmt.close();
@@ -100,6 +102,7 @@ public class SubscriptionManager {
                     "WHERE type = '" + subscriptionType + "';" );
             while( resultSet.next() ) {
                 int subId = resultSet.getInt( "id" );
+                Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
                 String userName = resultSet.getString( "user_name" );
                 String channelName = resultSet.getString( "channel_name" );
                 String nodeAddress = resultSet.getString( "node_address" );
@@ -107,8 +110,8 @@ public class SubscriptionManager {
                 String type = resultSet.getString( "type" );
                 boolean active = resultSet.getBoolean( "active" );
                 boolean synkronized = resultSet.getBoolean( "synkronized" );
-                Subscription sub = new Subscription( subId, userName, channelName, nodeAddress,
-                        operator, type, active, synkronized );
+                Subscription sub = new Subscription( subId, timeStamp, userName, channelName,
+                        nodeAddress, operator, type, active, synkronized );
                 subs.add( sub );
             }
             stmt.close();
@@ -139,6 +142,7 @@ public class SubscriptionManager {
                     subscriptionType + "';" );
             while( resultSet.next() ) {
                 int subId = resultSet.getInt( "id" );
+                Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
                 String userName = resultSet.getString( "user_name" );
                 String channel = resultSet.getString( "channel_name" );
                 String nodeAddress = resultSet.getString( "node_address" );
@@ -146,7 +150,7 @@ public class SubscriptionManager {
                 String type = resultSet.getString( "type" );
                 boolean active = resultSet.getBoolean( "active" );
                 boolean synkronized = resultSet.getBoolean( "synkronized" );
-                sub = new Subscription( subId, userName, channel, nodeAddress,
+                sub = new Subscription( subId, timeStamp, userName, channel, nodeAddress,
                         operator, type, active, synkronized );
             }
             stmt.close();
@@ -179,6 +183,7 @@ public class SubscriptionManager {
                     subscriptionType + "';" );
             while( resultSet.next() ) {
                 int subId = resultSet.getInt( "id" );
+                Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
                 String user = resultSet.getString( "user_name" );
                 String channel = resultSet.getString( "channel_name" );
                 String nodeAddress = resultSet.getString( "node_address" );
@@ -186,8 +191,8 @@ public class SubscriptionManager {
                 String type = resultSet.getString( "type" );
                 boolean active = resultSet.getBoolean( "active" );
                 boolean synkronized = resultSet.getBoolean( "synkronized" );
-                sub = new Subscription( subId, user, channel, nodeAddress, operator, type, active,
-                        synkronized );
+                sub = new Subscription( subId, timeStamp, user, channel, nodeAddress, operator,
+                        type, active, synkronized );
             }
             stmt.close();
         } catch( SQLException e ) {
@@ -228,83 +233,6 @@ public class SubscriptionManager {
         return fieldValues;
     }
     /**
-     * Gets subscriptions for a given operator name.
-     *
-     * @param operator Operator name
-     * @param subscriptionType Subscription type
-     * @return List of subscriptions for a given operator
-     */
-    public List<Subscription> getSubscriptionsByOperator( String operatorName,
-            String subscriptionType ) {
-        Connection conn = null;
-        List<Subscription> subs = new ArrayList<Subscription>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_subscriptions WHERE " +
-                    "operator_name = '" + operatorName + "' AND type = '" + subscriptionType + "';" );
-            while( resultSet.next() ) {
-                int subId = resultSet.getInt( "id" );
-                String user = resultSet.getString( "user_name" );
-                String channel = resultSet.getString( "channel_name" );
-                String nodeAddress = resultSet.getString( "node_address" );
-                String operator = resultSet.getString( "operator_name" );
-                String type = resultSet.getString( "type" );
-                boolean active = resultSet.getBoolean( "active" );
-                boolean synkronized = resultSet.getBoolean( "synkronized" );
-                Subscription sub = new Subscription( subId, user, channel, nodeAddress, operator,
-                        type, active, synkronized );
-                subs.add( sub );
-            }
-            stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select subscriptions by operator: " + e.getMessage() );
-        } catch( Exception e ) {
-            System.err.println( "Failed to select subscriptions by operator: " + e.getMessage() );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return subs;
-    }
-    /**
-     * Gets subscriptions for a given user name.
-     *
-     * @param userName User name
-     * @param subscriptionType Subscription type
-     * @return Subscriptions for a given user
-     */
-    public List<Subscription> getSubscriptionsByUser( String userName, String subscriptionType ) {
-        Connection conn = null;
-        List<Subscription> subs = new ArrayList<Subscription>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_subscriptions WHERE " +
-                    "user_name = '" + userName + "' AND type = '" + subscriptionType + "';" );
-            while( resultSet.next() ) {
-                int subId = resultSet.getInt( "id" );
-                String user = resultSet.getString( "user_name" );
-                String channel = resultSet.getString( "channel_name" );
-                String nodeAddress = resultSet.getString( "node_address" );
-                String operator = resultSet.getString( "operator_name" );
-                String type = resultSet.getString( "type" );
-                boolean active = resultSet.getBoolean( "active" );
-                boolean synkronized = resultSet.getBoolean( "synkronized" );
-                Subscription sub = new Subscription( subId, user, channel, nodeAddress, operator,
-                        type, active, synkronized );
-                subs.add( sub );
-            }
-            stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select subscriptions by user: " + e.getMessage() );
-        } catch( Exception e ) {
-            System.err.println( "Failed to select subscriptions by user: " + e.getMessage() );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return subs;
-    }
-    /**
      * Saves subscription object.
      *
      * @param sub Subscription to be saved
@@ -318,11 +246,12 @@ public class SubscriptionManager {
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = "INSERT INTO dex_subscriptions (user_name, channel_name, node_address, " + 
-                    "operator_name, type, active, synkronized ) VALUES ('" + sub.getUserName() +
-                    "', '" + sub.getChannelName() + "', '" + sub.getNodeAddress() + "', '" +
-                    sub.getOperatorName() + "', '" + sub.getType() + "', '" + sub.getActive() +
-                    "', '" + sub.getSynkronized() + "');";
+            String sql = "INSERT INTO dex_subscriptions (timestamp, user_name, channel_name, " +
+                    "node_address, operator_name, type, active, synkronized ) VALUES ('" +
+                    sub.getTimeStamp() + "', '" +sub.getUserName() + "', '" + sub.getChannelName() +
+                    "', '" + sub.getNodeAddress() + "', '" + sub.getOperatorName() + "', '" +
+                    sub.getType() + "', '" + sub.getActive() + "', '" + sub.getSynkronized() +
+                    "');";
             insert = stmt.executeUpdate( sql ) ;
             stmt.close();
         } catch( SQLException e ) {

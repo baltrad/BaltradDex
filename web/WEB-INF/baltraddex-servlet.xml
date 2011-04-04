@@ -41,12 +41,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="mappings">
             <props>
-                <prop key="home.htm">statusController</prop>
                 <prop key="radars.htm">channelController</prop>
                 <prop key="radarData.htm">bltRadarDataController</prop>
                 <prop key="fileDetails.htm">bltFileDetailsController</prop>
-                <prop key="credits.htm">urlFilenameController</prop>
                 <prop key="imagePreview.htm">bltImagePreviewController</prop>
+                <prop key="dataDownload.htm">downloadStatusController</prop>
+                <prop key="dataUpload.htm">uploadStatusController</prop>
             </props>
         </property>
     </bean>
@@ -210,14 +210,27 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
 
     <!--
-        Status / home page controller
+         Download status controller
     -->
-    <bean id="statusController" class="eu.baltrad.dex.subscription.controller.StatusController">
+    <bean id="downloadStatusController"
+            class="eu.baltrad.dex.subscription.controller.DownloadStatusController">
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
         </property>
         <property name="successView">
-            <value>home</value>
+            <value>dataDownload</value>
+        </property>
+    </bean>
+    <!--
+         Upload status controller
+    -->
+    <bean id="uploadStatusController"
+            class="eu.baltrad.dex.subscription.controller.UploadStatusController">
+        <property name="subscriptionManager">
+            <ref bean="subscriptionManager"/>
+        </property>
+        <property name="successView">
+            <value>dataUpload</value>
         </property>
     </bean>
 
@@ -235,7 +248,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="userManager"/>
         </property>
         <property name="successView">
-            <value>redirect:home.htm</value>
+            <value>redirect:dataDownload.htm</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.user.model.User</value>

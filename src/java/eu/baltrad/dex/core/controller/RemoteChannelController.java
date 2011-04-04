@@ -169,7 +169,7 @@ public class RemoteChannelController extends MultiActionController {
                         "You have already subscribed to " + channel.getChannelName() );
                 } else {
                     // add local subscription
-                    Subscription subs = new Subscription(
+                    Subscription subs = new Subscription( System.currentTimeMillis(),
                         frameDispatcherController.getLocalUserName(),
                         channel.getChannelName(), getSenderNodeAddress(), getSenderNodeName(),
                         Subscription.LOCAL_SUBSCRIPTION, true, true );

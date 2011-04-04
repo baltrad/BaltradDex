@@ -241,7 +241,7 @@ button::-moz-focus-inner {
 }
 #left .menu a:hover {
     color: #99CC66;
-    border: 1px solid #99CC66;
+    text-decoration:underline;
 }
 
 /*
@@ -295,7 +295,7 @@ button::-moz-focus-inner {
     width: 100%;
     float: left;
     clear: right;
-    padding: 12px 0px 12px 0px;
+    padding: 12px 0px 6px 0px;
 }
 #status-box .bottom {
     width: 100%;
@@ -1004,17 +1004,24 @@ tr {
     text-align:center;
 }
 #statustable > .table-hdr > .station, #statustable > .table-row > .station,
-        #statustable > .table-hdr > .operator, #statustable > .table-row > .operator,
-        #statustable > .table-hdr > .user, #statustable > .table-row > .user {
+        #statustable > .table-hdr > .user, #statustable > .table-row > .user,
+        #statustable > .table-hdr > .timestamp, #statustable > .table-row > .timestamp {
     float:left;
     padding:3px 0px 3px 0px;
-    width:40%;
+    width:30%;
+    overflow:hidden;
 }
 #statustable > .table-hdr > .active, #statustable > .table-row > .active {
     float:left;
     padding:3px 0px 3px 0px;
-    width:20%;
+    width:30%;
     text-align:center;
+    overflow:hidden;
+}
+#statustable > .table-hdr {
+    font-size:1em;
+    font-weight:normal;
+    overflow:hidden;
 }
 #peersubscriptions > .table-hdr > .station, #peersubscriptions > .table-row > .station,
 #peersubscriptions > .table-hdr > .user, #peersubscriptions > .table-row > .user {
@@ -1062,8 +1069,6 @@ tr {
     width:18%;
     text-align:center;
 }
-
-
 #adaptors > .table-hdr > .name, #adaptors > .table-row > .name {
     float:left;
     padding:3px 0px 3px 0px;
@@ -1245,9 +1250,7 @@ tr {
   color:#c80000;
 }
 
-/*
- * Common style for all tooltips
- */
+/*-------------------------------------------------------------------------------------- Tooltips */
 .tooltip {
     background-color: #FFFFF0;
     border: solid 1px gray;
@@ -1260,28 +1263,90 @@ tr {
     padding-left: 4px;
     padding-right: 4px;
 }
-
-
-
-
-
-.expandable-test {
+/*---------------------------------------------------------------------------- Expandable section */
+.expandable {
     width:100%;
     float:left;
     clear:both;
 }
-.save{
-   behavior:url(#default#savehistory);}
-a.dsphead{
+.expandable-hdr {
+    font-size:1.2em;
+    font-weight:bolder;
+    padding-top:8px;
+}
+.save {
+   behavior:url(#default#savehistory);
+}
+.dsphead {
    text-decoration:none;
-   margin-left:1.5em;}
-a.dsphead:hover{
-   text-decoration:underline;}
-a.dsphead span.dspchar{
+   margin-left:1.5em;
+   color: #2d76ae;
+}
+.dsphead:hover {
+   text-decoration:underline;
+   color: #99CC66;
+}
+.dsphead span.dspchar {
    font-family:monospace;
-   font-weight:normal;}
-.dspcont{
+   font-weight:normal;
+}
+.dspcont {
    display:none;
-   margin-left:1.5em;}
+   width:80%;
+   margin-left:10%;
+}
+/*--------------------------------------------------------------------------------- Tabbed section*/
+#tabs {
+    float:left;
+    clear:both;
+    width:100%;
+    padding:0px;
+}
+#tabs #tab {
+    border:1px solid #2D76AE;
+    border-bottom-width:0px;
+    float:left;
+    margin-left:12px;
+    position:relative;
+    top:1px;
+    z-index:1;
+}
+#tab .icon, #tab .link {
+    float:left;
+    padding-left:4px;
+    padding-right:4px;
+}
+#tab .link {
+    padding-top:2px;
+}
+#tab .link a {
+    font-weight:bold;
+    text-decoration:none;
+}
+#tabcontent {
+    float:left;
+    clear:both;
+    width:100%;
+    padding:0px;
+    border-top:1px solid #2D76AE;
+    z-index:-1;
+}
+#tabs #tab.active {
+    border-bottom-width:1px;
+    border-bottom:1px solid white;
+}
+#tabs #tab .link a {
+    color:gray;
+}
+#tabs #tab.active .link a {
+    color: #2D76AE;
+}
+#tabs #tab:hover {
+    background:#E2FFC6;
+}
+#tabs #tab.active:hover {
+    background:#FFFFFF;
+}
+
 
 

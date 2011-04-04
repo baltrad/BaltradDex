@@ -27,6 +27,7 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public class LogManager {
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
                 "timestamp DESC;" );
             while( resultSet.next() ) {
-                long timeStamp = resultSet.getLong( "timestamp" );
+                Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
                 LogEntry entry = new LogEntry( timeStamp, type, msg );
@@ -130,7 +131,7 @@ public class LogManager {
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
                 "timestamp DESC LIMIT " + limit + ";");
             while( resultSet.next() ) {
-                long timeStamp = resultSet.getLong( "timestamp" );
+                Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
                 LogEntry entry = new LogEntry( timeStamp, type, msg );
@@ -162,8 +163,7 @@ public class LogManager {
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
                 "timestamp DESC OFFSET " + offset + " LIMIT " + limit );
             while( resultSet.next() ) {
-                //Date timeStamp = resultSet.getTimestamp( "timestamp" );
-                long timeStamp = resultSet.getLong( "timestamp" );
+                Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
                 LogEntry entry = new LogEntry( timeStamp, type, msg );
@@ -208,19 +208,20 @@ public class LogManager {
     /**
      * Adds entry to the system log.
      *
-     * @param timestamp Log entry timestamp
+     * @param time Current time in milliseconds
      * @param type Log entry type
      * @param message Log entry message
      * @return Number of inserted records
      */
-    public synchronized int addEntry( long timestamp, String type, String message ) {
+    public synchronized int addEntry( long time, String type, String message ) {
         Connection conn = null;
         int insert = 0;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
+            Timestamp timeStamp = new Timestamp( time );
             String sql = "INSERT INTO dex_messages (timestamp, type, message) VALUES ('" +
-                    timestamp + "', '" + type + "', '" + message + "');";
+                    timeStamp + "', '" + type + "', '" + message + "');";
             insert = stmt.executeUpdate( sql );
             stmt.close();
         } catch( SQLException e ) {

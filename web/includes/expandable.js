@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -20,24 +20,24 @@
 ***************************************************************************************************/
 
 /*
- * Peer's menu
+ * Expandable HTML section script.
  */
-document.write( "<div class=\"menu\">" );
-
-document.write( "<div class=\"group\">Local node</div>" );
-
-document.write( "<a href=\"dataDownload.htm\">Status</a>" );
-document.write( "<a href=\"radars.htm\">Radars</a>" );
-
-document.write( "<div class=\"separator\"></div>" );
-
-document.write( "<div class=\"group\">Data Exchange</div>" );
-
-document.write( "<a href=\"connectToNode.htm\">Connect to node</a>" );
-document.write( "<a href=\"showSubscriptions.htm\">Subscriptions</a>" );
-
-document.write( "<div class=\"separator\"></div>" );
-
-document.write( "</div>" );
+function dsp( loc ) {
+    if( document.getElementById ) {
+        var foc=loc.firstChild;
+        foc=loc.firstChild.innerHTML?
+           loc.firstChild:
+           loc.firstChild.nextSibling;
+        foc.innerHTML=foc.innerHTML=='+'?'-':'+';
+        foc=loc.parentNode.nextSibling.style?
+           loc.parentNode.nextSibling:
+           loc.parentNode.nextSibling.nextSibling;
+        foc.style.display=foc.style.display=='block'?'none':'block';
+    }
+}
+if( !document.getElementById )
+   document.write( '<style type="text/css"><!--\n'+
+      '.dspcont{display:block;}\n'+
+      '//--></style>' );
 
 
