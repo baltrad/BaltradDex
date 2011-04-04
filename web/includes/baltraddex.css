@@ -1263,6 +1263,11 @@ tr {
     padding-left: 4px;
     padding-right: 4px;
 }
+.help-icon-right {
+    float:right;
+    padding-left: 4px;
+    padding-right: 4px;
+}
 /*---------------------------------------------------------------------------- Expandable section */
 .expandable {
     width:100%;

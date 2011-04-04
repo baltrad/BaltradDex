@@ -617,6 +617,14 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         subscriptionManager.getSubscriptions(
                                         Subscription.REMOTE_SUBSCRIPTION );
                                 for( int i = 0; i < subs.size(); i++ ) {
+
+                                    System.out.println( "___________________file entry what_source: " + fileEntry.what_source() );
+                                    System.out.println( "___________________file entry source: " + fileEntry.source() );
+
+
+
+
+
                                     if( subs.get( i ).getChannelName().equals( bfHandler.getChannel(
                                         header ) ) ) {
 

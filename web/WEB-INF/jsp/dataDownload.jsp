@@ -45,10 +45,22 @@ Author     : szewczenko
         <noscript>
             <style type="text/css"><!--.dspcont{display:block;}--></style>
         </noscript>
-        <script type="text/javascript" src="includes/expandable.js"></script>
+        <script type="text/javascript" language="javascript" src="includes/expandable.js"></script>
+        <script type="text/javascript" language="javascript" src="includes/tooltip.js"></script>
         <title>Baltrad | Home</title>
+        <!-- tooltips -->
+        <script type="text/javascript">
+            <!--
+            var t1 = null;
+            var l1 = "Shows list of nodes from which data is downloaded. Clicking on a node name " +
+                "expands the detailed list of data sources subscribed at a given node.";
+            function initTooltips() {
+                t1 = new ToolTip( "download_tooltip", false );
+            }
+            -->
+        </script>
     </head>
-    <body>
+    <body onload="initTooltips()">
         <div id="container">
             <div id="header">
                 <script type="text/javascript" src="includes/header.js"></script>
@@ -110,6 +122,10 @@ Author     : szewczenko
                         <div id="text-box">
                             <div class="title">
                                 Data download status | Subscribed data sources
+                                <div class="help-icon-right" onmouseover="if(t1)t1.Show(event,l1)"
+                                        onmouseout="if(t1)t1.Hide(event)">
+                                    <img src="includes/images/help-icon.png" alt="help_icon"/>
+                                </div>
                             </div>
                         </div>
                         <c:choose>
@@ -197,5 +213,6 @@ Author     : szewczenko
         <div id="footer">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
+        <div id="download_tooltip" class="tooltip" style="width: 220px; height: 88px;"></div>
     </body>
 </html>
