@@ -66,7 +66,8 @@ public class UploadStatusController implements Controller {
         throws ServletException, IOException {
         ModelAndView modelAndView = new ModelAndView( getSuccessView() );
         // get users
-        List<String> users = subscriptionManager.getDistinct( USER_NAME_FIELD );
+        List<String> users = subscriptionManager.getDistinct( USER_NAME_FIELD,
+                Subscription.REMOTE_SUBSCRIPTION );
         modelAndView.addObject( USERS, users );
         // get remote subscriptions
         List<Subscription> remoteSubscriptions = subscriptionManager.getSubscriptions(

@@ -208,16 +208,17 @@ public class SubscriptionManager {
      * Gets distinct field values.
      *
      * @param fieldName Name of the field the value of which will be selected
+     * @param subscriptionType Subscription type
      * @return List of strings representing field values
      */
-    public List<String> getDistinct( String fieldName ) {
+    public List<String> getDistinct( String fieldName, String subscriptionType ) {
         Connection conn = null;
         List<String> fieldValues = new ArrayList<String>();
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery( "SELECT DISTINCT " + fieldName +
-                    " FROM dex_subscriptions;" );
+                    " FROM dex_subscriptions WHERE type = '" + subscriptionType + "';" );
             while( resultSet.next() ) {
                 String fieldValue = resultSet.getString( fieldName );
                 fieldValues.add( fieldValue );

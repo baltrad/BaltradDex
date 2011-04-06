@@ -66,7 +66,8 @@ public class DownloadStatusController implements Controller {
         throws ServletException, IOException {
         ModelAndView modelAndView = new ModelAndView( getSuccessView() );
         // get operators
-        List<String> operators = subscriptionManager.getDistinct( OPERATOR_NAME_FIELD );
+        List<String> operators = subscriptionManager.getDistinct( OPERATOR_NAME_FIELD,
+                Subscription.LOCAL_SUBSCRIPTION );
         modelAndView.addObject( OPERATORS, operators );
         // get local subscriptions
         List<Subscription> localSubscriptions = subscriptionManager.getSubscriptions(
