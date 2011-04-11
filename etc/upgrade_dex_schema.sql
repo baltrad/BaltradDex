@@ -47,6 +47,9 @@ BEGIN
          || column_name ||
          ') FROM '
          || table_name INTO maxval;
+ IF NOT FOUND THEN
+   maxval = 0;
+ END IF;
  EXECUTE 'ALTER SEQUENCE '
          || table_name || '_' || column_name || '_seq'
          || ' RESTART WITH '
