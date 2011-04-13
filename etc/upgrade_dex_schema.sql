@@ -43,18 +43,13 @@ CREATE OR REPLACE FUNCTION restart_seq_with_max(table_name TEXT, column_name TEX
 DECLARE
  maxval BIGINT;
 BEGIN
- EXECUTE 'SELECT MAX('
-         || column_name ||
-         ') FROM '
+ EXECUTE 'SELECT COALESCE(MAX(' || column_name || '), 0) + 1 FROM '
          || table_name INTO maxval;
- IF NOT FOUND THEN
-   maxval = 0;
- END IF;
  EXECUTE 'ALTER SEQUENCE '
          || table_name || '_' || column_name || '_seq'
          || ' RESTART WITH '
-         || maxval + 1;
- RETURN maxval + 1;
+         || maxval;
+ RETURN maxval;
 END;
 $$ LANGUAGE plpgsql;
 
