@@ -179,8 +179,8 @@ public class SubscriptionManager {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_subscriptions " +
-                    "WHERE channel_name = '" + channelName + "' AND type = '" +
-                    subscriptionType + "';" );
+                    "WHERE user_name = '" + userName + "' AND channel_name = '" + channelName +
+                    "' AND type = '" + subscriptionType + "';" );
             while( resultSet.next() ) {
                 int subId = resultSet.getInt( "id" );
                 Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
@@ -249,17 +249,17 @@ public class SubscriptionManager {
             Statement stmt = conn.createStatement();
             String sql = "INSERT INTO dex_subscriptions (timestamp, user_name, channel_name, " +
                     "node_address, operator_name, type, active, synkronized ) VALUES ('" +
-                    sub.getTimeStamp() + "', '" +sub.getUserName() + "', '" + sub.getChannelName() +
+                    sub.getTimeStamp() + "', '" + sub.getUserName() + "', '" + sub.getChannelName() +
                     "', '" + sub.getNodeAddress() + "', '" + sub.getOperatorName() + "', '" +
                     sub.getType() + "', '" + sub.getActive() + "', '" + sub.getSynkronized() +
                     "');";
             insert = stmt.executeUpdate( sql ) ;
             stmt.close();
         } catch( SQLException e ) {
-            System.err.println( "Failed to save node connection: " + e.getMessage() );
+            System.err.println( "Failed to save subscription: " + e.getMessage() );
             throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save node connection: " + e.getMessage() );
+            System.err.println( "Failed to save subscription: " + e.getMessage() );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );

@@ -278,14 +278,14 @@ public class UserManager {
             } else {
                 // record exists, do update
                 sql = "UPDATE dex_users SET name = '" + user.getName() + "', name_hash = '" +
-                    user.getNameHash() + "', role_name = '" + user.getRoleName() + "', " +
-                    "password = '" + user.getPassword() + "', short_address = '" +
-                    user.getShortAddress() + "', port = '" + user.getPortNumber() +
-                    "', factory = '" + user.getFactory() + "', country = '" + user.getCountry() +
-                    "', city = '" + user.getCity() + "', city_code = '" + user.getCityCode() +
-                    "', street = '" + user.getStreet() + "', number = '" + user.getNumber() +
-                    "', phone = '" + user.getPhone() + "', email = '" + user.getEmail() +
-                    "' WHERE id = '" + user.getId() + "';";
+                    MessageDigestUtil.createHash( user.getName() ) + "', role_name = '" +
+                    user.getRoleName() + "', " + "password = '" + MessageDigestUtil.createHash(
+                    user.getPassword() ) + "', short_address = '" + user.getShortAddress() +
+                    "', port = '" + user.getPortNumber() + "', factory = '" + user.getFactory() +
+                    "', country = '" + user.getCountry() + "', city = '" + user.getCity() +
+                    "', city_code = '" + user.getCityCode() + "', street = '" + user.getStreet() +
+                    "', number = '" + user.getNumber() + "', phone = '" + user.getPhone() +
+                    "', email = '" + user.getEmail() + "' WHERE id = '" + user.getId() + "';";
             }
             update = stmt.executeUpdate( sql ) ;
             stmt.close();

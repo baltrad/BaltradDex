@@ -139,6 +139,7 @@ public class RemoteChannelController extends MultiActionController {
             HttpServletResponse response ) {
         // prepare subscription request
         try {
+
             File tempFile = InitAppUtil.createTempFile(
                     new File( InitAppUtil.getWorkDir() ) );
             InitAppUtil.writeObjectToStream( getSelectedChannels(), tempFile );
@@ -155,7 +156,6 @@ public class RemoteChannelController extends MultiActionController {
             frameDispatcherController.doPost( request, response, baltradFrame );
             // delete temporary file
             InitAppUtil.deleteFile( tempFile );
-
             // check subscription operation status
             setSubscribedChannels( frameDispatcherController.getConfirmedSubscriptions() );
             // reset confirmed subscriptions list stored in FrameDispatcherController
