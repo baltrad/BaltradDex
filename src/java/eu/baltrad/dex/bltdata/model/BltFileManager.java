@@ -93,7 +93,7 @@ public class BltFileManager {
     public long countEntries( String dataChannel ) {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
-        q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( dataChannel ) ) );
+        q.filter( xpr.eq( xpr.attribute( FC_SRC_PLC_ATTR ), xpr.string( dataChannel ) ) );
         q.fetch( "fileCount", xpr.count( xpr.attribute( "file:uuid" ) ) );
         AttributeResult r = fc.database().execute( q );
         r.next();
@@ -115,7 +115,7 @@ public class BltFileManager {
         q.skip( offset );
         q.order_by( xpr.combined_datetime( FC_DATE_ATTR, FC_TIME_ATTR ), FileQuery.SortDir.DESC );
         // filter the query with a given channel name
-        q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( dataChannel ) ) );
+        q.filter( xpr.eq( xpr.attribute( FC_SRC_PLC_ATTR ), xpr.string( dataChannel ) ) );
         FileResult r = fc.database().execute( q );
         List< BltFile > bltFiles = new ArrayList<BltFile>();
         while( r.next() ) {
@@ -150,7 +150,7 @@ public class BltFileManager {
         ExpressionFactory xpr = new ExpressionFactory();
         FileQuery q = new FileQuery();
         // filter the query with a given file identity string
-        q.filter( xpr.attribute( FC_FILE_UUID ).eq( xpr.string( uuid ) ) );
+        q.filter( xpr.eq( xpr.attribute( FC_FILE_UUID ), xpr.string( uuid ) ) );
         FileResult r = fc.database().execute( q );
         BltFile bltFile = null;
         while( r.next() ) {
