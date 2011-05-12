@@ -868,12 +868,13 @@ tr {
     padding:3px 0px 3px 0px;
     width: 50%;
 }
-#radartable a, #producttable a, #edituser a {
+#radartable a, #producttable a, #edituser a, #adaptors a, #showroutes a, #showschedule a {
     color:#2d76ae;
     text-decoration:underline;
     cursor:pointer
 }
-#radartable a:hover, #producttable a:hover, #edituser a:hover {
+#radartable a:hover, #producttable a:hover, #edituser a:hover, #adaptors a:hover,
+        #showroutes a:hover, #showschedule a:hover {
     text-decoration:none;
     font-weight:bolder; 
 }
