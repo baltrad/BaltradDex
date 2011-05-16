@@ -24,11 +24,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
 <project name="BaltradDex" basedir="." default="dist">
   <description>Builds and deploys BaltradDex application</description>
-  <property file="develop.properties" />  
+  <property file="develop.properties" />
+  <property name="app.name" value="Baltrad Data Exchange System: BaltradDex"/>
   <property name="root.dir" value="${basedir}"/>
   <property name="lib.dir" value="lib"/>
   <property name="extralib.dir" value="extralib"/>
   <property name="src.dir" value="src"/>
+  <property name="javadocs.dir" value="docs"/>
+  <property name="javadocs.src.dir" value="${src.dir}/java/eu/baltrad/dex"/>
   <property name="web.dir" value="web"/>
   <property name="webinf.dir" value="${web.dir}/WEB-INF"/>
   <property name="etc.dir" value="etc"/>
@@ -476,6 +479,19 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <istrue value="${context.stopped}"/>
       </or>
     </condition>
+  </target>
+
+  <!-- Generate BaltradDex source code documentation using javadoc -->
+  <target name="javadocs">
+      <mkdir dir="${javadocs.dir}"/>
+      <javadoc sourcepath="${src.dir}" destdir="${javadocs.dir}"
+          classpath="${src.dir}" author="true" version="true"
+          use="true" windowtitle="${app.name} API"
+          doctitle="&lt;h1&gt;${app.name}&lt;/h1&gt;">
+          <fileset dir="${javadocs.src.dir}">
+              <include name="**/*.java"/>
+          </fileset>
+      </javadoc>
   </target>
 
 </project>
