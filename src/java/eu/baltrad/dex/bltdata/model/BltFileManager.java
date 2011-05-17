@@ -25,12 +25,12 @@ import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.fc.FileCatalog;
-import eu.baltrad.fc.expr.ExpressionFactory;
-import eu.baltrad.fc.db.FileQuery;
-import eu.baltrad.fc.db.FileResult;
-import eu.baltrad.fc.db.FileEntry;
-import eu.baltrad.fc.db.AttributeQuery;
-import eu.baltrad.fc.db.AttributeResult;
+import eu.baltrad.fc.ExpressionFactory;
+import eu.baltrad.fc.FileQuery;
+import eu.baltrad.fc.FileResult;
+import eu.baltrad.fc.FileEntry;
+import eu.baltrad.fc.AttributeQuery;
+import eu.baltrad.fc.AttributeResult;
 
 import java.util.List;
 import java.util.ArrayList;

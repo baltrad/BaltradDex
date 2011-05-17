@@ -26,7 +26,7 @@ import eu.baltrad.fc.CacheDirStorage;
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileCatalogError;
 import eu.baltrad.fc.LocalStorage;
-import eu.baltrad.fc.db.Database;
+import eu.baltrad.fc.Database;
 
 import java.util.Properties;
 import java.io.InputStream;
