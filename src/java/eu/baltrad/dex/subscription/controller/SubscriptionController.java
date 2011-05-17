@@ -27,7 +27,7 @@ import eu.baltrad.dex.subscription.model.SubscriptionManager;
 import eu.baltrad.dex.core.controller.FrameDispatcherController;
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.frame.model.BaltradFrameHandler;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 import eu.baltrad.dex.util.InitAppUtil;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -226,10 +226,12 @@ public class SubscriptionController extends MultiActionController {
                         Subscription.LOCAL_SUBSCRIPTION,
                         getChangedSubscriptions().get( i ).getActive() );
             } catch( Exception e ) {
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Error while processing subscription change request for " +
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while processing " +
+                    "subscription change request for " +
                     getChangedSubscriptions().get( i ).getOperatorName() + ", channel " +
-                    getChangedSubscriptions().get( i ).getChannelName() + ": " + e.getMessage() );
+                    getChangedSubscriptions().get( i ).getChannelName() + ": " + e.getMessage(),
+                    null ) );
             }
         }
         return new ModelAndView( SUBSCRIPTION_STATUS_VIEW );
@@ -265,8 +267,9 @@ public class SubscriptionController extends MultiActionController {
             try {
                 response.sendRedirect( REDIRECT_VIEW );
             } catch( IOException e ) {
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Error while redirecting to " + REDIRECT_VIEW + ": " + e.getMessage() );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while redirecting to "
+                    + REDIRECT_VIEW + ": " + e.getMessage(), null ) );
             }
         } else {
             // determines whether user has selected an active subscription
@@ -286,9 +289,9 @@ public class SubscriptionController extends MultiActionController {
                         "error.removesubscription.activesubscription" ) );
                     response.sendRedirect( REDIRECT_VIEW );
                 } catch( IOException e ) {
-                    logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                            "Error while redirecting to " + REDIRECT_VIEW + ": " +
-                            e.getMessage() );
+                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                        System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while redirecting "
+                        + " to " + REDIRECT_VIEW + ": " + e.getMessage(), null ) );
                 }
             } else {
                 List< Subscription > currentSubs = new ArrayList< Subscription >();
@@ -370,9 +373,9 @@ public class SubscriptionController extends MultiActionController {
             try {
                 response.sendRedirect( SHOW_PEERS_SUBSCRIPTIONS_VIEW + ".htm" );
             } catch( IOException e ) {
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Error while redirecting to " + SHOW_PEERS_SUBSCRIPTIONS_VIEW + ": " +
-                        e.getMessage() );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while redirecting to "
+                    + SHOW_PEERS_SUBSCRIPTIONS_VIEW + ": " + e.getMessage(), null ) );
             }
         } else {
             List< Subscription > currentSubs = new ArrayList< Subscription >();

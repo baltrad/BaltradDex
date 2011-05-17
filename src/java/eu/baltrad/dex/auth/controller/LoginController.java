@@ -23,7 +23,7 @@ package eu.baltrad.dex.auth.controller;
 
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.validation.BindException;
@@ -49,8 +49,9 @@ public class LoginController extends SimpleFormController {
      */
     public LoginController() {
         this.logManager = new LogManager();
-        logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                "Baltrad Data Exchange System started" );
+        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+            System.currentTimeMillis(), LogEntry.LEVEL_INFO, "Baltrad Data Exchange System started",
+                null ) );
     }
     /**
      * Creates new user object.
@@ -83,8 +84,9 @@ public class LoginController extends SimpleFormController {
         if( ApplicationSecurityManager.authenticateFormUser( formUser, dbUser ) ) {
             // Set user variable for this session
             ApplicationSecurityManager.setUser( request, dbUser );
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO, "User " + 
-                    dbUser.getName() + " logged on" );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                System.currentTimeMillis(), LogEntry.LEVEL_INFO,
+                "User " + dbUser.getName() + " logged on", null ) );
         }
         return new ModelAndView( getSuccessView() );
     }

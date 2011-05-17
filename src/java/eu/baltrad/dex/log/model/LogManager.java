@@ -21,6 +21,11 @@
 
 package eu.baltrad.dex.log.model;
 
+import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+import org.apache.log4j.spi.LoggingEvent;
+
 import eu.baltrad.dex.util.JDBCConnectionManager;
 
 import java.sql.Connection;
@@ -33,33 +38,96 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Class implements system message manager.
+ * Class implements custom log message appender.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
- * @version 1.0
- * @since 1.0
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
+ * @version 0.6.6
+ * @since 0.6.6
+ *
+ * <pre>
+ * This class should be of interest to you if you want to append messages to the system log
+ * stored in the database. In order store a message in the system log, custom <b>append()</b>
+ * method should be used:
+ *
+ * <b>public void append( LoggingEvent event ) {}</b>
+ *
+ * The method accepts LoggingEvent as a call parameter. Use either <b>LogEntry</b> class or your
+ * own implementation of LoggingEvent. The following is an example of how this method should be
+ * used with <b>LogEntry</b> object:
+ * <b>
+ * logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+ *          System.currentTimeMillis(), LogEntry.LEVEL_INFO,  "A test message", null ) );
+ * </b>
+ * Note that <b>LogEntry</b> should be used in order to keep compliance with DEX message display
+ * functionality.
+ * Refer to the documentation of <b>LogEntry</b> class for details.
+ * </pre>
  */
-public class LogManager {
+public class LogManager extends AppenderSkeleton {
 //---------------------------------------------------------------------------------------- Constants
-    /** Informative message identifier */
-    public final static String MSG_INFO = "INFO";
-    /** Warning message identifier */
-    public final static String MSG_WRN = "WARNING";
-    /** Error message identifier */
-    public final static String MSG_ERR = "ERROR";
     /** Number of log entries per page */
     public final static int ENTRIES_PER_PAGE = 12;
     /** Number of pages in the scroll bar, must be an odd number >= 3 */
     public final static int SCROLL_RANGE = 11;
+    /** References logges object */
+    private Logger logger;
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Constructor gets reference to JDBCConnectionManager instance.
+     * Constructor gets reference to JDBCConnectionManager and Log4j Logger.
      */
     public LogManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.logger = Logger.getLogger( LogManager.class );
+    }
+    /**
+     * Determines if the appender requires a layout
+     * 
+     * @return True
+     */
+    public boolean requiresLayout() { return true; }
+    /**
+     *
+     */
+    public void close() {};
+    /**
+     * Gets reference to logger object
+     *
+     * @return Reference to logger object
+     */
+    public Logger getLogger() { return logger; }
+    /**
+     * Sets reference to logger object
+     *
+     * @param logger Reference to logger object to set
+     */
+    public void setLogger( Logger logger ) { this.logger = logger; }
+    /**
+     * Appends a log entry to the system log stored in the database
+     *
+     * @param event LoggingEvent
+     */
+    public void append( LoggingEvent event ) {
+        LogEntry entry = ( LogEntry )event;
+        Connection conn = null;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            Timestamp timestamp = new Timestamp( entry.getTimeStamp() );
+            String sql = "INSERT INTO dex_messages (timestamp, system, type, message) VALUES ('" +
+                timestamp + "', '" + entry.getSystem() + "', '" +
+                entry.getLevel() + "', '" + entry.getMessage() + "');";
+            stmt.executeUpdate( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to append log entry: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to append log entry: " + e.getMessage() );
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
     }
     /**
      * Gets number of log entries stored in a table.
@@ -101,9 +169,12 @@ public class LogManager {
                 "timestamp DESC;" );
             while( resultSet.next() ) {
                 Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
+                long time = timeStamp.getTime();
+                String system = resultSet.getString( "system" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
-                LogEntry entry = new LogEntry( timeStamp, type, msg );
+                LogEntry entry = new LogEntry( system, getLogger(), time, Level.toLevel( type ),
+                        msg, new Throwable() );
                 entries.add( entry );
             }
             stmt.close();
@@ -132,9 +203,12 @@ public class LogManager {
                 "timestamp DESC LIMIT " + limit + ";");
             while( resultSet.next() ) {
                 Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
+                long time = timeStamp.getTime();
+                String system = resultSet.getString( "system" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
-                LogEntry entry = new LogEntry( timeStamp, type, msg );
+                LogEntry entry = new LogEntry( system, getLogger(), time, Level.toLevel( type ),
+                        msg, new Throwable() );
                 entries.add( entry );
             }
             stmt.close();
@@ -164,9 +238,12 @@ public class LogManager {
                 "timestamp DESC OFFSET " + offset + " LIMIT " + limit );
             while( resultSet.next() ) {
                 Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
+                long time = timeStamp.getTime();
+                String system = resultSet.getString( "system" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
-                LogEntry entry = new LogEntry( timeStamp, type, msg );
+                LogEntry entry = new LogEntry( system, getLogger(), time, Level.toLevel( type ),
+                        msg, new Throwable() );
                 entries.add( entry );
             }
             stmt.close();
@@ -178,60 +255,6 @@ public class LogManager {
             jdbcConnectionManager.returnConnection( conn );
         }
         return entries;
-    }
-    /**
-     * Adds entry to the system log.
-     *
-     * @param entry Entry to add
-     * @return Number of inserted records
-     */
-    public synchronized int addEntry( LogEntry entry ) {
-        Connection conn = null;
-        int insert = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "INSERT INTO dex_messages (timestamp, type, message) VALUES ('" +
-                    entry.getTimeStamp() + "', '" + entry.getType() + "', '" + entry.getMessage() +
-                    "');";
-            insert = stmt.executeUpdate( sql );
-            stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to insert log entries: " + e.getMessage() );
-        } catch( Exception e ) {
-            System.err.println( "Failed to insert log entries: " + e.getMessage() );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return insert;
-    }
-    /**
-     * Adds entry to the system log.
-     *
-     * @param time Current time in milliseconds
-     * @param type Log entry type
-     * @param message Log entry message
-     * @return Number of inserted records
-     */
-    public synchronized int addEntry( long time, String type, String message ) {
-        Connection conn = null;
-        int insert = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            Timestamp timeStamp = new Timestamp( time );
-            String sql = "INSERT INTO dex_messages (timestamp, type, message) VALUES ('" +
-                    timeStamp + "', '" + type + "', '" + message + "');";
-            insert = stmt.executeUpdate( sql );
-            stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to insert log entries: " + e.getMessage() );
-        } catch( Exception e ) {
-            System.err.println( "Failed to insert log entries: " + e.getMessage() );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return insert;
     }
     /**
      * Deletes all entries from the system log.

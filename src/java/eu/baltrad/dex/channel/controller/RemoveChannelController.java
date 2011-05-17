@@ -23,7 +23,7 @@ package eu.baltrad.dex.channel.controller;
 
 import eu.baltrad.dex.channel.model.ChannelManager;
 import eu.baltrad.dex.channel.model.Channel;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -117,22 +117,25 @@ public class RemoveChannelController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removesuccess" ) );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                        "Local radar station " + channelName + " removed from the system.");
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_WARN, "Local radar station " +
+                    channelName + " removed from the system", null ) );
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removefail" ) );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Failed to remove local radar station " + channelName + "." );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_WARN, "Failed to remove local " +
+                    "radar station " + channelName, null ) );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removefail" ) );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Failed to remove local radar station " + channelName + "." );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_WARN, "Failed to remove local " +
+                    "radar station " + channelName, null ) );
             }
         }
         return new ModelAndView( REMOVED_CHANNELS_VIEW );

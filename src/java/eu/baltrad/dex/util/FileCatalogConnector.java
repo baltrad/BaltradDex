@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.util;
 
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 import eu.baltrad.fc.CacheDirStorage;
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileCatalogError;
@@ -103,18 +103,22 @@ public class FileCatalogConnector {
                 localStorage = new CacheDirStorage( dataStorageDirectory );
                 database = Database.create( dbURI );
                 fileCatalog = new FileCatalog( database, localStorage );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                        "File catalog successfully initialized" );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_INFO, "File catalog successfully " +
+                    "initialized", null ) );
             } else {
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Failed to load properties file: " + PROPS_FILE_NAME );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to load properties " +
+                    " file: " + PROPS_FILE_NAME, null ) );
             }
         } catch( FileCatalogError e ) {
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "File catalog error: " + e.getMessage() );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "File catalog error: " +
+                e.getMessage(), null ) );
         } catch( Exception e ) {
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "File catalog error: " + e.getMessage() );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "File catalog error: " +
+                e.getMessage(), null ) );
         }
     }
     /**

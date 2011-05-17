@@ -28,7 +28,7 @@ import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.core.model.NodeConnection;
 import eu.baltrad.dex.util.InitAppUtil;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 
 import eu.baltrad.fc.db.FileEntry;
 
@@ -98,11 +98,13 @@ public class HandleFrameTask implements Runnable {
                 user.getName(), new Date(), status );
         deliveryRegisterManager.addEntry( drEntry );
         if( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) {
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO, "Data from " +
-                    channelName + " sent to user " + user.getName() );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                System.currentTimeMillis(), LogEntry.LEVEL_INFO, "Data from " + channelName +
+                " sent to user " + user.getName(), null ) );
         } else {
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "Failed to send data from " + channelName + " to user " + user.getName() );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to send data from " +
+                channelName + " to user " + user.getName(), null ) );
         }
     }
 }

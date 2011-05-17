@@ -25,7 +25,7 @@ import eu.baltrad.dex.core.model.NodeConnection;
 import eu.baltrad.dex.core.model.NodeConnectionManager;
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.frame.model.BaltradFrameHandler;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.InitAppUtil;
 
@@ -111,7 +111,7 @@ public class ConnectToNodeController extends SimpleFormController {
                 MessageDigestUtil.createHash( nodeConn.getUserName() ),
                 MessageDigestUtil.createHash( nodeConn.getPassword() ),
                 InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                BaltradFrameHandler.REQUEST,
+                /*BaltradFrameHandler.REQUEST*/BaltradFrameHandler.LEVEL_INFO.toString(),
                 BaltradFrameHandler.CHNL_LIST_RQST );
         // set local user name in frame dispatcher
         frameDispatcherController.setLocalUserName( nodeConn.getUserName() );
@@ -130,11 +130,13 @@ public class ConnectToNodeController extends SimpleFormController {
                 try {
                     nodeConnectionManager.saveOrUpdate( nodeConn );
                 } catch( SQLException e ) {
-                    logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                            "Failed to save node connection: " + e.getMessage() );
+                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                        System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to save node " +
+                        "connection: " + e.getMessage(), null ) );
                 } catch( Exception e ) {
-                    logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                            "Failed to save node connection: " + e.getMessage() );
+                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                        System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to save node " +
+                        "connection: " + e.getMessage(), null ) );
                 }
             }
         }

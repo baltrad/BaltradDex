@@ -22,7 +22,7 @@
 package eu.baltrad.dex.auth.controller;
 
 import eu.baltrad.dex.util.ApplicationSecurityManager;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 import eu.baltrad.dex.user.model.User;
 
 import org.springframework.web.servlet.mvc.Controller;
@@ -55,8 +55,9 @@ public class LogoutController implements Controller {
             throws Exception {
         User user = ( User )ApplicationSecurityManager.getUser( request );
         ApplicationSecurityManager.removeUser( request );
-        logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO, "User " + user.getName()
-                + " logged out" );
+        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+            System.currentTimeMillis(), LogEntry.LEVEL_INFO, "User " + user.getName()
+                + " logged out", null ) );
         return new ModelAndView( getSuccessView() );
     }
     /**

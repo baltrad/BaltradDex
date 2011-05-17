@@ -26,7 +26,7 @@ import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.dex.channel.model.Channel;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 import eu.baltrad.dex.util.InitAppUtil;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -165,8 +165,9 @@ public class RemoteChannelController extends MultiActionController {
                 Channel channel = (  Channel )getSubscribedChannels().get( i );
                 if( subscriptionManager.getSubscription( channel.getChannelName(),
                         Subscription.LOCAL_SUBSCRIPTION ) != null ) {
-                    logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                        "You have already subscribed to " + channel.getChannelName() );
+                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                        System.currentTimeMillis(), LogEntry.LEVEL_WARN,
+                        "You have already subscribed to " + channel.getChannelName(), null ) );
                 } else {
                     // add local subscription
                     Subscription subs = new Subscription( System.currentTimeMillis(),
@@ -177,8 +178,10 @@ public class RemoteChannelController extends MultiActionController {
                 }
             }
         } catch( Exception e ) {
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "Error while adding remote channels to subscription list: " + e.getMessage() );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                System.currentTimeMillis(), LogEntry.LEVEL_ERROR,
+                "Error while adding remote channels to subscription list: " + e.getMessage(),
+                null ) );
         }
         return new ModelAndView( SUBSCRIBED_REMOTE_RADARS_VIEW, SUBSCRIBED_REMOTE_RADARS_KEY,
                 getSubscribedChannels() );

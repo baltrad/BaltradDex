@@ -145,6 +145,11 @@ BEGIN
 	EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'failed to modify column "timestamp" of table "dex_subscriptions"';
     END;
+    BEGIN
+        ALTER TABLE dex_messages ADD COLUMN system VARCHAR(16) NOT NULL DEFAULT 'DEX';
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to add column "system" to table "dex_messages"';
+    END;
 END;
 $$ LANGUAGE plpgsql;
 

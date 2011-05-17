@@ -22,8 +22,7 @@
 package eu.baltrad.dex.log.controller;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
-import eu.baltrad.dex.log.model.LogEntry;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 
 import junit.framework.TestCase;
 
@@ -85,9 +84,9 @@ public class LogControllerTest extends TestCase {
         @Override
         public void run() {
             for( int i = 0; i < numOp; i++ ) {
-                LogEntry entry = new LogEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                        "Logger " + label + " entry " + i );
-                manager.addEntry( entry );
+                manager.append( new LogEntry( LogEntry.LOG_SRC_DEX, manager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_INFO, "Logger " + label + " entry "
+                    + i, null ) );
             }
         }
     }

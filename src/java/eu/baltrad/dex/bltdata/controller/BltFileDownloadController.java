@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.bltdata.controller;
 
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
 
@@ -73,8 +73,9 @@ public class BltFileDownloadController implements Controller {
             try {
                 in = new BufferedInputStream( new FileInputStream( file ) );
             } catch( FileNotFoundException e ) {
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                        "File not found: " + e.getMessage() );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_WARN, "File not found: " +
+                    e.getMessage(), null ) );
             }
             String mimeType = servletContext.getMimeType( filePath );
             response.setBufferSize( fileSize );
@@ -88,14 +89,17 @@ public class BltFileDownloadController implements Controller {
                 response.getOutputStream().flush();
                 response.getOutputStream().close();
             } catch( IOException e ) {
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Error downloading file: " + e.getMessage() );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error downloading file: " +
+                    e.getMessage(), null ) );
             }
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO, "User " +
-                    user.getName() + " downloading file: " + file.getName() );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_INFO, "User " +
+                    user.getName() + " downloading file: " + file.getName(), null ) );
         } else {
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "Invalid file size: " + fileSize );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
+                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR,
+                    "Invalid file size: " + fileSize, null ) );
         }
         return null;
     }

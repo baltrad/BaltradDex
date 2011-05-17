@@ -81,7 +81,8 @@ CREATE TABLE dex_messages
 (
     id SERIAL NOT NULL,
     timestamp TIMESTAMP NOT NULL,
-    type VARCHAR(12) NOT NULL,
+    system VARCHAR(16) NOT NULL,
+    type VARCHAR(16) NOT NULL,
     message TEXT NOT NULL,
     PRIMARY KEY (id)
 );
