@@ -39,6 +39,7 @@ import eu.baltrad.dex.log.model.LogManager;
 
 import eu.baltrad.beast.db.AttributeFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
+import eu.baltrad.dex.log.model.LogEntry;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
@@ -51,6 +52,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.sql.SQLException;
+import org.apache.log4j.Level;
 
 /**
  * Allows to configure new data source or to modify an existing one.
@@ -369,12 +371,12 @@ public class SaveDataSourceController extends MultiActionController {
                 numSelectedUsers = selectedUsers.size();
             } catch( SQLException e ) {
                 modelAndView.addObject( DS_SAVE_ERROR_KEY, "SQL Exception" );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "Failed to recover data source parameters: SQL Exception " + e.getMessage() );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Failed to recover data source parameters: SQL Exception " + e.getMessage() ) );
             } catch( Exception e ) {
                 modelAndView.addObject( DS_SAVE_ERROR_KEY, "Exception" );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "Failed to recover data source parameters: Exception " + e.getMessage() );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Failed to recover data source parameters: SQL Exception " + e.getMessage() ) );
             }
         }
         modelAndView.setViewName( DS_SAVE_NAME_VIEW );
@@ -551,16 +553,16 @@ public class SaveDataSourceController extends MultiActionController {
                     dataSourceManager.deleteFilters( dsId );
                     dataSourceManager.saveFilter( dsId, sourceFilter.getId() );
                 }
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                        "Data source " + dataSource.getName() + " successfully saved" );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
+                        "Data source " + dataSource.getName() + " successfully saved" ) );
             } catch( SQLException e ) {
                 modelAndView.addObject( DS_SAVE_ERROR_KEY, "SQL Exception" );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Failed to save data source: SQL Exception " + e.getMessage() );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to save data source: SQL Exception " + e.getMessage() ) );
             } catch( Exception e ) {
                 modelAndView.addObject( DS_SAVE_ERROR_KEY, "Exception" );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Failed to save data source: Exception " + e.getMessage() );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to save data source: SQL Exception " + e.getMessage() ) );
             }
             resetModel();
             modelAndView.setViewName( DS_SAVE_VIEW );

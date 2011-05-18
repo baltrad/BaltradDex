@@ -23,7 +23,7 @@ package eu.baltrad.dex.datasource.controller;
 
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
@@ -94,16 +94,16 @@ public class RemoveDataSourceController extends MultiActionController {
                         String dataSourceName = dataSource.getName();
                         dataSourceManager.deleteDataSource( Integer.parseInt(
                                 parameterValues[ i ] ) );
-                        logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                                "Data source " + dataSourceName + " successfully removed" );
+                        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
+                                "Data source " + dataSourceName + " successfully removed" ) );
                     } catch( SQLException e ) {
                         modelAndView.addObject( DS_REMOVE_ERROR_KEY, "SQL exception" );
-                        logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                                "Failed to remove data source: SQL Exception " + e.getMessage() );
+                        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                                "Failed to remove data source: SQL Exception " + e.getMessage() ) );
                     } catch( Exception e ) {
                         modelAndView.addObject( DS_REMOVE_ERROR_KEY, "Exception" );
-                        logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                                "Failed to remove data source: Exception " + e.getMessage() );
+                        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                                "Failed to remove data source: Exception " + e.getMessage() ) );
                     }
                 }
                 modelAndView.setViewName( DS_REMOVE_VIEW );

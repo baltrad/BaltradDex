@@ -413,12 +413,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   </target>
   
   <!-- deploy on tomcat -->
-
-<<<<<<< HEAD
+  
   <target name="deploy" depends="dist, context-status"
-=======
-  <target name="deploy" depends="dist, insert-data, context-status"
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
     	if="context.deployable">
     <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
     <deploy url="${mgr.url}"
@@ -497,7 +493,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </condition>
   </target>
 
-<<<<<<< HEAD
     <!-- Generate BaltradDex source code documentation using javadoc -->
     <target name="javadocs">
         <mkdir dir="${javadocs.dir}"/>
@@ -510,20 +505,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             </fileset> 
          </javadoc>
     </target>
-=======
-  <!-- Generate BaltradDex source code documentation using javadoc -->
-  <target name="javadocs">
-      <mkdir dir="${javadocs.dir}"/>
-      <javadoc sourcepath="${src.dir}" destdir="${javadocs.dir}"
-          classpath="${src.dir}" author="true" version="true"
-          use="true" windowtitle="${app.name} API"
-          doctitle="&lt;h1&gt;${app.name}&lt;/h1&gt;">
-          <fileset dir="${javadocs.src.dir}">
-              <include name="**/*.java"/>
-          </fileset>
-      </javadoc>
-  </target>
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
 
 </project>
 

@@ -25,17 +25,9 @@ import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.frame.model.BaltradFrameHandler;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
-<<<<<<< HEAD
-
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
-
-import eu.baltrad.dex.log.model.LogManager;
-=======
-import eu.baltrad.dex.channel.model.ChannelManager;
-import eu.baltrad.dex.channel.model.Channel;
 import eu.baltrad.dex.log.model.*;
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
@@ -184,17 +176,10 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // user ID set upon authentication
                             int userId;
                             if( ( userId = authenticateFrame( header ) ) != 0 ) {
-<<<<<<< HEAD
-                                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                    "Data source listing request received from user " +
-                                     getUserName( bfHandler.getUserName( header ) ) + " ("
-                                     + bfHandler.getSenderNodeName( header ) + ")" );
-=======
                                 logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, 
                                     LogEntry.LEVEL_INFO, "Channel listing request received from " +
                                     "user " + getUserName( bfHandler.getUserName( header ) ) + " ("
                                      + bfHandler.getSenderNodeName( header ) + ")" ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
                                 
                                 // process channel listing request
 
@@ -252,15 +237,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                         if( bfHandler.getMessageText( header ).equals(
                             BaltradFrameHandler.CHNL_LIST ) ) {
-<<<<<<< HEAD
-                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                "Data source listing received from " + bfHandler.getSenderNodeName(
-                                header ) );
-=======
                             logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX,
                                 LogEntry.LEVEL_INFO, "Channel listing received from " +
                                 bfHandler.getSenderNodeName( header ) ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
 
                             // process incoming data source listing
 
@@ -287,16 +266,10 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                         if( bfHandler.getMessageText( header ).equals(
                                 BaltradFrameHandler.CHNL_SBN_RQST ) ) {
-<<<<<<< HEAD
-                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                "Data source subscription request received from " +
-                                bfHandler.getSenderNodeName( header ) );
-=======
 
                             logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX,
                                 LogEntry.LEVEL_INFO, "Channel subscription request received from " +
                                 bfHandler.getSenderNodeName( header ) ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
 
                             // process incoming subscription request
 
@@ -331,12 +304,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                             Subscription.REMOTE_SUBSCRIPTION ) != null ) {
                                         logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX,
                                             LogEntry.LEVEL_WARN, "User " + user.getName() +
-                                            " has already subscribed to "
-<<<<<<< HEAD
-                                            + localDataSource.getName() );
-=======
-                                            + localChannel.getChannelName() ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
+                                            " has already subscribed to " 
+                                            + localDataSource.getName() ) );
                                     } else {
                                         // add subscription
                                         subs = new Subscription( System.currentTimeMillis(),
@@ -375,15 +344,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                         if( bfHandler.getMessageText( header ).equals(
                                 BaltradFrameHandler.CHNL_SBN_CFN ) ) {
-<<<<<<< HEAD
-                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                "Data source subscription confirmation received from " +
-                                bfHandler.getSenderNodeName( header ) );
-=======
                             logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX,
                                 LogEntry.LEVEL_INFO, "Channel subscription confirmation received " +
                                 " from " + bfHandler.getSenderNodeName( header ) ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
 
                             // process incoming subscription confirmation
 
@@ -405,15 +368,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
                         if( bfHandler.getMessageText( header ).equals(
                                 BaltradFrameHandler.SBN_CHNG_RQST ) ) {
-<<<<<<< HEAD
-                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                "Data source subscription change request received from " +
-                                bfHandler.getSenderNodeName( header ) );
-=======
                             logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX,
                                 LogEntry.LEVEL_INFO, "Channel subscription change request " +
                                 "received from " + bfHandler.getSenderNodeName( header ) ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
 
                             // process incoming subscription change request
 
@@ -445,30 +402,19 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     confirmedSub = s;
                                     //@
                                     confirmedSub.setActive( true );
-<<<<<<< HEAD
-                                    logManager.addEntry( System.currentTimeMillis(),
-                                        LogManager.MSG_INFO, "User " + s.getUserName() +
-                                        " subscribed to " + s.getDataSourceName() );
-=======
                                     logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX,
                                         LogEntry.LEVEL_INFO, "User " + s.getUserName() +
-                                        " subscribed to " + s.getChannelName() ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
+                                        " subscribed to " + s.getDataSourceName() ) );
+
                                 } else {
                                     // subscription exists in the database - modify subscription
                                     subscriptionManager.updateSubscription( s.getDataSourceName(),
                                             Subscription.REMOTE_SUBSCRIPTION, true );
                                     confirmedSub = s;
                                     confirmedSub.setActive( true );
-<<<<<<< HEAD
-                                    logManager.addEntry( System.currentTimeMillis(),
-                                        LogManager.MSG_INFO, "User " + s.getUserName() +
-                                        " subscribed to " + s.getDataSourceName() );
-                                }
-=======
                                     logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX,
                                         LogEntry.LEVEL_INFO, "User " + s.getUserName() +
-                                        " subscribed to " + s.getChannelName() ) );
+                                        " subscribed to " + s.getDataSourceName() ) );
                                 }
                                 /*/ add remote subscription
                                 subscriptionManager.addSubscription( s );
@@ -476,21 +422,14 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 //@
                                 confirmedSub.setSelected( true );
                                 */
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
                             } else {
                                 // remove remote subscription
                                 subscriptionManager.deleteSubscription( s.getUserName(),
                                         s.getDataSourceName(), s.getType() );
                                 confirmedSub = s;
-<<<<<<< HEAD
-                                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                    "User " + s.getUserName() + " cancelled subscription to "
-                                    + s.getDataSourceName() );
-=======
                                 logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX,
                                     LogEntry.LEVEL_INFO, "User " + s.getUserName() +
-                                    " cancelled subscription to " + s.getChannelName() ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
+                                    " cancelled subscription to " + s.getDataSourceName() ) );
                             }
 
                             // send subscription change confirmation
@@ -544,18 +483,11 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                             String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
-<<<<<<< HEAD
-                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                "Remote node " + bfHandler.getSenderNodeName( header )
-                                + " changed your subscription status for " + 
-                                subs.getDataSourceName() + " to: " + selected );
-=======
                             logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX,
                                 LogEntry.LEVEL_INFO, "Remote node " +
                                 bfHandler.getSenderNodeName( header )
-                                + " changed your subscription status for " + subs.getChannelName()
-                                + " to: " + selected ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
+                                + " changed your subscription status for " + 
+                                subs.getDataSourceName() + " to: " + selected ) );
                         }
 
                         // incoming channel subscription change confirmation - failure
@@ -578,11 +510,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 LogEntry.LEVEL_ERROR, "Remote node " +
                                 bfHandler.getSenderNodeName( header )  +
                                 " failed to change your subscription status for "
-<<<<<<< HEAD
-                                + subs.getDataSourceName() + " to: " + selected );
-=======
-                                + subs.getChannelName() + " to: " + selected ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
+                                + subs.getDataSourceName() + " to: " + selected ) );
                         }
 
                         // channel synchronization request
@@ -696,19 +624,14 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         subscriptionManager.getSubscriptions(
                                         Subscription.REMOTE_SUBSCRIPTION );
                                 for( int i = 0; i < subs.size(); i++ ) {
-<<<<<<< HEAD
-
 
 
                                     // check if file entry matches the subscribed data source
                                     
 
 
-                                    if( subs.get( i ).getDataSourceName().equals( bfHandler.getChannel(
-=======
-                                    if( subs.get( i ).getChannelName().equals( bfHandler.getChannel(
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
-                                        header ) ) ) {
+                                    if( subs.get( i ).getDataSourceName().equals( 
+                                            bfHandler.getChannel( header ) ) ) {
 
                                         // make sure that user exists locally
                                         User user = userManager.getUserByName(
@@ -731,18 +654,11 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     }
                                 }
                             }
-<<<<<<< HEAD
                         } catch( DuplicateEntry e ) {
-                            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                                    "Duplicate entry error: " + e.getMessage() );
-=======
-                        }catch( DuplicateEntry e ) {
                             logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX,
                                 LogEntry.LEVEL_ERROR, "Duplicate entry error: " + e.getMessage() ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
                             // exception while storing file in FileCatalog - set error code
                             response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_500 );
-
                         } catch( FileCatalogError e ) {
                             logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX,
                                 LogEntry.LEVEL_ERROR, "File catalog error: " + e.getMessage() ) );

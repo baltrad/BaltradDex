@@ -228,17 +228,11 @@ public class SubscriptionController extends MultiActionController {
                         Subscription.LOCAL_SUBSCRIPTION,
                         getChangedSubscriptions().get( i ).getActive() );
             } catch( Exception e ) {
-<<<<<<< HEAD
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Error while processing subscription change request for " +
-                    getChangedSubscriptions().get( i ).getOperatorName() + ", data source " +
-                    getChangedSubscriptions().get( i ).getDataSourceName() + ": " + e.getMessage() );
-=======
                 logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
                     "Error while processing subscription change request for " +
                     getChangedSubscriptions().get( i ).getOperatorName() + ", channel " +
-                    getChangedSubscriptions().get( i ).getChannelName() + ": " + e.getMessage() ) );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
+                    getChangedSubscriptions().get( i ).getDataSourceName() + ": " +
+                    e.getMessage() ) );
             }
         }
         return new ModelAndView( SUBSCRIPTION_STATUS_VIEW );

@@ -146,7 +146,11 @@ BEGIN
         WHEN OTHERS THEN RAISE NOTICE 'failed to modify column "timestamp" of table "dex_subscriptions"';
     END;
     BEGIN
-<<<<<<< HEAD
+        ALTER TABLE dex_messages ADD COLUMN system VARCHAR(16) NOT NULL DEFAULT 'DEX';
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to add column "system" to table "dex_messages"';
+    END;
+    BEGIN
         CREATE SEQUENCE file_object_id_seq;
     EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'failed to create sequence "file_object_id_seq"';
@@ -355,11 +359,6 @@ BEGIN
         );
     EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_filters"';
-=======
-        ALTER TABLE dex_messages ADD COLUMN system VARCHAR(16) NOT NULL DEFAULT 'DEX';
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to add column "system" to table "dex_messages"';
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
     END;
 END;
 $$ LANGUAGE plpgsql;

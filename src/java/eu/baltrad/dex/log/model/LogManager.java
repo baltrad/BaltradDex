@@ -50,18 +50,11 @@ import java.util.ArrayList;
  * method should be used:
  *
  * <b>public void append( LoggingEvent event ) {}</b>
- *
-<<<<<<< HEAD
- * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.0
- * @since 1.0
- */
-public class LogManager /*extends AppenderSkeleton*/ {
-=======
+ * 
  * The method accepts LoggingEvent as a call parameter. Use either <b>LogEntry</b> class or your
  * own implementation of LoggingEvent. The following is an example of how this method should be
  * used with <b>LogEntry</b> object.
- * 
+ *
  * To append LogEntry using default logger available in <b>LogManager</b> class:
  *
  * <b>
@@ -71,7 +64,7 @@ public class LogManager /*extends AppenderSkeleton*/ {
  * To append LogEntry using logger of your choice:
  *
  * <b>
- * logManager.append( new LogEntry( LogEntry.LOG_SRC_PGF, 
+ * logManager.append( new LogEntry( LogEntry.LOG_SRC_PGF,
  *          Logger.getLogger( "eu.baltrad.test.class" ), LogEntry.LEVEL_INFO, "A test message" ) );
  * </b>
  * Note that <b>LogEntry</b> should be used in order to keep compliance with DEX message display
@@ -80,7 +73,6 @@ public class LogManager /*extends AppenderSkeleton*/ {
  * </pre>
  */
 public class LogManager extends AppenderSkeleton {
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
 //---------------------------------------------------------------------------------------- Constants
     /** Number of log entries per page */
     public final static int ENTRIES_PER_PAGE = 12;
@@ -106,7 +98,7 @@ public class LogManager extends AppenderSkeleton {
      */
     public boolean requiresLayout() { return true; }
     /**
-     *
+     * Method required by AppenderSkeleton
      */
     public void close() {};
     /**
