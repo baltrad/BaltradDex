@@ -902,7 +902,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="beastscheduler" class="eu.baltrad.beast.scheduler.BeastScheduler" autowire="byType"/>
 
     <!-- and the file catalog -->
-    <bean id="bdb_db" class="eu.baltrad.fc.db.Database" factory-method="create" destroy-method="delete">
+    <bean id="bdb_db" class="eu.baltrad.fc.Database" factory-method="create" destroy-method="delete">
         <constructor-arg value="${database.uri}" />
     </bean>
     <bean id="bdb_storage" class="eu.baltrad.fc.CacheDirStorage" destroy-method="delete">

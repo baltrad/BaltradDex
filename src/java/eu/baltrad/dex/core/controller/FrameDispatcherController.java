@@ -40,7 +40,7 @@ import eu.baltrad.dex.core.util.HandleFrameTask;
 import eu.baltrad.dex.register.model.DeliveryRegisterManager;
 
 import eu.baltrad.fc.FileCatalog;
-import eu.baltrad.fc.db.FileEntry;
+import eu.baltrad.fc.FileEntry;
 import eu.baltrad.fc.DuplicateEntry;
 import eu.baltrad.fc.FileCatalogError;
 

@@ -30,7 +30,7 @@ import eu.baltrad.dex.core.model.NodeConnection;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.log.model.*;
 
-import eu.baltrad.fc.db.FileEntry;
+import eu.baltrad.fc.FileEntry;
 
 import java.io.File;
 import java.util.Date;
