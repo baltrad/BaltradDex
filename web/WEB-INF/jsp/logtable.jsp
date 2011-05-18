@@ -51,17 +51,17 @@ Author     : szewczenko
             <c:forEach var="entry" items="${log_entry_list}">
                 <% String style = ""; %>
                 <c:choose>
-                    <c:when test="${entry.type == 'INFO'}">
+                    <c:when test="${entry.level == 'INFO'}">
                         <%
                             style = "info";
                         %>
                     </c:when>
-                    <c:when test="${entry.type == 'WARNING'}">
+                    <c:when test="${entry.level == 'WARN'}">
                         <%
                             style = "warning";
                         %>
                     </c:when>
-                    <c:when test="${entry.type == 'ERROR'}">
+                    <c:when test="${entry.level == 'ERROR'}">
                         <%
                             style = "error";
                         %>
@@ -79,13 +79,13 @@ Author     : szewczenko
                         </div>
                     </div>
                     <c:choose>
-                        <c:when test="${entry.type == 'ERROR'}">
+                        <c:when test="${entry.level == 'ERROR'}">
                             <div class="flag">
                                 <img src="includes/images/red_bulb.png"
                                      alt="error"/>
                             </div>
                         </c:when>
-                        <c:when test="${entry.type == 'WARNING'}">
+                        <c:when test="${entry.level == 'WARN'}">
                             <div class="flag">
                                 <img src="includes/images/blue_bulb.png"
                                      alt="warn"/>

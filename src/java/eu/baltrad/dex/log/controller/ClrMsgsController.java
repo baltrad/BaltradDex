@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.log.controller;
 
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -64,20 +64,20 @@ public class ClrMsgsController implements Controller {
             String msg = "Successfully deleted " + Integer.toString( deletedEntries ) 
                     + " message(s).";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                    "User removed all system messages." );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
+                "User removed all system messages" ) );
         } catch( SQLException e ) {
             String msg = "Failed to remove system messages:" + e.getMessage();
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                    "Failed to remove system messages." );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                "Failed to remove system messages" ) );
         } catch( Exception e ) {
             String msg = "Failed to remove system messages:" + e.getMessage();
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                    "Failed to remove system messages." );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                "Failed to remove system messages" ) );
         }
         return new ModelAndView( getSuccessView() );
     }

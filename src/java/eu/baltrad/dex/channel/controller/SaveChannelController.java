@@ -26,7 +26,7 @@ import eu.baltrad.dex.channel.model.Channel;
 import eu.baltrad.dex.channel.model.ChannelPermission;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -119,20 +119,20 @@ public class SaveChannelController extends SimpleFormController {
             channelManager.saveOrUpdate( channel );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savesuccess" ) );
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                    "Saved local radar station " + channel.getChannelName() + "." );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
+                    "Saved local radar station " + channel.getChannelName() ) );
         } catch( SQLException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savefail" ) );
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "Failed to save radar station " + channel.getChannelName() + "." );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Failed to save radar station " + channel.getChannelName() ) );
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savefail" ) );
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "Failed to save radar station " + channel.getChannelName() + "." );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Failed to save radar station " + channel.getChannelName() ) );
         }
         return new ModelAndView( getSuccessView() );
     }

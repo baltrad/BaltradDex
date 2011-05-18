@@ -23,7 +23,7 @@ package eu.baltrad.dex.user.controller;
 
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -100,21 +100,21 @@ public class SaveUserController extends SimpleFormController {
             userManager.saveOrUpdate( user );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.savesuccess" ) );
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                "User account saved: " + user.getName() );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
+                    "User account saved: " + user.getName() ) );
         } catch( SQLException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.nameexists" ) );
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "Failed to save user account: " + user.getName() + "." );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Failed to save user account: " + user.getName() ) );
             errors.reject( "message.adduser.nameexists" );
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.nameexists" ) );
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "Failed to save user account: " + user.getName() + "." );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Failed to save user account: " + user.getName() ) );
             errors.reject( "message.adduser.nameexists" );
         }
         return new ModelAndView( getSuccessView() );

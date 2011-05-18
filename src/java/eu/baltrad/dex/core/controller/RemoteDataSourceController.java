@@ -25,8 +25,12 @@ import eu.baltrad.frame.model.BaltradFrameHandler;
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
+<<<<<<< HEAD:src/java/eu/baltrad/dex/core/controller/RemoteDataSourceController.java
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.log.model.LogManager;
+=======
+import eu.baltrad.dex.log.model.*;
+>>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d:src/java/eu/baltrad/dex/core/controller/RemoteChannelController.java
 import eu.baltrad.dex.util.InitAppUtil;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -138,6 +142,7 @@ public class RemoteDataSourceController extends MultiActionController {
             HttpServletResponse response ) {
         // prepare subscription request
         try {
+
             File tempFile = InitAppUtil.createTempFile(
                     new File( InitAppUtil.getWorkDir() ) );
             InitAppUtil.writeObjectToStream( getSelectedDataSources(), tempFile );
@@ -153,7 +158,6 @@ public class RemoteDataSourceController extends MultiActionController {
             frameDispatcherController.doPost( request, response, baltradFrame );
             // delete temporary file
             InitAppUtil.deleteFile( tempFile );
-
             // check subscription operation status
             setSubscribedDataSources( frameDispatcherController.getConfirmedSubscriptions() );
             // reset confirmed subscriptions list stored in FrameDispatcherController
@@ -163,8 +167,13 @@ public class RemoteDataSourceController extends MultiActionController {
                 DataSource dataSource = ( DataSource )getSubscribedDataSources().get( i );
                 if( subscriptionManager.getSubscription( dataSource.getName(),
                         Subscription.LOCAL_SUBSCRIPTION ) != null ) {
+<<<<<<< HEAD:src/java/eu/baltrad/dex/core/controller/RemoteDataSourceController.java
                     logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
                         "You have already subscribed to " + dataSource.getName() );
+=======
+                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
+                        "You have already subscribed to " + channel.getChannelName() ) );
+>>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d:src/java/eu/baltrad/dex/core/controller/RemoteChannelController.java
                 } else {
                     // add local subscription
                     Subscription subs = new Subscription( System.currentTimeMillis(),
@@ -175,8 +184,13 @@ public class RemoteDataSourceController extends MultiActionController {
                 }
             }
         } catch( Exception e ) {
+<<<<<<< HEAD:src/java/eu/baltrad/dex/core/controller/RemoteDataSourceController.java
             logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                 "Error while adding remote data sources to subscription list: " + e.getMessage() );
+=======
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                "Error while adding remote channels to subscription list: " + e.getMessage() ) );
+>>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d:src/java/eu/baltrad/dex/core/controller/RemoteChannelController.java
         }
         return new ModelAndView( SUBSCRIBED_DATA_SOURCES_VIEW, SUBSCRIBED_DATA_SOURCES_KEY,
                 getSubscribedDataSources() );

@@ -23,7 +23,7 @@ package eu.baltrad.dex.user.controller;
 
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
 
 import org.springframework.web.servlet.ModelAndView;
@@ -132,23 +132,22 @@ public class RemoveUserController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY, 
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removesuccess" ) );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                        "User account " + userName + " removed from the system" );
-
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
+                        "User account " + userName + " removed from the system" ) );
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removefail" ) );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Failed to remove user account " + userName + "." );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to remove user account " + userName ) );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removefail" ) );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Failed to remove user account " + userName + "." );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to remove user account " + userName ) );
             }
         }
         return new ModelAndView( REMOVED_USERS_VIEW );

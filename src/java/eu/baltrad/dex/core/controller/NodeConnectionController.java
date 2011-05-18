@@ -23,7 +23,7 @@ package eu.baltrad.dex.core.controller;
 
 import eu.baltrad.dex.core.model.NodeConnectionManager;
 import eu.baltrad.dex.core.model.NodeConnection;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -112,20 +112,21 @@ public class NodeConnectionController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeconnection.success" ) );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                    "Removed node connection: " + getSelectedConns().get( i ).getConnectionName() );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO,
+                        "Removed node connection: "
+                        + getSelectedConns().get( i ).getConnectionName() ) );
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeconnection.fail" ) );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Failed to remove node connection: " + e.getMessage() );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to remove node connection: " + e.getMessage() ) );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeconnection.fail" ) );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Failed to remove node connection: " + e.getMessage() );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to remove node connection: " + e.getMessage() ) );
             }
         }
         return new ModelAndView( SHOW_REM_CONN_VIEW );

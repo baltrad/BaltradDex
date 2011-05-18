@@ -43,15 +43,13 @@ CREATE OR REPLACE FUNCTION restart_seq_with_max(table_name TEXT, column_name TEX
 DECLARE
  maxval BIGINT;
 BEGIN
- EXECUTE 'SELECT MAX('
-         || column_name ||
-         ') FROM '
+ EXECUTE 'SELECT COALESCE(MAX(' || column_name || '), 0) + 1 FROM '
          || table_name INTO maxval;
  EXECUTE 'ALTER SEQUENCE '
          || table_name || '_' || column_name || '_seq'
          || ' RESTART WITH '
-         || maxval + 1;
- RETURN maxval + 1;
+         || maxval;
+ RETURN maxval;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -148,6 +146,7 @@ BEGIN
         WHEN OTHERS THEN RAISE NOTICE 'failed to modify column "timestamp" of table "dex_subscriptions"';
     END;
     BEGIN
+<<<<<<< HEAD
         CREATE SEQUENCE file_object_id_seq;
     EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'failed to create sequence "file_object_id_seq"';
@@ -356,6 +355,11 @@ BEGIN
         );
     EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_filters"';
+=======
+        ALTER TABLE dex_messages ADD COLUMN system VARCHAR(16) NOT NULL DEFAULT 'DEX';
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to add column "system" to table "dex_messages"';
+>>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
     END;
 END;
 $$ LANGUAGE plpgsql;

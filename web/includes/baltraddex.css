@@ -874,17 +874,18 @@ tr {
     padding:3px 0px 3px 0px;
     width: 70%;
 }
-#radartable a, #producttable a, #edituser a, #dataSourceTable a, #subscriptions a {
+#radartable a, #producttable a, #edituser a, #dataSourceTable a, #subscriptions a,
+        #adaptors a, #showroutes a, #showschedule {
     color:#2d76ae;
     text-decoration:underline;
     cursor:pointer
 }
 #radartable a:hover, #producttable a:hover, #edituser a:hover, #dataSourceTable a:hover,
-        #subscriptions a:hover {
+        #subscriptions a:hover, #adaptors a:hover, #showroutes a:hover,
+        #showschedule a:hover {
     text-decoration:none;
     font-weight:bolder; 
 }
-
 #selectradars > .table-hdr > .station, #selectradars > .table-row > .station,
         #selectradars > .table-hdr > .wmo, #selectradars > .table-row > .wmo {
     float:left;

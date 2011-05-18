@@ -21,12 +21,12 @@
 
 package eu.baltrad.dex.util;
 
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 import eu.baltrad.fc.CacheDirStorage;
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileCatalogError;
 import eu.baltrad.fc.LocalStorage;
-import eu.baltrad.fc.db.Database;
+import eu.baltrad.fc.Database;
 
 import java.util.Properties;
 import java.io.InputStream;
@@ -103,18 +103,18 @@ public class FileCatalogConnector {
                 localStorage = new CacheDirStorage( dataStorageDirectory );
                 database = Database.create( dbURI );
                 fileCatalog = new FileCatalog( database, localStorage );
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                        "File catalog successfully initialized" );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO,
+                        "File catalog successfully initialized" ) );
             } else {
-                logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                        "Failed to load properties file: " + PROPS_FILE_NAME );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to load properties file: " + PROPS_FILE_NAME ) );
             }
         } catch( FileCatalogError e ) {
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "File catalog error: " + e.getMessage() );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "File catalog error: " + e.getMessage() ) );
         } catch( Exception e ) {
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "File catalog error: " + e.getMessage() );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "File catalog error: " + e.getMessage() ) );
         }
     }
     /**

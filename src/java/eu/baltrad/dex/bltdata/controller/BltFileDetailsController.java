@@ -27,7 +27,7 @@ import eu.baltrad.dex.bltdata.model.BltFile;
 import eu.baltrad.dex.bltdata.model.BltDataset;
 import eu.baltrad.dex.bltdata.model.BltDataProjector;
 import eu.baltrad.dex.util.FileCatalogConnector;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.*;
 import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.fc.FileCatalog;
@@ -130,8 +130,8 @@ public class BltFileDetailsController implements Controller {
             "+lon_0=" + lon0_val[ 0 ], "+ellps=" + PROJ4_ELLPS_CODE, "+a=" + EARTH_RADIUS };
         int res = BltDataProjector.initializeProjection( projParms );
         if( res == 1 ) {
-            logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "Failed to initialize projection" );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Failed to initialize projection" ) );
         }
         try {
             // iterate through datasets

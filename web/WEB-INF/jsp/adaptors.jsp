@@ -79,7 +79,9 @@ List of adaptors
                                         <c:forEach var="adaptor" items="${adaptors}">
                                             <div class="table-row">
                                                 <div class="name">
-                                                    <c:out value="${adaptor.name}"/>
+                                                    <a href="showadaptor.htm?name=${adaptor.name}">
+                                                        <c:out value="${adaptor.name}"/>
+                                                    </a>
                                                 </div>
                                                 <div class="type">
                                                     <c:out value="${adaptor.type}"/>

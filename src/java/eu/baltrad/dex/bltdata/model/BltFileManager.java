@@ -30,12 +30,12 @@ import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
 
 import eu.baltrad.fc.FileCatalog;
-import eu.baltrad.fc.expr.ExpressionFactory;
-import eu.baltrad.fc.db.FileQuery;
-import eu.baltrad.fc.db.FileResult;
-import eu.baltrad.fc.db.FileEntry;
-import eu.baltrad.fc.db.AttributeQuery;
-import eu.baltrad.fc.db.AttributeResult;
+import eu.baltrad.fc.ExpressionFactory;
+import eu.baltrad.fc.FileQuery;
+import eu.baltrad.fc.FileResult;
+import eu.baltrad.fc.FileEntry;
+import eu.baltrad.fc.AttributeQuery;
+import eu.baltrad.fc.AttributeResult;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -122,7 +122,11 @@ public class BltFileManager {
         IFilter attributeFilter = getFilter( dsName );
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
+<<<<<<< HEAD
         q.filter( attributeFilter.getExpression() );
+=======
+        q.filter( xpr.eq( xpr.attribute( FC_SRC_PLC_ATTR ), xpr.string( dataChannel ) ) );
+>>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
         q.fetch( "fileCount", xpr.count( xpr.attribute( "file:uuid" ) ) );
         AttributeResult r = fc.database().execute( q );
         r.next();
@@ -146,8 +150,13 @@ public class BltFileManager {
         q.limit( limit );
         q.skip( offset );
         q.order_by( xpr.combined_datetime( FC_DATE_ATTR, FC_TIME_ATTR ), FileQuery.SortDir.DESC );
+<<<<<<< HEAD
         //q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( dataChannel ) ) );
         q.filter( attributeFilter.getExpression() );
+=======
+        // filter the query with a given channel name
+        q.filter( xpr.eq( xpr.attribute( FC_SRC_PLC_ATTR ), xpr.string( dataChannel ) ) );
+>>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
         FileResult r = fc.database().execute( q );
         List< BltFile > bltFiles = new ArrayList<BltFile>();
         while( r.next() ) {
@@ -182,7 +191,7 @@ public class BltFileManager {
         ExpressionFactory xpr = new ExpressionFactory();
         FileQuery q = new FileQuery();
         // filter the query with a given file identity string
-        q.filter( xpr.attribute( FC_FILE_UUID ).eq( xpr.string( uuid ) ) );
+        q.filter( xpr.eq( xpr.attribute( FC_FILE_UUID ), xpr.string( uuid ) ) );
         FileResult r = fc.database().execute( q );
         BltFile bltFile = null;
         while( r.next() ) {
