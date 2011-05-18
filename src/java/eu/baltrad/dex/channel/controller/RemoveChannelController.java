@@ -117,25 +117,22 @@ public class RemoveChannelController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removesuccess" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_WARN, "Local radar station " +
-                    channelName + " removed from the system", null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
+                        "Local radar station " + channelName + " removed from the system" ) );
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removefail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_WARN, "Failed to remove local " +
-                    "radar station " + channelName, null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
+                        "Failed to remove local " + "radar station " + channelName ) );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removefail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_WARN, "Failed to remove local " +
-                    "radar station " + channelName, null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
+                        "Failed to remove local " + "radar station " + channelName ) );
             }
         }
         return new ModelAndView( REMOVED_CHANNELS_VIEW );

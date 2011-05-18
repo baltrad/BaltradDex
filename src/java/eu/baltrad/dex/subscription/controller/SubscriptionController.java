@@ -226,12 +226,10 @@ public class SubscriptionController extends MultiActionController {
                         Subscription.LOCAL_SUBSCRIPTION,
                         getChangedSubscriptions().get( i ).getActive() );
             } catch( Exception e ) {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while processing " +
-                    "subscription change request for " +
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Error while processing subscription change request for " +
                     getChangedSubscriptions().get( i ).getOperatorName() + ", channel " +
-                    getChangedSubscriptions().get( i ).getChannelName() + ": " + e.getMessage(),
-                    null ) );
+                    getChangedSubscriptions().get( i ).getChannelName() + ": " + e.getMessage() ) );
             }
         }
         return new ModelAndView( SUBSCRIPTION_STATUS_VIEW );
@@ -267,9 +265,8 @@ public class SubscriptionController extends MultiActionController {
             try {
                 response.sendRedirect( REDIRECT_VIEW );
             } catch( IOException e ) {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while redirecting to "
-                    + REDIRECT_VIEW + ": " + e.getMessage(), null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Error while redirecting to " + REDIRECT_VIEW + ": " + e.getMessage() ) );
             }
         } else {
             // determines whether user has selected an active subscription
@@ -289,9 +286,8 @@ public class SubscriptionController extends MultiActionController {
                         "error.removesubscription.activesubscription" ) );
                     response.sendRedirect( REDIRECT_VIEW );
                 } catch( IOException e ) {
-                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                        System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while redirecting "
-                        + " to " + REDIRECT_VIEW + ": " + e.getMessage(), null ) );
+                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Error while redirecting to " + REDIRECT_VIEW + ": " + e.getMessage() ) );
                 }
             } else {
                 List< Subscription > currentSubs = new ArrayList< Subscription >();
@@ -373,9 +369,9 @@ public class SubscriptionController extends MultiActionController {
             try {
                 response.sendRedirect( SHOW_PEERS_SUBSCRIPTIONS_VIEW + ".htm" );
             } catch( IOException e ) {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while redirecting to "
-                    + SHOW_PEERS_SUBSCRIPTIONS_VIEW + ": " + e.getMessage(), null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Error while redirecting to " + SHOW_PEERS_SUBSCRIPTIONS_VIEW + ": " +
+                    e.getMessage() ) );
             }
         } else {
             List< Subscription > currentSubs = new ArrayList< Subscription >();

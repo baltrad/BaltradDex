@@ -74,19 +74,48 @@ public class LogEntry extends LoggingEvent implements Serializable {
      * @param system Determines the system that produced this message. Note that in the case of
      * original <b>LoggingEvent</b> constructor this parameter determines fully qualified name
      * of the calling category class.
-     * @param logger References logger object. Use either Logger available in LogManager class or
-     * provide a reference to your own logger instance.
-     * @param timeStamp Time stamp of the message expressed in milliseconds.
+     * @param timeStamp Current system time in milliseconds
      * @param level Determines level of this log entry.
      * @param message Actual message string.
-     * @param t Throwable object, can be null.
      */
-    public LogEntry( String system, Logger logger, long timeStamp, Level level,
-            Object message, Throwable t ) {
-        super( system, logger, timeStamp, level, message, t );
+    public LogEntry( String system, long timeStamp, Level level, Object message ) {
+        super( system, LogManager.getLogger(), timeStamp, level, message, new Throwable() );
         this.system = system;
         setDateStr( timeStamp );
-        setTimeStr( timeStamp );        
+        setTimeStr( timeStamp );
+    }
+    /**
+     * Constructor
+     *
+     * @param system Determines the system that produced this message. Note that in the case of
+     * original <b>LoggingEvent</b> constructor this parameter determines fully qualified name
+     * of the calling category class.
+     * @param logger References logger object. Use either Logger available in LogManager class or
+     * provide a reference to your own logger instance.
+     * @param level Determines level of this log entry.
+     * @param message Actual message string.
+     */
+    public LogEntry( String system, Logger logger, Level level, Object message ) {
+        super( system, logger, System.currentTimeMillis(), level, message, new Throwable() );
+        this.system = system;
+        setDateStr( System.currentTimeMillis() );
+        setTimeStr( System.currentTimeMillis() );
+    }
+    /**
+     * Constructor
+     *
+     * @param system Determines the system that produced this message. Note that in the case of
+     * original <b>LoggingEvent</b> constructor this parameter determines fully qualified name
+     * of the calling category class.
+     * @param level Determines level of this log entry.
+     * @param message Actual message string.
+     */
+    public LogEntry( String system, Level level, Object message ) {
+        super( system, LogManager.getLogger(), System.currentTimeMillis(), level, message,
+                new Throwable() );
+        this.system = system;
+        setDateStr( System.currentTimeMillis() );
+        setTimeStr( System.currentTimeMillis() );
     }
     /**
      * Method gets log entry ID.

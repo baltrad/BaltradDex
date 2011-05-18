@@ -103,22 +103,18 @@ public class FileCatalogConnector {
                 localStorage = new CacheDirStorage( dataStorageDirectory );
                 database = Database.create( dbURI );
                 fileCatalog = new FileCatalog( database, localStorage );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_INFO, "File catalog successfully " +
-                    "initialized", null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO,
+                        "File catalog successfully initialized" ) );
             } else {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to load properties " +
-                    " file: " + PROPS_FILE_NAME, null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to load properties file: " + PROPS_FILE_NAME ) );
             }
         } catch( FileCatalogError e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "File catalog error: " +
-                e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "File catalog error: " + e.getMessage() ) );
         } catch( Exception e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "File catalog error: " +
-                e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "File catalog error: " + e.getMessage() ) );
         }
     }
     /**

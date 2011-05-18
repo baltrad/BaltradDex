@@ -112,23 +112,21 @@ public class NodeConnectionController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeconnection.success" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_INFO, "Removed node connection: " +
-                    getSelectedConns().get( i ).getConnectionName(), null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO,
+                        "Removed node connection: "
+                        + getSelectedConns().get( i ).getConnectionName() ) );
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeconnection.fail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to remove node " +
-                    "connection: " + e.getMessage(), null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to remove node connection: " + e.getMessage() ) );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeconnection.fail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to remove node " +
-                    "connection: " + e.getMessage(), null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to remove node connection: " + e.getMessage() ) );
             }
         }
         return new ModelAndView( SHOW_REM_CONN_VIEW );

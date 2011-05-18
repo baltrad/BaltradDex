@@ -119,9 +119,8 @@ public class BltDataProcessor {
             h5File = ( H5File )fileFormat.createInstance( fileName, FileFormat.READ );
             h5File.open();
         } catch( Exception e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR,
-                    "Exception while opening HDF5 file: " + e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Exception while opening HDF5 file: " + e.getMessage() ) );
         }
         return h5File;
     }
@@ -138,9 +137,8 @@ public class BltDataProcessor {
             res = 0;
         } catch( HDF5Exception hdf5e ) {
             res = 1;
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR,
-                    "Exception while closing HDF5 file: " + hdf5e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Exception while closing HDF5 file: " + hdf5e.getMessage() ) );
         }
         return res;
     }
@@ -155,9 +153,8 @@ public class BltDataProcessor {
         try {
             root = ( Group )( ( DefaultMutableTreeNode )h5File.getRootNode() ).getUserObject();
         } catch( Exception e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR,
-                    "Exception while accessing HDF5 file's root: " + e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Exception while accessing HDF5 file's root: " + e.getMessage() ) );
         }
         return root;
     }

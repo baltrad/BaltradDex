@@ -55,9 +55,8 @@ public class LogoutController implements Controller {
             throws Exception {
         User user = ( User )ApplicationSecurityManager.getUser( request );
         ApplicationSecurityManager.removeUser( request );
-        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-            System.currentTimeMillis(), LogEntry.LEVEL_INFO, "User " + user.getName()
-                + " logged out", null ) );
+        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO, "User " + 
+                user.getName() + " logged out" ) );
         return new ModelAndView( getSuccessView() );
     }
     /**

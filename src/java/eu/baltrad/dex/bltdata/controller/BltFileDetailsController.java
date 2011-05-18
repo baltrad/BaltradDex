@@ -130,9 +130,8 @@ public class BltFileDetailsController implements Controller {
             "+lon_0=" + lon0_val[ 0 ], "+ellps=" + PROJ4_ELLPS_CODE, "+a=" + EARTH_RADIUS };
         int res = BltDataProjector.initializeProjection( projParms );
         if( res == 1 ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR,
-                    "Failed to initialize projection", null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Failed to initialize projection" ) );
         }
         try {
             // iterate through datasets

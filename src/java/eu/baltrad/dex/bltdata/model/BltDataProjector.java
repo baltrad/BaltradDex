@@ -54,9 +54,8 @@ public class BltDataProjector {
             proj.initialize();
             res = 0;
         } catch( ProjectionException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR,
-                    "Failed to initialize projection: " + e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Failed to initialize projection: " + e.getMessage() ) );
             res = 1;
         }
         return res;

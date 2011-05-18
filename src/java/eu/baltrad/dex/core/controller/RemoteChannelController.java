@@ -165,9 +165,8 @@ public class RemoteChannelController extends MultiActionController {
                 Channel channel = (  Channel )getSubscribedChannels().get( i );
                 if( subscriptionManager.getSubscription( channel.getChannelName(),
                         Subscription.LOCAL_SUBSCRIPTION ) != null ) {
-                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                        System.currentTimeMillis(), LogEntry.LEVEL_WARN,
-                        "You have already subscribed to " + channel.getChannelName(), null ) );
+                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
+                        "You have already subscribed to " + channel.getChannelName() ) );
                 } else {
                     // add local subscription
                     Subscription subs = new Subscription( System.currentTimeMillis(),
@@ -178,10 +177,8 @@ public class RemoteChannelController extends MultiActionController {
                 }
             }
         } catch( Exception e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR,
-                "Error while adding remote channels to subscription list: " + e.getMessage(),
-                null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                "Error while adding remote channels to subscription list: " + e.getMessage() ) );
         }
         return new ModelAndView( SUBSCRIBED_REMOTE_RADARS_VIEW, SUBSCRIBED_REMOTE_RADARS_KEY,
                 getSubscribedChannels() );

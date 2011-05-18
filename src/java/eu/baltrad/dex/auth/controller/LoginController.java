@@ -49,9 +49,8 @@ public class LoginController extends SimpleFormController {
      */
     public LoginController() {
         this.logManager = new LogManager();
-        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-            System.currentTimeMillis(), LogEntry.LEVEL_INFO, "Baltrad Data Exchange System started",
-                null ) );
+        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO, 
+                "Baltrad Data Exchange System started" ) );
     }
     /**
      * Creates new user object.
@@ -84,9 +83,8 @@ public class LoginController extends SimpleFormController {
         if( ApplicationSecurityManager.authenticateFormUser( formUser, dbUser ) ) {
             // Set user variable for this session
             ApplicationSecurityManager.setUser( request, dbUser );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_INFO,
-                "User " + dbUser.getName() + " logged on", null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO,
+                "User " + dbUser.getName() + " logged on" ) );
         }
         return new ModelAndView( getSuccessView() );
     }

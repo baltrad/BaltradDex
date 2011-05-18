@@ -147,24 +147,20 @@ public class InitAppUtil {
             // create thumbs storage directory
             thumbsStorageDirectory = createDir( getWorkDir() + File.separator +
                 thumbsStorageFolder, "New thumbs storage directory created" );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_INFO, "Application successfully " +
-                " initialized", null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO,
+                    "Application successfully initialized" ) );
             return 0;
         } catch( SQLException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to initialize " +
-                " application: " + e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Failed to initialize application: " + e.getMessage() ) );
             return 1;
         } catch( IOException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to initialize " +
-                " application: " + e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Failed to initialize application: " + e.getMessage() ) );
             return 1;
         } catch( Exception e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to initialize " +
-                " application: " + e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Failed to initialize application: " + e.getMessage() ) );
             return 1;
         }
     }
@@ -418,12 +414,11 @@ public class InitAppUtil {
         File f = new File( dir );
         if( !f.exists() ) {
             if( f.mkdirs() ) {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_WARN, msg + ": " + dir, null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
+                        msg + ": " + dir ) );
             } else {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_WARN, "Failed to create directory: " +
-                    dir, null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
+                        "Failed to create directory: " + dir ) );
             }
         }
         return dir;
@@ -439,9 +434,8 @@ public class InitAppUtil {
         try {
             f = File.createTempFile( TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX, tempDir );
         } catch( IOException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while creating " +
-                "temporary file: \n" + e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Error while creating temporary file: \n" + e.getMessage() ) );
         }
         return f;
     }
@@ -465,13 +459,11 @@ public class InitAppUtil {
             is.close();
             fos.close();
         } catch( FileNotFoundException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while saving file: \n" +
-                e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Error while saving file: \n" + e.getMessage() ) );
         } catch( IOException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while saving file: \n" +
-                e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Error while saving file: \n" + e.getMessage() ) );
         }
         return dstFile;
     }
@@ -493,13 +485,11 @@ public class InitAppUtil {
             is.close();
             fos.close();
         } catch( FileNotFoundException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while saving file: \n" +
-                e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Error while saving file: \n" + e.getMessage() ) );
         } catch( IOException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while saving file: \n" +
-                e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Error while saving file: \n" + e.getMessage() ) );
         }
         return dstFile;
     }
@@ -513,9 +503,8 @@ public class InitAppUtil {
             File f = new File( filePath );
             f.delete();
         } catch( Exception e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while deleting file: \n" +
-                e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Error while deleting file: \n" + e.getMessage() ) );
         }
     }
     /**
@@ -525,9 +514,8 @@ public class InitAppUtil {
      */
     public static void deleteFile( File f ) {
         if( !f.delete() ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while deleting file: \n" +
-                f.getName(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Error while deleting file: \n" + f.getName() ) );
         }
     }
     /**
@@ -564,13 +552,11 @@ public class InitAppUtil {
             oos.writeObject( obj );
             oos.close();
         } catch( FileNotFoundException e )  {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while writing object " +
-                "to stream: " + e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Error while writing object to stream: " + e.getMessage() ) );
         } catch( IOException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while writing object " +
-                "to stream: " + e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Error while writing object to stream: " + e.getMessage() ) );
         }
     }
     /**
@@ -586,13 +572,11 @@ public class InitAppUtil {
             obj = ois.readObject();
             ois.close();
         } catch( ClassNotFoundException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while reading object " +
-                "from stream: " + e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Error while reading object from stream: " + e.getMessage() ) );
         } catch( IOException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Error while reading object " +
-                "from stream: " + e.getMessage(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                    "Error while reading object from stream: " + e.getMessage() ) );
         }
         return obj;
     }

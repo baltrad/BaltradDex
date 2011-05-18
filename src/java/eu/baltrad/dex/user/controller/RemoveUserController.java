@@ -132,25 +132,22 @@ public class RemoveUserController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY, 
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removesuccess" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_WARN, "User account " + userName + " " +
-                    "removed from the system", null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
+                        "User account " + userName + " removed from the system" ) );
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removefail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to remove user " +
-                    "account " + userName, null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to remove user account " + userName ) );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removefail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to remove user " +
-                    "account " + userName, null ) );
+                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                        "Failed to remove user account " + userName ) );
             }
         }
         return new ModelAndView( REMOVED_USERS_VIEW );

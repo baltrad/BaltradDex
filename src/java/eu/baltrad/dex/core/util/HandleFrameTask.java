@@ -98,13 +98,11 @@ public class HandleFrameTask implements Runnable {
                 user.getName(), new Date(), status );
         deliveryRegisterManager.addEntry( drEntry );
         if( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_INFO, "Data from " + channelName +
-                " sent to user " + user.getName(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO, "Data from " 
+                    + channelName + " sent to user " + user.getName() ) );
         } else {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to send data from " +
-                channelName + " to user " + user.getName(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                "Failed to send data from " + channelName + " to user " + user.getName() ) );
         }
     }
 }

@@ -100,24 +100,21 @@ public class SaveUserController extends SimpleFormController {
             userManager.saveOrUpdate( user );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.savesuccess" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_WARN, "User account saved: " +
-                user.getName(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
+                    "User account saved: " + user.getName() ) );
         } catch( SQLException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.nameexists" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to save user account: " +
-                user.getName(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Failed to save user account: " + user.getName() ) );
             errors.reject( "message.adduser.nameexists" );
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.nameexists" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to save user account: " +
-                user.getName(), null ) );
+            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
+                    "Failed to save user account: " + user.getName() ) );
             errors.reject( "message.adduser.nameexists" );
         }
         return new ModelAndView( getSuccessView() );

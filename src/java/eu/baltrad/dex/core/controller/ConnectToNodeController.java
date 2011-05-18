@@ -130,13 +130,11 @@ public class ConnectToNodeController extends SimpleFormController {
                 try {
                     nodeConnectionManager.saveOrUpdate( nodeConn );
                 } catch( SQLException e ) {
-                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                        System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to save node " +
-                        "connection: " + e.getMessage(), null ) );
+                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                            "Failed to save node connection: " + e.getMessage() ) );
                 } catch( Exception e ) {
-                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
-                        System.currentTimeMillis(), LogEntry.LEVEL_ERROR, "Failed to save node " +
-                        "connection: " + e.getMessage(), null ) );
+                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
+                            "Failed to save node connection: " + e.getMessage() ) );
                 }
             }
         }

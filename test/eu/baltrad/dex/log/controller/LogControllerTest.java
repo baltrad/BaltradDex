@@ -84,9 +84,8 @@ public class LogControllerTest extends TestCase {
         @Override
         public void run() {
             for( int i = 0; i < numOp; i++ ) {
-                manager.append( new LogEntry( LogEntry.LOG_SRC_DEX, manager.getLogger(),
-                    System.currentTimeMillis(), LogEntry.LEVEL_INFO, "Logger " + label + " entry "
-                    + i, null ) );
+                manager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogManager.getLogger(), 
+                        LogEntry.LEVEL_INFO, "Logger " + label + " entry " + i ) );
             }
         }
     }

@@ -53,10 +53,19 @@ import java.util.ArrayList;
  *
  * The method accepts LoggingEvent as a call parameter. Use either <b>LogEntry</b> class or your
  * own implementation of LoggingEvent. The following is an example of how this method should be
- * used with <b>LogEntry</b> object:
+ * used with <b>LogEntry</b> object.
+ * 
+ * To append LogEntry using default logger available in <b>LogManager</b> class:
+ *
  * <b>
- * logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, logManager.getLogger(),
- *          System.currentTimeMillis(), LogEntry.LEVEL_INFO,  "A test message", null ) );
+ * logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO, "A test message" ) );
+ * </b>
+ *
+ * To append LogEntry using logger of your choice:
+ *
+ * <b>
+ * logManager.append( new LogEntry( LogEntry.LOG_SRC_PGF, 
+ *          Logger.getLogger( "eu.baltrad.test.class" ), LogEntry.LEVEL_INFO, "A test message" ) );
  * </b>
  * Note that <b>LogEntry</b> should be used in order to keep compliance with DEX message display
  * functionality.
@@ -70,7 +79,7 @@ public class LogManager extends AppenderSkeleton {
     /** Number of pages in the scroll bar, must be an odd number >= 3 */
     public final static int SCROLL_RANGE = 11;
     /** References logges object */
-    private Logger logger;
+    private static Logger logger;
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
@@ -80,7 +89,7 @@ public class LogManager extends AppenderSkeleton {
      */
     public LogManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.logger = Logger.getLogger( LogManager.class );
+        logger = Logger.getLogger( LogManager.class );
     }
     /**
      * Determines if the appender requires a layout
@@ -97,13 +106,7 @@ public class LogManager extends AppenderSkeleton {
      *
      * @return Reference to logger object
      */
-    public Logger getLogger() { return logger; }
-    /**
-     * Sets reference to logger object
-     *
-     * @param logger Reference to logger object to set
-     */
-    public void setLogger( Logger logger ) { this.logger = logger; }
+    public static Logger getLogger() { return logger; }
     /**
      * Appends a log entry to the system log stored in the database
      *
@@ -173,8 +176,7 @@ public class LogManager extends AppenderSkeleton {
                 String system = resultSet.getString( "system" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
-                LogEntry entry = new LogEntry( system, getLogger(), time, Level.toLevel( type ),
-                        msg, new Throwable() );
+                LogEntry entry = new LogEntry( system, time, Level.toLevel( type ), msg );
                 entries.add( entry );
             }
             stmt.close();
@@ -207,8 +209,7 @@ public class LogManager extends AppenderSkeleton {
                 String system = resultSet.getString( "system" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
-                LogEntry entry = new LogEntry( system, getLogger(), time, Level.toLevel( type ),
-                        msg, new Throwable() );
+                LogEntry entry = new LogEntry( system, time, Level.toLevel( type ), msg );
                 entries.add( entry );
             }
             stmt.close();
@@ -242,8 +243,7 @@ public class LogManager extends AppenderSkeleton {
                 String system = resultSet.getString( "system" );
                 String type = resultSet.getString( "type" );
                 String msg = resultSet.getString( "message" );
-                LogEntry entry = new LogEntry( system, getLogger(), time, Level.toLevel( type ),
-                        msg, new Throwable() );
+                LogEntry entry = new LogEntry( system, time, Level.toLevel( type ), msg );
                 entries.add( entry );
             }
             stmt.close();
