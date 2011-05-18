@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * Controller class sets permission for a given data channel.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */

@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
  * Class implementing http request interceptor functionality. Most of http request is redirected
  * to HttpRequestInterceptor object to provide user authentication control.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski :: maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */

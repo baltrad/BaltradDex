@@ -26,7 +26,7 @@ import java.io.Serializable;
 /**
  * Class implements data channel object.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */
@@ -61,6 +61,31 @@ public class Channel implements Serializable {
     public Channel( String channelName, String wmoNumber ) {
         this.channelName = channelName;
         this.wmoNumber = wmoNumber;
+    }
+    /**
+     * Compares channel object with another object.
+     *
+     * @param o Object to compare with
+     * @return True if objects are equal, false otherwise
+     */
+    @Override
+    public boolean equals( Object o ) {
+        boolean res = false;
+        if( getClass() == o.getClass() ) {
+            if( this.getChannelName().equals( ( ( Channel )o ).getChannelName() ) ) {
+                res = true;
+            }
+        }
+        return res;
+    }
+    /**
+     * Creates channel name hash code.
+     *
+     * @return Channel name hash code or 0 if channel name is null
+     */
+    @Override
+    public int hashCode() {
+        return( channelName != null ? channelName.hashCode() : 0 );
     }
     /**
      * Method gets data channel id.

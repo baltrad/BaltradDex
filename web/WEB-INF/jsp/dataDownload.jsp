@@ -164,7 +164,7 @@ Author     : szewczenko
                                                         <c:if test="${sub.operatorName == op}">
                                                             <div class="table-row">
                                                                 <div class="station">
-                                                                    <c:out value="${sub.channelName}"/>
+                                                                    <c:out value="${sub.dataSourceName}"/>
                                                                 </div>
                                                                 <div class="timestamp">
                                                                     <c:out value="${sub.dateStr}"/>, <c:out value="${sub.timeStr}"/>

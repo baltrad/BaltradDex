@@ -23,9 +23,9 @@ package eu.baltrad.dex.core.controller;
 
 import eu.baltrad.frame.model.BaltradFrameHandler;
 import eu.baltrad.frame.model.BaltradFrame;
-import eu.baltrad.dex.channel.model.Channel;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
+import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.log.model.LogManager;
 import eu.baltrad.dex.util.InitAppUtil;
 
@@ -36,38 +36,37 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.File;
-
 import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Class implements remote channel list controller. 
+ * Implements remote data source list controller.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */
-public class RemoteChannelController extends MultiActionController {
+public class RemoteDataSourceController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Constants
-    // model keys
-    private static final String REMOTE_RADARS_KEY = "channels";
-    private static final String SELECTED_REMOTE_RADARS_KEY = "selected_channels";
-    private static final String SUBSCRIBED_REMOTE_RADARS_KEY = "subscribed_channels";
+    /** Remote data source key */
+    private static final String DATA_SOURCES_KEY = "remoteDataSources";
+    private static final String SELECTED_DATA_SOURCES_KEY = "selectedDataSources";
+    private static final String SUBSCRIBED_DATA_SOURCES_KEY = "subscribedDataSources";
     private static final String SENDER_NODE_NAME_KEY = "sender_node_name";
-    // view names
-    private static final String REMOTE_RADARS_VIEW = "remoteRadars";
-    private static final String SELECTED_REMOTE_RADARS_VIEW = "selectedRemoteRadars";
-    private static final String SUBSCRIBED_REMOTE_RADARS_VIEW = "subscribedRemoteRadars";
+    /** Remote data sources view */
+    private static final String DATA_SOURCES_VIEW = "remoteDataSources";
+    private static final String SELECTED_DATA_SOURCES_VIEW = "selectedRemoteDataSources";
+    private static final String SUBSCRIBED_DATA_SOURCES_VIEW = "subscribedRemoteDataSources";
 //---------------------------------------------------------------------------------------- Variables
     private FrameDispatcherController frameDispatcherController;
     private SubscriptionManager subscriptionManager;
     private LogManager logManager;
-    // remote channels object list
-    private List remoteChannels;
-    // selected channel list
-    private List selectedChannels;
-    // list of subscribed channels
-    private List subscribedChannels;
+    // remote data source object list
+    private List remoteDataSources;
+    // selected data source list
+    private List selectedDataSources;
+    // subscribed data sources
+    private List subscribedDataSources;
     // remote node name
     private String senderNodeName;
     // sender node address
@@ -78,76 +77,75 @@ public class RemoteChannelController extends MultiActionController {
     private String password;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Creates list of remote channels available for a given node.
+     * Creates list of remote data source available for a given node.
      *
      * @param request HTTP servlet request
      * @param response HTTP servlet response
-     * @return ModelAndView object holding list of data channels available at a given node
+     * @return ModelAndView object holding list of data sources available at a given node
      */
-    public ModelAndView remoteRadars( HttpServletRequest request,
+    public ModelAndView remoteDataSources( HttpServletRequest request,
             HttpServletResponse response ) {
-        // set remote channel list
-        setRemoteChannels( frameDispatcherController.getChannelListing() );
+        // set remote data source list
+        setRemoteDataSources( frameDispatcherController.getDataSourceListing() );
         // set sender node name
         setSenderNodeName( frameDispatcherController.getRemoteNodeName() );
         // set sender node address
         setSenderNodeAddress( frameDispatcherController.getRemoteNodeAddress() );
-        // reset remote channel list, node name and address stored in FrameDispatcherController
-        frameDispatcherController.resetChannelListing();
+        // reset remote data source list, node name and address stored in FrameDispatcherController
+        frameDispatcherController.resetDataSourceListing();
         frameDispatcherController.resetRemoteNodeName();
         frameDispatcherController.resetRemoteNodeAddress();
         // set sender node name
         request.setAttribute( SENDER_NODE_NAME_KEY, getSenderNodeName() );
-        return new ModelAndView( REMOTE_RADARS_VIEW, REMOTE_RADARS_KEY, getRemoteChannels() );
+        return new ModelAndView( DATA_SOURCES_VIEW, DATA_SOURCES_KEY, getRemoteDataSources() );
     }
     /**
-     * Creates list of data channels selected by the user
+     * Creates list of data sources selected by the user
      *
      * @param request HTTP servlet request
      * @param response HTTP servlet response
-     * @return ModelAndView object holding list of data channels selected by the user
+     * @return ModelAndView object holding list of data sources selected by the user
      */
-    public ModelAndView selectedRemoteRadars( HttpServletRequest request,
+    public ModelAndView selectedRemoteDataSources( HttpServletRequest request,
             HttpServletResponse response ) {
-        // get selected channels based on the checkbox values
-        String[] selChannelNames = request.getParameterValues( SELECTED_REMOTE_RADARS_KEY );
+        // get selected sources based on the checkbox values
+        String[] selDataSourceNames = request.getParameterValues( SELECTED_DATA_SOURCES_KEY );
         // check if selected channel list is not empty
-        if( selChannelNames != null ) {
-            selectedChannels = new ArrayList();
-            for( int i = 0; i < selChannelNames.length; i++ ) {
-                for( int j = 0; j < getRemoteChannels().size(); j++ ) {
-                    Channel ch = ( Channel )getRemoteChannels().get( j );
-                    if( ch.getChannelName().equals( selChannelNames[ i ] ) ) {
-                        selectedChannels.add( ch );
+        if( selDataSourceNames != null ) {
+            selectedDataSources = new ArrayList();
+            for( int i = 0; i < selDataSourceNames.length; i++ ) {
+                for( int j = 0; j < getRemoteDataSources().size(); j++ ) {
+                    DataSource ds = ( DataSource )getRemoteDataSources().get( j );
+                    if( ds.getName().equals( selDataSourceNames[ i ] ) ) {
+                        selectedDataSources.add( ds );
                     }
                 }
             }
         }
         // set sender node name
         request.setAttribute( SENDER_NODE_NAME_KEY, getSenderNodeName() );
-        return new ModelAndView( SELECTED_REMOTE_RADARS_VIEW, SELECTED_REMOTE_RADARS_KEY,
-                selectedChannels );
+        return new ModelAndView( SELECTED_DATA_SOURCES_VIEW, SELECTED_DATA_SOURCES_KEY,
+                selectedDataSources );
     }
     /**
-     * Submits channel subscription request by posting subscription list on remote node.
+     * Submits data source subscription request by posting subscription list on remote node.
      *
      * @param request HTTP servlet request
      * @param response HTTP servlet response
-     * @return
+     * @return ModelAndView
      */
-    public ModelAndView subscribedRemoteRadars( HttpServletRequest request,
+    public ModelAndView subscribedRemoteDataSources( HttpServletRequest request,
             HttpServletResponse response ) {
         // prepare subscription request
         try {
             File tempFile = InitAppUtil.createTempFile(
                     new File( InitAppUtil.getWorkDir() ) );
-            InitAppUtil.writeObjectToStream( getSelectedChannels(), tempFile );
+            InitAppUtil.writeObjectToStream( getSelectedDataSources(), tempFile );
             // prepare frame
             BaltradFrameHandler bfHandler = new BaltradFrameHandler( getSenderNodeAddress() );
             String hdrStr = bfHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
                 InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                frameDispatcherController.getLocalUserName(),
-                BaltradFrameHandler.CHNL_SBN_RQST,
+                frameDispatcherController.getLocalUserName(), BaltradFrameHandler.CHNL_SBN_RQST,
                 tempFile.getAbsolutePath() );
             BaltradFrame baltradFrame = new BaltradFrame( hdrStr, tempFile.getAbsolutePath() );
             // handle the frame
@@ -157,77 +155,77 @@ public class RemoteChannelController extends MultiActionController {
             InitAppUtil.deleteFile( tempFile );
 
             // check subscription operation status
-            setSubscribedChannels( frameDispatcherController.getConfirmedSubscriptions() );
+            setSubscribedDataSources( frameDispatcherController.getConfirmedSubscriptions() );
             // reset confirmed subscriptions list stored in FrameDispatcherController
             frameDispatcherController.resetConfirmedSubscriptions();
-            // once subscription is confirmed, add requested channels to local subscription list
-            for( int i = 0; i < getSubscribedChannels().size(); i++ ) {
-                Channel channel = (  Channel )getSubscribedChannels().get( i );
-                if( subscriptionManager.getSubscription( channel.getChannelName(),
+            // once subscription is confirmed, add requested data source to local subscription list
+            for( int i = 0; i < getSubscribedDataSources().size(); i++ ) {
+                DataSource dataSource = ( DataSource )getSubscribedDataSources().get( i );
+                if( subscriptionManager.getSubscription( dataSource.getName(),
                         Subscription.LOCAL_SUBSCRIPTION ) != null ) {
                     logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_WRN,
-                        "You have already subscribed to " + channel.getChannelName() );
+                        "You have already subscribed to " + dataSource.getName() );
                 } else {
                     // add local subscription
                     Subscription subs = new Subscription( System.currentTimeMillis(),
                         frameDispatcherController.getLocalUserName(),
-                        channel.getChannelName(), getSenderNodeAddress(), getSenderNodeName(),
+                        dataSource.getName(), getSenderNodeAddress(), getSenderNodeName(),
                         Subscription.LOCAL_SUBSCRIPTION, true, true );
                     subscriptionManager.saveSubscription( subs );
                 }
             }
         } catch( Exception e ) {
             logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
-                    "Error while adding remote channels to subscription list: " + e.getMessage() );
+                "Error while adding remote data sources to subscription list: " + e.getMessage() );
         }
-        return new ModelAndView( SUBSCRIBED_REMOTE_RADARS_VIEW, SUBSCRIBED_REMOTE_RADARS_KEY,
-                getSubscribedChannels() );
+        return new ModelAndView( SUBSCRIBED_DATA_SOURCES_VIEW, SUBSCRIBED_DATA_SOURCES_KEY,
+                getSubscribedDataSources() );
     }
     /**
-     * Gets the list of channels available for a given remote node.
+     * Gets the list of data sources available for a given remote node.
      *
-     * @return List of channels available for a given remote node
+     * @return List of data sources available for a given remote node
      */
-    public List getRemoteChannels() { return remoteChannels; }
+    public List getRemoteDataSources() { return remoteDataSources; }
     /**
-     * Sets the list of channels available for a given remote node.
+     * Sets the list of data sources available for a given remote node.
      *
-     * @param remoteChannels List of channels available for a given remote node
+     * @param remoteDataSources List of data sources available for a given remote node
      */
-    public void setRemoteChannels( List remoteChannels ) {
-        this.remoteChannels = remoteChannels;
+    public void setRemoteDataSources( List remoteDataSources ) {
+        this.remoteDataSources = remoteDataSources;
     }
     /**
-     * Gets the list of channels selected by the user.
+     * Gets the list of data sources selected by the user.
      *
-     * @return List of channels selected by the user
+     * @return List of data sources selected by the user
      */
-    public List getSelectedChannels() { return selectedChannels; }
+    public List getSelectedDataSources() { return selectedDataSources; }
     /**
-     * Sets the list of channels selected by the user..
+     * Sets the list of data sources selected by the user.
      *
-     * @param selectedChannels List of channels selected by the user
+     * @param selectedDataSources List of data sources selected by the user
      */
-    public void setSelectedChannels( List selectedChannels ) {
-        this.selectedChannels = selectedChannels;
+    public void setSelectedDataSources( List selectedDataSources ) {
+        this.selectedDataSources = selectedDataSources;
     }
     /**
-     * Resets the list of selected channels
+     * Resets the list of selected data sources
      */
-    public void resetSelectedChannels() { this.selectedChannels = null; }
+    public void resetSelectedDataSources() { this.selectedDataSources = null; }
     /**
-     * Gets the list of subscribed channels.
+     * Gets the list of subscribed data sources.
      *
-     * @return List of subscribed channels
+     * @return List of subscribed data sources
      */
-    public List getSubscribedChannels() { return subscribedChannels; }
+    public List getSubscribedDataSources() { return subscribedDataSources; }
     /**
-     * Sets the list of subscribed channels.
+     * Sets the list of subscribed data sources.
      *
-     * @param subscribedChannels List of subscribed channels
+     * @param subscribedDataSources List of subscribed data sources
      */
-    public void setSubscribedChannels( List subscribedChannels ) {
-        this.subscribedChannels = subscribedChannels;
+    public void setSubscribedDataSources( List subscribedDataSources ) {
+        this.subscribedDataSources = subscribedDataSources;
     }
     /**
      * Gets sender node name.

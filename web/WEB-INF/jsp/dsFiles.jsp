@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Page displaying data from selected channel
+Document   : Page displaying data from selected data source
 Created on : Sep 24, 2010, 13:51 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
@@ -29,26 +29,25 @@ Author     : szewczenko
 <%@page import="java.util.List" %>
 <%@page import="eu.baltrad.dex.bltdata.model.BltFile" %>
 <%@page import="eu.baltrad.dex.bltdata.model.BltFileManager" %>
-<%@page import="eu.baltrad.dex.bltdata.controller.BltRadarDataController"%>
+<%@page import="eu.baltrad.dex.bltdata.controller.BltDataSourceController"%>
 
 <%
     // determine channel name
     String name = null;
-    if( request.getParameter( "channelName" ) != null ) {
-        name = request.getParameter( "channelName" );
+    if( request.getParameter( "dsName" ) != null ) {
+        name = request.getParameter( "dsName" );
     } else {
-        name = BltRadarDataController.getChannelName();
+        name = BltDataSourceController.getDSName();
     }
     // Check if list of available subscriptions is not empty
-    List radarData = ( List )request.getAttribute( "file_entries" );
+    List radarData = ( List )request.getAttribute( "fileEntries" );
     if( radarData == null || radarData.size() <= 0 ) {
-        request.getSession().setAttribute( "data_status", 0 );
+        request.getSession().setAttribute( "dataStatus", 0 );
     } else {
-        request.getSession().setAttribute( "data_status", 1 );
+        request.getSession().setAttribute( "dataStatus", 1 );
     }
-    BltFileManager manager = new BltFileManager();
-    BltRadarDataController controller = new BltRadarDataController();
-    long numEntries = manager.countEntries( BltRadarDataController.getChannelName() );
+    long numEntries = BltDataSourceController.getBltFileManager().countEntries(
+            BltDataSourceController.getDSName() );
     int numPages = ( int )Math.ceil( numEntries / BltFileManager.ENTRIES_PER_PAGE );
     if( ( numPages * BltFileManager.ENTRIES_PER_PAGE ) < numEntries ) {
         ++numPages;
@@ -56,7 +55,7 @@ Author     : szewczenko
     if( numPages < 1 ) {
         numPages = 1;
     }
-    int currentPage = controller.getCurrentPage();
+    int currentPage = BltDataSourceController.getCurPage();
     int scrollStart = ( BltFileManager.SCROLL_RANGE - 1 ) / 2;
     int firstPage = 1;
     int lastPage = BltFileManager.SCROLL_RANGE;
@@ -100,15 +99,14 @@ Author     : szewczenko
                         </div>
                     </div>
                     <c:choose>
-                        <c:when test="${data_status == 1}">
+                        <c:when test="${dataStatus == 1}">
                             <div id="text-box">
-                                Data files available for radar station <%= name %>.
-                                Click on file name to download selected data file.
+                                Data files available for data source <%= name %>.
                             </div>
                             <div id="table">
                                 <div id="table-control">
                                 <c:set var="curPage" scope="page" value="<%=currentPage%>"/>
-                                    <form action="radarData.htm" method="post">
+                                    <form action="dsFiles.htm" method="post">
                                         <input type="submit" name="pagenum" value="<<">
                                         <span></span>
                                         <input type="submit" name="pagenum" value="<">
@@ -139,17 +137,16 @@ Author     : szewczenko
                                         <div class="time">
                                             Time
                                         </div>
+                                        <div class="source">
+                                            Source
+                                        </div>
                                         <div class="type">
                                             Type
                                         </div>
-                                        <div class="details">
-                                            Details
-                                        </div>
-                                        <div class="download">
-                                            Download
-                                        </div>
+                                        <div class="details"></div>
+                                        <div class="download"></div>
                                     </div>
-                                    <c:forEach var="entry" items="${file_entries}">
+                                    <c:forEach var="entry" items="${fileEntries}">
                                         <div class="table-row">
                                             <div class="date">
                                                 <fmt:formatDate pattern="yyyy-MM-dd"
@@ -159,17 +156,20 @@ Author     : szewczenko
                                                 <fmt:formatDate pattern="HH:mm:ss"
                                                     value="${entry.timeStamp}"/>
                                             </div>
+                                            <div class="source">
+                                                <c:out value="${entry.source}"></c:out>
+                                            </div>
                                             <div class="type">
                                                 <c:out value="${entry.type}"></c:out>
                                             </div>
                                             <div class="details">
                                                 <a href="fileDetails.htm?uuid=${entry.uuid}">
-                                                    <c:out value="Show"/>
+                                                    <c:out value="Details"/>
                                                 </a>
                                             </div>
                                             <div class="download">
                                                 <a href="download.htm?path=${entry.path}">
-                                                    <img src="${entry.thumbPath}" alt="Download"/>
+                                                    <c:out value="Download"/>
                                                 </a>
                                             </div>
                                         </div>
@@ -184,14 +184,14 @@ Author     : szewczenko
                                          alt="no_data"/>
                                 </div>
                                 <div class="text">
-                                    No data files found for the selected radar station.
+                                    No data files found for the selected data source.
                                 </div>
                             </div>
                         </c:otherwise>
                     </c:choose>
                     <div class="footer">
                         <div class="right">
-                            <form action="radars.htm">
+                            <form action="showDataSources.htm">
                                 <button class="rounded" type="submit">
                                     <span>Back</span>
                                 </button>

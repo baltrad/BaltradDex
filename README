@@ -1,0 +1,39 @@
+################################################################################
+#                                                                              #  
+# Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW  # 
+#                                                                              #
+# This file is part of the BaltradDex software.                                #
+#                                                                              #
+# BaltradDex is free software: you can redistribute it and/or modify           # 
+# it under the terms of the GNU Lesser General Public License as published by  #  
+# the Free Software Foundation, either version 3 of the License, or            #
+# (at your option) any later version.                                          #
+#                                                                              #
+# BaltradDex is distributed in the hope that it will be useful,                #
+# but WITHOUT ANY WARRANTY; without even the implied warranty of               # 
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                # 
+# GNU Lesser General Public License for more details.                          #
+#                                                                              #
+# You should have received a copy of the GNU Lesser General Public License     #
+# along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.#
+#                                                                              # 
+################################################################################
+
+NOTE: Baltrad Data Exchange System (BaltradDex) constitutes an integral part of 
+baltrad-node software package. As such, it provides full functionality only
+if installed from baltrad-node software bundle. However it is possible to deploy 
+BaltradDex provided that the following two baltrad-node libraries are installed
+in the system:
+
+baltrad-db - Baltrad database management component
+beast - Baltrad message management interface
+
+Please refer to the documentation of the above packages for installation and
+usage instructions.
+
+Although the above configuration may work, the functionality it provides will
+be limited and the system operation may be unstable. Therefore it should not
+be used for operational work. It is strongly recommended to perform full
+installation procedure using baltrad-node software package.
+
+

@@ -24,7 +24,7 @@ package eu.baltrad.dex.user.model;
 /**
  * Class implements user object.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */

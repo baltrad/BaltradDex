@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * Controller renders data upload status page. 
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.6
  * @since 1.6
  */

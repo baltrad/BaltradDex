@@ -28,7 +28,7 @@ import javax.servlet.ServletContextListener;
 /**
  * Utility class implementing servlet context detection functionality.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski :: maciej@baltrad.eu
  * @version 0.1.0
  * @since 0.1.0
  */

@@ -64,7 +64,7 @@ Author     : szewczenko
                                         <div id="selectedsubscriptions">
                                             <div class="table-hdr">
                                                 <div class="station">
-                                                    Radar station
+                                                    Data source
                                                 </div>
                                                 <div class="operator">
                                                     Operator
@@ -73,10 +73,10 @@ Author     : szewczenko
                                                     Request
                                                 </div>
                                             </div>
-                                            <c:forEach var="sub" items="${selected_subscriptions}">
+                                            <c:forEach var="sub" items="${selectedSubscriptions}">
                                                 <div class="table-row">
                                                     <div class="station">
-                                                        <c:out value="${sub.channelName}"/>
+                                                        <c:out value="${sub.dataSourceName}"/>
                                                     </div>
                                                     <div class="operator">
                                                         <c:out value="${sub.operatorName}"/>

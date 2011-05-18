@@ -43,7 +43,7 @@ import java.util.HashMap;
 /**
  * Controller class registers new channel in the system or modifies existing data channel.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */

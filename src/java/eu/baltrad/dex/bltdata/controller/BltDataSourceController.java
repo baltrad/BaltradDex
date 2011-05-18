@@ -38,27 +38,27 @@ import java.io.IOException;
 /**
  * Implemens functionality allowing for listing products available for a given data channel.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */
-public class BltRadarDataController implements Controller, ITableScroller {
+public class BltDataSourceController implements Controller, ITableScroller {
 //---------------------------------------------------------------------------------------- Constants
     /** File entries key */
-    public static final String FILE_ENTRIES = "file_entries";
-    /** Channel name key */
-    public static final String CHANNEL_NAME = "channelName";
+    public static final String FILE_ENTRIES = "fileEntries";
+    /** Data source name key */
+    public static final String DS_NAME = "dsName";
     /** Page number map key */
     private static final String PAGE_NUMBER = "pagenum";
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to file manager object */
-    private BltFileManager bltFileManager;
+    private static BltFileManager bltFileManager;
     /** Success view name */
     private String successView;
     /** Holds current page number, used for page scrolling */
     private static int currentPage;
-    /** Holds channel name value extracted from request parameter */
-    private static String channelName;
+    /** Holds data source name value extracted from request parameter */
+    private static String dsName;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Method handles http request
@@ -73,16 +73,16 @@ public class BltRadarDataController implements Controller, ITableScroller {
             HttpServletResponse response )
             throws ServletException, IOException {
         // Set static channel name to be used with next requests
-        if( request.getParameter( CHANNEL_NAME ) != null &&
-                !request.getParameter( CHANNEL_NAME ).isEmpty() ) {
-            setChannelName( request.getParameter( CHANNEL_NAME ) );
+        if( request.getParameter( DS_NAME ) != null &&
+                !request.getParameter( DS_NAME ).isEmpty() ) {
+            setDSName( request.getParameter( DS_NAME ) );
         }
         String pageNum = request.getParameter( PAGE_NUMBER );
         List<BltFile> fileEntries = null;
         if( pageNum != null ) {
             if( pageNum.matches( "<<" ) ) {
                 firstPage();
-                fileEntries = bltFileManager.getFileEntries( getChannelName(), 0,
+                fileEntries = bltFileManager.getFileEntries( getDSName(), 0,
                         BltFileManager.ENTRIES_PER_PAGE );
             } else {
                 if( pageNum.matches( ">>" ) ) {
@@ -97,12 +97,12 @@ public class BltRadarDataController implements Controller, ITableScroller {
                 }
                 int offset = ( getCurrentPage() * BltFileManager.ENTRIES_PER_PAGE )
                         - BltFileManager.ENTRIES_PER_PAGE;
-                fileEntries = bltFileManager.getFileEntries( getChannelName(), offset,
+                fileEntries = bltFileManager.getFileEntries( getDSName(), offset,
                         BltFileManager.ENTRIES_PER_PAGE );
             }
         } else {
             setCurrentPage( 1 );
-            fileEntries = bltFileManager.getFileEntries( getChannelName(), 0,
+            fileEntries = bltFileManager.getFileEntries( getDSName(), 0,
                     BltFileManager.ENTRIES_PER_PAGE );
         }
         return new ModelAndView( successView, FILE_ENTRIES, fileEntries );
@@ -114,6 +114,12 @@ public class BltRadarDataController implements Controller, ITableScroller {
      */
     public int getCurrentPage() { return currentPage; }
     /**
+     * Gets current page number.
+     *
+     * @return Current page number
+     */
+    public static int getCurPage() { return currentPage; }
+    /**
      * Sets current page number.
      *
      * @param page Current page number to set
@@ -123,10 +129,10 @@ public class BltRadarDataController implements Controller, ITableScroller {
      * Sets page number to the next page number.
      */
     public void nextPage() {
-        int lastPage = ( int )Math.ceil( bltFileManager.countEntries( getChannelName() ) /
+        int lastPage = ( int )Math.ceil( bltFileManager.countEntries( getDSName() ) /
                 BltFileManager.ENTRIES_PER_PAGE );
         if( ( lastPage * BltFileManager.ENTRIES_PER_PAGE ) < bltFileManager.countEntries(
-                getChannelName() ) ) {
+                getDSName() ) ) {
             ++lastPage;
         }
         if( lastPage == 0 ) {
@@ -154,10 +160,10 @@ public class BltRadarDataController implements Controller, ITableScroller {
      * Sets page number to the last page.
      */
     public void lastPage() {
-        long numEntries = bltFileManager.countEntries( getChannelName() );
+        long numEntries = bltFileManager.countEntries( getDSName() );
         int lastPage = ( int )Math.ceil( numEntries / BltFileManager.ENTRIES_PER_PAGE );
         if( ( lastPage * BltFileManager.ENTRIES_PER_PAGE ) < bltFileManager.countEntries(
-                getChannelName() ) ) {
+                getDSName() ) ) {
             ++lastPage;
         }
         if( lastPage == 0 ) {
@@ -166,34 +172,34 @@ public class BltRadarDataController implements Controller, ITableScroller {
         currentPage = lastPage;
     }
     /**
-     * Gets data channel name.
+     * Gets data data source name.
      *
-     * @return channelName Data channel name
+     * @return dsName Data source name
      */
-    public static String getChannelName() {
-        return channelName;
+    public static String getDSName() {
+        return dsName;
     }
     /**
-     * Sets data channel name.
+     * Sets data source name.
      *
-     * @param _channelName Data channnel name to set
+     * @param _dsName Data source name to set
      */
-    public static void setChannelName( String _channelName ) {
-        channelName = _channelName;
+    public static void setDSName( String _dsName ) {
+        dsName = _dsName;
     }
     /**
      * Method returns reference to file manager object.
      *
      * @return Reference to file manager object
      */
-    public BltFileManager getBltFileManager() { return bltFileManager; }
+    public static BltFileManager getBltFileManager() { return bltFileManager; }
     /**
      * Method sets reference to file manager object.
      *
      * @param Reference to file manager object
      */
-    public void setBltFileManager( BltFileManager bltFileManager ) {
-        this.bltFileManager = bltFileManager;
+    public void setBltFileManager( BltFileManager _bltFileManager ) {
+        bltFileManager = _bltFileManager;
     }
     /**
      * Method returns reference to success view name string.

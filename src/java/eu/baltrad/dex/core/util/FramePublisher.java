@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Class implements ThreadPoolExecutor used to execute concurrent tasks.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */

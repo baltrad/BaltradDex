@@ -162,10 +162,11 @@ Author     : szewczenko
                                                         <c:if test="${sub.userName == usr}">
                                                             <div class="table-row">
                                                                 <div class="station">
-                                                                    <c:out value="${sub.channelName}"/>
+                                                                    <c:out value="${sub.dataSourceName}"/>
                                                                 </div>
                                                                 <div class="timestamp">
-                                                                    <c:out value="${sub.dateStr}"/>, <c:out value="${sub.timeStr}"/>
+                                                                    <c:out value="${sub.dateStr}"/>,
+                                                                    <c:out value="${sub.timeStr}"/>
                                                                 </div>
                                                             </div>
                                                         </c:if>

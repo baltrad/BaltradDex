@@ -53,7 +53,7 @@ import java.awt.geom.Point2D;
 /**
  * Implements functionality allowing for accessing detailed information about radar data file.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */

@@ -23,6 +23,11 @@ package eu.baltrad.dex.bltdata.model;
 
 import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.util.InitAppUtil;
+import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.datasource.model.DataSourceManager;
+
+import eu.baltrad.beast.db.IFilter;
+import eu.baltrad.beast.db.CoreFilterManager;
 
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.expr.ExpressionFactory;
@@ -39,11 +44,12 @@ import java.util.Collections;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.sql.SQLException;
 
 /**
  * Data manager class implementing data handling functionality.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */
@@ -75,25 +81,48 @@ public class BltFileManager {
     private FileCatalogConnector fileCatalogConnector;
     /** Reference to FileCatalog object */
     private FileCatalog fc;
+    /** References DataSourceManager */
+    private DataSourceManager dataSourceManager;
+    /** References CoreFilterManager */
+    private CoreFilterManager coreFilterManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to FileCatalogConnector instance.
      */
     public BltFileManager() {
-        System.out.println("BltFileManager()");
         this.fileCatalogConnector = FileCatalogConnector.getInstance();
         this.fc = fileCatalogConnector.getFileCatalog();
     }
     /**
-     * Counts file entries from a given data channel.
+     * Gets filter associated with a given data source.
      *
-     * @param dataChannel Data channel name
+     * @param dsName Data source name
+     * @return Filter associated with a given data source
+     */
+    public IFilter getFilter( String dsName ) {
+        IFilter attributeFilter = null;
+        try {
+            DataSource dataSource = dataSourceManager.getDataSource( dsName );
+            attributeFilter = coreFilterManager.load( dataSourceManager.getFilterId(
+                dataSource.getId() ) );
+        } catch( SQLException e ){
+            System.out.println( "getFilter(): Failed to get filter ID: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.out.println( "getFilter(): Failed to get filter ID: " + e.getMessage() );
+        }
+        return attributeFilter;
+    }
+    /**
+     * Counts file entries from a given data source.
+     *
+     * @param dsName Data source name
      * @return Number of file entries.
      */
-    public long countEntries( String dataChannel ) {
+    public long countEntries( String dsName ) {
+        IFilter attributeFilter = getFilter( dsName );
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
-        q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( dataChannel ) ) );
+        q.filter( attributeFilter.getExpression() );
         q.fetch( "fileCount", xpr.count( xpr.attribute( "file:uuid" ) ) );
         AttributeResult r = fc.database().execute( q );
         r.next();
@@ -102,20 +131,23 @@ public class BltFileManager {
         return count;
     }
     /**
-     * Gets files from a given data channel.
+     * Gets data set for a given data source.
      *
-     * @param dataChannel Data channel name
-     * @return List containing data from a given radar station
+     * @param dsName Data source name
+     * @param offset Dataset offset
+     * @param limit Dataset size limit
+     * @return Dataset from a given data source
      */
-    public List<BltFile> getFileEntries( String dataChannel, int offset, int limit ) {
+    public List<BltFile> getFileEntries( String dsName, int offset, int limit ) {
         ExpressionFactory xpr = new ExpressionFactory();
         FileQuery q = new FileQuery();
+        IFilter attributeFilter = getFilter( dsName );
         // set offset and limit
         q.limit( limit );
         q.skip( offset );
         q.order_by( xpr.combined_datetime( FC_DATE_ATTR, FC_TIME_ATTR ), FileQuery.SortDir.DESC );
-        // filter the query with a given channel name
-        q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( dataChannel ) ) );
+        //q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( dataChannel ) ) );
+        q.filter( attributeFilter.getExpression() );
         FileResult r = fc.database().execute( q );
         List< BltFile > bltFiles = new ArrayList<BltFile>();
         while( r.next() ) {
@@ -126,7 +158,7 @@ public class BltFileManager {
                     format.parse( fileEntry.what_date().to_iso_string() + "T" +
                                   fileEntry.what_time().to_iso_string() ),
                     format.parse( fileEntry.stored_at().to_iso_string() ),
-                    dataChannel, fileEntry.what_object(),
+                    fileEntry.what_source(), fileEntry.what_object(),
                     InitAppUtil.getThumbsStorageFolder() + File.separator +
                     fileEntry.uuid() + IMAGE_FILE_EXT );
                 bltFiles.add( bltFile );
@@ -171,6 +203,36 @@ public class BltFileManager {
         // delete the result set
         r.delete();
         return bltFile;
+    }
+     /**
+     * Gets reference to data source manager object.
+     *
+     * @return Reference to data source manager object
+     */
+    public DataSourceManager getDataSourceManager() { return dataSourceManager; }
+    /**
+     * Sets reference to data source manager object.
+     *
+     * @param dataSourceManager Reference to data source manager object
+     */
+    public void setDataSourceManager( DataSourceManager dataSourceManager ) {
+        this.dataSourceManager = dataSourceManager;
+    }
+    /**
+     * Gets reference to CoreFilterManager.
+     *
+     * @return Reference to CoreFilterManager
+     */
+    public CoreFilterManager getCoreFilterManager() {
+        return coreFilterManager;
+    }
+    /**
+     * Sets reference to CoreFilterManager.
+     *
+     * @param coreFilterManager Reference tp CoreFilterManager to set
+     */
+    public void setCoreFilterManager( CoreFilterManager coreFilterManager ) {
+        this.coreFilterManager = coreFilterManager;
     }
 }
 //--------------------------------------------------------------------------------------------------

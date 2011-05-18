@@ -38,7 +38,7 @@ import java.util.HashMap;
 /**
  * Controller class registers new user in the system or modifies existing user account.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */

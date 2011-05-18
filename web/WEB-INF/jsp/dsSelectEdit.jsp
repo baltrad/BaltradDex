@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Remote radar station selection status
-Created on : Sep 30, 2010, 12:53 PM
+Document   : Page displays available data sources
+Created on : Apr 28, 2011, 11:42 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
@@ -27,12 +27,11 @@ Author     : szewczenko
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 <%@ page import="java.util.List" %>
 <%
-    // Check if subscription list is not empty
-    List subsStatus = ( List )request.getAttribute( "subscribed_channels" );
-    if( subsStatus == null || subsStatus.size() <= 0 ) {
-        request.getSession().setAttribute( "subs_status", 0 );
+    List dataSources = ( List )request.getAttribute( "dataSources" );
+    if( dataSources == null || dataSources.size() <= 0 ) {
+        request.getSession().setAttribute( "dsStatus", 0 );
     } else {
-        request.getSession().setAttribute( "subs_status", 1 );
+        request.getSession().setAttribute( "dsStatus", 1 );
     }
 %>
 
@@ -40,7 +39,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Remote radars</title>
+        <title>Baltrad | Edit data source</title>
     </head>
     <body>
         <div id="container">
@@ -54,50 +53,67 @@ Author     : szewczenko
                 <div id="right">
                     <div id="page-title">
                         <div class="left">
-                            Remote radars subscription status
+                            Edit data source
                         </div>
                         <div class="right">
                         </div>
                     </div>
                     <c:choose>
-                        <c:when test="${subs_status == 1}">
-                            <div class="message">
-                                <div class="icon">
-                                    <img src="includes/images/icons/circle-check.png"
-                                         alt="request_failure"/>
-                                </div>
-                                <div class="text">
-                                    Requested remote radar stations have been successfully
-                                    subscribed.
-                                    Check your subscription page for details.
-                                </div>
+                        <c:when test="${dsStatus == 1}">
+                            <div id="text-box">
+                                List of available data sources. Click on data source name in order
+                                to edit data source configuration.
                             </div>
-                            <div class="footer">
-                                <div class="right">
-                                    <form action="showSubscriptions.htm">
-                                        <button class="rounded" type="submit">
-                                            <span>OK</span>
-                                        </button>
-                                    </form>
+                            <div id="table">
+                                <div id="dataSourceTable">
+                                    <div class="table-hdr">
+                                        <div class="name">
+                                            Name
+                                        </div>
+                                        <div class="description">
+                                            Description
+                                        </div>
+                                    </div>
+                                    <c:forEach items="${dataSources}" var="dataSource">
+                                        <div class="table-row">
+                                            <div class="name">
+                                                <a href="dsSaveName.htm?dsName=${dataSource.name}">
+                                                    <c:out value="${dataSource.name}"/>
+                                                </a>
+                                            </div>
+                                            <div class="description">
+                                                <c:out value="${dataSource.description}"/>
+                                            </div>
+                                        </div>
+                                    </c:forEach>
+                                    <div class="footer">
+                                        <div class="right">
+                                            <form action="configuration.htm">
+                                                <button class="rounded" type="submit">
+                                                    <span>OK</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </c:when>
                         <c:otherwise>
                             <div class="message">
                                 <div class="icon">
-                                    <img src="includes/images/icons/circle-delete.png"
-                                         alt="request_failure"/>
+                                    <img src="includes/images/icons/circle-alert.png"
+                                         alt="no_radars"/>
                                 </div>
                                 <div class="text">
-                                    The remote system failed to complete your subscription request.
-                                    Try again or contact remote node administrator.
+                                    List of data sources is currently empty.
+                                    Use configuration options to add new data sources.
                                 </div>
                             </div>
                             <div class="footer">
                                 <div class="right">
-                                    <form action="connectToNode.htm">
+                                    <form action="configuration.htm">
                                         <button class="rounded" type="submit">
-                                            <span>Back</span>
+                                            <span>OK</span>
                                         </button>
                                     </form>
                                 </div>

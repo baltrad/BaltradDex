@@ -32,7 +32,7 @@ import java.awt.geom.Point2D;
 /**
  * Encapsulates data projection functionality.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.5
  * @since 0.1.5
  */

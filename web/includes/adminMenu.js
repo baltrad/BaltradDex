@@ -28,7 +28,7 @@ document.write( "<div class=\"menu\">" );
 document.write( "<div class=\"group\">Local node</div>" );
 
 document.write( "<a href=\"dataDownload.htm\">Status</a>" );
-document.write( "<a href=\"radars.htm\">Radars</a>" );
+document.write( "<a href=\"showDataSources.htm\">Data sources</a>" );
 document.write( "<a href=\"log.htm\">System messages</a>" );
 
 document.write( "<div class=\"separator\"></div>" );
@@ -37,6 +37,7 @@ document.write( "<div class=\"group\">Data Exchange</div>" );
 
 document.write( "<a href=\"connectToNode.htm\">Connect to node</a>" );
 document.write( "<a href=\"showSubscriptions.htm\">Subscriptions</a>" );
+document.write( "<a href=\"showRegister.htm\">Delivery register</a>" );
 
 document.write( "<div class=\"separator\"></div>" );
 

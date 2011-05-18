@@ -34,7 +34,7 @@ import java.util.ArrayList;
 /**
  * Data channel manager class implementing data channel handling functionality.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */
@@ -60,7 +60,7 @@ public class ChannelManager {
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channels" );
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_radars" );
             while( resultSet.next() ) {
                 int chnlId = resultSet.getInt( "id" );
                 String name = resultSet.getString( "name" );
@@ -90,7 +90,7 @@ public class ChannelManager {
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channels WHERE" +
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_radars WHERE" +
                     " id = " + id + ";" );
             while( resultSet.next() ) {
                 int chnlId = resultSet.getInt( "id" );
@@ -120,7 +120,7 @@ public class ChannelManager {
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channels WHERE" +
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_radars WHERE" +
                     " name = '" + channelName + "';");
             while( resultSet.next() ) {
                 int chnlId = resultSet.getInt( "id" );
@@ -155,11 +155,11 @@ public class ChannelManager {
             String sql = "";
             // record does not exists, do insert
             if( channel.getId() == 0 ) {
-                sql = "INSERT INTO dex_channels (name, wmo_number) VALUES ('" +
+                sql = "INSERT INTO dex_radars (name, wmo_number) VALUES ('" +
                     channel.getChannelName() + "', '" + channel.getWmoNumber() + "');";
             } else {
                 // record exists, do update
-                sql = "UPDATE dex_channels SET name = '" + channel.getChannelName() + "', " +
+                sql = "UPDATE dex_radars SET name = '" + channel.getChannelName() + "', " +
                     "wmo_number = '" + channel.getWmoNumber() + "' WHERE id = " +
                     channel.getId() + ";";
             }
@@ -190,7 +190,7 @@ public class ChannelManager {
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = "DELETE FROM dex_channels WHERE id = " + id + ";";
+            String sql = "DELETE FROM dex_radars WHERE id = " + id + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
         } catch( SQLException e ) {

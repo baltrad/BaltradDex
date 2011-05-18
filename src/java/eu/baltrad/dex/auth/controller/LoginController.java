@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Login controller class implementing basic user authentication functionality.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */
@@ -61,8 +61,8 @@ public class LoginController extends SimpleFormController {
      */
     @Override
     protected Object formBackingObject( HttpServletRequest request ) throws Exception {
-        return new User();
-        //return userManager.getUserById( 1 );
+        //return new User();
+        return userManager.getUserById( 1 );
     }
     /**
      * Method executed upon form submission.

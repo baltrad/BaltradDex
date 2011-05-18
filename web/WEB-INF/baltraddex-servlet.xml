@@ -42,7 +42,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="mappings">
             <props>
                 <prop key="radars.htm">channelController</prop>
-                <prop key="radarData.htm">bltRadarDataController</prop>
+                <prop key="showDataSources.htm">showDataSourcesController</prop>
+                <prop key="dsFiles.htm">bltDataSourceController</prop>
                 <prop key="fileDetails.htm">bltFileDetailsController</prop>
                 <prop key="imagePreview.htm">bltImagePreviewController</prop>
                 <prop key="dataDownload.htm">downloadStatusController</prop>
@@ -63,13 +64,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="mappings">
             <props>
                 <prop key="connectToNode.htm">connectToNodeController</prop>
-                <prop key="remoteRadars.htm">remoteChannelController</prop>
-                <prop key="selectedRemoteRadars.htm">remoteChannelController</prop>
-                <prop key="subscribedRemoteRadars.htm">remoteChannelController</prop>
+                <prop key="remoteDataSources.htm">remoteDataSourceController</prop>
+                <prop key="selectedRemoteDataSources.htm">remoteDataSourceController</prop>
+                <prop key="subscribedRemoteDataSources.htm">remoteDataSourceController</prop>
                 <prop key="download.htm">bltFileDownloadController</prop>
                 <prop key="showSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSelectedSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSubscriptionStatus.htm">subscriptionController</prop>
+                <prop key="showRegister.htm">registerController</prop>
             </props>
         </property>
     </bean>
@@ -108,7 +110,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="clearmessages.htm">urlFilenameController</prop>
                 <prop key="confirmclearmessages.htm">clrMsgsController</prop>
 
-                <prop key="showRegister.htm">registerController</prop>
                 <prop key="clearRegister.htm">registerController</prop>
                 <prop key="showClearRegisterStatus.htm">registerController</prop>
 
@@ -125,6 +126,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="saveRadarStatus">urlFilenameController</prop>
                 <prop key="showSelectedLocalChannels.htm">removeChannelController</prop>
                 <prop key="showRemovedLocalChannels.htm">removeChannelController</prop>
+
+                <prop key="dsSaveName.htm">saveDataSourceController</prop>
+                <prop key="dsSaveRadars.htm">saveDataSourceController</prop>
+                <prop key="dsSaveUsers.htm">saveDataSourceController</prop>
+                <prop key="dsSaveSummary.htm">saveDataSourceController</prop>
+                <prop key="dsSave.htm">saveDataSourceController</prop>
+                <prop key="dsSelectRemove.htm">removeDataSourceController</prop>
+                <prop key="dsRemove.htm">removeDataSourceController</prop>
+                <prop key="dsSelectEdit.htm">editDataSourceController</prop>
 
                 <prop key="selectRemoveSubscriptions.htm">subscriptionController</prop>
                 <prop key="showRemovedSubscriptions.htm">subscriptionController</prop>
@@ -293,13 +303,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Data from data channel controller.
     -->
-    <bean name="bltRadarDataController"
-        class="eu.baltrad.dex.bltdata.controller.BltRadarDataController">
+    <bean name="bltDataSourceController"
+        class="eu.baltrad.dex.bltdata.controller.BltDataSourceController">
         <property name="bltFileManager">
             <ref bean="bltFileManager" />
         </property>
         <property name="successView">
-            <value>radarData</value>
+            <value>dsFiles</value>
         </property>
     </bean>
 
@@ -336,8 +346,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
         </property>
-        <property name="channelManager">
-            <ref bean="channelManager" />
+        <property name="dataSourceManager">
+            <ref bean="dataSourceManager" />
         </property>
         <property name="frameDispatcherController">
             <ref bean="frameDispatcherController"/>
@@ -395,9 +405,16 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="channelManager" class="eu.baltrad.dex.channel.model.ChannelManager"/>
 
     <!--
-        Data manager.
+        Data source files manager
     -->
-    <bean name="bltFileManager" class="eu.baltrad.dex.bltdata.model.BltFileManager"/>
+    <bean id="bltFileManager" class="eu.baltrad.dex.bltdata.model.BltFileManager">
+        <property name="dataSourceManager">
+            <ref bean="dataSourceManager"/>
+        </property>
+        <property name="coreFilterManager">
+            <ref bean="coreFilterManager"/>
+        </property>
+    </bean>
 
     <!--
         Subscription manager.
@@ -421,8 +438,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="userManager">
             <ref bean="userManager" />
         </property>
-        <property name="channelManager">
-            <ref bean="channelManager" />
+        <property name="dataSourceManager">
+            <ref bean="dataSourceManager" />
         </property>
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
@@ -655,7 +672,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <value>eu.baltrad.dex.core.model.NodeConnection</value>
         </property>
         <property name="successView">
-            <value>redirect:remoteRadars.htm</value>
+            <value>redirect:remoteDataSources.htm</value>
         </property>
         <property name="nodeConnectionManager">
             <ref bean="nodeConnectionManager" />
@@ -674,8 +691,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Remote channel controller
     -->
-    <bean id="remoteChannelController"
-        class="eu.baltrad.dex.core.controller.RemoteChannelController">
+    <bean id="remoteDataSourceController"
+        class="eu.baltrad.dex.core.controller.RemoteDataSourceController">
         <property name="frameDispatcherController">
             <ref bean="frameDispatcherController"/>
         </property>
@@ -686,7 +703,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="logManager"/>
         </property>
     </bean>
-
 
     <!-- Node manager -->
 
@@ -802,6 +818,55 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="bltDataProcessorController"/>
         </property>
     </bean>
+
+    <!-- DataSourceManager -->
+    <bean name="dataSourceManager" class="eu.baltrad.dex.datasource.model.DataSourceManager"/>
+
+    <!-- SaveDataSourceController -->
+    <bean name="saveDataSourceController"
+            class="eu.baltrad.dex.datasource.controller.SaveDataSourceController">
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+        <property name="coreFilterManager">
+            <ref bean="coreFilterManager"/>
+        </property>
+    </bean>
+
+    <!-- ShowDataSourcesController -->
+    <bean name="showDataSourcesController"
+            class="eu.baltrad.dex.datasource.controller.ShowDataSourcesController">
+        <property name="successView">
+            <value>showDataSources</value>
+        </property>
+        <property name="dataSourceManager">
+            <ref bean="dataSourceManager"/>
+        </property>
+    </bean>
+
+    <!-- RemoveDataSourceController -->
+    <bean name="removeDataSourceController" 
+            class="eu.baltrad.dex.datasource.controller.RemoveDataSourceController">
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+        <property name="dataSourceManager">
+            <ref bean="dataSourceManager"/>
+        </property>
+    </bean>
+
+
+    <!-- EditDataSourcesController -->
+    <bean name="editDataSourceController"
+            class="eu.baltrad.dex.datasource.controller.EditDataSourceController">
+        <property name="successView">
+            <value>dsSelectEdit</value>
+        </property>
+        <property name="dataSourceManager">
+            <ref bean="dataSourceManager"/>
+        </property>
+    </bean>
+
 
     <!--
         Message resources.
@@ -931,4 +996,20 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="showRoutesController" class="eu.baltrad.beastui.web.controller.ShowRoutesController" autowire="byType" />
     
     <bean id="schedulerController" class="eu.baltrad.beastui.web.controller.SchedulerController" autowire="byType" />
+
+    <!-- Filter managers -->
+    <bean id="attributeFilterManager" class="eu.baltrad.beast.db.AttributeFilterManager"
+            autowire="byName"/>
+    <bean id="combinedFilterManager" class="eu.baltrad.beast.db.CombinedFilterManager"
+            autowire=" byName"/>
+    <bean id="coreFilterManager" class="eu.baltrad.beast.db.CoreFilterManager"
+            autowire="byName">
+        <property name="subManagers">
+            <map>
+                <entry key="attr" value-ref="attributeFilterManager"/>
+                <entry key="combined" value-ref="combinedFilterManager"/>
+            </map>
+        </property>
+    </bean>
+
 </beans>

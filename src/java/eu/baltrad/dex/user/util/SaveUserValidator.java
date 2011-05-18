@@ -32,7 +32,7 @@ import eu.baltrad.dex.util.WebUtil;
 /**
  * Validator class used to validate input from add user form.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */

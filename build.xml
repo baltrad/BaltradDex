@@ -24,11 +24,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
 <project name="BaltradDex" basedir="." default="dist">
   <description>Builds and deploys BaltradDex application</description>
-  <property file="develop.properties" />  
+  <property file="develop.properties" />
+  <property name="app.name" value="Baltrad Data Exchange System: BaltradDex"/>
   <property name="root.dir" value="${basedir}"/>
   <property name="lib.dir" value="lib"/>
   <property name="extralib.dir" value="extralib"/>
   <property name="src.dir" value="src"/>
+  <property name="javadocs.dir" value="docs"/>
+  <property name="javadocs.src.dir" value="${src.dir}/java/eu/baltrad/dex"/>
   <property name="web.dir" value="web"/>
   <property name="webinf.dir" value="${web.dir}/WEB-INF"/>
   <property name="etc.dir" value="etc"/>
@@ -353,13 +356,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
   <!-- create database and users -->
   <target name="create-db">
-    <sql classpath="${lib.dir}/${db.jar}" driver="${db.driver}" url="${db.url}" userid="${db.user}" password="${db.pwd}">
+    <sql classpath="${lib.dir}/${db.jar}" driver="${db.driver}" url="${db.url}" userid="${db.user}"
+        password="${db.pwd}">
       <transaction src="${etc.dir}/create_db.sql"/>
     </sql>
   </target>
 
   <!-- create database schema -->
-  <target name="create-schema">
+  <!--target name="create-schema">
     <sql classpath="${lib.dir}/${db.jar}"
          driver="${db.driver}"
          url="${db.url}"
@@ -367,10 +371,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
          password="${db.pwd}" >
       <transaction src="${etc.dir}/create_dex_schema.sql"/>
     </sql>
-  </target>
+  </target-->
 
   <!-- insert data into the database -->
-  <target name="insert-data" depends="create-schema">
+  <!--target name="insert-data" depends="create-schema">
     <sql classpath="${lib.dir}/${db.jar}"
          driver="${db.driver}"
          url="${db.url}"
@@ -378,7 +382,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
          password="${db.pwd}" >
     <transaction src="${etc.dir}/insert_dex_data.sql"/>
     </sql>
-  </target>
+  </target-->
 
   <!-- fetch data from the database -->
   <target name="fetch-data">
@@ -409,7 +413,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   </target>
   
   <!-- deploy on tomcat -->
-  <target name="deploy" depends="dist, insert-data, context-status"
+
+  <target name="deploy" depends="dist, context-status"
     	if="context.deployable">
     <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
     <deploy url="${mgr.url}"
@@ -419,6 +424,17 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             update="${mgr.update}"
             war="file:${dist.dir}/BaltradDex.war"/>
   </target>
+
+  <!--target name="deploy" depends="dist, insert-data, context-status"
+    	if="context.deployable">
+    <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
+    <deploy url="${mgr.url}"
+            username="${mgr.username}"
+            password="${mgr.password}"
+            path="${mgr.path}"
+            update="${mgr.update}"
+            war="file:${dist.dir}/BaltradDex.war"/>
+  </target-->
 
   <target name="hudson" depends="compile,prepare-testdb,execute.test"/>
 
@@ -476,6 +492,19 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </or>
     </condition>
   </target>
+
+    <!-- Generate BaltradDex source code documentation using javadoc -->
+    <target name="javadocs">
+        <mkdir dir="${javadocs.dir}"/>
+        <javadoc sourcepath="${src.dir}" destdir="${javadocs.dir}"
+            classpath="${src.dir}" author="true" version="true"
+            use="true" windowtitle="${app.name} API"
+            doctitle="&lt;h1&gt;${app.name}&lt;/h1&gt;">
+            <fileset dir="${javadocs.src.dir}">
+                <include name="**/*.java"/>
+            </fileset> 
+         </javadoc>
+    </target>
 
 </project>
 

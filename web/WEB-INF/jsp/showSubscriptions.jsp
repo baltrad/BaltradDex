@@ -64,21 +64,22 @@ Author     : szewczenko
                         <c:when test="${av_subs_status == 1}">
                             <div id="text-box">
                                 Click on a check box to subscribe or unsubscribe a desired
-                                radar station.
-                                Click on radar name in order to browse data from this radar.
+                                data source.
+                                Click on data source name in order to browse data from this
+                                source data .
                             </div>
                             <form action="showSelectedSubscriptions.htm">
                                 <div id="table">
                                     <div id="subscriptions">
                                         <div class="table-hdr">
                                             <div class="station">
-                                                Radar station
+                                                Data source
                                             </div>
                                             <div class="operator">
                                                 Operator
                                             </div>
                                             <div class="synkronized">
-                                                Channel status
+                                                Status
                                             </div>
                                             <div class="active">
                                                 Active
@@ -87,7 +88,9 @@ Author     : szewczenko
                                         <c:forEach var="sub" items="${subscriptions}">
                                             <div class="table-row">
                                                 <div class="station">
-                                                    <c:out value="${sub.channelName}"/>
+                                                    <a href="dsFiles.htm?dsName=${sub.dataSourceName}">
+                                                        <c:out value="${sub.dataSourceName}"/>
+                                                    </a>
                                                 </div>
                                                 <div class="operator">
                                                     <c:out value="${sub.operatorName}"/>
@@ -107,12 +110,12 @@ Author     : szewczenko
                                                 <div class="active">
                                                 <c:choose>
                                                     <c:when test="${sub.active == true}">
-                                                        <input type="checkbox" name="selected_channels"
-                                                            value="${sub.channelName}" checked/>
+                                                        <input type="checkbox" name="selectedDataSources"
+                                                            value="${sub.dataSourceName}" checked/>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <input type="checkbox" name="selected_channels"
-                                                            value="${sub.channelName}"/>
+                                                        <input type="checkbox" name="selectedDataSources"
+                                                            value="${sub.dataSourceName}"/>
                                                     </c:otherwise>
                                                 </c:choose>
                                                 </div>
@@ -136,9 +139,8 @@ Author     : szewczenko
                                          alt="no_radars"/>
                                 </div>
                                 <div class="text">
-                                    List of radar stations available for subscription is
-                                    currently empty.
-                                    Use node connection functionality to add new radars.
+                                    List of subscribed data sources is currently empty.
+                                    Use node connection functionality to add new data sources.
                                 </div>
                             </div>
                             <div class="footer">

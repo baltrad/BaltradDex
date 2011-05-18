@@ -44,7 +44,7 @@ Author     : szewczenko
                 <div id="right">
                     <div id="page-title">
                         <div class="left">
-                            Remove subscribed radar station
+                            Remove subscribed data source
                         </div>
                         <div class="right">
                         </div>

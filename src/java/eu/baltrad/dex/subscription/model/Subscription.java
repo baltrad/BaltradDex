@@ -29,7 +29,7 @@ import java.sql.Timestamp;
 /**
  * Class implements data channel subscription object.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */
@@ -54,8 +54,8 @@ public class Subscription implements Serializable, Comparable< Subscription > {
     private String timeStr;
     /** Subscriber's name */
     private String userName;
-    /** Data channel name */
-    private String channelName;
+    /** Data source name */
+    private String dataSourceName;
     /** Node's address */
     private String nodeAddress;
     /** Node's operator name */
@@ -76,18 +76,18 @@ public class Subscription implements Serializable, Comparable< Subscription > {
      *
      * @param time Current time in milliseconds
      * @param userName User name
-     * @param channelName Channel name
+     * @param dataSourceName Data source name
      * @param nodeAddress Node address
      * @param operatorName Operator name
      * @param type Subscription type
      * @param active Subscription activation toggle
      * @param synkronized Synchronization toggle
      */
-    public Subscription( long time, String userName, String channelName, String nodeAddress,
+    public Subscription( long time, String userName, String dataSourceName, String nodeAddress,
             String operatorName, String type, boolean active, boolean synkronized ) {
         this.timeStamp = new Timestamp( time );
         this.userName = userName;
-        this.channelName = channelName;
+        this.dataSourceName = dataSourceName;
         this.nodeAddress = nodeAddress;
         this.operatorName = operatorName;
         this.type = type;
@@ -104,19 +104,20 @@ public class Subscription implements Serializable, Comparable< Subscription > {
      * @param id Subscription ID
      * @param time Current time in milliseconds
      * @param userName User name
-     * @param channelName Channel name
+     * @param dataSourceName Data source name
      * @param nodeAddress Node address
      * @param operatorName Operator name
      * @param type Subscription type
      * @param active Subscription activation toggle
      * @param synkronized Synchronization toggle
      */
-    public Subscription( int id, long time, String userName, String channelName, String nodeAddress,
-            String operatorName, String type, boolean active, boolean synkronized ) {
+    public Subscription( int id, long time, String userName, String dataSourceName,
+            String nodeAddress, String operatorName, String type, boolean active,
+            boolean synkronized ) {
         this.id = id;
         this.timeStamp = new Timestamp( time );
         this.userName = userName;
-        this.channelName = channelName;
+        this.dataSourceName = dataSourceName;
         this.nodeAddress = nodeAddress;
         this.operatorName = operatorName;
         this.type = type;
@@ -133,20 +134,20 @@ public class Subscription implements Serializable, Comparable< Subscription > {
      * @param id Subscription ID
      * @param timeStamp Timestamp
      * @param userName User name
-     * @param channelName Channel name
+     * @param dataSourceName Data source name
      * @param nodeAddress Node address
      * @param operatorName Operator name
      * @param type Subscription type
      * @param active Subscription activation toggle
      * @param synkronized Synchronization toggle
      */
-    public Subscription( int id, Timestamp timeStamp, String userName, String channelName, 
+    public Subscription( int id, Timestamp timeStamp, String userName, String dataSourceName,
             String nodeAddress, String operatorName, String type, boolean active,
             boolean synkronized ) {
         this.id = id;
         this.timeStamp = timeStamp;
         this.userName = userName;
-        this.channelName = channelName;
+        this.dataSourceName = dataSourceName;
         this.nodeAddress = nodeAddress;
         this.operatorName = operatorName;
         this.type = type;
@@ -218,17 +219,17 @@ public class Subscription implements Serializable, Comparable< Subscription > {
      */
     public void setUserName( String userName ) { this.userName = userName; }
      /**
-     * Gets channel name.
+     * Gets data source name.
      *
-     * @return Channel name
+     * @return Data source name
      */
-    public String getChannelName() { return channelName; }
+    public String getDataSourceName() { return dataSourceName; }
     /**
-     * Sets channel name.
+     * Sets data source name.
      *
-     * @param channelName Channel name
+     * @param dataSourceName Data source name
      */
-    public void setChannelName( String channelName ) { this.channelName = channelName; }
+    public void setDataSourceName( String dataSourceName ) { this.dataSourceName = dataSourceName; }
     /**
      * Gets subscription type
      *
@@ -291,13 +292,13 @@ public class Subscription implements Serializable, Comparable< Subscription > {
     public void setSynkronized( boolean synkronized ) { this.synkronized = synkronized; }
     /**
      * Method implementing comparable interface. Sorts subscription objects based
-     * on channel name.
+     * on data source name.
      *
      * @param s Subscription
      * @return 0 if objects are equal
      */
     public int compareTo( Subscription s ) {
-        return getChannelName().compareTo( s.getChannelName() );
+        return getDataSourceName().compareTo( s.getDataSourceName() );
     }
 }
 //--------------------------------------------------------------------------------------------------

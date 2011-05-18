@@ -22,13 +22,13 @@
 package eu.baltrad.dex.log.model;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.sql.Timestamp;
 
 /**
  * Class implements system message object.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */
@@ -38,24 +38,48 @@ public class LogEntry implements Serializable {
     private final static String DATE_FORMAT = "yyyy/MM/dd";
     /** Time format string */
     private final static String TIME_FORMAT = "HH:mm:ss";
+
+
+    public final static String LOG_SRC_DEX = "DEX";
+
+    public final static String LOG_SRC_BEAST = "BEAST";
+
+    public final static String LOG_SRC_PGF = "PGF";
+
+
 //---------------------------------------------------------------------------------------- Variables
     /** Log entry ID */
     private int id;
     /** Timestamp */
     private Timestamp timeStamp;
-    /** Auxiliary variable storing date as string */
+    
+    /** Log entry type */
+    private String type;
+    /** Determines the system that generated the message */
+    private String system;
+    /** Actual message text */
+    private String message;
+
+
+   /** Auxiliary variable storing date as string */
     private String dateStr;
     /** Auxiliary variable storing time as string */
     private String timeStr;
-    /** Log entry type */
-    private String type;
-    /** Actual message text */
-    private String message;
+
+
+
 //------------------------------------------------------------------------------------------ Methods
+
+
+    
+
+
+
+
     /**
      * Default constructor
      */
-    public LogEntry() {}
+    //public LogEntry() {}
     /**
      * Constructor initializes log entry object.
      *
@@ -67,10 +91,13 @@ public class LogEntry implements Serializable {
         this.timeStamp = timeStamp;
         this.type = type;
         this.message = message;
-        SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
-        SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
-        this.dateStr = dateFormat.format( timeStamp );
-        this.timeStr = timeFormat.format( timeStamp );
+        setDateStr( timeStamp );
+        setTimeStr( timeStamp );
+
+        //SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
+        //SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
+        //this.dateStr = dateFormat.format( timeStamp );
+        //this.timeStr = timeFormat.format( timeStamp );
     }
     /**
      * Constructor initializes log entry object.
@@ -83,10 +110,11 @@ public class LogEntry implements Serializable {
         this.timeStamp = new Timestamp( time );
         this.type = type;
         this.message = message;
-        SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
-        SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
-        this.dateStr = dateFormat.format( timeStamp );
-        this.timeStr = timeFormat.format( timeStamp );
+        setDateStr( time );
+        setTimeStr( time );
+        
+        //this.dateStr = dateFormat.format( timeStamp );
+        //this.timeStr = timeFormat.format( timeStamp );
     }
     /**
      * Method gets log entry ID.
@@ -129,6 +157,7 @@ public class LogEntry implements Serializable {
      *
      * @return Log entry message
      */
+
     public String getMessage() { return message; }
     /**
      * Method sets log entry message.
@@ -147,7 +176,19 @@ public class LogEntry implements Serializable {
      *
      * @param dateStr Date string to set
      */
-    public void setDateStr( String dateStr ) { this.dateStr = dateStr; }
+    public void setDateStr( Timestamp timestamp ) {
+        SimpleDateFormat format = new SimpleDateFormat( DATE_FORMAT );
+        this.dateStr = format.format( timestamp );
+    }
+    /**
+     * Sets date string.
+     *
+     * @param dateStr Date string to set
+     */
+    public void setDateStr( long time ) {
+        SimpleDateFormat format = new SimpleDateFormat( DATE_FORMAT );
+        this.dateStr = format.format( time );
+    }
     /**
      * Gets time string.
      *
@@ -159,6 +200,30 @@ public class LogEntry implements Serializable {
      *
      * @param timeStr Time string to set
      */
-    public void setTimeStr( String timeStr ) { this.timeStr = timeStr; }
+    public void setTimeStr( Timestamp timestamp ) {
+        SimpleDateFormat format = new SimpleDateFormat( TIME_FORMAT );
+        this.timeStr = format.format( timestamp );
+    }
+    /**
+     * Sets time string.
+     *
+     * @param timeStr Time string to set
+     */
+    public void setTimeStr( long time ) {
+        SimpleDateFormat format = new SimpleDateFormat( TIME_FORMAT );
+        this.timeStr = format.format( time );
+    }
+    /**
+     * Gets name of the system that generated the message.
+     *
+     * @return System name
+     */
+    public String getSystem() { return system; }
+    /**
+     * Sets name of the system that generated the message.
+     *
+     * @param source the source to set
+     */
+    public void setSystem( String system ) { this.system = system; }
 }
 //--------------------------------------------------------------------------------------------------

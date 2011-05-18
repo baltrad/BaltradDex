@@ -47,7 +47,7 @@ import java.util.ArrayList;
 /**
  * Controller class creates new system configuration or modifies existing configuration.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */

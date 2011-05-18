@@ -44,13 +44,13 @@ Author     : szewczenko
                 <div id="right">
                     <div id="page-title">
                         <div class="left">
-                            Remove subscribed radar station
+                            Remove subscribed data source
                         </div>
                         <div class="right">
                         </div>
                     </div>
                     <div id="text-box">
-                        Warning: The following subscribed radar station(s) will be removed
+                        Warning: The following subscribed data sources will be removed
                         from the system.
                     </div>
                         <form method="post" action="showSubscriptionRemovalStatus.htm">
@@ -58,16 +58,16 @@ Author     : szewczenko
                                 <div id="subscriptions">
                                     <div class="table-hdr">
                                         <div class="station">
-                                            Radar station
+                                            Data source
                                         </div>
                                         <div class="operator">
                                             Operator
                                         </div>
                                     </div>
-                                    <c:forEach var="sub" items="${selected_subscriptions}">
+                                    <c:forEach var="sub" items="${selectedSubscriptions}">
                                         <div class="table-row">
                                             <div class="station">
-                                                <c:out value="${sub.channelName}"/>
+                                                <c:out value="${sub.dataSourceName}"/>
                                             </div>
                                             <div class="operator">
                                                 <c:out value="${sub.operatorName}"/>

@@ -27,7 +27,7 @@ import java.util.HashMap;
  * Implements functionality allowing to assign frame publisher object to the user identified
  * by name. This approach allows to access publisher tasks executed by a given user.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */

@@ -25,14 +25,15 @@ import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.frame.model.BaltradFrameHandler;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.channel.model.ChannelManager;
-import eu.baltrad.dex.channel.model.Channel;
+
+import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.datasource.model.DataSourceManager;
+
 import eu.baltrad.dex.log.model.LogManager;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
 import eu.baltrad.dex.util.FileCatalogConnector;
-import eu.baltrad.dex.channel.model.ChannelPermission;
 import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 import eu.baltrad.dex.core.util.FramePublisherManager;
 import eu.baltrad.dex.core.util.FramePublisher;
@@ -71,7 +72,7 @@ import java.util.ArrayList;
  * Class implements frame dispatching controller. This controller handles all incoming and outgoing
  * BaltradFrames according to the single point of entry rule.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */
@@ -96,7 +97,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 //---------------------------------------------------------------------------------------- Variables
     private BaltradFrameHandler bfHandler;
     private UserManager userManager;
-    private ChannelManager channelManager;
+    private DataSourceManager dataSourceManager;
     private SubscriptionManager subscriptionManager;
     private LogManager logManager;
     private BltDataProcessorController bltDataProcessorController;
@@ -104,8 +105,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private FileCatalog fc;
     // Beast message manager
     private IBltMessageManager bltMessageManager;
-    // remote channel listing
-    private List channelListing;
+    // remote data source listing
+    private List dataSourceListing;
     // confirmed subscription list
     private List confirmedSubscriptions;
     // synchronized subscription
@@ -178,29 +179,29 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             int userId;
                             if( ( userId = authenticateFrame( header ) ) != 0 ) {
                                 logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                    "Channel listing request received from user " +
+                                    "Data source listing request received from user " +
                                      getUserName( bfHandler.getUserName( header ) ) + " ("
                                      + bfHandler.getSenderNodeName( header ) + ")" );
                                 
                                 // process channel listing request
 
-                                // create a list of channels that user is allowed to subscribe
-                                List<ChannelPermission> perms = 
-                                        channelManager.getPermissionByUser( userId );
+                                // create a list of data sources that user is allowed to subscribe
+                                List<Integer> dataSourceIds = dataSourceManager.getDataSourceIds( 
+                                        userId );
 
-                                // channels allowed to be used by a given user
-                                List<Channel> channels = new ArrayList<Channel>();
-                                //List<Channel> channels = channelManager.getChannels();
-                                for( int i = 0; i < perms.size(); i++ ) {
-                                    ChannelPermission perm = perms.get( i );
-                                    channels.add( channelManager.getChannel( perm.getChannelId() ) );
+                                // data sources allowed to be used by a given user
+                                List<DataSource> dataSources = new ArrayList<DataSource>();
+                                for( int i = 0; i < dataSourceIds.size(); i++ ) {
+                                    dataSources.add( dataSourceManager.getDataSource(
+                                            dataSourceIds.get( i ) ) );
                                 }
 
                                 // write list to temporary file
                                 File tempFile = InitAppUtil.createTempFile(
                                         new File( InitAppUtil.getWorkDir() ) );
                                 // write object to stream
-                                InitAppUtil.writeObjectToStream( channels, tempFile );
+                                InitAppUtil.writeObjectToStream( dataSources, tempFile );
+
                                 // set the return address
                                 bfHandler.setUrl( bfHandler.getSenderNodeAddress( header ) );
                                 // prepare the return message header
@@ -238,10 +239,10 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         if( bfHandler.getMessageText( header ).equals(
                             BaltradFrameHandler.CHNL_LIST ) ) {
                             logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                "Channel listing received from " + bfHandler.getSenderNodeName(
+                                "Data source listing received from " + bfHandler.getSenderNodeName(
                                 header ) );
 
-                            // process incoming channel listing
+                            // process incoming data source listing
 
                             FileItemStream fileItem = iterator.next();
                             InputStream fileStream = fileItem.openStream();
@@ -250,9 +251,10 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         new File( InitAppUtil.getWorkDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
                             // retrieve channel list and save it to class field
-                            List remoteChannels = ( List )InitAppUtil.readObjectFromStream( tempFile );
+                            List remoteDataSources = ( List )InitAppUtil.readObjectFromStream(
+                                    tempFile );
                             // set channel listing
-                            setChannelListing( remoteChannels );
+                            setDataSourceListing( remoteDataSources );
                             // set remote node name
                             setRemoteNodeName( bfHandler.getSenderNodeName( header ) );
                             // set remote node address
@@ -266,7 +268,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         if( bfHandler.getMessageText( header ).equals(
                                 BaltradFrameHandler.CHNL_SBN_RQST ) ) {
                             logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                "Channel subscription request received from " +
+                                "Data source subscription request received from " +
                                 bfHandler.getSenderNodeName( header ) );
 
                             // process incoming subscription request
@@ -279,41 +281,39 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         new File( InitAppUtil.getWorkDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
                             // retrieve subscription list
-                            List subscribedChannels = ( List )InitAppUtil.readObjectFromStream(
+                            List subscribedDataSources = ( List )InitAppUtil.readObjectFromStream(
                                     tempFile );
+
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                             // identify user by name
                             User user = userManager.getUserByName( bfHandler.getUserName( header ) );
-                            // return channel list sent back to user to confirm
+                            // return data source list sent back to user to confirm
                             // subscription completion
-                            List confirmedChannels = new ArrayList();
-                            if( subscribedChannels != null ) {
-                                for( int i = 0; i < subscribedChannels.size(); i++ ) {
-                                    Channel requestedChannel =
-                                            ( Channel )subscribedChannels.get( i );
-                                    Channel localChannel = channelManager.getChannel( 
-                                            requestedChannel.getChannelName() );
+                            List confirmedDataSources = new ArrayList();
+                            if( subscribedDataSources != null ) {
+                                for( int i = 0; i < subscribedDataSources.size(); i++ ) {
+                                    DataSource requestedDataSource =
+                                            ( DataSource )subscribedDataSources.get( i );
+                                    DataSource localDataSource = dataSourceManager.getDataSource(
+                                            requestedDataSource.getName() );
                                     Subscription subs = null;
                                     // make sure user hasn't already subscribed the channels
                                     if( subscriptionManager.getSubscription( user.getName(),
-                                            localChannel.getChannelName(),
+                                            localDataSource.getName(),
                                             Subscription.REMOTE_SUBSCRIPTION ) != null ) {
                                         logManager.addEntry( System.currentTimeMillis(),
                                             LogManager.MSG_WRN, "User " + user.getName() +
                                             " has already subscribed to "
-                                            + localChannel.getChannelName() );
+                                            + localDataSource.getName() );
                                     } else {
                                         // add subscription
-                                        //subs = new Subscription( user.getName(),
-                                        //        localChannel.getChannelName(),
-                                        //        Subscription.REMOTE_SUBSCRIPTION );
                                         subs = new Subscription( System.currentTimeMillis(),
-                                            user.getName(), localChannel.getChannelName(),
+                                            user.getName(), localDataSource.getName(),
                                             InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
                                             Subscription.REMOTE_SUBSCRIPTION, false, false );
                                         subscriptionManager.saveSubscription( subs );
-                                        confirmedChannels.add( requestedChannel );
+                                        confirmedDataSources.add( requestedDataSource );
                                     }
                                 }
                             }
@@ -323,7 +323,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             tempFile = InitAppUtil.createTempFile(
                                     new File( InitAppUtil.getWorkDir() ) );
                             // write object to the stream
-                            InitAppUtil.writeObjectToStream( confirmedChannels, tempFile );
+                            InitAppUtil.writeObjectToStream( confirmedDataSources, tempFile );
                             // set the return address
                             bfHandler.setUrl( bfHandler.getSenderNodeAddress( header ) );
                             // prepare the return message header
@@ -345,7 +345,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         if( bfHandler.getMessageText( header ).equals(
                                 BaltradFrameHandler.CHNL_SBN_CFN ) ) {
                             logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                "Channel subscription confirmation received from " +
+                                "Data source subscription confirmation received from " +
                                 bfHandler.getSenderNodeName( header ) );
 
                             // process incoming subscription confirmation
@@ -357,9 +357,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         new File( InitAppUtil.getWorkDir() ) );
                             InitAppUtil.saveFile( fileStream, tempFile );
                             // retrieve list of confirmed channels
-                            List confirmedChannels = ( List )InitAppUtil.readObjectFromStream(
+                            List confirmedDataSources = ( List )InitAppUtil.readObjectFromStream(
                                     tempFile );
-                            setConfirmedSubscriptions( confirmedChannels );
+                            setConfirmedSubscriptions( confirmedDataSources );
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                         }
@@ -369,7 +369,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         if( bfHandler.getMessageText( header ).equals(
                                 BaltradFrameHandler.SBN_CHNG_RQST ) ) {
                             logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
-                                "Channel subscription change request received from " +
+                                "Data source subscription change request received from " +
                                 bfHandler.getSenderNodeName( header ) );
 
                             // process incoming subscription change request
@@ -387,19 +387,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             InitAppUtil.deleteFile( tempFile );
 
                             // create new subscription object
-                            //Subscription s = new Subscription( subs.getUserName(),
-                            //        subs.getChannelName(), Subscription.REMOTE_SUBSCRIPTION );
-
-
                             Subscription s = new Subscription( System.currentTimeMillis(),
-                                    subs.getUserName(), subs.getChannelName(), subs.getNodeAddress(),
+                                    subs.getUserName(), subs.getDataSourceName(), subs.getNodeAddress(),
                                     subs.getOperatorName(), Subscription.REMOTE_SUBSCRIPTION,
                                     false, false );
                             // subscription object serves as confirmation
                             Subscription confirmedSub = null;
                             if( subs.getActive() ) {
                                 if( subscriptionManager.getSubscription( s.getUserName(), 
-                                    s.getChannelName(), Subscription.REMOTE_SUBSCRIPTION ) == null) {
+                                    s.getDataSourceName(), Subscription.REMOTE_SUBSCRIPTION ) == null) {
                                     // subscription doesn't exist in the database - add as new
                                     // subscription
                                     subscriptionManager.saveSubscription( s );
@@ -408,34 +404,25 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     confirmedSub.setActive( true );
                                     logManager.addEntry( System.currentTimeMillis(),
                                         LogManager.MSG_INFO, "User " + s.getUserName() +
-                                        " subscribed to " + s.getChannelName() );
+                                        " subscribed to " + s.getDataSourceName() );
                                 } else {
                                     // subscription exists in the database - modify subscription
-                                    subscriptionManager.updateSubscription( s.getChannelName(),
+                                    subscriptionManager.updateSubscription( s.getDataSourceName(),
                                             Subscription.REMOTE_SUBSCRIPTION, true );
                                     confirmedSub = s;
                                     confirmedSub.setActive( true );
                                     logManager.addEntry( System.currentTimeMillis(),
                                         LogManager.MSG_INFO, "User " + s.getUserName() +
-                                        " subscribed to " + s.getChannelName() );
+                                        " subscribed to " + s.getDataSourceName() );
                                 }
-                                /*/ add remote subscription
-                                subscriptionManager.addSubscription( s );
-                                confirmedSub = s;
-                                //@
-                                confirmedSub.setSelected( true );
-                                logManager.addEntry( new Date(), LogManager.MSG_INFO,
-                                    "User " + s.getUserName() + " subscribed to "
-                                    + s.getChannelName() );
-                                */
                             } else {
                                 // remove remote subscription
                                 subscriptionManager.deleteSubscription( s.getUserName(),
-                                        s.getChannelName(), s.getType() );
+                                        s.getDataSourceName(), s.getType() );
                                 confirmedSub = s;
                                 logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                                     "User " + s.getUserName() + " cancelled subscription to "
-                                    + s.getChannelName() );
+                                    + s.getDataSourceName() );
                             }
 
                             // send subscription change confirmation
@@ -491,8 +478,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
                             logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                                 "Remote node " + bfHandler.getSenderNodeName( header )
-                                + " changed your subscription status for " + subs.getChannelName()
-                                + " to: " + selected );
+                                + " changed your subscription status for " + 
+                                subs.getDataSourceName() + " to: " + selected );
                         }
 
                         // incoming channel subscription change confirmation - failure
@@ -514,7 +501,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_INFO,
                                 "Remote node " + bfHandler.getSenderNodeName( header )  +
                                 " failed to change your subscription status for "
-                                + subs.getChannelName() + " to: " + selected );
+                                + subs.getDataSourceName() + " to: " + selected );
                         }
 
                         // channel synchronization request
@@ -534,13 +521,14 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             InitAppUtil.deleteFile( tempFile );
                             // check if the subscribed channel is available
                             try {
-                                Channel channel = channelManager.getChannel( subs.getChannelName() );
-                                if( channel == null ) {
+                                DataSource dataSource = dataSourceManager.getDataSource(
+                                        subs.getDataSourceName() );
+                                if( dataSource == null ) {
                                     subs.setSynkronized( false );
                                 }
                             } catch( NullPointerException e ) {
                                 System.err.println( "Failed to synchronize subscribed channel: "
-                                        + subs.getChannelName() );
+                                        + subs.getDataSourceName() );
                             }
 
                             // send subscription back to requesting node
@@ -601,6 +589,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         
                         try {
                             FileEntry fileEntry = fc.store( swapFile.getAbsolutePath() );
+
+
+
+                            
+                            
+
+
+
+
                             if( fileEntry == null ) {
                                 // failed to store file in File Catalog - set error code
                                 response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_500 );
@@ -618,20 +615,19 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                         Subscription.REMOTE_SUBSCRIPTION );
                                 for( int i = 0; i < subs.size(); i++ ) {
 
-                                    System.out.println( "___________________file entry what_source: " + fileEntry.what_source() );
-                                    System.out.println( "___________________file entry source: " + fileEntry.source() );
 
 
+                                    // check if file entry matches the subscribed data source
+                                    
 
 
-
-                                    if( subs.get( i ).getChannelName().equals( bfHandler.getChannel(
+                                    if( subs.get( i ).getDataSourceName().equals( bfHandler.getChannel(
                                         header ) ) ) {
 
                                         // make sure that user exists locally
                                         User user = userManager.getUserByName(
                                                                       subs.get( i ).getUserName() );
-                                        String channelName = subs.get( i ).getChannelName();
+                                        String dataSourceName = subs.get( i ).getDataSourceName();
                                         // look up file item in data register - if file item doesn't 
                                         // exist, create frame delivery task
                                         if( getDeliveryRegisterManager().getEntry( user.getId(),
@@ -640,7 +636,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                             // create frame delivery task
                                             HandleFrameTask task = new HandleFrameTask(
                                                 getDeliveryRegisterManager(), getLogManager(),
-                                                user, channelName, fileEntry, swapFile );
+                                                user, dataSourceName, fileEntry, swapFile );
 
                                             // add task to publisher manager
                                             framePublisherManager.getFramePublisher(
@@ -649,7 +645,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                     }
                                 }
                             }
-                        }catch( DuplicateEntry e ) {
+                        } catch( DuplicateEntry e ) {
                             logManager.addEntry( System.currentTimeMillis(), LogManager.MSG_ERR,
                                     "Duplicate entry error: " + e.getMessage() );
                             // exception while storing file in FileCatalog - set error code
@@ -720,21 +716,23 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         return user.getName();
     }
     /**
-     * Gets the list of channels available for a given remote node.
+     * Gets the list of data sources available for a given remote node.
      *
-     * @return List of channels available for a given remote node
+     * @return List of data sources available for a given remote node
      */
-    public List getChannelListing() { return channelListing; }
+    public List getDataSourceListing() { return dataSourceListing; }
     /**
-     * Sets the list of channels available for a given remote node.
+     * Sets the list of data sources available for a given remote node.
      *
-     * @param channelListing List of channels available for a given remote node
+     * @param dataSourceListing List of data sources available for a given remote node
      */
-    public void setChannelListing( List channelListing ) { this.channelListing = channelListing; }
+    public void setDataSourceListing( List dataSourceListing ) {
+        this.dataSourceListing = dataSourceListing;
+    }
     /**
-     * Resets the list of remote channels.
+     * Resets the list of remote data sources
      */
-    public void resetChannelListing() { this.channelListing = null; }
+    public void resetDataSourceListing() { this.dataSourceListing = null; }
     /**
      * Gets list of subscriptions confirmed by remote node.
      *
@@ -847,19 +845,19 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param userManager Reference to user manager object
      */
     public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
-     /**
-     * Method returns reference to data channel manager object.
-     *
-     * @return Reference to data channel manager object
-     */
-    public ChannelManager getChannelManager() { return channelManager; }
     /**
-     * Method sets reference to data channel manager object.
+     * Gets reference to data source manager object.
      *
-     * @param dataChannelManager Reference to data channel manager object
+     * @return Reference to data source manager object
      */
-    public void setChannelManager( ChannelManager channelManager ) {
-        this.channelManager = channelManager;
+    public DataSourceManager getDataSourceManager() { return dataSourceManager; }
+    /**
+     * Sets reference to data source manager object.
+     *
+     * @param dataSourceManager Reference to data source manager object
+     */
+    public void setDataSourceManager( DataSourceManager dataSourceManager ) {
+        this.dataSourceManager = dataSourceManager;
     }
     /**
      * Method returns reference to SubscriptionManager object.

@@ -28,7 +28,7 @@ import java.util.Date;
 /**
  * Class implements Baltrad file object.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */
@@ -38,7 +38,7 @@ public class BltFile implements Serializable, Comparable<BltFile> {
     private String path;
     private Date timeStamp;
     private Date storageTime;
-    private String radarName;
+    private String source;
     private String type;
     private String thumbPath;
 //------------------------------------------------------------------------------------------ Methods
@@ -53,17 +53,17 @@ public class BltFile implements Serializable, Comparable<BltFile> {
      * @param path Data file's absolute path
      * @param timeStamp Data file's time stamp
      * @param storageTime Time when the data was stored
-     * @param radarName Radar station name
+     * @param source File's origin
      * @param type Radar data type
      * @param thumbPath Image thumb's absolute path
      */
-    public BltFile( String uuid, String path, Date timeStamp, Date storageTime, String radarName,
+    public BltFile( String uuid, String path, Date timeStamp, Date storageTime, String source,
             String type, String thumbPath ) {
         this.uuid = uuid;
         this.path = path;
         this.timeStamp = timeStamp;
         this.storageTime = storageTime;
-        this.radarName = radarName;
+        this.source = source;
         this.type = type;
         this.thumbPath = thumbPath;
     }
@@ -89,17 +89,17 @@ public class BltFile implements Serializable, Comparable<BltFile> {
      */
     public void setUuid( String uuid ) { this.uuid = uuid; }
     /**
-     * Gets radar station name.
+     * Gets source name.
      *
-     * @return Radar station name
+     * @return Source name
      */
-    public String getRadarName() { return radarName; }
+    public String getSource() { return source; }
     /**
-     * Sets radar station name.
+     * Sets source name.
      *
-     * @param radarName Radar station name
+     * @param source Source name
      */
-    public void setRadarName( String radarName ) { this.radarName = radarName; }
+    public void setSource( String source ) { this.source = source; }
     /**
      * Method gets file's path.
      *

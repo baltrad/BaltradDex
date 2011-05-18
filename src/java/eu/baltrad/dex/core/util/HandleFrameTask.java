@@ -38,7 +38,7 @@ import java.util.Date;
 /**
  * Implements data delivery task executed in a separate thread.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */

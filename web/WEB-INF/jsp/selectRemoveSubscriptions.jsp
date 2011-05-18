@@ -54,7 +54,7 @@ Author     : szewczenko
                 <div id="right">
                     <div id="page-title">
                         <div class="left">
-                            Remove subscribed radar station
+                            Remove subscribed data source
                         </div>
                         <div class="right">
                         </div>
@@ -62,7 +62,7 @@ Author     : szewczenko
                     <c:choose>
                         <c:when test="${av_subs_status == 1}">
                             <div id="text-box">
-                                Select subscribed radar stations to be removed.
+                                Select subscribed data source to be removed.
                             </div>
                             <div id="text-box">
                                 <c:if test="${not empty active_subscription}">
@@ -84,7 +84,7 @@ Author     : szewczenko
                                         <div id="subscriptions">
                                             <div class="table-hdr">
                                                 <div class="station">
-                                                    Radar station
+                                                    Data source
                                                 </div>
                                                 <div class="operator">
                                                     Operator
@@ -99,7 +99,7 @@ Author     : szewczenko
                                             <c:forEach var="sub" items="${subscriptions}">
                                                 <div class="table-row">
                                                     <div class="station">
-                                                        <c:out value="${sub.channelName}"/>
+                                                        <c:out value="${sub.dataSourceName}"/>
                                                     </div>
                                                     <div class="operator">
                                                         <c:out value="${sub.operatorName}"/>
@@ -117,8 +117,8 @@ Author     : szewczenko
                                                     </c:choose>
                                                     </div>
                                                     <div class="check">
-                                                        <input type="checkbox" name="selected_channels"
-                                                            value="${sub.channelName}"/>
+                                                        <input type="checkbox" name="selectedDataSources"
+                                                            value="${sub.dataSourceName}"/>
                                                     </div>
                                                 </div>
                                             </c:forEach>
@@ -144,7 +144,7 @@ Author     : szewczenko
                                          alt="no_radars"/>
                                 </div>
                                 <div class="text">
-                                    No subscribed radar stations have been found.
+                                    No subscribed data sources have been found.
                                 </div>
                             </div>
                             <div class="footer">

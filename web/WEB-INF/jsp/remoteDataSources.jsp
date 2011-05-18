@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Remote radar stations
+Document   : Page displays list of remote data sources
 Created on : Sep 29, 2010, 12:00 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
@@ -27,13 +27,13 @@ Author     : szewczenko
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 <%@ page import="java.util.List" %>
 <%
-    // Check if remote channels list is not null
-    List remoteChannels = ( List )request.getAttribute( "channels" );
-    if( remoteChannels == null ) {
+    // Check if remote data sources list is not null
+    List remoteDataSources = ( List )request.getAttribute( "remoteDataSources" );
+    if( remoteDataSources == null ) {
         // remote node is unavailable
         request.getSession().setAttribute( "remote_node_status", 0 );
-    } else if( remoteChannels.size() == 0 ) {
-        // remote node is available, but no permissions on radars have been set
+    } else if( remoteDataSources.size() == 0 ) {
+        // remote node is available, but no permissions on data sources have been set
         request.getSession().setAttribute( "remote_node_status", 1 );
     } else {
         // remote node is available
@@ -52,7 +52,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Remote radars</title>
+        <title>Baltrad | Remote data sources</title>
     </head>
     <body>
         <div id="container">
@@ -66,7 +66,7 @@ Author     : szewczenko
                 <div id="right">
                     <div id="page-title">
                         <div class="left">
-                            Remote radars <%= remoteNodeName %>
+                            Remote data sources <%= remoteNodeName %>
                         </div>
                         <div class="right">
                         </div>
@@ -74,35 +74,35 @@ Author     : szewczenko
                     <c:choose>
                         <c:when test="${remote_node_status == 2}">
                             <div id="text-box">
-                                List of remote radar stations. 
-                                Subscribe a desired remote radar station by selecting
+                                List of remote data sources.
+                                Subscribe a desired remote data source by selecting
                                 a corresponding check box.
                             </div>
-                            <form action="selectedRemoteRadars.htm">
+                            <form action="selectedRemoteDataSources.htm">
                                 <div id="table">
-                                    <div id="selectradars">
+                                    <div id="remoteDataSources">
                                         <div class="table-hdr">
-                                            <div class="station">
-                                                Radar station
+                                            <div class="name">
+                                                Data source
                                             </div>
-                                            <div class="wmo">
-                                                WMO number
+                                            <div class="description">
+                                                Description
                                             </div>
                                             <div class="check">
                                                 Select
                                             </div>
                                         </div>
-                                        <c:forEach var="channel" items="${channels}">
+                                        <c:forEach var="dataSource" items="${remoteDataSources}">
                                             <div class="table-row">
-                                                <div class="station">
-                                                    <c:out value="${channel.channelName}"/>
+                                                <div class="name">
+                                                    <c:out value="${dataSource.name}"/>
                                                 </div>
-                                                <div class="wmo">
-                                                    <c:out value="${channel.wmoNumber}"/>
+                                                <div class="description">
+                                                    <c:out value="${dataSource.description}"/>
                                                 </div>
                                                 <div class="check">
-                                                    <input type="checkbox" name="selected_channels"
-                                                        value="${channel.channelName}"/>
+                                                    <input type="checkbox" name="selectedDataSources"
+                                                        value="${dataSource.name}"/>
                                                 </div>
                                             </div>
                                         </c:forEach>
@@ -125,9 +125,10 @@ Author     : szewczenko
                                 </div>
                                 <div class="text">
                                     You have successfully connected to the remote node, but you 
-                                    don't seem to be allowed to subscribe radars at this node.
+                                    don't seem to be allowed to subscribe any data sources at
+                                    this node.
                                     <br><br>
-                                    Ask remote node administrator to make radars available for
+                                    Ask remote node administrator to make data sources available for
                                     you to subscribe.
                                 </div>
                             </div>

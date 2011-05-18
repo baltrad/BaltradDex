@@ -69,7 +69,7 @@ Author     : szewczenko
                                         <div id="peersubscriptions">
                                             <div class="table-hdr">
                                                 <div class="station">
-                                                    Radar station
+                                                    Data source
                                                 </div>
                                                 <div class="user">
                                                     User name
@@ -81,15 +81,15 @@ Author     : szewczenko
                                             <c:forEach var="sub" items="${subscriptions}">
                                                 <div class="table-row">
                                                     <div class="station">
-                                                        <c:out value="${sub.channelName}"/>
+                                                        <c:out value="${sub.dataSourceName}"/>
                                                     </div>
                                                     <div class="user">
                                                         <c:out value="${sub.userName}"/>
                                                     </div>
                                                     <div class="check">
                                                         <input type="checkbox"
-                                                            name="selected_channels"
-                                                            value="${sub.channelName}"/>
+                                                            name="selectedDataSources"
+                                                            value="${sub.dataSourceName}"/>
                                                     </div>
                                                 </div>
                                             </c:forEach>

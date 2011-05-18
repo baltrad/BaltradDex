@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * Multi-action controller for handling delivery register functionality.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */

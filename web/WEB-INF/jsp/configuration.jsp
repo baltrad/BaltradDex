@@ -85,10 +85,27 @@ Author     : szewczenko
                                     </div>
                                     <div class="text">
                                         <div class="row">
-                                            <a href="showRegister.htm">Show</a>
+                                            <a href="clearRegister.htm">Clear</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tile">
+                                    <div class="icon">
+                                        <img src="includes/images/icons/data-source.png"
+                                                     alt="data_sources"/>
+                                    </div>
+                                    <div class="header">
+                                        Data Sources
+                                    </div>
+                                    <div class="text">
+                                        <div class="row">
+                                            <a href="dsSelectEdit.htm">Edit</a>
                                         </div>
                                         <div class="row">
-                                            <a href="clearRegister.htm">Clear</a>
+                                            <a href="dsSaveName.htm">Add</a>
+                                        </div>
+                                        <div class="row">
+                                            <a href="dsSelectRemove.htm">Remove</a>
                                         </div>
                                     </div>
                                 </div>

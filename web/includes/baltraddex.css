@@ -288,6 +288,9 @@ button::-moz-focus-inner {
     padding-bottom: 12px;
     color: #2d76ae;
 }
+#text-box .helpIcon {
+    text-align:right;
+}
 /*
  * status box
  */
@@ -701,13 +704,6 @@ tr {
     float:left;
     width:280px;
 }
-
-
-
-
-
-
-
 /*
  * Node configuration page
  */
@@ -868,15 +864,27 @@ tr {
     padding:3px 0px 3px 0px;
     width: 50%;
 }
-#radartable a, #producttable a, #edituser a {
+#dataSourceTable > .table-hdr > .name, #dataSourceTable > .table-row > .name {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width: 30%;
+}
+#dataSourceTable > .table-hdr > .description, #dataSourceTable > .table-row > .description {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width: 70%;
+}
+#radartable a, #producttable a, #edituser a, #dataSourceTable a, #subscriptions a {
     color:#2d76ae;
     text-decoration:underline;
     cursor:pointer
 }
-#radartable a:hover, #producttable a:hover, #edituser a:hover {
+#radartable a:hover, #producttable a:hover, #edituser a:hover, #dataSourceTable a:hover,
+        #subscriptions a:hover {
     text-decoration:none;
     font-weight:bolder; 
 }
+
 #selectradars > .table-hdr > .station, #selectradars > .table-row > .station,
         #selectradars > .table-hdr > .wmo, #selectradars > .table-row > .wmo {
     float:left;
@@ -887,6 +895,22 @@ tr {
     float:left;
     padding:3px 0px 3px 0px;
     width: 20%;
+    text-align:center;
+}
+#remoteDataSources > .table-hdr > .name, #remoteDataSources > .table-row > .name {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:30%;
+}
+#remoteDataSources > .table-hdr > .description, #remoteDataSources > .table-row > .description {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:60%;
+}
+#remoteDataSources > .table-hdr > .check, #remoteDataSources > .table-row > .check {
+    float:left;
+    padding:3px 0px 3px 0px;
+    width:10%;
     text-align:center;
 }
 #selectusers > .table-hdr > .user, #selectusers > .table-row > .user,
@@ -902,17 +926,37 @@ tr {
     text-align:center;
 }
 #producttable > .table-hdr > .date, #producttable > .table-row > .date,
-        #producttable > .table-hdr > .time, #producttable > .table-row > .time,
-        #producttable > .table-hdr > .type, #producttable > .table-row > .type,
-        #producttable > .table-hdr > .details, #producttable > .table-row > .details,
-        #producttable > .table-hdr > .download, #producttable > .table-row > .download {
+        #producttable > .table-hdr > .time, #producttable > .table-row > .time {
     float:left;
     padding:3px 0px 3px 0px;
-    width:20%;
+    width:15%;
+    overflow:hidden;
 }
-#producttable > .table-row > .download > a > img {
-    border:none;
-    background:none;
+#producttable > .table-hdr > .source, #producttable > .table-row > .source {
+    width:15%;
+    padding:3px 0px 3px 0px;
+    float:left;
+    overflow:hidden;
+}
+#producttable > .table-hdr > .type, #producttable > .table-row > .type {
+    width:15%;
+    padding:3px 0px 3px 0px;
+    float:left;
+    overflow:hidden;
+}
+#producttable > .table-hdr > .details, #producttable > .table-row > .details {
+    width:20%;
+    padding:3px 0px 3px 0px;
+    float:left;
+    text-align:right;
+    overflow:hidden;
+}
+#producttable > .table-hdr > .download, #producttable > .table-row > .download {
+    width:15%;
+    padding:3px 0px 3px 0px;
+    float:right;
+    text-align:center;
+    overflow:hidden;
 }
 #showusers > .table-hdr > .name, #showusers > .table-hdr > .role,
         #showusers > .table-hdr > .factory, #showusers > .table-row > .name,
@@ -1300,7 +1344,7 @@ tr {
    width:80%;
    margin-left:10%;
 }
-/*--------------------------------------------------------------------------------- Tabbed section*/
+/*-------------------------------------------------------------------------------- Tabbed section */
 #tabs {
     float:left;
     clear:both;
@@ -1352,6 +1396,230 @@ tr {
 #tabs #tab.active:hover {
     background:#FFFFFF;
 }
+/*--------------------------------------------------------------- Data source configuration pages */
+#dsConfig, #dsConfig > .row {
+    width:100%;
+    float:left;
+}
+#dsConfig > .row {
+    margin-top:1em;
+}
+#dsConfig > .row > .left {
+    width:24%;
+    float:left;
+    text-align:right;
+    margin-right:1em;
+    color:#2d76ae;
+    font-weight:bolder;
+    font-size:1.1em;
+}
+#dsConfig > .row > .right {
+    width:70%;
+    float:left;
+}
+#dsConfig .dsNameInput {
+    float:left;
+    width:240px;
+}
+#dsConfig .dsDescriptionInput {
+    float:left;
+    width:240px;
+}
+.helpIconLeft {
+    float:left;
+    margin-left:0.5em;
+    margin-right:0.5em;
+}
+.helpIconRight {
+    float:right;
+    margin-left:0.5em;
+    margin-right:0.5em;
+}
+#dsConfig .selectedItem {
+    width:100%;
+    border:1px solid #2d76ae;
+    padding:2px;
+    color:#6D6969;
+    margin-bottom:4px;
+    -webkit-border-radius:4px;
+    -khtml-border-radius:4px;
+    -moz-border-radius:4px;
+    border-radius:4px;
+}
+#dsConfig .buttonInput {
+    float:left;
+    margin-top:2px;
+    margin-right:2px;
+    margin-left:2px;
+    margin-bottom:2px;
+    background:#94C761;
+    cursor:pointer;
+    width:22px;
+}
+#dsConfig .buttonInput:hover {
+    background:#6FB729;
+}
+#dsConfig select {
+    float:left;
+    width:220px;
+}
+#dsConfig > .row > .left > a {
+    color:#2d76ae;
+    text-decoration:underline;
+    cursor:pointer
+}
+#dsConfig > .row > .left > a:hover {
+    text-decoration:none;
+}
+/*---------------------------------------------------------------------- Data source removal page */
+#dsSelect, #dsSelect > .row {
+    width:100%;
+    float:left;
+}
+#dsSelect > .row {
+    margin-top:1em;
+}
+#dsSelect > .table-hdr > .name, #dsSelect > .table-row > .name {
+    width:30%;
+    float:left;
+    overflow:hidden;
+    padding:3px 0px 3px 0px;
+}
+#dsSelect > .table-hdr > .description, #dsSelect > .table-row > .description {
+    width:60%;
+    float:left;
+    overflow:hidden;
+    padding:3px 0px 3px 0px;
+}
+#dsSelect > .table-hdr > .select, #dsSelect > .table-row > .select {
+    width:10%;
+    float:left;
+    overflow:hidden;
+    text-align:center;
+    padding:3px 0px 3px 0px;
+}
 
 
 
+/*#datasourceconfig, #datasourceconfig .row, #datasourcesave, #datasourcesave .row {
+    width:100%;
+    float:left;
+}
+#datasourcesave .row {
+    margin-bottom:4px;
+}
+#datasourceconfig .left, #datasourcesave .left {
+    float:left;
+    width:24%;
+    color:#2d76ae;
+    font-weight:bold;
+    text-align:right;
+    padding:4px;
+}
+#datasourceconfig .right, #datasourcesave .right {
+    float:left;
+    width:70%;
+    padding:4px;
+}
+#datasourcesave .right {
+    color:#6D6969;
+}
+#datasourceconfig .textinput, #datasourceconfig .textarea {
+    float:left;
+    width: 220px
+}
+#datasourceconfig select {
+    float:left;
+    width:220px;
+}
+#datasourceconfig .buttoninput {
+    float:left;
+    margin-top:2px;
+    margin-right:2px;
+    margin-left:2px;
+    margin-bottom:2px;
+    background:#94C761;
+    cursor:pointer;
+    width:22px;
+}
+#datasourceconfig .buttoninput:hover {
+    background:#6FB729;
+}
+#datasourceconfig .radar, #datasourceconfig .fileobject, #datasourceconfig .dataquantity,
+        #datasourceconfig .product, #datasourceconfig .user, #datasourcesave .radar,
+        #datasourcesave .fileobject, #datasourcesave .dataquantity, #datasourcesave .product,
+        #datasourcesave .user {
+    width:100%;
+    border:1px solid #2d76ae;
+    padding:2px;
+    color:#6D6969;
+    margin-bottom:4px;
+    -webkit-border-radius:4px; /* Safari, Chrome 
+    -khtml-border-radius:4px;    /* Konqueror 
+    -moz-border-radius:4px; /* Firefox 
+    border-radius:4px;
+}
+#datasourceconfig .footer .right {
+    float:right;
+}
+#datasourceconfig .parameter {
+    float:left;
+    color:#2d76ae;
+    font-weight:bold;
+}
+#datasourceconfig .parameterdescription, #datasourceconfig .parametervalue {
+    float:left;
+    clear:right;
+}
+#datasourceconfig .product {
+    float:left;
+    clear:both;
+    padding:4px;
+}
+#datasourceconfig .productdetails {
+    width:100%;
+    float:left;
+    clear:both;
+}
+#datasourceconfig .setparameter {
+    width:100%;
+    float:left;
+    clear:both;
+    border:1px solid #2d76ae;
+    margin-top:2px;
+    margin-bottom:2px;
+    -webkit-border-radius:4px;
+    -khtml-border-radius:4px;
+    -moz-border-radius:4px;
+    border-radius:4px;
+}
+#datasourceconfig .parameter, #datasourceconfig .parameterdescription {
+    float:left;
+    clear:right;
+    padding:1px;
+}
+#datasourceconfig .parameter, #datasourcesave .parameter {
+    color:#2d76ae;
+    font-weight:bold;
+    clear:left;
+}
+#datasourcesave .parameter {
+    float:left;
+}
+#datasourceconfig .parametervalue, #datasourcesave .parametervalue {
+    float:left;
+    clear:right;
+}
+#datasourceconfig .parametervalue input {
+    width:96px;
+    border:none;
+    background:#E5E5E5;
+    margin-bottom:2px;
+}
+#datasourceconfig .addparameter {
+    float:right;
+    clear:right;
+}
+.hidden {
+    display:none;
+}*/

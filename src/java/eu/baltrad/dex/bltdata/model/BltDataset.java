@@ -24,7 +24,7 @@ package eu.baltrad.dex.bltdata.model;
 /**
  * Class implements functionality allowing to store dataset specific metadata.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.5.1
  * @since 0.5.1
  */

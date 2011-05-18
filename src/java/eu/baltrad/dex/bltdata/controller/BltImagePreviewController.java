@@ -40,7 +40,7 @@ import java.util.HashMap;
 /**
  * Implements data visualization and preview functionality.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.5.4
  * @since 0.5.4
  */

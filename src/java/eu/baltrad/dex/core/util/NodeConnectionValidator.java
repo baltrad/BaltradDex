@@ -30,7 +30,7 @@ import org.springframework.validation.ValidationUtils;
 /**
  * Validator class used to validate user input on connect to node page.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */

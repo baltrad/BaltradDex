@@ -21,24 +21,41 @@ Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
 ***************************************************************************************************/
 
--- drop tables if exist ----------------------------------------------------------------
-
+-- drop tables -------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS dex_subscriptions CASCADE;
 DROP TABLE IF EXISTS dex_delivery_register CASCADE;
 DROP TABLE IF EXISTS dex_channel_permissions CASCADE;
 DROP TABLE IF EXISTS dex_users CASCADE;
 DROP TABLE IF EXISTS dex_roles CASCADE;
 DROP TABLE IF EXISTS dex_messages CASCADE;
-DROP TABLE IF EXISTS dex_channels CASCADE;
+DROP TABLE IF EXISTS dex_radars CASCADE;
 DROP TABLE IF EXISTS dex_node_connections CASCADE;
 DROP TABLE IF EXISTS dex_node_configuration CASCADE;
-
+DROP TABLE IF EXISTS dex_file_objects;
+DROP TABLE IF EXISTS dex_data_quantities;
+DROP TABLE IF EXISTS dex_products;
+DROP TABLE IF EXISTS dex_product_parameters;
+DROP TABLE IF EXISTS dex_data_sources;
+DROP TABLE IF EXISTS dex_data_source_quantities;
+DROP TABLE IF EXISTS dex_data_source_file_objects;
+DROP TABLE IF EXISTS dex_data_source_products;
+DROP TABLE IF EXISTS dex_data_source_product_parameters;
+DROP TABLE IF EXISTS dex_data_source_product_parameter_values;
+DROP TABLE IF EXISTS dex_data_source_radars;
+DROP TABLE IF EXISTS dex_data_source_users;
+DROP TABLE IF EXISTS dex_data_source_filters;
+-- drop sequences ----------------------------------------------------------------------------------
 DROP SEQUENCE IF EXISTS log_entry_id_seq;
-DROP SEQUENCE IF EXISTS channel_id_seq;
+DROP SEQUENCE IF EXISTS radar_id_seq;
 DROP SEQUENCE IF EXISTS user_id_seq;	
 DROP SEQUENCE IF EXISTS subscription_id_seq;
 DROP SEQUENCE IF EXISTS delivery_register_id_seq;
 DROP SEQUENCE IF EXISTS node_connection_id_seq;
 DROP SEQUENCE IF EXISTS configuration_id_seq;
 DROP SEQUENCE IF EXISTS channel_permission_id_seq;
+DROP SEQUENCE IF EXISTS file_object_id_seq;
+DROP SEQUENCE IF EXISTS data_quantity_id_seq;
+DROP SEQUENCE IF EXISTS product_id_seq;
+DROP SEQUENCE IF EXISTS product_parameter_id_seq;
+DROP SEQUENCE IF EXISTS data_source_id_seq;
 ----------------------------------------------------------------------------------------------------

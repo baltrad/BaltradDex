@@ -30,7 +30,7 @@ import eu.baltrad.dex.channel.model.Channel;
 /**
  * Validator class used to validate add channel form input.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */

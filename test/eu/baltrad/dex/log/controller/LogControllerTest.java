@@ -55,7 +55,7 @@ public class LogControllerTest extends TestCase {
         assertNotNull( conn );
     }
 
-    public void testInsertEntries() {
+    /*public void testInsertEntries() {
         ThreadedLogger tl1 = new ThreadedLogger( manager, 1, 1000 );
         ThreadedLogger tl2 = new ThreadedLogger( manager, 2, 1000 );
         ThreadedLogger tl3 = new ThreadedLogger( manager, 3, 1000 );
@@ -68,7 +68,7 @@ public class LogControllerTest extends TestCase {
         try {
             Thread.sleep( 60000 );
         } catch( InterruptedException e ) {}
-    }
+    }*/
 
     class ThreadedLogger extends Thread {
 

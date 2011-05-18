@@ -28,9 +28,9 @@ Author     : szewczenko
 <%@ page import="java.util.List" %>
 <%
     // Check selection list is not empty
-    List selChannels = ( List )request.getAttribute( "selected_channels" );
+    List selDataSources = ( List )request.getAttribute( "selectedDataSources" );
     // Subscription status is not changed
-    if( selChannels == null || selChannels.size() <= 0 ) {
+    if( selDataSources == null || selDataSources.size() <= 0 ) {
         request.getSession().setAttribute( "selection_status", 0 );
     } else {
         request.getSession().setAttribute( "selection_status", 1 );
@@ -48,7 +48,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Remote radars</title>
+        <title>Baltrad | Remote data sources</title>
     </head>
     <body>
         <div id="container">
@@ -62,7 +62,7 @@ Author     : szewczenko
                 <div id="right">
                     <div id="page-title">
                         <div class="left">
-                            Remote radars <%= remoteNodeName %>
+                            Remote data sources <%= remoteNodeName %>
                         </div>
                         <div class="right">
                         </div>
@@ -71,33 +71,33 @@ Author     : szewczenko
                     <c:choose>
                         <c:when test="${selection_status == 1}">
                             <div id="text-box">
-                                Remote radar stations selected for subscription.
+                                Remote data sources selected for subscription.
                                 Please confirm your selection.
                             </div>
                             <div id="table">
-                                <form action="subscribedRemoteRadars.htm">
+                                <form action="subscribedRemoteDataSources.htm">
                                     <div id="table">
-                                        <div id="radartable">
+                                        <div id="dataSourceTable">
                                             <div class="table-hdr">
-                                                <div class="station">
-                                                    Radar station
+                                                <div class="name">
+                                                    Data source
                                                 </div>
-                                                <div class="wmo">
-                                                    WMO number
+                                                <div class="description">
+                                                    Description
                                                 </div>
                                             </div>
-                                            <c:forEach var="channel" items="${selected_channels}">
+                                            <c:forEach var="dataSource" items="${selectedDataSources}">
                                                 <div class="table-row">
-                                                    <div class="station">
-                                                        <c:out value="${channel.channelName}"/>
+                                                    <div class="name">
+                                                        <c:out value="${dataSource.name}"/>
                                                     </div>
-                                                    <div class="wmo">
-                                                        <c:out value="${channel.wmoNumber}"/>
+                                                    <div class="description">
+                                                        <c:out value="${dataSource.description}"/>
                                                     </div>
-                                                    <div class="tdhidden">
+                                                    <%--div class="tdhidden">
                                                         <input type="checkbox" name="removed_channels"
                                                             value="${channel.id}" checked/>
-                                                    </div>
+                                                    </div--%>
                                                 </div>
                                             </c:forEach>
                                             <div class="footer">
@@ -123,7 +123,7 @@ Author     : szewczenko
                                          alt="no_data"/>
                                 </div>
                                 <div class="text">
-                                    No channels have been selected.
+                                    No data sources have been selected.
                                     Click on the button to go back to node connection page.
                                 </div>
                             </div>

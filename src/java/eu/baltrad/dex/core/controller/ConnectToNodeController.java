@@ -42,7 +42,7 @@ import java.util.HashMap;
 /**
  * Controller creates node connection object and sends it to the remote node.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */
@@ -78,7 +78,7 @@ public class ConnectToNodeController extends SimpleFormController {
         return model;
     }
     /**
-     * Prepares remote channel list request. The request is send to the remote node
+     * Prepares remote data source list request. The request is send to the remote node
      * as BaltradFrame.
      *
      * @param request HttpServletRequest
@@ -104,7 +104,7 @@ public class ConnectToNodeController extends SimpleFormController {
         // prepare BaltradFrame
         BaltradFrameHandler bfHandler = new BaltradFrameHandler( nodeConn.getFullAddress() );
 
-        // prepare channel request frame holding user name, password and node address
+        // prepare data source request frame holding user name, password and node address
         // this frame will be validated and authenticated upon reception
 
         String hdrStr = bfHandler.createMsgHdr( BaltradFrameHandler.MIME_MULTIPART,
@@ -117,11 +117,11 @@ public class ConnectToNodeController extends SimpleFormController {
         frameDispatcherController.setLocalUserName( nodeConn.getUserName() );
         BaltradFrame baltradFrame = new BaltradFrame( hdrStr );
         frameDispatcherController.setBfHandler( bfHandler );
-        // post remote channel request
+        // post remote data source request
         frameDispatcherController.doPost( request, response, baltradFrame );
 
         // add connection to the database
-        if( frameDispatcherController.getChannelListing() != null &&
+        if( frameDispatcherController.getDataSourceListing() != null &&
                 frameDispatcherController.getRemoteNodeName() != null ) {
             // check if connection exists
             if( nodeConnectionManager.getConnection(

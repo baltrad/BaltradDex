@@ -88,7 +88,7 @@ Author     : szewczenko
                                     </c:forEach>
                                     <div class="footer">
                                         <div class="right">
-                                            <form action="home.htm">
+                                            <form action="dataDownload.htm">
                                                 <button class="rounded" type="submit">
                                                     <span>Home</span>
                                                 </button>
@@ -111,7 +111,7 @@ Author     : szewczenko
                             </div>
                             <div class="footer">
                                 <div class="right">
-                                    <form action="home.htm">
+                                    <form action="dataDownload.htm">
                                         <button class="rounded" type="submit">
                                             <span>OK</span>
                                         </button>

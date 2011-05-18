@@ -22,25 +22,42 @@ Author     : szewczenko
 ***************************************************************************************************/
 
 -- drop tables if exist ----------------------------------------------------------------------------
-
 DROP TABLE IF EXISTS dex_subscriptions;
 DROP TABLE IF EXISTS dex_delivery_register;
 DROP TABLE IF EXISTS dex_channel_permissions CASCADE;
 DROP TABLE IF EXISTS dex_users CASCADE;
 DROP TABLE IF EXISTS dex_roles;
 DROP TABLE IF EXISTS dex_messages;
-DROP TABLE IF EXISTS dex_channels;
+DROP TABLE IF EXISTS dex_radars CASCADE;
 DROP TABLE IF EXISTS dex_node_connections;
 DROP TABLE IF EXISTS dex_node_configuration;
-
+DROP TABLE IF EXISTS dex_file_objects CASCADE;
+DROP TABLE IF EXISTS dex_data_quantities CASCADE;
+DROP TABLE IF EXISTS dex_products CASCADE;
+DROP TABLE IF EXISTS dex_product_parameters CASCADE;
+DROP TABLE IF EXISTS dex_data_sources CASCADE;
+DROP TABLE IF EXISTS dex_data_source_quantities;
+DROP TABLE IF EXISTS dex_data_source_file_objects;
+DROP TABLE IF EXISTS dex_data_source_products;
+DROP TABLE IF EXISTS dex_data_source_product_parameters;
+DROP TABLE IF EXISTS dex_data_source_product_parameter_values;
+DROP TABLE IF EXISTS dex_data_source_radars;
+DROP TABLE IF EXISTS dex_data_source_users;
+DROP TABLE IF EXISTS dex_data_source_filters;
+-- drop sequences if exist -------------------------------------------------------------------------
 DROP SEQUENCE IF EXISTS log_entry_id_seq;
-DROP SEQUENCE IF EXISTS channel_id_seq;
+DROP SEQUENCE IF EXISTS radar_id_seq;
 DROP SEQUENCE IF EXISTS user_id_seq;	
 DROP SEQUENCE IF EXISTS subscription_id_seq;
 DROP SEQUENCE IF EXISTS delivery_register_id_seq;
 DROP SEQUENCE IF EXISTS node_connection_id_seq;
 DROP SEQUENCE IF EXISTS configuration_id_seq;
 DROP SEQUENCE IF EXISTS channel_permission_id_seq;
+DROP SEQUENCE IF EXISTS file_object_id_seq;
+DROP SEQUENCE IF EXISTS data_quantity_id_seq CASCADE;
+DROP SEQUENCE IF EXISTS product_id_seq;
+DROP SEQUENCE IF EXISTS product_parameter_id_seq;
+DROP SEQUENCE IF EXISTS data_source_id_seq;
 
 -- create tables -----------------------------------------------------------------------------------
 
@@ -87,11 +104,11 @@ CREATE TABLE dex_messages
 );
 
 -- channel_id_seq ----------------------------------------------------------------------------------
-CREATE SEQUENCE channel_id_seq;
+CREATE SEQUENCE radar_id_seq;
 -- dex_channels ------------------------------------------------------------------------------------
-CREATE TABLE dex_channels
+CREATE TABLE dex_radars
 (
-    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('channel_id_seq'),
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('radar_id_seq'),
     name VARCHAR(32) UNIQUE NOT NULL,
     wmo_number VARCHAR(16) UNIQUE,
     PRIMARY KEY (id)
@@ -103,7 +120,7 @@ CREATE SEQUENCE channel_permission_id_seq;
 CREATE TABLE dex_channel_permissions
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('channel_permission_id_seq'),
-    channel_id INT NOT NULL REFERENCES dex_channels (id),
+    channel_id INT NOT NULL REFERENCES dex_radars (id),
     user_id INT NOT NULL REFERENCES dex_users (id),
     PRIMARY KEY (id)
 );
@@ -116,7 +133,7 @@ CREATE TABLE dex_subscriptions
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('subscription_id_seq'),
     timestamp TIMESTAMP NOT NULL,
     user_name VARCHAR(32),
-    channel_name VARCHAR(32),
+    data_source_name VARCHAR(64),
     node_address VARCHAR(64),
     operator_name VARCHAR(64),
     type VARCHAR(16),
@@ -169,13 +186,121 @@ CREATE TABLE dex_node_configuration
     email VARCHAR(32) NOT NULL,
     PRIMARY KEY (id)
 );
+-- file object id sequence -------------------------------------------------------------------------
+CREATE SEQUENCE file_object_id_seq;
+-- dex_file_objects --------------------------------------------------------------------------------
+CREATE TABLE dex_file_objects
+(
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('file_object_id_seq'),
+    file_object VARCHAR(64) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
+    PRIMARY KEY (id)
+);
+
+-- data quantity id sequence -----------------------------------------------------------------------
+CREATE SEQUENCE data_quantity_id_seq;
+-- dex_data_quantity -------------------------------------------------------------------------------
+CREATE TABLE dex_data_quantities
+(
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('data_quantity_id_seq'),
+    data_quantity VARCHAR(64) NOT NULL UNIQUE,
+    unit VARCHAR(32) NOT NULL,
+    description TEXT NOT NULL,
+    PRIMARY KEY (id)
+);
+-- data product id sequence ------------------------------------------------------------------------
+CREATE SEQUENCE product_id_seq;
+-- dex_products ------------------------------------------------------------------------------------
+CREATE TABLE dex_products
+(
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('product_id_seq'),
+    product VARCHAR(32) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
+    PRIMARY KEY (id)
+);
+-- data product parameter id sequence --------------------------------------------------------------
+CREATE SEQUENCE product_parameter_id_seq;
+-- dex_products ------------------------------------------------------------------------------------
+CREATE TABLE dex_product_parameters
+(
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('product_parameter_id_seq'),
+    parameter VARCHAR(32) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
+    PRIMARY KEY (id)
+);
+-- data source id sequence -------------------------------------------------------------------------
+CREATE SEQUENCE data_source_id_seq;
+-- dex_data_sources --------------------------------------------------------------------------------
+CREATE TABLE dex_data_sources
+(
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('data_source_id_seq'),
+    name VARCHAR(128) UNIQUE NOT NULL,
+    description TEXT,
+    PRIMARY KEY (id)
+);
+-- dex_data_source_quantities ----------------------------------------------------------------------
+CREATE TABLE dex_data_source_quantities
+(
+    id SERIAL NOT NULL,
+    data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+    data_quantity_id INT NOT NULL REFERENCES dex_data_quantities(id) ON DELETE CASCADE,
+    PRIMARY KEY(id)
+);
+-- dex_data_source_file_objects --------------------------------------------------------------------
+CREATE TABLE dex_data_source_file_objects
+(
+    id SERIAL NOT NULL,
+    data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+    file_object_id INT NOT NULL REFERENCES dex_file_objects(id) ON DELETE CASCADE,
+    PRIMARY KEY(id)
+);
+-- dex_data_source_products ------------------------------------------------------------------------
+CREATE TABLE dex_data_source_products
+(
+    id SERIAL NOT NULL,
+    data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+    product_id INT NOT NULL REFERENCES dex_products(id) ON DELETE CASCADE,
+    PRIMARY KEY(id)
+);
+-- dex_data_source_product_parameters --------------------------------------------------------------
+CREATE TABLE dex_data_source_product_parameters
+(
+    id SERIAL NOT NULL,
+    data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+    product_parameter_id INT NOT NULL REFERENCES dex_product_parameters(id) ON DELETE CASCADE,
+    PRIMARY KEY(id)
+);
+-- dex_data_source_product_parameter_values --------------------------------------------------------
+CREATE TABLE dex_data_source_product_parameter_values
+(
+    id SERIAL NOT NULL,
+    data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+    parameter_id INT NOT NULL REFERENCES dex_product_parameters(id) ON DELETE CASCADE,
+    parameter_value VARCHAR(64) NOT NULL,
+    PRIMARY KEY(id)
+);
+-- dex_data_source_radars --------------------------------------------------------------------------
+CREATE TABLE dex_data_source_radars
+(
+    id SERIAL NOT NULL,
+    data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+    radar_id INT NOT NULL REFERENCES dex_radars(id) ON DELETE CASCADE,
+    PRIMARY KEY(id)
+);
+-- dex_data_source_users ---------------------------------------------------------------------------
+CREATE TABLE dex_data_source_users
+(
+    id SERIAL NOT NULL,
+    data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+    user_id INT NOT NULL REFERENCES dex_users(id) ON DELETE CASCADE,
+    PRIMARY KEY(id)
+);
+-- dex_data_source_filters -------------------------------------------------------------------------
+CREATE TABLE dex_data_source_filters
+(
+    id SERIAL NOT NULL,
+    data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+    filter_id INT NOT NULL,
+    PRIMARY KEY(id)
+);
 ----------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-
-
-

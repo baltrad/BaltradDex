@@ -34,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Logout controller class implementing basic user authentication functionality.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */

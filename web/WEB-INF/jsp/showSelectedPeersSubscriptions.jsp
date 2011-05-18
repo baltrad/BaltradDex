@@ -50,7 +50,7 @@ Author     : szewczenko
                         </div>
                     </div>
                     <div id="text-box">
-                        Warning: The following peer's subscription(s) will be removed
+                        Warning: The following peer's subscriptions will be removed
                         from the system.
                     </div>
                     <form method="post" action="showRemovedPeersSubscriptions.htm">
@@ -58,16 +58,16 @@ Author     : szewczenko
                             <div id="selectedpeersubscriptions">
                                 <div class="table-hdr">
                                     <div class="station">
-                                        Radar station
+                                        Data source
                                     </div>
                                     <div class="user">
                                         User name
                                     </div>
                                 </div>
-                                <c:forEach var="sub" items="${selected_subscriptions}">
+                                <c:forEach var="sub" items="${selectedSubscriptions}">
                                     <div class="table-row">
                                         <div class="station">
-                                            <c:out value="${sub.channelName}"/>
+                                            <c:out value="${sub.dataSourceName}"/>
                                         </div>
                                         <div class="user">
                                             <c:out value="${sub.userName}"/>

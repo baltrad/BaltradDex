@@ -24,7 +24,7 @@ package eu.baltrad.dex.channel.model;
 /**
  * Class implements data channel permission object.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.6
  * @since 1.6
  */

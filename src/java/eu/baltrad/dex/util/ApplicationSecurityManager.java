@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Class implementing session handling functionality and user authentication control.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski :: maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */

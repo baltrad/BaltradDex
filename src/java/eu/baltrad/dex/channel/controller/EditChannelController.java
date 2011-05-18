@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * Controller class registering new channel in the system.
  *
- * @author <a href="mailto:maciej.szewczykowski@imgw.pl>Maciej Szewczykowski</a>
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */

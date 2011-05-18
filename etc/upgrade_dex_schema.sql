@@ -139,13 +139,223 @@ BEGIN
     END;
     BEGIN
         ALTER TABLE dex_subscriptions ADD COLUMN timestamp TIMESTAMP DEFAULT now();
-  	EXCEPTION
+    EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'failed to insert column "timestamp" into table "dex_subscriptions"';
     END;
     BEGIN
 	ALTER TABLE dex_subscriptions ALTER COLUMN timestamp SET NOT NULL;
-	EXCEPTION
+    EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'failed to modify column "timestamp" of table "dex_subscriptions"';
+    END;
+    BEGIN
+        CREATE SEQUENCE file_object_id_seq;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create sequence "file_object_id_seq"';
+    END;
+    BEGIN
+        CREATE TABLE dex_file_objects
+        (
+            id INT NOT NULL UNIQUE DEFAULT NEXTVAL('file_object_id_seq'),
+            file_object VARCHAR(64) NOT NULL UNIQUE,
+            description TEXT NOT NULL,
+            PRIMARY KEY (id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_file_objects"';
+    END;
+    BEGIN
+        CREATE SEQUENCE data_quantity_id_seq;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create sequence "data_quantity_id_seq"';
+    END;
+    BEGIN
+        CREATE TABLE dex_data_quantities
+        (
+            id INT NOT NULL UNIQUE DEFAULT NEXTVAL('data_quantity_id_seq'),
+            data_quantity VARCHAR(64) NOT NULL UNIQUE,
+            unit VARCHAR(32) NOT NULL,
+            description TEXT NOT NULL,
+            PRIMARY KEY (id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_quantities"';
+    END;
+    BEGIN
+        CREATE SEQUENCE product_id_seq;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create sequence "product_id_seq"';
+    END;
+    BEGIN
+        CREATE TABLE dex_products
+        (
+            id INT NOT NULL UNIQUE DEFAULT NEXTVAL('product_id_seq'),
+            product VARCHAR(32) NOT NULL UNIQUE,
+            description TEXT NOT NULL,
+            PRIMARY KEY (id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_products"';
+    END;
+    BEGIN 
+        CREATE SEQUENCE product_parameter_id_seq;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create sequence "product_parameter_id_seq"';
+    END;
+    BEGIN
+        CREATE TABLE dex_product_parameters
+        (
+            id INT NOT NULL UNIQUE DEFAULT NEXTVAL('product_parameter_id_seq'),
+            parameter VARCHAR(32) NOT NULL UNIQUE,
+            description TEXT NOT NULL,
+            PRIMARY KEY (id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_product_parameters"';
+    END;
+    BEGIN
+        ALTER SEQUENCE channel_id_seq RENAME TO radar_id_seq;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to rename sequence "channel_id_seq"';
+    END;
+    BEGIN
+        ALTER TABLE dex_channels RENAME TO dex_radars;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to rename table "dex_channels"';
+    END;
+    BEGIN
+        ALTER TABLE dex_radars ALTER COLUMN id SET DEFAULT nextval('radar_id_seq');
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to alter table "dex_radars"';
+    END;
+    BEGIN
+        ALTER TABLE dex_channel_permissions DROP COLUMN channel_id;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to drop column from table "dex_channel_permissions"';
+    END;
+    BEGIN
+        ALTER TABLE dex_channel_permissions ADD COLUMN channel_id INT REFERENCES dex_radars(id);
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to add column to table "dex_channel_permissions"';
+    END;
+    BEGIN
+        ALTER TABLE dex_channel_permissions ALTER COLUMN channel_id SET NOT NULL;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to alter column in table "dex_channel_permissions"';
+    END;
+    BEGIN
+        CREATE SEQUENCE data_source_id_seq;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create sequence "data_source_id_seq"';
+    END;
+    BEGIN
+        CREATE TABLE dex_data_sources
+        (
+            id INT NOT NULL UNIQUE DEFAULT NEXTVAL('data_source_id_seq'),
+            name VARCHAR(128) UNIQUE NOT NULL,
+            description TEXT,
+            PRIMARY KEY (id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_sources"';
+    END;
+    BEGIN
+        CREATE TABLE dex_data_source_quantities
+        (
+            id SERIAL NOT NULL,
+            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+            data_quantity_id INT NOT NULL REFERENCES dex_data_quantities(id) ON DELETE CASCADE,
+            PRIMARY KEY(id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_quantities"';
+    END;
+    BEGIN
+        CREATE TABLE dex_data_source_file_objects
+        (
+            id SERIAL NOT NULL,
+            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+            file_object_id INT NOT NULL REFERENCES dex_file_objects(id) ON DELETE CASCADE,
+            PRIMARY KEY(id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_file_objects"';
+    END;
+    BEGIN
+        CREATE TABLE dex_data_source_products
+        (
+            id SERIAL NOT NULL,
+            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+            product_id INT NOT NULL REFERENCES dex_products(id) ON DELETE CASCADE,
+            PRIMARY KEY(id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_products"';
+    END;
+    BEGIN
+        CREATE TABLE dex_data_source_product_parameters
+        (
+            id SERIAL NOT NULL,
+            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+            product_parameter_id INT NOT NULL REFERENCES dex_product_parameters(id) ON DELETE CASCADE,
+            PRIMARY KEY(id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_product_parameters"';
+    END;
+    BEGIN
+        CREATE TABLE dex_data_source_radars
+        (
+            id SERIAL NOT NULL,
+            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+            radar_id INT NOT NULL REFERENCES dex_radars(id) ON DELETE CASCADE,
+            PRIMARY KEY(id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_radars"';
+    END;
+    BEGIN
+        CREATE TABLE dex_data_source_users
+        (
+            id SERIAL NOT NULL,
+            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+            user_id INT NOT NULL REFERENCES dex_users(id) ON DELETE CASCADE,
+            PRIMARY KEY(id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_users"';
+    END;
+    BEGIN
+        CREATE TABLE dex_data_source_product_parameter_values
+        (
+            id SERIAL NOT NULL,
+            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+            parameter_id INT NOT NULL REFERENCES dex_product_parameters(id) ON DELETE CASCADE,
+            parameter_value VARCHAR(64) NOT NULL,
+            PRIMARY KEY(id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_product_parameter_values"';
+    END;
+    BEGIN
+        ALTER TABLE dex_subscriptions DROP COLUMN channel_name;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to drop column from table "dex_subscriptions"';
+    END;
+    BEGIN
+        ALTER TABLE dex_subscriptions ADD COLUMN data_source_name VARCHAR(64);
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to add column to "dex_subscriptions" table';
+    END;
+    BEGIN
+        CREATE TABLE dex_data_source_filters
+        (
+            id SERIAL NOT NULL,
+            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+            filter_id INT NOT NULL,
+            PRIMARY KEY(id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_filters"';
     END;
 END;
 $$ LANGUAGE plpgsql;
