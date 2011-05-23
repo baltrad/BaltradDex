@@ -203,7 +203,7 @@ public class SaveDataSourceControllerTest extends TestCase {
         }
     }
 
-    public void testSaveUser() {
+    /*public void testSaveUser() {
         try {
             int save = 0;
             if( dsManager.getDataSource( DS_NAME ) == null ) {
@@ -226,9 +226,9 @@ public class SaveDataSourceControllerTest extends TestCase {
         } catch( Exception e ) {
             System.out.println( "testSaveUser(): Exception: " + e.getMessage() );
         }
-    }
+    }*/
 
-    public void testGetUserIds() {
+    /*public void testGetUserIds() {
         try {
             List<Integer> idList = dsManager.getUserIds(
                     dsManager.getDataSource( DS_NAME ).getId() );
@@ -238,9 +238,9 @@ public class SaveDataSourceControllerTest extends TestCase {
         } catch( Exception e ) {
             System.out.println( "testGetUserIds(): Exception: " + e.getMessage() );
         }
-    }
+    }*/
 
-    public void testGetDSIds() {
+    /*public void testGetDSIds() {
         try {
             List<Integer> idList = dsManager.getDataSourceIds(
                     userManager.getUserByName( "TestUser" ).getId() );
@@ -250,9 +250,9 @@ public class SaveDataSourceControllerTest extends TestCase {
         } catch( Exception e ) {
             System.out.println( "testGetDSIds(): Exception: " + e.getMessage() );
         }
-    }
+    }*/
 
-    public void testDeleteUsers() {
+    /*public void testDeleteUsers() {
         try {
             int delete = 0;
             delete = dsManager.deleteUsers( dsManager.getDataSource( DS_NAME ).getId() );
@@ -264,7 +264,7 @@ public class SaveDataSourceControllerTest extends TestCase {
         } catch( Exception e ) {
             System.out.println( "testDeleteUsers(): Exception: " + e.getMessage() );
         }
-    }
+    }*/
 
     public void testSaveFilter() {
         try {
