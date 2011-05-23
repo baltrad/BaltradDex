@@ -62,7 +62,6 @@ public class LoginController extends SimpleFormController {
     @Override
     protected Object formBackingObject( HttpServletRequest request ) throws Exception {
         return new User();
-        //return userManager.getUserById( 1 );
     }
     /**
      * Method executed upon form submission.
