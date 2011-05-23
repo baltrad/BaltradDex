@@ -52,7 +52,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.sql.SQLException;
-import org.apache.log4j.Level;
 
 /**
  * Allows to configure new data source or to modify an existing one.

@@ -231,19 +231,15 @@ BEGIN
         WHEN OTHERS THEN RAISE NOTICE 'Failed to alter table "dex_radars"';
     END;
     BEGIN
-        ALTER TABLE dex_channel_permissions DROP COLUMN channel_id;
+	ALTER TABLE dex_channel_permissions ADD CONSTRAINT dex_channel_permissions_channel_id_fkey
+		FOREIGN KEY (channel_id) REFERENCES dex_radars (id) MATCH SIMPLE;
     EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'Failed to drop column from table "dex_channel_permissions"';
-    END;
-    BEGIN
-        ALTER TABLE dex_channel_permissions ADD COLUMN channel_id INT REFERENCES dex_radars(id);
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'Failed to add column to table "dex_channel_permissions"';
+	WHEN OTHERS THEN RAISE NOTICE 'Failed to alter column "dex_channel_permissions.channel_id"';
     END;
     BEGIN
         ALTER TABLE dex_channel_permissions ALTER COLUMN channel_id SET NOT NULL;
     EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'Failed to alter column in table "dex_channel_permissions"';
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to alter column "dex_channel_permissions.channel_id"';
     END;
     BEGIN
         CREATE SEQUENCE data_source_id_seq;
@@ -340,14 +336,14 @@ BEGIN
         WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_product_parameter_values"';
     END;
     BEGIN
-        ALTER TABLE dex_subscriptions DROP COLUMN channel_name;
+        ALTER TABLE dex_subscriptions RENAME COLUMN channel_name TO data_source_name;
     EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'Failed to drop column from table "dex_subscriptions"';
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to rename column "dex_subscriptions.channel_name"';
     END;
-    BEGIN
-        ALTER TABLE dex_subscriptions ADD COLUMN data_source_name VARCHAR(64);
+	BEGIN
+		ALTER TABLE dex_subscriptions ALTER COLUMN data_source_name TYPE VARCHAR(128);
     EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'Failed to add column to "dex_subscriptions" table';
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to modify data type of column "dex_subscriptions.data_source_name"';
     END;
     BEGIN
         CREATE TABLE dex_data_source_filters
@@ -363,11 +359,85 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+--
+-- creates data sources based on records existing in dex_channels table
+--
+CREATE OR REPLACE FUNCTION create_data_sources() RETURNS integer AS $$
+BEGIN
+	INSERT INTO dex_data_sources (name, description) SELECT name, name FROM dex_channels WHERE 1 = 1;
+	RETURN 0;
+END;
+$$ LANGUAGE plpgsql;
+--
+-- creates data sources users based on records existing in dex_channel_permissions table
+--
+CREATE OR REPLACE FUNCTION create_data_source_users() RETURNS integer AS $$
+DECLARE
+	perm RECORD;
+	channel RECORD;
+	dataSource RECORD;
+	userId INTEGER;
+BEGIN
+	FOR perm IN SELECT * FROM dex_channel_permissions LOOP
+		userId = perm.user_id;
+		FOR channel IN SELECT * FROM dex_channels WHERE id = perm.channel_id LOOP
+			FOR dataSource IN SELECT * FROM dex_data_sources WHERE name = channel.name LOOP
+				INSERT INTO dex_data_source_users (data_source_id, user_id) VALUES 
+					(dataSource.id, userId);
+			END LOOP;
+		END LOOP;
+	END LOOP;
+	RETURN 0;	
+END;
+$$ LANGUAGE plpgsql;
+
+--
+-- creates data source radars parameters based or records existing in dex_channels table
+--
+CREATE OR REPLACE FUNCTION create_data_source_radars() RETURNS INTEGER AS $$
+DECLARE
+	dataSource RECORD;
+	channel RECORD;
+BEGIN
+	FOR dataSource IN SELECT * FROM dex_data_sources LOOP
+		FOR channel IN SELECT * FROM dex_channels WHERE name = dataSource.name LOOP
+		 	INSERT INTO dex_data_source_radars (data_source_id, radar_id) VALUES
+				(dataSource.id, channel.id);
+		END LOOP;
+	END LOOP;
+	RETURN 0;
+END;
+$$ LANGUAGE plpgsql;
+--
+-- creates data source filters parameter
+--
+CREATE OR REPLACE FUNCTION create_data_source_filters() RETURNS INTEGER AS $$
+DECLARE
+	dataSource RECORD;
+	filterId INTEGER;
+	wmoNumber VARCHAR;
+BEGIN
+	FOR dataSource IN SELECT * FROM dex_data_sources LOOP
+		INSERT INTO beast_filters (type) VALUES ('attr') RETURNING filter_id INTO filterId;
+		SELECT wmo_number FROM dex_channels WHERE name = dataSource.name INTO wmoNumber; 
+		INSERT INTO beast_attr_filters (filter_id, attr, op, value_type, value, negated) VALUES
+			(filterId, 'what/source:WMO', 'EQ', 'STRING', wmoNumber, false);
+		INSERT INTO dex_data_source_filters (data_source_id, filter_id) VALUES
+                        (dataSource.id, filterId);
+	END LOOP;
+	RETURN 0;
+END;
+$$ LANGUAGE plpgsql;	
+
 SELECT split_dex_node_connections_address();
 SELECT split_dex_node_configuration_address();
 SELECT split_dex_users_node_address();
 SELECT restart_seq_with_max('dex_messages', 'id');
 SELECT upgrade_dex_schema();
+SELECT create_data_sources();
+SELECT create_data_source_users();
+SELECT create_data_source_radars();
+SELECT create_data_source_filters();
 
 DROP FUNCTION make_plpgsql();
 DROP FUNCTION split_dex_node_configuration_address();
@@ -375,3 +445,7 @@ DROP FUNCTION split_dex_node_connections_address();
 DROP FUNCTION split_dex_users_node_address();
 DROP FUNCTION restart_seq_with_max(TEXT, TEXT);
 DROP FUNCTION upgrade_dex_schema();
+DROP FUNCTION create_data_sources();
+DROP FUNCTION create_data_source_users();
+DROP FUNCTION create_data_source_radars();
+DROP FUNCTION create_data_source_filters();

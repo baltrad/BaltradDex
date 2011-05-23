@@ -179,13 +179,8 @@ public class SubscriptionManager {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_subscriptions " +
-<<<<<<< HEAD
                     "WHERE user_name = '" + userName + "' AND data_source_name = '" +
                     dataSourceName + "' AND type = '" + subscriptionType + "';" );
-=======
-                    "WHERE user_name = '" + userName + "' AND channel_name = '" + channelName +
-                    "' AND type = '" + subscriptionType + "';" );
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
             while( resultSet.next() ) {
                 int subId = resultSet.getInt( "id" );
                 Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
@@ -254,17 +249,10 @@ public class SubscriptionManager {
             Statement stmt = conn.createStatement();
             String sql = "INSERT INTO dex_subscriptions (timestamp, user_name, data_source_name, " +
                     "node_address, operator_name, type, active, synkronized ) VALUES ('" +
-<<<<<<< HEAD
                     sub.getTimeStamp() + "', '" + sub.getUserName() + "', '" + 
                     sub.getDataSourceName() + "', '" + sub.getNodeAddress() + "', '" +
                     sub.getOperatorName() + "', '" + sub.getType() + "', '" + sub.getActive() +
                     "', '" + sub.getSynkronized() + "');";
-=======
-                    sub.getTimeStamp() + "', '" + sub.getUserName() + "', '" + sub.getChannelName() +
-                    "', '" + sub.getNodeAddress() + "', '" + sub.getOperatorName() + "', '" +
-                    sub.getType() + "', '" + sub.getActive() + "', '" + sub.getSynkronized() +
-                    "');";
->>>>>>> 299cb355f341dc6af2655355839cfab37d4d359d
             insert = stmt.executeUpdate( sql ) ;
             stmt.close();
         } catch( SQLException e ) {

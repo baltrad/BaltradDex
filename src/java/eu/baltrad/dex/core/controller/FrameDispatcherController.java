@@ -36,16 +36,18 @@ import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 import eu.baltrad.dex.core.util.FramePublisherManager;
 import eu.baltrad.dex.core.util.FramePublisher;
 import eu.baltrad.dex.core.util.HandleFrameTask;
-import eu.baltrad.dex.register.model.DeliveryRegisterManager;
+import eu.baltrad.dex.register.model.*;
+import eu.baltrad.dex.bltdata.model.BltFileManager;
 
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileEntry;
 import eu.baltrad.fc.DuplicateEntry;
 import eu.baltrad.fc.FileCatalogError;
+import eu.baltrad.fc.Oh5FileMatcher;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;
-
+import eu.baltrad.beast.db.IFilter;
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -123,6 +125,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private DeliveryRegisterManager deliveryRegisterManager;
     /** Reference to FileCatalogConnector */
     private FileCatalogConnector fileCatalogConnector;
+    /** Reference to BltFileManager */
+    private BltFileManager bltFileManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to FileCatalogConnector instance.
@@ -599,15 +603,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         
                         try {
                             FileEntry fileEntry = fc.store( swapFile.getAbsolutePath() );
-
-
-
-                            
-                            
-
-
-
-
                             if( fileEntry == null ) {
                                 // failed to store file in File Catalog - set error code
                                 response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_500 );
@@ -620,23 +615,40 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 bltMessageManager.manage( message );
                                 
                                 // iterate through subscriptions list to send data to subscribers
+
                                 List<Subscription> subs =
                                         subscriptionManager.getSubscriptions(
                                         Subscription.REMOTE_SUBSCRIPTION );
                                 for( int i = 0; i < subs.size(); i++ ) {
+                                    // check if file entry matches the subscribed data source's
+                                    // filter
+                                    String dataSourceName = subs.get( i ).getDataSourceName();
+                                    IFilter filter = bltFileManager.getFilter( dataSourceName );
+                                    Oh5FileMatcher fileMatcher = new Oh5FileMatcher();
+                                    boolean matches = fileMatcher.match( fileEntry,
+                                            filter.getExpression() );
+                                    // make sure that user exists locally
+                                    User user = userManager.getUserByName(
+                                            subs.get( i).getUserName() );
+                                    DeliveryRegisterEntry dre = deliveryRegisterManager.getEntry(
+                                            user.getId(), fileEntry.uuid() );
 
-
-                                    // check if file entry matches the subscribed data source
-                                    
-
-
-                                    if( subs.get( i ).getDataSourceName().equals( 
+                                    if( matches && dre == null ) {
+                                        // create frame delivery task
+                                        HandleFrameTask task = new HandleFrameTask(
+                                            getDeliveryRegisterManager(), getLogManager(),
+                                            user, dataSourceName, fileEntry, swapFile );
+                                        // add task to publisher manager
+                                        framePublisherManager.getFramePublisher( user.getName()
+                                                ).addTask( task );
+                                    }
+                                    /*if( subs.get( i ).getDataSourceName().equals(
                                             bfHandler.getChannel( header ) ) ) {
 
                                         // make sure that user exists locally
                                         User user = userManager.getUserByName(
                                                                       subs.get( i ).getUserName() );
-                                        String dataSourceName = subs.get( i ).getDataSourceName();
+
                                         // look up file item in data register - if file item doesn't 
                                         // exist, create frame delivery task
                                         if( getDeliveryRegisterManager().getEntry( user.getId(),
@@ -651,7 +663,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                             framePublisherManager.getFramePublisher(
                                                     user.getName() ).addTask( task );
                                         }
-                                    }
+                                    }*/
                                 }
                             }
                         } catch( DuplicateEntry e ) {
@@ -973,6 +985,20 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public void setDeliveryRegisterManager( DeliveryRegisterManager deliveryRegisterManager ) {
         this.deliveryRegisterManager = deliveryRegisterManager;
+    }
+    /**
+     * Method returns reference to file manager object.
+     *
+     * @return Reference to file manager object
+     */
+    public BltFileManager getBltFileManager() { return bltFileManager; }
+    /**
+     * Method sets reference to file manager object.
+     *
+     * @param Reference to file manager object
+     */
+    public void setBltFileManager( BltFileManager bltFileManager ) {
+        this.bltFileManager = bltFileManager;
     }
 }
 //--------------------------------------------------------------------------------------------------
