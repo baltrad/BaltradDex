@@ -214,7 +214,7 @@ public class SaveDataSourceControllerTest extends TestCase {
             assertNotNull( ds );
             if( userManager.getUserByName( "TestUser" ) == null ) {
                 User user = new User( "TestUser", "s3cret" );
-                user.setRoleName( "user" );
+                user.setRoleName( User.ROLE_USER );
                 save = userManager.saveOrUpdate( user );
                 assertEquals( 1, save );
             }
