@@ -363,7 +363,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   </target>
 
   <!-- create database schema -->
-  <!--target name="create-schema">
+  <target name="create-schema">
     <sql classpath="${lib.dir}/${db.jar}"
          driver="${db.driver}"
          url="${db.url}"
@@ -371,10 +371,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
          password="${db.pwd}" >
       <transaction src="${etc.dir}/create_dex_schema.sql"/>
     </sql>
-  </target-->
+  </target>
 
   <!-- insert data into the database -->
-  <!--target name="insert-data" depends="create-schema">
+  <target name="insert-data" depends="create-schema">
     <sql classpath="${lib.dir}/${db.jar}"
          driver="${db.driver}"
          url="${db.url}"
@@ -382,7 +382,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
          password="${db.pwd}" >
     <transaction src="${etc.dir}/insert_dex_data.sql"/>
     </sql>
-  </target-->
+  </target>
 
   <!-- fetch data from the database -->
   <target name="fetch-data">
@@ -413,8 +413,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   </target>
   
   <!-- deploy on tomcat -->
-  
-  <target name="deploy" depends="dist, context-status"
+
+  <target name="deploy" depends="dist, insert-data, context-status"
     	if="context.deployable">
     <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
     <deploy url="${mgr.url}"
@@ -424,17 +424,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             update="${mgr.update}"
             war="file:${dist.dir}/BaltradDex.war"/>
   </target>
-
-  <!--target name="deploy" depends="dist, insert-data, context-status"
-    	if="context.deployable">
-    <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
-    <deploy url="${mgr.url}"
-            username="${mgr.username}"
-            password="${mgr.password}"
-            path="${mgr.path}"
-            update="${mgr.update}"
-            war="file:${dist.dir}/BaltradDex.war"/>
-  </target-->
 
   <target name="hudson" depends="compile,prepare-testdb,execute.test"/>
 
