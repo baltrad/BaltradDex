@@ -23,10 +23,12 @@ package eu.baltrad.dex.core.controller;
 
 import eu.baltrad.dex.core.model.NodeConnectionManager;
 import eu.baltrad.dex.core.model.NodeConnection;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
+
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,10 +57,16 @@ public class NodeConnectionController extends MultiActionController {
     private static final String SHOW_REM_CONN_VIEW = "showRemovedNodeConnections";
 //---------------------------------------------------------------------------------------- Variables
     private NodeConnectionManager nodeConnectionManager;
-    private LogManager logManager;
+    private Logger log;
     // selected node connections
     private List< NodeConnection > selectedConns;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public NodeConnectionController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Shows all registered node connections.
      *
@@ -112,21 +120,18 @@ public class NodeConnectionController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeconnection.success" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO,
-                        "Removed node connection: "
-                        + getSelectedConns().get( i ).getConnectionName() ) );
+                log.info( "Removed node connection: " +
+                        getSelectedConns().get( i ).getConnectionName() );
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeconnection.fail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                        "Failed to remove node connection: " + e.getMessage() ) );
+                log.error( "Failed to remove node connection: " + e.getMessage() );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeconnection.fail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                        "Failed to remove node connection: " + e.getMessage() ) );
+                log.error( "Failed to remove node connection: " + e.getMessage() );
             }
         }
         return new ModelAndView( SHOW_REM_CONN_VIEW );
@@ -145,18 +150,6 @@ public class NodeConnectionController extends MultiActionController {
     public void setNodeConnectionManager( NodeConnectionManager nodeConnectionManager ) {
         this.nodeConnectionManager = nodeConnectionManager;
     }
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
     /**
      * Gets list of node connections selected for removal.
      *

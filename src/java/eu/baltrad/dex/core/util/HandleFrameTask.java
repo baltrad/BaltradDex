@@ -28,9 +28,10 @@ import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.core.model.NodeConnection;
 import eu.baltrad.dex.util.InitAppUtil;
-import eu.baltrad.dex.log.model.*;
 
 import eu.baltrad.fc.FileEntry;
+
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.Date;
@@ -46,9 +47,9 @@ public class HandleFrameTask implements Runnable {
 //---------------------------------------------------------------------------------------- Variables
     private DeliveryRegisterManager deliveryRegisterManager;
     private BaltradFrameHandler baltradFrameHandler;
-    private LogManager logManager;
+    private Logger log;
     private User user;
-    private String channelName;
+    private String dataSource;
     private FileEntry fileEntry;
     private File fileItem;
 //------------------------------------------------------------------------------------------ Methods
@@ -61,16 +62,16 @@ public class HandleFrameTask implements Runnable {
      * @see LogManager
      * @param user User for which this task is performed
      * @see User
-     * @param channelName Data channel name
+     * @param dataSource Data source name
      * @param fileEntry File catalog's file entry object
      * @param fileItem BaltradFrame file item
      */
-    public HandleFrameTask( DeliveryRegisterManager deliveryRegisterManager, LogManager logManager, 
-            User user, String channelName, FileEntry fileEntry, File fileItem ) {
+    public HandleFrameTask( DeliveryRegisterManager deliveryRegisterManager, Logger log,
+            User user, String dataSource, FileEntry fileEntry, File fileItem ) {
         this.deliveryRegisterManager = deliveryRegisterManager;
-        this.logManager = logManager;
+        this.log = log;
         this.user = user;
-        this.channelName = channelName;
+        this.dataSource = dataSource;
         this.fileEntry = fileEntry;
         this.fileItem = fileItem;
         this.baltradFrameHandler = new BaltradFrameHandler();
@@ -85,7 +86,7 @@ public class HandleFrameTask implements Runnable {
     public void run() {
         // prepare frame header
         String header = baltradFrameHandler.createDataHdr( BaltradFrameHandler.MIME_MULTIPART,
-            InitAppUtil.getNodeName(), channelName, fileEntry.uuid() + ".h5" );
+            InitAppUtil.getNodeName(), dataSource, fileEntry.uuid() + ".h5" );
         // prepare frame
         BaltradFrame baltradFrame = new BaltradFrame( header, fileItem.getAbsolutePath() );
         // handle the frame
@@ -98,11 +99,9 @@ public class HandleFrameTask implements Runnable {
                 user.getName(), new Date(), status );
         deliveryRegisterManager.addEntry( drEntry );
         if( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO, "Data from " 
-                    + channelName + " sent to user " + user.getName() ) );
+            log.info( "Data from " + dataSource + " sent to user " + user.getName() );
         } else {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
-                "Failed to send data from " + channelName + " to user " + user.getName() ) );
+            log.error( "Failed to send data from " + dataSource + " to user " + user.getName() );
         }
     }
 }

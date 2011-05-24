@@ -35,17 +35,18 @@ import eu.baltrad.dex.datasource.model.ProductParameter;
 import eu.baltrad.dex.datasource.model.ProductParameterManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.model.MessageLogger;
 
 import eu.baltrad.beast.db.AttributeFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
-import eu.baltrad.dex.log.model.LogEntry;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -238,8 +239,8 @@ public class SaveDataSourceController extends MultiActionController {
     private static UserManager userManager;
      /** References CoreFilterManager */
     private CoreFilterManager coreFilterManager;
-    /** References log manager */
-    private LogManager logManager;
+    /** References message logger */
+    private static Logger log;
 
     /** Data source name */
     private String dsName;
@@ -321,6 +322,7 @@ public class SaveDataSourceController extends MultiActionController {
      * Constructor.
      */
     public SaveDataSourceController() {
+        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
         dataSourceManager = new DataSourceManager();
         //
         channelManager = new ChannelManager();
@@ -370,12 +372,12 @@ public class SaveDataSourceController extends MultiActionController {
                 numSelectedUsers = selectedUsers.size();
             } catch( SQLException e ) {
                 modelAndView.addObject( DS_SAVE_ERROR_KEY, "SQL Exception" );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                    "Failed to recover data source parameters: SQL Exception " + e.getMessage() ) );
+                log.error( "Failed to recover data source parameters: SQL Exception " +
+                        e.getMessage() );
             } catch( Exception e ) {
                 modelAndView.addObject( DS_SAVE_ERROR_KEY, "Exception" );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                    "Failed to recover data source parameters: SQL Exception " + e.getMessage() ) );
+                log.error( "Failed to recover data source parameters: SQL Exception " +
+                        e.getMessage() );
             }
         }
         modelAndView.setViewName( DS_SAVE_NAME_VIEW );
@@ -552,16 +554,13 @@ public class SaveDataSourceController extends MultiActionController {
                     dataSourceManager.deleteFilters( dsId );
                     dataSourceManager.saveFilter( dsId, sourceFilter.getId() );
                 }
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
-                        "Data source " + dataSource.getName() + " successfully saved" ) );
+                log.warn( "Data source " + dataSource.getName() + " successfully saved" );
             } catch( SQLException e ) {
                 modelAndView.addObject( DS_SAVE_ERROR_KEY, "SQL Exception" );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                        "Failed to save data source: SQL Exception " + e.getMessage() ) );
+                log.error( "Failed to save data source: SQL Exception " + e.getMessage() );
             } catch( Exception e ) {
                 modelAndView.addObject( DS_SAVE_ERROR_KEY, "Exception" );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                        "Failed to save data source: SQL Exception " + e.getMessage() ) );
+                log.error( "Failed to save data source: SQL Exception " + e.getMessage() );
             }
             resetModel();
             modelAndView.setViewName( DS_SAVE_VIEW );
@@ -834,17 +833,5 @@ public class SaveDataSourceController extends MultiActionController {
     public void setCoreFilterManager( CoreFilterManager coreFilterManager ) {
         this.coreFilterManager = coreFilterManager;
     }
-    /**
-     * Gets reference to LogManager.
-     *
-     * @return Reference to LogManager
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager.
-     *
-     * @param logManager Reference to LogManager
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

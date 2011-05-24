@@ -131,17 +131,17 @@ Author     : szewczenko
                             <c:forEach var="entry" items="${entries}">
                                 <% String style = ""; %>
                                 <c:choose>
-                                    <c:when test="${entry.level == 'INFO'}">
+                                    <c:when test="${entry.type == 'INFO'}">
                                         <%
                                             style = "info";
                                         %>
                                     </c:when>
-                                    <c:when test="${entry.level == 'WARN'}">
+                                    <c:when test="${entry.type == 'WARN'}">
                                         <%
                                             style = "warning";
                                         %>
                                     </c:when>
-                                    <c:when test="${entry.level == 'ERROR'}">
+                                    <c:when test="${entry.type == 'ERROR'}">
                                         <%
                                             style = "error";
                                         %>
@@ -159,13 +159,13 @@ Author     : szewczenko
                                         </div>
                                     </div>
                                     <c:choose>
-                                        <c:when test="${entry.level == 'ERROR'}">
+                                        <c:when test="${entry.type == 'ERROR'}">
                                             <div class="flag">
                                                 <img src="includes/images/red_bulb.png"
                                                      alt="error"/>
                                             </div>
                                         </c:when>
-                                        <c:when test="${entry.level == 'WARN'}">
+                                        <c:when test="${entry.type == 'WARN'}">
                                             <div class="flag">
                                                 <img src="includes/images/blue_bulb.png"
                                                      alt="warn"/>

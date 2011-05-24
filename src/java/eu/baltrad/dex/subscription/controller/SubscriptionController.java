@@ -22,13 +22,12 @@
 package eu.baltrad.dex.subscription.controller;
 
 import eu.baltrad.dex.subscription.model.Subscription;
-//import eu.baltrad.dex.channel.model.ChannelManager;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
 import eu.baltrad.dex.core.controller.FrameDispatcherController;
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.frame.model.BaltradFrameHandler;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -36,6 +35,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.io.File;
@@ -81,7 +82,7 @@ public class SubscriptionController extends MultiActionController {
     private DataSourceManager dataSourceManager;
     private SubscriptionManager subscriptionManager;
     private FrameDispatcherController frameDispatcherController;
-    private LogManager logManager;
+    private Logger log;
     // subscription change request
     private List< Subscription > changedSubscriptions;
     // removed subscriptions
@@ -89,6 +90,12 @@ public class SubscriptionController extends MultiActionController {
     // removed peers subscriptions
     private List< Subscription > removedPeersSubscriptions;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public SubscriptionController() {
+        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Shows list of all subscriptions.
      *
@@ -228,11 +235,10 @@ public class SubscriptionController extends MultiActionController {
                         Subscription.LOCAL_SUBSCRIPTION,
                         getChangedSubscriptions().get( i ).getActive() );
             } catch( Exception e ) {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                    "Error while processing subscription change request for " +
+                log.error( "Error while processing subscription change request for " +
                     getChangedSubscriptions().get( i ).getOperatorName() + ", channel " +
                     getChangedSubscriptions().get( i ).getDataSourceName() + ": " +
-                    e.getMessage() ) );
+                    e.getMessage() );
             }
         }
         return new ModelAndView( SUBSCRIPTION_STATUS_VIEW );
@@ -269,8 +275,7 @@ public class SubscriptionController extends MultiActionController {
             try {
                 response.sendRedirect( REDIRECT_VIEW );
             } catch( IOException e ) {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
-                    "Error while redirecting to " + REDIRECT_VIEW + ": " + e.getMessage() ) );
+                log.error( "Error while redirecting to " + REDIRECT_VIEW + ": " + e.getMessage() );
             }
         } else {
             // determines whether user has selected an active subscription
@@ -290,8 +295,8 @@ public class SubscriptionController extends MultiActionController {
                         "error.removesubscription.activesubscription" ) );
                     response.sendRedirect( REDIRECT_VIEW );
                 } catch( IOException e ) {
-                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                        "Error while redirecting to " + REDIRECT_VIEW + ": " + e.getMessage() ) );
+                    log.error( "Error while redirecting to " + REDIRECT_VIEW + ": " +
+                            e.getMessage() );
                 }
             } else {
                 List< Subscription > currentSubs = new ArrayList< Subscription >();
@@ -374,9 +379,8 @@ public class SubscriptionController extends MultiActionController {
             try {
                 response.sendRedirect( SHOW_PEERS_SUBSCRIPTIONS_VIEW + ".htm" );
             } catch( IOException e ) {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
-                    "Error while redirecting to " + SHOW_PEERS_SUBSCRIPTIONS_VIEW + ": " +
-                    e.getMessage() ) );
+                log.error( "Error while redirecting to " + SHOW_PEERS_SUBSCRIPTIONS_VIEW + ": " +
+                    e.getMessage() );
             }
         } else {
             List< Subscription > currentSubs = new ArrayList< Subscription >();
@@ -471,18 +475,6 @@ public class SubscriptionController extends MultiActionController {
             FrameDispatcherController frameDispatcherController ) {
         this.frameDispatcherController = frameDispatcherController;
     }
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
     /**
      * Gets a list of changed subscriptions.
      *

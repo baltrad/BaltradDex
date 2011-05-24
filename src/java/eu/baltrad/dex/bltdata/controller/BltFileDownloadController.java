@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.bltdata.controller;
 
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
 
@@ -32,6 +32,8 @@ import javax.servlet.ServletContext;
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.util.FileCopyUtils;
+
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.BufferedInputStream;
@@ -50,9 +52,15 @@ public class BltFileDownloadController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
     public static final String FILE_PATH = "path";
 //---------------------------------------------------------------------------------------- Variables
-    private LogManager logManager;
+    private Logger log;
     private String successView;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Controller.
+     */
+    public BltFileDownloadController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Method handles file download request.
      * 
@@ -73,8 +81,7 @@ public class BltFileDownloadController implements Controller {
             try {
                 in = new BufferedInputStream( new FileInputStream( file ) );
             } catch( FileNotFoundException e ) {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
-                        "File not found: " + e.getMessage() ) );
+                log.warn( "File not found: " + e.getMessage() );
             }
             String mimeType = servletContext.getMimeType( filePath );
             response.setBufferSize( fileSize );
@@ -87,14 +94,11 @@ public class BltFileDownloadController implements Controller {
                 response.getOutputStream().flush();
                 response.getOutputStream().close();
             } catch( IOException e ) {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
-                        "Error downloading file: " + e.getMessage() ) );
+                log.error( "Error downloading file: " + e.getMessage() );
             }
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO, "User " +
-                    user.getName() + " downloading file: " + file.getName() ) );
+            log.info( "User " + user.getName() + " downloading file: " + file.getName() );
         } else {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                    "Invalid file size: " + fileSize ) );
+            log.error( "Invalid file size: " + fileSize );
         }
         return null;
     }
@@ -114,17 +118,5 @@ public class BltFileDownloadController implements Controller {
     public void setSuccessView( String successView ) {
         this.successView = successView;
     }
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

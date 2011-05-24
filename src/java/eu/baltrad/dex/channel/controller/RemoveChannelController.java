@@ -23,7 +23,9 @@ package eu.baltrad.dex.channel.controller;
 
 import eu.baltrad.dex.channel.model.ChannelManager;
 import eu.baltrad.dex.channel.model.Channel;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -60,9 +62,15 @@ public class RemoveChannelController extends MultiActionController {
     private ChannelManager channelManager;
     // Name resolver
     private PropertiesMethodNameResolver nameResolver;
-    // Log manager
-    private LogManager logManager;
+    // Message logger
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
+    /*
+     * Constructor.
+     */
+    public RemoveChannelController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Shows all available channels.
      *
@@ -117,22 +125,19 @@ public class RemoveChannelController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removesuccess" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
-                        "Local radar station " + channelName + " removed from the system" ) );
+                log.warn( "Local radar station " + channelName + " removed from the system" );
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removefail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
-                        "Failed to remove local " + "radar station " + channelName ) );
+                log.warn( "Failed to remove local " + "radar station " + channelName );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removefail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
-                        "Failed to remove local " + "radar station " + channelName ) );
+                log.warn( "Failed to remove local " + "radar station " + channelName );
             }
         }
         return new ModelAndView( REMOVED_CHANNELS_VIEW );
@@ -165,17 +170,5 @@ public class RemoveChannelController extends MultiActionController {
     public void setChannelManager( ChannelManager channelManager ) {
         this.channelManager = channelManager;
     }
-     /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

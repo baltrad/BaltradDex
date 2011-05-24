@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.util;
 
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.fc.CacheDirStorage;
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileCatalogError;
@@ -31,11 +31,13 @@ import eu.baltrad.fc.Database;
 import java.util.Properties;
 import java.io.InputStream;
 
+import org.apache.log4j.Logger;
+
 /**
  * Provides connection to FileCatalog. Implemented as sigleton in order to keep control over the
  * number of created connections.
  *
- * @author Maciej Szewczykowski :: maciej@baltrad.eu
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.0
  * @since 0.1.0
  */
@@ -54,8 +56,8 @@ public class FileCatalogConnector {
     private static Database database;
     /** Reference to FileCatalog object */
     private static FileCatalog fileCatalog;
-    /** Reference to LogManager object */
-    private LogManager logManager;
+    /** References logger oblect */
+    private static Logger log;
     /** Data storage folder */
     private static String dataStorageFolder;
     /** Data storage directory path */
@@ -84,8 +86,8 @@ public class FileCatalogConnector {
      * Reads properties from stream and initializes FileCatalog.
      */
     public void init() {
-        // Initialize LogManager
-        this.logManager = new LogManager();
+        // Initialize logger
+        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
         // Initialize FileCatalog
         try {
             InputStream is = this.getClass().getResourceAsStream( PROPS_FILE_NAME );
@@ -103,18 +105,14 @@ public class FileCatalogConnector {
                 localStorage = new CacheDirStorage( dataStorageDirectory );
                 database = Database.create( dbURI );
                 fileCatalog = new FileCatalog( database, localStorage );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO,
-                        "File catalog successfully initialized" ) );
+                log.info( "File catalog successfully initialized" );
             } else {
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                        "Failed to load properties file: " + PROPS_FILE_NAME ) );
+                log.error( "Failed to load properties file: " + PROPS_FILE_NAME );
             }
         } catch( FileCatalogError e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
-                    "File catalog error: " + e.getMessage() ) );
+            log.error( "File catalog error: " + e.getMessage() );
         } catch( Exception e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
-                    "File catalog error: " + e.getMessage() ) );
+            log.error( "File catalog error: " + e.getMessage() );
         }
     }
     /**

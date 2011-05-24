@@ -21,7 +21,8 @@
 
 package eu.baltrad.dex.log.controller;
 
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.model.LogManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,6 +30,8 @@ import javax.servlet.ServletException;
 
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
+
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.io.IOException;
@@ -46,8 +49,16 @@ public class ClrMsgsController implements Controller {
     private static final String ERROR_MSG_KEY = "error_message";
 //---------------------------------------------------------------------------------------- Variables
     private String successView;
+    private Logger log;
     private LogManager logManager;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public ClrMsgsController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.logManager = new LogManager();
+    }
     /**
      * Deletes all mesages from message stack and returns model and view.
      *
@@ -64,20 +75,17 @@ public class ClrMsgsController implements Controller {
             String msg = "Successfully deleted " + Integer.toString( deletedEntries ) 
                     + " message(s).";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
-                "User removed all system messages" ) );
+            log.warn( "User removed all system messages" );
         } catch( SQLException e ) {
             String msg = "Failed to remove system messages:" + e.getMessage();
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                "Failed to remove system messages" ) );
+            log.error( "Failed to remove system messages" );
         } catch( Exception e ) {
             String msg = "Failed to remove system messages:" + e.getMessage();
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                "Failed to remove system messages" ) );
+            log.error( "Failed to remove system messages" );
         }
         return new ModelAndView( getSuccessView() );
     }
@@ -93,17 +101,5 @@ public class ClrMsgsController implements Controller {
      * @param successView Reference to success view name string
      */
     public void setSuccessView( String successView ) { this.successView = successView; }
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

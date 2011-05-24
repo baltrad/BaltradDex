@@ -23,7 +23,8 @@ Author     : szewczenko
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 <%@ page import="eu.baltrad.dex.user.model.User" %>
-<%@ page import="eu.baltrad.dex.log.model.LogEntry" %>
+<%@ page import="eu.baltrad.dex.log.model.MessageLogger" %>
+<%@ page import="org.apache.log4j.Logger" %>
 <%@ page import="java.util.Date" %>
 
 <jsp:useBean id="applicationSecurityManager" scope="session"
@@ -31,16 +32,13 @@ Author     : szewczenko
 </jsp:useBean>
 <jsp:useBean id="userManager" scope="session" class="eu.baltrad.dex.user.model.UserManager">
 </jsp:useBean>
-<jsp:useBean id="logManager" scope="session" class="eu.baltrad.dex.log.model.LogManager">
-</jsp:useBean>
 
 <%
+    Logger log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     User sessionUser = ( User )applicationSecurityManager.getUser( request );
     User dbUser = userManager.getUserByName( sessionUser.getName() );
     if( !applicationSecurityManager.authenticateSessionUser( sessionUser, dbUser ) ) {
-
-        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
-                "User failed to access restricted system area" ) );
+        log.warn( "User failed to access restricted system area" );
     } else {
         if( dbUser.getRoleName().equals( User.ROLE_ADMIN ) ) {
             request.getSession().setAttribute( "userRole", 0 );

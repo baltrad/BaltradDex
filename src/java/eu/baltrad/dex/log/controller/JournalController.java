@@ -56,7 +56,13 @@ public class JournalController implements Controller, ITableScroller {
     /** Holds current page number, used for page scrolling */
     private static int currentPage;
 //------------------------------------------------------------------------------------------ Methods
-     /**
+    /**
+     * Constructor.
+     */
+    public JournalController() {
+        this.logManager = new LogManager();
+    }
+    /**
      * Returns ModelAndView object containing log entry list.
      *
      * @param request Http request
@@ -163,19 +169,5 @@ public class JournalController implements Controller, ITableScroller {
      * @param successView Reference to success view name string
      */
     public void setSuccessView( String successView ) { this.successView = successView; }
-
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

@@ -21,11 +21,13 @@
 
 package eu.baltrad.dex.bltdata.model;
 
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 
 import com.jhlabs.map.proj.Projection;
 import com.jhlabs.map.proj.ProjectionFactory;
 import com.jhlabs.map.proj.ProjectionException;
+
+import org.apache.log4j.Logger;
 
 import java.awt.geom.Point2D;
 
@@ -39,8 +41,14 @@ import java.awt.geom.Point2D;
 public class BltDataProjector {
 //---------------------------------------------------------------------------------------- Variables
     private static Projection proj;
-    private static LogManager logManager;
+    private static Logger log;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public BltDataProjector() {
+        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Initializes projection object according to PROJ4 library specification.
      *
@@ -54,8 +62,7 @@ public class BltDataProjector {
             proj.initialize();
             res = 0;
         } catch( ProjectionException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                    "Failed to initialize projection: " + e.getMessage() ) );
+            log.error( "Failed to initialize projection: " + e.getMessage() );
             res = 1;
         }
         return res;
@@ -82,17 +89,5 @@ public class BltDataProjector {
         proj.transform( geoPoint, xyPoint );
         return xyPoint;
     }
-    /**
-     * Gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

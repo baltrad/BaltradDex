@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.bltdata.model;
 
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 
 import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.h5.H5File;
@@ -29,6 +29,8 @@ import ncsa.hdf.object.Group;
 import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
+
+import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -93,11 +95,9 @@ public class BltDataProcessor {
     // HDF5 DATASET prefix
     public static final String H5_DATASET_PREFIX = "dataset";
 //---------------------------------------------------------------------------------------- Variables
-    private LogManager logManager;
-
+    private Logger log;
     // used to store HDF5 dataset
     private Dataset dataset;
-
     // used to store HDF5 attributes
     private Attribute h5LongAttr;
     private Attribute h5DoubleAttr;
@@ -106,6 +106,12 @@ public class BltDataProcessor {
     // list of full dataset names
     private List<String> datasetFullNames = new ArrayList<String>();
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public BltDataProcessor() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Opens HDF5 file.
      *
@@ -119,8 +125,7 @@ public class BltDataProcessor {
             h5File = ( H5File )fileFormat.createInstance( fileName, FileFormat.READ );
             h5File.open();
         } catch( Exception e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                    "Exception while opening HDF5 file: " + e.getMessage() ) );
+            log.error( "Exception while opening HDF5 file: " + e.getMessage() );
         }
         return h5File;
     }
@@ -137,8 +142,7 @@ public class BltDataProcessor {
             res = 0;
         } catch( HDF5Exception hdf5e ) {
             res = 1;
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                    "Exception while closing HDF5 file: " + hdf5e.getMessage() ) );
+            log.error( "Error while closing HDF5 file: " + hdf5e.getMessage() );
         }
         return res;
     }
@@ -153,8 +157,7 @@ public class BltDataProcessor {
         try {
             root = ( Group )( ( DefaultMutableTreeNode )h5File.getRootNode() ).getUserObject();
         } catch( Exception e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                    "Exception while accessing HDF5 file's root: " + e.getMessage() ) );
+            log.error( "Error while accessing HDF5 file's root: " + e.getMessage() );
         }
         return root;
     }
@@ -175,7 +178,7 @@ public class BltDataProcessor {
                 Dataset dset = ( Dataset )members.get( i );
                 getDatasetFullNames().add( dset.getFullName() );
             } else {
-                System.err.println( "Get H5 datasets: Unrecognized HDF5 object" );
+                log.error( "Get H5 datasets: Unrecognized HDF5 object" );
             }
         }
     }
@@ -227,7 +230,7 @@ public class BltDataProcessor {
                     setDataset( dset );
                 }
             } else {
-                System.err.println( "Get H5 dataset: Unrecognized HDF5 object" );
+                log.error( "Get H5 dataset: Unrecognized HDF5 object" );
             }
         }
     }
@@ -276,7 +279,7 @@ public class BltDataProcessor {
                             }
                         }
                     } catch( Exception e ){
-                        System.err.println( "Get HDF5 attribute failed to get metadata: "
+                        log.error( "Get HDF5 attribute failed to get metadata: "
                                 + e.getMessage() );
                     }
                 }
@@ -312,12 +315,12 @@ public class BltDataProcessor {
         try {
             byteBuff = ( byte[] )dataset.read();
         } catch( Exception e ) {
-            System.err.println( "Failed to convert polar HDF5 dataset to image: " + e.getMessage() );
+            log.error( "Failed to convert polar HDF5 dataset to image: " + e.getMessage() );
         }
         try {
             shortBuff = ( short[] )dataset.read();
         } catch( Exception e ) {
-            System.err.println( "Failed to convert polar HDF5 dataset to image: " + e.getMessage() );
+            log.error( "Failed to convert polar HDF5 dataset to image: " + e.getMessage() );
         }
 
         // radar range is determined based on the number of bins
@@ -469,7 +472,7 @@ public class BltDataProcessor {
             }
             br.close();
         } catch( IOException e ) {
-            System.err.println( "Failed to create color palette: " + e.getMessage() );
+            log.error( "Failed to create color palette: " + e.getMessage() );
         }
 	return palette;
     }
@@ -489,7 +492,7 @@ public class BltDataProcessor {
             ImageIO.write( image, "png", f );
             res = 0;
         } catch( IOException e ) {
-            System.err.println( "Failed to save image to file: " + e.getMessage() );
+            log.error( "Failed to save image to file: " + e.getMessage() );
             res = 1;
         }
         return res;
@@ -542,18 +545,6 @@ public class BltDataProcessor {
      * @param _h5StringAttr String class attribute retrieved from HDF5 file
      */
     public void setStringAttribute( Attribute h5StringAttr ) { this.h5StringAttr = h5StringAttr; }
-    /**
-     * Gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
     /**
      * Gets list of full dataset names.
      *

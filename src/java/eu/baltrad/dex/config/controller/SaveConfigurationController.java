@@ -25,8 +25,10 @@ import eu.baltrad.dex.config.model.Configuration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.ServletContextUtil;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.core.model.NodeConnection;
+
+import org.apache.log4j.Logger;
 
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
@@ -62,8 +64,14 @@ public class SaveConfigurationController extends SimpleFormController {
     private static final String ERROR_MSG_KEY = "error_message";
 //---------------------------------------------------------------------------------------- Variables
     private ConfigurationManager configurationManager;
-    private LogManager logManager;
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public SaveConfigurationController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Fetches Configuration object from the database.
      *
@@ -76,11 +84,9 @@ public class SaveConfigurationController extends SimpleFormController {
         try {
             conf = configurationManager.getConfiguration( ConfigurationManager.CONF_REC_ID );
         } catch( SQLException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
-                "Error while loading configuration from database: " + e.getMessage() ) );
+            log.error( "Error while loading configuration from database: " + e.getMessage() );
         } catch( Exception e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                "Error while loading configuration from database: " + e.getMessage() ) );
+            log.error( "Error while loading configuration from database: " + e.getMessage() );
         }
         if( conf == null ) {
             conf = new Configuration( "Short node name", PRIMARY_NODE,
@@ -114,8 +120,7 @@ public class SaveConfigurationController extends SimpleFormController {
                 timeZones.add( strLine );
             }
         } catch( IOException e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                "Failed to load time zones from file: " + e.getMessage() ) );
+            log.error( "Failed to load time zones from file: " + e.getMessage() );
         }
         model.put( NODE_TYPES, nodeTypes );
         model.put( TIME_ZONES, timeZones );
@@ -145,23 +150,20 @@ public class SaveConfigurationController extends SimpleFormController {
             InitAppUtil.initApp();
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveconf.savesuccess" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
-                getMessageSourceAccessor().getMessage( "message.saveconf.savesuccess" ) ) );
+            log.warn( getMessageSourceAccessor().getMessage( "message.saveconf.savesuccess" ) );
         } catch( SQLException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                        "message.saveconf.savefail" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                getMessageSourceAccessor().getMessage( "message.saveconf.savefail" ) + ": " +
-                e.getMessage() ) );
+                    "message.saveconf.savefail" ) );
+            log.error( getMessageSourceAccessor().getMessage( "message.saveconf.savefail" ) + ": " +
+                e.getMessage() );
             errors.reject( "message.saveconf.savefail" ); 
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                        "message.saveconf.savefail" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                getMessageSourceAccessor().getMessage( "message.saveconf.savefail" ) + ": " +
-                e.getMessage() ) );
+                    "message.saveconf.savefail" ) );
+            log.error( getMessageSourceAccessor().getMessage( "message.saveconf.savefail" ) + ": " +
+                e.getMessage() );
             errors.reject( "message.saveconf.savefail" );
         }
         return new ModelAndView( getSuccessView() );
@@ -180,17 +182,5 @@ public class SaveConfigurationController extends SimpleFormController {
     public void setConfigurationManager( ConfigurationManager configurationManager ) {
         this.configurationManager = configurationManager;
     }
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

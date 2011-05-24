@@ -26,7 +26,9 @@ import eu.baltrad.dex.channel.model.Channel;
 import eu.baltrad.dex.channel.model.ChannelPermission;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,8 +58,14 @@ public class SaveChannelController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Variables
     private ChannelManager channelManager;
     private UserManager userManager;
-    private LogManager logManager;
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public SaveChannelController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Fetches Channel object with a given CHANNEL_ID passed as request parameter,
      * or creates new Channel instance in case CHANNEL_ID is not set in request.
@@ -119,20 +127,17 @@ public class SaveChannelController extends SimpleFormController {
             channelManager.saveOrUpdate( channel );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savesuccess" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
-                    "Saved local radar station " + channel.getChannelName() ) );
+            log.warn( "Saved local radar station " + channel.getChannelName() );
         } catch( SQLException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savefail" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
-                    "Failed to save radar station " + channel.getChannelName() ) );
+            log.error( "Failed to save radar station " + channel.getChannelName() );
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savefail" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
-                    "Failed to save radar station " + channel.getChannelName() ) );
+            log.error( "Failed to save radar station " + channel.getChannelName() );
         }
         return new ModelAndView( getSuccessView() );
     }
@@ -162,17 +167,5 @@ public class SaveChannelController extends SimpleFormController {
      * @param userManager Reference to user manager object
      */
     public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

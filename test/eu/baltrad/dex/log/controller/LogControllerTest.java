@@ -26,6 +26,8 @@ import eu.baltrad.dex.log.model.*;
 
 import junit.framework.TestCase;
 
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 
 /**
@@ -39,12 +41,15 @@ public class LogControllerTest extends TestCase {
 //---------------------------------------------------------------------------------------- Variables
     private static JDBCConnectionManager jdbcConn;
     private static Connection conn;
+    private static Logger log;
     private static LogManager manager;
 //------------------------------------------------------------------------------------------ Methods
     @Override
     public void setUp() {
         jdbcConn = JDBCConnectionManager.getInstance();
         assertNotNull( jdbcConn );
+        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        assertNotNull( log );
         manager = new LogManager();
         assertNotNull( manager );
     }
@@ -71,12 +76,12 @@ public class LogControllerTest extends TestCase {
 
     class ThreadedLogger extends Thread {
 
-        private LogManager manager;
+        private Logger log;
         private int label;
         private int numOp;
 
-        public ThreadedLogger( LogManager manager, int label, int numOp ) {
-            this.manager = manager;
+        public ThreadedLogger( Logger log, int label, int numOp ) {
+            this.log = log;
             this.label = label;
             this.numOp = numOp;
         }
@@ -84,8 +89,7 @@ public class LogControllerTest extends TestCase {
         @Override
         public void run() {
             for( int i = 0; i < numOp; i++ ) {
-                manager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogManager.getLogger(), 
-                        LogEntry.LEVEL_INFO, "Logger " + label + " entry " + i ) );
+                log.info( "Logger " + label + " adding entry " + i );
             }
         }
     }

@@ -22,7 +22,7 @@
 package eu.baltrad.dex.auth.controller;
 
 import eu.baltrad.dex.util.ApplicationSecurityManager;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.user.model.User;
 
 import org.springframework.web.servlet.mvc.Controller;
@@ -30,6 +30,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
 
 /**
  * Logout controller class implementing basic user authentication functionality.
@@ -39,10 +41,16 @@ import javax.servlet.http.HttpServletResponse;
  * @since 1.0
  */
 public class LogoutController implements Controller {
-//---------------------------------------------------------------------------------------- Variables
-    private LogManager logManager = new LogManager();
+//---------------------------------------------------------------------------------------- Variables 
     private String successView;
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public LogoutController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Method handles http request. Removes user attribute from session.
      * 
@@ -55,8 +63,7 @@ public class LogoutController implements Controller {
             throws Exception {
         User user = ( User )ApplicationSecurityManager.getUser( request );
         ApplicationSecurityManager.removeUser( request );
-        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO, "User " + 
-                user.getName() + " logged out" ) );
+        log.info( "User " + user.getName() + " logged out" );
         return new ModelAndView( getSuccessView() );
     }
     /**

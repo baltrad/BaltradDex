@@ -25,9 +25,11 @@ import eu.baltrad.dex.core.model.NodeConnection;
 import eu.baltrad.dex.core.model.NodeConnectionManager;
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.frame.model.BaltradFrameHandler;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.InitAppUtil;
+
+import org.apache.log4j.Logger;
 
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
@@ -52,8 +54,14 @@ public class ConnectToNodeController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Variables
     private FrameDispatcherController frameDispatcherController;
     private NodeConnectionManager nodeConnectionManager;
-    private LogManager logManager;
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public ConnectToNodeController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Cretes new connection parameters object.
      * 
@@ -130,11 +138,9 @@ public class ConnectToNodeController extends SimpleFormController {
                 try {
                     nodeConnectionManager.saveOrUpdate( nodeConn );
                 } catch( SQLException e ) {
-                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                            "Failed to save node connection: " + e.getMessage() ) );
+                    log.error( "Failed to save node connection: " + e.getMessage() );
                 } catch( Exception e ) {
-                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                            "Failed to save node connection: " + e.getMessage() ) );
+                    log.error( "Failed to save node connection: " + e.getMessage() );
                 }
             }
         }
@@ -171,17 +177,5 @@ public class ConnectToNodeController extends SimpleFormController {
             FrameDispatcherController frameDispatcherController ) {
         this.frameDispatcherController = frameDispatcherController;
     }
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

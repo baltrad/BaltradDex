@@ -23,7 +23,7 @@ package eu.baltrad.dex.user.controller;
 
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
 
 import org.springframework.web.servlet.ModelAndView;
@@ -36,6 +36,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
 
 /**
  * Multi-action controller handling user account removal functionality.
@@ -62,9 +64,15 @@ public class RemoveUserController extends MultiActionController {
     private UserManager userManager;
     // Name resolver
     private PropertiesMethodNameResolver nameResolver;
-    // Log manager
-    private LogManager logManager;
+    // Logger object
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public RemoveUserController() {
+        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Gets list of all registered users except for currently signed user.
      *
@@ -132,22 +140,19 @@ public class RemoveUserController extends MultiActionController {
                 request.getSession().setAttribute( OK_MSG_KEY, 
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removesuccess" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
-                        "User account " + userName + " removed from the system" ) );
+                log.warn( "User account " + userName + " removed from the system" );
             } catch( SQLException e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removefail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                        "Failed to remove user account " + userName ) );
+                log.error( "Failed to remove user account " + userName );
             } catch( Exception e ) {
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeuser.removefail" ) );
-                logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                        "Failed to remove user account " + userName ) );
+                log.error( "Failed to remove user account " + userName );
             }
         }
         return new ModelAndView( REMOVED_USERS_VIEW );
@@ -178,17 +183,5 @@ public class RemoveUserController extends MultiActionController {
      * @param userManager Reference to user manager object
      */
     public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

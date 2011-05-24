@@ -333,9 +333,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="successView">
             <value>fileDetails</value>
         </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
     </bean>
 
     <!--
@@ -352,9 +349,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="frameDispatcherController">
             <ref bean="frameDispatcherController"/>
         </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
     </bean>
 
     <!--
@@ -364,9 +358,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="successView">
             <value>logtable</value>
         </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
     </bean>
 
     <!--
@@ -375,9 +366,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="journalController" class="eu.baltrad.dex.log.controller.JournalController">
         <property name="successView">
             <value>journal</value>
-        </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
         </property>
     </bean>
 
@@ -389,9 +377,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="successView">
             <value>radarData</value>
         </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
-	</property>
     </bean>
 
     <!--
@@ -422,9 +407,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="subscriptionManager" class="eu.baltrad.dex.subscription.model.SubscriptionManager"/>
 
     <!--
-        Log manager
+        Message logger
     -->
-    <bean name="logManager" class="eu.baltrad.dex.log.model.LogManager"/>
+    <bean name="messageLogger" class="eu.baltrad.dex.log.model.MessageLogger"/>
 
     <!-- FramePublisherManager -->
     <bean name="framePublisherManager" class="eu.baltrad.dex.core.util.FramePublisherManager"/>
@@ -443,9 +428,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
-        </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
         </property>
         <property name="bltMessageManager">
             <ref bean="bltmanager"/>
@@ -489,9 +471,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="clrMsgsController" class="eu.baltrad.dex.log.controller.ClrMsgsController">
         <property name="successView">
             <value>confirmclearmessages</value>
-        </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
         </property>
     </bean>
 
@@ -547,9 +526,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="userManager">
             <ref bean="userManager"/>
         </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
     </bean>
 
     <!--
@@ -571,9 +547,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="userManager">
             <ref bean="userManager" />
-        </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
         </property>
     </bean>
 
@@ -602,9 +575,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>     
         <property name="userManager">
             <ref bean="userManager"/>
-        </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
         </property>
     </bean>
 
@@ -635,9 +605,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="channelManager">
             <ref bean="channelManager" />
-        </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
         </property>
     </bean>
 
@@ -686,24 +653,18 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="frameDispatcherController">
             <ref bean="frameDispatcherController"/>
         </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
     </bean>
 
     <!--
         Remote channel controller
     -->
     <bean id="remoteDataSourceController"
-        class="eu.baltrad.dex.core.controller.RemoteDataSourceController">
+            class="eu.baltrad.dex.core.controller.RemoteDataSourceController">
         <property name="frameDispatcherController">
             <ref bean="frameDispatcherController"/>
         </property>
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
-        </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
         </property>
     </bean>
 
@@ -758,9 +719,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="formView">
             <value>nodeProperties</value>
         </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
     </bean>
 
     <!--
@@ -771,9 +729,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="nodeConnectionManager">
             <ref bean="nodeConnectionManager" />
         </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
     </bean>
 
     <!--
@@ -781,20 +736,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="bltDataProcessor"
         class="eu.baltrad.dex.bltdata.model.BltDataProcessor">
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
     </bean>
 
     <!--
         Data projector model.
     -->
-    <bean name="bltDataProjector"
-        class="eu.baltrad.dex.bltdata.model.BltDataProjector">
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
-    </bean>
+    <bean name="bltDataProjector" class="eu.baltrad.dex.bltdata.model.BltDataProjector"/>
 
     <!--
         Data processor controller.
@@ -828,9 +775,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- SaveDataSourceController -->
     <bean name="saveDataSourceController"
             class="eu.baltrad.dex.datasource.controller.SaveDataSourceController">
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
         <property name="coreFilterManager">
             <ref bean="coreFilterManager"/>
         </property>
@@ -850,9 +794,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- RemoveDataSourceController -->
     <bean name="removeDataSourceController" 
             class="eu.baltrad.dex.datasource.controller.RemoveDataSourceController">
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
         <property name="dataSourceManager">
             <ref bean="dataSourceManager"/>
         </property>

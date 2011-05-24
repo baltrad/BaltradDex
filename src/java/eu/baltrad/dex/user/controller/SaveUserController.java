@@ -23,7 +23,7 @@ package eu.baltrad.dex.user.controller;
 
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,6 +34,8 @@ import org.springframework.validation.BindException;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+
+import org.apache.log4j.Logger;
 
 /**
  * Controller class registers new user in the system or modifies existing user account.
@@ -50,8 +52,14 @@ public class SaveUserController extends SimpleFormController {
     private static final String ERROR_MSG_KEY = "error_message";
 //---------------------------------------------------------------------------------------- Variables
     private UserManager userManager;
-    private LogManager logManager;
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public SaveUserController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Fetches User object with a given USER_ID passed as request parameter,
      * or creates new User instance in case USER_ID is not set in request.
@@ -100,21 +108,18 @@ public class SaveUserController extends SimpleFormController {
             userManager.saveOrUpdate( user );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.savesuccess" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN, 
-                    "User account saved: " + user.getName() ) );
+            log.warn( "User account saved: " + user.getName() );
         } catch( SQLException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.nameexists" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
-                    "Failed to save user account: " + user.getName() ) );
+            log.error( "Failed to save user account: " + user.getName() );
             errors.reject( "message.adduser.nameexists" );
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.adduser.nameexists" ) );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR, 
-                    "Failed to save user account: " + user.getName() ) );
+            log.error( "Failed to save user account: " + user.getName() );
             errors.reject( "message.adduser.nameexists" );
         }
         return new ModelAndView( getSuccessView() );
@@ -131,17 +136,5 @@ public class SaveUserController extends SimpleFormController {
      * @param userManager Reference to user manager object
      */
     public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

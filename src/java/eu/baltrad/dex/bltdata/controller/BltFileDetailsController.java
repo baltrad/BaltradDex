@@ -27,7 +27,7 @@ import eu.baltrad.dex.bltdata.model.BltFile;
 import eu.baltrad.dex.bltdata.model.BltDataset;
 import eu.baltrad.dex.bltdata.model.BltDataProjector;
 import eu.baltrad.dex.util.FileCatalogConnector;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.fc.FileCatalog;
@@ -38,6 +38,8 @@ import ncsa.hdf.object.Group;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
+
+import org.apache.log4j.Logger;
 
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
@@ -86,8 +88,14 @@ public class BltFileDetailsController implements Controller {
     private BltDataProcessorController bltDataProcessorController;
     private static FileCatalog fc;
     private String successView;
-    private LogManager logManager;
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public BltFileDetailsController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Fetches detailed information about a file and prepares dataset image thumbs.
      *
@@ -130,8 +138,7 @@ public class BltFileDetailsController implements Controller {
             "+lon_0=" + lon0_val[ 0 ], "+ellps=" + PROJ4_ELLPS_CODE, "+a=" + EARTH_RADIUS };
         int res = BltDataProjector.initializeProjection( projParms );
         if( res == 1 ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                    "Failed to initialize projection" ) );
+            log.error( "Failed to initialize projection" );
         }
         try {
             // iterate through datasets
@@ -284,17 +291,5 @@ public class BltFileDetailsController implements Controller {
      * @param Reference to success view name string
      */
     public void setSuccessView( String successView ) { this.successView = successView; }
-     /**
-     * Gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

@@ -26,11 +26,13 @@ import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
+
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -60,7 +62,7 @@ public class RemoteDataSourceController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Variables
     private FrameDispatcherController frameDispatcherController;
     private SubscriptionManager subscriptionManager;
-    private LogManager logManager;
+    private Logger log;
     // remote data source object list
     private List remoteDataSources;
     // selected data source list
@@ -77,6 +79,12 @@ public class RemoteDataSourceController extends MultiActionController {
     private String password;
 //------------------------------------------------------------------------------------------ Methods
     /**
+     * Constructor.
+     */
+    public RemoteDataSourceController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
+     /**
      * Creates list of remote data source available for a given node.
      *
      * @param request HTTP servlet request
@@ -163,8 +171,7 @@ public class RemoteDataSourceController extends MultiActionController {
                 DataSource dataSource = ( DataSource )getSubscribedDataSources().get( i );
                 if( subscriptionManager.getSubscription( dataSource.getName(),
                         Subscription.LOCAL_SUBSCRIPTION ) != null ) {
-                    logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
-                        "You have already subscribed to " + dataSource.getName() ) );
+                    log.warn( "You have already subscribed to " + dataSource.getName() );
                 } else {
                     // add local subscription
                     Subscription subs = new Subscription( System.currentTimeMillis(),
@@ -175,8 +182,8 @@ public class RemoteDataSourceController extends MultiActionController {
                 }
             }
         } catch( Exception e ) {
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                "Error while adding remote channels to subscription list: " + e.getMessage() ) );
+            log.error( "Error while adding remote channels to subscription list: " +
+                    e.getMessage() );
         }
         return new ModelAndView( SUBSCRIBED_DATA_SOURCES_VIEW, SUBSCRIBED_DATA_SOURCES_KEY,
                 getSubscribedDataSources() );
@@ -308,17 +315,5 @@ public class RemoteDataSourceController extends MultiActionController {
     public void setSubscriptionManager( SubscriptionManager subscriptionManager ) {
         this.subscriptionManager = subscriptionManager;
     }
-    /**
-     * Method gets reference to LogManager class instance.
-     *
-     * @return Reference to LogManager class instance
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager class instance.
-     *
-     * @param logManager Reference to LogManager class instance
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

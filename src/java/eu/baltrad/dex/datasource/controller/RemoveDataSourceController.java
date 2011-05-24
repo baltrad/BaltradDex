@@ -23,10 +23,12 @@ package eu.baltrad.dex.datasource.controller;
 
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
+
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,9 +61,15 @@ public class RemoveDataSourceController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Variables
     /** References data source manager object */
     private DataSourceManager dataSourceManager;
-    /** References log manager object */
-    private LogManager logManager;
+    /** References message logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public RemoveDataSourceController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    }
     /**
      * Renders select data source page.
      *
@@ -94,16 +102,13 @@ public class RemoveDataSourceController extends MultiActionController {
                         String dataSourceName = dataSource.getName();
                         dataSourceManager.deleteDataSource( Integer.parseInt(
                                 parameterValues[ i ] ) );
-                        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_WARN,
-                                "Data source " + dataSourceName + " successfully removed" ) );
+                        log.warn( "Data source " + dataSourceName + " successfully removed" );
                     } catch( SQLException e ) {
                         modelAndView.addObject( DS_REMOVE_ERROR_KEY, "SQL exception" );
-                        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                                "Failed to remove data source: SQL Exception " + e.getMessage() ) );
+                        log.error( "Failed to remove data source: SQL Exception " + e.getMessage() );
                     } catch( Exception e ) {
                         modelAndView.addObject( DS_REMOVE_ERROR_KEY, "Exception" );
-                        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_ERROR,
-                                "Failed to remove data source: Exception " + e.getMessage() ) );
+                        log.error( "Failed to remove data source: Exception " + e.getMessage() );
                     }
                 }
                 modelAndView.setViewName( DS_REMOVE_VIEW );
@@ -128,17 +133,5 @@ public class RemoveDataSourceController extends MultiActionController {
     public void setDataSourceManager( DataSourceManager dataSourceManager ) {
         this.dataSourceManager = dataSourceManager;
     }
-    /**
-     * Gets reference to LogManager.
-     *
-     * @return Reference to LogManager
-     */
-    public LogManager getLogManager() { return logManager; }
-    /**
-     * Method sets reference to LogManager.
-     *
-     * @param logManager Reference to LogManager
-     */
-    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

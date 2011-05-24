@@ -23,7 +23,7 @@ package eu.baltrad.dex.auth.controller;
 
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.log.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.validation.BindException;
@@ -31,6 +31,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.log4j.Logger;
 
 /**
  * Login controller class implementing basic user authentication functionality.
@@ -42,15 +44,14 @@ import javax.servlet.http.HttpServletResponse;
 public class LoginController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Variables
     private UserManager userManager;
-    private LogManager logManager;
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Default constructor.
      */
     public LoginController() {
-        this.logManager = new LogManager();
-        logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO, 
-                "Baltrad Data Exchange System started" ) );
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        log.info( "Baltrad Data Exchange System started" );
     }
     /**
      * Creates new user object.
@@ -82,8 +83,7 @@ public class LoginController extends SimpleFormController {
         if( ApplicationSecurityManager.authenticateFormUser( formUser, dbUser ) ) {
             // Set user variable for this session
             ApplicationSecurityManager.setUser( request, dbUser );
-            logManager.append( new LogEntry( LogEntry.LOG_SRC_DEX, LogEntry.LEVEL_INFO,
-                "User " + dbUser.getName() + " logged on" ) );
+            log.info( "User " + dbUser.getName() + " logged on" );
         }
         return new ModelAndView( getSuccessView() );
     }
