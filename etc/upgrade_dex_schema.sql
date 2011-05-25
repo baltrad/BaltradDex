@@ -18,7 +18,6 @@ along with the BaltradDex software. If not, see http://www.gnu.org/licenses.
 ****************************************************************************************************
 Document : SQL script upgrading existing BaltradDex schema
 Created on : Jan 14, 2011, 9:09 AM
-Author : szewczenko
 ***************************************************************************************************/
 
 
@@ -241,193 +240,189 @@ BEGIN
     EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'Failed to alter column "dex_channel_permissions.channel_id"';
     END;
-    BEGIN
-        CREATE SEQUENCE data_source_id_seq;
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to create sequence "data_source_id_seq"';
-    END;
-    BEGIN
-        CREATE TABLE dex_data_sources
-        (
-            id INT NOT NULL UNIQUE DEFAULT NEXTVAL('data_source_id_seq'),
-            name VARCHAR(128) UNIQUE NOT NULL,
-            description TEXT,
-            PRIMARY KEY (id)
-        );
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_sources"';
-    END;
-    BEGIN
-        CREATE TABLE dex_data_source_quantities
-        (
-            id SERIAL NOT NULL,
-            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
-            data_quantity_id INT NOT NULL REFERENCES dex_data_quantities(id) ON DELETE CASCADE,
-            PRIMARY KEY(id)
-        );
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_quantities"';
-    END;
-    BEGIN
-        CREATE TABLE dex_data_source_file_objects
-        (
-            id SERIAL NOT NULL,
-            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
-            file_object_id INT NOT NULL REFERENCES dex_file_objects(id) ON DELETE CASCADE,
-            PRIMARY KEY(id)
-        );
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_file_objects"';
-    END;
-    BEGIN
-        CREATE TABLE dex_data_source_products
-        (
-            id SERIAL NOT NULL,
-            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
-            product_id INT NOT NULL REFERENCES dex_products(id) ON DELETE CASCADE,
-            PRIMARY KEY(id)
-        );
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_products"';
-    END;
-    BEGIN
-        CREATE TABLE dex_data_source_product_parameters
-        (
-            id SERIAL NOT NULL,
-            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
-            product_parameter_id INT NOT NULL REFERENCES dex_product_parameters(id) ON DELETE CASCADE,
-            PRIMARY KEY(id)
-        );
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_product_parameters"';
-    END;
-    BEGIN
-        CREATE TABLE dex_data_source_radars
-        (
-            id SERIAL NOT NULL,
-            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
-            radar_id INT NOT NULL REFERENCES dex_radars(id) ON DELETE CASCADE,
-            PRIMARY KEY(id)
-        );
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_radars"';
-    END;
-    BEGIN
-        CREATE TABLE dex_data_source_users
-        (
-            id SERIAL NOT NULL,
-            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
-            user_id INT NOT NULL REFERENCES dex_users(id) ON DELETE CASCADE,
-            PRIMARY KEY(id)
-        );
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_users"';
-    END;
-    BEGIN
-        CREATE TABLE dex_data_source_product_parameter_values
-        (
-            id SERIAL NOT NULL,
-            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
-            parameter_id INT NOT NULL REFERENCES dex_product_parameters(id) ON DELETE CASCADE,
-            parameter_value VARCHAR(64) NOT NULL,
-            PRIMARY KEY(id)
-        );
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_product_parameter_values"';
-    END;
-    BEGIN
-        ALTER TABLE dex_subscriptions RENAME COLUMN channel_name TO data_source_name;
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'Failed to rename column "dex_subscriptions.channel_name"';
-    END;
-	BEGIN
-		ALTER TABLE dex_subscriptions ALTER COLUMN data_source_name TYPE VARCHAR(128);
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'Failed to modify data type of column "dex_subscriptions.data_source_name"';
-    END;
-    BEGIN
-        CREATE TABLE dex_data_source_filters
-        (
-            id SERIAL NOT NULL,
-            data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
-            filter_id INT NOT NULL,
-            PRIMARY KEY(id)
-        );
-    EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_filters"';
-    END;
 END;
 $$ LANGUAGE plpgsql;
 
 --
--- creates data sources based on records existing in dex_channels table
+-- creates data sources based on records existing in dex_radars table
 --
 CREATE OR REPLACE FUNCTION create_data_sources() RETURNS integer AS $$
 BEGIN
-	INSERT INTO dex_data_sources (name, description) SELECT name, name FROM dex_channels WHERE 1 = 1;
-	RETURN 0;
-END;
-$$ LANGUAGE plpgsql;
---
--- creates data sources users based on records existing in dex_channel_permissions table
---
-CREATE OR REPLACE FUNCTION create_data_source_users() RETURNS integer AS $$
-DECLARE
-	perm RECORD;
-	channel RECORD;
-	dataSource RECORD;
-	userId INTEGER;
-BEGIN
-	FOR perm IN SELECT * FROM dex_channel_permissions LOOP
-		userId = perm.user_id;
-		FOR channel IN SELECT * FROM dex_channels WHERE id = perm.channel_id LOOP
-			FOR dataSource IN SELECT * FROM dex_data_sources WHERE name = channel.name LOOP
-				INSERT INTO dex_data_source_users (data_source_id, user_id) VALUES 
-					(dataSource.id, userId);
-			END LOOP;
-		END LOOP;
-	END LOOP;
-	RETURN 0;	
-END;
-$$ LANGUAGE plpgsql;
+    --
+    -- check if data sources exist
+    --
+    PERFORM true FROM information_schema.tables where table_name = 'dex_data_sources';
+    IF NOT FOUND THEN
+        --
+        -- upgrade schema
+        --
+        BEGIN
+            CREATE SEQUENCE data_source_id_seq;
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create sequence "data_source_id_seq"';
+        END;
+        BEGIN
+            CREATE TABLE dex_data_sources
+            (
+                id INT NOT NULL UNIQUE DEFAULT NEXTVAL('data_source_id_seq'),
+                name VARCHAR(128) UNIQUE NOT NULL,
+                description TEXT,
+                PRIMARY KEY (id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_sources"';
+        END;
+        BEGIN
+            CREATE TABLE dex_data_source_quantities
+            (
+                id SERIAL NOT NULL,
+                data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+                data_quantity_id INT NOT NULL REFERENCES dex_data_quantities(id) ON DELETE CASCADE,
+                PRIMARY KEY(id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_quantities"';
+        END;
+        BEGIN
+            CREATE TABLE dex_data_source_file_objects
+            (
+                id SERIAL NOT NULL,
+                data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+                file_object_id INT NOT NULL REFERENCES dex_file_objects(id) ON DELETE CASCADE,
+                PRIMARY KEY(id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_file_objects"';
+        END;
+        BEGIN
+            CREATE TABLE dex_data_source_products
+            (
+                id SERIAL NOT NULL,
+                data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+                product_id INT NOT NULL REFERENCES dex_products(id) ON DELETE CASCADE,
+                PRIMARY KEY(id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_products"';
+        END;
+        BEGIN
+            CREATE TABLE dex_data_source_product_parameters
+            (
+                id SERIAL NOT NULL,
+                data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+                product_parameter_id INT NOT NULL REFERENCES dex_product_parameters(id) ON DELETE CASCADE,
+                PRIMARY KEY(id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_product_parameters"';
+        END;
+        BEGIN
+            CREATE TABLE dex_data_source_radars
+            (
+                id SERIAL NOT NULL,
+                data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+                radar_id INT NOT NULL REFERENCES dex_radars(id) ON DELETE CASCADE,
+                PRIMARY KEY(id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_radars"';
+        END;
+        BEGIN
+            CREATE TABLE dex_data_source_users
+            (
+                id SERIAL NOT NULL,
+                data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+                user_id INT NOT NULL REFERENCES dex_users(id) ON DELETE CASCADE,
+                PRIMARY KEY(id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_users"';
+        END;
+        BEGIN
+            CREATE TABLE dex_data_source_product_parameter_values
+            (
+                id SERIAL NOT NULL,
+                data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+                parameter_id INT NOT NULL REFERENCES dex_product_parameters(id) ON DELETE CASCADE,
+                parameter_value VARCHAR(64) NOT NULL,
+                PRIMARY KEY(id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_product_parameter_values"';
+        END;
+        BEGIN
+            ALTER TABLE dex_subscriptions RENAME COLUMN channel_name TO data_source_name;
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'Failed to rename column "dex_subscriptions.channel_name"';
+        END;
+            BEGIN
+                    ALTER TABLE dex_subscriptions ALTER COLUMN data_source_name TYPE VARCHAR(128);
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'Failed to modify data type of column "dex_subscriptions.data_source_name"';
+        END;
+        BEGIN
+            CREATE TABLE dex_data_source_filters
+            (
+                id SERIAL NOT NULL,
+                data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
+                filter_id INT NOT NULL,
+                PRIMARY KEY(id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_data_source_filters"';
+        END;
+        --
+        -- create data sources
+	--
+        INSERT INTO dex_data_sources (name, description) SELECT name, name FROM dex_radars
+            WHERE 1 = 1;
+        DECLARE
+            perm RECORD;
+            radar RECORD;
+            dataSource RECORD;
+            userId INTEGER;
+            filterId INTEGER;
+            wmoNumber VARCHAR;
+        BEGIN
+                --
+                -- create data source users based on records existing in dex_channel_permissions table
+                --
+                FOR perm IN SELECT * FROM dex_channel_permissions LOOP
+                        userId = perm.user_id;
+                        FOR radar IN SELECT * FROM dex_radars WHERE id = perm.channel_id LOOP
+                                FOR dataSource IN SELECT * FROM dex_data_sources WHERE name = radar.name LOOP
+                                        INSERT INTO dex_data_source_users (data_source_id, user_id) VALUES
+                                                (dataSource.id, userId);
+                                END LOOP;
+                        END LOOP;
+                END LOOP;
+                --
+                -- create data source radars parameters based or records existing in dex_radars table
+                --
+                FOR dataSource IN SELECT * FROM dex_data_sources LOOP
+                        FOR radar IN SELECT * FROM dex_radars WHERE name = dataSource.name LOOP
+                                INSERT INTO dex_data_source_radars (data_source_id, radar_id) VALUES
+                                        (dataSource.id, radar.id);
+                        END LOOP;
+                END LOOP;
+                --
+                -- create data source filters parameter
+                --
+                FOR dataSource IN SELECT * FROM dex_data_sources LOOP
+                        INSERT INTO beast_filters (type) VALUES ('attr') RETURNING filter_id INTO filterId;
+                        SELECT wmo_number FROM dex_radars WHERE name = dataSource.name INTO wmoNumber;
+                        INSERT INTO beast_attr_filters (filter_id, attr, op, value_type, value, negated) VALUES
+                                (filterId, 'what/source:WMO', 'EQ', 'STRING', wmoNumber, false);
+                        INSERT INTO dex_data_source_filters (data_source_id, filter_id) VALUES
+                                (dataSource.id, filterId);
+                END LOOP;
 
---
--- creates data source radars parameters based or records existing in dex_channels table
---
-CREATE OR REPLACE FUNCTION create_data_source_radars() RETURNS INTEGER AS $$
-DECLARE
-	dataSource RECORD;
-	channel RECORD;
-BEGIN
-	FOR dataSource IN SELECT * FROM dex_data_sources LOOP
-		FOR channel IN SELECT * FROM dex_channels WHERE name = dataSource.name LOOP
-		 	INSERT INTO dex_data_source_radars (data_source_id, radar_id) VALUES
-				(dataSource.id, channel.id);
-		END LOOP;
-	END LOOP;
-	RETURN 0;
+                RETURN 0;
+        END;
+    END IF;
+    RETURN 0;
 END;
 $$ LANGUAGE plpgsql;
---
--- creates data source filters parameter
---
-CREATE OR REPLACE FUNCTION create_data_source_filters() RETURNS INTEGER AS $$
-DECLARE
-	dataSource RECORD;
-	filterId INTEGER;
-	wmoNumber VARCHAR;
-BEGIN
-	FOR dataSource IN SELECT * FROM dex_data_sources LOOP
-		INSERT INTO beast_filters (type) VALUES ('attr') RETURNING filter_id INTO filterId;
-		SELECT wmo_number FROM dex_channels WHERE name = dataSource.name INTO wmoNumber; 
-		INSERT INTO beast_attr_filters (filter_id, attr, op, value_type, value, negated) VALUES
-			(filterId, 'what/source:WMO', 'EQ', 'STRING', wmoNumber, false);
-		INSERT INTO dex_data_source_filters (data_source_id, filter_id) VALUES
-                        (dataSource.id, filterId);
-	END LOOP;
-	RETURN 0;
-END;
-$$ LANGUAGE plpgsql;	
 
 SELECT split_dex_node_connections_address();
 SELECT split_dex_node_configuration_address();
@@ -435,9 +430,6 @@ SELECT split_dex_users_node_address();
 SELECT restart_seq_with_max('dex_messages', 'id');
 SELECT upgrade_dex_schema();
 SELECT create_data_sources();
-SELECT create_data_source_users();
-SELECT create_data_source_radars();
-SELECT create_data_source_filters();
 
 DROP FUNCTION make_plpgsql();
 DROP FUNCTION split_dex_node_configuration_address();
@@ -446,6 +438,3 @@ DROP FUNCTION split_dex_users_node_address();
 DROP FUNCTION restart_seq_with_max(TEXT, TEXT);
 DROP FUNCTION upgrade_dex_schema();
 DROP FUNCTION create_data_sources();
-DROP FUNCTION create_data_source_users();
-DROP FUNCTION create_data_source_radars();
-DROP FUNCTION create_data_source_filters();
