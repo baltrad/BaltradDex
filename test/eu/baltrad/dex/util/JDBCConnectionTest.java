@@ -64,12 +64,12 @@ public class JDBCConnectionTest extends TestCase {
     public void testSelectRecords() {
         try {
             Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channels" );
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_radars" );
 
             while( resultSet.next() ) {
                 String name = resultSet.getString( "name" );
                 String wmoNumber = resultSet.getString( "wmo_number" );
-                System.out.println( "Channel name: " + name );
+                System.out.println( "Radar name: " + name );
                 System.out.println( "WMO number: " + wmoNumber );
             }
             stmt.close();
