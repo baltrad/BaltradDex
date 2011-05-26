@@ -25,8 +25,8 @@ import junit.framework.TestCase;
 
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
-import eu.baltrad.dex.channel.model.Channel;
-import eu.baltrad.dex.channel.model.ChannelManager;
+import eu.baltrad.dex.radar.model.Radar;
+import eu.baltrad.dex.radar.model.RadarManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 
@@ -48,14 +48,14 @@ public class SaveDataSourceControllerTest extends TestCase {
     private static final int filterId = 1001;
 //---------------------------------------------------------------------------------------- Variables
     private DataSourceManager dsManager;
-    private ChannelManager radarManager;
+    private RadarManager radarManager;
     private UserManager userManager;
     private static int dsId;
 //------------------------------------------------------------------------------------------ Methods
     @Override
     public void setUp() throws Exception {
         dsManager = new DataSourceManager();
-        radarManager = new ChannelManager();
+        radarManager = new RadarManager();
         userManager = new UserManager();
     }
 
@@ -164,10 +164,10 @@ public class SaveDataSourceControllerTest extends TestCase {
             DataSource ds = dsManager.getDataSource( DS_NAME );
             assertNotNull( ds );
             if( radarManager.getChannel( "TestRadar" ) == null ) {
-                save = radarManager.saveOrUpdate( new Channel( "TestRadar", "12345" ) );
+                save = radarManager.saveOrUpdate( new Radar( "TestRadar", "12345" ) );
                 assertEquals( 1, save );
             }
-            Channel radar = radarManager.getChannel( "TestRadar" );
+            Radar radar = radarManager.getChannel( "TestRadar" );
             save = dsManager.saveRadar( ds.getId(), radar.getId() );
             assertEquals( 1, save );
         } catch( SQLException e ) {

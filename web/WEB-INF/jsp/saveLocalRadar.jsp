@@ -58,9 +58,6 @@ Author     : szewczenko
                                 <div class="left">
                                     <div class="row">Radar station name</div>
                                     <div class="row">WMO number</div>
-                                    <c:if test="${command.channelName != null}">
-                                        <div class="row">Users allowed</div>
-                                    </c:if>
                                 </div>
                                 <div class="right">
                                     <div class="row">
@@ -70,21 +67,6 @@ Author     : szewczenko
                                     <div class="row">
                                         <form:input path="command.wmoNumber"/>
                                         <form:errors path="command.wmoNumber" cssClass="errors"/>
-                                    </div>
-                                    <div class="row">
-                                        <c:if test="${command.channelName != null}">
-                                            <select>
-                                                <c:forEach items="${users}" var="user">
-                                                    <option>
-                                                        <c:out value="${user.name}"/>
-                                                    </option>
-                                                </c:forEach>
-                                            </select>
-                                            <button class="rounded" type="button"
-                                                onclick="window.location='setPermission.htm'">
-                                                <span>Set</span>
-                                            </button>
-                                        </c:if>
                                     </div>
                                 </div>
                                 <div class="footer">

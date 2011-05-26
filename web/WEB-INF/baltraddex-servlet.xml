@@ -41,7 +41,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="mappings">
             <props>
-                <prop key="radars.htm">channelController</prop>
+                <prop key="radars.htm">radarController</prop>
                 <prop key="showDataSources.htm">showDataSourcesController</prop>
                 <prop key="dsFiles.htm">bltDataSourceController</prop>
                 <prop key="fileDetails.htm">bltFileDetailsController</prop>
@@ -120,12 +120,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="showSelectedUsers.htm">removeUserController</prop>
                 <prop key="showRemovedUsers.htm">removeUserController</prop>
 
-                <prop key="saveLocalChannel.htm">saveChannelController</prop>
-                <prop key="editLocalChannel.htm">editChannelController</prop>
-                <prop key="showLocalChannels.htm">removeChannelController</prop>
+                <prop key="saveLocalRadar.htm">saveRadarController</prop>
+                <prop key="editLocalRadar.htm">editRadarController</prop>
+                <prop key="showLocalRadars.htm">removeRadarController</prop>
                 <prop key="saveRadarStatus">urlFilenameController</prop>
-                <prop key="showSelectedLocalChannels.htm">removeChannelController</prop>
-                <prop key="showRemovedLocalChannels.htm">removeChannelController</prop>
+                <prop key="showSelectedLocalRadars.htm">removeRadarController</prop>
+                <prop key="showRemovedLocalRadars.htm">removeRadarController</prop>
 
                 <prop key="dsSaveName.htm">saveDataSourceController</prop>
                 <prop key="dsSaveRadars.htm">saveDataSourceController</prop>
@@ -146,8 +146,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="showNodeConnections.htm">nodeConnectionController</prop>
                 <prop key="showSelectedNodeConnections.htm">nodeConnectionController</prop>
                 <prop key="showRemovedNodeConnections.htm">nodeConnectionController</prop>
-
-                <prop key="setPermission.htm">setPermissionController</prop>
             </props>
         </property>
     </bean>
@@ -201,9 +199,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
         <property name="mappings">
             <props>
-                <prop key="showChannels">showChannels</prop>
-                <prop key="showSelectedChannels">showSelectedChannels</prop>
-                <prop key="showRemovedChannels">showRemovedChannels</prop>
+                <prop key="showRadars">showRadars</prop>
+                <prop key="showSelectedRadars">showSelectedRadars</prop>
+                <prop key="showRemovedRadars">showRemovedRadars</prop>
                 <prop key="showUsers">showUsers</prop>
                 <prop key="showSelectedUsers">showSelectedUsers</prop>
                 <prop key="showRemovedUsers">showRemovedUsers</prop>
@@ -288,12 +286,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean -->
 
     <!--
-        Data channels list controller.
+        Radars' list controller.
     -->
-    <bean name="channelController"
-        class="eu.baltrad.dex.channel.controller.ChannelController">
-        <property name="channelManager">
-            <ref bean="channelManager" />
+    <bean name="radarController"
+        class="eu.baltrad.dex.radar.controller.RadarController">
+        <property name="radarManager">
+            <ref bean="radarManager" />
         </property>
         <property name="successView">
             <value>radars</value>
@@ -301,7 +299,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!--
-        Data from data channel controller.
+        Data from data source controller.
     -->
     <bean name="bltDataSourceController"
         class="eu.baltrad.dex.bltdata.controller.BltDataSourceController">
@@ -314,7 +312,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!--
-        Data from data channel controller.
+        File details controller.
     -->
     <bean name="bltFileDetailsController"
         class="eu.baltrad.dex.bltdata.controller.BltFileDetailsController">
@@ -385,9 +383,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="initAppUtil" class="eu.baltrad.dex.util.InitAppUtil"/>
 
     <!--
-        Data channel manager.
+        Radar manager.
     -->
-    <bean name="channelManager" class="eu.baltrad.dex.channel.model.ChannelManager"/>
+    <bean name="radarManager" class="eu.baltrad.dex.radar.model.RadarManager"/>
 
     <!--
         Data source files manager
@@ -551,85 +549,57 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!--
-        Add channel controller - registers new data channel in the system
+        Add radar controller
     -->
-    <bean name="saveChannelController" 
-        class="eu.baltrad.dex.channel.controller.SaveChannelController">
+    <bean name="saveRadarController"
+        class="eu.baltrad.dex.radar.controller.SaveRadarController">
         <property name="formView">
-            <value>saveLocalChannel</value>
+            <value>saveLocalRadar</value>
         </property>
         <property name="successView">
             <value>saveRadarStatus</value>
         </property>
         <property name="commandClass">
-            <value>eu.baltrad.dex.channel.model.Channel</value>
+            <value>eu.baltrad.dex.radar.model.Radar</value>
         </property>
         <property name="sessionForm">
             <value>false</value>
         </property>
-        <property name="channelManager">
-            <ref bean="channelManager"/>
+        <property name="radarManager">
+            <ref bean="radarManager"/>
         </property>
         <property name="validator">
-            <ref bean="saveChannelValidator"/>
+            <ref bean="saveRadarValidator"/>
         </property>     
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
     </bean>
 
     <!--
-        Add channel validator
+        Add radar validator
     -->
-    <bean name="saveChannelValidator" class="eu.baltrad.dex.channel.util.SaveChannelValidator"/>
+    <bean name="saveRadarValidator" class="eu.baltrad.dex.radar.util.SaveRadarValidator"/>
 
     <!--
-        Edit channel controller - allows to modify data channel
+        Edit radar controller
     -->
-    <bean name="editChannelController" class="eu.baltrad.dex.channel.controller.EditChannelController">
+    <bean name="editRadarController" class="eu.baltrad.dex.radar.controller.EditRadarController">
         <property name="successView">
-            <value>editLocalChannel</value>
+            <value>editLocalRadar</value>
         </property>
-        <property name="channelManager">
-            <ref bean="channelManager"/>
+        <property name="radarManager">
+            <ref bean="radarManager"/>
         </property>
     </bean>
 
     <!--
-        Remove channels controller extends MultiActionController
+        Remove radar controller
     -->
-    <bean id="removeChannelController"
-        class="eu.baltrad.dex.channel.controller.RemoveChannelController">
+    <bean id="removeRadarController"
+        class="eu.baltrad.dex.radar.controller.RemoveRadarController">
         <property name="nameResolver">
             <ref local="nameResolver"/>
         </property>
-        <property name="channelManager">
-            <ref bean="channelManager" />
-        </property>
-    </bean>
-
-    <!--
-        Set channel permission controller
-    -->
-    <bean id="setPermissionController"
-        class="eu.baltrad.dex.channel.controller.SetPermissionController">
-        <property name="successView">
-            <value>redirect:editLocalChannel.htm</value>
-        </property>
-        <property name="formView">
-            <value>setPermission</value>
-        </property>
-        <property name="sessionForm">
-            <value>false</value>
-        </property>
-        <property name="commandClass">
-            <value>eu.baltrad.dex.channel.model.Channel</value>
-        </property>
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-        <property name="channelManager">
-            <ref bean="channelManager" />
+        <property name="radarManager">
+            <ref bean="radarManager" />
         </property>
     </bean>
     
@@ -656,7 +626,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!--
-        Remote channel controller
+        Remote data source controller
     -->
     <bean id="remoteDataSourceController"
             class="eu.baltrad.dex.core.controller.RemoteDataSourceController">
@@ -690,7 +660,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="configurationManager" class="eu.baltrad.dex.config.model.ConfigurationManager"/>
 
     <!--
-        Add channel validator
+        Save configuration validator
     -->
     <bean name="saveConfigurationValidator"
             class="eu.baltrad.dex.config.util.SaveConfigurationValidator">

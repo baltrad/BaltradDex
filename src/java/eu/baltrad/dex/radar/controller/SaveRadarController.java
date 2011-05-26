@@ -19,13 +19,10 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.channel.controller;
+package eu.baltrad.dex.radar.controller;
 
-import eu.baltrad.dex.channel.model.ChannelManager;
-import eu.baltrad.dex.channel.model.Channel;
-import eu.baltrad.dex.channel.model.ChannelPermission;
-import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.radar.model.RadarManager;
+import eu.baltrad.dex.radar.model.Radar;
 import eu.baltrad.dex.log.model.MessageLogger;
 
 import org.apache.log4j.Logger;
@@ -38,9 +35,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
 
 import java.sql.SQLException;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Controller class registers new channel in the system or modifies existing data channel.
@@ -49,21 +43,20 @@ import java.util.HashMap;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class SaveChannelController extends SimpleFormController {
+public class SaveRadarController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
     public static final String CHANNEL_ID = "channelId";
     public static final String USERS = "users";
     private static final String OK_MSG_KEY = "ok_message";
     private static final String ERROR_MSG_KEY = "error_message";
 //---------------------------------------------------------------------------------------- Variables
-    private ChannelManager channelManager;
-    private UserManager userManager;
+    private RadarManager radarManager;
     private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      */
-    public SaveChannelController() {
+    public SaveRadarController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
@@ -75,40 +68,15 @@ public class SaveChannelController extends SimpleFormController {
      */
     @Override
     protected Object formBackingObject( HttpServletRequest request ) throws Exception {
-        Channel channel = null;
+        Radar channel = null;
         if( request.getParameter( CHANNEL_ID ) != null
                 && request.getParameter( CHANNEL_ID ).trim().length() > 0 ) {
-            channel = channelManager.getChannel( Integer.parseInt( 
+            channel = radarManager.getChannel( Integer.parseInt(
                     request.getParameter( CHANNEL_ID ) ) );
         } else {
-            channel = new Channel();
+            channel = new Radar();
         }
         return channel;
-    }
-    /**
-     * Returns HashMap holding list of registered users.
-     *
-     * @param request HttpServletRequest
-     * @return HashMap holding list of users
-     * @throws Exception
-     */
-    @Override
-    protected HashMap referenceData( HttpServletRequest request ) throws Exception {
-        HashMap model = new HashMap();
-        if( request.getParameter( CHANNEL_ID ) != null
-                && !request.getParameter( CHANNEL_ID ).isEmpty() ) {
-            List< ChannelPermission > channelPermissions = channelManager.getPermissionByChannel(
-                Integer.parseInt( request.getParameter( CHANNEL_ID ) ) );
-            List< User > users = new ArrayList< User >();
-            for( int i = 0; i < channelPermissions.size(); i++ ) {
-                User user = userManager.getUserById( channelPermissions.get( i ).getUserId() );
-                users.add( user );
-            }
-            model.put( USERS, users );
-            // set session attribute in order to define channel permissions
-            request.getSession().setAttribute( CHANNEL_ID, request.getParameter( CHANNEL_ID ) );
-        }
-        return model;
     }
     /**
      * Saves Channel object.
@@ -122,9 +90,9 @@ public class SaveChannelController extends SimpleFormController {
     @Override
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors) throws Exception {
-        Channel channel = ( Channel )command;
+        Radar channel = ( Radar )command;
         try {
-            channelManager.saveOrUpdate( channel );
+            radarManager.saveOrUpdate( channel );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                 "message.addradar.savesuccess" ) );
             log.warn( "Saved local radar station " + channel.getChannelName() );
@@ -142,30 +110,18 @@ public class SaveChannelController extends SimpleFormController {
         return new ModelAndView( getSuccessView() );
     }
     /**
-     * Method returns reference to data channel manager object.
+     * Method returns reference to radar manager object.
      *
-     * @return Reference to data channel manager object
+     * @return Reference to radar manager object
      */
-    public ChannelManager getChannelManager() { return channelManager; }
+    public RadarManager getRadarManager() { return radarManager; }
     /**
-     * Method sets reference to data channel manager object.
+     * Method sets reference to radar manager object.
      *
-     * @param Reference to data channel manager object
+     * @param Reference to radar manager object
      */
-    public void setChannelManager( ChannelManager channelManager ) {
-        this.channelManager = channelManager;
+    public void setRadarManager( RadarManager radarManager ) {
+        this.radarManager = radarManager;
     }
-    /**
-     * Method gets reference to user manager object.
-     *
-     * @return Reference to user manager object
-     */
-    public UserManager getUserManager() { return userManager; }
-    /**
-     * Method sets reference to user manager object.
-     *
-     * @param userManager Reference to user manager object
-     */
-    public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
 }
 //--------------------------------------------------------------------------------------------------

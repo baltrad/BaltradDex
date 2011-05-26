@@ -19,9 +19,9 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.channel.controller;
+package eu.baltrad.dex.radar.controller;
 
-import eu.baltrad.dex.channel.model.ChannelManager;
+import eu.baltrad.dex.radar.model.RadarManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,16 +40,16 @@ import java.util.List;
  * @version 1.0
  * @since 1.0
  */
-public class EditChannelController implements Controller {
+public class EditRadarController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
     private static final String MODEL_KEY = "registered_channels";
 //---------------------------------------------------------------------------------------- Variables
     private String successView;
-    private ChannelManager channelManager;
+    private RadarManager radarManager;
 //------------------------------------------------------------------------------------------ Methods
      public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
-         List channels = channelManager.getChannels();
+         List channels = radarManager.getChannels();
          return new ModelAndView( getSuccessView(), MODEL_KEY, channels );
      }
      /**
@@ -65,18 +65,18 @@ public class EditChannelController implements Controller {
      */
     public void setSuccessView( String successView ) { this.successView = successView; }
     /**
-     * Method returns reference to data channel manager object.
+     * Method returns reference to radar manager object.
      *
-     * @return Reference to data channel manager object
+     * @return Reference to radar manager object
      */
-    public ChannelManager getChannelManager() { return channelManager; }
+    public RadarManager getRadarManager() { return radarManager; }
     /**
-     * Method sets reference to data channel manager object.
+     * Method sets reference to radar manager object.
      *
-     * @param Reference to data channel manager object
+     * @param Reference to radar manager object
      */
-    public void setChannelManager( ChannelManager channelManager ) {
-        this.channelManager = channelManager;
+    public void setRadarManager( RadarManager radarManager ) {
+        this.radarManager = radarManager;
     }
 }
 //--------------------------------------------------------------------------------------------------

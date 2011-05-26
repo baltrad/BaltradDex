@@ -19,13 +19,13 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.channel.util;
+package eu.baltrad.dex.radar.util;
 
 import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 
-import eu.baltrad.dex.channel.model.Channel;
+import eu.baltrad.dex.radar.model.Radar;
 
 /**
  * Validator class used to validate add channel form input.
@@ -34,7 +34,7 @@ import eu.baltrad.dex.channel.model.Channel;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class SaveChannelValidator implements Validator {
+public class SaveRadarValidator implements Validator {
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Declares classes supported by this validator.
@@ -43,7 +43,7 @@ public class SaveChannelValidator implements Validator {
      * @return True if class is supported, false otherwise
      */
     public boolean supports( Class aClass ) {
-        return Channel.class.equals( aClass );
+        return Radar.class.equals( aClass );
     }
     /**
      * Validates form object.
@@ -52,7 +52,7 @@ public class SaveChannelValidator implements Validator {
      * @param errors Errors object
      */
     public void validate( Object command, Errors errors ) {
-        Channel channel = ( Channel )command;
+        Radar channel = ( Radar )command;
         if( channel == null ) return;
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "channelName", "error.field.required" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "wmoNumber", "error.field.required" );

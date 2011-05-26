@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.datasource.controller;
 
-import eu.baltrad.dex.channel.model.Channel;
-import eu.baltrad.dex.channel.model.ChannelManager;
+import eu.baltrad.dex.radar.model.Radar;
+import eu.baltrad.dex.radar.model.RadarManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.datasource.model.FileObject;
@@ -234,7 +234,7 @@ public class SaveDataSourceController extends MultiActionController {
     /** References data source manager */
     private static DataSourceManager dataSourceManager;
     /** References radar manager */
-    private static ChannelManager channelManager;
+    private static RadarManager channelManager;
     /** References user manager */
     private static UserManager userManager;
      /** References CoreFilterManager */
@@ -252,9 +252,9 @@ public class SaveDataSourceController extends MultiActionController {
     /** Number of all available radars */
     private static int numAvailableRadars;
     /** List holding all available radars */
-    private List<Channel> availableRadars;
+    private List<Radar> availableRadars;
     /** List holding radars selected for data source configuration */
-    private List<Channel> selectedRadars;
+    private List<Radar> selectedRadars;
 
     /** Number of users allowed to use this data source */
     private static int numSelectedUsers;
@@ -325,10 +325,10 @@ public class SaveDataSourceController extends MultiActionController {
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
         dataSourceManager = new DataSourceManager();
         //
-        channelManager = new ChannelManager();
+        channelManager = new RadarManager();
         availableRadars = channelManager.getChannels();
         numAvailableRadars = availableRadars.size();
-        selectedRadars = new ArrayList<Channel>();
+        selectedRadars = new ArrayList<Radar>();
         numSelectedRadars = 0;
         //
         userManager = new UserManager();

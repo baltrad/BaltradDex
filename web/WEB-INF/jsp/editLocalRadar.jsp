@@ -16,18 +16,18 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Remove local radar station
-Created on : Oct 5, 2010, 12:52 AM
+Document   : Edit local radar station
+Created on : Oct 5, 2010, 11:41 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
+   "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 <%@ page import="java.util.List" %>
 <%
-    List channels = ( List )request.getAttribute( "channels" );
+    List channels = ( List )request.getAttribute( "registered_channels" );
     if( channels == null || channels.size() <= 0 ) {
         request.getSession().setAttribute( "channels_status", 0 );
     } else {
@@ -39,7 +39,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Remove radar</title>
+        <title>Baltrad | Edit radar</title>
     </head>
     <body>
         <div id="container">
@@ -53,7 +53,7 @@ Author     : szewczenko
                 <div id="right">
                     <div id="page-title">
                         <div class="left">
-                            Remove local radar station
+                            Edit local radar station
                         </div>
                         <div class="right">
                         </div>
@@ -61,51 +61,42 @@ Author     : szewczenko
                     <c:choose>
                         <c:when test="${channels_status == 1}">
                             <div id="text-box">
-                                Select radar stations to be be removed. Confirm radar removal
-                                with Submit button.
+                                List of local radar stations. Click on station name in order to
+                                modify radar settings.
                             </div>
-                            <form action="showSelectedLocalChannels.htm">
-                                <div id="table">
-                                    <div id="selectradars">
-                                        <div class="table-hdr">
+                            <div id="table">
+                                <div id="radartable">
+                                    <div class="table-hdr">
+                                        <div class="station">
+                                            Radar station
+                                        </div>
+                                        <div class="wmo">
+                                            WMO number
+                                        </div>
+                                    </div>
+                                    <c:forEach var="channel" items="${registered_channels}">
+                                        <div class="table-row">
                                             <div class="station">
-                                                Radar station
+                                                <a href="saveLocalRadar.htm?channelId=${channel.id}">
+                                                    <c:out value="${channel.channelName}"/>
+                                                </a>
                                             </div>
                                             <div class="wmo">
-                                                WMO number
-                                            </div>
-                                            <div class="check">
-                                                Select
+                                                <c:out value="${channel.wmoNumber}"/>
                                             </div>
                                         </div>
-                                        <c:forEach var="channel" items="${channels}">
-                                            <div class="table-row">
-                                                <div class="station">
-                                                    <c:out value="${channel.channelName}"/>
-                                                </div>
-                                                <div class="wmo">
-                                                    <c:out value="${channel.wmoNumber}"/>
-                                                </div>
-                                                <div class="check">
-                                                    <input type="checkbox" name="selected_channels"
-                                                        value="${channel.id}"/>
-                                                </div>
-                                            </div>
-                                        </c:forEach>
-                                        <div class="footer">
-                                            <div class="right">
-                                                <button class="rounded" type="button"
-                                                    onclick="window.location='configuration.htm'">
+                                    </c:forEach>
+                                    <div class="footer">
+                                        <div class="right">
+                                            <form action="configuration.htm">
+                                                <button class="rounded" type="submit">
                                                     <span>Back</span>
                                                 </button>
-                                                <button class="rounded" type="submit">
-                                                    <span>Submit</span>
-                                                </button>
-                                            </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         </c:when>
                         <c:otherwise>
                             <div class="message">

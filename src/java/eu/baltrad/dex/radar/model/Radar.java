@@ -19,7 +19,7 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.channel.model;
+package eu.baltrad.dex.radar.model;
 
 import java.io.Serializable;
 
@@ -30,7 +30,7 @@ import java.io.Serializable;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class Channel implements Serializable {
+public class Radar implements Serializable {
 //---------------------------------------------------------------------------------------- Variables
     private int id;
     private String channelName;
@@ -39,7 +39,7 @@ public class Channel implements Serializable {
     /**
      * Default constructor
      */
-    public Channel() {}
+    public Radar() {}
     /**
      * Constructor setting field values.
      *
@@ -47,7 +47,7 @@ public class Channel implements Serializable {
      * @param channelName Channel name
      * @param wmoNumber Channel WMO number
      */
-    public Channel( int id, String channelName, String wmoNumber ) {
+    public Radar( int id, String channelName, String wmoNumber ) {
         this.id = id;
         this.channelName = channelName;
         this.wmoNumber = wmoNumber;
@@ -58,7 +58,7 @@ public class Channel implements Serializable {
      * @param channelName Channel name
      * @param wmoNumber Channel WMO number
      */
-    public Channel( String channelName, String wmoNumber ) {
+    public Radar( String channelName, String wmoNumber ) {
         this.channelName = channelName;
         this.wmoNumber = wmoNumber;
     }
@@ -72,7 +72,7 @@ public class Channel implements Serializable {
     public boolean equals( Object o ) {
         boolean res = false;
         if( getClass() == o.getClass() ) {
-            if( this.getChannelName().equals( ( ( Channel )o ).getChannelName() ) ) {
+            if( this.getChannelName().equals( ( ( Radar )o ).getChannelName() ) ) {
                 res = true;
             }
         }

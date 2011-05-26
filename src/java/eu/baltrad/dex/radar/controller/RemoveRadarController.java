@@ -19,10 +19,10 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.channel.controller;
+package eu.baltrad.dex.radar.controller;
 
-import eu.baltrad.dex.channel.model.ChannelManager;
-import eu.baltrad.dex.channel.model.Channel;
+import eu.baltrad.dex.radar.model.RadarManager;
+import eu.baltrad.dex.radar.model.Radar;
 import eu.baltrad.dex.log.model.MessageLogger;
 
 import org.apache.log4j.Logger;
@@ -45,7 +45,7 @@ import java.util.ArrayList;
  * @version 1.0
  * @since 1.0
  */
-public class RemoveChannelController extends MultiActionController {
+public class RemoveRadarController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Constants
     // model keys
     private static final String SHOW_CHANNELS_KEY = "channels";
@@ -54,12 +54,12 @@ public class RemoveChannelController extends MultiActionController {
     private static final String OK_MSG_KEY = "ok_message";
     private static final String ERROR_MSG_KEY = "error_message";
     // view names
-    private static final String SHOW_CHANNELS_VIEW = "showLocalChannels";
-    private static final String SELECTED_CHANNELS_VIEW = "showSelectedLocalChannels";
-    private static final String REMOVED_CHANNELS_VIEW = "showRemovedLocalChannels";
+    private static final String SHOW_CHANNELS_VIEW = "showLocalRadars";
+    private static final String SELECTED_CHANNELS_VIEW = "showSelectedLocalRadars";
+    private static final String REMOVED_CHANNELS_VIEW = "showRemovedLocalRadars";
 //---------------------------------------------------------------------------------------- Variables
-    // Channel manager
-    private ChannelManager channelManager;
+    // Radar manager
+    private RadarManager radarManager;
     // Name resolver
     private PropertiesMethodNameResolver nameResolver;
     // Message logger
@@ -68,7 +68,7 @@ public class RemoveChannelController extends MultiActionController {
     /*
      * Constructor.
      */
-    public RemoveChannelController() {
+    public RemoveRadarController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
@@ -78,9 +78,9 @@ public class RemoveChannelController extends MultiActionController {
      * @param response Http response
      * @return Models and view containing list of all available channels
      */
-    public ModelAndView showLocalChannels( HttpServletRequest request,
+    public ModelAndView showLocalRadars( HttpServletRequest request,
             HttpServletResponse response ) {
-        List channels = channelManager.getChannels();
+        List channels = radarManager.getChannels();
         return new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
     }
     /**
@@ -90,18 +90,18 @@ public class RemoveChannelController extends MultiActionController {
      * @param response Http response
      * @return Model and view containing list of channels selected for removal
      */
-    public ModelAndView showSelectedLocalChannels( HttpServletRequest request,
+    public ModelAndView showSelectedLocalRadars( HttpServletRequest request,
             HttpServletResponse response ) {
         ModelAndView modelAndView = null;
         String[] channelIds = request.getParameterValues( SELECTED_CHANNELS_KEY );
         if( channelIds != null ) {
-            List< Channel > channels = new ArrayList< Channel >();
+            List< Radar > channels = new ArrayList< Radar >();
             for( int i = 0; i < channelIds.length; i++ ) {
-                channels.add( channelManager.getChannel( Integer.parseInt( channelIds[ i ] ) ) );
+                channels.add( radarManager.getChannel( Integer.parseInt( channelIds[ i ] ) ) );
             }
             modelAndView = new ModelAndView( SELECTED_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
         } else {
-            List channels = channelManager.getChannels();
+            List channels = radarManager.getChannels();
             modelAndView = new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
         }
         return modelAndView;
@@ -113,15 +113,15 @@ public class RemoveChannelController extends MultiActionController {
      * @param response Http response
      * @return Model and view containing data access exception errors if occured.
      */
-    public ModelAndView showRemovedLocalChannels( HttpServletRequest request,
+    public ModelAndView showRemovedLocalRadars( HttpServletRequest request,
             HttpServletResponse response ) {
         String[] channelIds = request.getParameterValues( REMOVED_CHANNELS_KEY );
         String channelName = "";
         for( int i = 0; i < channelIds.length; i++ ) {
             try {
-                Channel channel = channelManager.getChannel( Integer.parseInt( channelIds[ i ] ) );
+                Radar channel = radarManager.getChannel( Integer.parseInt( channelIds[ i ] ) );
                 channelName = channel.getChannelName();
-                channelManager.deleteChannel( Integer.parseInt( channelIds[ i ] ) );
+                radarManager.deleteChannel( Integer.parseInt( channelIds[ i ] ) );
                 request.getSession().setAttribute( OK_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
                         "message.removeradar.removesuccess" ) );
@@ -157,18 +157,18 @@ public class RemoveChannelController extends MultiActionController {
         this.nameResolver = nameResolver;
     }
     /*
-     * Method returns reference to data channel manager object.
+     * Method returns reference to radar manager object.
      *
-     * @return Reference to data channel manager object
+     * @return Reference to radar manager object
      */
-    public ChannelManager getChannelManager() { return channelManager; }
+    public RadarManager getRadarManager() { return radarManager; }
     /**
-     * Method sets reference to data channel manager object.
+     * Method sets reference to radar manager object.
      *
-     * @param Reference to data channel manager object
+     * @param Reference to radar manager object
      */
-    public void setChannelManager( ChannelManager channelManager ) {
-        this.channelManager = channelManager;
+    public void setRadarManager( RadarManager radarManager ) {
+        this.radarManager = radarManager;
     }
 }
 //--------------------------------------------------------------------------------------------------

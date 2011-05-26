@@ -19,7 +19,7 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.channel.model;
+package eu.baltrad.dex.radar.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
 
@@ -38,7 +38,7 @@ import java.util.ArrayList;
  * @version 1.0
  * @since 1.0
  */
-public class ChannelManager {
+public class RadarManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
@@ -46,7 +46,7 @@ public class ChannelManager {
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
-    public ChannelManager() {
+    public RadarManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
     }
     /**
@@ -54,9 +54,9 @@ public class ChannelManager {
      *
      * @return List of all available data channels
      */
-    public List<Channel> getChannels() {
+    public List<Radar> getChannels() {
         Connection conn = null;
-        List<Channel> channels = new ArrayList<Channel>();
+        List<Radar> channels = new ArrayList<Radar>();
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
@@ -65,7 +65,7 @@ public class ChannelManager {
                 int chnlId = resultSet.getInt( "id" );
                 String name = resultSet.getString( "name" );
                 String wmoNumber = resultSet.getString( "wmo_number" );
-                Channel channel = new Channel( chnlId, name, wmoNumber );
+                Radar channel = new Radar( chnlId, name, wmoNumber );
                 channels.add( channel );
             }
             stmt.close();
@@ -84,9 +84,9 @@ public class ChannelManager {
      * @param id Data channel ID
      * @return Data channel with a given ID
      */
-    public Channel getChannel( int id ) {
+    public Radar getChannel( int id ) {
         Connection conn = null;
-        Channel channel = null;
+        Radar channel = null;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
@@ -96,7 +96,7 @@ public class ChannelManager {
                 int chnlId = resultSet.getInt( "id" );
                 String name = resultSet.getString( "name" );
                 String wmoNumber = resultSet.getString( "wmo_number" );
-                channel = new Channel( chnlId, name, wmoNumber );
+                channel = new Radar( chnlId, name, wmoNumber );
             }
             stmt.close();
         } catch( SQLException e ) {
@@ -114,9 +114,9 @@ public class ChannelManager {
      * @param channelName Data channel name
      * @return Data channel with a given name
      */
-    public Channel getChannel( String channelName ) {
+    public Radar getChannel( String channelName ) {
         Connection conn = null;
-        Channel channel = null;
+        Radar channel = null;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
@@ -126,7 +126,7 @@ public class ChannelManager {
                 int chnlId = resultSet.getInt( "id" );
                 String name = resultSet.getString( "name" );
                 String wmoNumber = resultSet.getString( "wmo_number" );
-                channel = new Channel( chnlId, name, wmoNumber );
+                channel = new Radar( chnlId, name, wmoNumber );
             }
             stmt.close();
         } catch( SQLException e ) {
@@ -146,7 +146,7 @@ public class ChannelManager {
      * @throws SQLException
      * @throws Exception
      */
-    public int saveOrUpdate( Channel channel ) throws SQLException, Exception {
+    public int saveOrUpdate( Radar channel ) throws SQLException, Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -199,147 +199,6 @@ public class ChannelManager {
         } catch( Exception e ) {
             System.err.println( "Failed to delete data channel: " + e.getMessage() );
             throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return delete;
-    }
-    /**
-     * Gets permission for a given channel and a given user.
-     *
-     * @param channelId Channel ID
-     * @param userId User ID
-     * @return ChannelPermission object
-     */
-    public ChannelPermission getPermission( int channelId, int userId ) {
-        Connection conn = null;
-        ChannelPermission channelPermission = null;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channel_permissions " +
-                    "WHERE channel_id = " + channelId + " AND user_id = " + userId + ";" );
-            while( resultSet.next() ) {
-                int chnlId = resultSet.getInt( "channel_id" );
-                int usrId = resultSet.getInt( "user_id" );
-                channelPermission = new ChannelPermission( chnlId, usrId );
-            }
-            stmt.close();
-        } catch ( SQLException e ) {
-            System.err.println( "Failed to select channel permission: " + e.getMessage() );
-        } catch ( Exception e ) {
-            System.err.println( "Failed to select channel permission: " + e.getMessage() );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return channelPermission;
-    }
-    /**
-     * Gets channel permissions for user with a given ID.
-     *
-     * @param userId User ID
-     * @return List of permissions for a given user
-     */
-    public List<ChannelPermission> getPermissionByUser( int userId ) {
-        Connection conn = null;
-        List<ChannelPermission> channelPermissions = new ArrayList<ChannelPermission>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channel_permissions " +
-                    "WHERE user_id = " + userId + ";" );
-            while( resultSet.next() ) {
-                int chnlId = resultSet.getInt( "channel_id" );
-                int usrId = resultSet.getInt( "user_id" );
-                ChannelPermission permission = new ChannelPermission( chnlId, usrId );
-                channelPermissions.add( permission );
-            }
-            stmt.close();
-        } catch ( SQLException e ) {
-            System.err.println( "Failed to select channel permission: " + e.getMessage() );
-        } catch ( Exception e ) {
-            System.err.println( "Failed to select channel permission: " + e.getMessage() );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return channelPermissions;
-    }
-    /**
-     * Gets channel permissions for a data channel with a given ID.
-     *
-     * @param channelId Data channel ID
-     * @return List of permissions for a given data channel
-     */
-    public List<ChannelPermission> getPermissionByChannel( int channelId ) {
-        Connection conn = null;
-        List<ChannelPermission> channelPermissions = new ArrayList<ChannelPermission>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_channel_permissions " +
-                    "WHERE channel_id = " + channelId + ";" );
-            while( resultSet.next() ) {
-                int chnlId = resultSet.getInt( "channel_id" );
-                int usrId = resultSet.getInt( "user_id" );
-                ChannelPermission permission = new ChannelPermission( chnlId, usrId );
-                channelPermissions.add( permission );
-            }
-            stmt.close();
-        } catch ( SQLException e ) {
-            System.err.println( "Failed to select channel permission: " + e.getMessage() );
-        } catch ( Exception e ) {
-            System.err.println( "Failed to select channel permission: " + e.getMessage() );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return channelPermissions;
-    }
-    /**
-     * Saves channel permission.
-     *
-     * @param channelPermission Channel permission object
-     * @return Number of inserted records
-     */
-    public int savePermission( ChannelPermission permission ) {
-        Connection conn = null;
-        int insert = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "INSERT INTO dex_channel_permissions (channel_id, user_id) VALUES ('" +
-                    permission.getChannelId() + "', '" + permission.getUserId() + "');";
-            insert = stmt.executeUpdate( sql );
-            stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save channel permission: " + e.getMessage() );
-        } catch( Exception e ) {
-            System.err.println( "Failed to save channel permission: " + e.getMessage() );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return insert;
-    }
-    /**
-     * Removes channel permission.
-     *
-     * @param channelId Channel ID
-     * @param userId User ID
-     * @return Number of deleted records
-     */
-    public int deletePermission( int channelId, int userId ) {
-        Connection conn = null;
-        int delete = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DELETE FROM dex_channel_permissions WHERE channel_id = " +
-                    channelId + "AND user_id = " + userId + ";";
-            delete = stmt.executeUpdate( sql );
-            stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete channel permission: " + e.getMessage() );
-        } catch( Exception e ) {
-            System.err.println( "Failed to delete channel permission: " + e.getMessage() );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }

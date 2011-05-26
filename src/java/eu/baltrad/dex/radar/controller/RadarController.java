@@ -19,9 +19,9 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.channel.controller;
+package eu.baltrad.dex.radar.controller;
 
-import eu.baltrad.dex.channel.model.ChannelManager;
+import eu.baltrad.dex.radar.model.RadarManager;
 
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
@@ -40,11 +40,11 @@ import java.util.List;
  * @version 1.0
  * @since 1.0
  */
-public class ChannelController implements Controller {
+public class RadarController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
     public static final String MAP_KEY = "channels";
 //---------------------------------------------------------------------------------------- Variables
-    private ChannelManager channelManager;
+    private RadarManager radarManager;
     private String successView;
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -59,22 +59,22 @@ public class ChannelController implements Controller {
     public ModelAndView handleRequest( HttpServletRequest request,
                                                         HttpServletResponse response )
                                                         throws ServletException, IOException {
-        List channelsList = channelManager.getChannels();
+        List channelsList = radarManager.getChannels();
         return new ModelAndView( getSuccessView(), MAP_KEY, channelsList );
     }
     /**
-     * Method returns reference to data channel manager object.
+     * Method returns reference to radar manager object.
      *
-     * @return Reference to data channel manager object
+     * @return Reference to radar manager object
      */
-    public ChannelManager getChannelManager() { return channelManager; }
+    public RadarManager getRadarManager() { return radarManager; }
     /**
-     * Method sets reference to data channel manager object.
+     * Method sets reference to radar manager object.
      *
-     * @param Reference to data channel manager object
+     * @param Reference to radar manager object
      */
-    public void setChannelManager( ChannelManager channelManager ) {
-        this.channelManager = channelManager;
+    public void setRadarManager( RadarManager radarManager ) {
+        this.radarManager = radarManager;
     }
     /**
      * Method returns reference to success view name string.

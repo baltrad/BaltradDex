@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Select users allowed to use the radar station
-Created on : Oct 5, 2010, 12:2 PM
+Document   : Remove local radar station
+Created on : Oct 5, 2010, 12:59 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
@@ -30,7 +30,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Set permissions</title>
+        <title>Baltrad | Remove radar</title>
     </head>
     <body>
         <div id="container">
@@ -44,47 +44,37 @@ Author     : szewczenko
                 <div id="right">
                     <div id="page-title">
                         <div class="left">
-                            Set permissions
+                            Remove local radar station
                         </div>
                         <div class="right">
                         </div>
                     </div>
                     <div id="text-box">
-                        Select users allowed to subscribe to this radar station.
+                        Warning: The following local radar station(s) will be removed
+                        from the system.
                     </div>
-                    <form method="post">
+                    <form method="post" action="showRemovedLocalRadars.htm">
                         <div id="table">
-                            <div id="selectusers">
+                            <div id="radartable">
                                 <div class="table-hdr">
-                                    <div class="user">
-                                        User name
+                                    <div class="station">
+                                        Radar station
                                     </div>
-                                    <div class="role">
-                                        Role
-                                    </div>
-                                    <div class="check">
-                                        Select
+                                    <div class="wmo">
+                                        WMO number
                                     </div>
                                 </div>
-                                <c:forEach var="user" items="${users}">
+                                <c:forEach var="channel" items="${channels}">
                                     <div class="table-row">
-                                        <div class="user">
-                                            <c:out value="${user.name}"/>
+                                        <div class="station">
+                                            <c:out value="${channel.channelName}"/>
                                         </div>
-                                        <div class="role">
-                                            <c:out value="${user.roleName}"/>
+                                        <div class="wmo">
+                                            <c:out value="${channel.wmoNumber}"/>
                                         </div>
-                                        <div class="check">
-                                            <c:choose>
-                                                <c:when test="${user.checked == true}">
-                                                    <input type="checkbox" name="selected_users"
-                                                        value="${user.id}" checked/>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <input type="checkbox" name="selected_users"
-                                                        value="${user.id}"/>
-                                                </c:otherwise>
-                                            </c:choose>
+                                        <div class="tdhidden">
+                                            <input type="checkbox" name="removed_channels"
+                                                value="${channel.id}" checked/>
                                         </div>
                                     </div>
                                 </c:forEach>
@@ -102,7 +92,7 @@ Author     : szewczenko
                             </div>
                         </div>
                     </form>
-                </div>
+                 </div>
                 <div id="clear"></div>
             </div>
         </div>
@@ -111,5 +101,3 @@ Author     : szewczenko
         </div>
     </body>
 </html>
-
-                            

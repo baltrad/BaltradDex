@@ -121,13 +121,13 @@ Author     : szewczenko
                                     </div>
                                     <div class="text">
                                         <div class="row">
-                                            <a href="editLocalChannel.htm">Edit</a>
+                                            <a href="editLocalRadar.htm">Edit</a>
                                         </div>
                                         <div class="row">
-                                            <a href="saveLocalChannel.htm">Add</a>
+                                            <a href="saveLocalRadar.htm">Add</a>
                                         </div>
                                         <div class="row">
-                                            <a href="showLocalChannels.htm">Remove</a>
+                                            <a href="showLocalRadars.htm">Remove</a>
                                         </div>
                                     </div>
                                 </div>

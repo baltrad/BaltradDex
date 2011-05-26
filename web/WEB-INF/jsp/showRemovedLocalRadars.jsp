@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Remove local radar station
-Created on : Oct 5, 2010, 12:59 PM
+Document   : Remove local radar station status
+Created on : Oct 5, 2010, 1:07 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
@@ -50,49 +50,43 @@ Author     : szewczenko
                         </div>
                     </div>
                     <div id="text-box">
-                        Warning: The following local radar station(s) will be removed
-                        from the system.
+                        <c:choose>
+                            <c:when test="${not empty ok_message}">
+                                <div class="message">
+                                    <div class="icon">
+                                        <img src="includes/images/icons/circle-check.png"
+                                             alt="remove_ok"/>
+                                    </div>
+                                    <div class="text">
+                                        <c:out value="${ok_message}"/>
+                                        <c:set var="ok_message" value="" scope="session"/>
+                                    </div>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="message">
+                                    <div class="icon">
+                                        <img src="includes/images/icons/circle-delete.png"
+                                             alt="remove_error"/>
+                                    </div>
+                                    <div class="text">
+                                        <c:out value="${error_message}"/>
+                                        <c:set var="error_message" value="" scope="session"/>
+                                    </div>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
-                    <form method="post" action="showRemovedLocalChannels.htm">
-                        <div id="table">
-                            <div id="radartable">
-                                <div class="table-hdr">
-                                    <div class="station">
-                                        Radar station
-                                    </div>
-                                    <div class="wmo">
-                                        WMO number
-                                    </div>
-                                </div>
-                                <c:forEach var="channel" items="${channels}">
-                                    <div class="table-row">
-                                        <div class="station">
-                                            <c:out value="${channel.channelName}"/>
-                                        </div>
-                                        <div class="wmo">
-                                            <c:out value="${channel.wmoNumber}"/>
-                                        </div>
-                                        <div class="tdhidden">
-                                            <input type="checkbox" name="removed_channels"
-                                                value="${channel.id}" checked/>
-                                        </div>
-                                    </div>
-                                </c:forEach>
-                                <div class="footer">
-                                    <div class="right">
-                                        <button class="rounded" type="button"
-                                            onclick="history.go(-1);">
-                                            <span>Back</span>
-                                        </button>
-                                        <button class="rounded" type="submit">
-                                            <span>Submit</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="footer">
+                        <div class="right">
+                            <form action="showLocalRadars.htm">
+                                <button class="rounded" type="submit">
+                                    <span>OK</span>
+                                </button>
+                            </form>
                         </div>
-                    </form>
-                 </div>
+                    </div>
+                </div>
                 <div id="clear"></div>
             </div>
         </div>
