@@ -596,7 +596,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_200 );
                                 // send message to Beast Framework
                                 BltDataMessage message = new BltDataMessage();
-                                message.setFileEntry( fileEntry );
+                                message.setFileEntry( fc.database().entry_by_uuid(fileEntry.uuid()) );
                                 bltMessageManager.manage( message );
                                 
                                 // iterate through subscriptions list to send data to subscribers
