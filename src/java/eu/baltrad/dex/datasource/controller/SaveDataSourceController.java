@@ -250,18 +250,18 @@ public class SaveDataSourceController extends MultiActionController {
     /** Number of radars used to configure a data source */
     private static int numSelectedRadars;
     /** Number of all available radars */
-    private static int numAvailableRadars;
+    //private static int numAvailableRadars;
     /** List holding all available radars */
-    private List<Radar> availableRadars;
+    //private List<Radar> availableRadars;
     /** List holding radars selected for data source configuration */
     private List<Radar> selectedRadars;
 
     /** Number of users allowed to use this data source */
     private static int numSelectedUsers;
     /** Number of all available users */
-    private static int numAvailableUsers;
+    //private static int numAvailableUsers;
     /** List holding all available users */
-    private List<User> availableUsers;
+    //private List<User> availableUsers;
     /** List holding selected users */
     private List<User> selectedUsers;
 
@@ -326,14 +326,14 @@ public class SaveDataSourceController extends MultiActionController {
         dataSourceManager = new DataSourceManager();
         //
         channelManager = new RadarManager();
-        availableRadars = channelManager.getChannels();
-        numAvailableRadars = availableRadars.size();
+        //availableRadars = channelManager.getChannels();
+        //numAvailableRadars = availableRadars.size();
         selectedRadars = new ArrayList<Radar>();
         numSelectedRadars = 0;
         //
         userManager = new UserManager();
-        availableUsers = userManager.getUsers();
-        numAvailableUsers = availableUsers.size();
+        //availableUsers = userManager.getUsers();
+        //numAvailableUsers = availableUsers.size();
         selectedUsers = new ArrayList<User>();
         numSelectedUsers = 0;
     }
@@ -587,8 +587,8 @@ public class SaveDataSourceController extends MultiActionController {
      * @param modelAndView ModelAndView to be filled
      */
     private void setDSRadarsModel( ModelAndView modelAndView ) {
-        modelAndView.addObject( DS_AVAILABLE_RADARS_KEY, availableRadars );
-        modelAndView.addObject( DS_NUM_AVAILABLE_RADARS_KEY, numAvailableRadars );
+        modelAndView.addObject( DS_AVAILABLE_RADARS_KEY, channelManager.getChannels() );
+        modelAndView.addObject( DS_NUM_AVAILABLE_RADARS_KEY, channelManager.getChannels().size() );
         modelAndView.addObject( DS_SELECTED_RADARS_KEY, selectedRadars );
         modelAndView.addObject( DS_NUM_SELECTED_RADARS_KEY, numSelectedRadars );
     }
@@ -598,8 +598,8 @@ public class SaveDataSourceController extends MultiActionController {
      * @param modelAndView ModelAndView to be filled
      */
     private void setDSUsersModel( ModelAndView modelAndView ) {
-        modelAndView.addObject( DS_AVAILABLE_USERS_KEY, availableUsers );
-        modelAndView.addObject( DS_NUM_AVAILABLE_USERS_KEY, numAvailableUsers );
+        modelAndView.addObject( DS_AVAILABLE_USERS_KEY, userManager.getUsers() );
+        modelAndView.addObject( DS_NUM_AVAILABLE_USERS_KEY, userManager.getUsers().size() );
         modelAndView.addObject( DS_SELECTED_USERS_KEY, selectedUsers );
         modelAndView.addObject( DS_NUM_SELECTED_USERS_KEY, numSelectedUsers );
     }
@@ -619,7 +619,7 @@ public class SaveDataSourceController extends MultiActionController {
      * @param radarName Radar station name
      */
     private  void addSelectedRadar( String radarName ) {
-        if( numSelectedRadars < numAvailableRadars &&
+        if( numSelectedRadars < channelManager.getChannels().size() &&
                 !radarName.equals( DEFAULT_LIST_OPTION_KEY ) ) {
             if( !selectedRadars.contains( channelManager.getChannel( radarName ) ) ) {
                 ++numSelectedRadars;
@@ -642,7 +642,7 @@ public class SaveDataSourceController extends MultiActionController {
      * @param userName User name
      */
     public void addSelectedUser( String userName ) {
-        if( numSelectedUsers < numAvailableUsers &&
+        if( numSelectedUsers < userManager.getUsers().size() &&
                 !userName.equals( DEFAULT_LIST_OPTION_KEY ) ) {
             if( !selectedUsers.contains( userManager.getUserByName( userName ) ) ) {
                 ++numSelectedUsers;
