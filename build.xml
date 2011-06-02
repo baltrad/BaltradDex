@@ -198,6 +198,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="groovy-all-1.6.4.jar"/>
       	<include name="cglib-nodep-2.2.jar"/>
       	<include name="quartz-1.8.3.jar"/>
+        <include name="sshj-0.3.1.jar"/>
         <include name="ws-commons-util-1.0.2.jar"/>
         <include name="xmlrpc-client-3.1.2.jar"/>
         <include name="xmlrpc-common-3.1.2.jar"/>
