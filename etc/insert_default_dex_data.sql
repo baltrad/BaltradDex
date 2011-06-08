@@ -81,7 +81,7 @@ INSERT INTO dex_products (product, description) VALUES
     ('QUAL', 'Quality metric');
 
 -- dex_product_parameters --------------------------------------------------------------------------
-INSERT INTO dex_product_parameters (product, parameter) VALUES
+INSERT INTO dex_product_parameters (parameter, description) VALUES
     ('CAPPI', 'Layer height (meters above the radar)'), ('PPI', 'Elevation angle used (degrees)'),
     ('ETOP', 'Reflectivity level (dBZ)'), ('RHI', 'Azimuth angle (degrees)'),
     ('VIL', 'Bottom and top heights (m) of the integration layer');
