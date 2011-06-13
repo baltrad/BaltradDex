@@ -36,6 +36,7 @@ import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 import eu.baltrad.dex.core.util.FramePublisherManager;
 import eu.baltrad.dex.core.util.FramePublisher;
 import eu.baltrad.dex.core.util.HandleFrameTask;
+import eu.baltrad.dex.core.util.IncomingFileNamer;
 import eu.baltrad.dex.register.model.*;
 import eu.baltrad.dex.bltdata.model.BltFileManager;
 
@@ -609,9 +610,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     protected int handleIncomingDataFrame(String header,
                                           FileItemStream fileItem)
             throws IOException {
-        log.info( "New data frame received from " +
-            bfHandler.getSenderNodeName( header ) + " / " +
-            bfHandler.getChannel( header ) );
+        String frameSource = bfHandler.getSenderNodeName(header) + "/" +
+                             bfHandler.getChannel(header);
+        log.info("New data frame received from " + frameSource);
 
         // write data to swap file
         File swapFile = InitAppUtil.createTempFile(new File(InitAppUtil.getWorkDir()));
@@ -630,6 +631,11 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             // exception while storing file in FileCatalog - set error code
             return BaltradFrameHandler.HTTP_STATUS_CODE_500;
         }
+
+        IncomingFileNamer namer = new IncomingFileNamer();
+        String friendlyName = namer.name(fileEntry);
+
+        log.info("frame content (" + friendlyName + ") stored with UUID: " + fileEntry.uuid());
 
         // file successfully stored in File Catalog
         // send message to Beast Framework
