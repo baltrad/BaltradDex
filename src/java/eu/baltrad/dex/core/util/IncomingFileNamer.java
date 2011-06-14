@@ -33,7 +33,7 @@ public class IncomingFileNamer extends FileNamer {
    * Give names similar to `(PVOL seang 2011-06-13T13:14)`
    */
   protected String do_name(FileEntry entry) {
-    String name = "(";
+    String name = "";
     name += entry.what_object();
     name += " ";
     name += entry.source().get("_name");
@@ -41,7 +41,6 @@ public class IncomingFileNamer extends FileNamer {
     name += entry.what_date().to_iso_string(true);
     name += "T";
     name += entry.what_time().to_iso_string(true);
-    name += ")";
     return name;
   }
 }

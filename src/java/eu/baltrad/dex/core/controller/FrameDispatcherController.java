@@ -635,7 +635,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         IncomingFileNamer namer = new IncomingFileNamer();
         String friendlyName = namer.name(fileEntry);
 
-        log.info("frame content (" + friendlyName + ") stored with UUID: " + fileEntry.uuid());
+        log.info(friendlyName + " stored with UUID " + fileEntry.uuid());
 
         // file successfully stored in File Catalog
         // send message to Beast Framework
