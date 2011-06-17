@@ -576,7 +576,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     // incoming data frame
                     if (bfHandler.getContentType(header).equals(BaltradFrameHandler.FILE)) {
                         FileItemStream fileItem = iterator.next();
-                        handleIncomingDataFrame(header, fileItem);
+                        response.setStatus(handleIncomingDataFrame(header, fileItem));
                     }
                 }
             }
