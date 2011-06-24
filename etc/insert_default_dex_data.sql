@@ -38,7 +38,7 @@ INSERT INTO dex_node_configuration (name, type, short_address, port, org_name, o
     'Relative temporary directory', 'Node administrator email');
 
 -- dex_data_quantity -------------------------------------------------------------------------------
-INSERT INTO dex_data_quantity (data_quantity, unit, description) VALUES 
+INSERT INTO dex_data_quantities (data_quantity, unit, description) VALUES
     ('TH', 'Th [dBZ]', 'Logged horizontally-polarized total (uncorrected) reflectivity factor'),
     ('TV', 'Tv [dBZ]', 'Logged vertically-polarized total (uncorrected) reflectivity factor'),
     ('DBZH', 'Zh [dBZ]', 'Logged horizontally-polarized (corrected) reflectivity factor'),
@@ -81,7 +81,7 @@ INSERT INTO dex_products (product, description) VALUES
     ('QUAL', 'Quality metric');
 
 -- dex_product_parameters --------------------------------------------------------------------------
-INSERT INTO dex_product_parameters (product, parameter) VALUES
+INSERT INTO dex_product_parameters (parameter, description) VALUES
     ('CAPPI', 'Layer height (meters above the radar)'), ('PPI', 'Elevation angle used (degrees)'),
     ('ETOP', 'Reflectivity level (dBZ)'), ('RHI', 'Azimuth angle (degrees)'),
     ('VIL', 'Bottom and top heights (m) of the integration layer');

@@ -200,7 +200,7 @@ CREATE TABLE dex_file_objects
 
 -- data quantity id sequence -----------------------------------------------------------------------
 CREATE SEQUENCE data_quantity_id_seq;
--- dex_data_quantity -------------------------------------------------------------------------------
+-- dex_data_quantities -------------------------------------------------------------------------------
 CREATE TABLE dex_data_quantities
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('data_quantity_id_seq'),

@@ -99,9 +99,9 @@ public class HandleFrameTask implements Runnable {
                 user.getName(), new Date(), status );
         deliveryRegisterManager.addEntry( drEntry );
         if( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) {
-            log.info( "Data from " + dataSource + " sent to user " + user.getName() );
+            log.info( "FileEntry " + fileEntry.uuid() + " sent to user " + user.getName() );
         } else {
-            log.error( "Failed to send data from " + dataSource + " to user " + user.getName() );
+            log.error( "Failed to send FileEntry " + fileEntry.uuid() + " to user " + user.getName() );
         }
     }
 }

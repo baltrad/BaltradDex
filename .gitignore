@@ -2,3 +2,4 @@
 .project
 develop.properties
 *~
+.*.swp

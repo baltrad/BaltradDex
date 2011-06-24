@@ -104,6 +104,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fileset dir="${beast.path}/bin">
       <include name="*.jar"/>
     </fileset>
+    <fileset dir="${beast.path}/libs">
+      <include name="*.jar"/>
+    </fileset>
     
     <!--fileset dir="/opt/apache-tomcat-6.0.26/lib">
       <include name="*.jar"/>
@@ -192,11 +195,16 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </fileset>
       <!-- Also, include neccesary libs from beast-lib -->
       <fileset dir="${beast.path}/libs">
+        <include name="bcprov-jdk16-146.jar"/>
+        <include name="cglib-nodep-2.2.jar"/>
         <include name="commons-dbcp.jar"/>
         <include name="commons-pool.jar"/>
+        <include name="commons-net-2.2.jar"/>
         <include name="groovy-all-1.6.4.jar"/>
-      	<include name="cglib-nodep-2.2.jar"/>
-      	<include name="quartz-1.8.3.jar"/>
+        <include name="jackson-core-lgpl-1.8.2.jar"/>
+        <include name="jackson-mapper-lgpl-1.8.2.jar"/>
+        <include name="quartz-1.8.3.jar"/>
+        <include name="sshj-0.3.1.jar"/>
         <include name="ws-commons-util-1.0.2.jar"/>
         <include name="xmlrpc-client-3.1.2.jar"/>
         <include name="xmlrpc-common-3.1.2.jar"/>

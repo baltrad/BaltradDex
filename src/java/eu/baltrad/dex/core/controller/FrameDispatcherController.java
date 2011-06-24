@@ -36,6 +36,7 @@ import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 import eu.baltrad.dex.core.util.FramePublisherManager;
 import eu.baltrad.dex.core.util.FramePublisher;
 import eu.baltrad.dex.core.util.HandleFrameTask;
+import eu.baltrad.dex.core.util.IncomingFileNamer;
 import eu.baltrad.dex.register.model.*;
 import eu.baltrad.dex.bltdata.model.BltFileManager;
 
@@ -573,93 +574,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     }
 
                     // incoming data frame
-
-                    if( bfHandler.getContentType( header ).equals(
-                            BaltradFrameHandler.FILE ) ) {
-                        log.info( "New data frame received from " +
-                            bfHandler.getSenderNodeName( header ) + " / " +
-                            bfHandler.getChannel( header ) );
-                        // write data to swap file
-                        File swapFile = InitAppUtil.createTempFile(
-                                new File( InitAppUtil.getWorkDir() ) );
+                    if (bfHandler.getContentType(header).equals(BaltradFrameHandler.FILE)) {
                         FileItemStream fileItem = iterator.next();
-                        InputStream fileStream = fileItem.openStream();
-                        InitAppUtil.saveFile( fileStream, swapFile );
-                        
-                        try {
-                            FileEntry fileEntry = fc.store( swapFile.getAbsolutePath() );
-                            if( fileEntry == null ) {
-                                // failed to store file in File Catalog - set error code
-                                response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_500 );
-                            } else {
-                                // file successfully stored in File Catalog
-                                response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_200 );
-                                // send message to Beast Framework
-                                BltDataMessage message = new BltDataMessage();
-                                message.setFileEntry( fileEntry );
-                                bltMessageManager.manage( message );
-                                
-                                // iterate through subscriptions list to send data to subscribers
-
-                                List<Subscription> subs =
-                                        subscriptionManager.getSubscriptions(
-                                        Subscription.REMOTE_SUBSCRIPTION );
-                                for( int i = 0; i < subs.size(); i++ ) {
-                                    // check if file entry matches the subscribed data source's
-                                    // filter
-                                    String dataSourceName = subs.get( i ).getDataSourceName();
-                                    IFilter filter = bltFileManager.getFilter( dataSourceName );
-                                    Oh5FileMatcher fileMatcher = new Oh5FileMatcher();
-                                    boolean matches = fileMatcher.match( fileEntry,
-                                            filter.getExpression() );
-                                    // make sure that user exists locally
-                                    User user = userManager.getUserByName(
-                                            subs.get( i).getUserName() );
-                                    DeliveryRegisterEntry dre = deliveryRegisterManager.getEntry(
-                                            user.getId(), fileEntry.uuid() );
-
-                                    if( matches && dre == null ) {
-                                        // create frame delivery task
-                                        HandleFrameTask task = new HandleFrameTask(
-                                            getDeliveryRegisterManager(), log, user, dataSourceName,
-                                            fileEntry, swapFile );
-                                        // add task to publisher manager
-                                        framePublisherManager.getFramePublisher( user.getName()
-                                                ).addTask( task );
-                                    }
-                                    /*if( subs.get( i ).getDataSourceName().equals(
-                                            bfHandler.getChannel( header ) ) ) {
-
-                                        // make sure that user exists locally
-                                        User user = userManager.getUserByName(
-                                                                      subs.get( i ).getUserName() );
-
-                                        // look up file item in data register - if file item doesn't 
-                                        // exist, create frame delivery task
-                                        if( getDeliveryRegisterManager().getEntry( user.getId(),
-                                                fileEntry.uuid() ) == null ) {
-
-                                            // create frame delivery task
-                                            HandleFrameTask task = new HandleFrameTask(
-                                                getDeliveryRegisterManager(), getLogManager(),
-                                                user, dataSourceName, fileEntry, swapFile );
-
-                                            // add task to publisher manager
-                                            framePublisherManager.getFramePublisher(
-                                                    user.getName() ).addTask( task );
-                                        }
-                                    }*/
-                                }
-                            }
-                        } catch( DuplicateEntry e ) {
-                            log.error( "Duplicate entry error: " + e.getMessage() );
-                            // exception while storing file in FileCatalog - set error code
-                            response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_500 );
-                        } catch( FileCatalogError e ) {
-                            log.error( "File catalog error: " + e.getMessage() );
-                            // exception while storing file in FileCatalog - set error code
-                            response.setStatus( BaltradFrameHandler.HTTP_STATUS_CODE_500 );
-                        }
+                        response.setStatus(handleIncomingDataFrame(header, fileItem));
                     }
                 }
             }
@@ -677,6 +594,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             e.printStackTrace();
         }
     }
+
     /**
      * Wraps BaltradFrameHandler's frame handling functionality.
      *
@@ -688,6 +606,70 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             BaltradFrame baltradFrame ) {
         bfHandler.handleBF( baltradFrame, InitAppUtil.getConnTimeout(), InitAppUtil.getSoTimeout() );
     }
+
+    protected int handleIncomingDataFrame(String header,
+                                          FileItemStream fileItem)
+            throws IOException {
+        String frameSource = bfHandler.getSenderNodeName(header) + "/" +
+                             bfHandler.getChannel(header);
+        log.info("New data frame received from " + frameSource);
+
+        // write data to swap file
+        File swapFile = InitAppUtil.createTempFile(new File(InitAppUtil.getWorkDir()));
+        InputStream fileStream = fileItem.openStream();
+        InitAppUtil.saveFile( fileStream, swapFile );
+        
+        FileEntry fileEntry = null;
+        try {
+            fileEntry = fc.store( swapFile.getAbsolutePath() );
+        } catch (DuplicateEntry e) {
+            log.error("Duplicate entry error: " + e.getMessage());
+            // exception while storing file in FileCatalog - set error code
+            return BaltradFrameHandler.HTTP_STATUS_CODE_500;
+        } catch (FileCatalogError e) {
+            log.error("File catalog error: " + e.getMessage());
+            // exception while storing file in FileCatalog - set error code
+            return BaltradFrameHandler.HTTP_STATUS_CODE_500;
+        }
+
+        IncomingFileNamer namer = new IncomingFileNamer();
+        String friendlyName = namer.name(fileEntry);
+
+        log.info(friendlyName + " stored with UUID " + fileEntry.uuid());
+
+        // file successfully stored in File Catalog
+        // send message to Beast Framework
+        BltDataMessage message = new BltDataMessage();
+        message.setFileEntry(fc.database().entry_by_uuid(fileEntry.uuid()));
+        bltMessageManager.manage( message );
+        
+        Oh5FileMatcher fileMatcher = new Oh5FileMatcher();
+
+        // iterate through subscriptions list to send data to subscribers
+        List<Subscription> subs =
+            subscriptionManager.getSubscriptions(Subscription.REMOTE_SUBSCRIPTION);
+        for (Subscription sub : subs) {
+            // check if file entry matches the subscribed data source's filter
+            String dataSourceName = sub.getDataSourceName();
+            IFilter filter = bltFileManager.getFilter( dataSourceName );
+            boolean matches = fileMatcher.match(fileEntry, filter.getExpression());
+            // make sure that user exists locally
+            User user = userManager.getUserByName(sub.getUserName());
+            DeliveryRegisterEntry dre =
+                deliveryRegisterManager.getEntry(user.getId(), fileEntry.uuid());
+
+            if (matches && dre == null) {
+                // create frame delivery task
+                HandleFrameTask task = new HandleFrameTask(getDeliveryRegisterManager(),
+                                                           log, user, dataSourceName,
+                                                           fileEntry, swapFile);
+                // add task to publisher manager
+                framePublisherManager.getFramePublisher(user.getName()).addTask(task);
+            }
+        }
+        return BaltradFrameHandler.HTTP_STATUS_CODE_200;
+    }
+
     /**
      * Autheticates incoming frame by verifying user name and password encoded in frame header.
      * WARNING: Only users belonging to groups ADMIN and PEER are authorized to exchange data.
