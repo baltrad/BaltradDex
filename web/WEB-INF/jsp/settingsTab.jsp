@@ -68,20 +68,24 @@ Author     : szewczenko
                 Home
             </a>
         </div>
-        <div id="tab">
-            <a href="exchange.htm">
-                Exchange
-            </a>
-        </div>
-        <div id="tab">
-            <a href="processing.htm">
-                Processing
-            </a>
-        </div>
-        <div id="tab" class="active">
-            <a href="settings.htm">
-                Settings
-            </a>
-        </div>
+        <c:if test="${userRole == 0 || userRole == 1}">
+            <div id="tab">
+                <a href="exchange.htm">
+                    Exchange
+                </a>
+            </div>
+            <div id="tab">
+                <a href="processing.htm">
+                    Processing
+                </a>
+            </div>
+        </c:if>
+        <c:if test="${userRole == 0}">
+            <div id="tab">
+                <a href="settings.htm">
+                    Settings
+                </a>
+            </div>
+        </c:if>
     </body>
 </html>

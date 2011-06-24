@@ -21,17 +21,15 @@
 
 package eu.baltrad.dex.core.util;
 
-import eu.baltrad.fc.Date;
 import eu.baltrad.fc.FileNamer;
 import eu.baltrad.fc.Oh5Attribute;
 import eu.baltrad.fc.Oh5File;
-import eu.baltrad.fc.Oh5Source;
-import eu.baltrad.fc.Time;
 
 public class IncomingFileNamer extends FileNamer {
   /**
    * Give names similar to `(PVOL seang 2011-06-13T13:14)`
    */
+  @Override
   protected String do_name(Oh5File file) {
     String name = "";
     name += file.what_object();

@@ -25,37 +25,6 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@ page import="eu.baltrad.dex.user.model.User" %>
-<%@ page import="eu.baltrad.dex.log.model.MessageLogger" %>
-<%@ page import="org.apache.log4j.Logger" %>
-<%@ page import="java.util.Date" %>
-
-<jsp:useBean id="applicationSecurityManager" scope="session"
-                                    class="eu.baltrad.dex.util.ApplicationSecurityManager">
-</jsp:useBean>
-<jsp:useBean id="userManager" scope="session" class="eu.baltrad.dex.user.model.UserManager">
-</jsp:useBean>
-<%
-    Logger log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-    User sessionUser = ( User )applicationSecurityManager.getUser( request );
-    User dbUser = userManager.getUserByName( sessionUser.getName() );
-    if( !applicationSecurityManager.authenticateSessionUser( sessionUser, dbUser ) ) {
-        log.warn( "User failed to access restricted system area" );
-    } else {
-        if( dbUser.getRoleName().equals( User.ROLE_ADMIN ) ) {
-            request.getSession().setAttribute( "userRole", 0 );
-        }
-        if( dbUser.getRoleName().equals( User.ROLE_OPERATOR ) ) {
-            request.getSession().setAttribute( "userRole", 1 );
-        } 
-        if( dbUser.getRoleName().equals( User.ROLE_PEER ) ) {
-            request.getSession().setAttribute( "userRole", 2 );
-        }
-        if( dbUser.getRoleName().equals( User.ROLE_USER ) ) {
-            request.getSession().setAttribute( "userRole", 3 );
-        }
-    }
-%>
 
 <html>
     <head>
@@ -70,38 +39,13 @@ Author     : szewczenko
             </div>
             <div id="bltmain">
                 <div id="tabs">
-                    <div id="tab">
-                        <a href="home.htm">
-                            Home
-                        </a>
-                    </div>
-                    <div id="tab">
-                        <a href="exchange.htm">
-                            Exchange
-                        </a>
-                    </div>
-                    <div id="tab" class="active">
-                        <a href="processing.htm">
-                            Processing
-                        </a>
-                    </div>
-                    <c:choose>
-                        <c:when test="${userRole == 0}">
-                            <div id="tab">
-                                <a href="settings.htm">
-                                    Settings
-                                </a>
-                            </div>
-                        </c:when>
-                    </c:choose>
+                    <%@include file="/WEB-INF/jsp/processingTab.jsp"%>
                 </div>
                 <div id="tabcontent">
                     <div class="left">
                         <%@include file="/WEB-INF/jsp/processingMenu.jsp"%>
                     </div>
-                    <div class="right">
-
-                    </div>
+                    <div class="right"></div>
                 </div>
             </div>
         </div>

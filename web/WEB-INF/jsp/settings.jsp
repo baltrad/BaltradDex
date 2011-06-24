@@ -45,9 +45,7 @@ Author     : szewczenko
                     <div class="left">
                         <%@include file="/WEB-INF/jsp/settingsMenu.jsp"%>
                     </div>
-                    <div class="right">
-
-                    </div>
+                    <div class="right"></div>
                 </div>
             </div>
         </div>

@@ -58,10 +58,8 @@ public class ApplicationSecurityManager {
         } else {
             String formUserName = formUser.getName().trim();
             String formUserPassword = MessageDigestUtil.createHash( formUser.getPassword().trim() );
-
             String dbUserName = dbUser.getName().trim();
             String dbUserPassword = dbUser.getPassword().trim();
-
             if( formUserName.equals( dbUserName ) && formUserPassword.equals( dbUserPassword ) && (
                     dbUser.getRoleName().equals( User.ROLE_ADMIN ) ||
                     dbUser.getRoleName().equals( User.ROLE_OPERATOR ) ||
