@@ -22,10 +22,12 @@ List of routes
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@ page import="java.util.List" %>
+
+<%@page import="java.util.List"%>
+
 <%
     // Check if there are routes available to display
     List routes = ( List )request.getAttribute( "routes" );
@@ -43,129 +45,124 @@ List of routes
         <title>Baltrad | Routes</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/processingTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/processingMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
                             Routes
                         </div>
-                        <div class="right">
+                        <div class="blttext">
+                            List of routes. Click on route name in order to modify route settings.
                         </div>
-                    </div>
-                    <div id="text-box">
-                        List of routes. Create or choose a route.
-                    </div>
-                    <form name="createRouteForm" action="createroute.htm">
-                        <div id="table">
-                            <c:choose>
-                                <c:when test="${routes_status == 1}">
-                                    <div id="showroutes">
-                                        <div class="table-hdr">
-                                            <div class="active">
-                                                Active
-                                            </div>
-                                            <div class="name">
-                                                Name
-                                            </div>
-                                            <div class="type">
-                                                Type
-                                            </div>
-                                            <div class="description">
-                                                Description
-                                            </div>
-                                        </div>
-                                        <c:forEach var="route" items="${routes}">
-                                            <div class="table-row">
-                                                <div class="active">
-                                                    <c:choose>
-                                                        <c:when test="${route.active == true}">
-                                                            <img src="includes/images/green_bulb.png"
-                                                                 width="12" height="12"/>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <img src="includes/images/red_bulb.png"
-                                                                 width="12" height="12"/>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </div>
-                                                <div class="name">
-                                                    <a href="showroute.htm?name=${route.name}">
-                                                        <c:out value="${route.name}"/>
-                                                    </a>
-                                                </div>
-                                                <div class="type">
-                                                    <c:choose>
-                                                        <c:when test="${route.ruleType == 'groovy'}">
-                                                            <c:out value="Script"/>
-                                                        </c:when>
-                                                        <c:when test="${route.ruleType == 'blt_volume'}">
-                                                            <c:out value="Volume"/>
-                                                        </c:when>
-                                                        <c:when test="${route.ruleType == 'composite'}">
-                                                          <c:out value="Composite"/>
-                                                        </c:when>
-                                                        <c:when test="${route.ruleType == 'bdb_trim_age'}">
-                                                            <c:out value="BdbTrimAge"/>
-                                                        </c:when>
-                                                        <c:when test="${route.ruleType == 'bdb_trim_count'}">
-                                                            <c:out value="BdbTrimCount"/>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <c:out value="${route.ruleType}"/>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </div>
-                                                <div class="description">
-                                                    <c:out value="${route.description}"/>
-                                                </div>
-                                            </div>
-                                        </c:forEach>
+                        <div class="table">
+                            <%if (request.getAttribute("emessage") != null) {%>
+                                <div class="systemerror">
+                                    <div class="header">
+                                        Problems encountered.
                                     </div>
-                                </c:when>
-                            </c:choose>
-                            <div class="footer">
-                                <div class="right">
-                                    <button class="rounded" name="submitButton" type="submit"
-                                            value="Script">
-                                        <span>Script</span>
-                                    </button>
-                                    <button class="rounded" name="submitButton" type="submit"
-                                            value="Composite">
-                                        <span>Composite</span>
-                                    </button>
-                                    <button class="rounded" name="submitButton" type="submit"
-                                            value="Volume">
-                                        <span>Volume</span>
-                                    </button>
+                                    <div class="message">
+                                        <%=request.getAttribute("emessage")%>
+                                    </div>
                                 </div>
-				<div class="right">
-                                    <button class="rounded" name="submitButton" type="submit"
-                                            value="BdbTrimCount">
-                                        <span>BdbTrimCount</span>
-                                    </button>
-                                    <button class="rounded" name="submitButton" type="submit"
-                                            value="BdbTrimAge">
-                                        <span>BdbTrimAge</span>
-                                    </button>
-				</div>
-                            </div>
+                            <%}%>
+                            <form name="createRouteForm" action="createroute.htm">
+                                <c:choose>
+                                    <c:when test="${routes_status == 1}">
+                                        <div class="showroutes">
+                                            <div class="tableheader">
+                                                <div id="cell" class="count">&nbsp;</div>
+                                                <div id="cell" class="name">
+                                                    Name
+                                                </div>
+                                                <div id="cell" class="description">
+                                                    Description
+                                                </div>
+                                                <div id="cell" class="type">
+                                                    Type
+                                                </div>
+                                                <div id ="cell" class="active">
+                                                    Active
+                                                </div>
+                                            </div>
+                                            <c:set var="count" scope="page" value="1"/>
+                                            <c:forEach var="route" items="${routes}">
+                                                <div class="entry">
+                                                    <div id="cell" class="count">
+                                                        <c:out value="${count}"/>
+                                                        <c:set var="count" value="${count + 1}"/>
+                                                    </div>
+                                                    <div id="cell" class="name">
+                                                        <a href="showroute.htm?name=${route.name}">
+                                                            <c:out value="${route.name}"/>
+                                                        </a>
+                                                    </div>
+                                                    <div id="cell" class="description">
+                                                        <c:out value="${route.description}"/>
+                                                    </div>
+                                                    <div id="cell" class="type">
+                                                        <c:choose>
+                                                            <c:when test="${route.ruleType == 'groovy'}">
+                                                                <c:out value="Script"/>
+                                                            </c:when>
+                                                            <c:when test="${route.ruleType == 'blt_volume'}">
+                                                                <c:out value="Volume"/>
+                                                            </c:when>
+                                                            <c:when test="${route.ruleType == 'composite'}">
+                                                              <c:out value="Composite"/>
+                                                            </c:when>
+                                                            <c:when test="${route.ruleType == 'bdb_trim_age'}">
+                                                                <c:out value="BdbTrimAge"/>
+                                                            </c:when>
+                                                            <c:when test="${route.ruleType == 'bdb_trim_count'}">
+                                                                <c:out value="BdbTrimCount"/>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <c:out value="${route.ruleType}"/>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </div>
+                                                    <div id="cell" class="active">
+                                                        <c:choose>
+                                                            <c:when test="${route.active == true}">
+                                                                <img src="includes/images/icons/success.png"
+                                                                     alt="Active">
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <img src="includes/images/icons/stop.png"
+                                                                     alt="Inactive"/>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                    </c:when>
+                                </c:choose>
+                                <div class="tablefooter">
+                                   <div class="buttons">
+                                       <button class="rounded" type="button"
+                                           onclick="window.location.href='processing.htm'">
+                                           <span>Back</span>
+                                       </button>
+                                   </div>
+                                </div>
+                            </form>
                         </div>
-                      </form>
-                    <%if (request.getAttribute("emessage") != null) {%>
-                        <div class="routerrerror"><%=request.getAttribute("emessage")%></div>
-                    <%}%>
+                    </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

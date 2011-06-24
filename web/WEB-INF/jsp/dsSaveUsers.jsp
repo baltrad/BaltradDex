@@ -22,100 +22,86 @@ Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@ page import="java.util.List" %>
 
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <script type="text/javascript" language="javascript" src="includes/tooltip.js"></script>
-        <script type="text/javascript">
-            <!--
-            var t1 = null;
-            var l1 = "Select users allowed to use this data source";
-            function initTooltips() {
-                t1 = new ToolTip( "ttUser", false );
-            }
-            -->
-        </script>
         <title>Baltrad | Configure data source</title>
     </head>
-    <body onload="initTooltips()">
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+    <body>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/settingsTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
-                            Configure data source
-                        </div>
-                        <div class="right">
-                        </div>
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/settingsMenu.jsp"%>
                     </div>
-                        <div id="text-box">
-                            Step 3. Select users
-                            <div class="helpIconRight" onmouseover="if(t1)t1.Show(event,l1)"
-                                    onmouseout="if(t1)t1.Hide(event)">
-                                <img src="includes/images/help-icon.png" alt="helpIcon"/>
+                    <div class="right">
+                        <div class="blttitle">
+                            Configure data source <div class="stepno">Step 3</div>
+                        </div>
+                        <div class="blttext">
+                            Select users
+                            <div class="hint">
+                                This data source will be available for the selected users.
                             </div>
                         </div>
-                        <div id="table">
-                            <form method="post" action="dsSaveSummary.htm">
-                                <div id="dsConfig">
-                                    <div class="row">
-                                        <div class="left">
-                                            Users allowed
-                                        </div>
-                                        <div class="right">
-                                            <c:forEach items="${selectedUsers}" var="user">
-                                                <div class="selectedItem">
-                                                    Name:&nbsp;<c:out value="${user.name}"></c:out>&nbsp;
-                                                    Role: <c:out value="${user.roleName}"></c:out>
-                                                    &nbsp;Organization:
-                                                    <c:out value="${user.factory}"></c:out>
-                                                </div>
-                                            </c:forEach>
-                                            <div class="row">
-                                                <c:if test="${numSelectedUsers < numAvailableUsers}">
-                                                    <select name="usersList">
-                                                        <option value="select">
-                                                            <c:out value="-- Select user --"/>
-                                                        </option>
-                                                        <c:forEach items="${availableUsers}"
-                                                                   var="user">
-                                                            <option value="${user.name}">
-                                                                <c:out value="${user.name}"/>
-                                                            </option>
-                                                        </c:forEach>
-                                                    </select>
-                                                        <input type="submit" name="addUser"
-                                                            title="Add user"
-                                                            class="buttonInput" value="+">
-                                                </c:if>
-                                                <c:if test="${numSelectedUsers > 0}">
-                                                    <input type="submit" name="removeUser"
-                                                        title="Remove user"
-                                                        class="buttonInput" value="-">
-                                                </c:if>
+                        <div class="table">
+                            <div class="dssave">
+                                <form method="post" action="dsSaveSummary.htm">
+                                    <div class="rightcol">
+                                        <c:forEach items="${selectedUsers}" var="user">
+                                            <div class="dsparam">
+                                                Name:&nbsp;<c:out value="${user.name}"></c:out>&nbsp;
+                                                Role: <c:out value="${user.roleName}"></c:out>
+                                                &nbsp;Organization:
+                                                <c:out value="${user.factory}"></c:out>
                                             </div>
-                                            <c:if test="${not empty dsSelectUsersError}">
-                                                <div class="errors">
-                                                    <c:out value="${dsSelectUsersError}"/>
+                                        </c:forEach>
+                                        <div class="row">
+                                            <c:if test="${numSelectedUsers < numAvailableUsers}">
+                                                <select name="usersList"
+                                                        title="Select user from the list">
+                                                    <option value="select">
+                                                        <c:out value="-- Select user --"/>
+                                                    </option>
+                                                    <c:forEach items="${availableUsers}"
+                                                               var="user">
+                                                        <option value="${user.name}">
+                                                            <c:out value="${user.name}"/>
+                                                        </option>
+                                                    </c:forEach>
+                                                </select>
+                                                <div class="dscontrol">
+                                                    <input type="submit" name="addUser"
+                                                        title="Add user" value="+">
+                                                </div>
+                                            </c:if>
+                                            <c:if test="${numSelectedUsers > 0}">
+                                                <div class="dscontrol">
+                                                    <input type="submit" name="removeUser"
+                                                        title="Remove user" value="-">
                                                 </div>
                                             </c:if>
                                         </div>
+                                        <c:if test="${not empty dsSelectUsersError}">
+                                            <div class="error">
+                                                <c:out value="${dsSelectUsersError}"/>
+                                            </div>
+                                        </c:if>
                                     </div>
-                                    <div class="footer">
-                                        <div class="right">
-                                            <button class="rounded" type="submit" name="backButton">
+                                    <div class="tablefooter">
+                                        <div class="buttons">
+                                           <button class="rounded" type="submit" name="backButton">
                                                 <span>Back</span>
                                             </button>
                                             <button class="rounded" type="submit" name="nextButton">
@@ -123,16 +109,15 @@ Author     : szewczenko
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                <div id="clear"></div>
+                </div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
-        <div id="ttUser" class="tooltip" style="width:170px; height:52px;"></div>
     </body>
 </html>

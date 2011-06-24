@@ -54,8 +54,8 @@ public class SaveRadarValidator implements Validator {
     public void validate( Object command, Errors errors ) {
         Radar channel = ( Radar )command;
         if( channel == null ) return;
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "channelName", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "wmoNumber", "error.field.required" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "channelName", "error.missing.radarname" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "wmoNumber", "error.missing.wmonumber" );
     }
 }
 //--------------------------------------------------------------------------------------------------

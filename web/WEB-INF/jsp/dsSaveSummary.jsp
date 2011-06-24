@@ -22,10 +22,9 @@ Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@ page import="java.util.List" %>
 
 <html>
     <head>
@@ -33,52 +32,48 @@ Author     : szewczenko
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
         <title>Baltrad | Configure data source</title>
     </head>
-    <body onload="initTooltips()">
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+    <body>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/settingsTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
-                            Configure data source
-                        </div>
-                        <div class="right">
-                        </div>
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/settingsMenu.jsp"%>
                     </div>
-                        <div id="text-box">
-                            Step 4. Data source configuration summary
+                    <div class="right">
+                        <div class="blttitle">
+                            Configure data source <div class="stepno">Step 4</div>
                         </div>
-                        <div id="table">
-                            <form method="post" action="dsSave.htm">
-                                <div id="dsConfig">
-                                    <div class="row">
-                                        <div class="left">
-                                            Data source name
-                                        </div>
-                                        <div class="right">
+                        <div class="blttext">
+                            Configuration summary
+                            <div class="hint">
+                                Data source will be saved with the following configuration.
+                            </div>
+                        </div>
+                        <div class="table">
+                            <div class="dssave">
+                                <form method="post" action="dsSave.htm">
+                                    <div class="leftcol">
+                                        <div class="row">Data source name</div>
+                                        <div class="row">Description</div>
+                                        <div class="row">Radar stations</div>
+                                        <div class="row">Users allowed</div>
+                                    </div>
+                                    <div class="rightcol">
+                                        <div class="row">
                                             <c:out value="${dsName}"></c:out>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="left">
-                                            Description
-                                        </div>
-                                        <div class="right">
+                                        <div class="row">
                                             <c:out value="${dsDescription}"></c:out>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="left">
-                                            Radar station
-                                        </div>
-                                        <div class="right">
+                                        <div class="row">
                                             <c:forEach items="${selectedRadars}" var="radar">
-                                                <div class="selectedItem">
+                                                <div class="dsparam">
                                                     <c:out value="${radar.channelName}"></c:out>
                                                     &nbsp;
                                                     WMO number: <c:out value="${radar.wmoNumber}"></c:out>
@@ -86,14 +81,9 @@ Author     : szewczenko
                                                 </div>
                                             </c:forEach>
                                         </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="left">
-                                            Users allowed
-                                        </div>
-                                        <div class="right">
+                                        <div class="row">
                                             <c:forEach items="${selectedUsers}" var="user">
-                                                <div class="selectedItem">
+                                                <div class="dsparam">
                                                     Name:&nbsp;<c:out value="${user.name}"></c:out>&nbsp;
                                                     Role: <c:out value="${user.roleName}"></c:out>
                                                     &nbsp;Organization:
@@ -102,24 +92,24 @@ Author     : szewczenko
                                             </c:forEach>
                                         </div>
                                     </div>
-                                    <div class="footer">
-                                        <div class="right">
-                                            <button class="rounded" type="submit" name="backButton">
+                                    <div class="tablefooter">
+                                        <div class="buttons">
+                                           <button class="rounded" type="submit" name="backButton">
                                                 <span>Back</span>
                                             </button>
                                             <button class="rounded" type="submit" name="nextButton">
-                                                <span>Save</span>
+                                                <span>Next</span>
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                <div id="clear"></div>
+                </div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

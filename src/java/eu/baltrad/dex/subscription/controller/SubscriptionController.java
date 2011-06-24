@@ -60,23 +60,21 @@ public class SubscriptionController extends MultiActionController {
 
     private static final String SELECTED_SUBSCRIPTIONS_KEY = "selectedSubscriptions";
     private static final String REQUEST_STATUS_KEY = "request_status";
-    private static final String OK_MSG_KEY = "ok_message";
-    private static final String ERROR_MSG_KEY = "error_message";
-    // used when user tries to remove active subscription
-    private static final String REMOVE_ACTIVE_SUBSCRIPTION_ERROR = "active_subscription";
+    private static final String OK_MSG_KEY = "message";
+    private static final String ERROR_MSG_KEY = "error";
     // view names
     private static final String SHOW_SUBSCRIPTIONS_VIEW = "showSubscriptions";
     private static final String SELECTED_SUBSCRIPTIONS_VIEW = "showSelectedSubscriptions";
     private static final String SUBSCRIPTION_STATUS_VIEW = "showSubscriptionStatus";
-    private static final String REMOVE_SUBSCRIPTIONS_VIEW = "selectRemoveSubscriptions";
-    private static final String SELECT_REMOVE_SUBSCRIPTION_VIEW = "showRemovedSubscriptions";
-    private static final String SUBSCRIPTION_REMOVAL_STATUS_VIEW = "showSubscriptionRemovalStatus";
-    private static final String REDIRECT_VIEW = "selectRemoveSubscriptions.htm";
-    private static final String SHOW_PEERS_SUBSCRIPTIONS_VIEW = "showPeersSubscriptions";
+    private static final String REMOVE_SUBSCRIPTIONS_VIEW = "removeDownloadSubscriptions";
+    private static final String SELECT_REMOVE_SUBSCRIPTION_VIEW = "downloadSubscriptionsToRemove";
+    private static final String SUBSCRIPTION_REMOVAL_STATUS_VIEW = "downloadSubscriptionsRemovalStatus";
+    private static final String REDIRECT_VIEW = "removeDownloadSubscriptions.htm";
+    private static final String SHOW_PEERS_SUBSCRIPTIONS_VIEW = "removeUploadSubscriptions";
     private static final String SHOW_SELECTED_PEERS_SUBSCRIPTIONS_VIEW =
-                                                                "showSelectedPeersSubscriptions";
+                                                                "uploadSubscriptionsToRemove";
     private static final String SHOW_REMOVED_PEERS_SUBSCRIPTIONS_VIEW =
-                                                                "showRemovedPeersSubscriptions";
+                                                                "uploadSubscriptionsRemovalStatus";
 //---------------------------------------------------------------------------------------- Variables
     //private ChannelManager channelManager;
     private DataSourceManager dataSourceManager;
@@ -210,7 +208,7 @@ public class SubscriptionController extends MultiActionController {
      */
     public ModelAndView showSubscriptionStatus( HttpServletRequest request,
             HttpServletResponse response ) {
-        // handle subscription change requests
+        ModelAndView modelAndView = new ModelAndView();
         for( int i = 0; i < getChangedSubscriptions().size(); i++ ) {
             try {
                 File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getWorkDir() ) );
@@ -234,16 +232,20 @@ public class SubscriptionController extends MultiActionController {
                         getChangedSubscriptions().get( i ).getDataSourceName(),
                         Subscription.LOCAL_SUBSCRIPTION,
                         getChangedSubscriptions().get( i ).getActive() );
+                String msg = "Subscription request successfully completed";
+                modelAndView.addObject( OK_MSG_KEY, msg );
             } catch( Exception e ) {
                 log.error( "Error while processing subscription change request for " +
                     getChangedSubscriptions().get( i ).getOperatorName() + ", channel " +
                     getChangedSubscriptions().get( i ).getDataSourceName() + ": " +
                     e.getMessage() );
+                String msg = "Failed to complete subscription request: " + e.getMessage();
+                modelAndView.addObject( ERROR_MSG_KEY, msg );
             }
         }
-        return new ModelAndView( SUBSCRIPTION_STATUS_VIEW );
+        modelAndView.setViewName( SUBSCRIPTION_STATUS_VIEW );
+        return modelAndView;
     }
-
     /**
      * Shows list of all subscribed channels with check-boxes allowing user to select channels
      * for removal.
@@ -252,7 +254,7 @@ public class SubscriptionController extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView holding list of all available channels
      */
-    public ModelAndView selectRemoveSubscriptions( HttpServletRequest request,
+    public ModelAndView removeDownloadSubscriptions( HttpServletRequest request,
             HttpServletResponse response ) {
         List subscriptions = subscriptionManager.getSubscriptions(
                 Subscription.LOCAL_SUBSCRIPTION );
@@ -265,7 +267,7 @@ public class SubscriptionController extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView holding list of channels selected for removal
      */
-    public ModelAndView showRemovedSubscriptions( HttpServletRequest request,
+    public ModelAndView downloadSubscriptionsToRemove( HttpServletRequest request,
             HttpServletResponse response ) {
         // get the list of channels selected for subscription by the user
         //String[] selChannels = request.getParameterValues( SELECTED_CHANNELS_KEY );
@@ -290,9 +292,9 @@ public class SubscriptionController extends MultiActionController {
             // user is not allowed to remove active subscription
             if( isActive ) {
                 try {
-                    request.getSession().setAttribute( REMOVE_ACTIVE_SUBSCRIPTION_ERROR,
+                    request.getSession().setAttribute( ERROR_MSG_KEY,
                         getMessageSourceAccessor().getMessage(
-                        "error.removesubscription.activesubscription" ) );
+                        "error.removesubscription.active" ) );
                     response.sendRedirect( REDIRECT_VIEW );
                 } catch( IOException e ) {
                     log.error( "Error while redirecting to " + REDIRECT_VIEW + ": " +
@@ -323,30 +325,29 @@ public class SubscriptionController extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView holding list of removed subscriptions
      */
-    public ModelAndView showSubscriptionRemovalStatus( HttpServletRequest request,
+    public ModelAndView downloadSubscriptionsRemovalStatus( HttpServletRequest request,
             HttpServletResponse response ) {
-        for( int i = 0; i < getRemovedSubscriptions().size(); i++ ) {
-            try {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            for( int i = 0; i < getRemovedSubscriptions().size(); i++ ) {
                 subscriptionManager.deleteSubscription(
                     getRemovedSubscriptions().get( i ).getDataSourceName(),
                     Subscription.LOCAL_SUBSCRIPTION );
-                request.getSession().setAttribute( OK_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removesubscription.removesuccess" ) );
-            } catch( SQLException e ) {
-                request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removesubscription.removefail" ) );
-            } catch( Exception e ) {
-                request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removesubscription.removefail" ) );
             }
-
+            String msg = "Selected subscriptions successfully removed";
+            request.getSession().setAttribute( OK_MSG_KEY, msg );
+            log.warn( msg );
+        } catch( SQLException e ) {
+            String msg = "Failed to remove selected subscriptions: " + e.getMessage();
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            log.error( msg );
+        } catch( Exception e ) {
+            String msg = "Failed to remove selected subscriptions: " + e.getMessage();
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            log.error( msg );
         }
-        return new ModelAndView( SUBSCRIPTION_REMOVAL_STATUS_VIEW );
+        modelAndView.setViewName( SUBSCRIPTION_REMOVAL_STATUS_VIEW );
+        return modelAndView;
     }
     /**
      * Creates list of subscriptions made by peers.
@@ -355,7 +356,7 @@ public class SubscriptionController extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView holding list peers subscriptions
      */
-    public ModelAndView showPeersSubscriptions( HttpServletRequest request,
+    public ModelAndView removeUploadSubscriptions( HttpServletRequest request,
             HttpServletResponse response ) {
         List subscriptions = subscriptionManager.getSubscriptions(
                 Subscription.REMOTE_SUBSCRIPTION );
@@ -369,7 +370,7 @@ public class SubscriptionController extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView holding list of peers subscriptions selected for removal
      */
-    public ModelAndView showSelectedPeersSubscriptions( HttpServletRequest request,
+    public ModelAndView uploadSubscriptionsToRemove( HttpServletRequest request,
             HttpServletResponse response ) {
         // get the list of channels selected for subscription by the user
         //String[] selChannels = request.getParameterValues( SELECTED_CHANNELS_KEY );
@@ -406,29 +407,29 @@ public class SubscriptionController extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView
      */
-    public ModelAndView showRemovedPeersSubscriptions( HttpServletRequest request,
+    public ModelAndView uploadSubscriptionsRemovalStatus( HttpServletRequest request,
             HttpServletResponse response ) {
-        for( int i = 0; i < getRemovedPeersSubscriptions().size(); i++ ) {
-            try {
+        ModelAndView modelAndView = new ModelAndView();
+        try {
+            for( int i = 0; i < getRemovedPeersSubscriptions().size(); i++ ) {
                 subscriptionManager.deleteSubscription(
                     getRemovedPeersSubscriptions().get( i ).getDataSourceName(),
                     Subscription.REMOTE_SUBSCRIPTION );
-                request.getSession().setAttribute( OK_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removesubscription.removesuccess" ) );
-            } catch( SQLException e ) {
-                request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removesubscription.removefail" ) );
-            } catch( Exception e ) {
-                request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removesubscription.removefail" ) );
             }
+            String msg = "Selected peer subscriptions successfully removed";
+            request.getSession().setAttribute( OK_MSG_KEY, msg );
+            log.warn( msg );
+        } catch( SQLException e ) {
+            String msg = "Failed to remove selected peer subscriptions: " + e.getMessage();
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            log.error( msg );
+        } catch( Exception e ) {
+            String msg = "Failed to remove selected peer subscriptions: " + e.getMessage();
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            log.error( msg );
         }
-        return new ModelAndView( SHOW_REMOVED_PEERS_SUBSCRIPTIONS_VIEW );
+        modelAndView.setViewName( SHOW_REMOVED_PEERS_SUBSCRIPTIONS_VIEW );
+        return modelAndView;
     }
     /**
      * Gets reference to data source manager object.

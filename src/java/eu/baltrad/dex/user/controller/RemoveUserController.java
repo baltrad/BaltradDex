@@ -28,7 +28,6 @@ import eu.baltrad.dex.util.ApplicationSecurityManager;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
-import org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,21 +48,19 @@ import org.apache.log4j.Logger;
 public class RemoveUserController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Constants
     // model keys
-    private static final String SHOW_USERS_KEY = "users";
-    private static final String SELECTED_USERS_KEY = "selected_users";
+    private static final String REMOVE_ACCOUNT_KEY = "users";
+    private static final String ACCOUNT_TO_REMOVE_KEY = "selected_users";
     private static final String REMOVED_USERS_KEY = "removed_users";
-    private static final String OK_MSG_KEY = "ok_message";
-    private static final String ERROR_MSG_KEY = "error_message";
+    private static final String OK_MSG_KEY = "message";
+    private static final String ERROR_MSG_KEY = "error";
 
     // view names
-    private static final String SHOW_USERS_VIEW = "showUsers";
-    private static final String SELECTED_USERS_VIEW = "showSelectedUsers";
-    private static final String REMOVED_USERS_VIEW = "showRemovedUsers";
+    private static final String REMOVE_ACCOUNT_VIEW = "removeAccount";
+    private static final String ACCOUNT_TO_REMOVE_VIEW = "accountToRemove";
+    private static final String REMOVED_ACCOUNT_VIEW = "removeAccountStatus";
 //---------------------------------------------------------------------------------------- Variables
     // User manager
     private UserManager userManager;
-    // Name resolver
-    private PropertiesMethodNameResolver nameResolver;
     // Logger object
     private Logger log;
 //------------------------------------------------------------------------------------------ Methods
@@ -80,7 +77,7 @@ public class RemoveUserController extends MultiActionController {
      * @param response HttpServletResponse
      * @return Model and view containing list of all user accounts registered in the system
      */
-    public ModelAndView showUsers( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView removeAccount( HttpServletRequest request, HttpServletResponse response ) {
         List users = userManager.getUsers();
         User signedUser = ( User )ApplicationSecurityManager.getUser( request );
         for( int i = 0; i < users.size(); i++ ) {
@@ -89,7 +86,7 @@ public class RemoveUserController extends MultiActionController {
                 users.remove( i );
             }
         }
-        return new ModelAndView( SHOW_USERS_VIEW, SHOW_USERS_KEY, users );
+        return new ModelAndView( REMOVE_ACCOUNT_VIEW, REMOVE_ACCOUNT_KEY, users );
     }
     /**
      * Gets list of user accounts selected for removal.
@@ -98,16 +95,16 @@ public class RemoveUserController extends MultiActionController {
      * @param response HttpServletResponse
      * @return Model and view containing list of user accounts selected for removal
      */
-    public ModelAndView showSelectedUsers( HttpServletRequest request,
+    public ModelAndView accountToRemove( HttpServletRequest request,
             HttpServletResponse response ) {
         ModelAndView modelAndView = null;
-        String[] userIds = request.getParameterValues( SELECTED_USERS_KEY );
+        String[] userIds = request.getParameterValues( ACCOUNT_TO_REMOVE_KEY );
         if( userIds != null ) {
             List< User > users = new ArrayList< User >();
             for( int i = 0; i < userIds.length; i++ ) {
                 users.add( userManager.getUserById( Integer.parseInt( userIds[ i ] ) ) );
             }
-            modelAndView = new ModelAndView( SELECTED_USERS_VIEW, SELECTED_USERS_KEY, users );
+            modelAndView = new ModelAndView( ACCOUNT_TO_REMOVE_VIEW, ACCOUNT_TO_REMOVE_KEY, users );
         } else {
             List users = userManager.getUsers();
             User signedUser = ( User )ApplicationSecurityManager.getUser( request );
@@ -117,7 +114,7 @@ public class RemoveUserController extends MultiActionController {
                     users.remove( i );
                 }
             }
-            modelAndView = new ModelAndView( SHOW_USERS_VIEW, SHOW_USERS_KEY, users );
+            modelAndView = new ModelAndView( REMOVE_ACCOUNT_VIEW, REMOVE_ACCOUNT_KEY, users );
         }
         return modelAndView;
     }
@@ -128,7 +125,7 @@ public class RemoveUserController extends MultiActionController {
      * @param response HttpServletResponse
      * @return Model and view containing data access exception errors if occured
      */
-    public ModelAndView showRemovedUsers( HttpServletRequest request,
+    public ModelAndView removeAccountStatus( HttpServletRequest request,
             HttpServletResponse response ) {
         String[] userIds = request.getParameterValues( REMOVED_USERS_KEY );
         String userName = "";
@@ -137,39 +134,21 @@ public class RemoveUserController extends MultiActionController {
                 User user = userManager.getUserById( Integer.parseInt( userIds[ i ] ) );
                 userName = user.getName();
                 userManager.deleteUser( Integer.parseInt( userIds[ i ] ) );
-                request.getSession().setAttribute( OK_MSG_KEY, 
-                        getMessageSourceAccessor().getMessage(
-                        "message.removeuser.removesuccess" ) );
-                log.warn( "User account " + userName + " removed from the system" );
+                log.warn( "User account removed from the system: " + userName );
             } catch( SQLException e ) {
+                String msg = "Failed to remove user account: " + e.getMessage();
                 request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removeuser.removefail" ) );
-                log.error( "Failed to remove user account " + userName );
+                request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+                log.error( msg );
             } catch( Exception e ) {
+                String msg = "Failed to remove user account: " + e.getMessage();
                 request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removeuser.removefail" ) );
-                log.error( "Failed to remove user account " + userName );
+                request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+                log.error( msg );
             }
         }
-        return new ModelAndView( REMOVED_USERS_VIEW );
-    }
-    /**
-     * Gets reference to name resolver object.
-     *
-     * @return the multiactionMethodNameResolver Name resolver class
-     */
-    public PropertiesMethodNameResolver getNameResolver() { return nameResolver; }
-    /**
-     * Sets reference to name resolver object.
-     *
-     * @param multiactionMethodNameResolver
-     */
-    public void setNameResolver( PropertiesMethodNameResolver nameResolver ) {
-        this.nameResolver = nameResolver;
+        String msg = "Selected user account successfully removed.";
+        return new ModelAndView( REMOVED_ACCOUNT_VIEW, OK_MSG_KEY, msg );
     }
     /**
      * Method gets reference to user manager object.

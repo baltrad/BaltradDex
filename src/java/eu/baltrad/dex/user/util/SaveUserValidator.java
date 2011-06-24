@@ -60,17 +60,18 @@ public class SaveUserValidator implements Validator {
     public void validate( Object command, Errors errors ) {
         User user = ( User )command;
         if( user == null ) return;
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "confirmPassword", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "factory", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "country", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "city", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "cityCode", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "street", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "number", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "phone", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", "error.field.required" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name", "error.missing.username" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password", "error.missing.password" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "confirmPassword", 
+                "error.missing.confirmpassword" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "factory", "error.missing.organization" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "country", "error.missing.country" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "city", "error.missing.city" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "cityCode", "error.missing.zipcode" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "street", "error.missing.street" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "number", "error.missing.addressnumber" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "phone", "error.missing.phone" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", "error.missing.email" );
         // validate password
         if( !errors.hasFieldErrors( "password" ) && !errors.hasFieldErrors( "confirmPassword" ) ) {
             if( !user.getPassword().trim().equals( user.getConfirmPassword().trim() ) ) {

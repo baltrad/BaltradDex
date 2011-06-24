@@ -34,12 +34,6 @@ Author     : szewczenko
     SimpleDateFormat format = new SimpleDateFormat( "dd MMMM yyyy, h:mm aa" );
     String dateAndTime = format.format( now );
     request.getSession().setAttribute( "init_status", InitAppUtil.getInitStatus() );
-    String operator = InitAppUtil.getOrgName();
-    String nodeName = InitAppUtil.getNodeName();
-    String nodeVersion = InitAppUtil.getNodeVersion();
-    String nodeType = InitAppUtil.getNodeType();
-    String address = InitAppUtil.getOrgAddress();
-    String timeZone = InitAppUtil.getTimeZone();
     String adminEmail = InitAppUtil.getAdminEmail();
 %>
 
@@ -47,164 +41,83 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <script type="text/javascript" language="javascript" src="includes/tooltip.js"></script>
         <title>Baltrad | Log in</title>
-        <!-- tooltips -->
-        <script type="text/javascript">
-            <!--
-            var t1 = null;
-            var t2 = null;
-            var l1 = "Enter your user name";
-            var l2 = "Enter password";
-            function initTooltips() {
-                t1 = new ToolTip( "user_name_tooltip", false );
-                t2 = new ToolTip( "password_tooltip", false );
-            }
-            -->
-        </script>
     </head>
-    <body onload="initTooltips()">
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header_login.js"></script>
+    <body>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header_login.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <div id="clear"></div>
-                </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
-                            Log in
-                        </div>
-                        <div class="right">
-                            <%= dateAndTime %>
-                        </div>
-                    </div>
-                    <div id="text-box">
-                        Please enter your user name, password and e-mail address in the boxes below.
-                    </div>
-                    <div id="text-box">
-                        <a href="recovery.htm">Click here if you have forgotten
-                            your security details.
-                        </a>
-                    </div>
-                    
-                    <div id="login">
-                        <form method="post">
-                            <div class="login-top">
-                                <%@include file="/WEB-INF/jsp/messages.jsp"%>
-                            </div>
-                            <div class="login-left">
-                                <div class="login-row">User Name</div>
-                                <div class="login-row">Password</div>
-                            </div>
-                            <div class="login-right">
-                                <div class="login-row">
-                                    <form:input path="command.name"/>
-                                    <div class="help-icon" onmouseover="if(t1)t1.Show(event,l1)"
-                                        onmouseout="if(t1)t1.Hide(event)">
-                                        <img src="includes/images/help-icon.png" alt="help_icon"/>
-                                    </div>
-                                </div>
-                                <div class="login-row">
-                                    <form:password path="command.password"/>
-                                    <div class="help-icon" onmouseover="if(t2)t2.Show(event,l2)"
-                                        onmouseout="if(t2)t2.Hide(event)">
-                                        <img src="includes/images/help-icon.png" alt="help_icon"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="login-bottom">
-                                <button class="rounded" type="submit">
-                                    <span>Submit</span>
-                                </button>
-                                <button class="rounded" type="reset">
-                                    <span>Clear</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <div id="separator"></div>
+            <div id="bltmain">
+                <div class="login">
                     <c:choose>
                         <c:when test="${ init_status == 0 }">
-                            <div id="text-box">
-                                <div class="title">
-                                    Welcome to Baltrad Data Exchange System!
-                                </div>
-                            </div>
-                            <div id="welcome-msg">
+                            <form method="post">
+                                <%@include file="/WEB-INF/jsp/formMessages.jsp"%>
                                 <div class="left">
-                                    <div class="row">
-                                        This node is operated by:
+                                    <div class="date">
+                                        <%= dateAndTime %>
                                     </div>
-                                    <div class="row">
-                                        Node location:
+                                    <div class="username">
+                                        User name
                                     </div>
-                                    <div class="row">
-                                        Node name:
-                                    </div>
-                                    <div class="row">
-                                        Node version:
-                                    </div>
-                                    <div class="row">
-                                        Node type:
-                                    </div>
-                                    <div class="row">
-                                        Local time zone:
-                                    </div>
-                                    <div class="row">
-                                        Node administrator's e-mail:
+                                    <div class="password">
+                                        Password
                                     </div>
                                 </div>
                                 <div class="right">
-                                    <div class="row">
-                                        <%= operator %>
+                                    <div class="prompt">
+                                        | Log on to Baltrad system.
                                     </div>
-                                    <div class="row">
-                                        <%= address %>
+                                    <div class="username">
+                                        <form:input path="command.name"/>
+                                        <div class="hint">
+                                            Valid account name
+                                        </div>
+                                        <form:errors path="command.name" cssClass="error"/>
                                     </div>
-                                    <div class="row">
-                                        <%= nodeName %>
+                                    <div class="password">
+                                        <form:password path="command.password"/>
+                                        <div class="hint">
+                                            Case-sensitive
+                                        </div>
+                                        <form:errors path="command.password" cssClass="error"/>
                                     </div>
-                                    <div class="row">
-                                        <%= nodeVersion %>
-                                    </div>
-                                    <div class="row">
-                                        <%= nodeType %>
-                                    </div>
-                                    <div class="row">
-                                        <%= timeZone %>
-                                    </div>
-                                    <div class="row">
-                                        <%= adminEmail %>
+                                    <div class="buttons">
+                                        <button class="rounded" type="submit">
+                                            <span>Sign in</span>
+                                        </button>
+                                        <button class="rounded" type="reset">
+                                            <span>Clear</span>
+                                        </button>
                                     </div>
                                 </div>
+                            </form>
+                            <div class="passwdrecovery">
+                                Forgot your user name or password?&nbsp; 
+                                <a href="recovery.htm">Click here.</a>
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <div class="message">
-                                <div class="icon">
-                                    <img src="includes/images/icons/circle-delete.png"
-                                         alt="remove_error"/>
+                            <div class="systemerror">
+                                <div class="header">
+                                    System failed to initialize.
                                 </div>
-                                <div class="text">
-                                    Warning: System failed to initialize. Please report this problem
-                                    to node's administrator before data exchange functionality is
-                                    used.
-                                    <c:set var="error_message" value="" scope="session"/>
+                                <div class="message">
+                                    System failed to initialize correctly. This may affect
+                                    its basic functionality.<br>
+                                    Please <a href="mailto:<%=adminEmail%>">report this problem</a>
+                                    to node administrator.
                                 </div>
+                                <c:set var="error_message" value="" scope="session"/>
                             </div>
                         </c:otherwise>
-                    </c:choose>    
+                    </c:choose>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
-        <div id="user_name_tooltip" class="tooltip" style="width: 160px; height: 22px;"></div>
-        <div id="password_tooltip" class="tooltip" style="width: 160px; height: 22px;"></div>
     </body>
 </html>

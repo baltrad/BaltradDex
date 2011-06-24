@@ -57,16 +57,16 @@ public class SaveConfigurationValidator implements Validator {
     public void validate( Object command, Errors errors ) {
         Configuration conf = ( Configuration )command;
         if( conf == null ) return;
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "nodeName", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "orgName", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "orgAddress", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "timeZone", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "tempDir", "error.field.required" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "adminEmail", "error.field.required" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "nodeName", "error.missing.nodename" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "orgName", "error.missing.orgname" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "orgAddress", "error.missing.address" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "timeZone", "error.missing.timezone" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "tempDir", "error.missing.workdir" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "adminEmail", "error.missing.email" );
         // validate node name
         if( conf.getNodeName().trim().length() > 0 && conf.getNodeName().trim().length()
                 < MIN_FIELD_LENGTH ) {
-            errors.rejectValue( "nodeName", "error.field.name.tooshort" );
+            errors.rejectValue( "nodeName", "error.short.nodename" );
         }
         // validate node address
         boolean isValidPortNumber = false;

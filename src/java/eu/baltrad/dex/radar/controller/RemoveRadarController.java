@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
-import org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,17 +50,15 @@ public class RemoveRadarController extends MultiActionController {
     private static final String SHOW_CHANNELS_KEY = "channels";
     private static final String SELECTED_CHANNELS_KEY = "selected_channels";
     private static final String REMOVED_CHANNELS_KEY = "removed_channels";
-    private static final String OK_MSG_KEY = "ok_message";
-    private static final String ERROR_MSG_KEY = "error_message";
+    private static final String OK_MSG_KEY = "message";
+    private static final String ERROR_MSG_KEY = "error";
     // view names
-    private static final String SHOW_CHANNELS_VIEW = "showLocalRadars";
-    private static final String SELECTED_CHANNELS_VIEW = "showSelectedLocalRadars";
-    private static final String REMOVED_CHANNELS_VIEW = "showRemovedLocalRadars";
+    private static final String SHOW_CHANNELS_VIEW = "removeRadar";
+    private static final String SELECTED_CHANNELS_VIEW = "radarToRemove";
+    private static final String REMOVED_CHANNELS_VIEW = "removeRadarStatus";
 //---------------------------------------------------------------------------------------- Variables
     // Radar manager
     private RadarManager radarManager;
-    // Name resolver
-    private PropertiesMethodNameResolver nameResolver;
     // Message logger
     private Logger log;
 //------------------------------------------------------------------------------------------ Methods
@@ -78,7 +75,7 @@ public class RemoveRadarController extends MultiActionController {
      * @param response Http response
      * @return Models and view containing list of all available channels
      */
-    public ModelAndView showLocalRadars( HttpServletRequest request,
+    public ModelAndView removeRadar( HttpServletRequest request,
             HttpServletResponse response ) {
         List channels = radarManager.getChannels();
         return new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
@@ -90,7 +87,7 @@ public class RemoveRadarController extends MultiActionController {
      * @param response Http response
      * @return Model and view containing list of channels selected for removal
      */
-    public ModelAndView showSelectedLocalRadars( HttpServletRequest request,
+    public ModelAndView radarToRemove( HttpServletRequest request,
             HttpServletResponse response ) {
         ModelAndView modelAndView = null;
         String[] channelIds = request.getParameterValues( SELECTED_CHANNELS_KEY );
@@ -113,48 +110,31 @@ public class RemoveRadarController extends MultiActionController {
      * @param response Http response
      * @return Model and view containing data access exception errors if occured.
      */
-    public ModelAndView showRemovedLocalRadars( HttpServletRequest request,
+    public ModelAndView removeRadarStatus( HttpServletRequest request,
             HttpServletResponse response ) {
         String[] channelIds = request.getParameterValues( REMOVED_CHANNELS_KEY );
         String channelName = "";
-        for( int i = 0; i < channelIds.length; i++ ) {
-            try {
+        try {
+            for( int i = 0; i < channelIds.length; i++ ) {
                 Radar channel = radarManager.getChannel( Integer.parseInt( channelIds[ i ] ) );
                 channelName = channel.getChannelName();
                 radarManager.deleteChannel( Integer.parseInt( channelIds[ i ] ) );
-                request.getSession().setAttribute( OK_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removeradar.removesuccess" ) );
-                log.warn( "Local radar station " + channelName + " removed from the system" );
-            } catch( SQLException e ) {
-                request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removeradar.removefail" ) );
-                log.warn( "Failed to remove local " + "radar station " + channelName );
-            } catch( Exception e ) {
-                request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removeradar.removefail" ) );
-                log.warn( "Failed to remove local " + "radar station " + channelName );
+                log.warn( "Local radar station successfully removed: " + channelName );
             }
+            request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
+                    "message.removeradar.removesuccess" ) );
+        } catch( SQLException e ) {
+            request.getSession().removeAttribute( OK_MSG_KEY );
+            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
+                    "message.removeradar.removefail" ) );
+            log.warn( "Failed to remove local radar station: " + e.getMessage() );
+        } catch( Exception e ) {
+            request.getSession().removeAttribute( OK_MSG_KEY );
+            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
+                    "message.removeradar.removefail" ) );
+            log.warn( "Failed to remove local radar station: " + e.getMessage() );
         }
         return new ModelAndView( REMOVED_CHANNELS_VIEW );
-    }
-    /**
-     * Gets reference to name resolver object.
-     *
-     * @return the multiactionMethodNameResolver Name resolver class
-     */
-    public PropertiesMethodNameResolver getNameResolver() { return nameResolver; }
-    /**
-     * Sets reference to name resolver object.
-     *
-     * @param multiactionMethodNameResolver 
-     */
-    public void setNameResolver( PropertiesMethodNameResolver nameResolver ) {
-        this.nameResolver = nameResolver;
     }
     /*
      * Method returns reference to radar manager object.

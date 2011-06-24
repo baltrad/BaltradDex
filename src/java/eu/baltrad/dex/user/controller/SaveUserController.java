@@ -48,8 +48,8 @@ public class SaveUserController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
     public static final String USER_ID = "userId";
     public static final String ROLES = "roles";
-    private static final String OK_MSG_KEY = "ok_message";
-    private static final String ERROR_MSG_KEY = "error_message";
+    private static final String OK_MSG_KEY = "message";
+    private static final String ERROR_MSG_KEY = "error";
 //---------------------------------------------------------------------------------------- Variables
     private UserManager userManager;
     private Logger log;
@@ -106,21 +106,19 @@ public class SaveUserController extends SimpleFormController {
         User user = ( User )command;
         try {
             userManager.saveOrUpdate( user );
-            request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
-                "message.adduser.savesuccess" ) );
-            log.warn( "User account saved: " + user.getName() );
+            String msg = "User account successfully saved: " + user.getName();
+            request.getSession().setAttribute( OK_MSG_KEY, msg );
+            log.warn( msg );
         } catch( SQLException e ) {
+            String msg = "Failed to save user account: " + e.getMessage();
             request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                "message.adduser.nameexists" ) );
-            log.error( "Failed to save user account: " + user.getName() );
-            errors.reject( "message.adduser.nameexists" );
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            log.error( msg );
         } catch( Exception e ) {
+            String msg = "Failed to save user account: " + e.getMessage();
             request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                "message.adduser.nameexists" ) );
-            log.error( "Failed to save user account: " + user.getName() );
-            errors.reject( "message.adduser.nameexists" );
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            log.error( msg );
         }
         return new ModelAndView( getSuccessView() );
     }

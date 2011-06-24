@@ -244,7 +244,7 @@ public class DeliveryRegisterManager {
      *
      * @return Number of deleted entries
      */
-    public int deleteEntries() {
+    public int deleteEntries() throws SQLException, Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -255,8 +255,10 @@ public class DeliveryRegisterManager {
             stmt.close();
         } catch( SQLException e ) {
             System.err.println( "Failed to delete delivery register entries: " + e.getMessage() );
+            throw e;
         } catch( Exception e ) {
             System.err.println( "Failed to delete delivery register entries: " + e.getMessage() );
+            throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }

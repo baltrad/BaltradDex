@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Page displays available data sources
+Document   : Displays available data sources allowing to select data source for removal
 Created on : Apr 4, 2011, 14:03 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
@@ -25,7 +25,7 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@ page import="java.util.List" %>
+<%@page import="java.util.List"%>
 <%
     List dataSources = ( List )request.getAttribute( "dataSources" );
     if( dataSources == null || dataSources.size() <= 0 ) {
@@ -42,98 +42,101 @@ Author     : szewczenko
         <title>Baltrad | Remove data source</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/settingsTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/settingsMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
                             Remove data source
                         </div>
-                        <div class="right">
-                        </div>
-                    </div>
-                    <c:choose>
-                        <c:when test="${dsStatus == 1}">
-                            <div id="text-box">
-                                List of available data sources. Click on check box to select 
-                                data source to be removed.
-                            </div>
-                            <div id="table">
-                                <form method="post" action="dsRemove.htm">
-                                    <div id="dsSelect">
-                                        <div class="table-hdr">
-                                            <div class="name">
-                                                Name
-                                            </div>
-                                            <div class="description">
-                                                Description
-                                            </div>
-                                            <div class="select">
-                                                Remove
-                                            </div>
-                                        </div>
-                                        <c:forEach items="${dataSources}" var="dataSource">
-                                            <div class="table-row">
-                                                <div class="name">
-                                                    <c:out value="${dataSource.name}"/>
+                        <c:choose>
+                            <c:when test="${dsStatus == 1}">
+                                <div class="blttext">
+                                    List of available data sources. Click on check box to select
+                                    data source to be removed.
+                                </div>
+                                <div class="table">
+                                    <div class="dsremove">
+                                        <form method="post" action="dsToRemove.htm">
+                                            <div class="tableheader">
+                                                <div id="cell" class="count">&nbsp;</div>
+                                                <div id="cell" class="name">
+                                                    Name
                                                 </div>
-                                                <div class="description">
-                                                    <c:out value="${dataSource.description}"/>
+                                                <div id="cell" class="description">
+                                                    Description
                                                 </div>
-                                                <div class="select">
-                                                    <input type="checkbox" name="selectedSources"
-                                                           value="${dataSource.id}">
+                                                <div id="cell" class="check">
+                                                    Select
                                                 </div>
                                             </div>
-                                        </c:forEach>
-                                        <div class="footer">
-                                            <div class="right">
-                                                <button class="rounded" type="button"
-                                                        onclick="window.location='configuration.htm'">
-                                                    <span>Back</span>
-                                                </button>
-                                                <button class="rounded" type="submit" name="submitButton">
-                                                    <span>Submit</span>
-                                                </button>
+                                            <c:set var="count" scope="page" value="1"/>
+                                            <c:forEach items="${dataSources}" var="dataSource">
+                                                <div class="entry">
+                                                    <div id="cell" class="count">
+                                                        <c:out value="${count}"/>
+                                                        <c:set var="count" value="${count + 1}"/>
+                                                    </div>
+                                                    <div id="cell" class="name">
+                                                        <c:out value="${dataSource.name}"/>
+                                                    </div>
+                                                    <div id="cell" class="description">
+                                                        <c:out value="${dataSource.description}"/>
+                                                    </div>
+                                                    <div id="cell" class="check">
+                                                        <input type="checkbox" name="selectedSources"
+                                                               value="${dataSource.id}">
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                            <div class="tablefooter">
+                                                <div class="buttons">
+                                                    <button class="rounded" type="button"
+                                                        onclick="window.location.href='home.htm'">
+                                                        <span>Cancel</span>
+                                                    </button>
+                                                    <button class="rounded" type="submit"
+                                                            name="submitButton">
+                                                        <span>OK</span>
+                                                    </button>
+                                                </div>
                                             </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="blttext">
+                                    No data sources have been found.
+                                    Use configure data source functionality in order to define
+                                    new data sources.
+                                </div>
+                                <div class="table">
+                                    <div class="tablefooter">
+                                        <div class="buttons">
+                                            <button class="rounded" type="button"
+                                                onclick="window.location.href='home.htm'">
+                                                <span>OK</span>
+                                            </button>
                                         </div>
                                     </div>
-                                </form>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="message">
-                                <div class="icon">
-                                    <img src="includes/images/icons/circle-alert.png"
-                                         alt="no_radars"/>
                                 </div>
-                                <div class="text">
-                                    List of data sources is currently empty.
-                                    Use configuration options to add new data sources.
-                                </div>
-                            </div>
-                            <div class="footer">
-                                <div class="right">
-                                    <form action="configuration.htm">
-                                        <button class="rounded" type="submit">
-                                            <span>OK</span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

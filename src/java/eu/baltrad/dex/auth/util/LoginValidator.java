@@ -27,6 +27,7 @@ import eu.baltrad.dex.user.model.UserManager;
 
 import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
 
 /**
  * Class implementing user authentication functionality.
@@ -58,11 +59,13 @@ public class LoginValidator implements Validator {
     public void validate( Object command, Errors errors ) {
         User formUser = ( User )command;
         if( formUser == null ) return;
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name", "error.missing.username" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password", "error.missing.password" );
         // Look for user in the database
         User dbUser = userManager.getUserByName( formUser.getName() );
         String userName = formUser.getName().trim();
         String password = formUser.getPassword().trim();
-        if( userName == null || password == null || userName.isEmpty() || password.isEmpty() ||
+        if( userName != null && password != null && !userName.isEmpty() && !password.isEmpty() &&
                 ApplicationSecurityManager.authenticateFormUser( formUser, dbUser ) == false ) {
             errors.rejectValue( "name", "error.login.invalid" );
         }

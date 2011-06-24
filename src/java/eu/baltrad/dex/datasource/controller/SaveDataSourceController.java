@@ -176,21 +176,24 @@ public class SaveDataSourceController extends MultiActionController {
     /** Data source name error key */
     private static final String DS_NAME_ERROR_KEY = "dsNameError";
     /** Data source name error message */
-    private static final String DS_NAME_ERROR_MSG = "Enter data source name";
+    private static final String DS_NAME_ERROR_MSG = "Data source name is required";
     /** Data source description error key */
     private static final String DS_DESCRIPTION_ERROR_KEY = "dsDescriptionError";
     /** Data source description error message */
-    private static final String DS_DESCRIPTION_ERROR_MSG = "Enter data source description";
+    private static final String DS_DESCRIPTION_ERROR_MSG = "Data source description is required";
     /* Radar station selection error key */
     private static final String DS_SELECT_RADARS_ERROR_KEY = "dsSelectRadarsError";
     /* Radar station selection error message */
-    private static final String DS_SELECT_RADARS_ERROR_MSG = "Select at least one radar station";
+    private static final String DS_SELECT_RADARS_ERROR_MSG = "At least one radar station is required";
     /* User selection error key */
     private static final String DS_SELECT_USERS_ERROR_KEY = "dsSelectUsersError";
     /* User selection error message */
-    private static final String DS_SELECT_USERS_ERROR_MSG = "Select at least one user";
-    /** Save data source error key */
-    private static final String DS_SAVE_ERROR_KEY = "dsSaveError";
+    private static final String DS_SELECT_USERS_ERROR_MSG = "At least one user is required";
+    /** Generic error message key */
+    private static final String ERROR_MSG_KEY = "error";
+    /** Generic success message key */
+    private static final String OK_MSG_KEY = "message";
+
 
     /** Next button key */
     private static final String DS_NEXT_BUTTON_KEY = "nextButton";
@@ -250,18 +253,18 @@ public class SaveDataSourceController extends MultiActionController {
     /** Number of radars used to configure a data source */
     private static int numSelectedRadars;
     /** Number of all available radars */
-    private static int numAvailableRadars;
+    //private static int numAvailableRadars;
     /** List holding all available radars */
-    private List<Radar> availableRadars;
+    //private List<Radar> availableRadars;
     /** List holding radars selected for data source configuration */
     private List<Radar> selectedRadars;
 
     /** Number of users allowed to use this data source */
     private static int numSelectedUsers;
     /** Number of all available users */
-    private static int numAvailableUsers;
+    //private static int numAvailableUsers;
     /** List holding all available users */
-    private List<User> availableUsers;
+    //private List<User> availableUsers;
     /** List holding selected users */
     private List<User> selectedUsers;
 
@@ -326,14 +329,14 @@ public class SaveDataSourceController extends MultiActionController {
         dataSourceManager = new DataSourceManager();
         //
         channelManager = new RadarManager();
-        availableRadars = channelManager.getChannels();
-        numAvailableRadars = availableRadars.size();
+        //availableRadars = channelManager.getChannels();
+        //numAvailableRadars = availableRadars.size();
         selectedRadars = new ArrayList<Radar>();
         numSelectedRadars = 0;
         //
         userManager = new UserManager();
-        availableUsers = userManager.getUsers();
-        numAvailableUsers = availableUsers.size();
+        //availableUsers = userManager.getUsers();
+        //numAvailableUsers = availableUsers.size();
         selectedUsers = new ArrayList<User>();
         numSelectedUsers = 0;
     }
@@ -371,13 +374,13 @@ public class SaveDataSourceController extends MultiActionController {
                 }
                 numSelectedUsers = selectedUsers.size();
             } catch( SQLException e ) {
-                modelAndView.addObject( DS_SAVE_ERROR_KEY, "SQL Exception" );
-                log.error( "Failed to recover data source parameters: SQL Exception " +
-                        e.getMessage() );
+                String msg = "Failed to recover data source parameters: " + e.getMessage();
+                modelAndView.addObject( ERROR_MSG_KEY, msg );
+                log.error( msg );
             } catch( Exception e ) {
-                modelAndView.addObject( DS_SAVE_ERROR_KEY, "Exception" );
-                log.error( "Failed to recover data source parameters: SQL Exception " +
-                        e.getMessage() );
+                String msg = "Failed to recover data source parameters: " + e.getMessage();
+                modelAndView.addObject( ERROR_MSG_KEY, msg );
+                log.error( msg );
             }
         }
         modelAndView.setViewName( DS_SAVE_NAME_VIEW );
@@ -550,17 +553,21 @@ public class SaveDataSourceController extends MultiActionController {
                     }
                     sourceFilter.setValue( wmoAttrValue );
                     // Save filter
-                    coreFilterManager.store(  sourceFilter );
+                    coreFilterManager.store( sourceFilter );
                     dataSourceManager.deleteFilters( dsId );
                     dataSourceManager.saveFilter( dsId, sourceFilter.getId() );
                 }
-                log.warn( "Data source " + dataSource.getName() + " successfully saved" );
+                String msg = "Data source successfully saved: " + dataSource.getName();
+                modelAndView.addObject( OK_MSG_KEY, msg );
+                log.warn( msg );
             } catch( SQLException e ) {
-                modelAndView.addObject( DS_SAVE_ERROR_KEY, "SQL Exception" );
-                log.error( "Failed to save data source: SQL Exception " + e.getMessage() );
+                String msg = "Failed to save data source: " + e.getMessage();
+                modelAndView.addObject( ERROR_MSG_KEY, msg );
+                log.error( msg );
             } catch( Exception e ) {
-                modelAndView.addObject( DS_SAVE_ERROR_KEY, "Exception" );
-                log.error( "Failed to save data source: SQL Exception " + e.getMessage() );
+                String msg = "Failed to save data source: " + e.getMessage();
+                modelAndView.addObject( ERROR_MSG_KEY, msg );
+                log.error( msg );
             }
             resetModel();
             modelAndView.setViewName( DS_SAVE_VIEW );
@@ -587,8 +594,8 @@ public class SaveDataSourceController extends MultiActionController {
      * @param modelAndView ModelAndView to be filled
      */
     private void setDSRadarsModel( ModelAndView modelAndView ) {
-        modelAndView.addObject( DS_AVAILABLE_RADARS_KEY, availableRadars );
-        modelAndView.addObject( DS_NUM_AVAILABLE_RADARS_KEY, numAvailableRadars );
+        modelAndView.addObject( DS_AVAILABLE_RADARS_KEY, channelManager.getChannels() );
+        modelAndView.addObject( DS_NUM_AVAILABLE_RADARS_KEY, channelManager.getChannels().size() );
         modelAndView.addObject( DS_SELECTED_RADARS_KEY, selectedRadars );
         modelAndView.addObject( DS_NUM_SELECTED_RADARS_KEY, numSelectedRadars );
     }
@@ -598,8 +605,8 @@ public class SaveDataSourceController extends MultiActionController {
      * @param modelAndView ModelAndView to be filled
      */
     private void setDSUsersModel( ModelAndView modelAndView ) {
-        modelAndView.addObject( DS_AVAILABLE_USERS_KEY, availableUsers );
-        modelAndView.addObject( DS_NUM_AVAILABLE_USERS_KEY, numAvailableUsers );
+        modelAndView.addObject( DS_AVAILABLE_USERS_KEY, userManager.getUsers() );
+        modelAndView.addObject( DS_NUM_AVAILABLE_USERS_KEY, userManager.getUsers().size() );
         modelAndView.addObject( DS_SELECTED_USERS_KEY, selectedUsers );
         modelAndView.addObject( DS_NUM_SELECTED_USERS_KEY, numSelectedUsers );
     }
@@ -619,7 +626,7 @@ public class SaveDataSourceController extends MultiActionController {
      * @param radarName Radar station name
      */
     private  void addSelectedRadar( String radarName ) {
-        if( numSelectedRadars < numAvailableRadars &&
+        if( numSelectedRadars < channelManager.getChannels().size() &&
                 !radarName.equals( DEFAULT_LIST_OPTION_KEY ) ) {
             if( !selectedRadars.contains( channelManager.getChannel( radarName ) ) ) {
                 ++numSelectedRadars;
@@ -642,7 +649,7 @@ public class SaveDataSourceController extends MultiActionController {
      * @param userName User name
      */
     public void addSelectedUser( String userName ) {
-        if( numSelectedUsers < numAvailableUsers &&
+        if( numSelectedUsers < userManager.getUsers().size() &&
                 !userName.equals( DEFAULT_LIST_OPTION_KEY ) ) {
             if( !selectedUsers.contains( userManager.getUserByName( userName ) ) ) {
                 ++numSelectedUsers;

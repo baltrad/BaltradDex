@@ -16,13 +16,13 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Remote radar subscription operation status
+Document   : Subscription request status
 Created on : Oct 1, 2010, 11:47 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
@@ -33,46 +33,43 @@ Author     : szewczenko
         <title>Baltrad | Subscriptions</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/exchangeTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/exchangeMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
                             Subscription management
                         </div>
-                        <div class="right">
+                        <div class="blttext">
+                            Data source subscription status.
                         </div>
-                    </div>
-                    <div class="message">
-                        <div class="icon">
-                            <img src="includes/images/icons/circle-check.png"
-                                 alt="request_failure"/>
-                        </div>
-                        <div class="text">
-                            Your subscription request has been successfully submitted.
-                            Click OK to go back to subscription selection page.
-                        </div>
-                    </div>
-                    <div class="footer">
-                        <div class="right">
-                            <form action="showSubscriptions.htm">
-                                <button class="rounded" type="submit">
-                                    <span>OK</span>
-                                </button>
-                            </form>
+                        <div class="table">
+                            <div class="addradar">
+                                <%@include file="/WEB-INF/jsp/genericMessages.jsp"%>
+                                <div class="tablefooter">
+                                   <div class="buttons">
+                                       <button class="rounded" type="button"
+                                            onclick="window.location.href='showSubscriptions.htm'">
+                                            <span>OK</span>
+                                       </button>
+                                   </div>
+                               </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

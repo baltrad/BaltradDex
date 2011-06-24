@@ -56,7 +56,7 @@ import java.sql.SQLException;
 public class BltFileManager {
 //---------------------------------------------------------------------------------------- Constants
     /** HDF5 source key */
-    private static final String FC_SRC_PLC_ATTR = "what/source:PLC";
+    //private static final String FC_SRC_PLC_ATTR = "what/source:PLC";
     /** HDF5 date attribute */
     private static final String FC_DATE_ATTR = "what/date";
     /** HDF5 time attribute */

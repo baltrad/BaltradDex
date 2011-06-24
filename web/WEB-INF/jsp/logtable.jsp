@@ -33,78 +33,76 @@ Author     : szewczenko
         <title>Logtable</title>
     </head>
     <body>
-        <div id="logtable">
-            <div class="table-hdr">
-                <div class="date">
-                    Date
-                </div>
-                <div class="time">
-                    Time
-                </div>
-                <div class="flag">
-                    Flag
-                </div>
-                <div class="msg">
-                    Message
-                </div>
+        <div class="tableheader">
+            <div id="cell" class="logdate">
+                Date
             </div>
-            <c:forEach var="entry" items="${log_entry_list}">
-                <% String style = ""; %>
+            <div id="cell" class="logtime">
+                Time
+            </div>
+            <div id="cell" class="logflag">
+                Flag
+            </div>
+            <div id="cell" class="logmsg">
+                Message
+            </div>
+        </div>
+        <c:forEach var="entry" items="${log_entry_list}">
+            <% String style = ""; %>
+            <c:choose>
+                <c:when test="${entry.type == 'INFO'}">
+                    <%
+                        style = "info-entry";
+                    %>
+                </c:when>
+                <c:when test="${entry.type == 'WARN'}">
+                    <%
+                        style = "warning-entry";
+                    %>
+                </c:when>
+                <c:when test="${entry.type == 'ERROR'}">
+                    <%
+                        style = "error-entry";
+                    %>
+                </c:when>
+            </c:choose>
+            <div class="entry">
+                <div id="cell" class="logdate">
+                    <div class="<%=style%>">
+                        <c:out value="${entry.dateStr}"/>
+                    </div>
+                </div>
+                <div id="cell" class="logtime">
+                    <div class="<%=style%>">
+                        <c:out value="${entry.timeStr}"/>
+                    </div>
+                </div>
                 <c:choose>
-                    <c:when test="${entry.type == 'INFO'}">
-                        <%
-                            style = "info";
-                        %>
+                    <c:when test="${entry.type == 'ERROR'}">
+                        <div id="cell" class="logflag">
+                            <img src="includes/images/icons/error.png"
+                                 alt="error"/>
+                        </div>
                     </c:when>
                     <c:when test="${entry.type == 'WARN'}">
-                        <%
-                            style = "warning";
-                        %>
+                        <div id="cell" class="logflag">
+                            <img src="includes/images/icons/warning.png"
+                                 alt="warn"/>
+                        </div>
                     </c:when>
-                    <c:when test="${entry.type == 'ERROR'}">
-                        <%
-                            style = "error";
-                        %>
-                    </c:when>
+                    <c:otherwise>
+                        <div id="cell" class="logflag">
+                            <img src="includes/images/icons/info.png"
+                                 alt="ok"/>
+                        </div>
+                    </c:otherwise>
                 </c:choose>
-                <div class="table-row">
-                    <div class="date">
-                        <div class="<%=style%>">
-                            <c:out value="${entry.dateStr}"/>
-                        </div>
-                    </div>
-                    <div class="time">
-                        <div class="<%=style%>">
-                            <c:out value="${entry.timeStr}"/>
-                        </div>
-                    </div>
-                    <c:choose>
-                        <c:when test="${entry.type == 'ERROR'}">
-                            <div class="flag">
-                                <img src="includes/images/red_bulb.png"
-                                     alt="error"/>
-                            </div>
-                        </c:when>
-                        <c:when test="${entry.type == 'WARN'}">
-                            <div class="flag">
-                                <img src="includes/images/blue_bulb.png"
-                                     alt="warn"/>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="flag">
-                                <img src="includes/images/green_bulb.png"
-                                     alt="ok"/>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-                    <div class="msg">
-                        <div class="<%=style%>">
-                            <c:out value="${entry.message}"/>
-                        </div>
+                <div id="cell" class="logmsg">
+                    <div class="<%=style%>">
+                        <c:out value="${entry.message}"/>
                     </div>
                 </div>
-            </c:forEach>
-        </div>
+            </div>
+        </c:forEach>
     </body>
 </html>

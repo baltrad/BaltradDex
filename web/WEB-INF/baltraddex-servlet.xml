@@ -42,12 +42,18 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="mappings">
             <props>
                 <prop key="radars.htm">radarController</prop>
-                <prop key="showDataSources.htm">showDataSourcesController</prop>
+                <prop key="dsShow.htm">showDataSourcesController</prop>
                 <prop key="dsFiles.htm">bltDataSourceController</prop>
                 <prop key="fileDetails.htm">bltFileDetailsController</prop>
                 <prop key="imagePreview.htm">bltImagePreviewController</prop>
                 <prop key="dataDownload.htm">downloadStatusController</prop>
                 <prop key="dataUpload.htm">uploadStatusController</prop>
+
+                <prop key="home.htm">urlFilenameController</prop>
+                <prop key="exchange.htm">urlFilenameController</prop>
+                <prop key="processing.htm">urlFilenameController</prop>
+                <prop key="settings.htm">urlFilenameController</prop>
+
             </props>
         </property>
     </bean>
@@ -64,9 +70,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="mappings">
             <props>
                 <prop key="connectToNode.htm">connectToNodeController</prop>
-                <prop key="remoteDataSources.htm">remoteDataSourceController</prop>
-                <prop key="selectedRemoteDataSources.htm">remoteDataSourceController</prop>
-                <prop key="subscribedRemoteDataSources.htm">remoteDataSourceController</prop>
+                <prop key="dsConnect.htm">remoteDataSourceController</prop>
+                <prop key="dsToConnect.htm">remoteDataSourceController</prop>
+                <prop key="dsSubscribed.htm">remoteDataSourceController</prop>
                 <prop key="download.htm">bltFileDownloadController</prop>
                 <prop key="showSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSelectedSubscriptions.htm">subscriptionController</prop>
@@ -87,9 +93,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="mappings">
             <props>
-                <prop key="log.htm">urlFilenameController</prop>
+                <prop key="latestMessages.htm">urlFilenameController</prop>
                 <prop key="logtable.htm">logTableController</prop>
-                <prop key="journal.htm">journalController</prop>
+                <prop key="allMessages.htm">journalController</prop>
             </props>
         </property>
     </bean>
@@ -107,25 +113,25 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <props>
                 <prop key="configuration.htm">urlFilenameController</prop>
                 <prop key="nodeProperties.htm">saveConfigurationController</prop>
-                <prop key="clearmessages.htm">urlFilenameController</prop>
-                <prop key="confirmclearmessages.htm">clrMsgsController</prop>
+                <prop key="removeMessages.htm">urlFilenameController</prop>
+                <prop key="messagesRemovalStatus.htm">removeMessagesController</prop>
 
-                <prop key="clearRegister.htm">registerController</prop>
-                <prop key="showClearRegisterStatus.htm">registerController</prop>
+                <prop key="removeRegisterEntries.htm">registerController</prop>
+                <prop key="registerEntriesRemovalStatus.htm">registerController</prop>
 
-                <prop key="saveUser.htm">saveUserController</prop>
-                <prop key="editUser.htm">editUserController</prop>
-                <prop key="showUsers.htm">removeUserController</prop>
-                <prop key="saveUserStatus">urlFilenameController</prop>
-                <prop key="showSelectedUsers.htm">removeUserController</prop>
-                <prop key="showRemovedUsers.htm">removeUserController</prop>
+                <prop key="saveAccount.htm">saveUserController</prop>
+                <prop key="editAccount.htm">editUserController</prop>
+                <prop key="saveAccountStatus">urlFilenameController</prop>
+                <prop key="removeAccount.htm">removeUserController</prop>
+                <prop key="accountToRemove.htm">removeUserController</prop>
+                <prop key="removeAccountStatus.htm">removeUserController</prop>
 
-                <prop key="saveLocalRadar.htm">saveRadarController</prop>
-                <prop key="editLocalRadar.htm">editRadarController</prop>
-                <prop key="showLocalRadars.htm">removeRadarController</prop>
+                <prop key="saveRadar.htm">saveRadarController</prop>
+                <prop key="editRadar.htm">editRadarController</prop>
                 <prop key="saveRadarStatus">urlFilenameController</prop>
-                <prop key="showSelectedLocalRadars.htm">removeRadarController</prop>
-                <prop key="showRemovedLocalRadars.htm">removeRadarController</prop>
+                <prop key="removeRadar.htm">removeRadarController</prop>
+                <prop key="radarToRemove.htm">removeRadarController</prop>
+                <prop key="removeRadarStatus.htm">removeRadarController</prop>
 
                 <prop key="dsSaveName.htm">saveDataSourceController</prop>
                 <prop key="dsSaveRadars.htm">saveDataSourceController</prop>
@@ -133,19 +139,20 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="dsSaveSummary.htm">saveDataSourceController</prop>
                 <prop key="dsSave.htm">saveDataSourceController</prop>
                 <prop key="dsSelectRemove.htm">removeDataSourceController</prop>
+                <prop key="dsToRemove.htm">removeDataSourceController</prop>
                 <prop key="dsRemove.htm">removeDataSourceController</prop>
                 <prop key="dsSelectEdit.htm">editDataSourceController</prop>
 
-                <prop key="selectRemoveSubscriptions.htm">subscriptionController</prop>
-                <prop key="showRemovedSubscriptions.htm">subscriptionController</prop>
-                <prop key="showSubscriptionRemovalStatus.htm">subscriptionController</prop>
-                <prop key="showPeersSubscriptions.htm">subscriptionController</prop>
-                <prop key="showSelectedPeersSubscriptions.htm">subscriptionController</prop>
-                <prop key="showRemovedPeersSubscriptions.htm">subscriptionController</prop>
+                <prop key="removeDownloadSubscriptions.htm">subscriptionController</prop>
+                <prop key="downloadSubscriptionsToRemove.htm">subscriptionController</prop>
+                <prop key="downloadSubscriptionsRemovalStatus.htm">subscriptionController</prop>
+                <prop key="removeUploadSubscriptions.htm">subscriptionController</prop>
+                <prop key="uploadSubscriptionsToRemove.htm">subscriptionController</prop>
+                <prop key="uploadSubscriptionsRemovalStatus.htm">subscriptionController</prop>
 
-                <prop key="showNodeConnections.htm">nodeConnectionController</prop>
-                <prop key="showSelectedNodeConnections.htm">nodeConnectionController</prop>
-                <prop key="showRemovedNodeConnections.htm">nodeConnectionController</prop>
+                <prop key="removeNodeConnections.htm">nodeConnectionController</prop>
+                <prop key="nodeConnectionsToRemove.htm">nodeConnectionController</prop>
+                <prop key="nodeConnectionsRemovalStatus.htm">nodeConnectionController</prop>
             </props>
         </property>
     </bean>
@@ -191,26 +198,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           class="org.springframework.web.servlet.view.InternalResourceViewResolver"
           p:prefix="/WEB-INF/jsp/"
           p:suffix=".jsp" />
-
-    <!--
-        Name resolver to be used with classes extending MultiActionController
-    -->
-    <bean id="nameResolver"
-        class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver">
-        <property name="mappings">
-            <props>
-                <prop key="showRadars">showRadars</prop>
-                <prop key="showSelectedRadars">showSelectedRadars</prop>
-                <prop key="showRemovedRadars">showRemovedRadars</prop>
-                <prop key="showUsers">showUsers</prop>
-                <prop key="showSelectedUsers">showSelectedUsers</prop>
-                <prop key="showRemovedUsers">showRemovedUsers</prop>
-                <prop key="showSubscriptions">showSubscriptions</prop>
-                <prop key="showSelectedSubscriptions">showSelectedSubscriptions</prop>
-                <prop key="showSubscriptionStatus">showSubscriptionStatus</prop>
-            </props>
-        </property>
-    </bean>
     <!--
         URL filename view controller.
     -->
@@ -256,7 +243,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="userManager"/>
         </property>
         <property name="successView">
-            <value>redirect:dataDownload.htm</value>
+            <value>redirect:home.htm</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.user.model.User</value>
@@ -363,7 +350,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="journalController" class="eu.baltrad.dex.log.controller.JournalController">
         <property name="successView">
-            <value>journal</value>
+            <value>allMessages</value>
         </property>
     </bean>
 
@@ -466,9 +453,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Clear message table controller - deletes records from message table
     -->
-    <bean name="clrMsgsController" class="eu.baltrad.dex.log.controller.ClrMsgsController">
+    <bean name="removeMessagesController"
+            class="eu.baltrad.dex.log.controller.RemoveMessagesController">
         <property name="successView">
-            <value>confirmclearmessages</value>
+            <value>messagesRemovalStatus</value>
         </property>
     </bean>
 
@@ -477,7 +465,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="registerController" class="eu.baltrad.dex.register.controller.RegisterController">
         <property name="successView">
-            <value>showregister</value>
+            <value>showRegister</value>
         </property>
         <property name="deliveryRegisterManager">
             <ref bean="deliveryRegisterManager"/>
@@ -495,7 +483,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="editUserController" class="eu.baltrad.dex.user.controller.EditUserController">
         <property name="successView">
-            <value>editUser</value>
+            <value>editAccount</value>
         </property>
         <property name="userManager">
             <ref bean="userManager"/>
@@ -507,13 +495,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="saveUserController" class="eu.baltrad.dex.user.controller.SaveUserController">
         <property name="successView">
-            <value>saveUserStatus</value>
+            <value>saveAccountStatus</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.user.model.User</value>
         </property>
         <property name="formView">
-            <value>saveUser</value>
+            <value>saveAccount</value>
         </property>
         <property name="validator">
             <ref bean="saveUserValidator"/>
@@ -540,9 +528,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean id="removeUserController"
         class="eu.baltrad.dex.user.controller.RemoveUserController">
-        <property name="nameResolver">
+        <!--property name="nameResolver">
             <ref local="nameResolver"/>
-        </property>
+        </property-->
         <property name="userManager">
             <ref bean="userManager" />
         </property>
@@ -554,7 +542,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="saveRadarController"
         class="eu.baltrad.dex.radar.controller.SaveRadarController">
         <property name="formView">
-            <value>saveLocalRadar</value>
+            <value>saveRadar</value>
         </property>
         <property name="successView">
             <value>saveRadarStatus</value>
@@ -583,7 +571,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="editRadarController" class="eu.baltrad.dex.radar.controller.EditRadarController">
         <property name="successView">
-            <value>editLocalRadar</value>
+            <value>editRadar</value>
         </property>
         <property name="radarManager">
             <ref bean="radarManager"/>
@@ -595,9 +583,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean id="removeRadarController"
         class="eu.baltrad.dex.radar.controller.RemoveRadarController">
-        <property name="nameResolver">
+        <!--property name="nameResolver">
             <ref local="nameResolver"/>
-        </property>
+        </property-->
         <property name="radarManager">
             <ref bean="radarManager" />
         </property>
@@ -612,7 +600,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <value>eu.baltrad.dex.core.model.NodeConnection</value>
         </property>
         <property name="successView">
-            <value>redirect:remoteDataSources.htm</value>
+            <value>redirect:dsConnect.htm</value>
         </property>
         <property name="nodeConnectionManager">
             <ref bean="nodeConnectionManager" />
@@ -754,7 +742,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="showDataSourcesController"
             class="eu.baltrad.dex.datasource.controller.ShowDataSourcesController">
         <property name="successView">
-            <value>showDataSources</value>
+            <value>dsShow</value>
         </property>
         <property name="dataSourceManager">
             <ref bean="dataSourceManager"/>

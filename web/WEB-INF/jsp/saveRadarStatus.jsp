@@ -16,13 +16,13 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Save local radar station
-Created on : Oct 5, 2010, 10:35 AM
+Document   : Save local radar station status
+Created on : Oct 5, 2010, 11:49 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
@@ -30,67 +30,46 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Save radar</title>
+        <title>Baltrad | Add radar station</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/settingsTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
-                            Save local radar station
-                        </div>
-                        <div class="right">
-                        </div>
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/settingsMenu.jsp"%>
                     </div>
-                    <div id="text-box">
-                        <c:choose>
-                            <c:when test="${not empty ok_message}">
-                                <div class="message">
-                                    <div class="icon">
-                                        <img src="includes/images/icons/circle-check.png"
-                                             alt="save_ok"/>
-                                    </div>
-                                    <div class="text">
-                                        <c:out value="${ok_message}"/>
-                                        <c:set var="ok_message" value="" scope="session"/>
-                                    </div>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <div class="message">
-                                    <div class="icon">
-                                        <img src="includes/images/icons/circle-delete.png"
-                                             alt="save_error"/>
-                                    </div>
-                                    <div class="text">
-                                        <c:out value="${error_message}"/>
-                                        <c:set var="error_message" value="" scope="session"/>
-                                    </div>
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
-                    <div class="footer">
-                        <div class="right">
-                            <form action="configuration.htm">
-                                <button class="rounded" type="submit">
-                                    <span>OK</span>
-                                </button>
-                            </form>
+                    <div class="right">
+                        <div class="blttitle">
+                            Save radar station
+                        </div>
+                        <div class="blttext">
+                            Save local radar station status.
+                        </div>
+                        <div class="table">
+                            <div class="addradar">
+                                <%@include file="/WEB-INF/jsp/genericMessages.jsp"%>
+                                <div class="tablefooter">
+                                   <div class="buttons">
+                                       <button class="rounded" type="button"
+                                            onclick="window.location.href='settings.htm'">
+                                            <span>OK</span>
+                                       </button>
+                                   </div>
+                               </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

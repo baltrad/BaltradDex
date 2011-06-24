@@ -60,8 +60,8 @@ public class SaveConfigurationController extends SimpleFormController {
     private static final String TZ_FILE = "includes/timezones_eu.txt";
     public static final String PRIMARY_NODE = "Primary";
     public static final String BACKUP_NODE = "Backup";
-    private static final String OK_MSG_KEY = "ok_message";
-    private static final String ERROR_MSG_KEY = "error_message";
+    private static final String OK_MSG_KEY = "message";
+    private static final String ERROR_MSG_KEY = "error";
 //---------------------------------------------------------------------------------------- Variables
     private ConfigurationManager configurationManager;
     private Logger log;
@@ -157,7 +157,7 @@ public class SaveConfigurationController extends SimpleFormController {
                     "message.saveconf.savefail" ) );
             log.error( getMessageSourceAccessor().getMessage( "message.saveconf.savefail" ) + ": " +
                 e.getMessage() );
-            errors.reject( "message.saveconf.savefail" ); 
+            errors.reject( "message.saveconf.savefail" );
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(

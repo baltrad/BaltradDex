@@ -19,1357 +19,266 @@
 *
 ***************************************************************************************************/
 
-/*
- * reset margins and padding
- */
+/* general styles --------------------------------------------------------------------------------*/
 * {
-     margin: 0;
-     padding: 0;
+    margin:0;
+    padding:0;
 }
-/*
- * global styles
- */
 html, body {
-    height: 100%;
-    overflow: inherit;
+    height:100%;
+    overflow:inherit;
+    background-color:#FFFFFF;
     font-family: Verdana, Arial, Tahoma, sans-serif;
-    font-size: small;
-    background: white;
 }
-/* input fields */
-input, password {
-    border: 1px solid #2d76ae;
-    -webkit-border-radius: 4px; /* Safari, Chrome */
-    -khtml-border-radius: 4px;    /* Konqueror */
-    -moz-border-radius: 4px; /* Firefox */
-    border-radius: 4px;
-}
-/* buttons */
-button {
-    border: 0 none;
-    cursor: pointer;
-    padding: 0 15px 0 0;
-    text-align: center;
-    height: 30px;
-    line-height: 30px;
-    width: auto;
-}
-button.rounded {
-    background: transparent url( "images/btn_right.png" ) no-repeat scroll right top;
-    clear: left;
-}
-button span {
-    display: block;
-    padding: 0 0 0 15px;
-    position: relative;
-    white-space: nowrap;
-    height: 30px;
-    line-height: 30px;
-}
-button.rounded span {
-    background: transparent url( "images/btn_left.png" ) no-repeat scroll left top;
-    color: #FFFFFF;
-}
-button.rounded:hover {
-    background-position: 100% -30px;
-}
-button.rounded:hover span {
-    background-position: 0% -30px;
-}
-button::-moz-focus-inner {
-    border: none;
-}
-
-/*
- * main container
- */
-#container {
-    min-height: 100%;
-    width: 1024px;
-    margin-left: auto;
-    margin-right: auto;
-    background-image: url("images/faux-columns_1024x14.png");
-    background-repeat: repeat-y;
-}
-* html #container {
-    height: 100%;
-}
-
-/*
- * actual page contant
- */
-#content {
-    padding-bottom: 30px;
-}
-
-/*
- * header
- */
-#header {
-    height: 88px;
-}
-#header .logo {
-    width: 236px;
-    height: 88px;
-    float: left;
-    clear: left;
-    background-image: url("images/logo_234x88_shadow.png");
-}
-#header .banner {
-    width: 788px;
-    height: 88px;
-    float: left;
-    clear: right;
-    background-image: url("images/banner_788x88_shadow.png");
-}
-.help {
-    float: right;
-    margin-right: 32px;
-    margin-top: 32px;
-    font-size: small;
-    color: white;
-}
-#header .help a {
-    color: white;
-    text-decoration: none;
-}
-#header .help a:hover {
-    color: #2d76ae;
-    text-decoration: underline;
-}
-
-/*
- * footer
- */
-#footer {
-    height: 30px;
-    width: 1024px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: -30px;
-    margin-bottom: 0px;
-    background: #2d76ae; /* for non-css3 browsers */
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#98CBFF', endColorstr='#003399'); /* for IE */
-    background: -webkit-gradient(linear, left top, left bottom, from(#98CBFF), to(#003399)); /* for webkit browsers */
-    background: -moz-linear-gradient(top,  #98CBFF,  #003399); /* for firefox 3.6+ */
-}
-#footer .menu {
+/* wrapper for all elements of the page ----------------------------------------------------------*/
+#bltcontainer {
     width:1024px;
-    color:white;
-    padding-top:4px;
-    position:absolute;
-    text-align:center;
-    z-index:1;
-    /*width: 312px;
-    color: white;
-    margin-left: auto;
-    margin-right: auto;
-    padding-top: 4px;
-    position:absolute;
-    z-index:1;*/
+    min-height:100%;
+    margin: 0px auto 0px auto;
+    background-color:#FFFFFF;
 }
-#footer .menu a {
-    color: white;
-    text-decoration: none;
+* html #bltcontainer {
+    height:100%;
 }
-#footer .menu a:hover {
-    text-decoration: underline;
-    color: #99cc66;
-}
-#footer .version {
+/* page header -----------------------------------------------------------------------------------*/
+#bltheader {
     width:1024px;
-    position:absolute;
-    text-align:right;
-    padding-top:4px;
-    color:white;
-    z-index:0;
+    height:88px;
+    background-image:url("images/Banner_1024x88_shadow.png");
+    background-repeat:no-repeat;
 }
-#footer .version span {
-    padding-right:12px;
+#bltheader .help {
+    float:right;
+    font-size:0.8em;
+    margin-top:22px;
+    margin-right:44px;
+    color:#FFFFFF;
 }
-/*
- * hidden div
- */
-#clear {
-    clear: both;
-    width: 100%;
-    color: white;
-    margin-bottom: 30px;
+#bltheader .help a {
+    text-decoration:none;
+    color:#FFFFFF;
 }
-
-/*
- * left column
-*/
-#left {
-    position: relative;
-    width: 236px;
-    float:left;
-    clear: left;
-}
-#left .menu {
-    padding: 32px 12px 12px 12px;
-}
-#left .menu > .group {
-    font-weight: bold;
-    font-size: 1.2em;
-    color: #003298;
-    padding-left: 12px;
-    clear: both;
-    padding-bottom: 4px;
-}
-#left .menu > .separator {
-    width: 100%;
-    position: relative;
-    float: left;
-    clear: both;
-    border-bottom: 1px solid #A7A7A7;
-    margin-top: 12px;
-    margin-bottom: 12px;
-
-}
-#left .menu a {
-    width: 70%;
-    position: relative;
-    float: left;
-    clear: both;
-    left: 32px;
-    padding: 2px;
-    font-weight: bold;
-    color: #2d76ae;
-    text-decoration: none;
-    border: 1px solid white;
-}
-#left .menu a:hover {
-    color: #99CC66;
+#bltheader .help a:hover {
     text-decoration:underline;
 }
-
-/*
- * right column
- */
-#right {
-    position: relative;
-    float: left;
-    width: 724px;
-    padding-top: 12px;
-    padding-left: 32px;
-    padding-right: 32px;
-}
-
-/*
- * page title
- */
-#page-title {
-    font-size: 1.5em;
-    color: #2d76ae;
-    border-bottom: 1px solid #2d76ae;
-    float: left;
-    width: 100%;
-}
-#page-title .left {
-    float: left;
-}
-#page-title .right {
-    float: right;
-}
-
-/*
- * text box
- */
-#text-box {
-    width: 100%;
-    position: relative;
-    float: left;
-    clear: right;
-    padding-top: 12px;
-}
-#text-box .title {
-    font-size: 1.1em;
-    padding-bottom: 12px;
-    color: #2d76ae;
-}
-#text-box .helpIcon {
-    text-align:right;
-}
-/*
- * status box
- */
-#status-box {
-    width: 100%;
-    float: left;
-    clear: right;
-    padding: 12px 0px 6px 0px;
-}
-#status-box .bottom {
-    width: 100%;
-    float: left;
-    clear: right;
-    font-size: 1.1em;
-    color: #2d76ae;
-    border-bottom: 1px solid #2d76ae;
-}
-#status-box .icon {
-    width: 64px;
-    height: 64px;
-    float: left;
-}
-#status-box .text {
-    height: 64px;
-    float: left;
-    font-size: 1.1em;
-    color: #2d76ae;
-    padding-top: 20px;
-}
-#status-box .message {
-    width: 100%;
-    float: left;
-    clear: right;
-    padding-left: 8px;
-}
-#status-box .message li {
-    margin-left: 12px;
-}
-
-/*------------------------------------------------------------------------------------ login form */
-#login {
-    clear:both;
-    width:360px;
-    height: 180px;
-    display:block;
+/* login section ---------------------------------------------------------------------------------*/
+#bltmain .login {
+    width:592px;
     margin-left:auto;
     margin-right:auto;
+    margin-top:86px;
 }
-.login-top {
-    width:100%;
-    float:left;
-    clear:both;
-    margin-top:48px;
-    margin-bottom:6px;
-}
-.login-left {
-    width:30%;
+.login .left {
     float:left;
     text-align:right;
-    color: #2d76ae;
-    font-weight: bold;
-    font-size: 1.1em;
+    width:50%;
 }
-.login-right {
-    width:70%;
+.login .right {
     float:left;
-}
-.login-bottom {
-    width:100%;
-    float:left;
-    clear:both;
-    text-align:center;
-    margin-top:12px;
-}
-.login-right input {
-    width:140px;
-    float:left;
-}
-.login-left .login-row {
-    padding-right:12px;
-}
-.login-row {
-    height:30px;
-}
-/*------------------------------------------------------------------------------------------------*/
-
-
-
-
-form > .left > .row4, form > .right > .row4 {
-    height: 88px;
-}
-form > .left > .row6, form > .right > .row6 {
-    height: 118px;
-}
-form > .left {
-    position: relative;
-    float: left;
-    margin-right: 8px;
-    color: #2d76ae;
-    font-weight: bold;
-    font-size: 1.1em;
-    text-align: right;
-}
-form > .left > .row, form > .right > .row {
-    height: 28px;
-}
-form > .right {
-    position: relative;
-    float: left;
-}
-form > .top {
-    position: relative;
-    clear: both;
-    margin-bottom: 8px;
-    right: 20%;
-}
-form > .bottom {
-    position: relative;
-    clear: both;
-    right: 20%;
-    padding-top: 18px;
-}
-
-/*
- * separator
- */
-#separator {
-    width: 100%;
-    float: left;
-    clear: left;
-    margin-top: 60px;
-    border-bottom: 1px solid #2d76ae;
-}
-
-/*
- * messages section
- */
-#messages {
-    margin-bottom: 12px;
-}
-
-/*
- * tables
- */
-#table {
-    width: 100%;
-    float: left;
-    clear: both;
-    padding-top: 24px;
-    padding-bottom: 24px;
-}
-.footer {
-    width: 100%;
-    position: relative;
-    float: left;
-    clear: both;
-    text-align: right;
-    border-top: 1px solid #2d76ae;
-    margin-top: 24px;
-}
-.footer > .right {
-    padding-top: 12px;
-}
-.tableborder {
-    width: 100%;
-    font-size: small;
-}
-
-
-
-
-
-tr:hover {
-    background: #99CC66;
-}
-tr {
-    background: #EEF4F7;
-}
-.tdcenter, .tdcheck {
-    padding: 4px 4px 4px 4px;
-}
-.tdred {
-    color: #EB0100;
-}
-.tdgreen {
-    color: #588D25;
-}
-.tdcenter a, .tdcheck a {
-    color: #003298;
-    padding: 1px 2px 1px 2px;
-    text-decoration: underline;
-}
-.tdcenter a:hover, .tdcheck a:hover  {
-    color: white;
-}
-.tdcheck {
-    text-align: center;
-}
-.tdhidden {
-    visibility: hidden;
-    display: none;
-}
-.tdimage {
-    text-align: center;
-}
-.tdimage img {
-    border: none;
-}
-.tdimage img:hover {
-    background: white;
-}
-
-
-
-
-
-.message {
-    width: 100%;
-    position: relative;
-    float: left;
-    clear: both;
-    margin-top: 24px;
-}
-.message > .icon {
-    width: 64px;
-    float: left;
-    clear: left;
-}
-.message > .text {
-    width: 624px;
-    float: left;
-    clear: right;
-    color: #2d76ae;
-    font-size: 1.1em;
-    padding-top: 16px;
-    padding-left: 32px;
-}
-#table > .header {
-    width: 100%;
-    float: left;
-    clear: right;
-    margin-top: 24px;
-    margin-bottom: 24px;
-}
-#table > .header > .title {
-    font-size: 1.1em;
-    color: #2d76ae;
-    font-weight: bold;
-    padding: 6px;
-    border-bottom: 1px solid #2d76ae;
-}
-#table > form > .left, #table > .left {
-    position: relative;
-    float: left;
-    clear: left;
-    padding-left: 24px;
-    padding-right: 24px;
-}
-#table > form > .right, #table > .right {
-    position: relative;
-    float: left;
-    clear: right;
-}
-#table > form > .right > .row > select {
-    width: 200px;
-}
-
-#table > form > .right > .row, #table > form > .left > .row, 
-        #table > .left > .row, #table > .right > .row {
-    height: 26px;
-    font-family: Verdana, Arial, Tahoma, sans-serif;
-    font-weight: normal;
-    color: black;
-}
-/*
- * File details table and probably other tables too
- */
-#table > .left > .row {
-    color: #2d76ae;
-    font-weight: bold;
-    font-size: 1.1em;
-    text-align: right;
-}
-
-/*
- * Welcome message on login page
- */
-#welcome-msg {
-    width: 100%;
-    float: left;
-    clear: both;
-    background: #FFFFFF;
-    color: #B7B7B7;
-    font-size: 1.0em;
-}
-#welcome-msg > .left {
-    float: left;
-    margin-right: 18px;
-}
-#welcome-msg > .right {
-    float: left;
-    clear: right;
-}
-#welcome-msg > .left > .row, #welcome-msg > .right > .row {
-    padding-top: 1px;
-    padding-bottom: 1px;
-}
-/*
- * Data source users configuration table
- */
-.options {
-     float: left;
-     margin-bottom: 12px;
-     width: 260px;
-}
-.option {
-    width: 80px;
-    float: left;
-    padding: 6px;
-}
-
-/*
- * Node properties page
- */
-#table > .props > form > .left {
-    margin-right: 22px;
-}
-#table > .props > form > .right > .row > select {
-    width: 240px;
-}
-#table > .props > form > .right > .row4 > input {
-    width: 360px;
-}
-#table > .props > form > .right > .row4 > select {
-    width: 240px;
-}
-
-#table > .props > form > .right > .row6 > input {
-    width: 360px;
-}
-#table > .props > form > .right > .row6 > select {
-    width: 240px;
-}
-
-/*-------------------------------------------------------------------------- Connect to node page */
-#node-connect {
-    width:100%;
-}
-#node-connect .connect-header {
-    width:100%;
-    float:left;
-    clear:both;
-    color:#2d76ae;
-    font-size:1.1em;
-    font-weight:bolder;
-    border-bottom: 1px solid #2d76ae;
-    margin-top:24px;
-}
-#node-connect .row {
-    width:100%;
-    float:left;
-    clear:both;
-    padding-top:12px;
-}
-#node-connect .left {
-    width:30%;
-    float:left;
-}
-#node-connect .right {
-    width:70%;
-    float:left;
-    clear:right;
-}
-#node-connect select {
-    width:220px;
-    float:left;
-}
-#node-connect button {
-    float:right;
-}
-.node-address {
-    float:left;
-}
-.protocol-prefix {
-    float:left;
-    color: #2d76ae;
-    font-weight: bold;
-}
-.port-separator {
-    float:left;
-    color: #2d76ae;
-    font-weight: bold;
-}
-.port-number {
-    width:40px;
-    float:left;
-}
-.user-name, .user-passwd {
-    float:left;
-    width:240px;
-}
-/*-------------------------------------------------------------------------- Node properties page */
-.node-name, .org-name, .org-address, .work-dir, .admin-email {
-    float:left;
-    width:280px;
-}
-/*----------------------------------------------------------------------------- User account page */
-.user-name, .user-passwd, .confirm-password, .country, .city, .city-code,
-        .street, .street-number, .phone {
-    float:left;
-    width:280px;
-}
-/*
- * Node configuration page
- */
-#table > .config {
-    width: 100%;
-    float: left;
-}
-#table > .config > .left {
-    float: left;
-    clear: left;
-}
-#table > .config > .middle {
-    float: left;
-}
-#table > .config > .right {
-    float: left;
-    clear: right;
-}
-.left > .tile > .icon {
-    float: left;
-    clear: left;
-}
-.left > .tile > .header {
-    float: left;
-    clear: right;
-}
-.left > .tile > .text {
-    float: left;
-    clear: both;
-}
-.middle > .tile > .icon {
-    float: left;
-    clear: left;
-}
-.middle > .tile > .header {
-    float: left;
-    clear: right;
-}
-.middle > .tile > .text {
-    float: left;
-    clear: both;
-}
-.right > .tile > .icon {
-    float: left;
-    clear: left;
-}
-.right > .tile > .header {
-    float: left;
-    clear: right;
-}
-.right > .tile > .text {
-    float: left;
-    clear: both;
-}
-.tile {
-    height: 158px;
-    display: block;
-    padding: 4px;
-}
-.tile > .header {
-    font-weight: bold;
-    font-size: 1.2em;
-    color: #003298;
-    text-align: center;
-    padding: 25px 0px 12px 0px;
-    border-bottom: 1px solid #2d76ae;
-}
-.tile > .icon {
-    padding: 8px 4px 0px 4px;
-}
-.tile > .text > .row {
-    position: relative;
-    float: left;
-    clear: both;
-    font-weight: bold;
-    padding: 0px 2px 2px 70px;
-}
-.tile > .text > .row > a {
-    color: #2d76ae;
-    text-decoration: underline;
-    padding: 2px;
-}
-.tile > .text > .row > a:hover {
-    color: #99CC66;
-    text-decoration: none;
-}
-
-/*
- * error messages
- */
-.errors {
-    color: red;
-    float: left;
-    padding-left: 4px;
-    clear: right;
-}
-
-/*
- * messages table
- */
-#logtable .warning {
-    color: #003197;
-}
-#logtable .error {
-    color: red;
-}
-#logtable tr {
-    width:100%;
-}
-
-/* general table properties */
-
-.table-hdr {
-    font-size:1.1em;
-    font-weight: bolder;
-    color:#2d76ae;
-    border-bottom: 1px solid #2d76ae;
-}
-.table-hdr, .table-row {
-    width:100%;
-    float:left;
-    clear:both;
-}
-.table-row {
-    border-bottom:1px solid #D0E7BA;
-}
-.table-row:hover {
-    background:#E2FFC6;
-}
-
-#logtable > .table-hdr > .date, #logtable > .table-row > .date {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:12%;
-}
-#logtable > .table-hdr > .time, #logtable > .table-row > .time {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:10%;
-}
-#logtable > .table-hdr > .flag, #logtable > .table-row > .flag {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:6%;
-    text-align:center;
-}
-#logtable > .table-hdr > .msg, #logtable > .table-row > .msg {
-    float:right;
-    padding:3px 0px 3px 0px;
-    width:72%;
-}
-#logtable > .table-hdr > .msg {
-    text-align:center; 
-}
-#radartable > .table-hdr > .station, #radartable > .table-row > .station,
-        #radartable > .table-hdr > .wmo, #radartable > .table-row > .wmo {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width: 50%;
-}
-#dataSourceTable > .table-hdr > .name, #dataSourceTable > .table-row > .name {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width: 30%;
-}
-#dataSourceTable > .table-hdr > .description, #dataSourceTable > .table-row > .description {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width: 70%;
-}
-#radartable a, #producttable a, #edituser a, #dataSourceTable a, #subscriptions a,
-        #adaptors a, #showroutes a, #showschedule {
-    color:#2d76ae;
-    text-decoration:underline;
-    cursor:pointer
-}
-#radartable a:hover, #producttable a:hover, #edituser a:hover, #dataSourceTable a:hover,
-        #subscriptions a:hover, #adaptors a:hover, #showroutes a:hover,
-        #showschedule a:hover {
-    text-decoration:none;
-    font-weight:bolder; 
-}
-#selectradars > .table-hdr > .station, #selectradars > .table-row > .station,
-        #selectradars > .table-hdr > .wmo, #selectradars > .table-row > .wmo {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width: 40%;
-}
-#selectradars > .table-hdr > .check, #selectradars > .table-row > .check {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width: 20%;
-    text-align:center;
-}
-#remoteDataSources > .table-hdr > .name, #remoteDataSources > .table-row > .name {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:30%;
-}
-#remoteDataSources > .table-hdr > .description, #remoteDataSources > .table-row > .description {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:60%;
-}
-#remoteDataSources > .table-hdr > .check, #remoteDataSources > .table-row > .check {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:10%;
-    text-align:center;
-}
-#selectusers > .table-hdr > .user, #selectusers > .table-row > .user,
-        #selectusers > .table-hdr > .role, #selectusers > .table-row > .role {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:40%;
-}
-#selectusers > .table-hdr > .check, #selectusers > .table-row > .check {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:20%;
-    text-align:center;
-}
-#producttable > .table-hdr > .date, #producttable > .table-row > .date,
-        #producttable > .table-hdr > .time, #producttable > .table-row > .time {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:15%;
-    overflow:hidden;
-}
-#producttable > .table-hdr > .source, #producttable > .table-row > .source {
-    width:15%;
-    padding:3px 0px 3px 0px;
-    float:left;
-    overflow:hidden;
-}
-#producttable > .table-hdr > .type, #producttable > .table-row > .type {
-    width:15%;
-    padding:3px 0px 3px 0px;
-    float:left;
-    overflow:hidden;
-}
-#producttable > .table-hdr > .details, #producttable > .table-row > .details {
-    width:20%;
-    padding:3px 0px 3px 0px;
-    float:left;
-    text-align:right;
-    overflow:hidden;
-}
-#producttable > .table-hdr > .download, #producttable > .table-row > .download {
-    width:15%;
-    padding:3px 0px 3px 0px;
-    float:right;
-    text-align:center;
-    overflow:hidden;
-}
-#showusers > .table-hdr > .name, #showusers > .table-hdr > .role,
-        #showusers > .table-hdr > .factory, #showusers > .table-row > .name,
-        #showusers > .table-row > .role, #showusers > .table-row > .factory {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:28%;
-    overflow:hidden;
-    margin-right:2%;
-}
-#showusers > .table-hdr > .check, #showusers > .table-row > .check {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:10%;
-    text-align:center;
-}
-#removeusers > .table-hdr > .name, #removeusers > .table-hdr > .role,
-        #removeusers > .table-hdr > .factory, #removeusers > .table-row > .name,
-        #removeusers > .table-row > .role, #removeusers > .table-row > .factory {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:30%;
-    overflow:hidden;
-    margin-right:2%;
-}
-#edituser > .table-hdr > .name, #edituser > .table-hdr > .role,
-        #edituser > .table-hdr > .factory, #edituser > .table-row > .name,
-        #edituser > .table-row > .role, #edituser > .table-row > .factory {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:30%;
-    overflow:hidden;
-    margin-right:2%;
-}
-#selectconnections > .table-hdr > .name, #selectconnections > .table-row > .name,
-        #selectconnections > .table-hdr > .address, #selectconnections > .table-row > .address,
-        #selectconnections > .table-hdr > .user, #selectconnections > .table-row > .user {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:30%;
-}
-#selectconnections > .table-hdr > .check, #selectconnections > .table-row > .check {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:10%;
-    text-align:center;
-}
-#selectedconnections > .table-hdr > .name, #selectedconnections > .table-row > .name,
-        #selectedconnections > .table-hdr > .address, #selectedconnections > .table-row > .address,
-        #selectedconnections > .table-hdr > .user, #selectedconnections > .table-row > .user {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:33%;
-}
-#subscriptions > .table-hdr > .station, #subscriptions > .table-row > .station,
-#subscriptions > .table-hdr > .operator, #subscriptions > .table-row > .operator {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:35%;
-}
-#subscriptions > .table-hdr > .synkronized, #subscriptions > .table-row > .synkronized {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:20%;
-    text-align:center;
-}
-#subscriptions > .table-hdr > .active, #subscriptions > .table-row > .active {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:10%;
-    text-align:center;
-}
-#subscriptions > .table-hdr > .check, #subscriptions > .table-row > .check {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:20%;
-    text-align:center;
-}
-#selectedsubscriptions > .table-hdr > .station, #selectedsubscriptions > .table-row > .station,
-#selectedsubscriptions > .table-hdr > .operator, #selectedsubscriptions > .table-row > .operator {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:40%;
-}
-#selectedsubscriptions > .table-hdr > .request, #selectedsubscriptions > .table-row > .request {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:20%;
-    text-align:center;
-}
-#statustable > .table-hdr > .station, #statustable > .table-row > .station,
-        #statustable > .table-hdr > .user, #statustable > .table-row > .user,
-        #statustable > .table-hdr > .timestamp, #statustable > .table-row > .timestamp {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:30%;
-    overflow:hidden;
-}
-#statustable > .table-hdr > .active, #statustable > .table-row > .active {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:30%;
-    text-align:center;
-    overflow:hidden;
-}
-#statustable > .table-hdr {
-    font-size:1em;
+    text-align:left;
+    width:50%;
+}
+.login .left .date {
+    font-size:0.8em;
     font-weight:normal;
-    overflow:hidden;
+    color:#444444;
+    padding-top:6px;
+    padding-right:3px;
 }
-#peersubscriptions > .table-hdr > .station, #peersubscriptions > .table-row > .station,
-#peersubscriptions > .table-hdr > .user, #peersubscriptions > .table-row > .user {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:45%;
+.login .username, .login .password {
+    height:44px;
 }
-#peersubscriptions > .table-hdr > .check, #peersubscriptions > .table-row > .check {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:10%;
-    text-align:center;
-}
-#selectedpeersubscriptions > .table-hdr > .station, #selectedpeersubscriptions > .table-row > 
-        .station, #selectedpeersubscriptions > .table-hdr > .user, #selectedpeersubscriptions >
-        .table-row > .user {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:50%;
-}
-#register > .table-hdr > .date, #register > .table-row > .date {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:12%;
-}
-#register > .table-hdr > .time, #register > .table-row > .time {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:10%;
-}
-#register > .table-hdr > .recipient, #register > .table-row > .recipient {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:20%;
-    text-align:center;
-}
-#register > .table-hdr > .uuid, #register > .table-row > .uuid {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:40%;
-}
-#register > .table-hdr > .status, #register > .table-row > .status {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:18%;
-    text-align:center;
-}
-#adaptors > .table-hdr > .name, #adaptors > .table-row > .name {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:60%;
-    overflow:hidden;
-    margin-right:5%;
-}
-#adaptors > .table-hdr > .type, #adaptors > .table-row > .type {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:30%;
-    overflow:hidden;
-}
-#showschedule > .table-hdr > .id, #showschedule > .table-row > .id {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:50%;
-}
-#showroutes > .table-hdr > .active, #showroutes > .table-row > .active {
-    float:left;
-    width:10%;
-    padding:3px 0px 3px 0px;
-    text-align:center;
-    overflow:hidden;
-    margin-right:2%;
-}
-#showroutes > .table-hdr > .name, #showroutes > .table-row > .name {
-    float:left;
-    width:20%;
-    padding:3px 0px 3px 0px;
-    text-align:center;
-    overflow:hidden;
-    margin-right:2%;
-}
-#showroutes > .table-hdr > .type, #showroutes > .table-row > .type {
-    float:left;
-    width:20%;
-    padding:3px 0px 3px 0px;
-    text-align:center;
-    overflow:hidden;
-    margin-right:2%;
-}
-#showroutes > .table-hdr > .description, #showroutes > .table-row > .description {
-    float:left;
-    padding:3px 0px 3px 0px;
-    width:40%;
-}
-
-
-/* table control bar */
-
-#table-control {
-    width:100%;
-    color:#FFFFFF;
-    font-size:0.9em;
-}
-#table-control input {
-    background:#94C761;
-}
-#table-control input:hover {
-    background:#6FB729;
-}
-
-
-/*
- * Image thumbs
- */
-#image-thumbs {
-    width: 100%;
-    float: left;
-    margin-top: 12px;
-}
-#image-thumbs > #thumb {
-    float: left;
-    margin: 4px;
-}
-#image-thumbs > #thumb .caption {
-    text-align: center;
-}
-#image-thumbs > #thumb > .image > a > img {
-    border: none;
-}
-#image-thumbs > #thumb > .image > a > img:hover {
-    background: #CECECE;
-}
-
-/*
- * Data preview with Google Maps
- */
-#map_canvas {
-    height: 90%;
-}
-#map-toolbar {
-    width: 100%;
-    height: 10%;
-    text-align: center;
-    background: #A7A7A7;
-}
-#map-toolbar .center {
-    width: 340px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 8px;
-}
-#map-toolbar .left {
-    float: left;
-}
-#map-toolbar .right {
-    float: right;
-}
-.slider {
-    position: relative;
-    width: 180px;
-    font-size: 12px;
-    height: 30px;
-    background: #EEE;
-    border: 1px solid #84B752;
-}
-.slider .handle {
-    position: absolute;
-    width: 60px;
-    height: 30px;
-    background: #84B752;
-    color: #FFFFFF;
-    line-height: 30px;
-    text-align: center;
-    cursor: pointer;
-}
-.slider .handle:hover {
-    background: #5E9626;
-}
-
-/*
- * Beast GUI
- */
-.beast-error {
-    font-weight: bold;
-    color: red;
-}
-.form-content {
-  width: 98%;
-  padding: 6px;
-  margin: 2px;
-  background-color: #CACACA;
-}
-.form-content ul {
-  padding:2px;
-  margin:2px;
-  list-style:none;
-  overflow:auto;
-}
-.form-content ul li {
-  padding:2px;
-  margin:2px;
-}
-.form-content ul li span {
-  float:left;
-  width:5em;
-  text-align:left;
-  padding-right:30px;
-  font-weight:bold;
-}
-.adaptorerror {
-  font-weight:bold;
-  color:#c80000;
-}
-.routererror {
-  font-weight:bold;
-  color:#c80000;
-}
-.routedefinition {
-  font-size:100%;
-  float:left;
-  width:100%;
-  height:400px;
-}
-.scheduleerror {
-  font-weight:bold;
-  color:#c80000;
-}
-
-/*-------------------------------------------------------------------------------------- Tooltips */
-.tooltip {
-    background-color: #FFFFF0;
-    border: solid 1px gray;
-    text-align: center;
-    filter: alpha(Opacity=65);
-    opacity: 0.65;
-}
-.help-icon {
-    float: left;
-    padding-left: 4px;
-    padding-right: 4px;
-}
-.help-icon-right {
-    float:right;
-    padding-left: 4px;
-    padding-right: 4px;
-}
-/*---------------------------------------------------------------------------- Expandable section */
-.expandable {
-    width:100%;
-    float:left;
-    clear:both;
-}
-.expandable-hdr {
+.login .right .prompt, .login .left .username, .login .left .password {
     font-size:1.2em;
     font-weight:bolder;
-    padding-top:8px;
+    color:#4C6EB3;
 }
-.save {
-   behavior:url(#default#savehistory);
+.login .left .username {
+    padding-right:3px;
 }
-.dsphead {
-   text-decoration:none;
-   margin-left:1.5em;
-   color: #2d76ae;
+.login .left .password {
+    padding-right:3px;
 }
-.dsphead:hover {
-   text-decoration:underline;
-   color: #99CC66;
+.login .right .username {
+    padding-left:3px;
 }
-.dsphead span.dspchar {
-   font-family:monospace;
-   font-weight:normal;
+.login .right .password {
+    padding-left:3px;
 }
-.dspcont {
-   display:none;
-   width:80%;
-   margin-left:10%;
+.login .right .buttons {
+    padding:16px;
 }
-/*-------------------------------------------------------------------------------- Tabbed section */
+.login .left .username, .login .right .username {
+    margin-top:24px;
+}
+.login .left .password, .login .right .password {
+    margin-top:12px;
+}
+.hint {
+    color:#AFAAAA;
+    font-size:0.7em;
+    font-weight:normal;
+    padding:1px;
+}
+.login .passwdrecovery {
+    float:left;
+    clear:both;
+    width:100%;
+    text-align:center;
+    margin-top:44px;
+    font-size:0.8em;
+    color:#444444;
+}
+#bltmain {
+    height:100%;
+    min-height:100%;
+}
+/* page footer -----------------------------------------------------------------------------------*/
+#bltfooter {
+    width:1024px;
+    height:24px;
+    margin-top:-30px;
+    margin-left:auto;
+    margin-right:auto;
+    border-top:1px solid #AFAAAA;
+    font-size:0.7em;
+    color:#AFAAAA;
+    padding-top:4px;
+    background-color:#FFFFFF;
+    clear:both;
+}
+#bltfooter a {
+    text-decoration:none;
+    color:#AFAAAA;
+}
+#bltfooter a:hover {
+    text-decoration:underline;
+}
+#bltfooter .projectref {
+    float:left;
+    padding-left:24px;
+}
+#bltfooter .info {
+    float:right;
+    padding-right:24px;
+}
+/* buttons ---------------------------------------------------------------------------------------*/
+button {
+    border:0 none;
+    cursor:pointer;
+    padding:0 15px 0 0;
+    text-align:center;
+    height:30px;
+    line-height:30px;
+    width:auto;
+}
+button.rounded {
+    background:transparent url( "images/btn_right.png" ) no-repeat scroll right top;
+    clear:left;
+}
+button span {
+    display:block;
+    padding:0 0 0 15px;
+    position:relative;
+    white-space:nowrap;
+    height:30px;
+    line-height:30px;
+}
+button.rounded span {
+    background:transparent url( "images/btn_left.png" ) no-repeat scroll left top;
+    color:#FFFFFF;
+}
+button.rounded:hover {
+    background-position:100% -30px;
+}
+button.rounded:hover span {
+    background-position:0% -30px;
+}
+button::-moz-focus-inner {
+    border:none;
+}
+/* links -----------------------------------------------------------------------------------------*/
+a {
+    color:#4C6EB3;
+    text-decoration:none;
+    outline:none;
+}
+a:hover {
+    text-decoration:underline;
+}
+/* text-box messages -----------------------------------------------------------------------------*/
+.systemerror {
+    background-color:#FFF2F2;
+    border:1px solid #FFBDBD;
+    -moz-border-radius:4px;
+    border-radius:4px;
+    padding:6px 12px 6px 12px;
+    margin-top:16px;
+    margin-bottom:16px;
+    font-size:0.8em;
+    text-align:left;
+}
+.systemerror .header {
+    color:#000000;
+    font-size:1em;
+    font-weight:bold;
+}
+.systemerror .message {
+    color:#C12125;
+    font-size:0.8em;
+    font-weight:bold;
+}
+.systemmessage {
+    background-color:#CEFFA7;
+    border:1px solid #429602;
+    -moz-border-radius:4px;
+    border-radius:4px;
+    padding:6px 12px 6px 12px;
+    margin-top:16px;
+    margin-bottom:16px;
+    font-size:0.8em;
+    text-align:left;
+}
+.systemmessage .header {
+    color:#000000;
+    font-size:1em;
+    font-weight:bold;
+}
+.systemmessage .message {
+    color:#429602;
+    font-size:0.8em;
+    font-weight:bold;
+}
+/* input fields and textareas --------------------------------------------------------------------*/
+input, textarea {
+    border:1px solid #A7A7A7;
+    -moz-border-radius:4px;
+    border-radius:4px;
+    height:18px;
+}
+input:focus, textarea:focus {
+    border:1px solid #429602;
+}
+/* tabs ------------------------------------------------------------------------------------------*/
 #tabs {
     float:left;
     clear:both;
     width:100%;
     padding:0px;
+    margin-top:24px;
 }
 #tabs #tab {
-    border:1px solid #2D76AE;
+    border:1px dotted #AFAAAA;
     border-bottom-width:0px;
+    padding:4px 8px 4px 8px;
+    padding-top:2px;
     float:left;
-    margin-left:12px;
+    margin-left:2px;
     position:relative;
     top:1px;
     z-index:1;
 }
-#tab .icon, #tab .link {
-    float:left;
-    padding-left:4px;
-    padding-right:4px;
-}
-#tab .link {
-    padding-top:2px;
-}
-#tab .link a {
+#tabs #tab a {
     font-weight:bold;
     text-decoration:none;
 }
@@ -1378,249 +287,746 @@ tr {
     clear:both;
     width:100%;
     padding:0px;
-    border-top:1px solid #2D76AE;
+    border-top:1px dotted #AFAAAA;
     z-index:-1;
 }
 #tabs #tab.active {
     border-bottom-width:1px;
     border-bottom:1px solid white;
 }
-#tabs #tab .link a {
-    color:gray;
-}
-#tabs #tab.active .link a {
-    color: #2D76AE;
+#tabs #tab.active a {
+    color:#429602;
 }
 #tabs #tab:hover {
-    background:#E2FFC6;
+    background:#429602;   
+}
+#tabs #tab:hover a {
+    color:#FFFFFF;
 }
 #tabs #tab.active:hover {
     background:#FFFFFF;
 }
-/*--------------------------------------------------------------- Data source configuration pages */
-#dsConfig, #dsConfig > .row {
-    width:100%;
+#tabs #tab.active:hover a {
+    color:#429602;
+}
+#tabcontent .left {
+    width:242px;
     float:left;
+    padding-top:18px;
 }
-#dsConfig > .row {
-    margin-top:1em;
-}
-#dsConfig > .row > .left {
-    width:24%;
+#tabcontent .right {
+    width:760px;
     float:left;
-    text-align:right;
-    margin-right:1em;
-    color:#2d76ae;
-    font-weight:bolder;
-    font-size:1.1em;
-}
-#dsConfig > .row > .right {
-    width:70%;
-    float:left;
-}
-#dsConfig .dsNameInput {
-    float:left;
-    width:240px;
-}
-#dsConfig .dsDescriptionInput {
-    float:left;
-    width:240px;
-}
-.helpIconLeft {
-    float:left;
-    margin-left:0.5em;
-    margin-right:0.5em;
-}
-.helpIconRight {
-    float:right;
-    margin-left:0.5em;
-    margin-right:0.5em;
-}
-#dsConfig .selectedItem {
-    width:100%;
-    border:1px solid #2d76ae;
-    padding:2px;
-    color:#6D6969;
-    margin-bottom:4px;
-    -webkit-border-radius:4px;
-    -khtml-border-radius:4px;
+    clear:right;
+    margin:18px 0px 18px 12px;
+    padding-bottom:18px;
+    background-color:#FAFAFA;
+    border:1px solid #B6B6B3;
     -moz-border-radius:4px;
     border-radius:4px;
 }
-#dsConfig .buttonInput {
-    float:left;
-    margin-top:2px;
-    margin-right:2px;
-    margin-left:2px;
-    margin-bottom:2px;
-    background:#94C761;
-    cursor:pointer;
-    width:22px;
-}
-#dsConfig .buttonInput:hover {
-    background:#6FB729;
-}
-#dsConfig select {
-    float:left;
-    width:220px;
-}
-#dsConfig > .row > .left > a {
-    color:#2d76ae;
-    text-decoration:underline;
-    cursor:pointer
-}
-#dsConfig > .row > .left > a:hover {
-    text-decoration:none;
-}
-/*---------------------------------------------------------------------- Data source removal page */
-#dsSelect, #dsSelect > .row {
-    width:100%;
-    float:left;
-}
-#dsSelect > .row {
-    margin-top:1em;
-}
-#dsSelect > .table-hdr > .name, #dsSelect > .table-row > .name {
-    width:30%;
-    float:left;
-    overflow:hidden;
-    padding:3px 0px 3px 0px;
-}
-#dsSelect > .table-hdr > .description, #dsSelect > .table-row > .description {
-    width:60%;
-    float:left;
-    overflow:hidden;
-    padding:3px 0px 3px 0px;
-}
-#dsSelect > .table-hdr > .select, #dsSelect > .table-row > .select {
-    width:10%;
-    float:left;
-    overflow:hidden;
-    text-align:center;
-    padding:3px 0px 3px 0px;
-}
-
-
-
-/*#datasourceconfig, #datasourceconfig .row, #datasourcesave, #datasourcesave .row {
-    width:100%;
-    float:left;
-}
-#datasourcesave .row {
+/* context menu in the left column ---------------------------------------------------------------*/
+.menu ul li {
+    width:224px;
+    padding-right:16px;
+    padding-bottom:4px;
     margin-bottom:4px;
-}
-#datasourceconfig .left, #datasourcesave .left {
-    float:left;
-    width:24%;
-    color:#2d76ae;
-    font-weight:bold;
-    text-align:right;
-    padding:4px;
-}
-#datasourceconfig .right, #datasourcesave .right {
-    float:left;
-    width:70%;
-    padding:4px;
-}
-#datasourcesave .right {
-    color:#6D6969;
-}
-#datasourceconfig .textinput, #datasourceconfig .textarea {
-    float:left;
-    width: 220px
-}
-#datasourceconfig select {
-    float:left;
-    width:220px;
-}
-#datasourceconfig .buttoninput {
-    float:left;
-    margin-top:2px;
-    margin-right:2px;
-    margin-left:2px;
-    margin-bottom:2px;
-    background:#94C761;
-    cursor:pointer;
-    width:22px;
-}
-#datasourceconfig .buttoninput:hover {
-    background:#6FB729;
-}
-#datasourceconfig .radar, #datasourceconfig .fileobject, #datasourceconfig .dataquantity,
-        #datasourceconfig .product, #datasourceconfig .user, #datasourcesave .radar,
-        #datasourcesave .fileobject, #datasourcesave .dataquantity, #datasourcesave .product,
-        #datasourcesave .user {
-    width:100%;
-    border:1px solid #2d76ae;
-    padding:2px;
-    color:#6D6969;
-    margin-bottom:4px;
-    -webkit-border-radius:4px; /* Safari, Chrome 
-    -khtml-border-radius:4px;    /* Konqueror 
-    -moz-border-radius:4px; /* Firefox 
-    border-radius:4px;
-}
-#datasourceconfig .footer .right {
-    float:right;
-}
-#datasourceconfig .parameter {
-    float:left;
-    color:#2d76ae;
-    font-weight:bold;
-}
-#datasourceconfig .parameterdescription, #datasourceconfig .parametervalue {
-    float:left;
-    clear:right;
-}
-#datasourceconfig .product {
-    float:left;
-    clear:both;
-    padding:4px;
-}
-#datasourceconfig .productdetails {
-    width:100%;
-    float:left;
-    clear:both;
-}
-#datasourceconfig .setparameter {
-    width:100%;
-    float:left;
-    clear:both;
-    border:1px solid #2d76ae;
-    margin-top:2px;
-    margin-bottom:2px;
-    -webkit-border-radius:4px;
-    -khtml-border-radius:4px;
+    list-style:none;
+    overflow:visible;
+    background-color:#F6F6F4;
+    border:1px solid #B6B6B3;
     -moz-border-radius:4px;
     border-radius:4px;
 }
-#datasourceconfig .parameter, #datasourceconfig .parameterdescription {
-    float:left;
-    clear:right;
-    padding:1px;
-}
-#datasourceconfig .parameter, #datasourcesave .parameter {
-    color:#2d76ae;
+.menu ul li a {
+    display:block;
+    height:28px;
+    width:218px;
+    margin-top:0px;
+    padding:10px 0px 0px 12px;
+    font-size:14px;
     font-weight:bold;
-    clear:left;
+    color:#429602;
 }
-#datasourcesave .parameter {
+.menu ul li img {
+    width:24px;
     float:left;
+    margin:8px 12px 0px 12px;
 }
-#datasourceconfig .parametervalue, #datasourcesave .parametervalue {
-    float:left;
-    clear:right;
+.menu ul li ul {
+    display:none;
+    margin:-6px 0px 0px 20px;
+    padding-bottom:8px;
 }
-#datasourceconfig .parametervalue input {
-    width:96px;
+.menu ul li ul li {
+    background:none;
+    font-size:12px;
+    height:14px;
+    list-style:circle;
+    color:#0066CC;
+    margin-bottom:0px;
+    padding-left:1px;
+    margin:2px 0px 2px 35px;
     border:none;
-    background:#E5E5E5;
-    margin-bottom:2px;
 }
-#datasourceconfig .addparameter {
-    float:right;
+.menu ul li ul li a {
+    background:none;
+    font-size:12px;
+    height:15px;
+    padding-left:0px;
+    color:#4C6EB3;
+}
+/* Right column title section --------------------------------------------------------------------*/
+.blttitle {
+    width:96%;
+    margin:12px 12px 6px 12px;
+    font-size:14px;
+    font-weight:bold;
+    color:#4C6EB3;
+    border-bottom:1px dotted #0066CC;
+}
+.blttext {
+    width:96%;
+    padding:6px 12px 6px 12px;
+    font-size:14px;
+    color:#444444;
+}
+.bltseparator {
+    width:96%;
+    border-bottom:1px dotted #4C6EB3;
+    margin:12px 12px 12px 12px;
+    float:left;
+    clear:both;
+    font-size:14px;
+    color:#444444;
+}
+.blttext p {
+    padding:4px;
+}
+/* Tables ----------------------------------------------------------------------------------------*/
+.table {
+    width:96%;
+    padding:12px;
+    margin-top:12px;
+}
+.table .leftcol {
+    float:left;
+    clear:left;
+    color:#444444;
+    font-size:14px;
+    text-align:right;
+}
+.table .rightcol {
+    float:left;
     clear:right;
+    color:#4C6EB3;
+    border:none;
+    font-size:14px;
+    font-weight:bold;
 }
+.table .row {
+    padding:4px;
+}
+.table .tablefooter {
+    width:100%;
+    float:left;
+    clear:both;
+    text-align:right;
+    padding:12px;
+}
+.tablefooter .buttons {
+    padding-right:24px;
+}
+.table .log {
+    width:100%;
+}
+#logtable {
+    width:100%;
+}
+.tableheader {
+    width:100%;
+    float:left;
+    clear:right;
+    border-bottom:1px solid #0066CC;
+    padding:3px;
+    font-size:14px;
+    font-weight:bold;
+    color:#4C6EB3;
+}
+.entry {
+    width:100%;
+    float:left;
+    clear:right;
+    color:#444444;
+    border-bottom:1px solid #CEF99E;
+    padding:3px 3px 1px 3px;
+    font-size:0.8em;
+}
+.entry:hover {
+    background-color:#CEFFA7;
+}
+#cell  {
+    float:left;
+    overflow:hidden;
+    padding:0px 2px 0px 2px;
+}
+/* Log tables ------------------------------------------------------------------------------------*/
+.logdate {
+    width:12%;   
+}
+.logtime {
+    width:10%;
+}
+.logflag {
+    width:6%;
+    text-align:center;
+}
+.logmsg {
+    width:60%;
+}
+.error-entry {
+    color:#C12125;
+}
+.warning-entry {
+    color:#4C6EB3;
+}
+.error {
+    float:left;
+    color:#C12125;
+    font-size:12px;
+    font-weight:bold;
+    padding-left:12px;
+}
+/* Counter ---------------------------------------------------------------------------------------*/
+.count {
+    width:32px;
+    text-align:right;
+    margin-right:18px;
+}
+/* Radar table -----------------------------------------------------------------------------------*/
+.station {
+    width:30%;
+}
+.wmonumber {
+    text-align:left;
+}
+.check {
+    width:10%;
+    float:right;
+    text-align:center;
+}
+/* Hidden class ----------------------------------------------------------------------------------*/
 .hidden {
     display:none;
-}*/
+    visibility:hidden;
+}
+/* Table control section -------------------------------------------------------------------------*/
+#tablecontrol {
+    width:100%;
+    float:left;
+    clear:right;
+    overflow:auto;
+    margin-bottom:12px;
+}
+#tablecontrol input:hover {
+    background-color:#5CA420;
+}
+#tablecontrol input {
+    padding:2px;
+    height:21px;
+    font-size:12px;
+    background-color:#A0CB6F;
+}
+/* Node settings page ----------------------------------------------------------------------------*/
+.protocol-prefix, .port-separator {
+    float:left;
+    color:#444444;
+    font-size:14px;
+    font-weight:normal;
+}
+.props .row {
+    height:32px;
+}
+.nodename {
+    float:left;
+}
+.nodename input {
+    width:200px;
+}
+.nodetype {
+    float:left;
+}
+.nodetype select {
+    width:200px;
+}
+.shortaddress {
+    float:left;
+}
+.shortaddress input {
+    width:200px;
+}
+.portnumber {
+    float:left;
+}
+.portnumber input {
+    width:60px;
+}
+.orgname {
+    float:left;
+}
+.orgname input {
+    width:320px;
+}
+.orgaddress {
+    float:left;
+}
+.orgaddress input {
+    width:320px;
+}
+.timezone {
+    float:left;
+}
+.timezone select {
+    width:320px;
+}
+.workdir {
+    float:left;
+}
+.workdir input {
+    width:200px;
+}
+.adminmail {
+    float:left;
+}
+.adminmail input {
+    width:200px;
+}
+/* Node connection page --------------------------------------------------------------------------*/
+.connect .row {
+    height:32px;
+}
+.selectconnection {
+    float:left;
+}
+.selectconnection select {
+    width:200px;
+}
+.connect .username {
+    float:left;
+}
+.connect .username input {
+    width:240px;
+}
+.connect .password {
+    float:left;
+}
+.connect .password input {
+    width:240px;
+}
+/* Add radar page --------------------------------------------------------------------------------*/
+.addradar .row {
+    height:32px;
+}
+.addradar .radarname {
+    float:left;
+}
+.addradar .wmonumber {
+    float:left;
+}
+.addradar .radarname input {
+    width:200px
+}
+.addradar .wmonumber input {
+    width:200px;
+}
+/* Save data source page -------------------------------------------------------------------------*/
+.dssave .dsname {
+    float:left;
+}
+.dssave .dsname input {
+    width:200px; 
+}
+.dssave .dsdescription {
+    float:left;
+}
+.dssave .dsdescription textarea {
+    width:200px;
+    height:64px;
+}
+.stepno {
+    float:right;
+}
+.dssave select {
+    width:280px;
+    float:left;
+}
+.dscontrol {
+    float:left;
+}
+.dscontrol input {
+    padding:2px;
+    height:24px;
+    width:24px;
+    font-size:12px;
+    margin: 0px 4px 0px 4px;
+    background-color:#A0CB6F;
+}
+.dscontrol input:hover {
+    background-color:#5CA420;
+}
+.dsparam {
+    width:540px;
+    border:1px solid #429602;
+    color:#444444;
+    font-weight:normal;
+    -moz-border-radius:4px;
+    border-radius:4px;
+    margin:4px 0px 4px 0px;
+    padding:2px;
+}
+.dssave .rightcol {
+    padding-left:24px;
+}
+/* Show data sources page ------------------------------------------------------------------------*/
+.dsshow .name {
+    width:30%;
+}
+.dsshow .description {
+    width:60%;
+}
+/* Browse data source files page -----------------------------------------------------------------*/
+.dsfiles .date {
+    width:12%;
+    text-align:center;
+}
+.dsfiles .time {
+    width:12%;
+    text-align:center;
+}
+.dsfiles .source {
+    width:12%;
+    text-align:center;
+}
+.dsfiles .type {
+    width:12%;
+    text-align:center;
+}
+.dsfiles .details {
+    width:12%;
+    text-align:center;
+}
+.dsfiles .download {
+    width:12%;
+    text-align:center;
+}
+/* Remove data source page -----------------------------------------------------------------------*/
+.dsremove .name {
+    width:30%;
+}
+.dsremove .description {
+    width:50%;
+}
+.dsremove .check {
+    float:right;
+    text-align:center;
+}
+/* Save user account page ------------------------------------------------------------------------*/
+.addaccount .row {
+    height:32px;
+}
+.addaccount .error {
+    float:left;
+}
+.addaccount .username {
+    float:left;
+}
+.addaccount .username input {
+    width:200px;
+}
+.addaccount .password {
+    float:left;
+}
+.addaccount .password password {
+    float:left;
+    width:200px;
+}
+.addaccount .rolename {
+    float:left;
+}
+.addaccount .rolename select {
+    width:200px;
+}
+.addaccount .orgname {
+    float:left;
+}
+.addaccount .orgname input {
+    width:320px;
+}
+.addaccount .country {
+    float:left;
+}
+.addaccount .country input {
+    width:200px;
+}
+.addaccount .city {
+    float:left;
+}
+.addaccount .city input {
+    width:200px;
+}
+.addaccount .zipcode {
+    float:left;
+}
+.addaccount .zipcode input {
+    width:100px;
+}
+.addaccount .street {
+    float:left;
+}
+.addaccount .street input {
+    width:200px;
+}
+.addaccount .streetno {
+    float:left;
+}
+.addaccount .streetno input {
+    width:100px;
+}
+.addaccount .phone {
+    float:left;
+}
+.addaccount .phone input {
+    width:200px;
+}
+.addaccount .email {
+    float:left;
+}
+.addaccount .email input {
+    width:200px;
+}
+/* Edit user account page ------------------------------------------------------------------------*/
+.editaccount .username {
+    width:24%;
+    margin-right:2%;
+}
+.editaccount .rolename {
+    width:16%;
+    margin-right:2%; 
+}
+/* Remove user account page ----------------------------------------------------------------------*/
+.removeaccount .username {
+    width:24%;
+    margin-right:2%;
+}
+.removeaccount .rolename {
+    width:12%;
+    margin-right:2%;
+}
+.removeaccount .orgname {
+    width:34%;
+    margin-right:2%;
+}
+.removeaccount .check {
+    float:right;
+    text-align:center;
+}
+/* Connect to data source page -------------------------------------------------------------------*/
+.dsconnect .name {
+    width:30%;
+}
+.dsconnect .description {
+    width:50%;
+}
+.dsconnect .check {
+    float:right;
+    text-align:center;
+}
+/* Subscription management page ------------------------------------------------------------------*/
+.subscriptions .name {
+    width:35%;
+}
+.subscriptions .operator {
+    width:35%;
+}
+.subscriptions .active {
+    width:20%;
+    text-align:center;
+}
+.subscriptions .check {
+    width:10%;
+    text-align:center;
+}
+.removesubscriptions .name {
+    width:30%;
+}
+.removesubscriptions .operator {
+    width:30%;
+}
+.removesubscriptions .active {
+    width:20%;
+    text-align:center;
+}
+.removesubscriptions .check {
+    width:10%;
+    text-align:center;
+}
+/* Data delivery register page -------------------------------------------------------------------*/
+.register .date {
+    width:12%;
+}
+.register .time {
+    width:12%;
+}
+.register .recipient {
+    width:16%;
+}
+.register .signature {
+    width:44%;
+}
+.register .status {
+    width:10%;
+    text-align:center;
+}
+/* Remove node connection page -------------------------------------------------------------------*/
+.removeconnection .name {
+    width:20%;
+}
+.removeconnection .address {
+    width:30%;
+}
+.removeconnection .user {
+    width:20%;
+}
+.removeconnection .check {
+    width:10%;
+    text-align:center;
+}
+/*---------------------------------------------------------------------------- Expandable section */
+.expandable {
+    width:94%;
+    float:left;
+    clear:both;
+    margin:12px;
+    padding:8px;
+    border:1px solid #0066CC;
+    -moz-border-radius:4px;
+    border-radius:4px;
+}
+.expandable .item {
+    font-size:14px;
+    font-weight:bold;
+    color:#4C6EB3;
+}
+.expandable .item .operator, .expandable .item .user {
+    float:left;
+    clear:right;
+    padding-top:4px;
+}
+.expandable .item .operator:hover, .expandable .item .user:hover {
+    text-decoration:underline;
+}
+.dsphead img {
+    border:none;
+}
+.dspchar {
+    float:left;
+    margin:0px 8px 0px 8px;
+}
+.save {
+   behavior:url(#default#savehistory);
+}
+.dsphead {
+   text-decoration:none;
+   margin-left:1.5em;
+}
+.dspcont {
+   display:none;
+}
+.dspcont .station {
+    width:30%;
+}
+.dspcont .timestamp {
+    width:30%
+}
+.dspcont .active {
+    width:20%;
+    text-align:center;
+}
+.statustable {
+   width:90%;
+   margin-left:6%;
+   clear:both;
+   padding-top:8px;
+}
+.statustable .header {
+    height:22px;
+    font-size:14px;
+    font-weight:bold;
+    color:#5B9C02;
+}
+.statustable .entry {
+    height:24px;
+    border-top:1px solid #AFAAAA;
+    border-bottom:none;
+    width:100%;
+}
+/* Adaptors page ---------------------------------------------------------------------------------*/
+.adaptors .name {
+    width:30%;
+}
+.adapators .type {
+    width:40%;
+}
+.createadaptor .row, .modifyadaptor .row {
+    height:36px;
+}
+.createadaptor input, .createadaptor select {
+    width:260px;
+}
+.modifyadaptor input, .modifyadaptor select {
+    width:260px;
+}
+/* Routes and schedule pages ---------------------------------------------------------------------*/
+.showroutes .name {
+    width:20%;
+}
+.showroutes .description {
+    width:40%
+}
+.showroutes .type {
+    width:20%;
+}
+.showroutes .active {
+    width:10%;
+    text-align:center;
+}
+.modifyroute .row, .modifyjob .row {
+    height:36px;
+}
+.modifyroute .row4, .modifyjob .row4 {
+    height:96px;
+    padding:4px;
+}
+.modifyroute .row6, .modifyjob .row6 {
+    height:128px;
+    padding:4px;
+}
+.modifyroute input, .modifyroute select, .modifyjob input, .modifyjob select {
+    width:260px;
+}
+.modifyroute .textrow {
+    height:360px;
+}
+.modifyroute textarea {
+    width:512px;
+    height:360px;
+}
+/* Schedule page ---------------------------------------------------------------------------------*/
+.schedules .id {
+    text-align:center;
+}
+/*------------------------------------------------------------------------------------------------*/
+
+
+
+

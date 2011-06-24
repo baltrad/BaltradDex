@@ -26,181 +26,106 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<jsp:useBean id="initAppUtil" scope="session" class="eu.baltrad.dex.util.InitAppUtil">
-</jsp:useBean>
-<jsp:useBean id="securityManager" scope="session"
-             class="eu.baltrad.dex.util.ApplicationSecurityManager"></jsp:useBean>
-<%
-    User user = ( User )securityManager.getUser( request );
-    String userName = user.getName();
-    String nodeName = initAppUtil.getNodeName();
-    String operator = initAppUtil.getOrgName();
-%>
-
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <meta name="save" content="history" />
+        <!--meta name="save" content="history" /-->
         <noscript>
             <style type="text/css"><!--.dspcont{display:block;}--></style>
         </noscript>
-        <script type="text/javascript" language="javascript" src="includes/expandable.js"></script>
-        <script type="text/javascript" language="javascript" src="includes/tooltip.js"></script>
-        <title>Baltrad | Home</title>
-        <!-- tooltips -->
-        <script type="text/javascript">
-            <!--
-            var t1 = null;
-            var l1 = "Shows list of users subscribing data sources at this node. Clicking on a " +
-                " user name expands the detailed list of data sources from which they receive data";
-            function initTooltips() {
-                t1 = new ToolTip( "upload_tooltip", false );
-            }
-            -->
-        </script>
+        <script type="text/javascript" language="javascript" src="includes/js/expandable.js"></script>
+        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+        <title>Baltrad | Data upload</title>
     </head>
-    <body onload="initTooltips()">
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+    <body>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/homeTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
-                            Local node
-                        </div>
-                        <div class="right">
-
-                        </div>
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/homeMenu.jsp"%>
                     </div>
-                    <div id="text-box">
-                        <div class="title">
-                            Welcome to Baltrad Radar Data Exchange & Processing System!
+                    <div class="right">
+                        <div class="blttitle">
+                            <img src="includes/images/icons/upload.png" alt="">
+                            Data upload status
                         </div>
-                    </div>
-                    <div id="text-box">
-                        Baltrad is running on <%=nodeName%> operated by <%=operator%>.
-                    </div>
-                    <div id="text-box">
-                        You are logged in as user <%=userName%>.
-                    </div>
-                    <div id="text-box">
-                        <div class="title">
-                            Data exchange status
-                        </div>
-                    </div>
-                    <div id="tabs">
-                        <div id="tab">
-                            <div class="icon">
-                                <img src="includes/images/icons/arrow-down-small.png"
-                                     alt="download"/>
-                            </div>
-                            <div class="link">
-                                <a href="dataDownload.htm">
-                                    Download
-                                </a>
-                            </div>
-                        </div>
-
-                        <div id="tab" class="active">
-                            <div class="icon">
-                                <img src="includes/images/icons/arrow-up-small.png"
-                                     alt="upload"/>
-                            </div>
-                            <div class="link">
-                                <a href="dataUpload.htm">
-                                    Upload
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div id="tabcontent">
-                        <div id="text-box">
-                            <div class="title">
-                                Data upload status | Data sent to subscribers
-                                <div class="help-icon-right" onmouseover="if(t1)t1.Show(event,l1)"
-                                        onmouseout="if(t1)t1.Hide(event)">
-                                    <img src="includes/images/help-icon.png" alt="help_icon"/>
-                                </div>
-                            </div>
+                        <div class="blttext">
+                            Data sent to users subscribing local data sources.
                         </div>
                         <c:choose>
                             <c:when test="${not empty users}">
-                                <div>
-                                Click on user name to view detailed information on subscriber.
+                                <div class="blttext">
+                                    Click on user name to view detailed information
+                                    on subscriber.
                                 </div>
                                 <c:forEach var="user" items="${users}">
                                 <c:set var="usr" scope="page" value="${user}"></c:set>
                                 <div class="expandable">
                                     <div class="save">
-                                        <div class="expandable-hdr">
+                                        <div class="item">
                                             <a href="javascript:void(0)" class="dsphead"
                                             onclick="dsp(this)">
-                                                <span class="dspchar">+</span>
-                                                <c:out value="${user}"/>
+                                                <span class="dspchar">
+                                                    <img src="includes/images/icons/expand.png"
+                                                     alt="+" title="Show">
+                                                </span>
+                                                <div class="user">
+                                                    <c:out value="${user}"/>
+                                                </div>
                                             </a>
                                         </div>
                                         <div class="dspcont">
-                                            <c:choose>
-                                            <c:when test="${not empty remote}">
-                                                <div id="statustable">
-                                                    <div class="table-hdr">
-                                                        <div class="station">
-                                                            Data source
-                                                        </div>
-                                                        <div class="timestamp">
-                                                            Started on
-                                                        </div>
-                                                    </div>
-                                                    <c:forEach var="sub" items="${remote}">  
-                                                        <c:if test="${sub.userName == usr}">
-                                                            <div class="table-row">
-                                                                <div class="station">
-                                                                    <c:out value="${sub.dataSourceName}"/>
-                                                                </div>
-                                                                <div class="timestamp">
-                                                                    <c:out value="${sub.dateStr}"/>,
-                                                                    <c:out value="${sub.timeStr}"/>
-                                                                </div>
+                                            <div class="statustable">
+                                                <c:choose>
+                                                    <c:when test="${not empty remote}">
+                                                        <div class="header">
+                                                            <div id="cell" class="station">
+                                                                Data source
                                                             </div>
-                                                        </c:if>
-                                                    </c:forEach>
-                                                </div>
-                                            </c:when>
-                                            </c:choose>
+                                                            <div id="cell" class="timestamp">
+                                                                Started on
+                                                            </div>
+                                                        </div>
+                                                        <c:forEach var="sub" items="${remote}">
+                                                            <c:if test="${sub.userName == usr}">
+                                                                <div class="entry">
+                                                                    <div id="cell" class="station">
+                                                                        <c:out value="${sub.dataSourceName}"/>
+                                                                    </div>
+                                                                    <div id="cell" class="timestamp">
+                                                                        <c:out value="${sub.dateStr}"/>,
+                                                                        <c:out value="${sub.timeStr}"/>
+                                                                    </div>
+                                                                </div>
+                                                            </c:if>
+                                                        </c:forEach>
+                                                    </c:when>
+                                                </c:choose>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                                 </c:forEach>
                             </c:when>
                             <c:otherwise>
-                                <div class="message">
-                                    <div class="icon">
-                                        <img src="includes/images/icons/circle-alert.png"
-                                             alt="no_data_sources"/>
-                                    </div>
-                                    <div class="text">
-                                        Your local data sources are currently not subscribed
-                                        by peers.
-                                    </div>
+                                <div class="blttext">
+                                    Your local data sources are currently not subscribed
+                                    by peers.
                                 </div>
                             </c:otherwise>
                         </c:choose>
-                    <div class="footer"></div>
                     </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
-        <div id="upload_tooltip" class="tooltip" style="width: 240px; height: 88px;"></div>
     </body>
 </html>

@@ -20,7 +20,7 @@ Modifies a bdb_trim_count route
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
@@ -28,85 +28,109 @@ Modifies a bdb_trim_count route
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Modify BdbTrimCount route</title>
+        <title>Baltrad | Create route</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/processingTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
-                            Modify BdbTrimCount route
-                        </div>
-                        <div class="right">
-                        </div>
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/processingMenu.jsp"%>
                     </div>
-                    <div id="text-box">
-                        Modify or delete a BdbTrimCount routing rule.
-                    </div>
-                    <div id="table">
-                        <div class="props">
-                            <form name="showRouteForm" action="bdbtrimcountroute_show.htm">
-                                <div class="left">
-                                    <%
-                                        String name = (String)request.getAttribute("name");
-                                        String author = (String)request.getAttribute("author");
-                                        Boolean active = (Boolean)request.getAttribute("active");
-                                        String description = (String)request.getAttribute("description");
-                                        Integer countLimit = (Integer)request.getAttribute("countLimit");
-                                        String activestr = active==true?"checked":"";
-                                    %>
-                                    <div class="row">Name</div>
-                                    <div class="row">Author</div>
-                                    <div class="row">Active</div>
-                                    <div class="row">Description</div>
-                                    <div class="row">CountLimit</div>
-                                </div>
-                                <div class="right">
-                                    <div class="row">
-                                        <input type="text" name="name" value="<%=name%>" disabled/>
-                                        <input type="hidden" name="name" value="<%=name%>"/>
+                    <div class="right">
+                        <div class="blttitle">
+                            Create route
+                        </div>
+                        <div class="blttext">
+                            Modify or delete a DB Trim Count routing rule.
+                        </div>
+                        <div class="table">
+                            <%if (request.getAttribute("emessage") != null) {%>
+                                <div class="systemerror">
+                                    <div class="header">
+                                        Problems encountered.
                                     </div>
-                                    <div class="row">
-                                        <input type="text" name="author" value="<%=author%>"/>
-                                    </div>
-                                    <div class="row">
-                                        <input type="checkbox" name="active" <%=activestr%>/>
-                                    </div>
-                                    <div class="row">
-                                        <input type="text" name="description" value="<%=description%>"/>
-                                    </div>
-                                    <div class="row">
-                                        <input type="text" name="countLimit" value="<%=countLimit%>"/>
+                                    <div class="message">
+                                        <%=request.getAttribute("emessage")%>
                                     </div>
                                 </div>
-                                <div class="footer">
-                                    <div class="right">
-                                        <button class="rounded" name="submitButton" type="submit" value="Modify">
-                                            <span>Modify</span>
-                                        </button>
-                                        <button class="rounded" name="submitButton" type="submit" value="Delete">
-                                            <span>Delete</span>
-                                        </button>
+                            <%}%>
+                            <div class="modifyroute">
+                                 <form name="showRouteForm" action="bdbtrimcountroute_show.htm">
+                                    <div class="leftcol">
+                                        <%
+                                            String name = (String)request.getAttribute("name");
+                                            String author = (String)request.getAttribute("author");
+                                            Boolean active = (Boolean)request.getAttribute("active");
+                                            String description = (String)request.getAttribute("description");
+                                            Integer countLimit = (Integer)request.getAttribute("countLimit");
+                                            String activestr = active==true?"checked":"";
+                                        %>
+                                        <div class="row">Name</div>
+                                        <div class="row">Author</div>
+                                        <div class="row">Active</div>
+                                        <div class="row">Description</div>
+                                        <div class="row">Count limit</div>
                                     </div>
-                                </div>
-                            </form>
+                                    <div class="rightcol">
+                                        <div class="row">
+                                            <input type="text" name="name" value="<%=name%>" disabled/>
+                                            <input type="hidden" name="name" value="<%=name%>"/>
+                                            <div class="hint">
+                                               Route name
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <input type="text" name="author" value="<%=author%>"/>
+                                            <div class="hint">
+                                               Route author's name
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <input type="checkbox" name="active" <%=activestr%>/>
+                                            <div class="hint">
+                                               Check to activate route
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <input type="text" name="description" value="<%=description%>"/>
+                                            <div class="hint">
+                                               Verbose description
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <input type="text" name="countLimit" value="<%=countLimit%>"/>
+                                            <div class="hint">
+                                               Specify maximum number of DB records
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tablefooter">
+                                       <div class="buttons">
+                                           <button class="rounded" name="submitButton" type="submit"
+                                                   value="Modify">
+                                               <span>Modify</span>
+                                           </button>
+                                           <button class="rounded" name="submitButton" type="submit"
+                                                   value="Delete">
+                                               <span>Delete</span>
+                                           </button>
+                                       </div>
+                                   </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                    <%if (request.getAttribute("emessage") != null) {%>
-                            <div class="routererror"><%=request.getAttribute("emessage")%></div>
-                    <%}%>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

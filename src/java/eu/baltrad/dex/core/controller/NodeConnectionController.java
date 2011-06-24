@@ -49,12 +49,12 @@ public class NodeConnectionController extends MultiActionController {
     // model keys
     private static final String SHOW_CONN_MODEL = "node_connections";
     private static final String SHOW_SEL_CONN_MODEL = "selected_node_connections";
-    private static final String OK_MSG_KEY = "ok_message";
-    private static final String ERROR_MSG_KEY = "error_message";
+    private static final String OK_MSG_KEY = "message";
+    private static final String ERROR_MSG_KEY = "error";
     // view names
-    private static final String SHOW_CONN_VIEW = "showNodeConnections";
-    private static final String SHOW_SEL_CONN_VIEW = "showSelectedNodeConnections";
-    private static final String SHOW_REM_CONN_VIEW = "showRemovedNodeConnections";
+    private static final String SHOW_CONN_VIEW = "removeNodeConnections";
+    private static final String SHOW_SEL_CONN_VIEW = "nodeConnectionsToRemove";
+    private static final String SHOW_REM_CONN_VIEW = "nodeConnectionsRemovalStatus";
 //---------------------------------------------------------------------------------------- Variables
     private NodeConnectionManager nodeConnectionManager;
     private Logger log;
@@ -74,7 +74,7 @@ public class NodeConnectionController extends MultiActionController {
      * @param response Http response
      * @return ModelAndView object containing list of all registered node connections
      */
-    public ModelAndView showNodeConnections( HttpServletRequest request,
+    public ModelAndView removeNodeConnections( HttpServletRequest request,
             HttpServletResponse response ) {
         List nodeConnections = nodeConnectionManager.getConnections();
         return new ModelAndView( SHOW_CONN_VIEW, SHOW_CONN_MODEL, nodeConnections );
@@ -86,7 +86,7 @@ public class NodeConnectionController extends MultiActionController {
      * @param response Http response
      * @return ModelAndView object containing list of node connections selected for removal
      */
-    public ModelAndView showSelectedNodeConnections( HttpServletRequest request,
+    public ModelAndView nodeConnectionsToRemove( HttpServletRequest request,
             HttpServletResponse response ) {
         ModelAndView modelAndView = null;
         String[] connectionIds = request.getParameterValues( SHOW_SEL_CONN_MODEL );
@@ -112,27 +112,23 @@ public class NodeConnectionController extends MultiActionController {
      * @param response Http response
      * @return ModelAndView object containing error messages.
      */
-    public ModelAndView showRemovedNodeConnections( HttpServletRequest request,
+    public ModelAndView nodeConnectionsRemovalStatus( HttpServletRequest request,
             HttpServletResponse response ) {
-        for( int i = 0; i < getSelectedConns().size(); i++ ) {
-            try {
+        try {
+            for( int i = 0; i < getSelectedConns().size(); i++ ) {
                 nodeConnectionManager.deleteConnection( getSelectedConns().get( i ).getId() );
-                request.getSession().setAttribute( OK_MSG_KEY,
-                        getMessageSourceAccessor().getMessage(
-                        "message.removeconnection.success" ) );
-                log.info( "Removed node connection: " +
-                        getSelectedConns().get( i ).getConnectionName() );
-            } catch( SQLException e ) {
-                request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                    "message.removeconnection.fail" ) );
-                log.error( "Failed to remove node connection: " + e.getMessage() );
-            } catch( Exception e ) {
-                request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                    "message.removeconnection.fail" ) );
-                log.error( "Failed to remove node connection: " + e.getMessage() );
             }
+            String msg = "Selected node connections successfully removed";
+            request.getSession().setAttribute( OK_MSG_KEY, msg );
+            log.warn( msg );
+        } catch( SQLException e ) {
+            String msg = "Failed to remove selected node connections:" + e.getMessage();
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            log.error( msg );
+        } catch( Exception e ) {
+            String msg = "Failed to remove selected node connections:" + e.getMessage();
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            log.error( msg );
         }
         return new ModelAndView( SHOW_REM_CONN_VIEW );
     }

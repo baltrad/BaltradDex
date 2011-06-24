@@ -26,6 +26,8 @@ import eu.baltrad.dex.register.model.DeliveryRegisterManager;
 import eu.baltrad.dex.bltdata.model.BltFileManager;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.util.ITableScroller;
+import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.model.LogManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,8 +36,10 @@ import javax.servlet.ServletException;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.util.List;
+import java.sql.SQLException;
 
 /**
  * Multi-action controller for handling delivery register functionality.
@@ -46,18 +50,21 @@ import java.util.List;
  */
 public class RegisterController extends MultiActionController implements ITableScroller {
 //---------------------------------------------------------------------------------------- Constants
-    // model keys
     /** Data delivery register entries map key */
     private static final String REGISTER_ENTRIES = "entries";
     private static final String CLEAR_REGISTER_KEY = "number_of_entries";
     private static final String SHOW_CLEAR_REGISTER_STATUS_KEY = "deleted_entries";
+    private static final String OK_MSG_KEY = "message";
+    private static final String ERROR_MSG_KEY = "error";
     // view names
     private static final String SHOW_REGISTER_VIEW = "showRegister";
-    private static final String CLEAR_REGISTER_VIEW = "clearRegister";
-    private static final String SHOW_CLEAR_REGISTER_STATUS_VIEW = "showClearRegisterStatus";
+    private static final String CLEAR_REGISTER_VIEW = "removeRegisterEntries";
+    private static final String SHOW_CLEAR_REGISTER_STATUS_VIEW = "registerEntriesRemovalStatus";
     /** Page number map key */
     private static final String PAGE_NUMBER = "pagenum";
 //---------------------------------------------------------------------------------------- Variables
+    private Logger log;
+    private LogManager logManager;
     private String successView;
     private DeliveryRegisterManager deliveryRegisterManager;
     private BltFileManager bltFileManager;
@@ -65,6 +72,13 @@ public class RegisterController extends MultiActionController implements ITableS
     /** Holds current page number, used for page scrolling */
     private static int currentPage;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor
+     */
+    public RegisterController() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.logManager = new LogManager();
+    }
     /**
      * Creates delivery entries list.
      *
@@ -115,7 +129,7 @@ public class RegisterController extends MultiActionController implements ITableS
      * @throws ServletException
      * @throws IOException
      */
-    public ModelAndView clearRegister( HttpServletRequest request,
+    public ModelAndView removeRegisterEntries( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
         return new ModelAndView( CLEAR_REGISTER_VIEW, CLEAR_REGISTER_KEY,
                 deliveryRegisterManager.countEntries() );
@@ -129,11 +143,24 @@ public class RegisterController extends MultiActionController implements ITableS
      * @throws ServletException
      * @throws IOException
      */
-    public ModelAndView showClearRegisterStatus( HttpServletRequest request,
+    public ModelAndView registerEntriesRemovalStatus( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
-        int deletedEntries = deliveryRegisterManager.deleteEntries();
-        return new ModelAndView( SHOW_CLEAR_REGISTER_STATUS_VIEW, SHOW_CLEAR_REGISTER_STATUS_KEY,
-                deletedEntries);
+        try {
+            int deletedEntries = deliveryRegisterManager.deleteEntries();
+            String msg = "Successfully deleted " + Integer.toString( deletedEntries )
+                    + " register entries.";
+            request.getSession().setAttribute( OK_MSG_KEY, msg );
+            log.warn( msg );
+        } catch( SQLException e ) {
+            String msg = "Failed to clear data delivery register:" + e.getMessage();
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            log.error( msg );
+        } catch( Exception e ) {
+            String msg = "Failed to clear data delivery register:" + e.getMessage();
+            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
+            log.error( msg );
+        }
+        return new ModelAndView( SHOW_CLEAR_REGISTER_STATUS_VIEW );
     }
     /**
      * Gets current page number.

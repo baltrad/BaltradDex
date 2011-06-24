@@ -22,7 +22,7 @@ List of adaptors
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
@@ -36,91 +36,123 @@ List of adaptors
         <title>Baltrad | Modify adaptor</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/processingTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/processingMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
                             Modify adaptor
                         </div>
-                        <div class="right">
+                        <div class="blttext">
+                            Modify an adaptor. Depending on type of adaptor, different choices will
+                            be available. However, right now, you are only able to choose XMLRPC.
+                        </div>
+                        <div class="table">
+                            <%if (request.getAttribute("emessage") != null) {%>
+                                <div class="systemerror">
+                                    <div class="header">
+                                        Problems encountered.
+                                    </div>
+                                    <div class="message">
+                                        <%=request.getAttribute("emessage")%>
+                                    </div>
+                                </div>
+                            <%}%>
+                            <div class="modifyadaptor">
+                                 <form name="showAdaptorForm" action="modifyadaptor.htm">
+                                    <div class="leftcol">
+                                        <%
+                                            List<String> types = (List<String>)request.getAttribute("types");
+                                            String uri = (String)request.getAttribute("uri");
+                                            Long timeout = (Long)request.getAttribute("timeout");
+                                            String timeoutstr = "";
+                                            if (uri == null) {
+                                              uri = "";
+                                            }
+                                            if (timeout != null) {
+                                              timeoutstr = "" + timeout;
+                                            }
+                                        %>
+                                        <div class="row">Name</div>
+                                        <div class="row">Type</div>
+                                        <div class="row">URI</div>
+                                        <div class="row">Timeout</div>
+                                    </div>
+                                    <div class="rightcol">
+                                        <div class="row">
+                                            <div class="name">
+                                                <input type="text" name="name"
+                                                       value="<%=request.getAttribute("name")%>"
+                                                       disabled/>
+                                                <input type="hidden" name="name"
+                                                       value="<%=request.getAttribute("name")%>"/>
+                                                <div class="hint">
+                                                   Adaptor name
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="type">
+                                                <select name="type">
+                                                <%
+                                                  for (String adtype : types) {
+                                                %>
+                                                    <option value="<%=adtype%>"><%=adtype%></option>
+                                                <%
+                                                  }
+                                                %>
+                                                </select>
+                                                <div class="hint">
+                                                   Select adaptor type
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="uri">
+                                                <input type="text" name="uri" value="<%=uri%>"/>
+                                                <div class="hint">
+                                                   Adaptor URI
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="timeout">
+                                                <input type="text" name="timeout" value="<%=timeoutstr%>"/>
+                                                <div class="hint">
+                                                   Timeout in milliseconds
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tablefooter">
+                                       <div class="buttons">
+                                           <button class="rounded" name="submitButton" type="submit"
+                                                   value="Modify">
+                                               <span>Modify</span>
+                                           </button>
+                                           <button class="rounded" name="submitButton" type="submit"
+                                                   value="Delete">
+                                               <span>Delete</span>
+                                           </button>
+                                       </div>
+                                   </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                    <div id="text-box">
-                        Modify an adaptor. Depending on type of adaptor, different choices will
-                        be available. However, right now, you are only able to choose XMLRPC.
-                    </div>
-                    <div id="table">
-                        <div class="props">
-                            <form name="showAdaptorForm" action="modifyadaptor.htm">
-                                <div class="left">
-                                    <%
-                                        List<String> types = (List<String>)request.getAttribute("types");
-                                        String uri = (String)request.getAttribute("uri");
-                                        Long timeout = (Long)request.getAttribute("timeout");
-                                        String timeoutstr = "";
-                                        if (uri == null) {
-                                          uri = "";
-                                        }
-                                        if (timeout != null) {
-                                          timeoutstr = "" + timeout;
-                                        }
-                                    %>
-                                    <div class="row">Name</div>
-                                    <div class="row">Type</div>
-                                    <div class="row">URI</div>
-                                    <div class="row">Timeout</div>
-                                </div>
-                                <div class="right">
-                                    <div class="row">
-                                        <input type="text" name="name" value="<%=request.getAttribute("name")%>" disabled/>
-                                        <input type="hidden" name="name" value="<%=request.getAttribute("name")%>"/>
-                                    </div>
-                                    <div class="row">
-                                        <select name="type">
-                                        <%
-                                          for (String adtype : types) {
-                                        %>
-                                            <option value="<%=adtype%>"><%=adtype%></option>
-                                        <%
-                                          }
-                                        %>
-                                        </select>
-                                    </div>
-                                    <div class="row">
-                                        <input type="text" name="uri" value="<%=uri%>"/>
-                                    </div>
-                                    <div class="row">
-                                        <input type="text" name="timeout" value="<%=timeoutstr%>"/>
-                                    </div>
-                                </div>
-                                <div class="footer">
-                                    <div class="right">
-                                        <button class="rounded" name="submitButton" type="submit" value="Modify">
-                                            <span>Modify</span>
-                                        </button>
-                                        <button class="rounded" name="submitButton" type="submit" value="Delete">
-                                            <span>Delete</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                     <%if (request.getAttribute("emessage") != null) {%>
-                            <div class="adaptorerror"><%=request.getAttribute("emessage")%></div>
-                     <%}%>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

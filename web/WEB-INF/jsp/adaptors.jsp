@@ -22,7 +22,7 @@ List of adaptors
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 <%@ page import="java.util.List" %>
@@ -43,74 +43,88 @@ List of adaptors
         <title>Baltrad | Adaptors</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/processingTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/processingMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
                             Adaptors
                         </div>
-                        <div class="right">
+                        <div class="blttext">
+                            List of adaptors. Click on adaptor name to modify or delete or click
+                            Create to create a new adaptor.
                         </div>
-                    </div>
-                    <div id="text-box">
-                        List of adaptors. Press on adaptor name to modify/delete or press
-                        Create to create a new adaptor.
-                    </div>
-                    <form name="createAdaptorForm" action="createadaptor.htm">
-                        <div id="table">
-                            <c:choose>
-                                <c:when test="${adaptors_status == 1}">
-                                    <div id="adaptors">
-                                        <div class="table-hdr">
-                                            <div class="name">
-                                                Name
-                                            </div>
-                                            <div class="type">
-                                                Type
-                                            </div>
-                                        </div>
-                                        <c:forEach var="adaptor" items="${adaptors}">
-                                            <div class="table-row">
-                                                <div class="name">
-                                                    <a href="showadaptor.htm?name=${adaptor.name}">
-                                                        <c:out value="${adaptor.name}"/>
-                                                    </a>
-                                                </div>
-                                                <div class="type">
-                                                    <c:out value="${adaptor.type}"/>
-                                                </div>
-                                            </div>
-                                        </c:forEach>
+                        <div class="table">
+                            <%if (request.getAttribute("emessage") != null) {%>
+                                <div class="systemerror">
+                                    <div class="header">
+                                        Problems encountered.
                                     </div>
-                                </c:when>
-                            </c:choose>
-                              <div class="footer">
-                                <div class="right">
-                                    <button class="rounded" type="button" onclick="history.go(-1);">
-                                        <span>Back</span>
-                                    </button>
-                                    <button class="rounded" type="submit">
-                                        <span>Create</span>
-                                    </button>
+                                    <div class="message">
+                                        <%=request.getAttribute("emessage")%>
+                                    </div>
                                 </div>
-                            </div>
+                            <%}%>
+                            <form name="createAdaptorForm" action="createadaptor.htm">
+                                <c:choose>
+                                    <c:when test="${adaptors_status == 1}">
+                                        <div class="adaptors">
+                                            <div class="tableheader">
+                                                <div id="cell" class="count">&nbsp;</div>
+                                                <div id="cell" class="name">
+                                                    Name
+                                                </div>
+                                                <div id="cell" class="type">
+                                                    Type
+                                                </div>
+                                            </div>
+                                            <c:set var="count" scope="page" value="1"/>
+                                            <c:forEach var="adaptor" items="${adaptors}">
+                                                <div class="entry">
+                                                    <div id="cell" class="count">
+                                                        <c:out value="${count}"/>
+                                                        <c:set var="count" value="${count + 1}"/>
+                                                    </div>
+                                                    <div id="cell" class="name">
+                                                        <a href="showadaptor.htm?name=${adaptor.name}">
+                                                            <c:out value="${adaptor.name}"/>
+                                                        </a>
+                                                    </div>
+                                                    <div id="cell" class="type">
+                                                        <c:out value="${adaptor.type}"/>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                    </c:when>
+                                </c:choose>
+                                <div class="tablefooter">
+                                   <div class="buttons">
+                                       <button class="rounded" type="button"
+                                           onclick="window.location.href='processing.htm'">
+                                           <span>Back</span>
+                                       </button>
+                                       <button class="rounded" type="submit">
+                                           <span>Create</span>
+                                       </button>
+                                   </div>
+                               </div>
+                            </form>
                         </div>
-                    </form>
-                    <%if (request.getAttribute("emessage") != null) {%>
-                    <div class="beast-error"><%=request.getAttribute("emessage")%></div>
-                    <%}%>
+                    </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

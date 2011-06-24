@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Connect to remote node page
+Document   : Page allowing to connect to remote node
 Created on : Sep 24, 2010, 2:46 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
@@ -25,157 +25,141 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+<%@page import="eu.baltrad.dex.util.InitAppUtil"%>
 
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <script type="text/javascript" language="javascript" src="includes/tooltip.js"></script>
-        <title>Baltrad | Connect to node</title>
-        <!-- tooltips -->
-        <script type="text/javascript">
-            <!--
-            var t1 = null;
-            var t2 = null;
-            var t3 = null;
-            var t4 = null;
-            var l1 = "Select previously defined node connection";
-            var l2 = "Enter base node address and port number, e.g. baltrad.org:8084";
-            var l3 = "User name for the remote node";
-            var l4 = "User's password for the remote node";
-            function initTooltips() {
-                t1 = new ToolTip( "connection_tooltip", false );
-                t2 = new ToolTip( "address_tooltip", false );
-                t3 = new ToolTip( "user_name_tooltip", false );
-                t4 = new ToolTip( "password_tooltip", false );
-            }
-            -->
-        </script>
+        <title>Baltrad | Connect</title>
     </head>
-    <body onload="initTooltips()">
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+    <body>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/exchangeTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/exchangeMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
+                            <img src="includes/images/icons/connection.png" alt="">
                             Connect to remote node
                         </div>
-                        <div class="right">
+                        <div class="blttext">
+                            Select existing node connection or define new connection in order
+                            to access data sources available at the remote node.
                         </div>
-                    </div>
-                    <div id="text-box">
-                        Select existing node connection or define new connection in order
-                        to access data at the remote node.
-                    </div>
-                    <div id="node-connect">
-                        <div class="connect-header">
-                            <div class="title">
-                                Select existing connection
-                            </div>
-                        </div>
-                        <form method="post">
-                            <div class="row">
-                                <div class="left">
-                                    Select connection
-                                </div>
-                                <div class="right">
-                                    <spring:bind path="command.connectionName">
-                                        <select name='<c:out value="${status.expression}"/>'>
-                                            <c:forEach items="${connection_list}" var="connection">
-                                                <option value='<c:out value="${connection.connectionName}"/>'
-                                                    <c:if test="${connection.connectionName == status.value}">
-                                                        SELECTED</c:if>>
-                                                        <c:out value="${connection.connectionName}"/>
-                                                </option>
-                                            </c:forEach>
-                                        </select>
-                                    </spring:bind>
-                                    <div class="help-icon" onmouseover="if(t1)t1.Show(event,l1)"
-                                        onmouseout="if(t1)t1.Hide(event)">
-                                        <img src="includes/images/help-icon.png" alt="help_icon"/>
+                        <div class="table">
+                            <div class="connect">
+                                <%@include file="/WEB-INF/jsp/formMessages.jsp"%>
+                                <div class="bltseparator">Select connection</div>
+                                <form method="post">
+                                    <div class="rightcol">
+                                        <div class="row">
+                                            <div class="selectconnection">
+                                                <spring:bind path="command.connectionName">
+                                                    <select name='<c:out value="${status.expression}"/>'
+                                                            title="Select node connection">
+                                                        <c:forEach items="${connection_list}" var="connection">
+                                                            <option value='<c:out value="${connection.connectionName}"/>'
+                                                                <c:if test="${connection.connectionName == status.value}">
+                                                                     SELECTED</c:if>>
+                                                                <c:out value="${connection.connectionName}"/>
+                                                            </option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </spring:bind>
+                                                <div class="hint">
+                                                    Node name to connect
+                                                </div>
+                                            </div>
+                                            <form:errors path="command.connectionName" cssClass="error"/>
+                                        </div>
                                     </div>
-                                    <form:errors path="command.connectionName" cssClass="errors"/>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <button class="rounded" type="submit">
-                                    <span>Connect</span>
-                                </button>  
-                            </div>
-                        </form>
-                        <div class="connect-header">
-                            <div class="title">
-                                Define new connection
+                                    <div class="tablefooter">
+                                        <div class="buttons">
+                                            <button class="rounded" type="submit">
+                                                <span>Connect</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-                        <form method="post">
-                            <div class="row">
-                                <div class="left">
-                                    Node address
-                                </div>
-                                <div class="right">
-                                    <div class="protocol-prefix">http://</div>
-                                    <form:input path="command.shortAddress"
-                                        cssClass="node-address"/>
-                                    <div class="port-separator">:</div>
-                                    <form:input path="command.portNumber" cssClass="port-number"/>
-                                    <div class="help-icon" onmouseover="if(t2)t2.Show(event,l2)"
-                                        onmouseout="if(t2)t2.Hide(event)">
-                                        <img src="includes/images/help-icon.png" alt="help_icon"/>
+                        <div class="table">
+                            <div class="connect">
+                                <div class="bltseparator">Define new connection</div>
+                                <br>
+                                <form method="post">
+                                    <div class="leftcol">
+                                        <div class="row">Node address</div>
+                                        <div class="row">User name</div>
+                                        <div class="row">Password</div>
                                     </div>
-                                    <form:errors path="command.fullAddress" cssClass="errors"/>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="left">
-                                    User name
-                                </div>
-                                <div class="right">
-                                    <form:input path="command.userName" cssClass="user-name"/>
-                                    <div class="help-icon" onmouseover="if(t3)t3.Show(event,l3)"
-                                        onmouseout="if(t3)t3.Hide(event)">
-                                        <img src="includes/images/help-icon.png" alt="help_icon"/>
+                                    <div class="rightcol">
+                                        <div class="row">
+                                            <div class="protocol-prefix">http://</div>
+                                            <div class="shortaddress">
+                                               <form:input path="command.shortAddress"
+                                                   title="Enter node address"/>
+                                               <div class="hint">
+                                                   Server address, e.g. baltrad.org
+                                               </div>
+                                            </div>
+                                            <div class="port-separator">:</div>
+                                            <div class="portnumber">
+                                                <form:input path="command.portNumber"
+                                                    title="Enter port number"/>
+                                                <div class="hint">
+                                                    Port number
+                                                </div>
+                                            </div>
+                                            <form:errors path="command.fullAddress" cssClass="error"/>
+                                        </div>
+                                        <div class="row">
+                                            <div class="username">
+                                                <form:input path="command.userName"
+                                                            title="Enter user name"/>
+                                                <div class="hint">
+                                                   User name on remote node
+                                                </div>
+                                            </div>
+                                            <form:errors path="command.userName" cssClass="error"/>
+                                        </div>
+                                        <div class="row">
+                                            <div class="password">
+                                                <form:password path="command.password"
+                                                               title="Enter password"/>
+                                                <div class="hint">
+                                                   Password
+                                               </div>
+                                            </div>
+                                            <form:errors path="command.password" cssClass="error"/>
+                                        </div>
                                     </div>
-                                    <form:errors path="command.userName" cssClass="errors"/>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="left">
-                                    Password
-                                </div>
-                                <div class="right">
-                                    <form:password path="command.password" cssClass="user-passwd"/>
-                                    <div class="help-icon" onmouseover="if(t4)t4.Show(event,l4)"
-                                        onmouseout="if(t4)t4.Hide(event)">
-                                        <img src="includes/images/help-icon.png" alt="help_icon"/>
-                                    </div>
-                                    <form:errors path="command.password" cssClass="errors"/>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <button class="rounded" type="submit">
-                                    <span>Connect</span>
-                                </button>
-                            </div>
-                            <div class="footer"></div>
-                        </form>
+                                    <div class="tablefooter">
+                                       <div class="buttons">
+                                           <button class="rounded" type="submit">
+                                               <span>Connect</span>
+                                           </button>
+                                       </div>
+                                   </div>
+                               </form>
+                           </div>
+                       </div>    
                     </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
-        <div id="connection_tooltip" class="tooltip" style="width:180px; height:40px;"></div>
-        <div id="address_tooltip" class="tooltip" style="width:180px; height:52px;"></div>
-        <div id="user_name_tooltip" class="tooltip" style="width:180px; height:40px;"></div>
-        <div id="password_tooltip" class="tooltip" style="width:180px; height:40px;"></div>
     </body>
 </html>
+               

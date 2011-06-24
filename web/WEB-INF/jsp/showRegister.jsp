@@ -70,122 +70,138 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Delivery register</title>
+        <title>Baltrad | Data delivery register</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/exchangeTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/exchangeMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
                             Data delivery register
                         </div>
-                        <div class="right">
-                        </div>
-                    </div>
-                    <c:choose>
-                        <c:when test="${register_status == 1}">
-                            <div id="text-box">
-                                Data delivery register.
-                            </div>
-                            <div id="table">
-                                <div id="table-control">
-                                    <c:set var="curPage" scope="page" value="<%=currentPage%>"/>
-                                    <form action="showRegister.htm" method="post">
-                                        <input type="submit" name="pagenum" value="<<">
-                                        <span></span>
-                                        <input type="submit" name="pagenum" value="<">
-                                        <span></span>
-                                        <c:forEach var="i" begin="<%=firstPage%>" end="<%=lastPage%>"
-                                                   step="1" varStatus ="status">
-                                                <c:choose>
-                                                    <c:when test="${curPage == i}">
-                                                        <input style="background:#FFFFFF" type="submit"
-                                                               name="pagenum" value="${i}">
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <input type="submit" name="pagenum" value="${i}">
-                                                    </c:otherwise>
-                                                </c:choose>
-
-                                            </c:forEach>
-                                        <span></span>
-                                        <input type="submit" name="pagenum" value=">">
-                                        <span></span>
-                                        <input type="submit" name="pagenum" value=">>">
-                                    </form>
+                        <c:choose>
+                            <c:when test="${register_status == 1}">
+                                <div class="blttext">
+                                    All data delivery register entries.
                                 </div>
-                                <div id="register">
-                                    <div class="table-hdr">
-                                        <div class="date">
-                                            Date
+                                <div class="table">
+                                    <div class="register">
+                                        <div id="tablecontrol">
+                                            <c:set var="curPage" scope="page" value="<%=currentPage%>"/>
+                                            <form action="showRegister.htm" method="post">
+                                                <input type="submit" name="pagenum" value="<<"
+                                                       title="First page">
+                                                <span></span>
+                                                <input type="submit" name="pagenum" value="<"
+                                                       title="Previous page">
+                                                <span></span>
+                                                <c:forEach var="i" begin="<%=firstPage%>" end="<%=lastPage%>"
+                                                           step="1" varStatus ="status">
+                                                        <c:choose>
+                                                            <c:when test="${curPage == i}">
+                                                                <input style="background:#FFFFFF" type="submit"
+                                                                       name="pagenum" value="${i}">
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <input type="submit" name="pagenum" value="${i}">
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:forEach>
+                                                <span></span>
+                                                <input type="submit" name="pagenum" value=">"
+                                                       title="Next page">
+                                                <span></span>
+                                                <input type="submit" name="pagenum" value=">>"
+                                                       title="Last page">
+                                            </form>
                                         </div>
-                                        <div class="time">
-                                            Time
+                                        <div class="tableheader">
+                                            <div id="cell" class="date">
+                                                Date
+                                            </div>
+                                            <div id="cell" class="time">
+                                                Time
+                                            </div>
+                                            <div id="cell" class="recipient">
+                                                Recipient
+                                            </div>
+                                            <div id="cell" class="signature">
+                                                File signature
+                                            </div>
+                                            <div id="cell" class="status">
+                                                Status
+                                            </div>
                                         </div>
-                                        <div class="recipient">
-                                            Recipient
-                                        </div>
-                                        <div class="uuid">
-                                            File signature
-                                        </div>
-                                        <div class="status">
-                                            Delivery status
+                                        <c:forEach var="entry" items="${entries}">
+                                            <div class="entry">
+                                                <div id="cell" class="date">
+                                                    <c:out value="${fn:substring(entry.timeStamp, 0, 10)}"/>
+                                                </div>
+                                                <div id="cell" class="time">
+                                                    <c:out value="${fn:substring(entry.timeStamp, 10, 19)}"/>
+                                                </div>
+                                                <div id="cell" class="recipient">
+                                                    <c:out value="${entry.userName}"/>
+                                                </div>
+                                                <div id="cell" class="signature">
+                                                    <c:out value="${entry.uuid}"/>
+                                                </div>
+                                                <div id="cell" class="status">
+                                                    <c:choose>
+                                                        <c:when test="${entry.deliveryStatus == 'SUCCESS'}">
+                                                            <img src="includes/images/icons/success.png"
+                                                                 alt="Success" title="Delivery success">
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <img src="includes/images/icons/failure.png"
+                                                                 alt="Failure" title="Delivery failure">
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
+                                        <div class="tablefooter">
+                                            <div class="buttons">
+                                                <button class="rounded" type="button"
+                                                    onclick="window.location.href='exchange.htm'">
+                                                    <span>Back</span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <c:forEach var="entry" items="${entries}">
-                                        <div class="table-row">
-                                            <div class="date">
-                                                <c:out value="${fn:substring(entry.timeStamp, 0, 10)}"/>
-                                            </div>
-                                            <div class="time">
-                                                <c:out value="${fn:substring(entry.timeStamp, 10, 19)}"/>
-                                            </div>
-                                            <div class="recipient">
-                                                <c:out value="${entry.userName}"/>
-                                            </div>
-                                            <div class="uuid">
-                                                <c:out value="${entry.uuid}"/>
-                                            </div>
-                                            <div class="status">
-                                                <c:out value="${entry.deliveryStatus}"/>
-                                            </div> 
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="blttext">
+                                    Data delivery register is empty.
+                                </div>
+                                <div class="table">
+                                    <div class="tablefooter">
+                                        <div class="buttons">
+                                            <button class="rounded" type="button"
+                                                onclick="window.location.href='exchange.htm'">
+                                                <span>OK</span>
+                                            </button>
                                         </div>
-                                    </c:forEach>
+                                    </div>
                                 </div>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="message">
-                                <div class="icon">
-                                    <img src="includes/images/icons/circle-alert.png"
-                                         alt="no_entries"/>
-                                </div>
-                                <div class="text">
-                                    No entries found in data delivery register.
-                                </div>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>  
-                    <div class="footer">
-                        <div class="right">
-                            <button class="rounded" type="button"
-                                onclick="window.location='configuration.htm'">
-                                <span>Back</span>
-                            </button>
-                        </div>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

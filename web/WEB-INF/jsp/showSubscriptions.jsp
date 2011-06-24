@@ -43,124 +43,104 @@ Author     : szewczenko
         <title>Baltrad | Subscriptions</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/exchangeTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/exchangeMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
                             Subscription management
                         </div>
-                        <div class="right">
-                        </div>
-                    </div>
-
-                    <c:choose>
-                        <c:when test="${av_subs_status == 1}">
-                            <div id="text-box">
-                                Click on a check box to subscribe or unsubscribe a desired
-                                data source.
-                                Click on data source name in order to browse data from this
-                                source data .
-                            </div>
-                            <form action="showSelectedSubscriptions.htm">
-                                <div id="table">
-                                    <div id="subscriptions">
-                                        <div class="table-hdr">
-                                            <div class="station">
-                                                Data source
+                        <c:choose>
+                            <c:when test="${av_subs_status == 1}">
+                                <div class="blttext">
+                                    Click on a check box to subscribe or unsubscribe a desired
+                                    data source.
+                                </div>
+                                <div class="table">
+                                    <div class="subscriptions">
+                                        <form action="showSelectedSubscriptions.htm" method="post">
+                                            <div class="tableheader">
+                                                <div id="cell" class="count">&nbsp;</div>
+                                                <div id="cell" class="name">
+                                                    Data source
+                                                </div>
+                                                <div id="cell" class="operator">
+                                                    Operator
+                                                </div>
+                                                <div id="cell" class="active">
+                                                    Status
+                                                </div>
                                             </div>
-                                            <div class="operator">
-                                                Operator
-                                            </div>
-                                            <div class="synkronized">
-                                                Status
-                                            </div>
-                                            <div class="active">
-                                                Active
-                                            </div>
-                                        </div>
-                                        <c:forEach var="sub" items="${subscriptions}">
-                                            <div class="table-row">
-                                                <div class="station">
-                                                    <a href="dsFiles.htm?dsName=${sub.dataSourceName}">
+                                            <c:set var="count" scope="page" value="1"/>
+                                            <c:forEach items="${subscriptions}" var="sub">
+                                                <div class="entry">
+                                                    <div id="cell" class="count">
+                                                        <c:out value="${count}"/>
+                                                        <c:set var="count" value="${count + 1}"/>
+                                                    </div>
+                                                    <div id="cell" class="name">
                                                         <c:out value="${sub.dataSourceName}"/>
-                                                    </a>
+                                                    </div>
+                                                    <div id="cell" class="operator">
+                                                        <c:out value="${sub.operatorName}"/>
+                                                    </div>
+                                                    <div id="cell" class="active">
+                                                        <c:choose>
+                                                            <c:when test="${sub.active == true}">
+                                                                <input type="checkbox" name="selectedDataSources"
+                                                                    value="${sub.dataSourceName}" checked/>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <input type="checkbox" name="selectedDataSources"
+                                                                    value="${sub.dataSourceName}"/>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </div>
                                                 </div>
-                                                <div class="operator">
-                                                    <c:out value="${sub.operatorName}"/>
-                                                </div>
-                                                <div class="synkronized">
-                                                <c:choose>
-                                                    <c:when test="${sub.synkronized == true}">
-                                                        <img src="includes/images/green_bulb.png"
-                                                                 alt="active"/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <img src="includes/images/red_bulb.png"
-                                                                 alt="deactivated"/>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                </div>
-                                                <div class="active">
-                                                <c:choose>
-                                                    <c:when test="${sub.active == true}">
-                                                        <input type="checkbox" name="selectedDataSources"
-                                                            value="${sub.dataSourceName}" checked/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <input type="checkbox" name="selectedDataSources"
-                                                            value="${sub.dataSourceName}"/>
-                                                    </c:otherwise>
-                                                </c:choose>
+                                            </c:forEach>
+                                            <div class="tablefooter">
+                                                <div class="buttons">
+                                                    <button class="rounded" type="submit">
+                                                        <span>OK</span>
+                                                    </button>
                                                 </div>
                                             </div>
-                                        </c:forEach>
-                                        <div class="footer">
-                                            <div class="right">
-                                                <button class="rounded" type="submit">
-                                                    <span>Submit</span>
-                                                </button>
-                                            </div>
-                                        </div>
+                                        </form>
                                     </div>
                                 </div>
-                            </form>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="message">
-                                <div class="icon">
-                                    <img src="includes/images/icons/circle-alert.png"
-                                         alt="no_radars"/>
-                                </div>
-                                <div class="text">
+                            </c:when>
+                            <c:otherwise>
+                                <div class="blttext">
                                     List of subscribed data sources is currently empty.
                                     Use node connection functionality to add new data sources.
                                 </div>
-                            </div>
-                            <div class="footer">
-                                <div class="right">
-                                    <form action="connectToNode.htm">
-                                        <button class="rounded" type="submit">
-                                            <span>OK</span>
-                                        </button>
-                                    </form>
+                                <div class="table">
+                                    <div class="tablefooter">
+                                        <div class="buttons">
+                                            <button class="rounded" type="button"
+                                                onclick="window.location.href='connectToNode.htm'">
+                                                <span>OK</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>
 </html>
-

@@ -56,9 +56,13 @@ public class RemoteDataSourceController extends MultiActionController {
     private static final String SUBSCRIBED_DATA_SOURCES_KEY = "subscribedDataSources";
     private static final String SENDER_NODE_NAME_KEY = "sender_node_name";
     /** Remote data sources view */
-    private static final String DATA_SOURCES_VIEW = "remoteDataSources";
-    private static final String SELECTED_DATA_SOURCES_VIEW = "selectedRemoteDataSources";
-    private static final String SUBSCRIBED_DATA_SOURCES_VIEW = "subscribedRemoteDataSources";
+    private static final String DATA_SOURCES_VIEW = "dsConnect";
+    private static final String SELECTED_DATA_SOURCES_VIEW = "dsToConnect";
+    private static final String SUBSCRIBED_DATA_SOURCES_VIEW = "dsSubscribed";
+    /** Remove data source message key */
+    private static final String DS_SUBSCRIBE_MSG_KEY = "message";
+    /** Remove data source error key */
+    private static final String DS_SUBSCRIBE_ERROR_KEY = "error";
 //---------------------------------------------------------------------------------------- Variables
     private FrameDispatcherController frameDispatcherController;
     private SubscriptionManager subscriptionManager;
@@ -91,7 +95,7 @@ public class RemoteDataSourceController extends MultiActionController {
      * @param response HTTP servlet response
      * @return ModelAndView object holding list of data sources available at a given node
      */
-    public ModelAndView remoteDataSources( HttpServletRequest request,
+    public ModelAndView dsConnect( HttpServletRequest request,
             HttpServletResponse response ) {
         // set remote data source list
         setRemoteDataSources( frameDispatcherController.getDataSourceListing() );
@@ -114,7 +118,7 @@ public class RemoteDataSourceController extends MultiActionController {
      * @param response HTTP servlet response
      * @return ModelAndView object holding list of data sources selected by the user
      */
-    public ModelAndView selectedRemoteDataSources( HttpServletRequest request,
+    public ModelAndView dsToConnect( HttpServletRequest request,
             HttpServletResponse response ) {
         // get selected sources based on the checkbox values
         String[] selDataSourceNames = request.getParameterValues( SELECTED_DATA_SOURCES_KEY );
@@ -142,11 +146,10 @@ public class RemoteDataSourceController extends MultiActionController {
      * @param response HTTP servlet response
      * @return ModelAndView
      */
-    public ModelAndView subscribedRemoteDataSources( HttpServletRequest request,
+    public ModelAndView dsSubscribed( HttpServletRequest request,
             HttpServletResponse response ) {
-        // prepare subscription request
+        ModelAndView modelAndView = new ModelAndView();
         try {
-
             File tempFile = InitAppUtil.createTempFile(
                     new File( InitAppUtil.getWorkDir() ) );
             InitAppUtil.writeObjectToStream( getSelectedDataSources(), tempFile );
@@ -181,12 +184,16 @@ public class RemoteDataSourceController extends MultiActionController {
                     subscriptionManager.saveSubscription( subs );
                 }
             }
+            String msg = "Subscription request was successfully completed";
+            modelAndView.addObject( DS_SUBSCRIBE_MSG_KEY, msg );
+            log.warn( msg );
         } catch( Exception e ) {
-            log.error( "Error while adding remote channels to subscription list: " +
-                    e.getMessage() );
+            String msg = "Failed to complete subscription request: " + e.getMessage();
+            modelAndView.addObject( DS_SUBSCRIBE_ERROR_KEY, msg );
+            log.error( msg );
         }
-        return new ModelAndView( SUBSCRIBED_DATA_SOURCES_VIEW, SUBSCRIBED_DATA_SOURCES_KEY,
-                getSubscribedDataSources() );
+        modelAndView.setViewName( SUBSCRIBED_DATA_SOURCES_VIEW );
+        return modelAndView;
     }
     /**
      * Gets the list of data sources available for a given remote node.

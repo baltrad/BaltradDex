@@ -22,7 +22,7 @@ List of adaptors
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 <%@ page import="java.util.List" %>
@@ -43,66 +43,82 @@ List of adaptors
         <title>Baltrad | Schedule</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/processingTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/processingMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
                             Schedule
                         </div>
-                        <div class="right">
+                        <div class="blttext">
+                            Schedule. Click job ID to modify or delete a job or press Create to
+                            create a new job.
                         </div>
-                    </div>
-                    <div id="text-box">
-                        Schedule. Press job to modify/delete or press Create to create a new job.
-                    </div>
-                    <form name="createJobForm" action="createscheduledjob.htm">
-                        <div id="table">
-                            <c:choose>
-                                <c:when test="${schedules_status == 1}">
-                                    <div id="showschedule">
-                                        <div class="table-hdr">
-                                            <div class="id">
-                                                Id
-                                            </div>
-                                        </div>
-                                        <c:forEach var="job" items="${schedule}">
-                                            <div class="table-row">
-                                                <div class="id">
-                                                    <c:out value="${job.id}"/>
-                                                    <a href="showscheduledjob.htm?id=${job.id}">
-                                                        <c:out value="${job.id}"/>
-                                                    </a>
-
+                        <div class="table">
+                            <%if (request.getAttribute("emessage") != null) {%>
+                                <div class="systemerror">
+                                    <div class="header">
+                                        Problems encountered.
+                                    </div>
+                                    <div class="message">
+                                        <%=request.getAttribute("emessage")%>
+                                    </div>
+                                </div>
+                            <%}%>
+                            <form name="createJobForm" action="createscheduledjob.htm">
+                                <c:choose>
+                                    <c:when test="${schedules_status == 1}">
+                                        <div class="schedules">
+                                            <div class="tableheader">
+                                                <div id="cell" class="count">&nbsp;</div>
+                                                <div id="cell" class="id">
+                                                    Job ID
                                                 </div>
                                             </div>
-                                        </c:forEach>
-                                    </div>
-                                </c:when>
-                            </c:choose>
-                            <div class="footer">
-                                <div class="right">
-                                    <button class="rounded" type="submit">
-                                        <span>Create</span>
-                                    </button>
-                                </div>
-                            </div>
-                            </div>
-                          </form>
-                    <%if (request.getAttribute("emessage") != null) {%>
-                        <div class="scheduleerror"><%=request.getAttribute("emessage")%></div>
-                    <%}%>
+                                            <c:set var="count" scope="page" value="1"/>
+                                            <c:forEach var="job" items="${schedule}">
+                                                <div class="entry">
+                                                    <div id="cell" class="count">
+                                                        <c:out value="${count}"/>
+                                                        <c:set var="count" value="${count + 1}"/>
+                                                    </div>
+                                                    <div id="cell" class="id">
+                                                        <a href="showscheduledjob.htm?id=${job.id}">
+                                                            <c:out value="${job.id}"/>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                    </c:when>
+                                </c:choose>
+                                <div class="tablefooter">
+                                   <div class="buttons">
+                                       <button class="rounded" type="button"
+                                           onclick="window.location.href='processing.htm'">
+                                           <span>Back</span>
+                                       </button>
+                                       <button class="rounded" type="submit">
+                                           <span>Create</span>
+                                       </button>
+                                   </div>
+                               </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

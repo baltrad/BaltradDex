@@ -25,7 +25,6 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@ page import="java.util.List" %>
 <%
     int request_status = ( Integer )request.getAttribute( "request_status" );
 %>
@@ -37,130 +36,120 @@ Author     : szewczenko
         <title>Baltrad | Subscriptions</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/exchangeTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/exchangeMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
                             Subscription management
                         </div>
-                        <div class="right">
-                        </div>
-                    </div>
-                    <c:choose>
-                        <c:when test="${request_status == 1}">
-                            <div id="text-box">
-                                Please confirm your subscription request.
-                            </div>
-                            <div id="table-content">
-                                <form action="showSubscriptionStatus.htm">
-                                    <div id="table">
-                                        <div id="selectedsubscriptions">
-                                            <div class="table-hdr">
-                                                <div class="station">
+                        <c:choose>
+                            <c:when test="${request_status == 1}">
+                                <div class="blttext">
+                                    Confirm your subscription request.
+                                </div>
+                                <div class="table">
+                                    <div class="subscriptions">
+                                        <form action="showSubscriptionStatus.htm" method="post">
+                                            <div class="tableheader">
+                                                <div id="cell" class="count">&nbsp;</div>
+                                                <div id="cell" class="name">
                                                     Data source
                                                 </div>
-                                                <div class="operator">
+                                                <div id="cell" class="operator">
                                                     Operator
                                                 </div>
-                                                <div class="request">
+                                                <div id="cell" class="active">
                                                     Request
                                                 </div>
                                             </div>
-                                            <c:forEach var="sub" items="${selectedSubscriptions}">
-                                                <div class="table-row">
-                                                    <div class="station">
+                                            <c:set var="count" scope="page" value="1"/>
+                                            <c:forEach items="${selectedSubscriptions}" var="sub">
+                                                <div class="entry">
+                                                    <div id="cell" class="count">
+                                                        <c:out value="${count}"/>
+                                                        <c:set var="count" value="${count + 1}"/>
+                                                    </div>
+                                                    <div id="cell" class="name">
                                                         <c:out value="${sub.dataSourceName}"/>
                                                     </div>
-                                                    <div class="operator">
+                                                    <div id="cell" class="operator">
                                                         <c:out value="${sub.operatorName}"/>
                                                     </div>
-                                                    <div class="request">
+                                                    <div id="cell" class="active">
                                                         <c:choose>
                                                             <c:when test="${sub.active == true}">
-                                                                <div class="tdgreen">
-                                                                    <c:out value="Activate"/>
-                                                                </div>
+                                                                <img src="includes/images/icons/download.png" 
+                                                                     alt="Start" title="Start subscription">
                                                             </c:when>
                                                             <c:otherwise>
-                                                                <div class="tdred">
-                                                                    <c:out value="Deactivate"/>
-                                                                </div>
+                                                                <img src="includes/images/icons/stop.png" 
+                                                                     alt="Stop" title="Stop subscription">
                                                             </c:otherwise>
                                                         </c:choose>
                                                     </div>
                                                 </div>
                                             </c:forEach>
-                                            <div class="footer">
-                                                <div class="right">
-                                                    <button class="rounded" type="button"
-                                                        onclick="window.location='showSubscriptions.htm'">
-                                                        <span>Back</span>
-                                                    </button>
-                                                    <button class="rounded" type="submit">
-                                                        <span>Submit</span>
-                                                    </button>
-                                                </div>
+                                            <div class="tablefooter">
+                                                <button class="rounded" type="button"
+                                                    onclick="window.location='showSubscriptions.htm'">
+                                                    <span>Back</span>
+                                                </button>
+                                                <button class="rounded" type="submit">
+                                                    <span>OK</span>
+                                                </button>
                                             </div>
-                                        </div>
+                                        </form>
                                     </div>
-                                </form>
-                            </div>
-                        </c:when>
-                        <c:when test="${request_status == 2}">
-                            <div class="message">
-                                <div class="icon">
-                                    <img src="includes/images/icons/circle-alert.png"
-                                         alt="no_radars"/>
                                 </div>
-                                <div class="text">
+                            </c:when>
+                            <c:when test="${request_status == 2}">
+                                <div class="blttext">
                                     Confirm your request in order to cancel all your
                                     active subscriptions.
                                 </div>
-                            </div>
-                            <div class="footer">
-                                <div class="right">
-                                    <form action="showSubscriptionStatus.htm">
-                                        <button class="rounded" type="submit">
-                                            <span>Submit</span>
-                                        </button>
-                                    </form>
+                                <div class="table">
+                                    <div class="tablefooter">
+                                        <div class="buttons">
+                                            <button class="rounded" type="button"
+                                                onclick="window.location.href='showSubscriptionStatus.htm'">
+                                                <span>OK</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="message">
-                                <div class="icon">
-                                    <img src="includes/images/icons/circle-alert.png"
-                                         alt="no_radars"/>
-                                </div>
-                                <div class="text">
+                            </c:when>
+                            <c:otherwise>
+                                <div class="blttext">
                                     Your subscription status was not changed.
-                                    Click OK to go back to the selection page.
+                                    Click OK to go back to subscription management page.
                                 </div>
-                            </div>
-                            <div class="footer">
-                                <div class="right">
-                                    <form action="showSubscriptions.htm">
-                                        <button class="rounded" type="submit">
-                                            <span>OK</span>
-                                        </button>
-                                    </form>
+                                <div class="table">
+                                    <div class="tablefooter">
+                                        <div class="buttons">
+                                            <button class="rounded" type="button"
+                                                onclick="window.location.href='showSubscriptions.htm'">
+                                                <span>OK</span>
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.sql.SQLException;
 
@@ -48,6 +49,8 @@ public class RemoveDataSourceController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Constants
     /** Select remove data source view */
     private static final String DS_SELECT_REMOVE_VIEW = "dsSelectRemove";
+    /** Data source selection view */
+    private static final String DS_TO_REMOVE_VIEW = "dsToRemove";
     /** Remove data source view */
     private static final String DS_REMOVE_VIEW = "dsRemove";
     /** Data sources list model key */
@@ -56,8 +59,10 @@ public class RemoveDataSourceController extends MultiActionController {
     private static final String DS_SUBMIT_BUTTON_KEY = "submitButton";
     /** Selected data sources key */
     private static final String DS_SELECTED_SOURCES = "selectedSources";
+    /** Remove data source message key */
+    private static final String DS_REMOVE_MSG_KEY = "message";
     /** Remove data source error key */
-    private static final String DS_REMOVE_ERROR_KEY = "dsRemoveError";
+    private static final String DS_REMOVE_ERROR_KEY = "error";
 //---------------------------------------------------------------------------------------- Variables
     /** References data source manager object */
     private DataSourceManager dataSourceManager;
@@ -82,6 +87,44 @@ public class RemoveDataSourceController extends MultiActionController {
         return new ModelAndView( DS_SELECT_REMOVE_VIEW, DS_SELECT_REMOVE_KEY, dataSources );
     }
     /**
+     * Prepares a list of data sources selected for removal.
+     * 
+     * @param request Current HTTP request
+     * @param response Current HTTP response
+     * @return The prepared model and view
+     */
+    public ModelAndView dsToRemove( HttpServletRequest request, HttpServletResponse response ) {
+        ModelAndView modelAndView = new ModelAndView();
+        Map parameterMap = request.getParameterMap();
+        String[] parameterValues = null;
+        List<DataSource> dataSources = new ArrayList<DataSource>();
+        if( parameterMap.containsKey( DS_SUBMIT_BUTTON_KEY ) ) {
+            parameterValues = ( String[] )parameterMap.get( DS_SELECTED_SOURCES );
+            if( parameterValues != null ) {
+                for( int i = 0; i < parameterValues.length; i++ ) {
+                    try {
+                        dataSources.add( dataSourceManager.getDataSource(
+                                Integer.parseInt( parameterValues[ i ] ) ) );
+                    } catch( SQLException e ) {
+                        String msg = "Failed to fetch data sources: " + e.getMessage();
+                        modelAndView.addObject( DS_REMOVE_ERROR_KEY, msg );
+                        log.error( msg );
+                    } catch( Exception e ) {
+                        String msg = "Failed to fetch data sources: " + e.getMessage();
+                        modelAndView.addObject( DS_REMOVE_ERROR_KEY, msg );
+                        log.error( msg );
+                    }
+                }
+                modelAndView = new ModelAndView( DS_TO_REMOVE_VIEW, DS_SELECT_REMOVE_KEY,
+                        dataSources );
+            } else {
+                modelAndView.addObject( DS_SELECT_REMOVE_KEY, dataSourceManager.getDataSources() );
+                modelAndView.setViewName( DS_SELECT_REMOVE_VIEW );
+            }
+        }
+        return modelAndView;
+    }
+    /**
      * Removes selected data sources.
      *
      * @param request Current HTTP request
@@ -102,7 +145,8 @@ public class RemoveDataSourceController extends MultiActionController {
                         String dataSourceName = dataSource.getName();
                         dataSourceManager.deleteDataSource( Integer.parseInt(
                                 parameterValues[ i ] ) );
-                        log.warn( "Data source " + dataSourceName + " successfully removed" );
+                        String msg = "Data source successfully removed: " + dataSourceName;
+                        log.warn( msg );
                     } catch( SQLException e ) {
                         modelAndView.addObject( DS_REMOVE_ERROR_KEY, "SQL exception" );
                         log.error( "Failed to remove data source: SQL Exception " + e.getMessage() );
@@ -111,6 +155,8 @@ public class RemoveDataSourceController extends MultiActionController {
                         log.error( "Failed to remove data source: Exception " + e.getMessage() );
                     }
                 }
+                String msg = "Selected data sources have been removed.";
+                modelAndView.addObject( DS_REMOVE_MSG_KEY, msg );
                 modelAndView.setViewName( DS_REMOVE_VIEW );
             } else {
                 modelAndView.addObject( DS_SELECT_REMOVE_KEY, dataSourceManager.getDataSources() );

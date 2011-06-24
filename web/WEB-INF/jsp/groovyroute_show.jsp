@@ -22,7 +22,7 @@ Modifies a groovy route
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
@@ -38,100 +38,127 @@ Modifies a groovy route
         <title>Baltrad | Modify Groovy route</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/processingTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/processingMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
                             Modify Groovy route
                         </div>
-                        <div class="right">
+                        <div class="blttext">
+                            Modify or delete a Groovy routing rule.
+                        </div>
+                        <div class="table">
+                            <%if (request.getAttribute("emessage") != null) {%>
+                                <div class="systemerror">
+                                    <div class="header">
+                                        Problems encountered.
+                                    </div>
+                                    <div class="message">
+                                        <%=request.getAttribute("emessage")%>
+                                    </div>
+                                </div>
+                            <%}%>
+                            <div class="modifyroute">
+                                <form name="showRouteForm" action="groovyroute_show.htm">
+                                    <div class="leftcol">
+                                        <%
+                                            List<String> adaptors = (List<String>)request.getAttribute("adaptors");
+                                            String name = (String)request.getAttribute("name");
+                                            String author = (String)request.getAttribute("author");
+                                            Boolean active = (Boolean)request.getAttribute("active");
+                                            String description = (String)request.getAttribute("description");
+                                            List<String> recipients = (List<String>)request.getAttribute("recipients");
+                                            String definition = (String)request.getAttribute("definition");
+                                            String activestr = active==true?"checked":"";
+                                        %>
+                                        <div class="row">Name</div>
+                                        <div class="row">Author</div>
+                                        <div class="row">Active</div>
+                                        <div class="row">Description</div>
+                                        <div class="row4">Recipients</div>
+                                        <div class="row">Script</div>
+                                    </div>
+                                    <div class="rightcol">
+                                        <div class="row">
+                                            <input type="text" name="name" value="<%=name%>" disabled/>
+                                            <input type="hidden" name="name" value="<%=name%>"/>
+                                            <div class="hint">
+                                               Route name
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <input type="text" name="author" value="<%=author%>"/>
+                                            <div class="hint">
+                                               Route author's name
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <input type="checkbox" name="active" <%=activestr%>/>
+                                            <div class="hint">
+                                               Check to activate route
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <input type="text" name="description" value="<%=description%>"/>
+                                            <div class="hint">
+                                               Verbose description
+                                            </div>
+                                        </div>
+                                        <div class="row4">
+                                            <select multiple size="4" name="recipients">
+                                            <%
+                                              for (String adaptor : adaptors) {
+                                                String selectstr = "";
+                                                if (recipients.contains(adaptor)) {
+                                                  selectstr = "selected";
+                                                }
+                                            %>
+                                                <option value="<%=adaptor%>" <%=selectstr%>><%=adaptor%></option>
+                                            <%
+                                              }
+                                            %>
+                                            </select>
+                                            <div class="hint">
+                                               Select target adaptors
+                                            </div>
+                                        </div>
+                                        <div class="textrow">
+                                            <textarea class="routedefinition" name="typdef"><%=definition%></textarea>
+                                            <div class="hint">
+                                               Groovy route definition
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tablefooter">
+                                       <div class="buttons">
+                                           <button class="rounded" name="submitButton" type="submit"
+                                                   value="Modify">
+                                               <span>Modify</span>
+                                           </button>
+                                           <button class="rounded" name="submitButton" type="submit"
+                                                   value="Delete">
+                                               <span>Delete</span>
+                                           </button>
+                                       </div>
+                                   </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                    <div id="text-box">
-                        Modify or delete a Groovy routing rule.
-                    </div>
-                    <div id="table">
-                        <div class="props">
-                            <form name="showRouteForm" action="groovyroute_show.htm">
-                                <div class="left">
-                                    <%
-                                        List<String> adaptors = (List<String>)request.getAttribute("adaptors");
-                                        String name = (String)request.getAttribute("name");
-                                        String author = (String)request.getAttribute("author");
-                                        Boolean active = (Boolean)request.getAttribute("active");
-                                        String description = (String)request.getAttribute("description");
-                                        List<String> recipients = (List<String>)request.getAttribute("recipients");
-                                        String definition = (String)request.getAttribute("definition");
-                                        String activestr = active==true?"checked":"";
-                                    %>
-                                    <div class="row">Name</div>
-                                    <div class="row">Author</div>
-                                    <div class="row">Active</div>
-                                    <div class="row">Description</div>
-                                    <div class="row4">Recipients</div>
-                                    <div class="row">Script</div>
-                                </div>
-                                <div class="right">
-                                    <div class="row">
-                                        <input type="text" name="name" value="<%=name%>" disabled/>
-                                        <input type="hidden" name="name" value="<%=name%>"/>
-                                    </div>
-                                    <div class="row">
-                                        <input type="text" name="author" value="<%=author%>"/>
-                                    </div>
-                                    <div class="row">
-                                        <input type="checkbox" name="active" <%=activestr%>/>
-                                    </div>
-                                    <div class="row">
-                                        <input type="text" name="description" value="<%=description%>"/>
-                                    </div>
-                                    <div class="row4">
-                                        <select multiple size="4" name="recipients">
-                                        <%
-                                          for (String adaptor : adaptors) {
-                                            String selectstr = "";
-                                            if (recipients.contains(adaptor)) {
-                                              selectstr = "selected";
-                                            }
-                                        %>
-                                            <option value="<%=adaptor%>" <%=selectstr%>><%=adaptor%></option>
-                                        <%
-                                          }
-                                        %>
-                                        </select>
-                                    </div>
-                                    <div class="row">
-                                        <textarea class="routedefinition" name="typdef"><%=definition%></textarea>
-                                    </div>
-                                </div>
-                                <div class="footer">
-                                    <div class="right">
-                                        <button class="rounded" name="submitButton" type="submit" value="Modify">
-                                            <span>Modify</span>
-                                        </button>
-                                        <button class="rounded" name="submitButton" type="submit" value="Delete">
-                                            <span>Delete</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                    <%if (request.getAttribute("emessage") != null) {%>
-                            <div class="routererror"><%=request.getAttribute("emessage")%></div>
-                    <%}%>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>

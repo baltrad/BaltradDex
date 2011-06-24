@@ -47,8 +47,8 @@ public class SaveRadarController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Constants
     public static final String CHANNEL_ID = "channelId";
     public static final String USERS = "users";
-    private static final String OK_MSG_KEY = "ok_message";
-    private static final String ERROR_MSG_KEY = "error_message";
+    private static final String OK_MSG_KEY = "message";
+    private static final String ERROR_MSG_KEY = "error";
 //---------------------------------------------------------------------------------------- Variables
     private RadarManager radarManager;
     private Logger log;
@@ -93,19 +93,21 @@ public class SaveRadarController extends SimpleFormController {
         Radar channel = ( Radar )command;
         try {
             radarManager.saveOrUpdate( channel );
-            request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
-                "message.addradar.savesuccess" ) );
-            log.warn( "Saved local radar station " + channel.getChannelName() );
+            String msg = "Local radar station successfully saved: " + channel.getChannelName();
+            request.setAttribute( OK_MSG_KEY, msg  );
+            log.warn( msg );
         } catch( SQLException e ) {
-            request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                "message.addradar.savefail" ) );
-            log.error( "Failed to save radar station " + channel.getChannelName() );
+            request.removeAttribute( OK_MSG_KEY );
+            String msg = "Failed to save local radar station " + channel.getChannelName() + ": "
+                    + e.getMessage();
+            request.setAttribute( ERROR_MSG_KEY, msg  );
+            log.error( msg );
         } catch( Exception e ) {
-            request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                "message.addradar.savefail" ) );
-            log.error( "Failed to save radar station " + channel.getChannelName() );
+            request.removeAttribute( OK_MSG_KEY );
+            String msg = "Failed to save local radar station " + channel.getChannelName() + ": "
+                    + e.getMessage();
+            request.setAttribute( ERROR_MSG_KEY, msg );
+            log.error( msg );
         }
         return new ModelAndView( getSuccessView() );
     }

@@ -59,7 +59,7 @@ public class NodeConnectionValidator implements Validator {
                 conn.getUserName() == null &&
                 conn.getPassword() == null ) {
                 ValidationUtils.rejectIfEmptyOrWhitespace( errors, "connectionName",
-                    "error.field.required" );
+                    "error.select.connection" );
             } else {
                 boolean isValidPortNumber = false;
                 try {
@@ -77,11 +77,11 @@ public class NodeConnectionValidator implements Validator {
                 }
                 if( conn.getUserName().isEmpty() ) {
                     ValidationUtils.rejectIfEmptyOrWhitespace( errors, "userName",
-                        "error.field.required" );
+                        "error.missing.username" );
                 }
                 if( conn.getPassword().isEmpty() ) {
                     ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password",
-                        "error.field.required" );
+                        "error.missing.password" );
                 }
             }   
         }

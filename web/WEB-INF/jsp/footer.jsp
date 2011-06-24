@@ -22,24 +22,20 @@ Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@page import="eu.baltrad.dex.util.InitAppUtil"%>
-
-<%
-    String version = InitAppUtil.getNodeVersion();
-%>
 
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
-        <div class="menu">
-            <a href="security.htm">Security</a> |
-            <a href="terms.htm">Terms And Conditions</a> |
-            <a href="contact.htm">Contact</a>
+        <div class="projectref">
+            &#169 2009-2011 <a href="http://baltrad.eu/">baltrad.eu</a>
         </div>
-        <div class="version">
-            <span><%=version%></span>
+        <div class="info">
+            <a href="feedback.htm">Feedback</a> |
+            <a href="about.htm">About</a> |
+            <a href="security.htm">Security</a> |
+            <a href="terms.htm">Terms And Conditions</a>
         </div>
     </body>
 </html>
