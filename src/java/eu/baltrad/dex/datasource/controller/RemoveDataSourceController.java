@@ -25,6 +25,9 @@ import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.log.model.MessageLogger;
 
+import eu.baltrad.beast.db.CoreFilterManager;
+import eu.baltrad.beast.db.IFilter;
+
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -66,6 +69,8 @@ public class RemoveDataSourceController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Variables
     /** References data source manager object */
     private DataSourceManager dataSourceManager;
+    /** References core filter manager object */
+    private CoreFilterManager coreFilterManager;
     /** References message logger */
     private Logger log;
 //------------------------------------------------------------------------------------------ Methods
@@ -143,6 +148,11 @@ public class RemoveDataSourceController extends MultiActionController {
                         DataSource dataSource = dataSourceManager.getDataSource(
                                 Integer.parseInt( parameterValues[ i ] ) );
                         String dataSourceName = dataSource.getName();
+                        // Delete filters
+                        int filterId = dataSourceManager.getFilterId( dataSource.getId() );
+                        IFilter filter = coreFilterManager.load( filterId );
+                        coreFilterManager.remove( filter );
+                        // Delete data source
                         dataSourceManager.deleteDataSource( Integer.parseInt(
                                 parameterValues[ i ] ) );
                         String msg = "Data source successfully removed: " + dataSourceName;
@@ -178,6 +188,22 @@ public class RemoveDataSourceController extends MultiActionController {
      */
     public void setDataSourceManager( DataSourceManager dataSourceManager ) {
         this.dataSourceManager = dataSourceManager;
+    }
+    /**
+     * Gets reference to CoreFilterManager.
+     *
+     * @return Reference to CoreFilterManager
+     */
+    public CoreFilterManager getCoreFilterManager() {
+        return coreFilterManager;
+    }
+    /**
+     * Sets reference to CoreFilterManager.
+     *
+     * @param coreFilterManager Reference tp CoreFilterManager to set
+     */
+    public void setCoreFilterManager( CoreFilterManager coreFilterManager ) {
+        this.coreFilterManager = coreFilterManager;
     }
 }
 //--------------------------------------------------------------------------------------------------

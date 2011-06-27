@@ -98,7 +98,7 @@ Author     : szewczenko
                                                 <span>Back</span>
                                             </button>
                                             <button class="rounded" type="submit" name="nextButton">
-                                                <span>Next</span>
+                                                <span>Save</span>
                                             </button>
                                         </div>
                                     </div>

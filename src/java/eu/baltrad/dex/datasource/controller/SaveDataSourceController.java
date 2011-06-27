@@ -37,6 +37,7 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.log.model.MessageLogger;
 
+import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.AttributeFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
 
@@ -524,6 +525,13 @@ public class SaveDataSourceController extends MultiActionController {
             DataSource dataSource = new DataSource( dsName, dsDescription );
             try {
                 int saved = dataSourceManager.saveOrUpdate( dataSource );
+                // Delete filters if exist - important upon data source modification
+                int dataSourceId = dataSourceManager.getDataSource( dsName ).getId();
+                int filterId = dataSourceManager.getFilterId( dataSourceId );
+                if( filterId > 0 ) {
+                    IFilter filter = coreFilterManager.load( filterId );
+                    coreFilterManager.remove( filter );
+                }
                 if( saved > 0 ) {
                     // Initialize filter
                     AttributeFilter sourceFilter = new AttributeFilter();

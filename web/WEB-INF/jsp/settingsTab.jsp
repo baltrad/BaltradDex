@@ -81,7 +81,7 @@ Author     : szewczenko
             </div>
         </c:if>
         <c:if test="${userRole == 0}">
-            <div id="tab">
+            <div id="tab" class="active">
                 <a href="settings.htm">
                     Settings
                 </a>
