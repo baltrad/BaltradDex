@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Save data source users page
-Created on : Apr 27, 2011, 8:05 AM
+Document   : Save data source file objects parameter page
+Created on : Jun 27, 2011, 11:38 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
@@ -47,55 +47,57 @@ Author     : szewczenko
                     </div>
                     <div class="right">
                         <div class="blttitle">
-                            Configure data source <div class="stepno">Step 4</div>
+                            Configure data source <div class="stepno">Step 3</div>
                         </div>
                         <div class="blttext">
-                            Select users
+                            Select file object
                             <div class="hint">
-                                This data source will be available for the selected users.
+                                Select file objects that will be available with this
+                                data source.
                             </div>
                         </div>
                         <div class="table">
                             <div class="dssave">
-                                <form method="post" action="dsSaveSummary.htm">
+                                <form method="post" action="dsSaveUsers.htm">
                                     <div class="rightcol">
-                                        <c:forEach items="${selectedUsers}" var="user">
+                                        <c:forEach items="${selectedFileObjects}" var="fobject">
                                             <div class="dsparam">
-                                                Name:&nbsp;<c:out value="${user.name}"></c:out>&nbsp;
-                                                Role: <c:out value="${user.roleName}"></c:out>
-                                                &nbsp;Organization:
-                                                <c:out value="${user.factory}"></c:out>
+                                                <c:out value="${fobject.fileObject}"></c:out>
+                                                &nbsp;
+                                                <c:out value="${fobject.description}"></c:out>
+                                                &nbsp;
                                             </div>
                                         </c:forEach>
                                         <div class="row">
-                                            <c:if test="${numSelectedUsers < numAvailableUsers}">
-                                                <select name="usersList"
-                                                        title="Select user from the list">
+                                            <c:if test="${numSelectedFileObjects <
+                                                          numAvailableFileObjects}">
+                                                <select name="fileObjectsList"
+                                                        title="Select file object from the list">
                                                     <option value="select">
-                                                        <c:out value="-- Select user --"/>
+                                                        <c:out value="-- Select file object --"/>
                                                     </option>
-                                                    <c:forEach items="${availableUsers}"
-                                                               var="user">
-                                                        <option value="${user.name}">
-                                                            <c:out value="${user.name}"/>
+                                                    <c:forEach items="${availableFileObjects}"
+                                                               var="fobject">
+                                                        <option value="${fobject.fileObject}">
+                                                            <c:out value="${fobject.description}"/>
                                                         </option>
                                                     </c:forEach>
                                                 </select>
                                                 <div class="dscontrol">
-                                                    <input type="submit" name="addUser"
-                                                        title="Add user" value="+">
+                                                    <input type="submit" name="addFileObject"
+                                                        title="Add file object" value="+">
                                                 </div>
                                             </c:if>
-                                            <c:if test="${numSelectedUsers > 0}">
+                                            <c:if test="${numSelectedFileObjects > 0}">
                                                 <div class="dscontrol">
-                                                    <input type="submit" name="removeUser"
-                                                        title="Remove user" value="-">
+                                                    <input type="submit" name="removeFileObject"
+                                                        title="Remove file object" value="-">
                                                 </div>
                                             </c:if>
                                         </div>
-                                        <c:if test="${not empty dsSelectUsersError}">
+                                        <c:if test="${not empty dsSelectFileObjectsError}">
                                             <div class="error">
-                                                <c:out value="${dsSelectUsersError}"/>
+                                                <c:out value="${dsSelectFileObjectsError}"/>
                                             </div>
                                         </c:if>
                                     </div>

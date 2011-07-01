@@ -58,7 +58,7 @@ Author     : szewczenko
                                 <div class="tablefooter">
                                    <div class="buttons">
                                        <button class="rounded" type="button"
-                                            onclick="window.location.href='settings.htm'">
+                                            onclick="window.location.href='dsSelectEdit.htm'">
                                             <span>OK</span>
                                        </button>
                                    </div>

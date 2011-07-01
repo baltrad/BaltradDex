@@ -52,18 +52,17 @@ Author     : szewczenko
                         <div class="blttext">
                             Enter data source name and description
                             <div class="hint">
-                                These parameters should describe data source characteristics.
+                                Parameters should identify data source characteristics.
                             </div>
                         </div>
                         <div class="table">
                             <div class="dssave">
                                 <form method="post" action="dsSaveRadars.htm">
-                                    <div class="leftcol">
-                                        <div class="row">Data source name</div>
-                                        <div class="row">Description</div>
-                                    </div>
-                                    <div class="rightcol">
-                                        <div class="row">
+                                    <div class="row">
+                                        <div class="leftcol">
+                                            Data source name
+                                        </div>
+                                        <div class="rightcol">
                                             <div class="dsname">
                                                 <input type="text" name="dsName"
                                                     value="${dsName}" title="Enter data source name">
@@ -77,9 +76,14 @@ Author     : szewczenko
                                                 </div>
                                             </c:if>
                                         </div>
-                                        <div class="row">
+                                    </div>
+                                    <div class="row">
+                                        <div class="leftcol">
+                                            Description
+                                        </div>
+                                        <div class="rightcol">
                                             <div class="dsdescription">
-                                                <textarea name="dsDescription"
+                                                <textarea name="dsDescription" rows="64" cols="200"
                                                     title="Enter data source description">
                                                     <c:out value="${dsDescription}"/>
                                                 </textarea>

@@ -58,7 +58,7 @@ Author     : szewczenko
                         </div>
                         <div class="table">
                             <div class="dssave">
-                                <form method="post" action="dsSaveUsers.htm">
+                                <form method="post" action="dsSaveFileObjects.htm">
                                     <div class="rightcol">
                                         <c:forEach items="${selectedRadars}" var="radar">
                                             <div class="dsparam">

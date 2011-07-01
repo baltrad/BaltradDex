@@ -140,6 +140,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
                 <prop key="dsSaveName.htm">saveDataSourceController</prop>
                 <prop key="dsSaveRadars.htm">saveDataSourceController</prop>
+                <prop key="dsSaveFileObjects.htm">saveDataSourceController</prop>
                 <prop key="dsSaveUsers.htm">saveDataSourceController</prop>
                 <prop key="dsSaveSummary.htm">saveDataSourceController</prop>
                 <prop key="dsSave.htm">saveDataSourceController</prop>
@@ -898,7 +899,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="attributeFilterManager" class="eu.baltrad.beast.db.AttributeFilterManager"
             autowire="byName"/>
     <bean id="combinedFilterManager" class="eu.baltrad.beast.db.CombinedFilterManager"
-            autowire=" byName"/>
+            autowire=" byName">
+        <property name="childManager"> 
+            <ref bean="coreFilterManager"/>
+        </property>        
+    </bean>
     <bean id="coreFilterManager" class="eu.baltrad.beast.db.CoreFilterManager"
             autowire="byName">
         <property name="subManagers">

@@ -640,6 +640,12 @@ input:focus, textarea:focus {
     width:200px;
 }
 /* Save data source page -------------------------------------------------------------------------*/
+.row .leftcol, .row .rightcol {
+    margin-top:12px;
+}
+.dssave .leftcol {
+    width:20%;
+}
 .dssave .dsname {
     float:left;
 }

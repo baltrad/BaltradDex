@@ -74,7 +74,7 @@ Author     : szewczenko
                     Exchange
                 </a>
             </div>
-            <div id="tab">
+            <div id="tab" class="active">
                 <a href="processing.htm">
                     Processing
                 </a>

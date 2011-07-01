@@ -27,18 +27,13 @@ import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.datasource.model.FileObject;
 import eu.baltrad.dex.datasource.model.FileObjectManager;
-import eu.baltrad.dex.datasource.model.DataQuantity;
-import eu.baltrad.dex.datasource.model.DataQuantityManager;
-import eu.baltrad.dex.datasource.model.Product;
-import eu.baltrad.dex.datasource.model.ProductManager;
-import eu.baltrad.dex.datasource.model.ProductParameter;
-import eu.baltrad.dex.datasource.model.ProductParameterManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.log.model.MessageLogger;
 
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.AttributeFilter;
+import eu.baltrad.beast.db.CombinedFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -49,7 +44,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -64,104 +58,73 @@ import java.sql.SQLException;
  */
 public class SaveDataSourceController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Constants
-    
-
-
-
-
-
-
-
-
-    /** Available file objects key */
-    private static final String AVAILABLE_FILE_OBJECTS_KEY = "available_file_objects";
-    /** Number of available file_objects key */
-    private static final String NUMBER_OF_AVAILABLE_FILE_OBJECTS_KEY = 
-            "number_of_available_file_objects";
-    /** Selected file objects key */
-    private static final String SELECTED_FILE_OBJECTS_KEY = "selected_file_objects";
-    /** Number of selected file objects key */
-    private static final String NUMBER_OF_SELECTED_FILE_OBJECTS_KEY = 
-            "number_of_selected_file_objects";
-    /** File object list parameter key */
-    private static final String FILE_OBJECT_LIST_PARAMETER_KEY = "file_object_list";
-    /** Add file object operation key */
-    private static final String ADD_FILE_OBJECT_KEY = "add_object";
-    /** Remove file object operation key */
-    private static final String REMOVE_FILE_OBJECT_KEY = "remove_object";
-
-    /** Available data quantities key */
+    /** Available data quantities key *
     private static final String AVAILABLE_DATA_QUANTITIES_KEY = "available_data_quantities";
-    /** Number of available data quantities key */
+    /** Number of available data quantities key *
     private static final String NUMBER_OF_AVAILABLE_DATA_QUANTITIES_KEY =
             "number_of_available_data_quantities";
-    /** Selected data quantities key */
+    /** Selected data quantities key *
     private static final String SELECTED_DATA_QUANTITIES_KEY = "selected_data_quantities";
-    /** Number of selected data quantities key */
+    /** Number of selected data quantities key *
     private static final String NUMBER_OF_SELECTED_DATA_QUANTITIES_KEY =
             "number_of_selected_data_quantities";
-    /** Data quantity list parameter key */
+    /** Data quantity list parameter key *
     private static final String DATA_QUANTITY_LIST_PARAMETER_KEY = "data_quantity_list";
-    /** Add data quantity operation key */
+    /** Add data quantity operation key *
     private static final String ADD_DATA_QUANTITY_KEY = "add_quantity";
-    /** Remove data quantity operation key */
+    /** Remove data quantity operation key *
     private static final String REMOVE_DATA_QUANTITY_KEY = "remove_quantity";
 
-    /** Available products key */
+    /** Available products key *
     private static final String AVAILABLE_PRODUCTS_KEY = "available_products";
-    /** Number of available products key */
+    /** Number of available products key *
     private static final String NUMBER_OF_AVAILABLE_PRODUCTS_KEY = "number_of_available_products";
-    /** Selected products key */
+    /** Selected products key *
     private static final String SELECTED_PRODUCTS_KEY = "selected_products";
-    /** Number of selected products key */
+    /** Number of selected products key *
     private static final String NUMBER_OF_SELECTED_PRODUCTS_KEY = "number_of_selected_products";
-    /** Product list parameter key */
+    /** Product list parameter key *
     private static final String PRODUCT_LIST_PARAMETER_KEY = "product_list";
-    /** Add product operation key */
+    /** Add product operation key *
     private static final String ADD_PRODUCT_KEY = "add_product";
-    /** Remove product operation key */
+    /** Remove product operation key *
     private static final String REMOVE_PRODUCT_KEY = "remove_product";
 
-    /** Available product parameters key */
+    /** Available product parameters key *
     private static final String AVAILABLE_PRODUCT_PARAMETERS_KEY = "available_product_parameters";
-    /** Products parameters values key */
+    /** Products parameters values key *
     private static final String SELECTED_PRODUCT_PARAMETER_VALUES_KEY =
             "selected_product_parameter_values";
-    /** Add product parameter operation key */
+    /** Add product parameter operation key *
     private static final String ADD_PRODUCT_PARAMETER_KEY = "add_product_parameter";
-    /** Product parameter name key */
+    /** Product parameter name key *
     private static final String PRODUCT_PARAMETER_NAME_KEY = "product_parameter_name";
-    /** Product parameter value key */
+    /** Product parameter value key *
     private static final String PRODUCT_PARAMETER_VALUE_KEY = "product_parameter_value";
+
+    /** Data source review page *
+    private static final String SAVE_DATA_SOURCE_STATUS_PAGE = "saveDataSourceStatus";
+    /** Data source name parameter *
+    private static final String DATA_SOURCE_NAME_KEY = "name";
+    /** Data source description parameter *
+    private static final String DATA_SOURCE_DESCRIPTION_KEY = "description";
+
+    /** Radar selection error key *
+    private static final String SELECT_RADARS_ERROR_KEY = "select_radars_error";
+    /** User selection error key *
+    private static final String SELECT_USERS_ERROR_KEY = "select_users_error";
+    /** Submit form key *
+    private static final String SUBMIT_FORM_KEY = "submit_form";*/
+
 
     /** Default option on the list */
     private static final String DEFAULT_LIST_OPTION_KEY = "select";
-    /** Data source review page */
-    private static final String SAVE_DATA_SOURCE_STATUS_PAGE = "saveDataSourceStatus";
-    /** Data source name parameter */
-    private static final String DATA_SOURCE_NAME_KEY = "name";
-    /** Data source description parameter */
-    private static final String DATA_SOURCE_DESCRIPTION_KEY = "description";
-
-    /** Radar selection error key */
-    private static final String SELECT_RADARS_ERROR_KEY = "select_radars_error";
-    /** User selection error key */
-    private static final String SELECT_USERS_ERROR_KEY = "select_users_error";
-    /** Submit form key */
-    private static final String SUBMIT_FORM_KEY = "submit_form";
-    
-
-
-
-
-
-
-
-
     /** Save data source name view */
     private static final String DS_SAVE_NAME_VIEW = "dsSaveName";
     /** Save data source radars view */
     private static final String DS_SAVE_RADARS_VIEW = "dsSaveRadars";
+    /** Save data source file objects view */
+    private static final String DS_SAVE_FILE_OBJECTS_VIEW = "dsSaveFileObjects";
     /** Save data source users view */
     private static final String DS_SAVE_USERS_VIEW = "dsSaveUsers";
     /** Save data source summary view */
@@ -195,7 +158,6 @@ public class SaveDataSourceController extends MultiActionController {
     /** Generic success message key */
     private static final String OK_MSG_KEY = "message";
 
-
     /** Next button key */
     private static final String DS_NEXT_BUTTON_KEY = "nextButton";
     /** Back button key */
@@ -216,6 +178,21 @@ public class SaveDataSourceController extends MultiActionController {
     /** Remove radar operation key */
     private static final String DS_REMOVE_RADAR_KEY = "removeRadar";
 
+    /** Available file objects key */
+    private static final String DS_AVAILABLE_FILE_OBJECTS_KEY = "availableFileObjects";
+    /** Number of available file_objects key */
+    private static final String DS_NUM_AVAILABLE_FILE_OBJECTS_KEY = "numAvailableFileObjects";
+    /** Selected file objects key */
+    private static final String Ds_SELECTED_FILE_OBJECTS_KEY = "selectedFileObjects";
+    /** Number of selected file objects key */
+    private static final String DS_NUM_SELECTED_FILE_OBJECTS_KEY = "numSelectedFileObjects";
+    /** File object list parameter key */
+    private static final String DS_FILE_OBJECTS_LIST_KEY = "fileObjectsList";
+    /** Add file object operation key */
+    private static final String DS_ADD_FILE_OBJECT_KEY = "addFileObject";
+    /** Remove file object operation key */
+    private static final String DS_REMOVE_FILE_OBJECT_KEY = "removeFileObject";
+
     /** Available users key */
     private static final String DS_AVAILABLE_USERS_KEY = "availableUsers";
     /** Number of available users key */
@@ -233,12 +210,15 @@ public class SaveDataSourceController extends MultiActionController {
 
     /** ODIM what/source attribute key */
     private static final String DS_SOURCE_ATTR_STR = "what/source:WMO";
-
+    /** ODIM what/object attribute key */
+    private static final String DS_OBJECT_ATTR_STR = "what/object";
 //---------------------------------------------------------------------------------------- Variables
     /** References data source manager */
     private static DataSourceManager dataSourceManager;
     /** References radar manager */
-    private static RadarManager channelManager;
+    private static RadarManager radarManager;
+    /** References file object manager */
+    private static FileObjectManager fileObjectManager;
     /** References user manager */
     private static UserManager userManager;
      /** References CoreFilterManager */
@@ -253,74 +233,18 @@ public class SaveDataSourceController extends MultiActionController {
 
     /** Number of radars used to configure a data source */
     private static int numSelectedRadars;
-    /** Number of all available radars */
-    //private static int numAvailableRadars;
-    /** List holding all available radars */
-    //private List<Radar> availableRadars;
     /** List holding radars selected for data source configuration */
     private List<Radar> selectedRadars;
 
-    /** Number of users allowed to use this data source */
-    private static int numSelectedUsers;
-    /** Number of all available users */
-    //private static int numAvailableUsers;
-    /** List holding all available users */
-    //private List<User> availableUsers;
-    /** List holding selected users */
-    private List<User> selectedUsers;
-
-
-
-
-
-
-    
-    
-    /** References file object manager */
-    private static FileObjectManager fileObjectManager;
-    /** References data quantity manager */
-    private static DataQuantityManager dataQuantityManager;
-    /** References product manager */
-    private static ProductManager productManager;
-    /** References product parameter manager */
-    private static ProductParameterManager productParameterManager;
-    
-
-    
-
     /** Number of file objects used to configure a data source */
-    private static int numberOfSelectedFileObjects;
-    /** Number of all available file objects */
-    private static int numberOfAvailableFileObjects;
-    /** List holding all available file objects */
-    private List<FileObject> availableFileObjects;
+    private static int numSelectedFileObjects;
     /** List holding selected file objects */
     private List<FileObject> selectedFileObjects;
 
-    /** Number of data quantities used to configure a data source */
-    private static int numberOfSelectedDataQuantities;
-    /** Number of all available data quantities */
-    private static int numberOfAvailableDataQuantities;
-    /** List holding all available data quantities */
-    private List<DataQuantity> availableDataQuantities;
-    /** List holding selected data quantities */
-    private List<DataQuantity> selectedDataQuantities;
-
-    /** Number of products used to configure a data source */
-    private static int numberOfSelectedProducts;
-    /** Number of all available products */
-    private static int numberOfAvailableProducts;
-    /** List holding all available products */
-    private List<Product> availableProducts;
-    /** List holding selected products */
-    private List<Product> selectedProducts;
-
-    /** List holding all available product parameters */
-    private List<ProductParameter> availableProductParameters;
-    /** Hash map storing product parameters values*/
-    private HashMap<String, String> selectedProductParameterValues;
-
-    
+    /** Number of users allowed to use this data source */
+    private static int numSelectedUsers;
+    /** List holding selected users */
+    private List<User> selectedUsers;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
@@ -329,15 +253,15 @@ public class SaveDataSourceController extends MultiActionController {
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
         dataSourceManager = new DataSourceManager();
         //
-        channelManager = new RadarManager();
-        //availableRadars = channelManager.getChannels();
-        //numAvailableRadars = availableRadars.size();
+        radarManager = new RadarManager();
         selectedRadars = new ArrayList<Radar>();
         numSelectedRadars = 0;
         //
+        fileObjectManager = new FileObjectManager();
+        selectedFileObjects = new ArrayList<FileObject>();
+        numSelectedFileObjects = 0;
+        //
         userManager = new UserManager();
-        //availableUsers = userManager.getUsers();
-        //numAvailableUsers = availableUsers.size();
         selectedUsers = new ArrayList<User>();
         numSelectedUsers = 0;
     }
@@ -357,6 +281,7 @@ public class SaveDataSourceController extends MultiActionController {
             // Clear the lists
             selectedRadars.clear();
             selectedUsers.clear();
+            selectedFileObjects.clear();
             // Recover data source parameters for modification
             String dataSourceName = request.getParameter( DS_NAME_KEY );
             try {
@@ -364,11 +289,21 @@ public class SaveDataSourceController extends MultiActionController {
                 dsName = dataSource.getName();
                 dsDescription = dataSource.getDescription();
                 setDSNameModel( modelAndView );
+                // Recover radars parameter
                 List<Integer> radarIds = dataSourceManager.getRadarIds( dataSource.getId() );
                 for( int i = 0; i < radarIds.size(); i++ ){
-                    selectedRadars.add( channelManager.getChannel( radarIds.get( i ) ) );
+                    selectedRadars.add( radarManager.getChannel( radarIds.get( i ) ) );
                 }
                 numSelectedRadars = selectedRadars.size();
+                // Recover file objects parameter
+                List<Integer> fileObjectIds = dataSourceManager.getFileObjectIds(
+                        dataSource.getId() );
+                for( int i = 0; i < fileObjectIds.size(); i++ ) {
+                    selectedFileObjects.add( fileObjectManager.getFileObject(
+                            fileObjectIds.get( i ) ) );
+                }
+                numSelectedFileObjects = selectedFileObjects.size();
+                // Recover users parameter
                 List<Integer> userIds = dataSourceManager.getUserIds( dataSource.getId() );
                 for( int i = 0; i< userIds.size(); i++ ){
                     selectedUsers.add( userManager.getUserById( userIds.get( i ) ) );
@@ -421,13 +356,14 @@ public class SaveDataSourceController extends MultiActionController {
         return modelAndView;
     }
     /**
-     * Renders users selection page.
+     * Renders file object selection page.
      *
      * @param request Current HTTP request
      * @param response Current HTTP response
      * @return The prepared model and view
      */
-    public ModelAndView dsSaveUsers( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView dsSaveFileObjects( HttpServletRequest request,
+            HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         // Get parameter map
         Map parameterMap = request.getParameterMap();
@@ -447,7 +383,7 @@ public class SaveDataSourceController extends MultiActionController {
         }
         // Go to next page
         if( parameterMap.containsKey( DS_NEXT_BUTTON_KEY ) ) {
-            modelAndView.setViewName( DS_SAVE_USERS_VIEW );
+            modelAndView.setViewName( DS_SAVE_FILE_OBJECTS_VIEW );
         }
         // Go to previous page
         if( parameterMap.containsKey( DS_BACK_BUTTON_KEY ) ) {
@@ -458,6 +394,43 @@ public class SaveDataSourceController extends MultiActionController {
         if( selectedRadars.size() == 0 ) {
             modelAndView.setViewName( DS_SAVE_RADARS_VIEW );
             modelAndView.addObject( DS_SELECT_RADARS_ERROR_KEY, DS_SELECT_RADARS_ERROR_MSG );
+            setDSRadarsModel( modelAndView );
+        }
+        setDSFileObjectsModel( modelAndView );
+        return modelAndView;
+    }
+    /**
+     * Renders users selection page.
+     *
+     * @param request Current HTTP request
+     * @param response Current HTTP response
+     * @return The prepared model and view
+     */
+    public ModelAndView dsSaveUsers( HttpServletRequest request, HttpServletResponse response ) {
+        ModelAndView modelAndView = new ModelAndView();
+        // Get parameter map
+        Map parameterMap = request.getParameterMap();
+        String[] parameterValues = null;
+        // Add file object
+        if( parameterMap.containsKey( DS_ADD_FILE_OBJECT_KEY ) ) {
+            parameterValues = ( String[] )parameterMap.get( DS_FILE_OBJECTS_LIST_KEY );
+            addSelectedFileObject( parameterValues[ 0 ] );
+            modelAndView.setViewName( DS_SAVE_FILE_OBJECTS_VIEW );
+            setDSFileObjectsModel( modelAndView );
+        }
+        // Remove file object
+        if( parameterMap.containsKey( DS_REMOVE_FILE_OBJECT_KEY ) ) {
+            removeSelectedFileObject();
+            modelAndView.setViewName( DS_SAVE_FILE_OBJECTS_VIEW );
+            setDSFileObjectsModel( modelAndView );
+        }
+        // Go to next page
+        if( parameterMap.containsKey( DS_NEXT_BUTTON_KEY ) ) {
+            modelAndView.setViewName( DS_SAVE_USERS_VIEW );
+        }
+        // Go to previous page
+        if( parameterMap.containsKey( DS_BACK_BUTTON_KEY ) ) {
+            modelAndView.setViewName( DS_SAVE_RADARS_VIEW );
             setDSRadarsModel( modelAndView );
         }
         setDSUsersModel( modelAndView );
@@ -493,12 +466,13 @@ public class SaveDataSourceController extends MultiActionController {
             modelAndView.setViewName( DS_SAVE_SUMMARY_VIEW );
             setDSNameModel( modelAndView );
             setDSRadarsModel( modelAndView );
+            setDSFileObjectsModel( modelAndView );
             setDSUsersModel( modelAndView );
         }
         // Go to previous page
         if( parameterMap.containsKey( DS_BACK_BUTTON_KEY ) ) {
-            modelAndView.setViewName( DS_SAVE_RADARS_VIEW );
-            setDSRadarsModel( modelAndView );
+            modelAndView.setViewName( DS_SAVE_FILE_OBJECTS_VIEW );
+            setDSFileObjectsModel( modelAndView );
         }
         // At least one user has to be selected
         if( selectedUsers.size() == 0 ) {
@@ -533,25 +507,33 @@ public class SaveDataSourceController extends MultiActionController {
                     coreFilterManager.remove( filter );
                 }
                 if( saved > 0 ) {
-                    // Initialize filter
-                    AttributeFilter sourceFilter = new AttributeFilter();
-                    sourceFilter.setAttribute( DS_SOURCE_ATTR_STR );
-                    sourceFilter.setValueType( AttributeFilter.ValueType.STRING );
-                    sourceFilter.setOperator( AttributeFilter.Operator.IN );
-
-                    // Save data source radars
+                    // Create radars parameter
                     int dsId = ( dataSourceManager.getDataSource( dsName ) ).getId();
                     dataSourceManager.deleteRadars( dsId );
                     String wmoAttrValue = "";
                     for( int i = 0; i < selectedRadars.size(); i++ ) {
                         String radarName = selectedRadars.get( i ).getChannelName();
-                        int radarId = ( channelManager.getChannel( radarName ) ).getId();
-                        String wmoNumber = ( channelManager.getChannel( radarName ) ).getWmoNumber();
+                        int radarId = ( radarManager.getChannel( radarName ) ).getId();
+                        String wmoNumber = ( radarManager.getChannel( radarName ) ).getWmoNumber();
                         dataSourceManager.saveRadar( dsId, radarId );
-                        // Set filter values
+                        // Set filter value
                         wmoAttrValue += wmoNumber + ",";
                     }
+                    // Create file objects parameter
+                    dataSourceManager.deleteFileObjects( dsId );
+                    String fileObjectAttrValue = "";
+                    for( int i = 0; i < selectedFileObjects.size(); i++ ) {
+                        String fileObject = selectedFileObjects.get( i ).getFileObject();
+                        int fileObjectId = ( fileObjectManager.getFileObject( fileObject ) ).getId();
+                        dataSourceManager.saveFileObject( dsId, fileObjectId );
+                        // Set filter value
+                        fileObjectAttrValue += fileObject + ",";
+                    }
                     wmoAttrValue = wmoAttrValue.substring( 0, wmoAttrValue.lastIndexOf( "," ) );
+                    if( !fileObjectAttrValue.isEmpty() ) {
+                        fileObjectAttrValue = fileObjectAttrValue.substring( 0,
+                            fileObjectAttrValue.lastIndexOf( ",") );
+                    }
                     // Save data source users
                     dataSourceManager.deleteUsers( dsId );
                     for( int i = 0; i < selectedUsers.size(); i++ ) {
@@ -559,11 +541,29 @@ public class SaveDataSourceController extends MultiActionController {
                         int userId = ( userManager.getUserByName( userName ) ).getId();
                         dataSourceManager.saveUser( dsId, userId );
                     }
-                    sourceFilter.setValue( wmoAttrValue );
+                    // Configure filters
+                    CombinedFilter combinedFilter = new CombinedFilter();
+                    combinedFilter.setMatchType( CombinedFilter.MatchType.ALL );
+                    AttributeFilter sourceFilter = new AttributeFilter();
+                    if( !wmoAttrValue.isEmpty() ) {
+                        sourceFilter.setAttribute( DS_SOURCE_ATTR_STR );
+                        sourceFilter.setValueType( AttributeFilter.ValueType.STRING );
+                        sourceFilter.setOperator( AttributeFilter.Operator.IN );
+                        sourceFilter.setValue( wmoAttrValue );
+                        combinedFilter.addChildFilter( sourceFilter );
+                    }
+                    AttributeFilter fileObjectFilter = new AttributeFilter();
+                    if( !fileObjectAttrValue.isEmpty() ) {
+                        fileObjectFilter.setAttribute( DS_OBJECT_ATTR_STR );
+                        fileObjectFilter.setValueType( AttributeFilter.ValueType.STRING );
+                        fileObjectFilter.setOperator( AttributeFilter.Operator.IN );
+                        fileObjectFilter.setValue( fileObjectAttrValue );
+                        combinedFilter.addChildFilter( fileObjectFilter );
+                    }
                     // Save filter
-                    coreFilterManager.store( sourceFilter );
+                    coreFilterManager.store( combinedFilter );
                     dataSourceManager.deleteFilters( dsId );
-                    dataSourceManager.saveFilter( dsId, sourceFilter.getId() );
+                    dataSourceManager.saveFilter( dsId, combinedFilter.getId() );
                 }
                 String msg = "Data source successfully saved: " + dataSource.getName();
                 modelAndView.addObject( OK_MSG_KEY, msg );
@@ -602,10 +602,22 @@ public class SaveDataSourceController extends MultiActionController {
      * @param modelAndView ModelAndView to be filled
      */
     private void setDSRadarsModel( ModelAndView modelAndView ) {
-        modelAndView.addObject( DS_AVAILABLE_RADARS_KEY, channelManager.getChannels() );
-        modelAndView.addObject( DS_NUM_AVAILABLE_RADARS_KEY, channelManager.getChannels().size() );
+        modelAndView.addObject( DS_AVAILABLE_RADARS_KEY, radarManager.getChannels() );
+        modelAndView.addObject( DS_NUM_AVAILABLE_RADARS_KEY, radarManager.getChannels().size() );
         modelAndView.addObject( DS_SELECTED_RADARS_KEY, selectedRadars );
         modelAndView.addObject( DS_NUM_SELECTED_RADARS_KEY, numSelectedRadars );
+    }
+    /**
+     * Fills ModelAndView with file objects parameters.
+     *
+     * @param modelAndView ModelAndView to be filled
+     */
+    private void setDSFileObjectsModel( ModelAndView modelAndView ) {
+        modelAndView.addObject( DS_AVAILABLE_FILE_OBJECTS_KEY, fileObjectManager.getFileObjects() );
+        modelAndView.addObject( DS_NUM_AVAILABLE_FILE_OBJECTS_KEY,
+                fileObjectManager.getFileObjects().size() );
+        modelAndView.addObject( Ds_SELECTED_FILE_OBJECTS_KEY, selectedFileObjects );
+        modelAndView.addObject( DS_NUM_SELECTED_FILE_OBJECTS_KEY, numSelectedFileObjects );
     }
     /**
      * Fills ModelAndView with users.
@@ -625,6 +637,9 @@ public class SaveDataSourceController extends MultiActionController {
         selectedRadars.clear();
         numSelectedRadars = 0;
         //
+        selectedFileObjects.clear();
+        numSelectedFileObjects = 0;
+        //
         selectedUsers.clear();
         numSelectedUsers = 0;
     }
@@ -634,11 +649,11 @@ public class SaveDataSourceController extends MultiActionController {
      * @param radarName Radar station name
      */
     private  void addSelectedRadar( String radarName ) {
-        if( numSelectedRadars < channelManager.getChannels().size() &&
+        if( numSelectedRadars < radarManager.getChannels().size() &&
                 !radarName.equals( DEFAULT_LIST_OPTION_KEY ) ) {
-            if( !selectedRadars.contains( channelManager.getChannel( radarName ) ) ) {
+            if( !selectedRadars.contains( radarManager.getChannel( radarName ) ) ) {
                 ++numSelectedRadars;
-                selectedRadars.add( channelManager.getChannel( radarName ) );
+                selectedRadars.add( radarManager.getChannel( radarName ) );
             }
         }
     }
@@ -649,6 +664,29 @@ public class SaveDataSourceController extends MultiActionController {
         if( numSelectedRadars > 0 ) {
             selectedRadars.remove( selectedRadars.size() - 1 );
             --numSelectedRadars;
+        }
+    }
+    /**
+     * Increments number of file objects used to configure data source.
+     *
+     * @param fileObject File object identifier
+     */
+    private  void addSelectedFileObject( String fileObject ) {
+        if( numSelectedFileObjects < fileObjectManager.getFileObjects().size() &&
+                !fileObject.equals( DEFAULT_LIST_OPTION_KEY ) ) {
+            if( !selectedFileObjects.contains( fileObjectManager.getFileObject( fileObject ) ) ) {
+                ++numSelectedFileObjects;
+                selectedFileObjects.add( fileObjectManager.getFileObject( fileObject ) );
+            }
+        }
+    }
+    /**
+     * Decrements number of file objects used to configure data source.
+     */
+    private void removeSelectedFileObject() {
+        if( numSelectedFileObjects > 0 ) {
+            selectedFileObjects.remove( selectedFileObjects.size() - 1 );
+            --numSelectedFileObjects;
         }
     }
     /**
@@ -675,31 +713,7 @@ public class SaveDataSourceController extends MultiActionController {
         }
     }
 
-   
     /*
-     * Increments number of file objects used to configure data source.
-     *
-     * @param fileObject File object identifier
-     *
-    public void addSelectedFileObject( String fileObject ) {
-        if( numberOfSelectedFileObjects < numberOfAvailableFileObjects &&
-                !fileObject.equals( DEFAULT_LIST_OPTION_KEY ) ) {
-            if( !selectedFileObjects.contains( fileObjectManager.getFileObject( fileObject ) ) ) {
-                ++numberOfSelectedFileObjects;
-                selectedFileObjects.add( fileObjectManager.getFileObject( fileObject ) );
-            }
-        }
-    }
-    /**
-     * Decrements number of file objects used to configure data source.
-     *
-    public void removeSelectedFileObject() {
-        if( numberOfSelectedFileObjects > 0 ) {
-            selectedFileObjects.remove( selectedFileObjects.size() - 1 );
-            --numberOfSelectedFileObjects;
-        }
-    }
-    /**
      * Increments number of data quantities used to configure data source.
      *
      * @param dataQuantity Data quantity identifier

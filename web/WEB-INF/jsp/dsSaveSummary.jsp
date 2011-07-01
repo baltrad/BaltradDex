@@ -47,7 +47,7 @@ Author     : szewczenko
                     </div>
                     <div class="right">
                         <div class="blttitle">
-                            Configure data source <div class="stepno">Step 4</div>
+                            Configure data source <div class="stepno">Step 5</div>
                         </div>
                         <div class="blttext">
                             Configuration summary
@@ -58,40 +58,63 @@ Author     : szewczenko
                         <div class="table">
                             <div class="dssave">
                                 <form method="post" action="dsSave.htm">
-                                    <div class="leftcol">
-                                        <div class="row">Data source name</div>
-                                        <div class="row">Description</div>
-                                        <div class="row">Radar stations</div>
-                                        <div class="row">Users allowed</div>
-                                    </div>
-                                    <div class="rightcol">
-                                        <div class="row">
+                                    <div class="row">
+                                        <div class="leftcol">Data source name</div>
+                                        <div class="rightcol">
                                             <c:out value="${dsName}"></c:out>
                                         </div>
-                                        <div class="row">
+                                    </div>
+                                    <div class="row">
+                                        <div class="leftcol">Description</div>
+                                        <div class="rightcol">
                                             <c:out value="${dsDescription}"></c:out>
                                         </div>
-                                        <div class="row">
-                                            <c:forEach items="${selectedRadars}" var="radar">
-                                                <div class="dsparam">
-                                                    <c:out value="${radar.channelName}"></c:out>
-                                                    &nbsp;
-                                                    WMO number: <c:out value="${radar.wmoNumber}"></c:out>
-                                                    &nbsp;
-                                                </div>
-                                            </c:forEach>
-                                        </div>
-                                        <div class="row">
-                                            <c:forEach items="${selectedUsers}" var="user">
-                                                <div class="dsparam">
-                                                    Name:&nbsp;<c:out value="${user.name}"></c:out>&nbsp;
-                                                    Role: <c:out value="${user.roleName}"></c:out>
-                                                    &nbsp;Organization:
-                                                    <c:out value="${user.factory}"></c:out>
-                                                </div>
-                                            </c:forEach>
-                                        </div>
                                     </div>
+                                    <c:if test="${not empty selectedRadars}">
+                                        <div class="row">
+                                            <div class="leftcol">Radar stations</div>
+                                            <div class="rightcol">
+                                                <c:forEach items="${selectedRadars}" var="radar">
+                                                    <div class="dsparam">
+                                                        <c:out value="${radar.channelName}"></c:out>
+                                                        &nbsp;
+                                                        WMO number: <c:out value="${radar.wmoNumber}"></c:out>
+                                                        &nbsp;
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                        </div>
+                                    </c:if>
+                                    <c:if test="${not empty selectedFileObjects}">
+                                        <div class="row">
+                                            <div class="leftcol">File objects</div>
+                                            <div class="rightcol">
+                                                <c:forEach items="${selectedFileObjects}" var="fobject">
+                                                    <div class="dsparam">
+                                                        <c:out value="${fobject.fileObject}"></c:out>
+                                                        &nbsp;
+                                                        <c:out value="${fobject.description}"></c:out>
+                                                        &nbsp;
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                        </div>
+                                    </c:if>
+                                    <c:if test="${not empty selectedUsers}">
+                                        <div class="row">
+                                            <div class="leftcol">Users allowed</div>
+                                            <div class="rightcol">
+                                                <c:forEach items="${selectedUsers}" var="user">
+                                                    <div class="dsparam">
+                                                        Name:&nbsp;<c:out value="${user.name}"></c:out>&nbsp;
+                                                        Role: <c:out value="${user.roleName}"></c:out>
+                                                        &nbsp;Organization:
+                                                        <c:out value="${user.factory}"></c:out>
+                                                    </div>
+                                                </c:forEach>
+                                            </div>
+                                        </div>
+                                    </c:if>
                                     <div class="tablefooter">
                                         <div class="buttons">
                                            <button class="rounded" type="submit" name="backButton">
