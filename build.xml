@@ -270,7 +270,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <!-- compile source files -->
   <target name="compile" depends="init">
     <javac encoding="8859_1" srcdir="${src.dir}" deprecation="on"
-             destdir="${build.classes.dir}">
+           destdir="${build.classes.dir}"
+	   debug="${compile.debug}">
       <include name="**/*.java"/>
       <classpath refid="lib.path"/>
     </javac>

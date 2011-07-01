@@ -28,6 +28,7 @@
   <servlet-mapping>
     <servlet-name>baltraddex</servlet-name>
     <url-pattern>*.htm</url-pattern>
+    <url-pattern>*.json</url-pattern>
   </servlet-mapping>
   <session-config>
     <session-timeout>

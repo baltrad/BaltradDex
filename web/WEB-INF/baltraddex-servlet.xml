@@ -892,6 +892,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="bdbTrimAgeRoutesController" class="eu.baltrad.beastui.web.controller.BdbTrimAgeRoutesController" autowire="byType" />
     <bean id="bdbTrimCountRoutesController" class="eu.baltrad.beastui.web.controller.BdbTrimCountRoutesController" autowire="byType" />
     <bean id="showRoutesController" class="eu.baltrad.beastui.web.controller.ShowRoutesController" autowire="byType" />
+    <bean id="filterController" class="eu.baltrad.beastui.web.controller.FilterController" autowire="byType" />
     
     <bean id="schedulerController" class="eu.baltrad.beastui.web.controller.SchedulerController" autowire="byType" />
 
