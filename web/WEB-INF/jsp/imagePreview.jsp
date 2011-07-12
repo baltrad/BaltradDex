@@ -21,7 +21,6 @@ Created on : Dec 10, 2010, 10:14 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
-<!--%@page contentType="text/html" pageEncoding="UTF-8"%-->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -45,7 +44,7 @@ Author     : szewczenko
         <title>Baltrad | Data preview</title>
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
         <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-        <script type="text/javascript" src="includes/slider.js"></script>
+        <script type="text/javascript" src="includes/js/slider.js"></script>
         <script type="text/javascript">
 
             RadarOverlay.prototype = new google.maps.OverlayView();

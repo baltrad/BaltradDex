@@ -86,6 +86,7 @@ public class BltImagePreviewController implements Controller {
             throws ServletException, IOException {
         // get dataset metadata
         String fileUuid = request.getParameter( "file_uuid" );
+        String fileObject = request.getParameter( "file_object" );
         String datasetPath = request.getParameter( "dataset_path" );
         String datasetWhere = request.getParameter( "dataset_where" );
         String datasetWidth = request.getParameter( "dataset_width" );
@@ -102,13 +103,21 @@ public class BltImagePreviewController implements Controller {
             + datasetPath.replaceAll( BltDataProcessor.H5_PATH_SEPARATOR, "_" ) +
             BltDataProcessor.IMAGE_FILE_EXT;
         File imageFile = new File( filePath );
-
-
         if( !imageFile.exists() ) {
-            bltDataProcessorController.createImage( FileCatalogConnector.getDataStorageDirectory()
-            + File.separator + fileUuid + BltDataProcessor.H5_FILE_EXT, datasetPath, datasetWhere,
-            Integer.parseInt( datasetWidth ), ( short )0, 1.0f, IMAGE_RANGE_RINGS_COLOR,
+            // Create image from SCAN or PVOL
+            if( fileObject.equals( BltDataProcessor.ODIMH5_SCAN_OBJ ) || fileObject.equals(
+                    BltDataProcessor.ODIMH5_PVOL_OBJ ) ) {
+                bltDataProcessorController.polarH5Dataset2Image(
+                    FileCatalogConnector.getDataStorageDirectory() + File.separator + fileUuid +
+                    BltDataProcessor.H5_FILE_EXT, datasetPath, datasetWhere,
+                    Integer.parseInt( datasetWidth ), ( short )0, 1.0f, IMAGE_RANGE_RINGS_COLOR,
                     IMAGE_RANGE_MASK_COLOR, filePath );
+            }
+            // Create image from Cartesian IMAGE object
+            if( fileObject.equals( BltDataProcessor.ODIMH5_IMAGE_OBJ ) ) {
+                // ... to be implemented ...
+            }
+            // ... other objects will come here ...
         }
         // reconstruct image URL
         StringBuffer requestURL = request.getRequestURL();

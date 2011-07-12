@@ -30,8 +30,6 @@ import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 
-import eu.baltrad.fc.FileCatalog;
-
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.Group;
 
@@ -86,7 +84,6 @@ public class BltFileDetailsController implements Controller {
     private BltDataProjector bltDataProjector;
     private BltFileManager bltFileManager;
     private BltDataProcessorController bltDataProcessorController;
-    private static FileCatalog fc;
     private String successView;
     private Logger log;
 //------------------------------------------------------------------------------------------ Methods
@@ -110,32 +107,58 @@ public class BltFileDetailsController implements Controller {
         String uuid = request.getParameter( FC_FILE_UUID );
         // get file from the database
         BltFile bltFile = bltFileManager.getFileEntry( uuid );
+        // Determine data type
+        String fileObject = bltFile.getType();
         // open file from storage dir
         String filePath = FileCatalogConnector.getDataStorageDirectory() + File.separator + uuid 
                 + BltDataProcessor.H5_FILE_EXT;
         H5File h5File = bltDataProcessor.openH5File( filePath );
+        HashMap model = new HashMap();
+        // Process the file depending on file object / data type
+        // SCANs and PVOLs
+        if( fileObject.equals( BltDataProcessor.ODIMH5_SCAN_OBJ ) || fileObject.equals(
+                BltDataProcessor.ODIMH5_PVOL_OBJ ) ) {
+            model = processPolarData( bltFile, h5File, uuid );
+        }
+        // IMAGEs
+        if( fileObject.equals( BltDataProcessor.ODIMH5_IMAGE_OBJ ) ) {
+            model = processCartesianData( bltFile, h5File, uuid );
+        }
+
+        // ... other file objects to be implemented here ...
+
+        return new ModelAndView( getSuccessView(), FILE_DETAILS_KEY, model );
+    }
+    /**
+     * Wrapper method processing polar data - SCANs and PVOLs
+     * 
+     * @param bltFile File entry from the File Catalog
+     * @param h5File HDF5 file object
+     * @param uuid Unique file entry ID
+     * @return HashMap holding file entry and extracted datasets
+     */
+    public HashMap processPolarData( BltFile bltFile, H5File h5File, String uuid ) {
         // process the file
         Group root = bltDataProcessor.getH5Root( h5File );
         // get dataset full names
         bltDataProcessor.getH5Datasets( root );
         List<String> datasetFullNames = bltDataProcessor.getDatasetFullNames();
-
         // dataset objects holds file's metadata
         List<BltDataset> bltDatasets = new ArrayList<BltDataset>();
 
         // get radar location latitude
         bltDataProcessor.getH5Attribute( root, BltDataProcessor.H5_PATH_SEPARATOR +
-                BltDataProcessor.H5_WHERE_GROUP_PREFIX, BltDataProcessor.H5_LAT_0_ATTR,
-                BltDataProcessor.H5_DOUBLE_ATTR );
-        double[] lat0_val = ( double[] )bltDataProcessor.getDoubleAttribute().getValue();
+                BltDataProcessor.H5_WHERE_GROUP_PREFIX, BltDataProcessor.H5_LAT_0_ATTR );
+        double lat0_val = ( Double )bltDataProcessor.getAttributeValue();
+
         // get radar location longitude
         bltDataProcessor.getH5Attribute( root, BltDataProcessor.H5_PATH_SEPARATOR +
-                BltDataProcessor.H5_WHERE_GROUP_PREFIX, BltDataProcessor.H5_LON_0_ATTR,
-                BltDataProcessor.H5_DOUBLE_ATTR );
-        double[] lon0_val = ( double[] )bltDataProcessor.getDoubleAttribute().getValue();
+                BltDataProcessor.H5_WHERE_GROUP_PREFIX, BltDataProcessor.H5_LON_0_ATTR );
+        double lon0_val = ( Double )bltDataProcessor.getAttributeValue();
+
         // initialize projection
-        String[] projParms = new String[] { "+proj=" + PROJ4_PROJ_CODE, "+lat_0=" + lat0_val[ 0 ],
-            "+lon_0=" + lon0_val[ 0 ], "+ellps=" + PROJ4_ELLPS_CODE, "+a=" + EARTH_RADIUS };
+        String[] projParms = new String[] { "+proj=" + PROJ4_PROJ_CODE, "+lat_0=" + lat0_val,
+            "+lon_0=" + lon0_val, "+ellps=" + PROJ4_ELLPS_CODE, "+a=" + EARTH_RADIUS };
         int res = BltDataProjector.initializeProjection( projParms );
         if( res == 1 ) {
             log.error( "Failed to initialize projection" );
@@ -158,23 +181,24 @@ public class BltFileDetailsController implements Controller {
                     }
                 }
                 // get data quantity
-                bltDataProcessor.getH5Attribute( root, whatGroup, BltDataProcessor.H5_QUANTITY_ATTR,
-                        BltDataProcessor.H5_STR_ATTR );
-                String[] quantity_val = ( String[] )bltDataProcessor.getStringAttribute().getValue();
+                bltDataProcessor.getH5Attribute( root, whatGroup,
+                        BltDataProcessor.H5_QUANTITY_ATTR );
+                String quantity_val = ( String )bltDataProcessor.getAttributeValue();
+
                 // get elevation angles
-                bltDataProcessor.getH5Attribute( root, whereGroup, BltDataProcessor.H5_ELANGLE_ATTR,
-                        BltDataProcessor.H5_DOUBLE_ATTR );
-                double[] elangle_val = ( double[] )bltDataProcessor.getDoubleAttribute().getValue();
+                bltDataProcessor.getH5Attribute( root, whereGroup, BltDataProcessor.H5_ELANGLE_ATTR );
+                double elangle_val = ( Double )bltDataProcessor.getAttributeValue();
+
                 // get number of range bins
-                bltDataProcessor.getH5Attribute( root, whereGroup, BltDataProcessor.H5_NBINS_ATTR,
-                        BltDataProcessor.H5_LONG_ATTR );
-                long[] nbins_val = ( long[] )bltDataProcessor.getLongAttribute().getValue();
+                bltDataProcessor.getH5Attribute( root, whereGroup, BltDataProcessor.H5_NBINS_ATTR );
+                long nbins_val = ( Long )bltDataProcessor.getAttributeValue();
+
                 // retrieve data domain coordinates
-                bltDataProcessor.getH5Attribute( root, whereGroup, BltDataProcessor.H5_RSCALE_ATTR,
-                        BltDataProcessor.H5_DOUBLE_ATTR );
-                double[] rscale_val = ( double[] )bltDataProcessor.getDoubleAttribute().getValue();
+                bltDataProcessor.getH5Attribute( root, whereGroup, BltDataProcessor.H5_RSCALE_ATTR );
+                double rscale_val = ( Double )bltDataProcessor.getAttributeValue();
+
                 // scale - in meters
-                double range = rscale_val[ 0 ] * nbins_val[ 0 ];
+                double range = rscale_val * nbins_val;
                 Point2D.Double llXY = new Point2D.Double( -range, -range );
                 Point2D.Double llLatLon = BltDataProjector.pointXY2Geo( llXY );
                 Point2D.Double urXY = new Point2D.Double( range, range );
@@ -182,9 +206,9 @@ public class BltFileDetailsController implements Controller {
 
                 // create dataset objects
                 BltDataset bltDataset = new BltDataset( datasetFullNames.get( i ),
-                    whereGroup, quantity_val[ 0 ], nbins_val[ 0 ] * 2, nbins_val[ 0 ] * 2,
-                    lat0_val[ 0 ], lon0_val[ 0 ], llLatLon.getY(), llLatLon.getX(), urLatLon.getY(),
-                    urLatLon.getX(), elangle_val[ 0 ], InitAppUtil.getThumbsStorageFolder() +
+                    whereGroup, quantity_val, nbins_val * 2, nbins_val * 2,
+                    lat0_val, lon0_val, llLatLon.getY(), llLatLon.getX(), urLatLon.getY(),
+                    urLatLon.getX(), elangle_val, InitAppUtil.getThumbsStorageFolder() +
                     File.separator + uuid + datasetFullNames.get( i ).replaceAll(
                         BltDataProcessor.H5_PATH_SEPARATOR, "_" ) + BltDataProcessor.IMAGE_FILE_EXT );
 
@@ -199,7 +223,7 @@ public class BltFileDetailsController implements Controller {
                 // generate image thumbs
                 File thumb = new File( thumbPath );
                 if( !thumb.exists() ) {
-                    bltDataProcessorController.createImage( h5File,
+                    bltDataProcessorController.polarH5Dataset2Image( h5File,
                     datasetFullNames.get( i ).toString(), whereGroup, THUMB_IMAGE_SIZE,
                     THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE, THUMB_RANGE_RINGS_COLOR,
                     THUMB_RANGE_MASK_COLOR, thumbPath );
@@ -218,7 +242,19 @@ public class BltFileDetailsController implements Controller {
         HashMap model = new HashMap();
         model.put( BLT_DATASETS_KEY, bltDatasets );
         model.put( BLT_FILE_KEY, bltFile );
-        return new ModelAndView( getSuccessView(), FILE_DETAILS_KEY, model );
+        return model;
+    }
+    /**
+     * Wrapper method processing Cartesian data - IMAGEs
+     *
+     * @param bltFile File entry from the File Catalog
+     * @param h5File HDF5 file object
+     * @param uuid Unique file entry ID
+     * @return HashMap holding file entry and extracted dataset
+     */
+    public HashMap processCartesianData( BltFile bltFile, H5File h5File, String uuid ) {
+        // ... to be implemented ...
+        return null;
     }
     /**
      * Gets reference to BltDataProcessor object.

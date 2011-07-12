@@ -22,7 +22,7 @@ Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
@@ -43,7 +43,7 @@ Author     : szewczenko
     String uuid = bltFile.getUuid();
     String fileName = bltFile.getPath().substring( bltFile.getPath().lastIndexOf( File.separator )
             + 1, bltFile.getPath().length() );
-    String source = bltFile.getRadarName();
+    String source = bltFile.getSource();
     SimpleDateFormat dateTimeFormat = new SimpleDateFormat( "MMM d, yyyy HH:mm:ss" );
     String storageTime = dateTimeFormat.format( bltFile.getStorageTime() );
     SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
@@ -60,135 +60,150 @@ Author     : szewczenko
         <title>Baltrad | File details</title>
     </head>
     <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
+        <div id="bltcontainer">
+            <div id="bltheader">
+                <script type="text/javascript" src="includes/js/header.js"></script>
             </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
+            <div id="bltmain">
+                <div id="tabs">
+                    <%@include file="/WEB-INF/jsp/homeTab.jsp"%>
                 </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
+                <div id="tabcontent">
+                    <div class="left">
+                        <%@include file="/WEB-INF/jsp/homeMenu.jsp"%>
+                    </div>
+                    <div class="right">
+                        <div class="blttitle">
                             File details
                         </div>
-                        <div class="right">
+                        <div class="blttext">
+                            Detailed information about data file.
                         </div>
-                    </div>
-                        <div id="text-box">
-                            Detailed data file information.
+                        <div class="table">
+                            <div class="leftcol">
+                                <div class="row">
+                                    File:
+                                </div>
+                                <div class="row">
+                                    Date:
+                                </div>
+                                <div class="row">
+                                    Time:
+                                </div>
+                                <div class="row">
+                                    Source:
+                                </div>
+                                <div class="row">
+                                    Data type:
+                                </div>
+                                <div class="row">
+                                    Storage time:
+                                </div>
+                            </div>
+                            <div class="rightcol">
+                                <div class="row">
+                                    <%=fileName%>
+                                </div>
+                                <div class="row">
+                                    <%=dateStr%>
+                                </div>
+                                <div class="row">
+                                    <%=timeStr%>
+                                </div>
+                                <div class="row">
+                                    <%=source%>
+                                </div>
+                                <div class="row">
+                                    <%=type%>
+                                </div>
+                                <div class="row">
+                                    <%=storageTime%>
+                                </div>
+                            </div>
                         </div>
-                    <div id="table">
-                        <div class="left">
-                            <div class="row">File entry ID</div>
-                            <div class="row">File name</div>
-                            <div class="row">Storage time</div>
-                            <div class="row">Source</div>
-                            <div class="row">Date</div>
-                            <div class="row">Time</div>
-                            <div class="row">Data type</div>
-                        </div>
-                        <div class="right">
-                            <div class="row">
-                                <%=uuid%>
-                            </div>
-                            <div class="row">
-                                <%=fileName%>
-                            </div>
-                            <div class="row">
-                                <%=storageTime%>
-                            </div>
-                            <div class="row">
-                                <%=source%>
-                            </div>
-                            <div class="row">
-                                <%=dateStr%>
-                            </div>
-                            <div class="row">
-                                <%=timeStr%>
-                            </div>
-                            <div class="row">
-                                <%=type%>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="page-title">
-                        <div class="left">
+                        <div class="blttitle">
+                            <div class="break"></div>
                             Data preview
-                        </div>
-                        <div class="right">
-                        </div>
-                    </div>
-                    <c:choose>
-                        <c:when test="${not empty blt_datasets}">
-                            <div id="text-box">
-                                Click on selected image to preview data from a given dataset.
-                            </div>
-                            <div id="image-thumbs">
-                                <c:forEach var="dataset" items="${blt_datasets}">
-                                    <div id="thumb">
-                                        <div class="image">
-                                            <c:url var="imagePreviewURL" value="imagePreview.htm">
-                                                <c:param name="file_uuid"
-                                                        value="<%=bltFile.getUuid()%>" />
-                                                <c:param name="dataset_path"
-                                                        value="${dataset.name}"/>
-                                                <c:param name="dataset_where"
-                                                        value="${dataset.where}"/>
-                                                <c:param name="dataset_quantity"
-                                                        value="${dataset.quantity}"/>
-                                                <c:param name="dataset_width"
-                                                        value="${dataset.width}"/>
-                                                <c:param name="lat0" value="${dataset.lat0}"/>
-                                                <c:param name="lon0" value="${dataset.lon0}"/>
-                                                <c:param name="llLat" value="${dataset.llLat}"/>
-                                                <c:param name="llLon" value="${dataset.llLon}"/>
-                                                <c:param name="urLat" value="${dataset.urLat}"/>
-                                                <c:param name="urLon" value="${dataset.urLon}"/>
-                                            </c:url>
-                                            <a href="#" onClick="window.open(
-                                                    '<c:out value="${imagePreviewURL}"/>',
-                                                    'mywindow','width=${dataset.width},\n\
-                                                    height=${dataset.height}, left=100, top=100,\n\
-                                                    screenX=100, screenY=100')">
-                                                <img src="${dataset.thumbPath}" alt="no_thumb"/>
-                                            </a>
-                                        </div>
-                                        <div class="caption">
-                                            <c:out value="${dataset.elevationAngle}"></c:out>&deg;
-                                            <c:out value="${dataset.quantity}"></c:out>
-                                        </div>
+                        </div>    
+                        <c:choose>
+                            <c:when test="${not empty blt_datasets}">
+                                <div class="blttext">
+                                    Click thumbnail to view full-sized image.
+                                </div>
+                                <div class="table">
+                                    <div id="thumbnails">
+                                        <c:forEach var="dataset" items="${blt_datasets}">
+                                            <div class="thumb">
+                                                <div class="image">
+                                                    <c:url var="imagePreviewURL" value="imagePreview.htm">
+                                                        <c:param name="file_uuid"
+                                                                value="<%=bltFile.getUuid()%>"/>
+                                                        <c:param name="file_object"
+                                                                value="<%=bltFile.getType()%>"/>
+                                                        <c:param name="dataset_path"
+                                                                value="${dataset.name}"/>
+                                                        <c:param name="dataset_where"
+                                                                value="${dataset.where}"/>
+                                                        <c:param name="dataset_quantity"
+                                                                value="${dataset.quantity}"/>
+                                                        <c:param name="dataset_width"
+                                                                value="${dataset.width}"/>
+                                                        <c:param name="lat0" value="${dataset.lat0}"/>
+                                                        <c:param name="lon0" value="${dataset.lon0}"/>
+                                                        <c:param name="llLat" value="${dataset.llLat}"/>
+                                                        <c:param name="llLon" value="${dataset.llLon}"/>
+                                                        <c:param name="urLat" value="${dataset.urLat}"/>
+                                                        <c:param name="urLon" value="${dataset.urLon}"/>
+                                                    </c:url>
+                                                    <a href="#" onClick="window.open(
+                                                            '<c:out value="${imagePreviewURL}"/>',
+                                                            'mywindow','width=${dataset.width},\n\
+                                                            height=${dataset.height}, left=100, top=100,\n\
+                                                            screenX=100, screenY=100')">
+                                                        <img src="${dataset.thumbPath}" alt="no_thumb"/>
+                                                    </a>
+                                                </div>
+                                                <div class="caption">
+                                                    <c:out value="${dataset.elevationAngle}"></c:out>&deg;
+                                                    <c:out value="${dataset.quantity}"></c:out>
+                                                </div>
+                                            </div>
+                                        </c:forEach>
                                     </div>
-                                </c:forEach>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div id="text-box">
-                                No image thumbs found.
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-                    <div class="footer">
-                        <div class="right">
-                            <form action="radars.htm">
-                                <button class="rounded" type="button"
-                                    onclick="history.go(-1);">
-                                    <span>Back</span>
-                                </button>
-                            </form>
-                        </div>
+                                    <div class="tablefooter">
+                                        <form action="radars.htm">
+                                            <div class="buttons">
+                                               <button class="rounded" type="button" onclick="history.go(-1);">
+                                                    <span>Back</span>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="table">
+                                    <div class="blttext">
+                                        No image thumbnails found.
+                                    </div>
+                                    <div class="tablefooter">
+                                        <form action="radars.htm">
+                                            <div class="buttons">
+                                               <button class="rounded" type="button" onclick="history.go(-1);">
+                                                    <span>Back</span>
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
-                <div id="clear"></div>
             </div>
         </div>
-        <div id="footer">
+        <div id="bltfooter">
             <%@include file="/WEB-INF/jsp/footer.jsp"%>
         </div>
     </body>
 </html>
-
-
-
-

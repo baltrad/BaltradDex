@@ -27,6 +27,7 @@ import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.Dataset;
+import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Attribute;
 import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
 
@@ -80,10 +81,6 @@ public class BltDataProcessor {
     public static final String H5_LAT_0_ATTR = "lat";
      // radar location longitude
     public static final String H5_LON_0_ATTR = "lon";
-    // attribute classes
-    public static final String H5_LONG_ATTR = "h5_long_attr";
-    public static final String H5_DOUBLE_ATTR = "h5_double_attr";
-    public static final String H5_STR_ATTR = "h5_string_attr";
     // color table resolution
     private static int COLOR_TABLE_DEPTH = 256;
     // HDF5 path separator
@@ -94,16 +91,25 @@ public class BltDataProcessor {
     public static final String H5_WHAT_GROUP_PREFIX = "what";
     // HDF5 DATASET prefix
     public static final String H5_DATASET_PREFIX = "dataset";
+    // HDF5 data object types
+    public static final String ODIMH5_PVOL_OBJ = "PVOL"; // Polar volume
+    public static final String ODIMH5_CVOL_OBJ = "CVOL"; // Cartesian volume
+    public static final String ODIMH5_SCAN_OBJ = "SCAN"; // Polar scan
+    public static final String ODIMH5_RAY_OBJ = "RAY"; // Single polar ray
+    public static final String ODIMH5_AZIM_OBJ = "AZIM"; // Azimuthal object
+    public static final String ODIMH5_IMAGE_OBJ = "IMAGE"; // 2-D cartesian image
+    public static final String ODIMH5_COMP_OBJ = "COMP"; // Cartesian composite image(s)
+    public static final String ODIMH5_XSEC_OBJ = "XSEC"; // 2-D vertical cross section(s)
+    public static final String ODIMH5_VP_OBJ = "VP"; // 1-D vertical profile
+    public static final String ODIMH5_PIC_OBJ = "PIC"; // Embedded graphical image
 //---------------------------------------------------------------------------------------- Variables
+    /* Message logger */
     private Logger log;
-    // used to store HDF5 dataset
+    /* Used to store HDF5 dataset */
     private Dataset dataset;
-    // used to store HDF5 attributes
-    private Attribute h5LongAttr;
-    private Attribute h5DoubleAttr;
-    private Attribute h5StringAttr;
-    
-    // list of full dataset names
+    /* Used to store HDF5 attribute */
+    private Attribute attribute;
+    /* List of full dataset names */
     private List<String> datasetFullNames = new ArrayList<String>();
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -126,6 +132,7 @@ public class BltDataProcessor {
             h5File.open();
         } catch( Exception e ) {
             log.error( "Exception while opening HDF5 file: " + e.getMessage() );
+            e.printStackTrace();
         }
         return h5File;
     }
@@ -235,26 +242,13 @@ public class BltDataProcessor {
         }
     }
     /**
-     * Gets the root element of dataset path.
-     *
-     * @param datasetPath Full dataset path
-     * @param pathElemIndex Index of the path element
-     * @return First element of the dataset path
-     */
-    //public String getDatasetRoot( String datasetPath, short pathElemIndex ) {
-    //    String[] pathElems = datasetPath.split( H5_PATH_SEPARATOR );
-    //    return pathElems[ pathElemIndex ];
-    //}
-    /**
-     * Gets HDF5 attribute identified by path, name and class.
+     * Gets HDF5 attribute identified by path and name.
      *
      * @param root HDF5 file's root group
      * @param groupPath Path pointing to a given group
      * @param attributeName Attribute's name
-     * @param attributeClass Attribute's class
      */
-    public void getH5Attribute( Group root, String groupPath, String attributeName,
-            String attributeClass ) {
+    public void getH5Attribute( Group root, String groupPath, String attributeName ) {
         List members = root.getMemberList();
         for( int i=0; i< members.size(); i++ ) {
             if( members.get( i ) instanceof Group ) {
@@ -267,15 +261,7 @@ public class BltDataProcessor {
                         for( int j = 0; j < metadata.size(); j++ ) {
                             Attribute attr = ( Attribute )metadata.get( j );
                             if( attr.getName().equals( attributeName ) ) {
-                                if( attributeClass.equals( H5_LONG_ATTR ) ) {
-                                    setLongAttribute( attr );
-                                }
-                                if( attributeClass.equals( H5_DOUBLE_ATTR ) ) {
-                                    setDoubleAttribute( attr );
-                                }
-                                if( attributeClass.equals( H5_STR_ATTR ) ) {
-                                    setStringAttribute( attr );
-                                }
+                                setAttribute( attr );
                             }
                         }
                     } catch( Exception e ){
@@ -284,7 +270,7 @@ public class BltDataProcessor {
                     }
                 }
                 if( group.getMemberList().size() > 0 ) {
-                    getH5Attribute( group, groupPath, attributeName, attributeClass );
+                    getH5Attribute( group, groupPath, attributeName );
                 }
             }
         }
@@ -304,25 +290,17 @@ public class BltDataProcessor {
      * @param rangeRingsColor Range rings color string
      * @param rangeMaskColor Range mask color String
      * @return Scaled image
+     * @throws ArrayIndexOutOfBoundsException
      */
     public BufferedImage polarH5Dataset2Image( Dataset dataset, long nbins, long nrays, long a1gate,
             int size, Color[] colorPalette, short rangeRingsDistance, float rangeMaskStroke,
-            String rangeRingsColor, String rangeMaskColor ) {
-        byte[] byteBuff = null;
-        short[] shortBuff = null;
-
-        // allows to deal with both byte and short data types
+            String rangeRingsColor, String rangeMaskColor ) throws ArrayIndexOutOfBoundsException {
+        byte[] buff = null;
         try {
-            byteBuff = ( byte[] )dataset.read();
+            buff = ( byte[] )dataset.read();
         } catch( Exception e ) {
             log.error( "Failed to convert polar HDF5 dataset to image: " + e.getMessage() );
         }
-        try {
-            shortBuff = ( short[] )dataset.read();
-        } catch( Exception e ) {
-            log.error( "Failed to convert polar HDF5 dataset to image: " + e.getMessage() );
-        }
-
         // radar range is determined based on the number of bins
         int range = ( int )nbins;
         BufferedImage bi = new BufferedImage( 2 * range, 2 * range, BufferedImage.TYPE_INT_ARGB );
@@ -342,13 +320,14 @@ public class BltDataProcessor {
                 } else {
                     float beta = getBeta( x, y );
                     int index = getRayIndex( beta, a1gate );
-
-                    // allows to deal with both byte and short data types
                     int pixel = -999999;
-                    if( byteBuff != null ) {
-                        pixel = byteBuff[ ( int )( index * nbins + r ) ];
-                    } else if( shortBuff != null ) {
-                        pixel = shortBuff[ ( int )( index * nbins + r ) ];
+                    if( buff != null ) {
+                        long lpx = index * nbins + r;
+                        int ipx = ( int )lpx;
+                        if( ipx == buff.length ) {
+                            ipx -= 1;
+                        }
+                        pixel = buff[ ipx ];
                     }
                     // we get out of color table bounds if we don't change pixel sign
                     if( pixel < 0 ) {
@@ -510,41 +489,40 @@ public class BltDataProcessor {
      */
     public void setDataset( Dataset dataset) { this.dataset = dataset; }
     /**
-     * Gets long class attribute retrieved from HDF5 file.
-     *
-     * @return Long class attribute retrieved from HDF5 file
+     * Gets current HDF5 attribute.
+     * 
+     * @return HDF5 attribute
      */
-    public Attribute getLongAttribute() { return h5LongAttr; }
+    public Attribute getAttribute() { return this.attribute; }
     /**
-     * Sets long class attribute retrieved from HDF5 file.
-     *
-     * @param _h5LongAttr Long class attribute retrieved from HDF5 file
+     * Sets current HDF5 attribute. 
+     * 
+     * @param attribute Current HDF5 attribute
      */
-    public void setLongAttribute( Attribute h5LongAttr ) { this.h5LongAttr = h5LongAttr; }
+    public void setAttribute( Attribute attribute ) { this.attribute = attribute; }
     /**
-     * Gets double class attribute retrieved from HDF5 file.
+     * Gets attribute value as object. Correct type has to be casted before usage.
      *
-     * @return Double class attribute retrieved from HDF5 file
+     * @return Attribute value as object
      */
-    public Attribute getDoubleAttribute() { return h5DoubleAttr; }
-    /**
-     * Sets double class attribute retrieved from HDF5 file.
-     *
-     * @param _h5DoubleAttr Double class attribute retrieved from HDF5 file
-     */
-    public void setDoubleAttribute( Attribute h5DoubleAttr ) { this.h5DoubleAttr = h5DoubleAttr; }
-    /**
-     * Gets string class attribute retrieved from HDF5 file.
-     *
-     * @return String class attribute retrieved from HDF5 file
-     */
-    public Attribute getStringAttribute() { return h5StringAttr; }
-    /**
-     * Sets string class attribute retrieved from HDF5 file.
-     *
-     * @param _h5StringAttr String class attribute retrieved from HDF5 file
-     */
-    public void setStringAttribute( Attribute h5StringAttr ) { this.h5StringAttr = h5StringAttr; }
+    public Object getAttributeValue() {
+        Object value = null;
+        if( getAttribute().getType().getDatatypeClass() == Datatype.CLASS_INTEGER ) {
+            int attrLong[] = ( int[] )getAttribute().getValue();
+            Integer i = attrLong[ 0 ];
+            long l = i.longValue();
+            value = l;
+        }
+        if( getAttribute().getType().getDatatypeClass() == Datatype.CLASS_FLOAT ) {
+            double attrDouble[] = ( double[] )getAttribute().getValue();
+            value = attrDouble[ 0 ];
+        }
+        if( getAttribute().getType().getDatatypeClass() == Datatype.CLASS_STRING ) {
+            String attrString[] = ( String[] )getAttribute().getValue();
+            value = attrString[ 0 ];
+        }
+        return value;
+    }
     /**
      * Gets list of full dataset names.
      *
