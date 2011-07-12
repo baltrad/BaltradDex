@@ -508,14 +508,28 @@ public class BltDataProcessor {
     public Object getAttributeValue() {
         Object value = null;
         if( getAttribute().getType().getDatatypeClass() == Datatype.CLASS_INTEGER ) {
-            int attrLong[] = ( int[] )getAttribute().getValue();
-            Integer i = attrLong[ 0 ];
-            long l = i.longValue();
-            value = l;
+            try {
+                int attrInt[] = ( int[] )getAttribute().getValue();
+                Integer i = attrInt[ 0 ];
+                long l = i.longValue();
+                value = l;
+            } catch( ClassCastException e ) {
+                long attrLong[] = ( long[] )getAttribute().getValue();
+                Long l = attrLong[ 0 ];
+                value = l;
+            }
         }
         if( getAttribute().getType().getDatatypeClass() == Datatype.CLASS_FLOAT ) {
-            double attrDouble[] = ( double[] )getAttribute().getValue();
-            value = attrDouble[ 0 ];
+            try {
+                float attrFloat[] = ( float[] )getAttribute().getValue();
+                Float f = attrFloat[ 0 ];
+                double d = f.doubleValue();
+                value = d;
+            } catch( ClassCastException e ) {
+                double attrDouble[] = ( double[] )getAttribute().getValue();
+                Double d = attrDouble[ 0 ];
+                value = d;
+            }
         }
         if( getAttribute().getType().getDatatypeClass() == Datatype.CLASS_STRING ) {
             String attrString[] = ( String[] )getAttribute().getValue();

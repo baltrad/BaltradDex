@@ -83,18 +83,15 @@ public class BltDataProcessorControllerTest extends TestCase {
 
     public void testGetH5Attribute() {
         dataProcessor.getH5Attribute( root, "/dataset1/where", "nbins" );
-        long[] nbins = ( long[] )dataProcessor.getAttributeValue();
-        nbins_val = nbins[ 0 ];
+        nbins_val = ( Long )dataProcessor.getAttributeValue();
         assertNotNull( nbins_val );
 
         dataProcessor.getH5Attribute( root, "/dataset1/where", "nrays" );
-        long[] nrays = ( long[] )dataProcessor.getAttributeValue();
-        nrays_val = nrays[ 0 ];
+        nrays_val = ( Long )dataProcessor.getAttributeValue();
         assertNotNull( nrays_val );
 
         dataProcessor.getH5Attribute( root, "/dataset1/where", "a1gate" );
-        long[] a1gate = ( long[] )dataProcessor.getAttributeValue();
-        a1gate_val = a1gate[ 0 ];
+        a1gate_val = ( Long )dataProcessor.getAttributeValue();
         assertNotNull( a1gate_val );
     }
 
