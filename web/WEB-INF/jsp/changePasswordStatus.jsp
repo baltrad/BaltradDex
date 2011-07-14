@@ -30,7 +30,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Save user account</title>
+        <title>Baltrad | Change password</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -47,10 +47,10 @@ Author     : szewczenko
                     </div>
                     <div class="right">
                         <div class="blttitle">
-                            Save user account
+                            Change password
                         </div>
                         <div class="blttext">
-                            Save user account status.
+                            Password modification status.
                         </div>
                         <div class="table">
                             <div class="addradar">

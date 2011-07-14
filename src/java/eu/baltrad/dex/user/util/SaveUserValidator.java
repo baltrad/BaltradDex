@@ -61,9 +61,12 @@ public class SaveUserValidator implements Validator {
         User user = ( User )command;
         if( user == null ) return;
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name", "error.missing.username" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password", "error.missing.password" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "confirmPassword", 
+        // Password is only validated for new accounts
+        if( user.getId() == 0 ) {
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password", "error.missing.password" );
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "confirmPassword",
                 "error.missing.confirmpassword" );
+        }
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "factory", "error.missing.organization" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "country", "error.missing.country" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "city", "error.missing.city" );
@@ -72,15 +75,17 @@ public class SaveUserValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "number", "error.missing.addressnumber" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "phone", "error.missing.phone" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", "error.missing.email" );
-        // validate password
-        if( !errors.hasFieldErrors( "password" ) && !errors.hasFieldErrors( "confirmPassword" ) ) {
-            if( !user.getPassword().trim().equals( user.getConfirmPassword().trim() ) ) {
-                errors.rejectValue( "confirmPassword", "error.field.passwd.mismatch" );
-            }      
-        }
-        if( user.getPassword().trim().length() > 0 && user.getPassword().trim().length() 
-                < MIN_FIELD_LENGTH ) {
-            errors.rejectValue( "password", "error.field.passwd.tooshort" );
+        // Password is only validated for new accounts
+        if( user.getId() == 0 ) {
+            if( !errors.hasFieldErrors( "password" ) && !errors.hasFieldErrors( "confirmPassword" ) ) {
+                if( !user.getPassword().trim().equals( user.getConfirmPassword().trim() ) ) {
+                    errors.rejectValue( "confirmPassword", "error.field.passwd.mismatch" );
+                }
+            }
+            if( user.getPassword().trim().length() > 0 && user.getPassword().trim().length()
+                    < MIN_FIELD_LENGTH ) {
+                errors.rejectValue( "password", "error.field.passwd.tooshort" );
+            }
         }
         // validate node address
         boolean isValidPortNumber = false;

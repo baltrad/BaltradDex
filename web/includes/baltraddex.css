@@ -821,6 +821,30 @@ input:focus, textarea:focus {
     width:16%;
     margin-right:2%; 
 }
+.editaccount .orgname {
+    width:30%;
+    margin-right:2%;
+}
+.editaccount .passwdchange {
+    width:12%;
+    text-align:center;
+}
+/* Change password page --------------------------------------------------------------------------*/
+.changepasswd .row {
+    height:32px;
+}
+.changepasswd .user {
+    float:left;
+}
+.changepasswd .username input {
+    width:200px;
+}
+.changepasswd .password {
+    float:left;
+}
+.changepasswd .password input {
+    width:200px;
+}
 /* Remove user account page ----------------------------------------------------------------------*/
 .removeaccount .username {
     width:24%;

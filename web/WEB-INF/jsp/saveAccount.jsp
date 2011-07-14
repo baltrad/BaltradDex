@@ -26,6 +26,10 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
+<%
+    String userId = request.getParameter( "userId" );
+%>
+
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -53,13 +57,16 @@ Author     : szewczenko
                             Save new user account or modify an existing one.
                         </div>
                         <div class="table">
+                            <c:set var="editMode" scope="page" value="<%=userId%>"/>
                             <div class="addaccount">
                                 <%@include file="/WEB-INF/jsp/formMessages.jsp"%>
                                 <form method="post">
                                     <div class="leftcol">
                                         <div class="row">User name</div>
-                                        <div class="row">Password</div>
-                                        <div class="row">Confirm password</div>
+                                        <c:if test="${editMode == null}">
+                                            <div class="row">Password</div>
+                                            <div class="row">Confirm password</div>
+                                        </c:if>
                                         <div class="row">Role</div>
                                         <div class="row">Node address</div>
                                         <div class="row">Organization</div>
@@ -82,26 +89,30 @@ Author     : szewczenko
                                             </div>
                                             <form:errors path="command.name" cssClass="error"/>
                                         </div>
-                                        <div class="row">
-                                            <div class="password">
-                                                <form:password path="command.password"
-                                                    title="Enter password"/>
-                                                <div class="hint">
-                                                   Password
+                                        <c:if test="${editMode == null}">
+                                            <div class="row">
+                                                <div class="password">
+                                                    <form:password path="command.password"
+                                                        title="Enter password"/>
+                                                    <div class="hint">
+                                                       Password
+                                                    </div>
                                                 </div>
+                                                <form:errors path="command.password"
+                                                             cssClass="error"/>
                                             </div>
-                                            <form:errors path="command.password" cssClass="error"/>
-                                        </div>
-                                        <div class="row">
-                                            <div class="password">
-                                                <form:password path="command.confirmPassword"
-                                                    title="Repeat password"/>
-                                                <div class="hint">
-                                                   Retype password here
+                                            <div class="row">
+                                                <div class="password">
+                                                    <form:password path="command.confirmPassword"
+                                                        title="Repeat password"/>
+                                                    <div class="hint">
+                                                       Retype password here
+                                                    </div>
                                                 </div>
+                                                <form:errors path="command.confirmPassword"
+                                                             cssClass="error"/>
                                             </div>
-                                            <form:errors path="command.confirmPassword" cssClass="error"/>
-                                        </div>
+                                        </c:if>
                                         <div class="row">
                                             <div class="rolename">
                                                 <spring:bind path="command.roleName">

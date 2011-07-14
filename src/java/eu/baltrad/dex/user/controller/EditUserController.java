@@ -47,12 +47,21 @@ public class EditUserController implements Controller {
     private String successView;
     private UserManager userManager;
 //------------------------------------------------------------------------------------------ Methods
-     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
+    /**
+     * 
+     * 
+     * @param request
+     * @param response
+     * @return
+     * @throws ServletException
+     * @throws IOException
+     */
+    public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
          List users = userManager.getUsers();
          return new ModelAndView( getSuccessView(), MODEL_KEY, users );
-     }
-     /**
+    }
+    /**
      * Method returns reference to success view name string.
      *
      * @return Reference to success view name string

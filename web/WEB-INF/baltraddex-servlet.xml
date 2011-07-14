@@ -130,6 +130,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="removeAccount.htm">removeUserController</prop>
                 <prop key="accountToRemove.htm">removeUserController</prop>
                 <prop key="removeAccountStatus.htm">removeUserController</prop>
+                <prop key="changePassword.htm">changePasswordController</prop>
+                <prop key="changePasswordStatus">urlFilenameController</prop>
 
                 <prop key="saveRadar.htm">saveRadarController</prop>
                 <prop key="editRadar.htm">editRadarController</prop>
@@ -517,13 +519,40 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!--
+        Change password controller
+    -->
+    <bean name="changePasswordController"
+            class="eu.baltrad.dex.user.controller.ChangePasswordController">
+        <property name="successView">
+            <value>changePasswordStatus</value>
+        </property>
+        <property name="commandClass">
+            <value>eu.baltrad.dex.user.model.Password</value>
+        </property>
+        <property name="formView">
+            <value>changePassword</value>
+        </property>
+        <property name="validator">
+            <ref bean="changePasswordValidator"/>
+        </property>
+        <property name="sessionForm">
+            <value>false</value>
+        </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+    </bean>
+
+    <!--
+        Change password validator
+    -->
+    <bean name="changePasswordValidator" class="eu.baltrad.dex.user.util.ChangePasswordValidator"/>
+
+    <!--
         Remove user account controller extends MultiActionController
     -->
     <bean id="removeUserController"
         class="eu.baltrad.dex.user.controller.RemoveUserController">
-        <!--property name="nameResolver">
-            <ref local="nameResolver"/>
-        </property-->
         <property name="userManager">
             <ref bean="userManager" />
         </property>

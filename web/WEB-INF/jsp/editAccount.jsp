@@ -79,6 +79,9 @@ Author     : szewczenko
                                             <div id="cell" class="orgname">
                                                 Organization
                                             </div>
+                                            <div id="cell" class="passwdchange">
+                                                Password
+                                            </div>
                                         </div>
                                         <c:set var="count" scope="page" value="1"/>
                                         <c:forEach var="user" items="${registered_users}">
@@ -97,6 +100,11 @@ Author     : szewczenko
                                                 </div>
                                                 <div id="cell" class="orgname">
                                                     <c:out value="${user.factory}"/>
+                                                </div>
+                                                <div id="cell" class="passwdchange">
+                                                    <a href="changePassword.htm?userId=${user.id}">
+                                                        Change
+                                                    </a>
                                                 </div>
                                             </div>
                                         </c:forEach>
