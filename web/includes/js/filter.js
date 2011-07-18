@@ -354,6 +354,11 @@ function makeFilterDialog(data) {
  * @param {data} Filter data. If present, will create controls
  *               to edit a filter, otherwise, will create controls
  *               to create a new filter.
+ * @param {onSave} function to call when the filter dialog is saved.
+ *               The function is called with the dialog as it's argument.
+ *               This can be used for example to update a form with the
+ *               (JSON) value of the created filter. The return value
+ *               of this callback is ignored.
  *
  * the intended setup is along these lines:
  *
@@ -371,19 +376,22 @@ function makeFilterDialog(data) {
  * $("#filterElm").data("filter").toJSON();
  *
  */
-function createTopLevelFilter(elm, data) {
+function createTopLevelFilter(elm, data, onSave) {
   if (data) {
     var dialog = makeFilterDialog(data);
     var div = $.tmpl("filter-template-edit", null, dialog);
     div.find("#filter-edit").click(function() {
       dialog.display();
       dialog.onSave = function() {
-      	createTopLevelFilter(elm, dialog.toJSON());
-	return true;
+        createTopLevelFilter(elm, dialog.toJSON(), onSave);
+        if (typeof(onSave) === "function") {
+          onSave(dialog);
+        }
+        return true;
       }
     });
     div.find("#filter-remove").click(function() {
-      createTopLevelFilter(elm);
+      createTopLevelFilter(elm, null, onSave);
     });
     $(elm).empty().append(div);
     $(elm).data("filter", dialog);
@@ -394,7 +402,10 @@ function createTopLevelFilter(elm, data) {
         "type": div.find("#filter-type option:selected").val()
       });
       dialog.onSave = function() {
-        createTopLevelFilter(elm, dialog.toJSON());
+        createTopLevelFilter(elm, dialog.toJSON(), onSave);
+        if (typeof(onSave) === "function") {
+          onSave(dialog);
+        }
         return true;
       };
       dialog.display();
