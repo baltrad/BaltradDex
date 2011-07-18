@@ -359,16 +359,16 @@ function makeFilterDialog(data) {
  *
  * <script type="text/javascript">
  *   $(document).ready(function() {
- *     createTopLevelFilter($.find("#filter"));
+ *     createTopLevelFilter($.find("#filterElm"));
  *   }
  * </script>
  * <body>
- *   <div id="filter">
+ *   <div id="filterElm">
  * </body>
  *
  * after user has created/modified to filter, it's data can be accessed:
  *
- * $.find("#filter").data("filter").toJSON();
+ * $("#filterElm").data("filter").toJSON();
  *
  */
 function createTopLevelFilter(elm, data) {
@@ -386,6 +386,7 @@ function createTopLevelFilter(elm, data) {
       createTopLevelFilter(elm);
     });
     $(elm).empty().append(div);
+    $(elm).data("filter", dialog);
   } else {
     var div = $.tmpl("filter-template-create");
     div.find("#filter-create").click(function() {
