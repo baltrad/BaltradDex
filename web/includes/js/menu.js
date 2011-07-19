@@ -10,7 +10,7 @@
 */
 
 (function($){
-$.fn.menu = function(ustawienia){ 
+$.fn.bltMenu = function(ustawienia){ 
 //Dekleracja zmiennych globalnych 
 var el, rozwLinkAkt;
 ustawienia = jQuery.extend({

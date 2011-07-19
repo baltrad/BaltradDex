@@ -1,3 +1,3 @@
 $(document).ready(function (){ 
-  $(".menu ul li").menu();
+  $(".menu ul li").bltMenu();
 }); 
