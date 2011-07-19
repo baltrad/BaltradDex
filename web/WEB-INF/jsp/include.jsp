@@ -20,7 +20,6 @@ Document   : JSP include page
 Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
-
 <!-- JSP includes -->
 <%@ page contentType="text/html; charset=UTF-8" session="true" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -28,5 +27,4 @@ Author     : szewczenko
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<!-- favicon -->
-<link rel="icon" type="image/png" href="includes/images/favicon.png"/>
+<%@ taglib prefix="t" tagdir="/WEB-INF/tags" %>

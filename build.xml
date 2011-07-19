@@ -251,6 +251,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="baltraddex-servlet.xml" />
         <include name="web.xml" />
         <include name="jsp/**/*.jsp" />
+	<include name="tags/**/*.tag" />
       </fileset>
     </copy>
 
