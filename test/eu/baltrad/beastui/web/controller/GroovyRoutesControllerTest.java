@@ -411,25 +411,24 @@ public class GroovyRoutesControllerTest extends TestCase {
   public void testViewCreateRoute() {
     List<String> recipients = new ArrayList<String>();
     List<String> adaptors = new ArrayList<String>();
+    RouteDefinition routeDefinition = new RouteDefinition();
 
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
     model.addAttribute("adaptors", adaptors);
     modelControl.setReturnValue(null);
-    model.addAttribute("name", "somename");
+    manager.create("somename", "someauthor", true, "descr", recipients, null);
+    managerControl.setReturnValue(routeDefinition);
+
+    model.addAttribute("route", routeDefinition);
     modelControl.setReturnValue(null);
-    model.addAttribute("author", "someauthor");
-    modelControl.setReturnValue(null);
-    model.addAttribute("active", true);
-    modelControl.setReturnValue(null);
-    model.addAttribute("description", "descr");
-    modelControl.setReturnValue(null);
-    model.addAttribute("recipients", recipients);
+    model.addAttribute("emessage", null);
     modelControl.setReturnValue(null);
     model.addAttribute("typdef", "def");
     modelControl.setReturnValue(null);
 
     classUnderTest = new GroovyRoutesController();
+    classUnderTest.setManager(manager);
     classUnderTest.setAdaptorManager(adaptorManager);
     
     replay();
@@ -464,25 +463,23 @@ public class GroovyRoutesControllerTest extends TestCase {
   public void testViewShowRoute() {
     List<String> recipients = new ArrayList<String>();
     List<String> adaptors = new ArrayList<String>();
+    RouteDefinition routeDefinition = new RouteDefinition();
 
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
     model.addAttribute("adaptors", adaptors);
     modelControl.setReturnValue(null);
-    model.addAttribute("name", "somename");
-    modelControl.setReturnValue(null);
-    model.addAttribute("author", "someauthor");
-    modelControl.setReturnValue(null);
-    model.addAttribute("active", true);
-    modelControl.setReturnValue(null);
-    model.addAttribute("description", "descr");
-    modelControl.setReturnValue(null);
-    model.addAttribute("recipients", recipients);
+    manager.create("somename", "someauthor", true, "descr", recipients, null);
+    managerControl.setReturnValue(routeDefinition);
+    model.addAttribute("route", routeDefinition);
     modelControl.setReturnValue(null);
     model.addAttribute("definition", "def");
     modelControl.setReturnValue(null);
+    model.addAttribute("emessage", null);
+    modelControl.setReturnValue(null);
     
     classUnderTest = new GroovyRoutesController();
+    classUnderTest.setManager(manager);
     classUnderTest.setAdaptorManager(adaptorManager);
     
     replay();
@@ -493,40 +490,6 @@ public class GroovyRoutesControllerTest extends TestCase {
     assertEquals("groovyroute_show", result);
   }
 
-  public void testViewShowRoute_wEmessage() {
-    List<String> recipients = new ArrayList<String>();
-    List<String> adaptors = new ArrayList<String>();
-
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
-    model.addAttribute("adaptors", adaptors);
-    modelControl.setReturnValue(null);
-    model.addAttribute("name", "somename");
-    modelControl.setReturnValue(null);
-    model.addAttribute("author", "someauthor");
-    modelControl.setReturnValue(null);
-    model.addAttribute("active", true);
-    modelControl.setReturnValue(null);
-    model.addAttribute("description", "descr");
-    modelControl.setReturnValue(null);
-    model.addAttribute("recipients", recipients);
-    modelControl.setReturnValue(null);
-    model.addAttribute("definition", "def");
-    modelControl.setReturnValue(null);
-    model.addAttribute("emessage", "xyz");
-    modelControl.setReturnValue(null);
-    
-    classUnderTest = new GroovyRoutesController();
-    classUnderTest.setAdaptorManager(adaptorManager);
-
-    replay();
-
-    String result = classUnderTest.viewShowRoute(model, "somename", "someauthor", true, "descr", recipients, "def", "xyz");
-    
-    verify();
-    assertEquals("groovyroute_show", result);
-  }
-  
   public void testModifyRoute() throws Exception {
     String name = "A";
     String author = "B";

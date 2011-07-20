@@ -192,19 +192,17 @@ public class GroovyRoutesController {
   protected String viewCreateRoute(Model model, String name, String author,
       Boolean active, String description, List<String> recipients,
       String definition, String emessage) {
-    List<String> adaptors = adaptormanager.getAdaptorNames();
+    if (active == null)
+      active = new Boolean(true);
+    if (recipients == null)
+      recipients = new ArrayList<String>();
+    
+    model.addAttribute("adaptors", adaptormanager.getAdaptorNames());
+    RouteDefinition def = manager.create(name, author, active, description, recipients, null);
+    model.addAttribute("route", def);
+    model.addAttribute("emessage", emessage);
+    model.addAttribute("typdef", definition);
 
-    model.addAttribute("adaptors", adaptors);
-    model.addAttribute("name", (name == null) ? "" : name);
-    model.addAttribute("author", (author == null) ? "" : author);
-    model.addAttribute("active", (active == null) ? new Boolean(true) : active);
-    model.addAttribute("description", (description == null) ? "" : description);
-    model.addAttribute("recipients",
-        (recipients == null) ? new ArrayList<String>() : recipients);
-    model.addAttribute("typdef", (definition == null) ? "" : definition);
-    if (emessage != null) {
-      model.addAttribute("emessage", emessage);
-    }
     return "groovyroute_create";
   }
 
@@ -251,20 +249,17 @@ public class GroovyRoutesController {
   protected String viewShowRoute(Model model, String name, String author,
       Boolean active, String description, List<String> recipients,
       String definition, String emessage) {
-    List<String> adaptors = adaptormanager.getAdaptorNames();
+    if (active == null)
+      active = new Boolean(false);
+    if (recipients == null)
+      recipients = new ArrayList<String>();
 
-    model.addAttribute("adaptors", adaptors);
-    model.addAttribute("name", name == null ? "" : name);
-    model.addAttribute("author", author == null ? "" : author);
-    model.addAttribute("active", (active == null ? false : active
-        .booleanValue()));
-    model.addAttribute("description", description == null ? "" : description);
-    model.addAttribute("recipients",
-        recipients == null ? new ArrayList<String>() : recipients);
-    model.addAttribute("definition", definition == null ? "" : definition);
-    if (emessage != null) {
-      model.addAttribute("emessage", emessage);
-    }
+    model.addAttribute("adaptors", adaptormanager.getAdaptorNames());
+    RouteDefinition def = manager.create(name, author, active, description, recipients, null);
+    model.addAttribute("route", def);
+    model.addAttribute("definition", definition);
+    model.addAttribute("emessage", emessage);
+
     return "groovyroute_show";
   }
   

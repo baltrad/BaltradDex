@@ -21,137 +21,39 @@ Creates a groovy route
 @author Anders Henja
 --------------------------------------------------------------------------------------------------%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
-
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@page import="java.util.List"%>
-<%@page import="java.util.ArrayList"%>
-
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Create Groovy route</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
-            </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/processingTab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/processingMenu.jsp"%>
-                    </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            Create Groovy route
-                        </div>
-                        <div class="blttext">
-                            Create a Groovy scripted routing rule.
-                        </div>
-                        <div class="table">
-                            <%if (request.getAttribute("emessage") != null) {%>
-                                <div class="systemerror">
-                                    <div class="header">
-                                        Problems encountered.
-                                    </div>
-                                    <div class="message">
-                                        <%=request.getAttribute("emessage")%>
-                                    </div>
-                                </div>
-                            <%}%>
-                            <div class="modifyroute">
-                                <form name="createRouteForm" action="groovyroute_create.htm">
-                                    <div class="leftcol">
-                                        <%
-                                            List<String> adaptors = (List<String>)request.getAttribute("adaptors");
-                                            String name = (String)request.getAttribute("name");
-                                            String author = (String)request.getAttribute("author");
-                                            Boolean active = (Boolean)request.getAttribute("active");
-                                            String description = (String)request.getAttribute("description");
-                                            List<String> recipients = (List<String>)request.getAttribute("recipients");
-                                            String typdef = (String)request.getAttribute("typdef");
-                                            String activestr = (active == true)?"checked":"";
-                                          %>
-                                        <div class="row">Name</div>
-                                        <div class="row">Author</div>
-                                        <div class="row">Active</div>
-                                        <div class="row">Description</div>
-                                        <div class="row4">Recipients</div>
-                                        <div class="row">Script</div>
-                                    </div>
-                                    <div class="rightcol">
-                                        <div class="row">
-                                            <input type="text" name="name" value="<%=name%>"/>
-                                            <div class="hint">
-                                               Route name
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="text" name="author" value="<%=author%>"/>
-                                            <div class="hint">
-                                               Route author's name
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="checkbox" name="active" <%=activestr%>/>
-                                            <div class="hint">
-                                               Check to activate route
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="text" name="description" value="<%=description%>"/>
-                                            <div class="hint">
-                                               Verbose description
-                                            </div>
-                                        </div>
-                                        <div class="row4">
-                                            <select multiple size="4" name="recipients">
-                                            <%
-                                              for (String adaptor : adaptors) {
-                                                String selectstr = "";
-                                                if (recipients.contains(adaptor)) {
-                                                  selectstr = "selected";
-                                                }
-                                            %>
-                                                <option value="<%=adaptor%>" <%=selectstr%>><%=adaptor%></option>
-                                            <%
-                                              }
-                                            %>
-                                            </select>
-                                            <div class="hint">
-                                               Select target adaptors
-                                            </div>
-                                        </div>
-                                        <div class="textrow">
-                                            <textarea class="routedefinition" name="typdef"><%=typdef%></textarea>
-                                            <div class="hint">
-                                               Groovy route definition
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tablefooter">
-                                       <div class="buttons">
-                                           <button class="rounded" type="submit">
-                                               <span>Add</span>
-                                           </button>
-                                       </div>
-                                   </div>
-                                </form>
+<t:page_tabbed pageTitle="Create Groovy route" activeTab="processing">
+    <div class="left">
+        <t:menu_processing/>
+    </div>
+    <div class="right">
+        <div class="blttitle">
+            Create Groovy route
+        </div>
+        <div class="blttext">
+            Create a Groovy scripted routing rule.
+        </div>
+        <div class="table">
+            <t:error_message message="${emessage}"/>
+            <div class="modifyroute">
+                <t:form_route_common adaptors="${adaptors}"
+                                     route="${route}"
+                                     create="true"
+                                     formAction="groovyroute_create.htm">
+                    <jsp:attribute name="extraLeft">
+                        <div class="row">Script</div>
+                    </jsp:attribute>
+                    <jsp:attribute name="extraRight">
+                        <div class="textrow">
+                            <textarea class="routedefinition" name="typdef">${typdef}</textarea>
+                            <div class="hint">
+                               Groovy route definition
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </jsp:attribute>
+                </t:form_route_common>
             </div>
         </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
-        </div>
-    </body>
-</html>
+    </div>
+</t:page_tabbed>
