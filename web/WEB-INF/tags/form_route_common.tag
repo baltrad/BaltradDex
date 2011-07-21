@@ -8,10 +8,11 @@
 <%@attribute name="extraRight" fragment="true"%>
 
 <%@attribute name="formAction"%>
+<%@attribute name="formMethod"%>
 <%@attribute name="create" type="java.lang.Boolean"
              description="set true if creating (not modifying) the rule"%>
 
-<form action="${formAction}">
+<form action="${formAction}" method="${formMethod ? formMethod : 'POST'}">
     <div class="leftcol">
         <div class="row">Name</div>
         <div class="row">Author</div>
@@ -68,7 +69,7 @@
       <div class="buttons">
        <c:choose>
          <c:when test="${create}">
-           <button class="rounded" type="submit">
+           <button class="rounded" name="submitButton" type="submit" value="Add">
              <span>Add</span>
            </button>
          </c:when>

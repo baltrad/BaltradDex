@@ -106,6 +106,8 @@ public class ShowRoutesController {
         result = "redirect:compositeroute_show.htm";
       } else if (type.equals("blt_volume")) {
         result = "redirect:volumeroute_show.htm";
+      } else if (type.equals("distribution")) {
+        result = "redirect:distributionroute.htm";
       } else if (type.equals("bdb_trim_age")) {
         result = "redirect:bdbtrimageroute_show.htm";
       } else if (type.equals("bdb_trim_count")) {

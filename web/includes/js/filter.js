@@ -354,45 +354,47 @@ function makeFilterDialog(data) {
  * @param {data} Filter data. If present, will create controls
  *               to edit a filter, otherwise, will create controls
  *               to create a new filter.
- * @param {onSave} function to call when the filter dialog is saved.
- *               The function is called with the dialog as it's argument.
- *               This can be used for example to update a form with the
- *               (JSON) value of the created filter. The return value
- *               of this callback is ignored.
+ * @param {target} (optional) form field whose value will be set to the
+ *               stringified JSON value of this filter on modification.
  *
  * the intended setup is along these lines:
  *
- * <script type="text/javascript">
- *   $(document).ready(function() {
- *     createTopLevelFilter($.find("#filterElm"));
- *   }
- * </script>
  * <body>
- *   <div id="filterElm">
+ *   <script type="text/javascript">
+ *     $(document).ready(function() {
+ *       createTopLevelFilter($("#filterElm"), null, $("#filterJson"));
+ *     }
+ *   </script>
+ *   <form>
+ *    <div id="filterElm">
+ *    <input type="hidden" name="filterJson" id="filterJson"
+ *   </form>
  * </body>
  *
- * after user has created/modified to filter, it's data can be accessed:
- *
- * $("#filterElm").data("filter").toJSON();
+ * the filter can additionally be accessed through:
+ * $("#filterElm").data("filter");
  *
  */
-function createTopLevelFilter(elm, data, onSave) {
+function createTopLevelFilter(elm, data, target) {
   if (data) {
     var dialog = makeFilterDialog(data);
     var div = $.tmpl("filter-template-edit", null, dialog);
     div.find("#filter-edit").click(function() {
       dialog.display();
       dialog.onSave = function() {
-        createTopLevelFilter(elm, dialog.toJSON(), onSave);
-        if (typeof(onSave) === "function") {
-          onSave(dialog);
-        }
+        createTopLevelFilter(elm, dialog.toJSON(), target);
         return true;
       }
     });
     div.find("#filter-remove").click(function() {
-      createTopLevelFilter(elm, null, onSave);
+      createTopLevelFilter(elm, null, target);
+      if (typeof(target) !== "undefined") {
+        $(target).val("");
+      }
     });
+    if (typeof(target) !== "undefined") {
+      $(target).val(JSON.stringify(dialog.toJSON()));
+    }
     $(elm).empty().append(div);
     $(elm).data("filter", dialog);
   } else {
@@ -402,10 +404,7 @@ function createTopLevelFilter(elm, data, onSave) {
         "type": div.find("#filter-type option:selected").val()
       });
       dialog.onSave = function() {
-        createTopLevelFilter(elm, dialog.toJSON(), onSave);
-        if (typeof(onSave) === "function") {
-          onSave(dialog);
-        }
+        createTopLevelFilter(elm, dialog.toJSON(), target);
         return true;
       };
       dialog.display();
