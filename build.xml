@@ -417,6 +417,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <transaction src="${etc.dir}/drop_dex_schema.sql"/>
       <transaction src="${baltrad.db.path}/share/baltrad-db/sql/postgresql/drop.sql"/>
       <transaction src="${baltrad.db.path}/share/baltrad-db/sql/postgresql/create.sql"/>
+      <transaction src="${baltrad.db.path}/share/baltrad-db/sql/postgresql/data.sql"/>
       <transaction src="${beast.path}/sql/drop_db.sql"/>
       <transaction src="${beast.path}/sql/create_db.sql"/>
       <transaction src="${etc.dir}/create_dex_schema.sql"/>
