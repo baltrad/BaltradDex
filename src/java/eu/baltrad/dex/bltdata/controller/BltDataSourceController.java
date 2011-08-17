@@ -129,9 +129,9 @@ public class BltDataSourceController implements Controller, ITableScroller {
      * Sets page number to the next page number.
      */
     public void nextPage() {
-        int lastPage = ( int )Math.ceil( bltFileManager.countEntries( getDSName() ) /
+        int lastPage = ( int )Math.ceil( bltFileManager.countDSFileEntries( getDSName() ) /
                 BltFileManager.ENTRIES_PER_PAGE );
-        if( ( lastPage * BltFileManager.ENTRIES_PER_PAGE ) < bltFileManager.countEntries(
+        if( ( lastPage * BltFileManager.ENTRIES_PER_PAGE ) < bltFileManager.countDSFileEntries(
                 getDSName() ) ) {
             ++lastPage;
         }
@@ -160,9 +160,9 @@ public class BltDataSourceController implements Controller, ITableScroller {
      * Sets page number to the last page.
      */
     public void lastPage() {
-        long numEntries = bltFileManager.countEntries( getDSName() );
+        long numEntries = bltFileManager.countDSFileEntries( getDSName() );
         int lastPage = ( int )Math.ceil( numEntries / BltFileManager.ENTRIES_PER_PAGE );
-        if( ( lastPage * BltFileManager.ENTRIES_PER_PAGE ) < bltFileManager.countEntries(
+        if( ( lastPage * BltFileManager.ENTRIES_PER_PAGE ) < bltFileManager.countDSFileEntries(
                 getDSName() ) ) {
             ++lastPage;
         }

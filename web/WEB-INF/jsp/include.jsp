@@ -21,7 +21,7 @@ Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 <!-- JSP includes -->
-<%@ page contentType="text/html; charset=UTF-8" session="true" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" session="true" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>

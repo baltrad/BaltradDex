@@ -1129,6 +1129,37 @@ input:focus, textarea:focus {
 .slider .handle:hover {
     background: #5E9626;
 }
+/* File browser page -----------------------------------------------------------------------------*/
+.filebrowser {
+    float:left;
+    clear:right;
+    padding:12px 12px 0px 12px;
+}
+.filebrowser .leftcol {
+    float:left;
+    clear:left;
+    width:200px;
+    margin:0px 12px 0px 12px;
+}
+.filebrowser .midcol {
+    float:left;
+    width:200px;
+    margin:0px 12px 0px 12px;
+}
+.filebrowser .rightcol {
+    float:left;
+    clear:right;
+    margin:0px 0px 0px 24px;
+}
+.filebrowser select {
+    width:100%;
+}
+.filebrowser .leftcol input {
+    width:80%;
+}
+.filebrowser .midcol input {
+    width:26px;
+}
 
 
 

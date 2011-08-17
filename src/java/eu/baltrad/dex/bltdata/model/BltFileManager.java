@@ -25,6 +25,7 @@ import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
+import eu.baltrad.dex.util.JDBCConnectionManager;
 
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
@@ -40,11 +41,22 @@ import eu.baltrad.fc.AttributeResult;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Time;
+
 
 import java.io.File;
-import java.text.SimpleDateFormat;
+
 import java.text.ParseException;
-import java.sql.SQLException;
+
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * Data manager class implementing data handling functionality.
@@ -55,11 +67,13 @@ import java.sql.SQLException;
  */
 public class BltFileManager {
 //---------------------------------------------------------------------------------------- Constants
-    /** HDF5 source key */
-    //private static final String FC_SRC_PLC_ATTR = "what/source:PLC";
-    /** HDF5 date attribute */
+    /** File catalog source radar station key */
+    private static final String FC_SRC_PLC_ATTR = "what/source:PLC";
+    /** File catalog file object key */
+    private static final String FC_FILE_OBJECT_ATTR = "what/object";
+    /** File catalog date attribute */
     private static final String FC_DATE_ATTR = "what/date";
-    /** HDF5 time attribute */
+    /** File catalog time attribute */
     private static final String FC_TIME_ATTR = "what/time";
     /** File UUID key */
     private static final String FC_FILE_UUID = "file:uuid";
@@ -67,6 +81,8 @@ public class BltFileManager {
     private static final String FC_DATE_STR = "yyyyMMdd";
     /** Time format string */
     private static final String FC_TIME_STR = "HHmmss";
+    /** HDF5 file extension */
+    private static final String H5_FILE_EXT = ".h5";
     /** Image file extension */
     private static final String IMAGE_FILE_EXT = ".png";
     /** Number of file entries per page */
@@ -85,6 +101,8 @@ public class BltFileManager {
     private DataSourceManager dataSourceManager;
     /** References CoreFilterManager */
     private CoreFilterManager coreFilterManager;
+    /** Reference to JDBCConnector class object */
+    private JDBCConnectionManager jdbcConnectionManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to FileCatalogConnector instance.
@@ -92,6 +110,7 @@ public class BltFileManager {
     public BltFileManager() {
         this.fileCatalogConnector = FileCatalogConnector.getInstance();
         this.fc = fileCatalogConnector.getFileCatalog();
+        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
     }
     /**
      * Gets filter associated with a given data source.
@@ -118,7 +137,7 @@ public class BltFileManager {
      * @param dsName Data source name
      * @return Number of file entries.
      */
-    public long countEntries( String dsName ) {
+    public long countDSFileEntries( String dsName ) {
         IFilter attributeFilter = getFilter( dsName );
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
@@ -146,7 +165,6 @@ public class BltFileManager {
         q.limit( limit );
         q.skip( offset );
         q.order_by( xpr.combined_datetime( FC_DATE_ATTR, FC_TIME_ATTR ), FileQuery.SortDir.DESC );
-        //q.filter( xpr.attribute( FC_SRC_PLC_ATTR ).eq( xpr.string( dataChannel ) ) );
         q.filter( attributeFilter.getExpression() );
         FileResult r = fc.database().execute( q );
         List< BltFile > bltFiles = new ArrayList<BltFile>();
@@ -204,7 +222,188 @@ public class BltFileManager {
         r.delete();
         return bltFile;
     }
-     /**
+    /**
+     * Gets distinct radar stations. Stations are discovered based on the content of
+     * data files saved in the local storage.
+     *
+     * @return List containing distinct radar stations names.
+     */
+    public List<String> getDistinctRadarStations() {
+        Connection conn = null;
+        List<String> sourceNames = new ArrayList<String>();
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT value FROM bdb_source_kvs WHERE " +
+                    "source_id IN (SELECT id FROM bdb_sources WHERE id IN (SELECT DISTINCT " +
+                    "source_id FROM bdb_files)) AND key = 'PLC';" );
+            while( resultSet.next() ) {
+                String value = resultSet.getString( 1 );
+                sourceNames.add( value );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select distinct radar stations: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select distinct radar stations: " + e.getMessage() );
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return sourceNames;
+    }
+    /**
+     * Constructs file selection SQL query based on parameters provided.
+     *
+     * @param select Method builds select query if true, count query otherwise
+     * @param radarStation Source radar station name
+     * @param fileObject File object type
+     * @param startDate Dataset timespan - start date
+     * @param startTime Dataset timespan - start time
+     * @param endDate Dataset timespan - end date
+     * @param endTime Dataset timespan - end time
+     * @param offset Dataset offset
+     * @param limit Dataset size limit
+     * @return SQL query as string
+     */
+    public String buildQuery( boolean select, String radarStation, String fileObject,
+            String startDate, String startTime, String endDate, String endTime, String offset,
+            String limit ) {
+        StringBuffer stmt = new StringBuffer();
+        if( select ) {
+            stmt.append( "SELECT * FROM bdb_files" );
+        } else {
+            stmt.append( "SELECT COUNT(*) FROM bdb_files" );
+        }
+        int numberOfParameters = 0;
+        if( radarStation != null && !radarStation.isEmpty() ) {
+            stmt.append( " WHERE source_id IN (SELECT source_id FROM bdb_source_kvs WHERE value = '" +
+                    radarStation + "' AND key = 'PLC')" );
+            numberOfParameters++;
+        }
+        if( fileObject != null && !fileObject.isEmpty() ) {
+            if( numberOfParameters > 0 ) {
+                stmt.append( " AND what_object = '" + fileObject + "'" );
+            } else {
+                stmt.append( " WHERE what_object = '" + fileObject + "'" );
+                numberOfParameters++;
+            }
+        }
+        if( startDate != null && !startDate.isEmpty() ) {
+            if( numberOfParameters > 0 ) {
+                stmt.append( " AND what_date >= '" + startDate + "'" );
+            } else {
+                stmt.append( " WHERE what_date >= '" + startDate + "'"  );
+                numberOfParameters++;
+            }
+        }
+        if( startTime != null && !startTime.isEmpty() ) {
+            if( numberOfParameters > 0 ) {
+                stmt.append( " AND what_time >= '" + startTime + "'" );
+            } else {
+                stmt.append( " WHERE what_time >= '" + startTime + "'" );
+                numberOfParameters++;
+            }
+        }
+        if( endDate != null && !endDate.isEmpty() ) {
+            if( numberOfParameters > 0 ) {
+                stmt.append( " AND what_date <= '" + endDate + "'" );
+            } else {
+                stmt.append( " WHERE what_date <= '" + endDate + "'" );
+                numberOfParameters++;
+            }
+        }
+        if( endTime != null && !endTime.isEmpty() ) {
+            if( numberOfParameters > 0 ) {
+                stmt.append( " AND what_time <= '" + endTime + "'" );
+            } else {
+                stmt.append( " WHERE what_time <= '" + endTime + "'" );
+                numberOfParameters++;
+            }
+        }
+        if( offset != null && !offset.isEmpty() ) {
+            stmt.append( " OFFSET " + offset );
+        }
+        if( limit != null && !limit.isEmpty() ) {
+            stmt.append( " LIMIT " + limit );
+        }
+        return stmt.toString();
+    }
+    /**
+     * Counts file entries returned by a query passed as parameter.
+     *
+     * @param sql Count query
+     * @return Number of records / file entries
+     */
+    public long countSelectedFileEntries( String sql ) {
+        Connection conn = null;
+        long count = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( sql );
+            while( resultSet.next() ) {
+                count = resultSet.getLong( 1 );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to count file entries: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to count file entries: " + e.getMessage() );
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return count;
+    }
+    /**
+     * Selects fileset matching criteria given by SQL query parameter.
+     *
+     * @param sql SQL query string
+     * @return Fileset matching search criteria
+     */
+    public List<BltFile> getFileEntries( String sql ) {
+        Connection conn = null;
+        List<BltFile> bltFiles = new ArrayList<BltFile>();
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( sql );
+            BltFile bltFile = null;
+            while( resultSet.next() ) {
+                String uuid = resultSet.getString( "uuid" );
+                String path = FileCatalogConnector.getDataStorageDirectory() + File.separator +
+                        uuid + H5_FILE_EXT;
+                String thumbPath = InitAppUtil.getThumbsStorageDirectory();
+                Date storageTime = resultSet.getTimestamp( "stored_at" );
+                String type = resultSet.getString( "what_object" );
+                Date sqlDate = resultSet.getDate( "what_date" );
+                Time sqlTime = resultSet.getTime( "what_time" );
+                DateFormat df = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss");
+                Date timeStamp = df.parse( sqlDate.toString() + " " + sqlTime.toString() );
+                int sourceId = resultSet.getInt( "source_id" );
+                String source = "";
+                String subQuery = "SELECT value FROM bdb_source_kvs WHERE source_id = " +
+                        sourceId + " AND key ='PLC';";
+                Statement subStmt = conn.createStatement();
+                ResultSet subResultSet = subStmt.executeQuery( subQuery );
+                while( subResultSet.next() ) {
+                    String value = subResultSet.getString( 1 );
+                    source = value;
+                }
+                subStmt.close();
+                bltFile = new BltFile( uuid, path, timeStamp, storageTime, source, type,
+                        thumbPath );
+                bltFiles.add( bltFile );
+            }
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select file entries: " + e.getMessage() );
+        } catch( Exception e ) {
+            System.err.println( "Failed to select file entries: " + e.getMessage() );
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return bltFiles;
+    }
+    /**
      * Gets reference to data source manager object.
      *
      * @return Reference to data source manager object

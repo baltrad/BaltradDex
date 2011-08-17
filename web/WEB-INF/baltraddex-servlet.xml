@@ -51,6 +51,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="latestMessages.htm">urlFilenameController</prop>
                 <prop key="logtable.htm">logTableController</prop>
                 <prop key="allMessages.htm">journalController</prop>
+                <prop key="browseFiles.htm">bltFileBrowserController</prop>
             </props>
         </property>
     </bean>
@@ -314,6 +315,32 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <value>fileDetails</value>
         </property>
     </bean>
+    <!--
+        File browser controller
+    -->
+    <bean name="bltFileBrowserController"
+            class="eu.baltrad.dex.bltdata.controller.BltFileBrowserController">
+        <property name="successView">
+            <value>browseFiles</value>
+        </property>
+        <property name="formView">
+            <value>browseFiles</value>
+        </property>
+        <property name="sessionForm">
+            <value>false</value>
+        </property>
+        <property name="bltFileManager">
+            <ref bean="bltFileManager"/>
+        </property>
+        <property name="fileObjectManager">
+            <ref bean="fileObjectManager"/>
+        </property>
+    </bean>
+
+    <!--
+        File object manager
+    -->
+    <bean name="fileObjectManager" class="eu.baltrad.dex.datasource.model.FileObjectManager"/>
 
     <!--
         Subscription controller
@@ -782,7 +809,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
     </bean>
 
-
     <!-- EditDataSourcesController -->
     <bean name="editDataSourceController"
             class="eu.baltrad.dex.datasource.controller.EditDataSourceController">
@@ -793,7 +819,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="dataSourceManager"/>
         </property>
     </bean>
-
 
     <!--
         Message resources.

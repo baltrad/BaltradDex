@@ -39,14 +39,14 @@ Author     : szewczenko
     } else {
         name = BltDataSourceController.getDSName();
     }
-    // Check if list of available subscriptions is not empty
+    // Check if file's list is not empty
     List radarData = ( List )request.getAttribute( "fileEntries" );
     if( radarData == null || radarData.size() <= 0 ) {
         request.getSession().setAttribute( "dataStatus", 0 );
     } else {
         request.getSession().setAttribute( "dataStatus", 1 );
     }
-    long numEntries = BltDataSourceController.getBltFileManager().countEntries(
+    long numEntries = BltDataSourceController.getBltFileManager().countDSFileEntries(
             BltDataSourceController.getDSName() );
     int numPages = ( int )Math.ceil( numEntries / BltFileManager.ENTRIES_PER_PAGE );
     if( ( numPages * BltFileManager.ENTRIES_PER_PAGE ) < numEntries ) {

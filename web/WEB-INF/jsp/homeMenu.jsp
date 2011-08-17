@@ -55,6 +55,10 @@ Author     : szewczenko
                     <img src="includes/images/icons/data-source.png" alt="">
                     <a href="dsShow.htm">Data sources</a>
                 </li>
+                <li>
+                    <img src="includes/images/icons/browse.png" alt="">
+                    <a href="browseFiles.htm">Browse files</a>
+                </li>
             </ul>
         </div>
     </body>
