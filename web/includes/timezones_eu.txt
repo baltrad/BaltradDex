@@ -1,55 +1,13 @@
-Europe/Andorra UTC+01
-Europe/Tirane UTC+01
-Europe/Vienna UTC+01
-Europe/Mariehamn UTC+02
-Europe/Sarajevo UTC+01
-Europe/Brussels UTC+01
-Europe/Sofia UTC+02
-Europe/Minsk UTC+02
-Europe/Zurich UTC+01
-Europe/Prague UTC+01
-Europe/Berlin UTC+01
-Europe/Copenhagen UTC+01
-Europe/Tallinn UTC+02
-Europe/Madrid UTC+01
-Europe/Helsinki UTC+02
-Europe/Paris UTC+01
-Europe/London UTC+00
-Europe/Guernsey UTC+00
-Europe/Gibraltar UTC+01
-Europe/Athens UTC+02
-Europe/Zagreb UTC+01
-Europe/Budapest UTC+01
-Europe/Dublin UTC+00
-Europe/Isle_of_Man UTC+00
-Europe/Rome UTC+01
-Europe/Jersey UTC+00
-Europe/Vaduz UTC+01
-Europe/Vilnius UTC+02
-Europe/Luxembourg UTC+01
-Europe/Riga UTC+02
-Europe/Monaco UTC+01
-Europe/Chisinau UTC+02
-Europe/Podgorica UTC+01
-Europe/Skopje UTC+01
-Europe/Malta UTC+01
-Europe/Amsterdam UTC+01
-Europe/Oslo UTC+01
-Europe/Warsaw UTC+01
-Europe/Lisbon UTC+00
-Europe/Bucharest UTC+02
-Europe/Belgrade UTC+01
-Europe/Kaliningrad UTC+02
-Europe/Moscow UTC+03
-Europe/Volgograd UTC+03
-Europe/Samara UTC+03
-Europe/Stockholm UTC+01
-Europe/Ljubljana UTC+01
-Europe/Bratislava UTC+01
-Europe/San_Marino UTC+01
-Europe/Istanbul UTC+02
-Europe/Kiev UTC+02
-Europe/Uzhgorod UTC+02
-Europe/Zaporozhye UTC+02
-Europe/Simferopol UTC+02
-Europe/Vatican UTC+01
+BST British Summer Time	UTC+1
+CEST Central European Summer Time UTC+2
+CET Central European Time UTC+1
+EEST Eastern European Summer Time UTC+3
+EET Eastern European Time UTC+2
+GMT Greenwich Mean Time	UTC
+IST Irish Standard Time	UTC+1
+KUYT Kuybyshev Time UTC+4
+MSD Moscow Daylight Time UTC+4
+MSK Moscow Standard Time UTC+3
+SAMT Samara Time UTC+4
+WEST Western European Summer Time UTC+1
+WET Western European Time UTC
