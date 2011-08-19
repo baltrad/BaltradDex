@@ -157,10 +157,6 @@ public class GroovyRoutesControllerTest extends TestCase {
   public void testCreateRoute_initial() {
     List<String> types = new ArrayList<String>();
     types.add("groovy");
-    List<String> adaptors = new ArrayList<String>();
-    adaptors.add("A1");
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
     methodMock.viewCreateRoute(model, null, null, null, null, null, null,null);
     methodMockControl.setReturnValue("groovyroute_create");
     
@@ -174,13 +170,8 @@ public class GroovyRoutesControllerTest extends TestCase {
   }
 
   public void testCreateRoute_noAdaptors() {
-    List<String> adaptors = new ArrayList<String>();
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
-
-    model.addAttribute("emessage",
-        "No adaptors defined, please add one before creating a route.");
-    modelControl.setReturnValue(null);
+    methodMock.viewCreateRoute(model, null, null, null, null, null, null,null);
+    methodMockControl.setReturnValue("groovyroute_create");
 
     replay();
 
@@ -188,7 +179,7 @@ public class GroovyRoutesControllerTest extends TestCase {
         null, null, null);
 
     verify();
-    assertEquals("redirect:adaptors.htm", result);
+    assertEquals("groovyroute_create", result);
   }
 
   public void testCreateRoute_success() {
@@ -203,10 +194,6 @@ public class GroovyRoutesControllerTest extends TestCase {
     GroovyRule rule = (GroovyRule)ruleControl.getMock();
     
     List<String> recipients = new ArrayList<String>();
-    List<String> adaptors = new ArrayList<String>();
-    adaptors.add("A1");
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
     methodMock.createRule(def);
     methodMockControl.setReturnValue(rule);
     manager.create(name, author, active, description, recipients, rule);
@@ -233,10 +220,6 @@ public class GroovyRoutesControllerTest extends TestCase {
 
     List<String> types = new ArrayList<String>();
     types.add("groovy");
-    List<String> adaptors = new ArrayList<String>();
-    adaptors.add("A1");
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
     methodMock.viewCreateRoute(model, name, "nisse", true, "some description", recipients, "some code", "Name must be specified.");
     methodMockControl.setReturnValue("groovyroute_create");
 
@@ -260,10 +243,6 @@ public class GroovyRoutesControllerTest extends TestCase {
 
     List<String> types = new ArrayList<String>();
     types.add("groovy");
-    List<String> adaptors = new ArrayList<String>();
-    adaptors.add("A1");
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
     methodMock.viewCreateRoute(model, name, author, active, description, recipients, def, "Can not create a groovy rule when script is empty.");
     methodMockControl.setReturnValue("createroute");
 
@@ -288,10 +267,6 @@ public class GroovyRoutesControllerTest extends TestCase {
     GroovyRule rule = (GroovyRule)ruleControl.getMock();
     
     List<String> recipients = new ArrayList<String>();
-    List<String> adaptors = new ArrayList<String>();
-    adaptors.add("A1");
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
     methodMock.createRule(def);
     methodMockControl.setReturnValue(rule);
     manager.create(name, author, active, description, recipients, rule);

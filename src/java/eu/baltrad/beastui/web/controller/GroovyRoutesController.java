@@ -94,14 +94,7 @@ public class GroovyRoutesController {
       @RequestParam(value = "recipients", required = false) List<String> recipients,
       @RequestParam(value = "typdef", required = false) String typdef) {
     logger.debug("createRoute(Model)");
-    List<String> adaptors = adaptormanager.getAdaptorNames();
     String emessage = null;
-    
-    if (adaptors.size() == 0) {
-      model.addAttribute("emessage",
-          "No adaptors defined, please add one before creating a route.");
-      return "redirect:adaptors.htm";
-    }
 
     // If everything are null, then we probably came here from some menu.
     if (name == null && author == null && active == null && description == null &&
