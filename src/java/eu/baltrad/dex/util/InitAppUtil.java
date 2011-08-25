@@ -119,7 +119,7 @@ public class InitAppUtil {
      */
     public static int initApp() {
         try {
-            Configuration conf = configurationManager.getConfiguration(
+            Configuration conf = configurationManager.getNodeConfiguration(
                     ConfigurationManager.CONF_REC_ID );
             // reconstruct node's full address
             setNodeAddress( NodeConnection.HTTP_PREFIX + conf.getShortAddress() +

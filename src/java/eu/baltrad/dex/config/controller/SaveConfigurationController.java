@@ -82,7 +82,7 @@ public class SaveConfigurationController extends SimpleFormController {
     protected Object formBackingObject( HttpServletRequest request ) {
         Configuration conf = null;
         try {
-            conf = configurationManager.getConfiguration( ConfigurationManager.CONF_REC_ID );
+            conf = configurationManager.getNodeConfiguration( ConfigurationManager.CONF_REC_ID );
         } catch( SQLException e ) {
             log.error( "Error while loading configuration from database: " + e.getMessage() );
         } catch( Exception e ) {

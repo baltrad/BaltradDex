@@ -63,8 +63,9 @@ Author     : szewczenko
                 </li>
                 <li>
                     <img src="includes/images/icons/register.png" alt="">
-                    <a href="#">Delivery register</a>
+                    <a href="#">Delivery registry</a>
                     <ul>
+                        <li><a href="configureRegistry.htm">Configure</a></li>
                         <li><a href="removeRegisterEntries.htm">Clear</a></li>
                     </ul>
                 </li>
@@ -77,8 +78,9 @@ Author     : szewczenko
                 </li>
                 <li>
                     <img src="includes/images/icons/messages.png" alt="">
-                    <a href="#">Messages</a>
+                    <a href="#">System messages</a>
                     <ul>
+                        <li><a href="configureMessages.htm">Configure</a></li>
                         <li><a href="removeMessages.htm">Clear</a></li>
                     </ul>
                 </li>

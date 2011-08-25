@@ -32,6 +32,7 @@ DROP TABLE IF EXISTS dex_messages CASCADE;
 DROP TABLE IF EXISTS dex_radars CASCADE;
 DROP TABLE IF EXISTS dex_node_connections CASCADE;
 DROP TABLE IF EXISTS dex_node_configuration CASCADE;
+DROP TABLE IF EXISTS dex_log_configuration;
 DROP TABLE IF EXISTS dex_file_objects CASCADE;
 DROP TABLE IF EXISTS dex_data_quantities CASCADE;
 DROP TABLE IF EXISTS dex_products CASCADE;

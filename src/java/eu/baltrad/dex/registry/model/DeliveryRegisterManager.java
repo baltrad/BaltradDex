@@ -19,7 +19,7 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.register.model;
+package eu.baltrad.dex.registry.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
 
@@ -45,6 +45,25 @@ public class DeliveryRegisterManager {
     public final static int ENTRIES_PER_PAGE = 12;
     /** Number of pages in the scroll bar, must be an odd number >= 3 */
     public final static int SCROLL_RANGE = 11;
+    /** SQL script creating trimmer function */
+    private static final String SQL_TRIM_REG_BY_NUMBER = "DROP FUNCTION IF EXISTS " +
+        "dex_trim_registry_by_number() CASCADE; CREATE OR REPLACE FUNCTION " +
+        "dex_trim_registry_by_number() RETURNS trigger AS $$ DECLARE records_limit INTEGER; " +
+        "total_records INTEGER; start_record INTEGER; BEGIN records_limit = TG_ARGV[0]; " +
+        "SELECT count(*) FROM dex_delivery_register INTO total_records; IF total_records > " +
+        "records_limit THEN start_record = total_records - records_limit; DELETE FROM " +
+        "dex_delivery_register WHERE id IN (SELECT id FROM dex_delivery_register LIMIT " +
+        "start_record); END IF; RETURN NEW; END; $$ LANGUAGE plpgsql;";
+    /** SQL script creating trimmer function */
+    private static final String SQL_TRIM_REG_BY_DATE = "DROP FUNCTION IF EXISTS " +
+        "dex_trim_registry_by_date() CASCADE; CREATE OR REPLACE FUNCTION " +
+        "dex_trim_registry_by_date() RETURNS trigger AS $$ DECLARE date_limit TIMESTAMP; " +
+        "BEGIN date_limit = to_timestamp(TG_ARGV[0], 'YYYY/MM/DD HH24:MI:SS'); DELETE FROM " +
+        "dex_delivery_register where timestamp < date_limit; RETURN NEW; END; $$ LANGUAGE plpgsql;";
+    /** Trim messages by number function name */
+    public static final String TRIM_REG_BY_NUMBER_FUNC = "dex_trim_registry_by_number()";
+    /** Trim messages by date function name */
+    public static final String TRIM_REG_BY_DATE_FUNC = "dex_trim_registry_by_date()";
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
@@ -263,6 +282,89 @@ public class DeliveryRegisterManager {
             jdbcConnectionManager.returnConnection( conn );
         }
         return delete;
+    }
+    /**
+     * Creates trigger on delivery registry table. Trigger activates trimmer function which
+     * deletes records from delivery registry table.
+     *
+     * @param recordLimit Trimmer function is activated if records number given by this parameter
+     * is exceeded
+     * @throws SQLException
+     * @throws Exception
+     */
+    public void setTrimmer( int recordLimit ) throws SQLException, Exception {
+        Connection conn = null;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = SQL_TRIM_REG_BY_NUMBER + " CREATE TRIGGER dex_trim_registry_by_number_tg "
+                + "AFTER INSERT ON dex_delivery_register FOR EACH ROW EXECUTE PROCEDURE " +
+                "dex_trim_registry_by_number(" + recordLimit + ");";
+            stmt.execute( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to set delivery registry trimmer: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to set delivery registry trimmer: " + e.getMessage() );
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+    }
+    /**
+     * Creates trigger on delivery registry table. Trigger activates trimmer function which
+     * deletes records from delivery registry table.
+     *
+     * @param dateLimit Trimmer function is activated if delivery entry's timestamp is older
+     * than the timestamp given by this parameter
+     * @throws SQLException
+     * @throws Exception
+     */
+    public void setTrimmer( String dateLimit ) throws SQLException, Exception {
+        Connection conn = null;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = SQL_TRIM_REG_BY_DATE + " CREATE TRIGGER dex_trim_registry_by_date_tg " +
+                "AFTER INSERT ON " + "dex_delivery_register FOR EACH ROW EXECUTE PROCEDURE " +
+                "dex_trim_registry_by_date('" + dateLimit + "');";
+            stmt.execute( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to set delivery registry trimmer: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to set delivery registry trimmer: " + e.getMessage() );
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+    }
+    /**
+     * Removes function and the calling trigger on delivery registry table.
+     *
+     * @param functionName Name of the function
+     * @throws SQLException
+     * @throws Exception
+     */
+    public void removeTrimmer( String functionName ) throws SQLException, Exception {
+        Connection conn = null;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "DROP FUNCTION IF EXISTS " + functionName + " CASCADE;";
+            stmt.execute( sql );
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to remove delivery registry trimmer: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to remove delivery registry trimmer: " + e.getMessage() );
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
     }
 }
 //--------------------------------------------------------------------------------------------------

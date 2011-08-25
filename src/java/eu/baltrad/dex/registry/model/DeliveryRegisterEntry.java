@@ -19,7 +19,7 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.register.model;
+package eu.baltrad.dex.registry.model;
 
 import java.util.Date;
 

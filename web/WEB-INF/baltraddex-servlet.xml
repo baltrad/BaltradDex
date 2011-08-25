@@ -120,8 +120,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="settings.htm">urlFilenameController</prop>
                 <prop key="nodeProperties.htm">saveConfigurationController</prop>
                 <prop key="removeMessages.htm">urlFilenameController</prop>
+                <prop key="configureMessages.htm">saveMessagesConfigurationController</prop>
                 <prop key="messagesRemovalStatus.htm">removeMessagesController</prop>
 
+                <prop key="configureRegistry.htm">saveRegistryConfigurationController</prop>
                 <prop key="removeRegisterEntries.htm">registerController</prop>
                 <prop key="registerEntriesRemovalStatus.htm">registerController</prop>
 
@@ -470,7 +472,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         Delivery register manager
     -->
     <bean name="deliveryRegisterManager"
-                        class="eu.baltrad.dex.register.model.DeliveryRegisterManager"/>
+                        class="eu.baltrad.dex.registry.model.DeliveryRegisterManager"/>
 
     <!--
         Clear message table controller - deletes records from message table
@@ -481,11 +483,43 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <value>messagesRemovalStatus</value>
         </property>
     </bean>
-
+    <!--
+        Configure messages controller
+    -->
+    <bean name="saveMessagesConfigurationController"
+            class="eu.baltrad.dex.config.controller.SaveMessagesConfigurationController">
+        <property name="successView">
+            <value>redirect:configureMessages.htm</value>
+        </property>
+        <property name="formView">
+            <value>configureMessages</value>
+        </property>
+        <property name="commandClass">
+            <value>eu.baltrad.dex.config.model.LogConfiguration</value>
+        </property>
+        <property name="validator">
+            <ref bean="saveMessagesConfigurationValidator"/>
+        </property>
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+        <property name="logManager">
+            <ref bean="logManager"/>
+        </property>
+    </bean>
+    <!--
+        Configure messages validator
+    -->
+    <bean name="saveMessagesConfigurationValidator"
+            class="eu.baltrad.dex.config.util.SaveMessagesConfigurationValidator"/>
+    <!--
+        Log manager
+    -->
+    <bean name="logManager" class="eu.baltrad.dex.log.model.LogManager"/>
     <!--
         Register controller - handles data delivery register
     -->
-    <bean name="registerController" class="eu.baltrad.dex.register.controller.RegisterController">
+    <bean name="registerController" class="eu.baltrad.dex.registry.controller.RegisterController">
         <property name="successView">
             <value>showRegister</value>
         </property>
@@ -499,7 +533,35 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="bltFileManager" />
         </property>
     </bean>
-
+    <!--
+        Configure registry controller
+    -->
+    <bean name="saveRegistryConfigurationController"
+            class="eu.baltrad.dex.config.controller.SaveRegistryConfigurationController">
+        <property name="successView">
+            <value>redirect:configureRegistry.htm</value>
+        </property>
+        <property name="formView">
+            <value>configureRegistry</value>
+        </property>
+        <property name="commandClass">
+            <value>eu.baltrad.dex.config.model.LogConfiguration</value>
+        </property>
+        <property name="validator">
+            <ref bean="saveRegistryConfigurationValidator"/>
+        </property>
+        <property name="configurationManager">
+            <ref bean="configurationManager"/>
+        </property>
+        <property name="deliveryRegisterManager">
+            <ref bean="deliveryRegisterManager"/>
+        </property>
+    </bean>
+    <!--
+        Configure messages validator
+    -->
+    <bean name="saveRegistryConfigurationValidator"
+            class="eu.baltrad.dex.config.util.SaveRegistryConfigurationValidator"/>
     <!--
         Edit user controller - allows to modify user credentials
     -->

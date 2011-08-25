@@ -30,7 +30,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Clear register</title>
+        <title>Baltrad | Clear registry</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -47,12 +47,12 @@ Author     : szewczenko
                     </div>
                     <div class="right">
                         <div class="blttitle">
-                            Clear register
+                            Clear registry
                         </div>
                         <c:choose>
                             <c:when test="${number_of_entries == 0}">
                                 <div class="blttext">
-                                    No entries found in data delivery register.
+                                    No entries found in data delivery registry.
                                 </div>
                                 <div class="table">
                                     <div class="addradar">
@@ -70,7 +70,7 @@ Author     : szewczenko
                             <c:otherwise>
                                 <div class="blttext">
                                     Click OK to delete ${number_of_entries} entry/entries
-                                    from data delivery register.
+                                    from data delivery registry.
                                 </div>
                                 <div class="table">
                                     <div class="addradar">

@@ -26,8 +26,8 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@page import="eu.baltrad.dex.register.model.DeliveryRegisterManager"%>
-<%@page import="eu.baltrad.dex.register.controller.RegisterController"%>
+<%@page import="eu.baltrad.dex.registry.model.DeliveryRegisterManager"%>
+<%@page import="eu.baltrad.dex.registry.controller.RegisterController"%>
 <%@page import="java.util.List"%>
 
 <%
@@ -70,7 +70,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Data delivery register</title>
+        <title>Baltrad | Data delivery registry</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -87,12 +87,12 @@ Author     : szewczenko
                     </div>
                     <div class="right">
                         <div class="blttitle">
-                            Data delivery register
+                            Data delivery registry
                         </div>
                         <c:choose>
                             <c:when test="${register_status == 1}">
                                 <div class="blttext">
-                                    All data delivery register entries.
+                                    All data delivery registry entries.
                                 </div>
                                 <div class="table">
                                     <div class="register">
@@ -183,7 +183,7 @@ Author     : szewczenko
                             </c:when>
                             <c:otherwise>
                                 <div class="blttext">
-                                    Data delivery register is empty.
+                                    Data delivery registry is empty.
                                 </div>
                                 <div class="table">
                                     <div class="tablefooter">

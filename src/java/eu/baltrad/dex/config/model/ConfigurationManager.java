@@ -25,6 +25,7 @@ import eu.baltrad.dex.util.JDBCConnectionManager;
 
 import java.sql.Connection;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -55,7 +56,7 @@ public class ConfigurationManager {
      * @param id Record ID
      * @return Configuration object with a given ID
      */
-    public Configuration getConfiguration( int id ) throws SQLException, Exception {
+    public Configuration getNodeConfiguration( int id ) throws SQLException, Exception {
         Connection conn = null;
         Configuration conf = null;
         try {
@@ -88,6 +89,44 @@ public class ConfigurationManager {
             jdbcConnectionManager.returnConnection( conn );
         }
         return conf;
+    }
+    /**
+     * Gets configuration record for a log system with a given ID.
+     *
+     * @param logId Log system identification string
+     * @return LogConfiguration
+     * @throws SQLException
+     * @throws Exception
+     */
+    public LogConfiguration getLogConfiguration( String logId ) throws SQLException, Exception {
+        Connection conn = null;
+        LogConfiguration logConf = null;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_log_configuration WHERE" +
+                    " log_id = '" + logId + "';" );
+            while( resultSet.next() ) {
+                int Id = resultSet.getInt( "id" );
+                String logSystemId = resultSet.getString( "log_id" );
+                boolean trimByNumber = resultSet.getBoolean( "trim_by_number" );
+                boolean trimByDate = resultSet.getBoolean( "trim_by_date" );
+                int recordLimit = resultSet.getInt( "record_limit" );
+                Timestamp dateLimit = resultSet.getTimestamp( "date_limit" );
+                logConf = new LogConfiguration( Id, logSystemId, trimByNumber, trimByDate,
+                        recordLimit, dateLimit );
+            }
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to select log configuration: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to select log configuration: " + e.getMessage() );
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return logConf;
     }
     /**
      * Saves or updates configuration.
@@ -130,6 +169,49 @@ public class ConfigurationManager {
             throw e;
         } catch( Exception e ) {
             System.err.println( "Failed to save configuration: " + e.getMessage() );
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return update;
+    }
+    /**
+     * Saves or updates log configuration.
+     *
+     * @param logConfiguration Log configuration object
+     * @return Number of saved or updated records
+     * @throws SQLException
+     * @throws Exception
+     */
+    public int saveOrUpdate( LogConfiguration logConf ) throws SQLException, Exception {
+        Connection conn = null;
+        int update = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "";
+            // record does not exists, do insert
+            if( logConf.getId() == 0 ) {
+                sql = "INSERT INTO dex_log_configuration (log_id, trim_by_number, trim_by_date, " +
+                    "record_limit, date_limit) VALUES ('" +
+                    logConf.getLogId() + "', " + logConf.getTrimByNumber() + ", " +
+                    logConf.getTrimByDate() + ", " + logConf.getRecordLimit() + ", '" +
+                    logConf.getDateLimit() + "');";
+            } else {
+                // record exists, do update
+                sql = "UPDATE dex_log_configuration SET log_id = '" + logConf.getLogId() + "', " +
+                    "trim_by_number = " + logConf.getTrimByNumber() + ", trim_by_date = " +
+                    logConf.getTrimByDate() + ", record_limit = " + logConf.getRecordLimit() +
+                    ", date_limit = '" + logConf.getDateLimit() + "' WHERE id = '" + logConf.getId()
+                    + "';";
+            }
+            update = stmt.executeUpdate( sql ) ;
+            stmt.close();
+        } catch( SQLException e ) {
+            System.err.println( "Failed to save log configuration: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            System.err.println( "Failed to save log configuration: " + e.getMessage() );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );

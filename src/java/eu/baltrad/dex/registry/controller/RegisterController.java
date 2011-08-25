@@ -19,10 +19,10 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.register.controller;
+package eu.baltrad.dex.registry.controller;
 
-import eu.baltrad.dex.register.model.DeliveryRegisterEntry;
-import eu.baltrad.dex.register.model.DeliveryRegisterManager;
+import eu.baltrad.dex.registry.model.DeliveryRegisterEntry;
+import eu.baltrad.dex.registry.model.DeliveryRegisterManager;
 import eu.baltrad.dex.bltdata.model.BltFileManager;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.util.ITableScroller;
@@ -53,7 +53,6 @@ public class RegisterController extends MultiActionController implements ITableS
     /** Data delivery register entries map key */
     private static final String REGISTER_ENTRIES = "entries";
     private static final String CLEAR_REGISTER_KEY = "number_of_entries";
-    private static final String SHOW_CLEAR_REGISTER_STATUS_KEY = "deleted_entries";
     private static final String OK_MSG_KEY = "message";
     private static final String ERROR_MSG_KEY = "error";
     // view names
@@ -77,7 +76,6 @@ public class RegisterController extends MultiActionController implements ITableS
      */
     public RegisterController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        this.logManager = new LogManager();
     }
     /**
      * Creates delivery entries list.
@@ -148,15 +146,15 @@ public class RegisterController extends MultiActionController implements ITableS
         try {
             int deletedEntries = deliveryRegisterManager.deleteEntries();
             String msg = "Successfully deleted " + Integer.toString( deletedEntries )
-                    + " register entries.";
+                    + " registry entries.";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             log.warn( msg );
         } catch( SQLException e ) {
-            String msg = "Failed to clear data delivery register:" + e.getMessage();
+            String msg = "Failed to clear data delivery registry:" + e.getMessage();
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
             log.error( msg );
         } catch( Exception e ) {
-            String msg = "Failed to clear data delivery register:" + e.getMessage();
+            String msg = "Failed to clear data delivery registry:" + e.getMessage();
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
             log.error( msg );
         }
@@ -264,5 +262,17 @@ public class RegisterController extends MultiActionController implements ITableS
     public void setBltFileManager( BltFileManager bltFileManager ) {
         this.bltFileManager = bltFileManager;
     }
+    /**
+     * Gets reference to log manager object.
+     *
+     * @return logManager Reference to log manager object
+     */
+    public LogManager getLogManager() { return logManager; }
+    /**
+     * Sets reference to log manager object.
+     *
+     * @param logManager Reference to log manager object
+     */
+    public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
 }
 //--------------------------------------------------------------------------------------------------

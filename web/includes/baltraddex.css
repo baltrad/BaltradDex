@@ -1160,7 +1160,25 @@ input:focus, textarea:focus {
 .filebrowser .midcol input {
     width:26px;
 }
-
+/* Log configuration page ------------------------------------------------------------------------*/
+.logconf .leftcol {
+    float:left;
+    clear:left;
+    width:40%;
+    text-align:left;
+    padding:0px 12px 0px 12px;
+}
+.logconf .rightcol {
+    float:left;
+    clear:right;
+    width:40%;
+    color:#444444;
+    font-weight:normal;
+}
+.logconf .col {
+    float:left;
+    padding-right:8px;
+}
 
 
 

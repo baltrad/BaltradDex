@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Remove data delivery register entries page.
+Document   : Remove data delivery registry entries page.
 Created on : Oct 5, 2010, 3:06 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
@@ -30,7 +30,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Clear register</title>
+        <title>Baltrad | Clear registry</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -47,10 +47,10 @@ Author     : szewczenko
                     </div>
                     <div class="right">
                         <div class="blttitle">
-                            Clear register
+                            Clear registry
                         </div>
                         <div class="blttext">
-                            Clear data delivery register status
+                            Clear data delivery registry status
                         </div>
                         <div class="table">
                             <div class="addradar">
@@ -74,76 +74,3 @@ Author     : szewczenko
         </div>
     </body>
 </html>
-
-
-
-
-
-<%--
-    int deletedEntries = ( Integer )request.getAttribute( "deleted_entries" );
-%>
-
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Delivery register</title>
-    </head>
-    <body>
-        <div id="container">
-            <div id="header">
-                <script type="text/javascript" src="includes/header.js"></script>
-            </div>
-            <div id="content">
-                <div id="left">
-                    <%@include file="/WEB-INF/jsp/mainMenu.jsp"%>
-                </div>
-                <div id="right">
-                    <div id="page-title">
-                        <div class="left">
-                            Data delivery register
-                        </div>
-                        <div class="right">
-                        </div>
-                    </div>
-                    <c:choose>
-                        <c:when test="${deletedEntries > 0}">
-                            <div class="message">
-                                <div class="icon">
-                                    <img src="includes/images/icons/circle-alert.png"
-                                         alt="no_entries"/>
-                                </div>
-                                <div class="text">
-                                    Deleted <%=deletedEntries%> entries from data delivery register.
-                                </div>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="message">
-                                <div class="icon">
-                                    <img src="includes/images/icons/circle-alert.png"
-                                         alt="no_entries"/>
-                                </div>
-                                <div class="text">
-                                    No entries found in data delivery register.
-                                </div>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-                    <div class="footer">
-                        <div class="right">
-                            <button class="rounded" type="button"
-                                onclick="window.location='configuration.htm'">
-                                <span>OK</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div id="clear"></div>
-            </div>
-        </div>
-        <div id="footer">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
-        </div>
-    </body>
-</html--%>

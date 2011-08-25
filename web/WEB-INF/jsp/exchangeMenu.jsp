@@ -45,7 +45,7 @@ Author     : szewczenko
                 </li>
                 <li>
                     <img src="includes/images/icons/register.png" alt="">
-                    <a href="showRegister.htm">Delivery register</a>
+                    <a href="showRegister.htm">Delivery registry</a>
                 </li>
             </ul>
         </div>

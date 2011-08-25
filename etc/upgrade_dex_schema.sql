@@ -240,6 +240,20 @@ BEGIN
     EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'Failed to alter column "dex_channel_permissions.channel_id"';
     END;
+    BEGIN
+        CREATE TABLE dex_log_configuration
+        (
+            id SERIAL NOT NULL,
+            log_id VARCHAR(32) NOT NULL UNIQUE,
+            trim_by_number BOOLEAN NOT NULL,
+            trim_by_date BOOLEAN NOT NULL,
+            record_limit INT,
+            date_limit TIMESTAMP,
+            PRIMARY KEY(id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_log_configuration"';
+    END;
 END;
 $$ LANGUAGE plpgsql;
 

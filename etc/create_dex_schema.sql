@@ -31,6 +31,7 @@ DROP TABLE IF EXISTS dex_messages;
 DROP TABLE IF EXISTS dex_radars CASCADE;
 DROP TABLE IF EXISTS dex_node_connections;
 DROP TABLE IF EXISTS dex_node_configuration;
+DROP TABLE IF EXISTS dex_log_configuration;
 DROP TABLE IF EXISTS dex_file_objects CASCADE;
 DROP TABLE IF EXISTS dex_data_quantities CASCADE;
 DROP TABLE IF EXISTS dex_products CASCADE;
@@ -186,6 +187,17 @@ CREATE TABLE dex_node_configuration
     temp_dir VARCHAR(32) NOT NULL,
     email VARCHAR(32) NOT NULL,
     PRIMARY KEY (id)
+);
+-- dex_message_configuration -----------------------------------------------------------------------
+CREATE TABLE dex_log_configuration
+(
+    id SERIAL NOT NULL,
+    log_id VARCHAR(32) NOT NULL UNIQUE,
+    trim_by_number BOOLEAN NOT NULL,
+    trim_by_date BOOLEAN NOT NULL,
+    record_limit INT,
+    date_limit TIMESTAMP,
+    PRIMARY KEY(id)
 );
 -- file object id sequence -------------------------------------------------------------------------
 CREATE SEQUENCE file_object_id_seq;

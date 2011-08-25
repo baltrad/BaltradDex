@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.core.util;
 
-import eu.baltrad.dex.register.model.DeliveryRegisterManager;
-import eu.baltrad.dex.register.model.DeliveryRegisterEntry;
+import eu.baltrad.dex.registry.model.DeliveryRegisterManager;
+import eu.baltrad.dex.registry.model.DeliveryRegisterEntry;
 import eu.baltrad.frame.model.BaltradFrameHandler;
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.dex.user.model.User;
