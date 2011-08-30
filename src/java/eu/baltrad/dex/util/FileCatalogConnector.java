@@ -111,8 +111,10 @@ public class FileCatalogConnector {
             }
         } catch( FileCatalogError e ) {
             log.error( "File catalog error: " + e.getMessage() );
+            log.error( "Full stack trace: " + e.getStackTrace() );
         } catch( Exception e ) {
             log.error( "File catalog error: " + e.getMessage() );
+            log.error( "Full stack trace: " + e.getStackTrace() );
         }
     }
     /**
