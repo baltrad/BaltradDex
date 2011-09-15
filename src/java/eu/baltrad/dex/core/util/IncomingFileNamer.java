@@ -21,27 +21,38 @@
 
 package eu.baltrad.dex.core.util;
 
+import eu.baltrad.fc.FileEntry;
 import eu.baltrad.fc.FileNamer;
 import eu.baltrad.fc.Oh5Attribute;
 import eu.baltrad.fc.Oh5File;
+import eu.baltrad.fc.Oh5Metadata;
 
 public class IncomingFileNamer extends FileNamer {
+  @Override
+  protected String do_name(Oh5File file) {
+    return name_metadata(file.metadata());
+  }
+
+  @Override
+  protected String do_name(FileEntry entry) {
+    return name_metadata(entry.metadata());
+  }
+
   /**
    * Give names similar to `(PVOL seang 2011-06-13T13:14)`
    */
-  @Override
-  protected String do_name(Oh5File file) {
+  protected String name_metadata(Oh5Metadata meta) {
     String name = "";
-    name += file.what_object();
+    name += meta.what_object();
     name += " ";
-    name += file.source().get("_name");
+    name += meta.source().get("_name");
     name += " ";
-    name += file.what_date().to_iso_string(true);
+    name += meta.what_date().to_iso_string(true);
     name += "T";
-    name += file.what_time().to_iso_string(true);
-    if (file.what_object().equals("SCAN")) {
+    name += meta.what_time().to_iso_string(true);
+    if (meta.what_object().equals("SCAN")) {
       name += " elangle=";
-      Oh5Attribute elangle = file.attribute("/dataset1/where/elangle");
+      Oh5Attribute elangle = meta.attribute("/dataset1/where/elangle");
       if (elangle != null) {
         name += String.valueOf(elangle.value().to_double());
       } else {
@@ -49,5 +60,5 @@ public class IncomingFileNamer extends FileNamer {
       }
     }
     return name;
- }
+  }
 }

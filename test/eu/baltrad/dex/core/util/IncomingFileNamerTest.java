@@ -24,54 +24,56 @@ package eu.baltrad.dex.core.util;
 import junit.framework.TestCase;
 
 import eu.baltrad.fc.Date;
-import eu.baltrad.fc.HlFile;
 import eu.baltrad.fc.Oh5Attribute;
 import eu.baltrad.fc.Oh5Group;
+import eu.baltrad.fc.Oh5Metadata;
 import eu.baltrad.fc.Oh5Node;
 import eu.baltrad.fc.Oh5Scalar;
 import eu.baltrad.fc.Time;
 
 public class IncomingFileNamerTest extends TestCase {
   private IncomingFileNamer classUnderTest;
+  private Oh5Metadata metadata;
 
   public void setUp() {
     classUnderTest = new IncomingFileNamer();
+    metadata = new Oh5Metadata();
   }
 
   public void testNamePvol() {
-    HlFile file = new HlFile();
-    Oh5Node what = file.root().add(new Oh5Group("what"));
+    Oh5Node what = metadata.root().add(new Oh5Group("what"));
     what.add(new Oh5Attribute("object", new Oh5Scalar("PVOL")));
     what.add(new Oh5Attribute("date", new Oh5Scalar(new Date(2011, 6, 22))));
     what.add(new Oh5Attribute("time", new Oh5Scalar(new Time(13, 14, 15))));
     what.add(new Oh5Attribute("source", new Oh5Scalar("_name:seang")));
     
-    assertEquals("PVOL seang 2011-06-22T13:14:15", classUnderTest.name(file));
+    assertEquals("PVOL seang 2011-06-22T13:14:15",
+                 classUnderTest.name_metadata(metadata));
   }
 
   public void testNameScan() {
-    HlFile file = new HlFile();
-    Oh5Node what = file.root().add(new Oh5Group("what"));
+    Oh5Node what = metadata.root().add(new Oh5Group("what"));
     what.add(new Oh5Attribute("object", new Oh5Scalar("SCAN")));
     what.add(new Oh5Attribute("date", new Oh5Scalar(new Date(2011, 6, 22))));
     what.add(new Oh5Attribute("time", new Oh5Scalar(new Time(13, 14, 15))));
     what.add(new Oh5Attribute("source", new Oh5Scalar("_name:seang"))); 
-    Oh5Node ds1 = file.root().add(new Oh5Group("dataset1"));
+    Oh5Node ds1 = metadata.root().add(new Oh5Group("dataset1"));
     Oh5Node ds1w = ds1.add(new Oh5Group("where"));
     ds1w.add(new Oh5Attribute("elangle", new Oh5Scalar(12.5)));
 
-    assertEquals("SCAN seang 2011-06-22T13:14:15 elangle=12.5", classUnderTest.name(file));
+    assertEquals("SCAN seang 2011-06-22T13:14:15 elangle=12.5",
+                 classUnderTest.name_metadata(metadata));
   }
 
   public void testNameScan_noElangle() {
-    HlFile file = new HlFile();
-    Oh5Node what = file.root().add(new Oh5Group("what"));
+    Oh5Node what = metadata.root().add(new Oh5Group("what"));
     what.add(new Oh5Attribute("object", new Oh5Scalar("SCAN")));
     what.add(new Oh5Attribute("date", new Oh5Scalar(new Date(2011, 6, 22))));
     what.add(new Oh5Attribute("time", new Oh5Scalar(new Time(13, 14, 15))));
     what.add(new Oh5Attribute("source", new Oh5Scalar("_name:seang"))); 
 
-    assertEquals("SCAN seang 2011-06-22T13:14:15 elangle=?", classUnderTest.name(file));
+    assertEquals("SCAN seang 2011-06-22T13:14:15 elangle=?",
+                 classUnderTest.name_metadata(metadata));
   }
 
 }

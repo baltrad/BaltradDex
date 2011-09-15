@@ -44,7 +44,7 @@ import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileEntry;
 import eu.baltrad.fc.DuplicateEntry;
 import eu.baltrad.fc.FileCatalogError;
-import eu.baltrad.fc.Oh5FileMatcher;
+import eu.baltrad.fc.Oh5MetadataMatcher;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;
@@ -643,7 +643,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         message.setFileEntry(fc.database().entry_by_uuid(fileEntry.uuid()));
         bltMessageManager.manage( message );
         
-        Oh5FileMatcher fileMatcher = new Oh5FileMatcher();
+        Oh5MetadataMatcher metadataMatcher = new Oh5MetadataMatcher();
 
         // iterate through subscriptions list to send data to subscribers
         List<Subscription> subs =
@@ -652,7 +652,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             // check if file entry matches the subscribed data source's filter
             String dataSourceName = sub.getDataSourceName();
             IFilter filter = bltFileManager.getFilter( dataSourceName );
-            boolean matches = fileMatcher.match(fileEntry, filter.getExpression());
+            boolean matches = metadataMatcher.match(fileEntry.metadata(), filter.getExpression());
             // make sure that user exists locally
             User user = userManager.getUserByName(sub.getUserName());
             DeliveryRegisterEntry dre =

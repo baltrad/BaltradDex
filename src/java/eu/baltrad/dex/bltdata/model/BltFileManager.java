@@ -30,13 +30,14 @@ import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
 
-import eu.baltrad.fc.FileCatalog;
-import eu.baltrad.fc.ExpressionFactory;
-import eu.baltrad.fc.FileQuery;
-import eu.baltrad.fc.FileResult;
-import eu.baltrad.fc.FileEntry;
 import eu.baltrad.fc.AttributeQuery;
 import eu.baltrad.fc.AttributeResult;
+import eu.baltrad.fc.ExpressionFactory;
+import eu.baltrad.fc.FileCatalog;
+import eu.baltrad.fc.FileEntry;
+import eu.baltrad.fc.FileQuery;
+import eu.baltrad.fc.FileResult;
+import eu.baltrad.fc.Oh5Metadata;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -149,6 +150,25 @@ public class BltFileManager {
         r.delete();
         return count;
     }
+    
+    /**
+     * Convert a FileEntry instance to a BltFile instance
+     */
+    protected BltFile fileEntryToBltFile(FileEntry entry) throws ParseException {
+        // XXX: this method does too much!
+        Oh5Metadata metadata = entry.metadata();
+        return new BltFile(
+            entry.uuid(), fc.storage().store( entry ),
+            format.parse( metadata.what_date().to_iso_string() + "T" +
+                          metadata.what_time().to_iso_string() ),
+            format.parse( entry.stored_at().to_iso_string() ),
+            metadata.what_source(), metadata.what_object(),
+            InitAppUtil.getThumbsStorageFolder() + File.separator +
+            entry.uuid() + IMAGE_FILE_EXT
+        );
+    }
+
+
     /**
      * Gets data set for a given data source.
      *
@@ -170,16 +190,7 @@ public class BltFileManager {
         List< BltFile > bltFiles = new ArrayList<BltFile>();
         while( r.next() ) {
             try {
-                FileEntry fileEntry = r.entry();
-                BltFile bltFile = new BltFile(
-                    fileEntry.uuid(), fc.storage().store( fileEntry ),
-                    format.parse( fileEntry.what_date().to_iso_string() + "T" +
-                                  fileEntry.what_time().to_iso_string() ),
-                    format.parse( fileEntry.stored_at().to_iso_string() ),
-                    fileEntry.what_source(), fileEntry.what_object(),
-                    InitAppUtil.getThumbsStorageFolder() + File.separator +
-                    fileEntry.uuid() + IMAGE_FILE_EXT );
-                bltFiles.add( bltFile );
+                bltFiles.add( fileEntryToBltFile( r.entry() ) );
             } catch( ParseException e ) {
                 System.err.println( "Error while parsing file's timestamp: " + e.getMessage() );
             }
@@ -205,15 +216,7 @@ public class BltFileManager {
         BltFile bltFile = null;
         while( r.next() ) {
             try {
-            FileEntry fileEntry = r.entry();
-            bltFile = new BltFile(
-                fileEntry.uuid(), fc.storage().store( fileEntry ),
-                format.parse( fileEntry.what_date().to_iso_string() + "T" +
-                              fileEntry.what_time().to_iso_string() ),
-                format.parse( fileEntry.stored_at().to_iso_string() ),
-                fileEntry.what_source(), fileEntry.what_object(),
-                InitAppUtil.getThumbsStorageFolder() + File.separator + fileEntry.uuid() +
-                IMAGE_FILE_EXT );
+                bltFile = fileEntryToBltFile( r.entry() );
             } catch( ParseException e ) {
                 System.err.println( "Error while parsing file's timestamp: " + e.getMessage() );
             }
