@@ -5,6 +5,10 @@
             <a href="adaptors.htm">Adaptors</a>
         </li>
         <li>
+          <img src="includes/images/icons/anomalydetectors.png" alt=""/>
+          <a href="anomalydetectors.htm">Anomaly detectors</a>
+        </li>
+        <li>
             <img src="includes/images/icons/route.png" alt="">
             <a href="#">Routes</a>
             <ul>

@@ -64,17 +64,6 @@ public class AdaptorsController {
     this.manager = manager;
   }
 
-  /**
-   * Just fake the behaviour from the BaltradDex.....
-   * 
-   * @param model
-   * @return
-   */
-  @RequestMapping("/signin.htm")
-  public String signin(Model model) {
-    return "redirect:adaptors.htm";
-  }
-
   @RequestMapping("/adaptors.htm")
   public String showAdaptors(Model model,
       @RequestParam(value="emessage", required=false) String emessage) {

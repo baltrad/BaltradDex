@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.qc.AnomalyDetector;
+import eu.baltrad.beast.qc.IAnomalyDetectorManager;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.composite.CompositingRule;
@@ -58,16 +60,18 @@ public class CompositeRoutesController {
   private IRuleUtilities utilities = null;
   
   /**
+   * The anomaly detector manager
+   */
+  private IAnomalyDetectorManager anomalymanager = null;
+  
+  /**
    * Default constructor
    */
   public CompositeRoutesController() {
   }
 
   /**
-   * Sets the router manager instance
-   * 
-   * @param manager
-   *          the manager
+   * @param manager the manager to set
    */
   @Autowired
   public void setManager(IRouterManager manager) {
@@ -75,9 +79,7 @@ public class CompositeRoutesController {
   }
 
   /**
-   * Sets the adaptor manager
-   * 
-   * @param adaptormanager
+   * @param adaptormanager the adaptor manager to set
    */
   @Autowired
   public void setAdaptorManager(IBltAdaptorManager adaptormanager) {
@@ -91,7 +93,15 @@ public class CompositeRoutesController {
   public void setRuleUtilities(IRuleUtilities utils) {
     this.utilities = utils;
   }
-  
+
+  /**
+   * @param anomalymanager the anomaly manager to set
+   */
+  @Autowired
+  public void setAnomalyDetectorManager(IAnomalyDetectorManager anomalymanager) {
+    this.anomalymanager = anomalymanager;
+  }
+
   /**
    * Handles create route requests 
    * @param model the model
@@ -105,6 +115,7 @@ public class CompositeRoutesController {
    * @param interval the interval
    * @param timeout the timeout
    * @param sources the sources this rule should affect
+   * @param detectors the detectors that should be used for this rule
    * @return a jsp page string or redirect
    */
   @RequestMapping("/compositeroute_create.htm")
@@ -116,10 +127,12 @@ public class CompositeRoutesController {
       @RequestParam(value = "description", required = false) String description,
       @RequestParam(value = "recipients", required = false) List<String> recipients,
       @RequestParam(value = "byscan", required = false) Boolean byscan,
+      @RequestParam(value = "selection_method", required = false) Integer selection_method,
       @RequestParam(value = "areaid", required = false) String areaid,
       @RequestParam(value = "interval", required = false) Integer interval,
       @RequestParam(value = "timeout", required = false) Integer timeout,
-      @RequestParam(value = "sources", required = false) List<String> sources) {
+      @RequestParam(value = "sources", required = false) List<String> sources,
+      @RequestParam(value = "detectors", required = false) List<String> detectors) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     String emessage = null;
     
@@ -130,10 +143,10 @@ public class CompositeRoutesController {
     }
     
     if (name == null && author == null && active == null && description == null && byscan == null &&
-        recipients == null && areaid == null && interval == null && timeout == null &&
-        sources == null) {
+        selection_method == null && recipients == null && areaid == null && interval == null && timeout == null &&
+        sources == null && detectors == null) {
       return viewCreateRoute(model, name, author, active, description,
-          recipients, byscan, areaid, interval, timeout, sources, null);
+          recipients, byscan, selection_method, areaid, interval, timeout, sources, detectors, null);
     }
     
     if (name == null || name.trim().equals("")) {
@@ -150,7 +163,8 @@ public class CompositeRoutesController {
         int iinterval = (interval == null) ? 15 : interval.intValue();
         int itimeout = (timeout == null) ? 15*60 : timeout.intValue();
         boolean bbyscan = (byscan == null) ? false : byscan.booleanValue();
-        CompositingRule rule = createRule(areaid, iinterval, sources, itimeout, bbyscan);
+        int iselection_method = (selection_method == null) ? 0 : selection_method.intValue();
+        CompositingRule rule = createRule(areaid, iinterval, sources, detectors, itimeout, bbyscan, iselection_method);
         List<String> recip = (recipients == null) ? new ArrayList<String>() : recipients;
         RouteDefinition def = manager.create(name, author, bactive, description, recip, rule);
         manager.storeDefinition(def);
@@ -162,7 +176,7 @@ public class CompositeRoutesController {
     }
     
     return viewCreateRoute(model, name, author, active, description,
-        recipients, byscan, areaid, interval, timeout, sources, emessage);
+        recipients, byscan, selection_method, areaid, interval, timeout, sources, detectors, emessage);
   }
   
   /**
@@ -189,17 +203,19 @@ public class CompositeRoutesController {
       @RequestParam(value = "description", required = false) String description,
       @RequestParam(value = "recipients", required = false) List<String> recipients,
       @RequestParam(value = "byscan", required = false) Boolean byscan,
+      @RequestParam(value = "selection_method", required = false) Integer selection_method,
       @RequestParam(value = "areaid", required = false) String areaid,
       @RequestParam(value = "interval", required = false) Integer interval,
       @RequestParam(value = "timeout", required = false) Integer timeout,
       @RequestParam(value = "sources", required = false) List<String> sources,
+      @RequestParam(value = "detectors", required = false) List<String> detectors,
       @RequestParam(value = "submitButton", required = false) String operation) {
     RouteDefinition def = manager.getDefinition(name);
     if (def == null) {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
     if (operation != null && operation.equals("Modify")) {
-      return modifyRoute(model, name, author, active, description, byscan, recipients, areaid, interval, timeout, sources);
+      return modifyRoute(model, name, author, active, description, byscan, selection_method, recipients, areaid, interval, timeout, sources, detectors);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -211,7 +227,7 @@ public class CompositeRoutesController {
       if (def.getRule() instanceof CompositingRule) {
         CompositingRule crule = (CompositingRule)def.getRule();
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
-            def.getRecipients(), crule.isScanBased(), crule.getArea(), crule.getInterval(), crule.getTimeout(), crule.getSources(), null);
+            def.getRecipients(), crule.isScanBased(), crule.getSelectionMethod(), crule.getArea(), crule.getInterval(), crule.getTimeout(), crule.getSources(), crule.getDetectors(), null);
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a compositing rule");
       }
@@ -235,16 +251,18 @@ public class CompositeRoutesController {
    * @return compositeroute_create
    */
   protected String viewCreateRoute(Model model, String name, String author,
-      Boolean active, String description, List<String> recipients, Boolean byscan,
-      String areaid, Integer interval, Integer timeout, List<String> sources, String emessage) {
+      Boolean active, String description, List<String> recipients, Boolean byscan, Integer selection_method,
+      String areaid, Integer interval, Integer timeout, List<String> sources, List<String> detectors, String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
     model.addAttribute("adaptors", adaptors);
+    model.addAttribute("anomaly_detectors", anomalymanager.list());
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
     model.addAttribute("active", (active == null) ? new Boolean(true) : active);
     model.addAttribute("byscan", (byscan == null) ? new Boolean(false) : byscan);
+    model.addAttribute("selection_method", (selection_method == null) ? new Integer(0) : selection_method);
     model.addAttribute("description", (description == null) ? "" : description);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
@@ -253,6 +271,8 @@ public class CompositeRoutesController {
     model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
+    model.addAttribute("detectors",
+        (detectors == null) ? new ArrayList<String>() : detectors);
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
@@ -267,16 +287,19 @@ public class CompositeRoutesController {
       String description,
       List<String> recipients,
       Boolean byscan,
+      Integer selection_method,
       String areaid,
       Integer interval,
       Integer timeout,
       List<String> sources,
+      List<String> detectors,
       String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     
     model.addAttribute("adaptors", adaptors);
     model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
+    model.addAttribute("anomaly_detectors", anomalymanager.list());
     
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
@@ -285,11 +308,14 @@ public class CompositeRoutesController {
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
     model.addAttribute("byscan", (byscan == null) ? new Boolean(false) : byscan);
+    model.addAttribute("selection_method", (selection_method == null) ? new Integer(0) : selection_method);
     model.addAttribute("areaid", (areaid == null) ? "" : areaid);
     model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
     model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
+    model.addAttribute("detectors",
+        (detectors == null) ? new ArrayList<String>() : detectors);
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
@@ -332,18 +358,23 @@ public class CompositeRoutesController {
       Boolean active, 
       String description,
       Boolean byscan,
+      Integer selection_method,
       List<String> recipients,
       String area,
       Integer interval,
       Integer timeout,
-      List<String> sources) {
+      List<String> sources,
+      List<String> detectors) {
     List<String> newrecipients = (recipients == null) ? new ArrayList<String>() : recipients;
     List<String> newsources = (sources == null) ? new ArrayList<String>() : sources;
+    List<String> newdetectors = (detectors == null) ? new ArrayList<String>() : detectors;
+    
     boolean isactive = (active != null) ? active.booleanValue() : false;
     int iinterval = (interval != null) ? interval.intValue() : 15;
     int itimeout = (timeout != null) ? timeout.intValue() : 15*60;
     String emessage = null;
     boolean bbyscan = (byscan != null) ? byscan.booleanValue() : false;
+    int iselection_method = (selection_method != null) ? selection_method.intValue() : 0;
     if (area == null || area.trim().equals("")) {
       emessage = "You must specify an area.";
     }
@@ -353,7 +384,7 @@ public class CompositeRoutesController {
     
     if (emessage == null) {
       try {
-        CompositingRule rule = createRule(area, iinterval, newsources, itimeout, bbyscan);
+        CompositingRule rule = createRule(area, iinterval, newsources, newdetectors, itimeout, bbyscan, iselection_method);
         RouteDefinition def = manager.create(name, author, isactive, description,
             newrecipients, rule);
         manager.updateDefinition(def);
@@ -365,7 +396,7 @@ public class CompositeRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        newrecipients,byscan, area, interval, timeout, sources, null);
+        newrecipients,byscan, selection_method, area, interval, timeout, sources, detectors, null);
   }
   
   protected List<Integer> getIntervals() {
@@ -378,13 +409,15 @@ public class CompositeRoutesController {
   }
   
   protected CompositingRule createRule(String areaid, int interval,
-      List<String> sources, int timeout, boolean byscan) {
+      List<String> sources, List<String> detectors, int timeout, boolean byscan, int selection_method) {
     CompositingRule rule = (CompositingRule)manager.createRule(CompositingRule.TYPE);
     rule.setArea(areaid);
     rule.setInterval(interval);
     rule.setSources(sources);
+    rule.setDetectors(detectors);
     rule.setTimeout(timeout);
     rule.setScanBased(byscan);
+    rule.setSelectionMethod(selection_method);
     return rule;
   }
 }
