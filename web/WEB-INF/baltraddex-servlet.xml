@@ -313,6 +313,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="bltDataProcessorController">
             <ref bean="bltDataProcessorController"/>
         </property>
+	<property name="fileCatalog">
+	    <ref bean="fileCatalog" />
+	</property>
         <property name="successView">
             <value>fileDetails</value>
         </property>
@@ -408,6 +411,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="coreFilterManager">
             <ref bean="coreFilterManager"/>
         </property>
+	<property name="fileCatalog">
+	    <ref bean="fileCatalog" />
+	</property>
     </bean>
 
     <!--
@@ -456,6 +462,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="bltFileManager">
             <ref bean="bltFileManager" />
         </property>
+        <property name="fileCatalog">
+	    <ref bean="fileCatalog" />
+	</property>
     </bean>
 
     <!--
@@ -836,6 +845,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="bltDataProcessorController">
             <ref bean="bltDataProcessorController"/>
         </property>
+	<property name="fileCatalog">
+	    <ref bean="fileCatalog" />
+	</property>
     </bean>
 
     <!-- DataSourceManager -->
@@ -990,7 +1002,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <constructor-arg value="${data.storage.folder}" />
         <constructor-arg value="1000" /> <!-- cache size -->
     </bean>
-    <bean id="fc" class="eu.baltrad.fc.FileCatalog" destroy-method="delete">
+    <bean id="fileCatalog" class="eu.baltrad.fc.FileCatalog" destroy-method="delete">
         <constructor-arg ref="bdb_db" />
         <constructor-arg ref="bdb_storage" />
     </bean>
