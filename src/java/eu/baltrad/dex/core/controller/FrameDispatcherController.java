@@ -31,7 +31,6 @@ import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
-import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 import eu.baltrad.dex.core.util.FramePublisherManager;
 import eu.baltrad.dex.core.util.FramePublisher;
@@ -106,7 +105,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private Logger log;
     private BltDataProcessorController bltDataProcessorController;
     // Reference to file catalog object
-    private FileCatalog fc;
+    private FileCatalog fileCatalog;
     // Beast message manager
     private IBltMessageManager bltMessageManager;
     // remote data source listing
@@ -127,8 +126,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private FramePublisher framePublisher;
     /** References delivery register manager object @see DeliveryRegisterManager */
     private DeliveryRegisterManager deliveryRegisterManager;
-    /** Reference to FileCatalogConnector */
-    private FileCatalogConnector fileCatalogConnector;
     /** Reference to BltFileManager */
     private BltFileManager bltFileManager;
 //------------------------------------------------------------------------------------------ Methods
@@ -136,8 +133,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * Constructor.
      */
     public FrameDispatcherController() {
-        this.fileCatalogConnector = FileCatalogConnector.getInstance();
-        this.fc = fileCatalogConnector.getFileCatalog();
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
@@ -621,7 +616,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         
         FileEntry fileEntry = null;
         try {
-            fileEntry = fc.store( swapFile.getAbsolutePath() );
+            fileEntry = fileCatalog.store( swapFile.getAbsolutePath() );
         } catch (DuplicateEntry e) {
             log.error("Duplicate entry error: " + e.getMessage());
             // exception while storing file in FileCatalog - set error code
@@ -640,7 +635,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         // file successfully stored in File Catalog
         // send message to Beast Framework
         BltDataMessage message = new BltDataMessage();
-        message.setFileEntry(fc.database().entry_by_uuid(fileEntry.uuid()));
+        message.setFileEntry(fileCatalog.database().entry_by_uuid(fileEntry.uuid()));
         bltMessageManager.manage( message );
         
         Oh5MetadataMatcher metadataMatcher = new Oh5MetadataMatcher();
@@ -949,6 +944,12 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public void setBltFileManager( BltFileManager bltFileManager ) {
         this.bltFileManager = bltFileManager;
+    }
+
+    public FileCatalog getFileCatalog() { return fileCatalog; }
+
+    public void setFileCatalog(FileCatalog fileCatalog) {
+        this.fileCatalog = fileCatalog;
     }
 }
 //--------------------------------------------------------------------------------------------------
