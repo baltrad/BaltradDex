@@ -133,6 +133,10 @@ List of routes
                                                     </div>
                                                     <div id="cell" class="active">
                                                         <c:choose>
+                                                            <c:when test="${route.ruleValid == false}">
+                                                              <img src="includes/images/icons/routes-warning.png"
+                                                                       alt="Invalid">
+                                                            </c:when>
                                                             <c:when test="${route.active == true}">
                                                                 <img src="includes/images/icons/success.png"
                                                                      alt="Active">

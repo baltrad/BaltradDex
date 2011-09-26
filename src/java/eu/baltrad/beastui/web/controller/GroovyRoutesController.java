@@ -153,11 +153,22 @@ public class GroovyRoutesController {
       }
     } else {
       String d = "";
+      String emsg = null;
       if (def.getRule() instanceof GroovyRule) {
-        d = ((GroovyRule) def.getRule()).getScript();
+        GroovyRule r = (GroovyRule)def.getRule();
+        d = r.getScript();
+        if (r.getState() != GroovyRule.OK) {
+          emsg = "Failure in groovy script";
+          if (r.getThrowable() != null) {
+            emsg += ":" + r.getThrowable().getMessage();
+            if (r.getThrowable().getCause() != null) {
+              emsg += " caused by " + r.getThrowable().getCause().toString();
+            }
+          }
+        }
       }
       return viewShowRoute(model, def.getName(), def.getAuthor(), def
-          .isActive(), def.getDescription(), def.getRecipients(), d, null);
+          .isActive(), def.getDescription(), def.getRecipients(), d, emsg);
     }
   }
 
@@ -290,7 +301,9 @@ public class GroovyRoutesController {
     
     if (emessage == null) {
       try {
+        logger.debug("Creating rule");
         GroovyRule rule = createRule(script);
+        logger.debug("Rule created");
         RouteDefinition def = manager.create(name, author, isactive, description,
             newrecipients, rule);
         manager.updateDefinition(def);
@@ -300,6 +313,7 @@ public class GroovyRoutesController {
         if (t.getCause() != null) {
           emessage += " caused by:\n" + t.getCause().toString();
         }
+        logger.debug("Failure during rule modification", t);
       }
     }
     
