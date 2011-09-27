@@ -21,31 +21,55 @@
 
 package eu.baltrad.dex.core.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.baltrad.fc.FileEntry;
 import eu.baltrad.fc.FileNamer;
 import eu.baltrad.fc.Oh5Attribute;
 import eu.baltrad.fc.Oh5File;
 import eu.baltrad.fc.Oh5Metadata;
+import eu.baltrad.fc.Oh5Source;
 
 public class IncomingFileNamer extends FileNamer {
+  private List<String> sourceKeyPriorities;
+
+  public IncomingFileNamer() {
+    sourceKeyPriorities = new ArrayList<String>();
+    sourceKeyPriorities.add("_name");
+    sourceKeyPriorities.add("NOD");
+    sourceKeyPriorities.add("PLC");
+    sourceKeyPriorities.add("WMO");
+    sourceKeyPriorities.add("ORG");
+    sourceKeyPriorities.add("CTY");
+  }
+
+  public List<String> getSourceKeyPriorities() {
+    return sourceKeyPriorities;
+  }
+
+  public void setSourceKeyPriorities(List<String> value) {
+    sourceKeyPriorities = value;
+  }
+
   @Override
   protected String do_name(Oh5File file) {
-    return name_metadata(file.metadata());
+    return nameMetadata(file.metadata());
   }
 
   @Override
   protected String do_name(FileEntry entry) {
-    return name_metadata(entry.metadata());
+    return nameMetadata(entry.metadata());
   }
 
   /**
    * Give names similar to `(PVOL seang 2011-06-13T13:14)`
    */
-  protected String name_metadata(Oh5Metadata meta) {
+  protected String nameMetadata(Oh5Metadata meta) {
     String name = "";
     name += meta.what_object();
     name += " ";
-    name += meta.source().get("_name");
+    name += getSourceRepr(meta.source());
     name += " ";
     name += meta.what_date().to_iso_string(true);
     name += "T";
@@ -61,4 +85,14 @@ public class IncomingFileNamer extends FileNamer {
     }
     return name;
   }
+
+  protected String getSourceRepr(Oh5Source src) {
+    for (String key : sourceKeyPriorities) {
+      if (src.has(key)) {
+        return key + ":" + src.get(key);
+      }
+    }
+    return "unknown";
+  }
+
 }
