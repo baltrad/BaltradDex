@@ -59,17 +59,21 @@ public class IncomingFileNamer extends FileNamer {
 
   @Override
   protected String do_name(FileEntry entry) {
-    return nameMetadata(entry.metadata());
+    return nameMetadata(entry.metadata(), entry.source());
+  }
+
+  protected String nameMetadata(Oh5Metadata meta) {
+    return nameMetadata(meta, meta.source());
   }
 
   /**
    * Give names similar to `(PVOL seang 2011-06-13T13:14)`
    */
-  protected String nameMetadata(Oh5Metadata meta) {
+  protected String nameMetadata(Oh5Metadata meta, Oh5Source source) {
     String name = "";
     name += meta.what_object();
     name += " ";
-    name += getSourceRepr(meta.source());
+    name += getSourceRepr(source);
     name += " ";
     name += meta.what_date().to_iso_string(true);
     name += "T";

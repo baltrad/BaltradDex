@@ -26,7 +26,11 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.easymock.MockControl;
+import org.easymock.classextension.MockClassControl;
+
 import eu.baltrad.fc.Date;
+import eu.baltrad.fc.FileEntry;
 import eu.baltrad.fc.Oh5Attribute;
 import eu.baltrad.fc.Oh5Group;
 import eu.baltrad.fc.Oh5Metadata;
@@ -86,9 +90,7 @@ public class IncomingFileNamerTest extends TestCase {
     keyPriorities.add("NOD");
     classUnderTest.setSourceKeyPriorities(keyPriorities);
 
-    Oh5Source src = new Oh5Source();
-    src.add("NOD", "n");
-    src.add("PLC", "p");
+    Oh5Source src = Oh5Source.from_string("NOD:n,PLC:p");
 
     assertEquals("PLC:p", classUnderTest.getSourceRepr(src));
   }
@@ -99,4 +101,27 @@ public class IncomingFileNamerTest extends TestCase {
     assertEquals("unknown", classUnderTest.getSourceRepr(src));
   }
 
+  public void testName_fileEntry() {
+    Oh5Node what = metadata.root().add(new Oh5Group("what"));
+    what.add(new Oh5Attribute("object", new Oh5Scalar("PVOL")));
+    what.add(new Oh5Attribute("date", new Oh5Scalar(new Date(2011, 6, 22))));
+    what.add(new Oh5Attribute("time", new Oh5Scalar(new Time(13, 14, 15))));
+    what.add(new Oh5Attribute("source", new Oh5Scalar("WMO:12345")));
+    Oh5Source src = Oh5Source.from_string("_name:seang");
+    
+    MockControl entryControl = MockClassControl.createControl(FileEntry.class);
+    FileEntry entry = (FileEntry)entryControl.getMock();
+
+    entry.metadata();
+    entryControl.setReturnValue(metadata, MockControl.ONE_OR_MORE);
+    entry.source();
+    entryControl.setReturnValue(src, MockControl.ONE_OR_MORE);
+
+    entryControl.replay();
+
+    assertEquals("PVOL _name:seang 2011-06-22T13:14:15",
+                 classUnderTest.do_name(entry));
+    
+    entryControl.verify();
+  }
 }
