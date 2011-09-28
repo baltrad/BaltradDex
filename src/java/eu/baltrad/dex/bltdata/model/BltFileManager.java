@@ -21,7 +21,6 @@
 
 package eu.baltrad.dex.bltdata.model;
 
-import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
@@ -30,13 +29,14 @@ import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
 
-import eu.baltrad.fc.FileCatalog;
-import eu.baltrad.fc.ExpressionFactory;
-import eu.baltrad.fc.FileQuery;
-import eu.baltrad.fc.FileResult;
-import eu.baltrad.fc.FileEntry;
 import eu.baltrad.fc.AttributeQuery;
 import eu.baltrad.fc.AttributeResult;
+import eu.baltrad.fc.ExpressionFactory;
+import eu.baltrad.fc.FileCatalog;
+import eu.baltrad.fc.FileEntry;
+import eu.baltrad.fc.FileQuery;
+import eu.baltrad.fc.FileResult;
+import eu.baltrad.fc.Oh5Metadata;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -90,10 +90,8 @@ public class BltFileManager {
     /** Date and time format string */
     private static SimpleDateFormat format = new SimpleDateFormat( FC_DATE_STR + "'T'" +
             FC_TIME_STR );
-    /** Reference to FileCatalogConnector object */
-    private FileCatalogConnector fileCatalogConnector;
     /** Reference to FileCatalog object */
-    private FileCatalog fc;
+    private FileCatalog fileCatalog;
     /** References DataSourceManager */
     private DataSourceManager dataSourceManager;
     /** References CoreFilterManager */
@@ -104,11 +102,9 @@ public class BltFileManager {
     private InitAppUtil init;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Constructor gets reference to FileCatalogConnector instance.
+     * Constructor
      */
     public BltFileManager() {
-        this.fileCatalogConnector = FileCatalogConnector.getInstance();
-        this.fc = fileCatalogConnector.getFileCatalog();
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
         this.init = InitAppUtil.getInstance();
     }
@@ -143,12 +139,31 @@ public class BltFileManager {
         ExpressionFactory xpr = new ExpressionFactory();
         q.filter( attributeFilter.getExpression() );
         q.fetch( "fileCount", xpr.count( xpr.attribute( "file:uuid" ) ) );
-        AttributeResult r = fc.database().execute( q );
+        AttributeResult r = fileCatalog.database().execute( q );
         r.next();
         long count = r.int64_( "fileCount" );
         r.delete();
         return count;
     }
+    
+    /**
+     * Convert a FileEntry instance to a BltFile instance
+     */
+    protected BltFile fileEntryToBltFile(FileEntry entry) throws ParseException {
+        // XXX: this method does too much!
+        Oh5Metadata metadata = entry.metadata();
+        return new BltFile(
+            entry.uuid(), fileCatalog.storage().store( entry ),
+            format.parse( metadata.what_date().to_iso_string() + "T" +
+                          metadata.what_time().to_iso_string() ),
+            format.parse( entry.stored_at().to_iso_string() ),
+            metadata.what_source(), metadata.what_object(),
+            /*InitAppUtil.getThumbsStorageFolder()*/ init.getConfiguration().getThumbsDir() +
+            File.separator + entry.uuid() + IMAGE_FILE_EXT
+        );
+    }
+
+
     /**
      * Gets data set for a given data source.
      *
@@ -166,20 +181,11 @@ public class BltFileManager {
         q.skip( offset );
         q.order_by( xpr.combined_datetime( FC_DATE_ATTR, FC_TIME_ATTR ), FileQuery.SortDir.DESC );
         q.filter( attributeFilter.getExpression() );
-        FileResult r = fc.database().execute( q );
+        FileResult r = fileCatalog.database().execute( q );
         List< BltFile > bltFiles = new ArrayList<BltFile>();
         while( r.next() ) {
             try {
-                FileEntry fileEntry = r.entry();
-                BltFile bltFile = new BltFile(
-                    fileEntry.uuid(), fc.storage().store( fileEntry ),
-                    format.parse( fileEntry.what_date().to_iso_string() + "T" +
-                                  fileEntry.what_time().to_iso_string() ),
-                    format.parse( fileEntry.stored_at().to_iso_string() ),
-                    fileEntry.what_source(), fileEntry.what_object(),
-                    init.getThumbsDirPath() + File.separator +
-                    fileEntry.uuid() + IMAGE_FILE_EXT );
-                bltFiles.add( bltFile );
+                bltFiles.add( fileEntryToBltFile( r.entry() ) );
             } catch( ParseException e ) {
                 System.err.println( "Error while parsing file's timestamp: " + e.getMessage() );
             }
@@ -201,19 +207,11 @@ public class BltFileManager {
         FileQuery q = new FileQuery();
         // filter the query with a given file identity string
         q.filter( xpr.eq( xpr.attribute( FC_FILE_UUID ), xpr.string( uuid ) ) );
-        FileResult r = fc.database().execute( q );
+        FileResult r = fileCatalog.database().execute( q );
         BltFile bltFile = null;
         while( r.next() ) {
             try {
-            FileEntry fileEntry = r.entry();
-            bltFile = new BltFile(
-                fileEntry.uuid(), fc.storage().store( fileEntry ),
-                format.parse( fileEntry.what_date().to_iso_string() + "T" +
-                              fileEntry.what_time().to_iso_string() ),
-                format.parse( fileEntry.stored_at().to_iso_string() ),
-                fileEntry.what_source(), fileEntry.what_object(),
-                init.getThumbsDirPath() + File.separator + fileEntry.uuid() +
-                IMAGE_FILE_EXT );
+                bltFile = fileEntryToBltFile( r.entry() );
             } catch( ParseException e ) {
                 System.err.println( "Error while parsing file's timestamp: " + e.getMessage() );
             }
@@ -370,9 +368,19 @@ public class BltFileManager {
             BltFile bltFile = null;
             while( resultSet.next() ) {
                 String uuid = resultSet.getString( "uuid" );
-                String path = FileCatalogConnector.getDataStorageDirectory() + File.separator +
-                        uuid + H5_FILE_EXT;
-                String thumbPath = init.getThumbsDirPath();
+//<<<<<<< HEAD
+                //String path = FileCatalogConnector.getDataStorageDirectory() + File.separator +
+                //        uuid + H5_FILE_EXT;
+                //String thumbPath = init.getThumbsDirPath();
+//=======
+                // XXX: this is not correct. If the result is larger than the size of
+                // LocalStorage used by FileCatalog, old files might get deleted and the
+                // paths become invalid. Path to the local file should only be asked
+                // when it's actually used.
+                String path = fileCatalog.local_path_for_uuid(uuid);
+                String thumbPath = /*InitAppUtil.getThumbsStorageDirectory();*/
+                        init.getConfiguration().getThumbsDir();
+//>>>>>>> 34fc6621d01e2768d3ed7f4e729163474f1d1149
                 Date storageTime = resultSet.getTimestamp( "stored_at" );
                 String type = resultSet.getString( "what_object" );
                 Date sqlDate = resultSet.getDate( "what_date" );
@@ -432,6 +440,12 @@ public class BltFileManager {
      */
     public void setCoreFilterManager( CoreFilterManager coreFilterManager ) {
         this.coreFilterManager = coreFilterManager;
+    }
+
+    public FileCatalog getFileCatalog() { return fileCatalog; }
+
+    public void setFileCatalog(FileCatalog fileCatalog) {
+      this.fileCatalog = fileCatalog;
     }
 }
 //--------------------------------------------------------------------------------------------------

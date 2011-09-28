@@ -26,9 +26,10 @@ import eu.baltrad.dex.bltdata.model.BltFileManager;
 import eu.baltrad.dex.bltdata.model.BltFile;
 import eu.baltrad.dex.bltdata.model.BltDataset;
 import eu.baltrad.dex.bltdata.model.BltDataProjector;
-import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
+
+import eu.baltrad.fc.FileCatalog;
 
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.Group;
@@ -84,6 +85,7 @@ public class BltFileDetailsController implements Controller {
     private BltDataProjector bltDataProjector;
     private BltFileManager bltFileManager;
     private BltDataProcessorController bltDataProcessorController;
+    private FileCatalog fileCatalog;
     private String successView;
     private Logger log;
     private InitAppUtil init;
@@ -112,8 +114,7 @@ public class BltFileDetailsController implements Controller {
         // Determine data type
         String fileObject = bltFile.getType();
         // open file from storage dir
-        String filePath = FileCatalogConnector.getDataStorageDirectory() + File.separator + uuid 
-                + BltDataProcessor.H5_FILE_EXT;
+        String filePath = fileCatalog.local_path_for_uuid(uuid);
         H5File h5File = bltDataProcessor.openH5File( filePath );
         HashMap model = new HashMap();
         // Process the file depending on file object / data type
@@ -330,5 +331,11 @@ public class BltFileDetailsController implements Controller {
      * @param Reference to success view name string
      */
     public void setSuccessView( String successView ) { this.successView = successView; }
+
+    public FileCatalog getFileCatalog() { return fileCatalog; }
+
+    public void setFileCatalog(FileCatalog fileCatalog) {
+        this.fileCatalog = fileCatalog;
+    }
 }
 //--------------------------------------------------------------------------------------------------

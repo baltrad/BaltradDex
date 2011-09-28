@@ -299,6 +299,9 @@ public class GroovyRoutesControllerTest extends TestCase {
       public String getScript() {
         return "def";
       }
+      public int getState() {
+        return GroovyRule.OK;
+      }
     });
     manager.getDefinition(name);
     managerControl.setReturnValue(routeDefinition);
@@ -596,6 +599,7 @@ public class GroovyRoutesControllerTest extends TestCase {
     groovyRule.setScript("abc");
 
     replay();
+    
     groovyRuleControl.replay();
     
     GroovyRule result = classUnderTest.createRule("abc");

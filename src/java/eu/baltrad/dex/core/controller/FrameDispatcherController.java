@@ -31,7 +31,6 @@ import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
-import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 import eu.baltrad.dex.core.util.FramePublisherManager;
 import eu.baltrad.dex.core.util.FramePublisher;
@@ -44,7 +43,7 @@ import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileEntry;
 import eu.baltrad.fc.DuplicateEntry;
 import eu.baltrad.fc.FileCatalogError;
-import eu.baltrad.fc.Oh5FileMatcher;
+import eu.baltrad.fc.Oh5MetadataMatcher;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;
@@ -107,7 +106,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private Logger log;
     private BltDataProcessorController bltDataProcessorController;
     // Reference to file catalog object
-    private FileCatalog fc;
+    private FileCatalog fileCatalog;
     // Beast message manager
     private IBltMessageManager bltMessageManager;
     // remote data source listing
@@ -136,8 +135,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private FramePublisher framePublisher;
     /** References delivery register manager object @see DeliveryRegisterManager */
     private DeliveryRegisterManager deliveryRegisterManager;
-    /** Reference to FileCatalogConnector */
-    private FileCatalogConnector fileCatalogConnector;
     /** Reference to BltFileManager */
     private BltFileManager bltFileManager;
 //------------------------------------------------------------------------------------------ Methods
@@ -145,8 +142,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * Constructor.
      */
     public FrameDispatcherController() {
-        this.fileCatalogConnector = FileCatalogConnector.getInstance();
-        this.fc = fileCatalogConnector.getFileCatalog();
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
         this.init = InitAppUtil.getInstance();
     }
@@ -688,7 +683,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         
         FileEntry fileEntry = null;
         try {
-            fileEntry = fc.store( swapFile.getAbsolutePath() );
+            fileEntry = fileCatalog.store( swapFile.getAbsolutePath() );
         } catch (DuplicateEntry e) {
             log.error("Duplicate entry error: " + e.getMessage());
             // exception while storing file in FileCatalog - set error code
@@ -707,10 +702,10 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         // file successfully stored in File Catalog
         // send message to Beast Framework
         BltDataMessage message = new BltDataMessage();
-        message.setFileEntry(fc.database().entry_by_uuid(fileEntry.uuid()));
+        message.setFileEntry(fileCatalog.database().entry_by_uuid(fileEntry.uuid()));
         bltMessageManager.manage( message );
         
-        Oh5FileMatcher fileMatcher = new Oh5FileMatcher();
+        Oh5MetadataMatcher metadataMatcher = new Oh5MetadataMatcher();
 
         // iterate through subscriptions list to send data to subscribers
         List<Subscription> subs =
@@ -719,7 +714,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             // check if file entry matches the subscribed data source's filter
             String dataSourceName = sub.getDataSourceName();
             IFilter filter = bltFileManager.getFilter( dataSourceName );
-            boolean matches = fileMatcher.match(fileEntry, filter.getExpression());
+            boolean matches = metadataMatcher.match(fileEntry.metadata(), filter.getExpression());
             // make sure that user exists locally
             User user = userManager.getUserByName(sub.getUserName());
             DeliveryRegisterEntry dre =
@@ -1078,6 +1073,12 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public void setBltFileManager( BltFileManager bltFileManager ) {
         this.bltFileManager = bltFileManager;
+    }
+
+    public FileCatalog getFileCatalog() { return fileCatalog; }
+
+    public void setFileCatalog(FileCatalog fileCatalog) {
+        this.fileCatalog = fileCatalog;
     }
 }
 //--------------------------------------------------------------------------------------------------

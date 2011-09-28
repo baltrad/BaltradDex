@@ -28,6 +28,7 @@ Creates a composite route
 
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
+<%@page import="eu.baltrad.beast.qc.AnomalyDetector"%>
 
 <html>
     <head>
@@ -73,6 +74,7 @@ Creates a composite route
                                             List<String> adaptors = (List<String>)request.getAttribute("adaptors");
                                             List<String> sourceids = (List<String>)request.getAttribute("sourceids");
                                             List<Integer> intervals = (List<Integer>)request.getAttribute("intervals");
+                                            List<AnomalyDetector> anomaly_detectors = (List<AnomalyDetector>)request.getAttribute("anomaly_detectors");
 
                                             String name = (String)request.getAttribute("name");
                                             String author = (String)request.getAttribute("author");
@@ -80,10 +82,12 @@ Creates a composite route
                                             String description = (String)request.getAttribute("description");
                                             List<String> recipients = (List<String>)request.getAttribute("recipients");
                                             Boolean byscan = (Boolean)request.getAttribute("byscan");
+                                            Integer selection_method = (Integer)request.getAttribute("selection_method");
                                             String areaid = (String)request.getAttribute("areaid");
                                             Integer interval = (Integer)request.getAttribute("interval");
                                             Integer timeout = (Integer)request.getAttribute("timeout");
                                             List<String> sources = (List<String>)request.getAttribute("sources");
+                                            List<String> detectors = (List<String>)request.getAttribute("detectors");
 
                                             String activestr = (active == true)?"checked":"";
                                             String byscanstr = (byscan == true)?"checked":"";
@@ -94,11 +98,13 @@ Creates a composite route
                                         <div class="row">Active</div>
                                         <div class="row">Description</div>
                                         <div class="row">Scan based</div>
+                                        <div class="row">Selection method</div>
                                         <div class="row4">Recipients</div>
                                         <div class="row">Areaid</div>
                                         <div class="row">Interval</div>
                                         <div class="row">Timeout</div>
                                         <div class="row6">Sources</div>
+                                        <div class="row6">Detectors</div>
                                     </div>
                                     <div class="rightcol">
                                         <div class="row">
@@ -132,6 +138,15 @@ Creates a composite route
                                                Check to select scan-based route
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <select name="selection_method">
+                                              <option value="0" <%=selection_method==0?"selected":""%>>Nearest radar</option>
+                                              <option value="1" <%=selection_method==1?"selected":""%>>Nearest sea level</option>
+                                            </select>
+                                            <div class="hint">
+                                              Choose a selection method
+                                            </div>
+                                        </div>                                        
                                         <div class="row4">
                                             <select multiple size="4" name="recipients">
                                             <%
@@ -198,6 +213,25 @@ Creates a composite route
                                                Select source radars
                                             </div>
                                         </div>
+                                        <div class="row6">
+                                            <select multiple size="6" name="detectors">
+                                            <%
+                                              for (AnomalyDetector detector : anomaly_detectors) {
+                                                String selectstr = "";
+                                                String detectorname = detector.getName();
+                                                if (detectors.contains(detectorname)) {
+                                                  selectstr = "selected";
+                                                }
+                                            %>
+                                                <option value="<%=detectorname%>" <%=selectstr%>><%=detectorname%></option>
+                                            <%
+                                              }
+                                            %>
+                                            </select>
+                                            <div class="hint">
+                                               Select anomaly detectors to be used
+                                            </div>
+                                        </div>                                        
                                     </div>
                                     <div class="tablefooter">
                                        <div class="buttons">

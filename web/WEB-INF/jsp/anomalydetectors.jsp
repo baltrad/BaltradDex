@@ -1,5 +1,5 @@
 <%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -16,8 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-List of routes
-@date 2010-03-25
+List of anomaly detectors
+@date 2011-09-22
 @author Anders Henja
 --------------------------------------------------------------------------------------------------%>
 
@@ -25,16 +25,14 @@ List of routes
     "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-
-<%@page import="java.util.List"%>
-
+<%@ page import="java.util.List" %>
 <%
-    // Check if there are routes available to display
-    List routes = ( List )request.getAttribute( "routes" );
-    if( routes == null || routes.size() <= 0 ) {
-        request.getSession().setAttribute( "routes_status", 0 );
+    // Check if there are adaptors available to display
+    List detectors = ( List )request.getAttribute("anomaly_detectors");
+    if( detectors == null || detectors.size() <= 0 ) {
+        request.getSession().setAttribute( "detectors_status", 0 );
     } else {
-        request.getSession().setAttribute( "routes_status", 1 );
+        request.getSession().setAttribute( "detectors_status", 1 );
     }
 %>
 
@@ -42,7 +40,7 @@ List of routes
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Routes</title>
+        <title>Baltrad | Anomaly detectors</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -59,10 +57,11 @@ List of routes
                     </div>
                     <div class="right">
                         <div class="blttitle">
-                            Routes
+                            Anomaly detectors
                         </div>
                         <div class="blttext">
-                            List of routes. Click on route name in order to modify route settings.
+                            List of anomaly detectors. Click on name to modify or delete or click
+                            Create to create a new anomaly detector.
                         </div>
                         <div class="table">
                             <%if (request.getAttribute("emessage") != null) {%>
@@ -75,10 +74,10 @@ List of routes
                                     </div>
                                 </div>
                             <%}%>
-                            <form name="createRouteForm" action="createroute.htm">
+                            <form name="createAnomalyDetectorForm" action="create_anomaly_detector.htm">
                                 <c:choose>
-                                    <c:when test="${routes_status == 1}">
-                                        <div class="showroutes">
+                                    <c:when test="${detectors_status == 1}">
+                                        <div class="anomalydetectors">
                                             <div class="tableheader">
                                                 <div id="cell" class="count">&nbsp;</div>
                                                 <div id="cell" class="name">
@@ -87,65 +86,21 @@ List of routes
                                                 <div id="cell" class="description">
                                                     Description
                                                 </div>
-                                                <div id="cell" class="type">
-                                                    Type
-                                                </div>
-                                                <div id ="cell" class="active">
-                                                    Active
-                                                </div>
                                             </div>
                                             <c:set var="count" scope="page" value="1"/>
-                                            <c:forEach var="route" items="${routes}">
+                                            <c:forEach var="detector" items="${anomaly_detectors}">
                                                 <div class="entry">
                                                     <div id="cell" class="count">
                                                         <c:out value="${count}"/>
                                                         <c:set var="count" value="${count + 1}"/>
                                                     </div>
                                                     <div id="cell" class="name">
-                                                        <a href="showroute.htm?name=${route.name}">
-                                                            <c:out value="${route.name}"/>
+                                                        <a href="show_anomaly_detector.htm?name=${detector.name}">
+                                                            <c:out value="${detector.name}"/>
                                                         </a>
                                                     </div>
                                                     <div id="cell" class="description">
-                                                        <c:out value="${route.description}"/>
-                                                    </div>
-                                                    <div id="cell" class="type">
-                                                        <c:choose>
-                                                            <c:when test="${route.ruleType == 'groovy'}">
-                                                                <c:out value="Script"/>
-                                                            </c:when>
-                                                            <c:when test="${route.ruleType == 'blt_volume'}">
-                                                                <c:out value="Volume"/>
-                                                            </c:when>
-                                                            <c:when test="${route.ruleType == 'composite'}">
-                                                              <c:out value="Composite"/>
-                                                            </c:when>
-                                                            <c:when test="${route.ruleType == 'bdb_trim_age'}">
-                                                                <c:out value="BdbTrimAge"/>
-                                                            </c:when>
-                                                            <c:when test="${route.ruleType == 'bdb_trim_count'}">
-                                                                <c:out value="BdbTrimCount"/>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <c:out value="${route.ruleType}"/>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </div>
-                                                    <div id="cell" class="active">
-                                                        <c:choose>
-                                                            <c:when test="${route.ruleValid == false}">
-                                                              <img src="includes/images/icons/routes-warning.png"
-                                                                       alt="Invalid">
-                                                            </c:when>
-                                                            <c:when test="${route.active == true}">
-                                                                <img src="includes/images/icons/success.png"
-                                                                     alt="Active">
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <img src="includes/images/icons/stop.png"
-                                                                     alt="Inactive"/>
-                                                            </c:otherwise>
-                                                        </c:choose>
+                                                        <c:out value="${detector.description}"/>
                                                     </div>
                                                 </div>
                                             </c:forEach>
@@ -158,8 +113,11 @@ List of routes
                                            onclick="window.location.href='processing.htm'">
                                            <span>Back</span>
                                        </button>
+                                       <button class="rounded" type="submit">
+                                           <span>Create</span>
+                                       </button>
                                    </div>
-                                </div>
+                               </div>
                             </form>
                         </div>
                     </div>

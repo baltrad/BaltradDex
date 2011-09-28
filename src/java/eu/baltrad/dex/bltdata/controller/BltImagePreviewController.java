@@ -22,8 +22,9 @@
 package eu.baltrad.dex.bltdata.controller;
 
 import eu.baltrad.dex.bltdata.model.BltDataProcessor;
-import eu.baltrad.dex.util.FileCatalogConnector;
 import eu.baltrad.dex.util.InitAppUtil;
+
+import eu.baltrad.fc.FileCatalog;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -73,6 +74,7 @@ public class BltImagePreviewController implements Controller {
     private BltDataProcessor bltDataProcessor;
     private BltDataProcessorController bltDataProcessorController;
     private InitAppUtil init;
+    private FileCatalog fileCatalog;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
@@ -115,8 +117,8 @@ public class BltImagePreviewController implements Controller {
             if( fileObject.equals( BltDataProcessor.ODIMH5_SCAN_OBJ ) || fileObject.equals(
                     BltDataProcessor.ODIMH5_PVOL_OBJ ) ) {
                 bltDataProcessorController.polarH5Dataset2Image(
-                    FileCatalogConnector.getDataStorageDirectory() + File.separator + fileUuid +
-                    BltDataProcessor.H5_FILE_EXT, datasetPath, datasetWhere,
+                    fileCatalog.local_path_for_uuid(fileUuid),
+                    datasetPath, datasetWhere,
                     Integer.parseInt( datasetWidth ), ( short )0, 1.0f, IMAGE_RANGE_RINGS_COLOR,
                     IMAGE_RANGE_MASK_COLOR, filePath );
             }
@@ -187,6 +189,12 @@ public class BltImagePreviewController implements Controller {
     public void setBltDataProcessorController(
             BltDataProcessorController bltDataProcessorController ) {
         this.bltDataProcessorController = bltDataProcessorController;
+    }
+
+    public FileCatalog getFileCatalog() { return fileCatalog; }
+
+    public void setFileCatalog(FileCatalog fileCatalog) {
+        this.fileCatalog = fileCatalog;
     }
 }
 //--------------------------------------------------------------------------------------------------

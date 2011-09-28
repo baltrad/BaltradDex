@@ -313,6 +313,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="bltDataProcessorController">
             <ref bean="bltDataProcessorController"/>
         </property>
+	<property name="fileCatalog">
+	    <ref bean="fileCatalog" />
+	</property>
         <property name="successView">
             <value>fileDetails</value>
         </property>
@@ -408,6 +411,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="coreFilterManager">
             <ref bean="coreFilterManager"/>
         </property>
+	<property name="fileCatalog">
+	    <ref bean="fileCatalog" />
+	</property>
     </bean>
 
     <!--
@@ -456,6 +462,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="bltFileManager">
             <ref bean="bltFileManager" />
         </property>
+        <property name="fileCatalog">
+	    <ref bean="fileCatalog" />
+	</property>
     </bean>
 
     <!--
@@ -836,6 +845,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="bltDataProcessorController">
             <ref bean="bltDataProcessorController"/>
         </property>
+	<property name="fileCatalog">
+	    <ref bean="fileCatalog" />
+	</property>
     </bean>
 
     <!-- DataSourceManager -->
@@ -923,6 +935,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- we want transactions on classes -->
     <tx:annotation-driven transaction-manager="txManager" proxy-target-class="true"/>
     
+    <bean id="anomalydetectormanager" class="eu.baltrad.beast.qc.AnomalyDetectorManager" autowire="byType"/>
+    
     <bean id="xmlrpcgenerator" class="eu.baltrad.beast.adaptor.xmlrpc.XmlRpcCommandGenerator"/>
   
     <bean id="xmlrpcadaptormanager" class="eu.baltrad.beast.adaptor.xmlrpc.XmlRpcConfigurationManager" autowire="byType"/>
@@ -986,10 +1000,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="bdb_db" class="eu.baltrad.fc.Database" factory-method="create" destroy-method="delete">
         <constructor-arg value="${database.uri}" />
     </bean>
-    <bean id="bdb_storage" class="eu.baltrad.fc.CacheDirStorage" destroy-method="delete">
+    <bean id="bdb_storage" class="eu.baltrad.fc.CacheDirStorage" init-method="init" destroy-method="delete">
         <constructor-arg value="${data.storage.folder}" />
+        <constructor-arg value="1000" /> <!-- cache size -->
     </bean>
-    <bean id="fc" class="eu.baltrad.fc.FileCatalog" destroy-method="delete">
+    <bean id="fileCatalog" class="eu.baltrad.fc.FileCatalog" destroy-method="delete">
         <constructor-arg ref="bdb_db" />
         <constructor-arg ref="bdb_storage" />
     </bean>
@@ -1010,6 +1025,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
  
     <bean id="adaptorsController" class="eu.baltrad.beastui.web.controller.AdaptorsController" autowire="byType" />
+    <bean id="anomalyDetectorsController" class="eu.baltrad.beastui.web.controller.AnomalyDetectorController" autowire="byType" />
     <bean id="groovyRoutesController" class="eu.baltrad.beastui.web.controller.GroovyRoutesController" autowire="byType" />
     <bean id="compositeRoutesController" class="eu.baltrad.beastui.web.controller.CompositeRoutesController" autowire="byType" />
     <bean id="volumeRoutesController" class="eu.baltrad.beastui.web.controller.VolumeRoutesController" autowire="byType" />

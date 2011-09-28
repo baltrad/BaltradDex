@@ -1018,6 +1018,22 @@ input:focus, textarea:focus {
 .modifyadaptor input, .modifyadaptor select {
     width:260px;
 }
+/* Anomaly detectors page ---------------------------------------------------------------------------------*/
+.anomalydetectors .name {
+    width:30%;
+}
+.anomalydetectors .type {
+    width:40%;
+}
+.create_anomaly_detector .row, .modify_anomaly_detector .row {
+    height:36px;
+}
+.create_anomaly_detector input, .create_anomaly_detector select {
+    width:260px;
+}
+.modify_anomaly_detector input, .modify_anomaly_detector select {
+    width:260px;
+}
 /* Routes and schedule pages ---------------------------------------------------------------------*/
 .showroutes .name {
     width:20%;
