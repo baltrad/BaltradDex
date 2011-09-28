@@ -44,7 +44,7 @@ html, body {
 #bltheader {
     width:1024px;
     height:88px;
-    background-image:url("images/Banner_1024x88_shadow.png");
+    background-image:url("images/Banner_1024x88.png");
     background-repeat:no-repeat;
 }
 #bltheader .help {
