@@ -28,6 +28,7 @@ import eu.baltrad.dex.subscription.model.SubscriptionManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
+import eu.baltrad.dex.util.NodeAddress;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
@@ -67,6 +68,7 @@ public class RemoteDataSourceController extends MultiActionController {
     private FrameDispatcherController frameDispatcherController;
     private SubscriptionManager subscriptionManager;
     private Logger log;
+    private InitAppUtil init;
     // remote data source object list
     private List remoteDataSources;
     // selected data source list
@@ -75,8 +77,16 @@ public class RemoteDataSourceController extends MultiActionController {
     private List subscribedDataSources;
     // remote node name
     private String senderNodeName;
-    // sender node address
-    private String senderNodeAddress;
+     /** Sender communication scheme */
+    private String senderScheme;
+    /** Sender host address */
+    private String senderHostAddress;
+    /** Sender port number */
+    private int senderPort;
+    /** Sender application context */
+    private String senderAppCtx;
+    /** Sender entry point address */
+    private String senderEntryAddress;
     // user name
     private String userName;
     // user's password
@@ -87,6 +97,7 @@ public class RemoteDataSourceController extends MultiActionController {
      */
     public RemoteDataSourceController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.init = InitAppUtil.getInstance();
     }
      /**
      * Creates list of remote data source available for a given node.
@@ -100,13 +111,21 @@ public class RemoteDataSourceController extends MultiActionController {
         // set remote data source list
         setRemoteDataSources( frameDispatcherController.getDataSourceListing() );
         // set sender node name
-        setSenderNodeName( frameDispatcherController.getRemoteNodeName() );
+        setSenderNodeName( frameDispatcherController.getRemNodeName() );
         // set sender node address
-        setSenderNodeAddress( frameDispatcherController.getRemoteNodeAddress() );
+        setSenderScheme( frameDispatcherController.getRemScheme() );
+        setSenderHostAddress( frameDispatcherController.getRemHostAddress() );
+        setSenderPort( frameDispatcherController.getRemPort() );
+        setSenderAppCtx( frameDispatcherController.getRemAppCtx() );
+        setSenderEntryAddress( frameDispatcherController.getRemEntryAddress() );
         // reset remote data source list, node name and address stored in FrameDispatcherController
         frameDispatcherController.resetDataSourceListing();
-        frameDispatcherController.resetRemoteNodeName();
-        frameDispatcherController.resetRemoteNodeAddress();
+        frameDispatcherController.resetRemNodeName();
+        frameDispatcherController.resetRemScheme();
+        frameDispatcherController.resetRemHostAddress();
+        frameDispatcherController.resetRemPort();
+        frameDispatcherController.resetRemAppCtx();
+        frameDispatcherController.resetRemEntryAddress();
         // set sender node name
         request.setAttribute( SENDER_NODE_NAME_KEY, getSenderNodeName() );
         return new ModelAndView( DATA_SOURCES_VIEW, DATA_SOURCES_KEY, getRemoteDataSources() );
@@ -146,20 +165,27 @@ public class RemoteDataSourceController extends MultiActionController {
      * @param response HTTP servlet response
      * @return ModelAndView
      */
-    public ModelAndView dsSubscribed( HttpServletRequest request,
-            HttpServletResponse response ) {
+    public ModelAndView dsSubscribed( HttpServletRequest request, HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         try {
-            File tempFile = InitAppUtil.createTempFile(
-                    new File( InitAppUtil.getWorkDir() ) );
+            File tempFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
             InitAppUtil.writeObjectToStream( getSelectedDataSources(), tempFile );
             // prepare frame
-            BaltradFrameHandler bfHandler = new BaltradFrameHandler( getSenderNodeAddress() );
-            String hdrStr = bfHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
-                InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                frameDispatcherController.getLocalUserName(), BaltradFrameHandler.CHNL_SBN_RQST,
+            BaltradFrameHandler bfHandler = new BaltradFrameHandler( getSenderScheme(),
+                    getSenderHostAddress(), getSenderPort(), getSenderAppCtx(),
+                    getSenderEntryAddress(), init.getConfiguration().getSoTimeout(),
+                    init.getConfiguration().getConnTimeout() );
+            //
+            String hdrStr = BaltradFrameHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
+                init.getConfiguration().getScheme(), init.getConfiguration().getHostAddress(),
+                init.getConfiguration().getPort(), init.getConfiguration().getAppCtx(), 
+                init.getConfiguration().getEntryAddress(), init.getConfiguration().getNodeName(),
+                frameDispatcherController.getLocUsrName(), BaltradFrameHandler.CHNL_SBN_RQST,
                 tempFile.getAbsolutePath() );
-            BaltradFrame baltradFrame = new BaltradFrame( hdrStr, tempFile.getAbsolutePath() );
+            //
+            BaltradFrame baltradFrame = new BaltradFrame( NodeAddress.ADDR_SEPARATOR +
+                    getSenderAppCtx() + NodeAddress.ADDR_SEPARATOR + getSenderEntryAddress(),
+                    hdrStr, tempFile );
             // handle the frame
             frameDispatcherController.setBfHandler( bfHandler );
             frameDispatcherController.doPost( request, response, baltradFrame );
@@ -178,9 +204,10 @@ public class RemoteDataSourceController extends MultiActionController {
                 } else {
                     // add local subscription
                     Subscription subs = new Subscription( System.currentTimeMillis(),
-                        frameDispatcherController.getLocalUserName(),
-                        dataSource.getName(), getSenderNodeAddress(), getSenderNodeName(),
-                        Subscription.LOCAL_SUBSCRIPTION, true, true );
+                        frameDispatcherController.getLocUsrName(), dataSource.getName(),
+                        getSenderNodeName(), Subscription.LOCAL_SUBSCRIPTION, true, true,
+                        getSenderScheme(), getSenderHostAddress(), getSenderPort(),
+                        getSenderAppCtx(), getSenderEntryAddress() );
                     subscriptionManager.saveSubscription( subs );
                 }
             }
@@ -254,18 +281,68 @@ public class RemoteDataSourceController extends MultiActionController {
      */
     public void setSenderNodeName( String senderNodeName ) { this.senderNodeName = senderNodeName; }
     /**
-     * Gets sender node address.
+     * Get sender's communication scheme.
      *
-     * @return Sender node address
+     * @return senderScheme Sender's communication scheme
      */
-    public String getSenderNodeAddress() { return senderNodeAddress; }
+    public String getSenderScheme() { return senderScheme; }
     /**
-     * Sets sender node address.
+     * Set sender's communication scheme
      *
-     * @param senderNodeAddress Sender node address
+     * @param senderScheme Sender's communication scheme to set
      */
-    public void setSenderNodeAddress( String senderNodeAddress ) {
-        this.senderNodeAddress = senderNodeAddress;
+    public void setSenderScheme( String senderScheme ) { this.senderScheme = senderScheme; }
+    /**
+     * Get sender's host address.
+     *
+     * @return senderHostAddress Sender's host address
+     */
+    public String getSenderHostAddress() { return senderHostAddress; }
+    /**
+     * Set sender's host address.
+     *
+     * @param senderHostAddress Sender's host address to set
+     */
+    public void setSenderHostAddress( String senderHostAddress ) {
+        this.senderHostAddress = senderHostAddress;
+    }
+    /**
+     * Get sender's port number.
+     *
+     * @return senderPort Sender's port number
+     */
+    public int getSenderPort() { return senderPort; }
+    /**
+     * Set sender's port number.
+     *
+     * @param senderPort Remote node's port number to set
+     */
+    public void setSenderPort(int senderPort) { this.senderPort = senderPort; }
+    /**
+     * Get sender's application context.
+     *
+     * @return senderAppCtx Sender's application context
+     */
+    public String getSenderAppCtx() { return senderAppCtx; }
+    /**
+     * Set sender's application context.
+     *
+     * @param senderAppCtx Sender's application context to set
+     */
+    public void setSenderAppCtx( String senderAppCtx ) { this.senderAppCtx = senderAppCtx; }
+    /**
+     * Get sender's entry point address.
+     *
+     * @return senderEntryAddress Sender's entry point address
+     */
+    public String getSenderEntryAddress() { return senderEntryAddress; }
+    /**
+     * Set sender's entry point address.
+     *
+     * @param senderEntryAddress Sender's entry point address to set.
+     */
+    public void setSenderEntryAddress( String senderEntryAddress ) {
+        this.senderEntryAddress = senderEntryAddress;
     }
     /**
      * Gets user name.

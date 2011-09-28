@@ -31,15 +31,7 @@ import java.util.Date;
  * @since 0.7.3
  */
 public class LogConfiguration {
-//---------------------------------------------------------------------------------------- Constants
-    /** Log system IDs */
-    public static final String LOG_SYSTEM_MESSAGES = "system_messages";
-    public static final String LOG_DELIVERY_REGISTRY = "delivery_registry";
 //---------------------------------------------------------------------------------------- Variables
-    /** Record ID */
-    private int id;
-    /** Log system ID */
-    private String logId;
     /** Trim by number toggle */
     private boolean trimByNumber;
     /** Trim by date toggle */
@@ -50,69 +42,24 @@ public class LogConfiguration {
     private Date dateLimit;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Default constructor.
+     * Constructor.
      */
     public LogConfiguration() {}
     /**
      * Constructor.
      *
-     * @param id Record ID
-     * @param logId Log system ID
      * @param trimByNumber Trim by number toggle
      * @param trimByDate Trim by date toggle
      * @param recordLimit Maximum number of records limit
      * @param dateLimit Maximum date limit
      */
-    public LogConfiguration( int id, String logId, boolean trimByNumber, boolean trimByDate,
-            int recordLimit, Date dateLimit ) {
-        this.id = id;
-        this.logId = logId;
+    public LogConfiguration( boolean trimByNumber, boolean trimByDate, int recordLimit,
+            Date dateLimit ) {
         this.trimByNumber = trimByNumber;
         this.trimByDate = trimByDate;
         this.recordLimit = recordLimit;
         this.dateLimit = dateLimit;
     }
-    /**
-     * Constructor.
-     *
-     * @param logId Log system ID
-     * @param trimByNumber Trim by number toggle
-     * @param trimByDate Trim by date toggle
-     * @param recordLimit Maximum number of records limit
-     * @param dateLimit Maximum date limit
-     */
-    public LogConfiguration( String logId, boolean trimByNumber, boolean trimByDate,
-            int recordLimit, Date dateLimit ) {
-        this.logId = logId;
-        this.trimByNumber = trimByNumber;
-        this.trimByDate = trimByDate;
-        this.recordLimit = recordLimit;
-        this.dateLimit = dateLimit;
-    }
-    /**
-     * Gets record ID.
-     *
-     * @return Record's ID in the database
-     */
-    public int getId() { return id; }
-    /**
-     * Sets record's ID.
-     *
-     * @param id Record's ID in the database
-     */
-    public void setId( int id ) { this.id = id; }
-    /**
-     * Gets log system ID.
-     *
-     * @return logId Log system ID
-     */
-    public String getLogId() { return logId; }
-    /**
-     * Sets log system ID.
-     *
-     * @param logId Log system ID to set
-     */
-    public void setLogId( String logId ) { this.logId = logId; }
     /**
      * Gets trim by number toggle.
      *

@@ -49,11 +49,10 @@ public class LogManager {
     private static final String SQL_TRIM_MSG_BY_NUMBER = "DROP FUNCTION IF EXISTS " +
         "dex_trim_messages_by_number() CASCADE; CREATE OR REPLACE FUNCTION " +
         "dex_trim_messages_by_number() RETURNS trigger AS $$ DECLARE records_limit INTEGER; " +
-        "total_records INTEGER; start_record INTEGER; BEGIN records_limit = TG_ARGV[0]; " +
-        "SELECT count(*) FROM dex_messages INTO total_records; IF total_records > records_limit " +
-        "THEN start_record = total_records - records_limit; DELETE FROM dex_messages WHERE " +
-        "id IN (SELECT id FROM dex_messages LIMIT start_record); END IF; RETURN NEW; END; " +
-        "$$ LANGUAGE plpgsql;";
+        " BEGIN records_limit = TG_ARGV[0]; DELETE FROM dex_messages WHERE " +
+        "id IN (SELECT id FROM dex_messages ORDER BY timestamp DESC OFFSET records_limit); " +
+        "RETURN NEW; END; $$ LANGUAGE plpgsql;";
+
     /** SQL script creating trimmer function */
     private static final String SQL_TRIM_MSG_BY_DATE = "DROP FUNCTION IF EXISTS " +
         "dex_trim_messages_by_date() CASCADE; CREATE OR REPLACE FUNCTION " +

@@ -101,44 +101,43 @@ Author     : szewczenko
                                             <form:errors path="command.nodeType" cssClass="error"/>
                                         </div>
                                         <div class="row">
-                                            <div class="protocol-prefix">http://</div>
+                                            <div class="protocol-prefix">https://</div>
                                             <div class="shortaddress">
-                                                <form:input path="command.shortAddress"
-                                                    title="Enter node address"/>
+                                                <form:input path="command.hostAddress"
+                                                    title="Enter host address"/>
                                                 <div class="hint">
-                                                    Server address, e.g. baltrad.org
+                                                    Server host address, e.g. baltrad.org
                                                 </div>
                                             </div>
                                             <div class="port-separator">:</div>
                                             <div class="portnumber">
-                                                <form:input path="command.portNumber"
+                                                <form:input path="command.port"
                                                     title="Enter port number"/>
                                                 <div class="hint">
                                                     Port number
                                                 </div>
                                             </div>
-                                            <form:errors path="command.fullAddress" cssClass="error"/>
+                                            <form:errors path="command.hostAddress" cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="orgname">
-                                                <form:input path="command.orgName"
+                                                <form:input path="command.organization"
                                                     title="Enter organization name"/>
                                                 <div class="hint">
                                                     Name of organization hosting Baltrad node
                                                 </div>
                                             </div>
-                                            <form:errors path="command.orgName" cssClass="error"/>
+                                            <form:errors path="command.organization" cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="orgaddress">
-                                                <form:input path="command.orgAddress"
+                                                <form:input path="command.address"
                                                     title="Enter organization's address"/>
                                                 <div class="hint">
                                                     Organization's address
                                                 </div>
                                             </div>
-                                            <form:errors path="command.orgAddress"
-                                                         cssClass="error"/>
+                                            <form:errors path="command.address" cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="timezone">
@@ -163,23 +162,23 @@ Author     : szewczenko
                                         </div>
                                         <div class="row">
                                             <div class="workdir">
-                                                <form:input path="command.tempDir"
+                                                <form:input path="command.workDir"
                                                     title="Enter work directory path"/>
                                                 <div class="hint">
                                                     Storage for temporary files & images 
                                                 </div>
                                             </div>
-                                            <form:errors path="command.tempDir" cssClass="error"/>
+                                            <form:errors path="command.workDir" cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="adminmail">
-                                                <form:input path="command.adminEmail"
+                                                <form:input path="command.email"
                                                     title="Enter administrator's e-mail"/>
                                                 <div class="hint">
                                                     Node administrator's e-mail
                                                 </div>
                                             </div>
-                                            <form:errors path="command.adminEmail" cssClass="error"/>
+                                            <form:errors path="command.email" cssClass="error"/>
                                         </div>
                                     </div>
                                     <div class="tablefooter">

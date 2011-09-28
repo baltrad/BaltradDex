@@ -82,21 +82,11 @@ public class SaveRegistryConfigurationController extends SimpleFormController {
      */
     @Override
     protected Object formBackingObject( HttpServletRequest request ) {
-        LogConfiguration logConf = null;
-        try {
-            logConf = configurationManager.getLogConfiguration(
-                LogConfiguration.LOG_DELIVERY_REGISTRY );
-        } catch( SQLException e ) {
-            log.error( "Error while loading delivery registry configuration from database: " +
-                    e.getMessage() );
-        } catch( Exception e ) {
-            log.error( "Error while loading delivery registry configuration from database: " +
-                    e.getMessage() );
+        LogConfiguration regConf = configurationManager.loadRegConf();
+        if( regConf == null ) {
+            regConf = new LogConfiguration();
         }
-        if( logConf == null ) {
-            logConf = new LogConfiguration();
-        }
-        return logConf;
+        return regConf;
     }
     /**
      * Initialize the given binder instance with custom property editors.
@@ -123,18 +113,17 @@ public class SaveRegistryConfigurationController extends SimpleFormController {
     @Override
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors ) throws Exception {
-        LogConfiguration logConf = ( LogConfiguration )command;
-        logConf.setLogId( LogConfiguration.LOG_DELIVERY_REGISTRY );
+        LogConfiguration regConf = ( LogConfiguration )command;
         try {
-            configurationManager.saveOrUpdate( logConf );
-            if( logConf.getTrimByNumber() ) {
-                deliveryRegisterManager.setTrimmer( logConf.getRecordLimit() );
+            configurationManager.saveRegConf( regConf );
+            if( regConf.getTrimByNumber() ) {
+                deliveryRegisterManager.setTrimmer( regConf.getRecordLimit() );
             } else {
                 deliveryRegisterManager.removeTrimmer(
                         DeliveryRegisterManager.TRIM_REG_BY_NUMBER_FUNC );
             }
-            if( logConf.getTrimByDate() ) {
-                deliveryRegisterManager.setTrimmer( df.format( logConf.getDateLimit() ) );
+            if( regConf.getTrimByDate() ) {
+                deliveryRegisterManager.setTrimmer( df.format( regConf.getDateLimit() ) );
             } else {
                 deliveryRegisterManager.removeTrimmer(
                         DeliveryRegisterManager.TRIM_REG_BY_DATE_FUNC );

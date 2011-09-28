@@ -26,25 +26,23 @@ Author     : szewczenko
 <%@page import="eu.baltrad.dex.util.InitAppUtil"%>
 <%@page import="eu.baltrad.dex.user.model.User" %>
 
-<jsp:useBean id="initAppUtil" scope="session"
-             class="eu.baltrad.dex.util.InitAppUtil">
-</jsp:useBean>
 <jsp:useBean id="securityManager" scope="session"
              class="eu.baltrad.dex.util.ApplicationSecurityManager">
 </jsp:useBean>
 
 <%
+    InitAppUtil init = InitAppUtil.getInstance();
     User user = (User)securityManager.getUser(request);
     HttpSession sess = request.getSession();
     String userName = user.getName();
-    sess.setAttribute("userName", user.getName());
-    sess.setAttribute("nodeName", initAppUtil.getNodeName());
-    sess.setAttribute("operator", initAppUtil.getOrgName());
-    sess.setAttribute("nodeVersion", InitAppUtil.getNodeVersion());
-    sess.setAttribute("nodeType", InitAppUtil.getNodeType());
-    sess.setAttribute("address", InitAppUtil.getOrgAddress());
-    sess.setAttribute("timeZone", InitAppUtil.getTimeZone());
-    sess.setAttribute("adminEmail", InitAppUtil.getAdminEmail());
+    sess.setAttribute("userName", userName);
+    sess.setAttribute("nodeName", init.getConfiguration().getNodeName());
+    sess.setAttribute("operator", init.getConfiguration().getOrganization());
+    sess.setAttribute("nodeVersion", init.getConfiguration().getVersion());
+    sess.setAttribute("nodeType", init.getConfiguration().getNodeType());
+    sess.setAttribute("address", init.getConfiguration().getAddress());
+    sess.setAttribute("timeZone", init.getConfiguration().getTimeZone());
+    sess.setAttribute("adminEmail", init.getConfiguration().getEmail());
 %>
 
 <t:page_tabbed pageTitle="Home" activeTab="home">

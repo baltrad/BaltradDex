@@ -78,7 +78,7 @@ Author     : szewczenko
                                                 <c:out value="${conn.connectionName}"/>
                                             </div>
                                             <div id="cell" class="address">
-                                                <c:out value="${conn.shortAddress}"/>
+                                                <c:out value="${conn.hostAddress}"/>
                                             </div>
                                             <div id="cell" class="user">
                                                 <c:out value="${conn.userName}"/>

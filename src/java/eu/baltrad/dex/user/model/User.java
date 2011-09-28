@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.user.model;
 
+import eu.baltrad.dex.util.NodeAddress;
+
 /**
  * Class implements user object.
  *
@@ -28,7 +30,7 @@ package eu.baltrad.dex.user.model;
  * @version 1.0
  * @since 1.0
  */
-public class User {
+public class User extends NodeAddress {
 //---------------------------------------------------------------------------------------- Constants
     // Role key values
     public final static String ROLE_ADMIN = "admin";
@@ -42,12 +44,6 @@ public class User {
     private String roleName;
     private String password;
     private String confirmPassword;
-    // Short node address, e.g. baltrad.imgw.pl (without port name and other stuff)
-    private String shortAddress;
-    // Full node address, e.g. http://baltrad.imgw.pl:8084/BaltradDex/dispatch.htm
-    private String fullAddress;
-    // Port number
-    private String portNumber;
     private String factory;
     private String country;
     private String city;
@@ -91,19 +87,22 @@ public class User {
      * @param number Address number
      * @param phone Phone number
      * @param email Contact email
+     * @param scheme Communication scheme
+     * @param hostAddress Host address
+     * @param port Port number
+     * @param appCtx Application context
+     * @param entryAddress Entry point address
      */
     public User( int id, String name, String nameHash, String roleName, String password,
-            String confirmPassword, String shortAddress, String portNumber, String factory,
-            String country, String city, String cityCode, String street, String number,
-            String phone, String email ) {
+            String confirmPassword, String factory, String country, String city, String cityCode,
+            String street, String number, String phone, String email, String scheme,
+            String hostAddress, int port, String appCtx, String entryAddress ) {
         this.id = id;
         this.name = name;
         this.nameHash = nameHash;
         this.roleName = roleName;
         this.password = password;
         this.confirmPassword = confirmPassword;
-        this.shortAddress = shortAddress;
-        this.portNumber = portNumber;
         this.factory = factory;
         this.country = country;
         this.city = city;
@@ -112,6 +111,11 @@ public class User {
         this.number = number;
         this.phone = phone;
         this.email = email;
+        this.scheme = scheme;
+        this.hostAddress = hostAddress;
+        this.port = port;
+        this.appCtx = appCtx;
+        this.entryAddress = entryAddress;
     }
     /**
      * Constructor creates user object with field values provided as parameters.
@@ -131,17 +135,21 @@ public class User {
      * @param number Address number
      * @param phone Phone number
      * @param email Contact email
+     * @param scheme Communication scheme
+     * @param hostAddress Host address
+     * @param port Port number
+     * @param appCtx Application context
+     * @param entryAddress Entry point address
      */
-    public User( int id, String name, String nameHash, String roleName, String password, String shortAddress,
-            String portNumber, String factory, String country, String city, String cityCode,
-            String street, String number, String phone, String email ) {
+    public User( int id, String name, String nameHash, String roleName, String password, 
+            String factory, String country, String city, String cityCode, String street,
+            String number, String phone, String email, String scheme, String hostAddress,
+            int port, String appCtx, String entryAddress ) {
         this.id = id;
         this.name = name;
         this.nameHash = nameHash;
         this.roleName = roleName;
         this.password = password;
-        this.shortAddress = shortAddress;
-        this.portNumber = portNumber;
         this.factory = factory;
         this.country = country;
         this.city = city;
@@ -150,6 +158,11 @@ public class User {
         this.number = number;
         this.phone = phone;
         this.email = email;
+        this.scheme = scheme;
+        this.hostAddress = hostAddress;
+        this.port = port;
+        this.appCtx = appCtx;
+        this.entryAddress = entryAddress;
     }
     /**
      * Method gets user id.
@@ -205,42 +218,6 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
-   /**
-     * Gets node's short address.
-     *
-     * @return Node's short address
-     */
-    public String getShortAddress() { return shortAddress; }
-    /**
-     * Sets node's short address.
-     *
-     * @param shortAddress Node's short address
-     */
-    public void setShortAddress( String shortAddress ) { this.shortAddress = shortAddress; }
-    /**
-     * Gets node's full address.
-     *
-     * @return Node's full address
-     */
-    public String getFullAddress() { return fullAddress; }
-    /**
-     * Sets node's full address.
-     *
-     * @param fullAddress Node's full address
-     */
-    public void setFullAddress( String fullAddress ) { this.fullAddress = fullAddress; }
-    /**
-     * Gets port number.
-     *
-     * @return Port number
-     */
-    public String getPortNumber() { return portNumber; }
-    /**
-     * Sets port number.
-     *
-     * @param portNumber Port number to set
-     */
-    public void setPortNumber( String portNumber ) { this.portNumber = portNumber; }
     /**
      * @return the factory
      */

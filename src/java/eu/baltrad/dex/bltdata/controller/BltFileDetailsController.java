@@ -86,12 +86,14 @@ public class BltFileDetailsController implements Controller {
     private BltDataProcessorController bltDataProcessorController;
     private String successView;
     private Logger log;
+    private InitAppUtil init;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      */
     public BltFileDetailsController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        init = InitAppUtil.getInstance();
     }
     /**
      * Fetches detailed information about a file and prepares dataset image thumbs.
@@ -208,15 +210,16 @@ public class BltFileDetailsController implements Controller {
                 BltDataset bltDataset = new BltDataset( datasetFullNames.get( i ),
                     whereGroup, quantity_val, nbins_val * 2, nbins_val * 2,
                     lat0_val, lon0_val, llLatLon.getY(), llLatLon.getX(), urLatLon.getY(),
-                    urLatLon.getX(), elangle_val, InitAppUtil.getThumbsStorageFolder() +
-                    File.separator + uuid + datasetFullNames.get( i ).replaceAll(
-                        BltDataProcessor.H5_PATH_SEPARATOR, "_" ) + BltDataProcessor.IMAGE_FILE_EXT );
+                    urLatLon.getX(), elangle_val, init.getConfiguration().getWorkDir() +
+                    File.separator + init.getConfiguration().getThumbsDir() + File.separator +
+                    uuid + datasetFullNames.get( i ).replaceAll( BltDataProcessor.H5_PATH_SEPARATOR,
+                    "_" ) + BltDataProcessor.IMAGE_FILE_EXT );
 
                 // add dataset object to the list
                 bltDatasets.add( bltDataset );
 
                 // try to load thumb from disk before creating a new one
-                String thumbPath = InitAppUtil.getThumbsStorageDirectory() + File.separator
+                String thumbPath = init.getThumbsDirPath() + File.separator
                     + uuid + datasetFullNames.get( i ).replaceAll(
                         BltDataProcessor.H5_PATH_SEPARATOR, "_" )  + BltDataProcessor.IMAGE_FILE_EXT;
 

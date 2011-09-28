@@ -134,23 +134,23 @@ Author     : szewczenko
                                             <form:errors path="command.roleName" cssClass="error"/>
                                         </div>
                                         <div class="row">
-                                            <div class="protocol-prefix">http://</div>
+                                            <div class="protocol-prefix">https://</div>
                                             <div class="shortaddress">
-                                                <form:input path="command.shortAddress"
-                                                    title="Enter user's node address"/>
+                                                <form:input path="command.hostAddress"
+                                                    title="Enter host address"/>
                                                 <div class="hint">
-                                                    User's server address, e.g. baltrad.org
+                                                    Host address, e.g. baltrad.org
                                                 </div>
                                             </div>
                                             <div class="port-separator">:</div>
                                             <div class="portnumber">
-                                                <form:input path="command.portNumber"
+                                                <form:input path="command.port"
                                                     title="Enter port number"/>
                                                 <div class="hint">
                                                     Port number
                                                 </div>
                                             </div>
-                                            <form:errors path="command.fullAddress" cssClass="error"/>
+                                            <form:errors path="command.hostAddress" cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="orgname">

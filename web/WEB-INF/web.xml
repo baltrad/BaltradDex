@@ -53,27 +53,17 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-
-    <!--security-constraint>
+    <!-- Tomcat secured with SSL -->
+    <security-constraint>
+        <display-name>Tomcat with SSL</display-name>
         <web-resource-collection>
             <web-resource-name>Secure</web-resource-name>
-            <url-pattern>/login.htm</url-pattern>
+            <url-pattern>/*</url-pattern>
             <http-method>GET</http-method>
             <http-method>POST</http-method>
-
         </web-resource-collection>
         <user-data-constraint>
             <transport-guarantee>CONFIDENTIAL</transport-guarantee>
         </user-data-constraint>
     </security-constraint>
-    <security-constraint>
-        <display-name>Constraint1</display-name>
-    </security-constraint-->
-
-    
-
-
-
-
-
 </web-app>

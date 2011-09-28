@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.config.util;
 
-import eu.baltrad.dex.config.model.Configuration;
+import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.util.WebUtil;
 
 import org.springframework.validation.Validator;
@@ -46,7 +46,7 @@ public class SaveConfigurationValidator implements Validator {
      * @return True if class is supported, false otherwise
      */
     public boolean supports( Class aClass ) {
-        return Configuration.class.equals( aClass );
+        return AppConfiguration.class.equals( aClass );
     }
     /**
      * Validates form object.
@@ -55,38 +55,35 @@ public class SaveConfigurationValidator implements Validator {
      * @param errors Errors object
      */
     public void validate( Object command, Errors errors ) {
-        Configuration conf = ( Configuration )command;
+        AppConfiguration conf = ( AppConfiguration )command;
         if( conf == null ) return;
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "nodeName", "error.missing.nodename" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "orgName", "error.missing.orgname" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "orgAddress", "error.missing.address" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "organization", "error.missing.orgname" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "address", "error.missing.address" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "timeZone", "error.missing.timezone" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "tempDir", "error.missing.workdir" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "adminEmail", "error.missing.email" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "workDir", "error.missing.workdir" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", "error.missing.email" );
         // validate node name
         if( conf.getNodeName().trim().length() > 0 && conf.getNodeName().trim().length()
                 < MIN_FIELD_LENGTH ) {
             errors.rejectValue( "nodeName", "error.short.nodename" );
         }
-        // validate node address
-        boolean isValidPortNumber = false;
-        try {
-            int port = Integer.parseInt( conf.getPortNumber() );
-            isValidPortNumber = true;
-        } catch( NumberFormatException e ) {
-            isValidPortNumber = false;
-        } catch( Exception e ) {
-            isValidPortNumber = false;
-        }
-        if( conf.getShortAddress().isEmpty() || conf.getPortNumber().isEmpty() ||
-                !isValidPortNumber ) {
-            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "fullAddress",
+        // validate host address
+        if( conf.getHostAddress().isEmpty() ) {
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "hostAddress",
                 "error.address.invalid" );
         }
+        // Validate port number
+        if( errors.hasFieldErrors( "port") ) {
+            errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
+        }
+        if( conf.getPort() <= 0 ) {
+            errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
+        }
         // validate email address
-        if( conf.getAdminEmail().trim().length() > 0 && !WebUtil.validateEmailAddress(
-                conf.getAdminEmail() ) ) {
-            errors.rejectValue( "adminEmail", "error.address.invalid" );
+        if( conf.getEmail().trim().length() > 0 && !WebUtil.validateEmailAddress(
+                conf.getEmail() ) ) {
+            errors.rejectValue( "email", "error.address.invalid" );
         }
     }
 }

@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -55,12 +55,14 @@ public class ConnectToNodeController extends SimpleFormController {
     private FrameDispatcherController frameDispatcherController;
     private NodeConnectionManager nodeConnectionManager;
     private Logger log;
+    private InitAppUtil init;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      */
     public ConnectToNodeController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.init = InitAppUtil.getInstance();
     }
     /**
      * Cretes new connection parameters object.
@@ -104,37 +106,40 @@ public class ConnectToNodeController extends SimpleFormController {
             nodeConn = nodeConnectionManager.getConnection( formConn.getConnectionName() );
         } else {
             nodeConn = formConn;
+            // Temporary solution. Should be set via connect to node GUI
+            nodeConn.setScheme( init.getConfiguration().getScheme() );
+            nodeConn.setAppCtx( init.getConfiguration().getAppCtx() );
+            nodeConn.setEntryAddress( init.getConfiguration().getEntryAddress() );
         }
-        nodeConn.setFullAddress( NodeConnection.HTTP_PREFIX + nodeConn.getShortAddress() +
-            NodeConnection.PORT_SEPARATOR + nodeConn.getPortNumber() +
-            NodeConnection.ADDRESS_SEPARATOR + NodeConnection.APP_CONTEXT +
-            NodeConnection.ADDRESS_SEPARATOR + NodeConnection.ENTRY_ADDRESS );
         // prepare BaltradFrame
-        BaltradFrameHandler bfHandler = new BaltradFrameHandler( nodeConn.getFullAddress() );
-
+        BaltradFrameHandler bfHandler = new BaltradFrameHandler( nodeConn.getScheme(),
+                nodeConn.getHostAddress(), nodeConn.getPort(), nodeConn.getAppCtx(),
+                nodeConn.getEntryAddress(), init.getConfiguration().getSoTimeout(),
+                init.getConfiguration().getConnTimeout() );
         // prepare data source request frame holding user name, password and node address
         // this frame will be validated and authenticated upon reception
-
-        String hdrStr = bfHandler.createMsgHdr( BaltradFrameHandler.MIME_MULTIPART,
+        String hdrStr = BaltradFrameHandler.createMsgHdr( BaltradFrameHandler.MIME_MULTIPART,
                 MessageDigestUtil.createHash( nodeConn.getUserName() ),
                 MessageDigestUtil.createHash( nodeConn.getPassword() ),
-                InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                /*BaltradFrameHandler.REQUEST*/BaltradFrameHandler.LEVEL_INFO.toString(),
-                BaltradFrameHandler.CHNL_LIST_RQST );
+                init.getConfiguration().getScheme(), init.getConfiguration().getHostAddress(),
+                init.getConfiguration().getPort(), init.getConfiguration().getAppCtx(),
+                init.getConfiguration().getEntryAddress(), init.getConfiguration().getNodeName(),
+                BaltradFrameHandler.LEVEL_INFO.toString(), BaltradFrameHandler.CHNL_LIST_RQST );
         // set local user name in frame dispatcher
-        frameDispatcherController.setLocalUserName( nodeConn.getUserName() );
-        BaltradFrame baltradFrame = new BaltradFrame( hdrStr );
+        frameDispatcherController.setLocUsrName( nodeConn.getUserName() );
+        BaltradFrame baltradFrame = new BaltradFrame( bfHandler.getServletPath(), hdrStr );
         frameDispatcherController.setBfHandler( bfHandler );
         // post remote data source request
         frameDispatcherController.doPost( request, response, baltradFrame );
 
         // add connection to the database
         if( frameDispatcherController.getDataSourceListing() != null &&
-                frameDispatcherController.getRemoteNodeName() != null ) {
+                frameDispatcherController.getRemNodeName() != null &&
+                !frameDispatcherController.getRemNodeName().isEmpty() ) {
             // check if connection exists
             if( nodeConnectionManager.getConnection(
-                    frameDispatcherController.getRemoteNodeName() ) == null ) {
-                nodeConn.setConnectionName( frameDispatcherController.getRemoteNodeName() );
+                    frameDispatcherController.getRemNodeName() ) == null ) {
+                nodeConn.setConnectionName( frameDispatcherController.getRemNodeName() );
                 try {
                     nodeConnectionManager.saveOrUpdate( nodeConn );
                 } catch( SQLException e ) {

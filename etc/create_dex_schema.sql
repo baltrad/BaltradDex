@@ -22,16 +22,14 @@ Author     : szewczenko
 ***************************************************************************************************/
 
 -- drop tables if exist ----------------------------------------------------------------------------
-DROP TABLE IF EXISTS dex_subscriptions;
+DROP TABLE IF EXISTS dex_subscriptions CASCADE;
 DROP TABLE IF EXISTS dex_delivery_register;
 DROP TABLE IF EXISTS dex_channel_permissions CASCADE;
 DROP TABLE IF EXISTS dex_users CASCADE;
 DROP TABLE IF EXISTS dex_roles;
 DROP TABLE IF EXISTS dex_messages;
 DROP TABLE IF EXISTS dex_radars CASCADE;
-DROP TABLE IF EXISTS dex_node_connections;
-DROP TABLE IF EXISTS dex_node_configuration;
-DROP TABLE IF EXISTS dex_log_configuration;
+DROP TABLE IF EXISTS dex_node_connections CASCADE;
 DROP TABLE IF EXISTS dex_file_objects CASCADE;
 DROP TABLE IF EXISTS dex_data_quantities CASCADE;
 DROP TABLE IF EXISTS dex_products CASCADE;
@@ -45,6 +43,11 @@ DROP TABLE IF EXISTS dex_data_source_product_parameter_values CASCADE;
 DROP TABLE IF EXISTS dex_data_source_radars CASCADE;
 DROP TABLE IF EXISTS dex_data_source_users CASCADE;
 DROP TABLE IF EXISTS dex_data_source_filters;
+DROP TABLE IF EXISTS dex_node_address CASCADE;
+DROP TABLE IF EXISTS dex_user_address;
+DROP TABLE IF EXISTS dex_node_connection_address;
+DROP TABLE IF EXISTS dex_subscription_address;
+
 -- drop sequences if exist -------------------------------------------------------------------------
 DROP SEQUENCE IF EXISTS log_entry_id_seq;
 DROP SEQUENCE IF EXISTS radar_id_seq;
@@ -52,7 +55,6 @@ DROP SEQUENCE IF EXISTS user_id_seq;
 DROP SEQUENCE IF EXISTS subscription_id_seq;
 DROP SEQUENCE IF EXISTS delivery_register_id_seq;
 DROP SEQUENCE IF EXISTS node_connection_id_seq;
-DROP SEQUENCE IF EXISTS configuration_id_seq;
 DROP SEQUENCE IF EXISTS channel_permission_id_seq;
 DROP SEQUENCE IF EXISTS file_object_id_seq;
 DROP SEQUENCE IF EXISTS data_quantity_id_seq CASCADE;
@@ -68,7 +70,17 @@ CREATE TABLE dex_roles
     id SERIAL NOT NULL,
     role VARCHAR(32) PRIMARY KEY
 );
-
+-- dex_node_address --------------------------------------------------------------------------------
+CREATE TABLE dex_node_address
+(
+    id SERIAL NOT NULL,
+    scheme VARCHAR(16) NOT NULL DEFAULT 'https',
+    host_address VARCHAR(128) NOT NULL,
+    port INT NOT NULL DEFAULT 8084,
+    app_context VARCHAR(64) NOT NULL DEFAULT 'BaltradDex',
+    entry_address VARCHAR(64) NOT NULL DEFAULT 'dispatch.htm',
+    PRIMARY KEY (id)
+);
 -- user_id_seq -------------------------------------------------------------------------------------
 CREATE SEQUENCE user_id_seq;
 -- dex_users ---------------------------------------------------------------------------------------
@@ -79,8 +91,6 @@ CREATE TABLE dex_users
     name_hash VARCHAR(32) NOT NULL UNIQUE,
     role_name VARCHAR(32) NOT NULL REFERENCES dex_roles (role),
     password VARCHAR(32) NOT NULL,
-    short_address VARCHAR(64) NOT NULL,
-    port VARCHAR(16) NOT NULL,
     factory VARCHAR(256) NOT NULL,
     country VARCHAR(64) NOT NULL,
     city VARCHAR(64) NOT NULL,
@@ -91,19 +101,28 @@ CREATE TABLE dex_users
     email VARCHAR(64) NOT NULL,
     PRIMARY KEY (id)
 );
-
+-- dex_user_address --------------------------------------------------------------------------------
+CREATE TABLE dex_user_address
+(
+    id SERIAL NOT NULL,
+    user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE,
+    address_id INT NOT NULL REFERENCES dex_node_address (id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+);
 -- log_entry_id_seq --------------------------------------------------------------------------------
 CREATE SEQUENCE log_entry_id_seq;
 -- dex_messages ------------------------------------------------------------------------------------
 CREATE TABLE dex_messages
 (
-    id SERIAL NOT NULL,
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('log_entry_id_seq'),
     timestamp TIMESTAMP NOT NULL,
     system VARCHAR(16) NOT NULL,
     type VARCHAR(16) NOT NULL,
     message TEXT NOT NULL,
     PRIMARY KEY (id)
 );
+-- dex_messages_timestamp_idx ----------------------------------------------------------------------
+CREATE UNIQUE INDEX dex_messages_timestamp_idx ON dex_messages (timestamp);
 
 -- channel_id_seq ----------------------------------------------------------------------------------
 CREATE SEQUENCE radar_id_seq;
@@ -136,14 +155,20 @@ CREATE TABLE dex_subscriptions
     timestamp TIMESTAMP NOT NULL,
     user_name VARCHAR(32),
     data_source_name VARCHAR(64),
-    node_address VARCHAR(64),
     operator_name VARCHAR(64),
     type VARCHAR(16),
     active BOOLEAN DEFAULT false,
     synkronized BOOLEAN DEFAULT false,
     PRIMARY KEY (id)
 );
-
+-- dex_subscription_address ------------------------------------------------------------------------
+CREATE TABLE dex_subscription_address
+(
+    id SERIAL NOT NULL,
+    subscription_id INT NOT NULL REFERENCES dex_subscriptions (id) ON DELETE CASCADE,
+    address_id INT NOT NULL REFERENCES dex_node_address (id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+);
 -- delivery_register_id_seq ------------------------------------------------------------------------
 CREATE SEQUENCE delivery_register_id_seq;
 -- dex_delivery_register ---------------------------------------------------------------------------
@@ -157,47 +182,27 @@ CREATE TABLE dex_delivery_register
     status VARCHAR(16) NOT NULL,
     PRIMARY KEY (id)
 );
+-- dex_messages_timestamp_idx ----------------------------------------------------------------------
+CREATE UNIQUE INDEX dex_delivery_register_timestamp_idx ON dex_delivery_register (timestamp);
 
--- node id sequence --------------------------------------------------------------------------------
+-- node connection id sequence ---------------------------------------------------------------------
 CREATE SEQUENCE node_connection_id_seq;
 -- dex_node connections-----------------------------------------------------------------------------
 CREATE TABLE dex_node_connections
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('node_connection_id_seq'),
     name VARCHAR(64) NOT NULL UNIQUE,
-    short_address VARCHAR(64) NOT NULL,
-    port VARCHAR(16) NOT NULL,
     user_name VARCHAR(64) NOT NULL,
     password VARCHAR(32) NOT NULL,
     PRIMARY KEY (id)
 );
--- configuration id sequence -----------------------------------------------------------------------
-CREATE SEQUENCE configuration_id_seq;
--- dex_node_configuration --------------------------------------------------------------------------
-CREATE TABLE dex_node_configuration
-(
-    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('configuration_id_seq'),
-    name VARCHAR(64) NOT NULL,
-    type VARCHAR(16) NOT NULL,
-    short_address VARCHAR(64) NOT NULL,
-    port VARCHAR(16) NOT NULL,
-    org_name VARCHAR(128) NOT NULL,
-    org_address VARCHAR(128) NOT NULL,
-    time_zone VARCHAR(128) NOT NULL,
-    temp_dir VARCHAR(32) NOT NULL,
-    email VARCHAR(32) NOT NULL,
-    PRIMARY KEY (id)
-);
--- dex_message_configuration -----------------------------------------------------------------------
-CREATE TABLE dex_log_configuration
+-- dex_node_connection_address ---------------------------------------------------------------------
+CREATE TABLE dex_node_connection_address
 (
     id SERIAL NOT NULL,
-    log_id VARCHAR(32) NOT NULL UNIQUE,
-    trim_by_number BOOLEAN NOT NULL,
-    trim_by_date BOOLEAN NOT NULL,
-    record_limit INT,
-    date_limit TIMESTAMP,
-    PRIMARY KEY(id)
+    connection_id INT NOT NULL REFERENCES dex_node_connections (id) ON DELETE CASCADE,
+    address_id INT NOT NULL REFERENCES dex_node_address (id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
 );
 -- file object id sequence -------------------------------------------------------------------------
 CREATE SEQUENCE file_object_id_seq;

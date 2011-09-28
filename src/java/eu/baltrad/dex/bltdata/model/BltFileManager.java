@@ -49,11 +49,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 
-
 import java.io.File;
-
 import java.text.ParseException;
-
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -103,6 +100,8 @@ public class BltFileManager {
     private CoreFilterManager coreFilterManager;
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** Initialization utility */
+    private InitAppUtil init;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to FileCatalogConnector instance.
@@ -111,6 +110,7 @@ public class BltFileManager {
         this.fileCatalogConnector = FileCatalogConnector.getInstance();
         this.fc = fileCatalogConnector.getFileCatalog();
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.init = InitAppUtil.getInstance();
     }
     /**
      * Gets filter associated with a given data source.
@@ -177,7 +177,7 @@ public class BltFileManager {
                                   fileEntry.what_time().to_iso_string() ),
                     format.parse( fileEntry.stored_at().to_iso_string() ),
                     fileEntry.what_source(), fileEntry.what_object(),
-                    InitAppUtil.getThumbsStorageFolder() + File.separator +
+                    init.getThumbsDirPath() + File.separator +
                     fileEntry.uuid() + IMAGE_FILE_EXT );
                 bltFiles.add( bltFile );
             } catch( ParseException e ) {
@@ -212,7 +212,7 @@ public class BltFileManager {
                               fileEntry.what_time().to_iso_string() ),
                 format.parse( fileEntry.stored_at().to_iso_string() ),
                 fileEntry.what_source(), fileEntry.what_object(),
-                InitAppUtil.getThumbsStorageFolder() + File.separator + fileEntry.uuid() +
+                init.getThumbsDirPath() + File.separator + fileEntry.uuid() +
                 IMAGE_FILE_EXT );
             } catch( ParseException e ) {
                 System.err.println( "Error while parsing file's timestamp: " + e.getMessage() );
@@ -372,7 +372,7 @@ public class BltFileManager {
                 String uuid = resultSet.getString( "uuid" );
                 String path = FileCatalogConnector.getDataStorageDirectory() + File.separator +
                         uuid + H5_FILE_EXT;
-                String thumbPath = InitAppUtil.getThumbsStorageDirectory();
+                String thumbPath = init.getThumbsDirPath();
                 Date storageTime = resultSet.getTimestamp( "stored_at" );
                 String type = resultSet.getString( "what_object" );
                 Date sqlDate = resultSet.getDate( "what_date" );

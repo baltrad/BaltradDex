@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
@@ -87,12 +88,15 @@ public class SubscriptionController extends MultiActionController {
     private List< Subscription > removedSubscriptions;
     // removed peers subscriptions
     private List< Subscription > removedPeersSubscriptions;
+    /** Reference to InitAppUtil */
+    private InitAppUtil init;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      */
     public SubscriptionController() {
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        init = InitAppUtil.getInstance();
     }
     /**
      * Shows list of all subscriptions.
@@ -108,22 +112,30 @@ public class SubscriptionController extends MultiActionController {
 
         // synchronize local and remote subscriptions
         for( int i = 0; i < subscriptions.size(); i++ ) {
-            File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getWorkDir() ) );
+            File tempFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
             InitAppUtil.writeObjectToStream( subscriptions.get( i ), tempFile );
-
+            //
             BaltradFrameHandler bfHandler = new BaltradFrameHandler(
-                    subscriptions.get( i ).getNodeAddress() );
-
-            String hdfStr = bfHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
-                    InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                    BaltradFrameHandler.CHNL_SYNC_RQST,
+                    subscriptions.get( i ).getScheme(), subscriptions.get( i ).getHostAddress(),
+                    subscriptions.get( i ).getPort(), subscriptions.get( i ).getAppCtx(),
+                    subscriptions.get( i ).getEntryAddress(), init.getConfiguration().getSoTimeout(),
+                    init.getConfiguration().getConnTimeout() );
+            //
+            String hdrStr = BaltradFrameHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
+                    init.getConfiguration().getScheme(), init.getConfiguration().getHostAddress(),
+                    init.getConfiguration().getPort(), init.getConfiguration().getAppCtx(),
+                    init.getConfiguration().getEntryAddress(),
+                    init.getConfiguration().getNodeName(), BaltradFrameHandler.CHNL_SYNC_RQST,
                     tempFile.getAbsolutePath() );
-            // 
-            BaltradFrame baltradFrame = new BaltradFrame( hdfStr, tempFile.getAbsolutePath() );
-            // handle the frame
-            frameDispatcherController.setBfHandler( bfHandler );
-            frameDispatcherController.doPost( request, response, baltradFrame );
-
+            try {
+                BaltradFrame baltradFrame = new BaltradFrame( bfHandler.getServletPath(), hdrStr,
+                        tempFile );
+                // handle the frame
+                frameDispatcherController.setBfHandler( bfHandler );
+                frameDispatcherController.doPost( request, response, baltradFrame );
+            } catch( FileNotFoundException e ) {
+                log.error( "Failed to collect subscription information: " + e.getMessage() );
+            }
             if( frameDispatcherController.getSynkronizedSubscription() != null ) {
                 // check if current subscription matches sunchronized subscription
                 if( subscriptionManager.compareSubscriptions( subscriptions.get( i ),
@@ -211,17 +223,30 @@ public class SubscriptionController extends MultiActionController {
         ModelAndView modelAndView = new ModelAndView();
         for( int i = 0; i < getChangedSubscriptions().size(); i++ ) {
             try {
-                File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getWorkDir() ) );
+                File tempFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
                 InitAppUtil.writeObjectToStream( getChangedSubscriptions().get( i ), tempFile );
                 // prepare the frame
                 BaltradFrameHandler bfHandler = new BaltradFrameHandler(
-                        getChangedSubscriptions().get( i ).getNodeAddress() );
-                String hdrStr = bfHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
-                    InitAppUtil.getNodeAddress(), InitAppUtil.getNodeName(),
-                    getChangedSubscriptions().get( i ).getUserName(),
-                    BaltradFrameHandler.SBN_CHNG_RQST,
-                    tempFile.getAbsolutePath() );
-                BaltradFrame baltradFrame = new BaltradFrame( hdrStr, tempFile.getAbsolutePath() );
+                        getChangedSubscriptions().get( i ).getScheme(),
+                        getChangedSubscriptions().get( i ).getHostAddress(),
+                        getChangedSubscriptions().get( i ).getPort(),
+                        getChangedSubscriptions().get( i ).getAppCtx(),
+                        getChangedSubscriptions().get( i ).getEntryAddress(),
+                        init.getConfiguration().getSoTimeout(),
+                        init.getConfiguration().getConnTimeout() );
+                //
+                String hdrStr = BaltradFrameHandler.createObjectHdr(
+                        BaltradFrameHandler.MIME_MULTIPART, init.getConfiguration().getScheme(),
+                        init.getConfiguration().getHostAddress(),
+                        init.getConfiguration().getPort(), init.getConfiguration().getAppCtx(),
+                        init.getConfiguration().getEntryAddress(),
+                        init.getConfiguration().getNodeName(),
+                        getChangedSubscriptions().get( i ).getUserName(),
+                        BaltradFrameHandler.SBN_CHNG_RQST,
+                        tempFile.getAbsolutePath() );
+                //
+                BaltradFrame baltradFrame = new BaltradFrame( bfHandler.getServletPath(),
+                        hdrStr, tempFile );
                 // handle the frame
                 frameDispatcherController.setBfHandler( bfHandler );
                 frameDispatcherController.doPost( request, response, baltradFrame );
@@ -270,7 +295,6 @@ public class SubscriptionController extends MultiActionController {
     public ModelAndView downloadSubscriptionsToRemove( HttpServletRequest request,
             HttpServletResponse response ) {
         // get the list of channels selected for subscription by the user
-        //String[] selChannels = request.getParameterValues( SELECTED_CHANNELS_KEY );
         String[] selDataSources = request.getParameterValues( SELECTED_DATA_SOURCES_KEY );
         ModelAndView modelAndView = null;
         if( selDataSources == null ) {

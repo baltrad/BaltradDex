@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.core.model;
 
+import eu.baltrad.dex.util.NodeAddress;
 import java.io.Serializable;
 
 /**
@@ -31,29 +32,12 @@ import java.io.Serializable;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class NodeConnection implements Serializable {
-//---------------------------------------------------------------------------------------- Constants
-    // HTTP protocol prefix
-    public static final String HTTP_PREFIX = "http://";
-    // Application context
-    public static final String APP_CONTEXT = "BaltradDex";
-    // Relative entry point address
-    public static final String ENTRY_ADDRESS = "dispatch.htm";
-    // Address separator
-    public static final String ADDRESS_SEPARATOR = "/";
-    // Port separator
-    public static final String PORT_SEPARATOR = ":";
+public class NodeConnection extends NodeAddress implements Serializable {
 //---------------------------------------------------------------------------------------- Variables
     // Connection id
     private int id;
     // Connection name
     private String connectionName;
-    // Short node address, e.g. baltrad.imgw.pl (without port name and protocol)
-    private String shortAddress;
-    // Full node address, e.g. http://baltrad.imgw.pl:8084/BaltradDex/dispatch.htm
-    private String fullAddress;
-    // Port number
-    private String portNumber;
     // Full address of node's entry point
     // User's name on the remote node
     private String userName;
@@ -67,15 +51,21 @@ public class NodeConnection implements Serializable {
     /**
      * Constructor sets node address, user name and password field values.
      *
-     * @param shortAddress Node's short address
-     * @param portNumber Port number
+     * @param scheme Communication scheme identifier
+     * @param hostAddress Host address
+     * @param port Port number
+     * @param appCtx Application context
+     * @param entryAddress Entry point address
      * @param userName User's name
      * @param password User's password
      */
-    public NodeConnection( String shortAddress, String portNumber, String userName,
-            String password ) {
-        this.shortAddress = shortAddress;
-        this.portNumber = portNumber;
+    public NodeConnection( String scheme, String hostAddress, int port, String appCtx,
+            String entryAddress, String userName, String password ) {
+        this.scheme = scheme;
+        this.hostAddress = hostAddress;
+        this.port = port;
+        this.appCtx = appCtx;
+        this.entryAddress = entryAddress;
         this.userName = userName;
         this.password = password;
     }
@@ -84,17 +74,23 @@ public class NodeConnection implements Serializable {
      *
      * @param id Node connection ID
      * @param connectionName Connection name
-     * @param shortAddress Node's short address
-     * @param portNumber Port number
+     * @param scheme Communication scheme
+     * @param hostAddress Host address
+     * @param port Port number
+     * @param appCtx Application context
+     * @param entryAddress Entry point address
      * @param userName User's name
      * @param password User's password
      */
-    public NodeConnection( int id, String connectionName, String shortAddress, String portNumber,
-            String userName, String password ) {
+    public NodeConnection( int id, String connectionName, String scheme, String hostAddress,
+            int port, String appCtx, String entryAddress, String userName, String password ) {
         this.id = id;
         this.connectionName = connectionName;
-        this.shortAddress = shortAddress;
-        this.portNumber = portNumber;
+        this.scheme = scheme;
+        this.hostAddress = hostAddress;
+        this.port = port;
+        this.appCtx = appCtx;
+        this.entryAddress = entryAddress;
         this.userName = userName;
         this.password = password;
     }
@@ -122,42 +118,6 @@ public class NodeConnection implements Serializable {
      * @param connectionName Connection name
      */
     public void setConnectionName( String connectionName ) { this.connectionName = connectionName; }
-    /**
-     * Gets node's short address.
-     *
-     * @return Node's short address
-     */
-    public String getShortAddress() { return shortAddress; }
-    /**
-     * Sets node's short address.
-     *
-     * @param shortAddress Node's short address
-     */
-    public void setShortAddress( String shortAddress ) { this.shortAddress = shortAddress; }
-    /**
-     * Gets node's full address.
-     *
-     * @return Node's full address
-     */
-    public String getFullAddress() { return fullAddress; }
-    /**
-     * Sets node's full address.
-     *
-     * @param fullAddress Node's full address
-     */
-    public void setFullAddress( String fullAddress ) { this.fullAddress = fullAddress; }
-    /**
-     * Gets port number.
-     *  
-     * @return Port number
-     */
-    public String getPortNumber() { return portNumber; }
-    /**
-     * Sets port number.
-     *
-     * @param portNumber Port number to set
-     */
-    public void setPortNumber( String portNumber ) { this.portNumber = portNumber; }
     /**
      * Gets user name.
      *

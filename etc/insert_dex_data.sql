@@ -25,36 +25,40 @@ Author     : szewczenko
 INSERT INTO dex_roles (id, role) VALUES (1, 'admin'), (2, 'operator'),
     (3, 'peer'), (4, 'user');
 
--- dex_users ----------------------------------------------------------------------------
-INSERT INTO dex_users (name, name_hash, role_name, password, short_address, port, factory, country,
-    city, city_code, street, number, phone, email)
-    VALUES ('admin', MD5('admin'), 'admin', MD5('7GIg7Y@K!Yi'), 'localhost', '8084', 'IMGW',
-        'Poland', 'Warsaw', '01-673', 'Podleśna', '61', '+48 22 569 44 91',
-        'admin@baltrad.imgw.pl'),
+-- dex_users ---------------------------------------------------------------------------------------
+INSERT INTO dex_users (name, name_hash, role_name, password, factory, country, city, city_code,
+        street, number, phone, email)
+    VALUES ('admin', MD5('admin'), 'admin', MD5('7GIg7Y@K!Yi'), 'IMGW', 'Poland', 'Warsaw',
+            '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'admin@baltrad.imgw.pl'),
 
-        ('operator', MD5('operator'), 'operator', MD5('yL!wkReDB5h'), 'baltrad.imgw.pl',  '8084',
-        'IMGW', 'Poland', 'Warsaw', '01-673', 'Podleśna', '61', '+48 22 569 44 91',
-        'operator@baltrad.imgw.pl'),
+        ('operator', MD5('operator'), 'operator', MD5('Baltrad2008'), 'IMGW', 'Poland', 'Warsaw',
+        '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'operator@baltrad.imgw.pl'),
 
-        ('smhi', MD5('smhi'), 'peer', MD5('20lAdK0wA'), 'se.baltrad.eu', '8080', 'SMHI', 'Sweden',
-        'Norrkoping', '01-111', 'Some street', '111', '+46', 'smhi@baltrad.smhi.se'),
+        ('smhi', MD5('smhi'), 'peer', MD5('20lAdK0wA'), 'SMHI', 'Sweden', 'Norrkoping', '01-111',
+        'Some street', '111', '+46', 'smhi@baltrad.smhi.se'),
 
-        ('peer', MD5('peer'), 'peer', MD5('yL!wkReDB5h'), 'baltrad.imgw.pl', '8084', 'IMGW',
-        'Poland', 'Warsaw', '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'peer@baltrad.imgw.pl'),
+        ('peer', MD5('peer'), 'peer', MD5('Baltrad2008'), 'IMGW', 'Poland', 'Warsaw', '01-673',
+        'Podleśna', '61', '+48 22 569 44 91', 'peer@baltrad.imgw.pl'),
 
-        ('user', MD5('user'), 'user', MD5('yL!wkReDB5h'), 'baltrad.imgw.pl', '8084', 'IMGW',
-        'Poland', 'Warsaw', '01-673', 'Podleśna', '61', '+48 22 569 44 91', 'user@baltrad.imgw.pl');
+        ('user', MD5('user'), 'user', MD5('Baltrad2008'), 'IMGW', 'Poland', 'Warsaw', '01-673',
+        'Podleśna', '61', '+48 22 569 44 91', 'user@baltrad.imgw.pl');
 
--- dex_channels ------------------------------------------------------------------------
+-- dex_node_address --------------------------------------------------------------------------------
+INSERT INTO dex_node_address (scheme, host_address, port, app_context, entry_address) VALUES
+    ('https', 'localhost', 8084, 'BaltradDex', 'dispatch.htm'),
+    ('https', 'localhost', 8084, 'BaltradDex', 'dispatch.htm'),
+    ('https', 'se.baltrad.eu', 8084, 'BaltradDex', 'dispatch.htm'),
+    ('https', 'localhost', 8084, 'BaltradDex', 'dispatch.htm'),
+    ('https', 'localhost', 8084, 'BaltradDex', 'dispatch.htm');
+
+-- dex_user_address --------------------------------------------------------------------------------
+INSERT INTO dex_user_address (user_id, address_id) VALUES (1,1), (2,2), (3,3), (4,4), (5,5);
+
+-- dex_radars --------------------------------------------------------------------------------------
 
 INSERT INTO dex_radars (name, wmo_number) VALUES ('Legionowo', '12374'),
     ('Świdwin', '12220'), ('Brzuchania', '12568'), ('Pastewnik', '12544'),
     ('Rzeszów', '12579'), ('Ramża', '12514'), ('Poznań', '12331'), ('Gdańsk', '12151');
-
-INSERT INTO dex_node_configuration (name, type, short_address, port, org_name, org_address,
-    time_zone, temp_dir, email ) VALUES('baltrad.imgw.pl', 'Primary', 'localhost', '8084',
-    'Institute of Meteorology and Water Management', '01-673 Warsaw, Podleśna 61, Poland',
-    'Europe/Warsaw UTC+01', 'temp', 'admin@baltrad.imgw.pl');
 
 -- dex_data_quantity -------------------------------------------------------------------------------
 INSERT INTO dex_data_quantities (data_quantity, unit, description) VALUES

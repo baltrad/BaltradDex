@@ -21,13 +21,19 @@
 
 package eu.baltrad.dex.config.model;
 
-import eu.baltrad.dex.util.JDBCConnectionManager;
+import eu.baltrad.dex.log.model.MessageLogger;
+import java.io.FileOutputStream;
 
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import org.apache.log4j.Logger;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Properties;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
+
+import java.net.URL;
 
 /**
  * Class implemens configuration object handling functionality.
@@ -38,185 +44,260 @@ import java.sql.SQLException;
  */
 public class ConfigurationManager {
 //---------------------------------------------------------------------------------------- Constants
-    /** configuration record ID */
-    public static final int CONF_REC_ID = 1;
+    /** Properties file name */
+    private static final String DEX_INIT_PROPS = "dex.init.properties";
+    /** Properties file comment */
+    private static final String DEX_PROPS_FILE_COMMENT = "BaltradDex configuration file";
+    
+    // Application configuration
+
+    /** Node name property */
+    private static final String NODE_NAME_PROP = "node.name";
+    /** Node type property */
+    private static final String NODE_TYPE_PROP = "node.type"; 
+    /** Software version property */
+    private static final String SOFT_VERSION_PROP = "software.version";
+    /** Communication scheme property */
+    private static final String COM_SCHEME_PROP = "communication.scheme";
+    /** Host afddress property */
+    private static final String HOST_ADDRESS_PROP = "host.address";
+    /** Port number property */
+    private static final String PORT_NUMBER_PROP = "port.number";
+    /** Application context property */
+    private static final String APP_CTX_PROP = "application.context";
+    /** Entry point property */
+    private static final String ENTRY_ADDRESS_PROP = "entry.address";
+    /** Socket timeout property */
+    private static final String SO_TIMEOUT_PROP = "socket.timeout";
+    /** Connection timeout property */
+    private static final String CONN_TIMEOUT_PROP = "connection.timeout";
+    /** Organization's name property */
+    private static final String ORG_NAME_PROP = "organization.name";
+    /** Organization's address property */
+    private static final String ORG_ADDRESS_PROP = "organization.address";
+    /** Time zone property */
+    private static final String TIME_ZONE_PROP = "time.zone";
+    /** Work directory property */
+    private static final String WORK_DIR_PROP = "work.directory";
+    /** Images directory property */
+    private static final String IMAGES_DIR_PROP = "images.directory";
+    /** Thumbnails directory property */
+    private static final String THUMBNAILS_DIR_PROP = "thumbnails.directory";
+    /** Node administrator's email property */
+    private static final String EMAIL_PROP = "admin.email";
+
+    // System messages configuration
+
+    /** Trim by number toggle */
+    private static final String MSG_TRIM_BY_NUMBER = "messages.trim_by_number";
+    /** Trim by date toggle */
+    private static final String MSG_TRIM_BY_DATE = "messages.trim_by_date";
+    /** Records limit */
+    private static final String MSG_REC_LIMIT = "messages.rec_limit";
+    /** Date limit */
+    private static final String MSG_DATE_LIMIT = "messages.date_limit";
+
+    // Delivery registry configuration
+
+    /** Trim by number toggle */
+    private static final String REG_TRIM_BY_NUMBER = "registry.trim_by_number";
+    /** Trim by date toggle */
+    private static final String REG_TRIM_BY_DATE = "registry.trim_by_date";
+    /** Records limit */
+    private static final String REG_REC_LIMIT = "registry.rec_limit";
+    /** Date limit */
+    private static final String REG_DATE_LIMIT = "registry.date_limit";
+
+    /** Date format string */
+    private final static String DATE_FORMAT = "yyyy/MM/dd";
+    /** Time format string */
+    private final static String TIME_FORMAT = "HH:mm:ss";
+
 //---------------------------------------------------------------------------------------- Variables
-    /** Reference to JDBCConnector class object */
-    private JDBCConnectionManager jdbcConnectionManager;
+    /** References logger object */
+    private static Logger log;
+    /** Date format */
+    private static DateFormat df;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Constructor gets reference to JDBCConnectionManager instance.
+     * Constructor
      */
     public ConfigurationManager() {
-        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        df = new SimpleDateFormat( DATE_FORMAT + " " + TIME_FORMAT );
     }
     /**
-     * Gets configuration record with a given ID.
+     * Loads system configuration from properties file.
      *
-     * @param id Record ID
-     * @return Configuration object with a given ID
+     * @return Configuration object
      */
-    public Configuration getNodeConfiguration( int id ) throws SQLException, Exception {
-        Connection conn = null;
-        Configuration conf = null;
+    public AppConfiguration loadAppConf() {
         try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_node_configuration WHERE" +
-                    " id = " + id + ";" );
-            while( resultSet.next() ) {
-                int confId = resultSet.getInt( "id" );
-                String name = resultSet.getString( "name" );
-                String type = resultSet.getString( "type" );
-                String address = resultSet.getString( "short_address" );
-                String port = resultSet.getString( "port" );
-                String orgName = resultSet.getString( "org_name" );
-                String orgAddress = resultSet.getString( "org_address" );
-                String timeZone = resultSet.getString( "time_zone" );
-                String workDir = resultSet.getString( "temp_dir" );
-                String adminEmail = resultSet.getString( "email" );
-                conf = new Configuration( confId, name, type, address, port, orgName, orgAddress,
-                        timeZone, workDir, adminEmail );
-            }
-            stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select configuration: " + e.getMessage() );
-            throw e;
+            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
+            Properties props = new Properties();
+            props.load( url.openStream() );
+            AppConfiguration conf = new AppConfiguration( props.getProperty( NODE_NAME_PROP ),
+                props.getProperty( NODE_TYPE_PROP ), props.getProperty( SOFT_VERSION_PROP ),
+                props.getProperty( COM_SCHEME_PROP ), props.getProperty( HOST_ADDRESS_PROP ),
+                Integer.parseInt( props.getProperty( PORT_NUMBER_PROP ) ),
+                props.getProperty( APP_CTX_PROP ), props.getProperty( ENTRY_ADDRESS_PROP ),
+                Integer.parseInt( props.getProperty( SO_TIMEOUT_PROP ) ),
+                Integer.parseInt( props.getProperty( CONN_TIMEOUT_PROP ) ),
+                props.getProperty( WORK_DIR_PROP ), props.getProperty( IMAGES_DIR_PROP ),
+                props.getProperty( THUMBNAILS_DIR_PROP ), props.getProperty( ORG_NAME_PROP),
+                props.getProperty( ORG_ADDRESS_PROP ), props.getProperty( TIME_ZONE_PROP ),
+                props.getProperty( EMAIL_PROP ) );
+            return conf;
+        } catch( IOException e ) {
+            log.error( "Failed to load properties: " + e.getMessage() );
+            return null;
         } catch( Exception e ) {
-            System.err.println( "Failed to select configuration: " + e.getMessage() );
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            log.error( "Failed to load properties: " + e.getMessage() );
+            return null;
         }
-        return conf;
     }
     /**
-     * Gets configuration record for a log system with a given ID.
+     * Saves system configuration in properties file.
      *
-     * @param logId Log system identification string
-     * @return LogConfiguration
-     * @throws SQLException
+     * @param appConf Application configuration object
+     * @throws IOException
      * @throws Exception
      */
-    public LogConfiguration getLogConfiguration( String logId ) throws SQLException, Exception {
-        Connection conn = null;
-        LogConfiguration logConf = null;
+    public void saveAppConf( AppConfiguration appConf ) throws IOException, Exception {
         try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_log_configuration WHERE" +
-                    " log_id = '" + logId + "';" );
-            while( resultSet.next() ) {
-                int Id = resultSet.getInt( "id" );
-                String logSystemId = resultSet.getString( "log_id" );
-                boolean trimByNumber = resultSet.getBoolean( "trim_by_number" );
-                boolean trimByDate = resultSet.getBoolean( "trim_by_date" );
-                int recordLimit = resultSet.getInt( "record_limit" );
-                Timestamp dateLimit = resultSet.getTimestamp( "date_limit" );
-                logConf = new LogConfiguration( Id, logSystemId, trimByNumber, trimByDate,
-                        recordLimit, dateLimit );
-            }
-            stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select log configuration: " + e.getMessage() );
+            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
+            Properties props = new Properties();
+            props.load( url.openStream() );
+            //
+            props.setProperty( NODE_NAME_PROP, appConf.getNodeName() );
+            props.setProperty( NODE_TYPE_PROP, appConf.getNodeType() );
+            props.setProperty( SOFT_VERSION_PROP, appConf.getVersion() );
+            props.setProperty( COM_SCHEME_PROP, appConf.getScheme() );
+            props.setProperty( HOST_ADDRESS_PROP, appConf.getHostAddress() );
+            props.setProperty( PORT_NUMBER_PROP, Integer.toString( appConf.getPort() ) );
+            props.setProperty( APP_CTX_PROP, appConf.getAppCtx() );
+            props.setProperty( ENTRY_ADDRESS_PROP, appConf.getEntryAddress() );
+            props.setProperty( SO_TIMEOUT_PROP, Integer.toString( appConf.getSoTimeout() ) );
+            props.setProperty( CONN_TIMEOUT_PROP, Integer.toString( appConf.getConnTimeout()) );
+            props.setProperty( WORK_DIR_PROP, appConf.getWorkDir() );
+            props.setProperty( IMAGES_DIR_PROP, appConf.getImagesDir() );
+            props.setProperty( THUMBNAILS_DIR_PROP, appConf.getThumbsDir() );
+            props.setProperty( ORG_NAME_PROP, appConf.getOrganization() );
+            props.setProperty( ORG_ADDRESS_PROP, appConf.getAddress() );
+            props.setProperty( TIME_ZONE_PROP, appConf.getTimeZone() );
+            props.setProperty( EMAIL_PROP, appConf.getEmail() );
+            //
+            OutputStream os = new FileOutputStream( url.getPath() );
+            props.store( os, DEX_PROPS_FILE_COMMENT );
+        } catch( IOException e ) {
+            log.error( "Failed to save properties: " + e.getMessage() );
             throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to select log configuration: " + e.getMessage() );
+            log.error( "Failed to save properties: " + e.getMessage() );
             throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
         }
-        return logConf;
     }
     /**
-     * Saves or updates configuration.
+     * Load messages configuration.
      *
-     * @param conf Configuration object
-     * @return Number of saved or updated records
-     * @throws SQLException
-     * @throws Exception
+     * @return Messages configuration
      */
-    public int saveOrUpdate( Configuration conf ) throws SQLException, Exception {
-        Connection conn = null;
-        int update = 0;
+    public LogConfiguration loadMsgConf() {
         try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "";
-            // record does not exists, do insert
-            if( conf.getId() == 0 ) {
-                sql = "INSERT INTO dex_node_configuration (name, type, short_address, port, " +
-                    "org_name, org_address, time_zone, temp_dir, email) VALUES ('" +
-                    conf.getNodeName() + "', '" + conf.getNodeType() + "', '" +
-                    conf.getShortAddress() + "', '" + conf.getPortNumber() + "', '" +
-                    conf.getOrgName() + "', '" + conf.getOrgAddress() + "', '" +
-                    conf.getTimeZone() + "', '" + conf.getTempDir() + "', '" +
-                    conf.getAdminEmail() + "');";
-            } else {
-                // record exists, do update
-                sql = "UPDATE dex_node_configuration SET name = '" + conf.getNodeName() + "', " +
-                    "type = '" + conf.getNodeType() + "', short_address = '" +
-                    conf.getShortAddress() + "', port = '" + conf.getPortNumber() + "', " +
-                    "org_name = '" + conf.getOrgName() + "', org_address = '" +
-                    conf.getOrgAddress() + "', time_zone = '" + conf.getTimeZone() + "', " + 
-                    "temp_dir = '" + conf.getTempDir() + "', email = '" + 
-                    conf.getAdminEmail() + "' WHERE id = " + conf.getId() + ";";
-            }
-            update = stmt.executeUpdate( sql ) ;
-            stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save configuration: " + e.getMessage() );
-            throw e;
+            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
+            Properties props = new Properties();
+            props.load( url.openStream() );
+            LogConfiguration conf = new LogConfiguration( Boolean.parseBoolean( props.getProperty(
+                    MSG_TRIM_BY_NUMBER ) ), Boolean.parseBoolean( props.getProperty(
+                    MSG_TRIM_BY_DATE ) ), Integer.parseInt( props.getProperty( MSG_REC_LIMIT ) ),
+                    df.parse( props.getProperty( MSG_DATE_LIMIT ) ) );
+            return conf;
+        } catch( IOException e ) {
+            log.error( "Failed to load properties: " + e.getMessage() );
+            return null;
         } catch( Exception e ) {
-            System.err.println( "Failed to save configuration: " + e.getMessage() );
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            log.error( "Failed to load properties: " + e.getMessage() );
+            return null;
         }
-        return update;
     }
     /**
-     * Saves or updates log configuration.
+     * Save messages configuration.
      *
-     * @param logConfiguration Log configuration object
-     * @return Number of saved or updated records
-     * @throws SQLException
+     * @param msgConf Messages configuration
+     * @throws IOException
      * @throws Exception
      */
-    public int saveOrUpdate( LogConfiguration logConf ) throws SQLException, Exception {
-        Connection conn = null;
-        int update = 0;
+    public void saveMsgConf( LogConfiguration msgConf ) throws IOException, Exception {
         try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "";
-            // record does not exists, do insert
-            if( logConf.getId() == 0 ) {
-                sql = "INSERT INTO dex_log_configuration (log_id, trim_by_number, trim_by_date, " +
-                    "record_limit, date_limit) VALUES ('" +
-                    logConf.getLogId() + "', " + logConf.getTrimByNumber() + ", " +
-                    logConf.getTrimByDate() + ", " + logConf.getRecordLimit() + ", '" +
-                    logConf.getDateLimit() + "');";
-            } else {
-                // record exists, do update
-                sql = "UPDATE dex_log_configuration SET log_id = '" + logConf.getLogId() + "', " +
-                    "trim_by_number = " + logConf.getTrimByNumber() + ", trim_by_date = " +
-                    logConf.getTrimByDate() + ", record_limit = " + logConf.getRecordLimit() +
-                    ", date_limit = '" + logConf.getDateLimit() + "' WHERE id = '" + logConf.getId()
-                    + "';";
-            }
-            update = stmt.executeUpdate( sql ) ;
-            stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save log configuration: " + e.getMessage() );
+            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
+            Properties props = new Properties();
+            props.load( url.openStream() );
+            //
+            props.setProperty( MSG_TRIM_BY_NUMBER, Boolean. toString( msgConf.getTrimByNumber() ) );
+            props.setProperty( MSG_TRIM_BY_DATE, Boolean.toString( msgConf.getTrimByDate() ) );
+            props.setProperty( MSG_REC_LIMIT, Integer.toString( msgConf.getRecordLimit() ) );
+            props.setProperty( MSG_DATE_LIMIT, df.format( msgConf.getDateLimit() ) );
+            //
+            OutputStream os = new FileOutputStream( url.getPath() );
+            props.store( os, DEX_PROPS_FILE_COMMENT );
+        } catch( IOException e ) {
+            log.error( "Failed to save messages properties: " + e.getMessage() );
             throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save log configuration: " + e.getMessage() );
+            log.error( "Failed to save messages properties: " + e.getMessage() );
             throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
         }
-        return update;
+    }
+    /**
+     * Load delivery registry configuration.
+     *
+     * @return Delivery registry configuration
+     */
+    public LogConfiguration loadRegConf() {
+        try {
+            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
+            Properties props = new Properties();
+            props.load( url.openStream() );
+            LogConfiguration conf = new LogConfiguration( Boolean.parseBoolean( props.getProperty(
+                    REG_TRIM_BY_NUMBER ) ), Boolean.parseBoolean( props.getProperty(
+                    REG_TRIM_BY_DATE ) ), Integer.parseInt( props.getProperty( REG_REC_LIMIT ) ),
+                    df.parse( props.getProperty( REG_DATE_LIMIT ) ) );
+            return conf;
+        } catch( IOException e ) {
+            log.error( "Failed to load properties: " + e.getMessage() );
+            return null;
+        } catch( Exception e ) {
+            log.error( "Failed to load properties: " + e.getMessage() );
+            return null;
+        }
+    }
+    /**
+     * Save delivery registry configuration.
+     *
+     * @param regConf Delivery registry configuration
+     * @throws IOException
+     * @throws Exception
+     */
+    public void saveRegConf( LogConfiguration regConf ) throws IOException, Exception {
+        try {
+            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
+            Properties props = new Properties();
+            props.load( url.openStream() );
+            //
+            props.setProperty( REG_TRIM_BY_NUMBER, Boolean. toString( regConf.getTrimByNumber() ) );
+            props.setProperty( REG_TRIM_BY_DATE, Boolean.toString( regConf.getTrimByDate() ) );
+            props.setProperty( REG_REC_LIMIT, Integer.toString( regConf.getRecordLimit() ) );
+            props.setProperty( REG_DATE_LIMIT, df.format( regConf.getDateLimit() ) );
+            //
+            OutputStream os = new FileOutputStream( url.getPath() );
+            props.store( os, DEX_PROPS_FILE_COMMENT );
+        } catch( IOException e ) {
+            log.error( "Failed to save messages properties: " + e.getMessage() );
+            throw e;
+        } catch( Exception e ) {
+            log.error( "Failed to save messages properties: " + e.getMessage() );
+            throw e;
+        }
     }
 }
 //--------------------------------------------------------------------------------------------------

@@ -124,7 +124,7 @@ Author     : szewczenko
                         <div class="blttitle">
                             <div class="break"></div>
                             Data preview
-                        </div>    
+                        </div>
                         <c:choose>
                             <c:when test="${not empty blt_datasets}">
                                 <div class="blttext">

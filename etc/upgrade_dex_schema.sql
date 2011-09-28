@@ -241,18 +241,21 @@ BEGIN
         WHEN OTHERS THEN RAISE NOTICE 'Failed to alter column "dex_channel_permissions.channel_id"';
     END;
     BEGIN
-        CREATE TABLE dex_log_configuration
-        (
-            id SERIAL NOT NULL,
-            log_id VARCHAR(32) NOT NULL UNIQUE,
-            trim_by_number BOOLEAN NOT NULL,
-            trim_by_date BOOLEAN NOT NULL,
-            record_limit INT,
-            date_limit TIMESTAMP,
-            PRIMARY KEY(id)
-        );
+        DROP TABLE IF EXISTS dex_node_configuration CASCADE;
+        DROP TABLE IF EXISTS dex_log_configuration;
+        DROP SEQUENCE IF EXISTS configuration_id_seq;
     EXCEPTION
-        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_log_configuration"';
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to drop configuration tables';
+    END;
+    BEGIN
+        CREATE UNIQUE INDEX dex_messages_timestamp_idx ON dex_messages (timestamp);
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to create index dex_messages_timestamp_idx';
+    END;
+    BEGIN
+        CREATE UNIQUE INDEX dex_delivery_register_timestamp_idx ON dex_delivery_register (timestamp);
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to create index dex_delivery_register_timestamp_idx';
     END;
 END;
 $$ LANGUAGE plpgsql;
@@ -438,12 +441,198 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+--
+-- Create node address table and depending tables, copy data from existing tables, modify existing
+-- tables by dropping columns that are no longer needed
+--
+CREATE OR REPLACE FUNCTION create_node_address_schema() RETURNS integer AS $$
+BEGIN
+    --
+    -- check if node address table exist
+    --
+    PERFORM true FROM information_schema.tables where table_name = 'dex_node_address';
+    IF NOT FOUND THEN
+        -- create schema
+        BEGIN
+            CREATE TABLE dex_node_address
+            (
+                id SERIAL NOT NULL,
+                scheme VARCHAR(16) NOT NULL DEFAULT 'https',
+                host_address VARCHAR(128) NOT NULL,
+                port INT NOT NULL DEFAULT 8084,
+                app_context VARCHAR(64) NOT NULL DEFAULT 'BaltradDex',
+                entry_address VARCHAR(64) NOT NULL DEFAULT 'dispatch.htm',
+                PRIMARY KEY (id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table dex_node_address';
+        END;
+        BEGIN
+            CREATE TABLE dex_node_connection_address
+            (
+                id SERIAL NOT NULL,
+                connection_id INT NOT NULL REFERENCES dex_node_connections (id) ON DELETE CASCADE,
+                address_id INT NOT NULL REFERENCES dex_node_address (id) ON DELETE CASCADE,
+                PRIMARY KEY (id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table dex_node_connection_address';
+        END;
+        BEGIN
+            CREATE TABLE dex_subscription_address
+            (
+                id SERIAL NOT NULL,
+                subscription_id INT NOT NULL REFERENCES dex_subscriptions (id) ON DELETE CASCADE,
+                address_id INT NOT NULL REFERENCES dex_node_address (id) ON DELETE CASCADE,
+                PRIMARY KEY (id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table dex_subscription_address';
+        END;
+        BEGIN
+            CREATE TABLE dex_user_address
+            (
+                id SERIAL NOT NULL,
+                user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE,
+                address_id INT NOT NULL REFERENCES dex_node_address (id) ON DELETE CASCADE,
+                PRIMARY KEY (id)
+            );
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to create table dex_user_address';
+        END;
+        -- copy data from existing tables
+        BEGIN
+            DECLARE
+                    conn RECORD;
+                    sub RECORD;
+                    usr RECORD;
+                    addr_id INTEGER;
+                    host_addr VARCHAR;
+                    port_number VARCHAR;
+            BEGIN
+                    FOR conn IN SELECT * FROM dex_node_connections LOOP
+                            INSERT INTO dex_node_address(host_address, port) VALUES
+                                (conn.short_address, int4(conn.port)) RETURNING id INTO addr_id;
+                            INSERT INTO dex_node_connection_address(connection_id, address_id)
+                                VALUES (conn.id, addr_id);
+                    END LOOP;
+                    FOR sub IN SELECT * FROM dex_subscriptions LOOP
+                            host_addr = substring(sub.node_address from E'://([\\w\.-]+):');
+                            port_number = substring(sub.node_address from E'://[\\w\.-]+:(\\d+)/');
+                            INSERT INTO dex_node_address(host_address, port)
+                                VALUES (host_addr, int4(port_number)) RETURNING id INTO addr_id;
+                            INSERT INTO dex_subscription_address(subscription_id, address_id)
+                                VALUES (sub.id, addr_id);
+                    END LOOP;
+                    FOR usr IN SELECT * FROM dex_users LOOP
+                            INSERT INTO dex_node_address(host_address, port)
+                                VALUES (usr.short_address, int4(usr.port)) RETURNING id INTO addr_id;
+                            INSERT INTO dex_user_address(user_id, address_id) VALUES (usr.id, addr_id);
+                    END LOOP;
+            END;
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to copy node address data';
+        END;
+        -- modify existing schema
+        BEGIN
+            ALTER TABLE dex_users DROP COLUMN short_address;
+            ALTER TABLE dex_users DROP COLUMN port;
+            ALTER TABLE dex_subscriptions DROP COLUMN node_address;
+            ALTER TABLE dex_node_connections DROP COLUMN short_address;
+            ALTER TABLE dex_node_connections DROP COLUMN port;
+        EXCEPTION
+            WHEN OTHERS THEN RAISE NOTICE 'failed to modify node address schema';
+        END;
+    END IF;
+    RETURN 0;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_dex_data() RETURNS VOID AS $$
+DECLARE
+    num_records INTEGER;
+BEGIN
+    BEGIN
+        SELECT count(*) FROM dex_file_objects INTO num_records;
+	IF num_records = 0 THEN
+            INSERT INTO dex_file_objects (file_object, description) VALUES
+                ('PVOL', 'Polar volume'), ('CVOL', 'Cartesian volume'), ('SCAN', 'Polar scan'),
+                ('RAY', 'Single polar ray'), ('AZIM', 'Azimuthal object'), ('IMAGE', '2-D cartesian image'),
+                ('COMP', 'Cartesian composite image(s)'), ('XSEC', '2-D vertical cross section(s)'),
+                ('VP', '1-D vertical profile'), ('PIC', 'Embedded graphical image');
+	END IF;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to insert data into dex_file_objects';
+    END;
+    BEGIN
+        SELECT count(*) FROM dex_data_quantities INTO num_records;
+	IF num_records = 0 THEN
+            INSERT INTO dex_data_quantities (data_quantity, unit, description) VALUES
+                ('TH', 'Th [dBZ]', 'Logged horizontally-polarized total (uncorrected) reflectivity factor'),
+                ('TV', 'Tv [dBZ]', 'Logged vertically-polarized total (uncorrected) reflectivity factor'),
+                ('DBZH', 'Zh [dBZ]', 'Logged horizontally-polarized (corrected) reflectivity factor'),
+                ('DBZV', 'Zv [dBZ]', 'Logged vertically-polarized (corrected) reflectivity factor'),
+                ('ZDR', 'ZDR [dBZ]', 'Logged differential reflectivity'),
+                ('RHOHV', 'ρhv [0-1]', 'Correlation between Zh and Zv'),
+                ('LDR', 'Ldr [dB]', 'Linear depolarization ratio'),
+                ('PHIDP', 'φdp [degrees]', 'Differential phase'),
+                ('KDP', 'Kdp [degrees/km]', 'Specific differential phase'),
+                ('SQI', 'SQI [0-1]', 'Signal quality index'),
+                ('SNR', 'SNR [0-1]', 'Normalized signal-to-noise ratio'),
+                ('RATE', 'RR [mm/h]', 'Rain rate'),
+                ('ACRR', 'RRaccum [mm]', 'Accumulated precipitation'),
+                ('HGHT', 'H [km]', 'Height (of echotops)'),
+                ('VIL', 'VIL [kg/m2 ]', 'Vertical Integrated Liquid water'),
+                ('VRAD', 'Vrad [m/s]', 'Radial velocity'),
+                ('WRAD', 'Wrad [m/s]', 'Spectral width of radial velocity'),
+                ('UWND', 'U [m/s]', 'Component of wind in x-direction'),
+                ('VWND', 'V [m/s]', 'Component of wind in y-direction'),
+                ('BRDR', '0 or 1', '1 denotes a border where data from two or more radars meet in composites,
+                                    otherwise 0'),
+                ('QIND', 'Quality [0-1]', 'Spatially analayzed quality indicator, according to OPERA II,
+                                            normalized to between 0 (poorest quality) to 1 (best quality)');
+	END IF;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to insert data into dex_data_quantities';
+    END;
+    BEGIN
+        SELECT count(*) FROM dex_products INTO num_records;
+	IF num_records = 0 THEN
+            INSERT INTO dex_products (product, description) VALUES
+                ('SCAN', 'A scan of polar data'), ('PPI', 'Plan position indicator'),
+                ('CAPPI', 'Constant altitude PPI'), ('PCAPPI', 'Pseudo-CAPPI'), ('ETOP', 'Echo top'),
+                ('MAX', 'Maximum'), ('RR', 'Accumulation'), ('VIL', 'Vertically integrated liquid water'),
+                ('COMP', 'Composite'), ('VP', 'Vertical profile'), ('RHI', 'Range height indicator'),
+                ('XSEC', 'Arbitrary vertical slice'), ('VSP', 'Vertical side panel'),
+                ('HSP', 'Horizontal side panel'), ('RAY', 'Ray'), ('AZIM', 'Azimuthal type product'),
+                ('QUAL', 'Quality metric');
+	END IF;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to insert data into dex_products';
+    END;
+    BEGIN
+        SELECT count(*) FROM dex_product_parameters INTO num_records;
+	IF num_records = 0 THEN
+            INSERT INTO dex_product_parameters (parameter, description) VALUES
+                ('CAPPI', 'Layer height (meters above the radar)'), ('PPI', 'Elevation angle used (degrees)'),
+                ('ETOP', 'Reflectivity level (dBZ)'), ('RHI', 'Azimuth angle (degrees)'),
+                ('VIL', 'Bottom and top heights (m) of the integration layer');
+	END IF;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to insert data into dex_product_parameters';
+    END;
+END;
+$$ LANGUAGE plpgsql;
+
+
 SELECT split_dex_node_connections_address();
 SELECT split_dex_node_configuration_address();
 SELECT split_dex_users_node_address();
 SELECT restart_seq_with_max('dex_messages', 'id');
 SELECT upgrade_dex_schema();
 SELECT create_data_sources();
+SELECT create_node_address_schema();
+SELECT insert_dex_data();
 
 DROP FUNCTION make_plpgsql();
 DROP FUNCTION split_dex_node_configuration_address();
@@ -452,3 +641,5 @@ DROP FUNCTION split_dex_users_node_address();
 DROP FUNCTION restart_seq_with_max(TEXT, TEXT);
 DROP FUNCTION upgrade_dex_schema();
 DROP FUNCTION create_data_sources();
+DROP FUNCTION create_node_address_schema();
+DROP FUNCTION insert_dex_data();

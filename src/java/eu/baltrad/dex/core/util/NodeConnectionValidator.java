@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -55,24 +55,13 @@ public class NodeConnectionValidator implements Validator {
         NodeConnection conn = ( NodeConnection )command;
         if( conn == null ) return;
         if( conn.getConnectionName() == null ) {
-            if( conn.getFullAddress() == null &&
-                conn.getUserName() == null &&
-                conn.getPassword() == null ) {
+            if( conn.getHostAddress() == null && conn.getUserName() == null &&
+                    conn.getPassword() == null ) {
                 ValidationUtils.rejectIfEmptyOrWhitespace( errors, "connectionName",
                     "error.select.connection" );
             } else {
-                boolean isValidPortNumber = false;
-                try {
-                    int port = Integer.parseInt( conn.getPortNumber() );
-                    isValidPortNumber = true;
-                } catch( NumberFormatException e ) {
-                    isValidPortNumber = false;
-                } catch( Exception e ) {
-                    isValidPortNumber = false;
-                }
-                if( conn.getShortAddress().isEmpty() || conn.getPortNumber().isEmpty() ||
-                        !isValidPortNumber ) {
-                    ValidationUtils.rejectIfEmptyOrWhitespace( errors, "fullAddress",
+                if( conn.getHostAddress().isEmpty() || conn.getPort() == 0 ) {
+                    ValidationUtils.rejectIfEmptyOrWhitespace( errors, "hostAddress",
                         "error.address.invalid" );
                 }
                 if( conn.getUserName().isEmpty() ) {
@@ -83,7 +72,14 @@ public class NodeConnectionValidator implements Validator {
                     ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password",
                         "error.missing.password" );
                 }
-            }   
+                // Validate port number
+                if( errors.hasFieldErrors( "port") ) {
+                    errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
+                }
+                if( conn.getPort() <= 0 ) {
+                    errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
+                }
+            }
         }
     }
 }

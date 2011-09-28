@@ -48,12 +48,11 @@ public class DeliveryRegisterManager {
     /** SQL script creating trimmer function */
     private static final String SQL_TRIM_REG_BY_NUMBER = "DROP FUNCTION IF EXISTS " +
         "dex_trim_registry_by_number() CASCADE; CREATE OR REPLACE FUNCTION " +
-        "dex_trim_registry_by_number() RETURNS trigger AS $$ DECLARE records_limit INTEGER; " +
-        "total_records INTEGER; start_record INTEGER; BEGIN records_limit = TG_ARGV[0]; " +
-        "SELECT count(*) FROM dex_delivery_register INTO total_records; IF total_records > " +
-        "records_limit THEN start_record = total_records - records_limit; DELETE FROM " +
-        "dex_delivery_register WHERE id IN (SELECT id FROM dex_delivery_register LIMIT " +
-        "start_record); END IF; RETURN NEW; END; $$ LANGUAGE plpgsql;";
+        "dex_trim_registry_by_number() RETURNS trigger AS $$ DECLARE records_limit INTEGER; " + 
+        "BEGIN records_limit = TG_ARGV[0]; DELETE FROM dex_delivery_register WHERE id IN " +
+        "(SELECT id FROM dex_delivery_register ORDER BY timestamp DESC OFFSET records_limit);" +
+        " RETURN NEW; END; $$ LANGUAGE plpgsql;";
+
     /** SQL script creating trimmer function */
     private static final String SQL_TRIM_REG_BY_DATE = "DROP FUNCTION IF EXISTS " +
         "dex_trim_registry_by_date() CASCADE; CREATE OR REPLACE FUNCTION " +

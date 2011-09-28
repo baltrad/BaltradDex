@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,18 +21,18 @@
 
 package eu.baltrad.dex.config.controller;
 
-import eu.baltrad.dex.config.model.Configuration;
+import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
-import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.ServletContextUtil;
 import eu.baltrad.dex.log.model.MessageLogger;
-import eu.baltrad.dex.core.model.NodeConnection;
 
 import org.apache.log4j.Logger;
 
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
+import org.springframework.web.bind.ServletRequestDataBinder;
+import org.springframework.beans.propertyeditors.CustomNumberEditor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,10 +41,10 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.text.DecimalFormat;
 
 /**
  * Controller class creates new system configuration or modifies existing configuration.
@@ -80,21 +80,25 @@ public class SaveConfigurationController extends SimpleFormController {
      */
     @Override
     protected Object formBackingObject( HttpServletRequest request ) {
-        Configuration conf = null;
-        try {
-            conf = configurationManager.getNodeConfiguration( ConfigurationManager.CONF_REC_ID );
-        } catch( SQLException e ) {
-            log.error( "Error while loading configuration from database: " + e.getMessage() );
-        } catch( Exception e ) {
-            log.error( "Error while loading configuration from database: " + e.getMessage() );
-        }
+        AppConfiguration conf = configurationManager.loadAppConf();
         if( conf == null ) {
-            conf = new Configuration( "Short node name", PRIMARY_NODE,
-                    "Short node address", "8084", "Host organization name", "Host organization " +
-                    "address", "Local time zone", "temp", "Node administrator's " +
-                    "email" );
+            conf = new AppConfiguration( "Node name", PRIMARY_NODE, "0.7.3", "https", "localhost",
+                    8443, "BaltradDex", "dispatch.htm", 60000, 60000, "work", "images",
+                    "thumbs", "My Organization", "Organization's address", "Time zone",
+                    "Node admin's email" );
         }
         return conf;
+    }
+    /**
+     * Initialize the given binder instance with custom property editors.
+     *
+     * @param request Current servlet request
+     * @param binder New binder instance
+     */
+    @Override
+    protected void initBinder( HttpServletRequest request, ServletRequestDataBinder binder ) {
+        binder.registerCustomEditor( Integer.class, new CustomNumberEditor( Integer.class,
+                new DecimalFormat( "#" ), true ) );
     }
     /**
      * Returns HashMap holding list of available node types.
@@ -120,7 +124,7 @@ public class SaveConfigurationController extends SimpleFormController {
                 timeZones.add( strLine );
             }
         } catch( IOException e ) {
-            log.error( "Failed to load time zones from file: " + e.getMessage() );
+            log.error( "Failed to load time zones configuration file: " + e.getMessage() );
         }
         model.put( NODE_TYPES, nodeTypes );
         model.put( TIME_ZONES, timeZones );
@@ -138,20 +142,13 @@ public class SaveConfigurationController extends SimpleFormController {
     @Override
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors ) {
-        Configuration conf = ( Configuration )command;
-        // set node's full address
-        conf.setFullAddress( NodeConnection.HTTP_PREFIX + conf.getShortAddress() +
-            NodeConnection.PORT_SEPARATOR + conf.getPortNumber() +
-            NodeConnection.ADDRESS_SEPARATOR + NodeConnection.APP_CONTEXT +
-            NodeConnection.ADDRESS_SEPARATOR + NodeConnection.ENTRY_ADDRESS );
+        AppConfiguration appConf = ( AppConfiguration )command;
         try {
-            configurationManager.saveOrUpdate( conf );
-            // read modified configuration
-            InitAppUtil.initApp();
+            configurationManager.saveAppConf( appConf );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveconf.savesuccess" ) );
             log.warn( getMessageSourceAccessor().getMessage( "message.saveconf.savesuccess" ) );
-        } catch( SQLException e ) {
+        } catch( IOException e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveconf.savefail" ) );

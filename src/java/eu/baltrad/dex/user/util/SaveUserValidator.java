@@ -87,20 +87,17 @@ public class SaveUserValidator implements Validator {
                 errors.rejectValue( "password", "error.field.passwd.tooshort" );
             }
         }
-        // validate node address
-        boolean isValidPortNumber = false;
-        try {
-            int port = Integer.parseInt( user.getPortNumber() );
-            isValidPortNumber = true;
-        } catch( NumberFormatException e ) {
-            isValidPortNumber = false;
-        } catch( Exception e ) {
-            isValidPortNumber = false;
-        }
-        if( user.getShortAddress().isEmpty() || user.getPortNumber().isEmpty() ||
-                !isValidPortNumber ) {
-            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "fullAddress",
+        // Validate host address
+        if( user.getHostAddress().isEmpty() ) {
+            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "hostAddress",
                 "error.address.invalid" );
+        }
+        // Validate port number
+        if( errors.hasFieldErrors( "port") ) {
+            errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
+        }
+        if( user.getPort() <= 0 ) {
+            errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
         }
         // validate email address
         if( user.getEmail().trim().length() > 0 && !WebUtil.validateEmailAddress( user.getEmail() ) ) {

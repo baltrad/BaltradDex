@@ -26,7 +26,6 @@ import eu.baltrad.dex.registry.model.DeliveryRegisterEntry;
 import eu.baltrad.frame.model.BaltradFrameHandler;
 import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.core.model.NodeConnection;
 import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.fc.FileEntry;
@@ -34,6 +33,7 @@ import eu.baltrad.fc.FileEntry;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Date;
 
 /**
@@ -46,20 +46,20 @@ import java.util.Date;
 public class HandleFrameTask implements Runnable {
 //---------------------------------------------------------------------------------------- Variables
     private DeliveryRegisterManager deliveryRegisterManager;
-    private BaltradFrameHandler baltradFrameHandler;
+    private BaltradFrameHandler bfHandler;
     private Logger log;
     private User user;
     private String dataSource;
     private FileEntry fileEntry;
     private File fileItem;
+    private InitAppUtil init;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      *
      * @param deliveryRegisterManager References delivery register manager object
      * @see DeliveryRegisterManager
-     * @param logManager References log manager object
-     * @see LogManager
+     * @param log Logger object
      * @param user User for which this task is performed
      * @see User
      * @param dataSource Data source name
@@ -74,34 +74,35 @@ public class HandleFrameTask implements Runnable {
         this.dataSource = dataSource;
         this.fileEntry = fileEntry;
         this.fileItem = fileItem;
-        this.baltradFrameHandler = new BaltradFrameHandler();
-        this.baltradFrameHandler = new BaltradFrameHandler( NodeConnection.HTTP_PREFIX +
-                user.getShortAddress() + NodeConnection.PORT_SEPARATOR + user.getPortNumber() +
-                NodeConnection.ADDRESS_SEPARATOR + NodeConnection.APP_CONTEXT +
-                NodeConnection.ADDRESS_SEPARATOR + NodeConnection.ENTRY_ADDRESS );
+        this.init = InitAppUtil.getInstance();
+        this.bfHandler = new BaltradFrameHandler( user.getScheme(), user.getHostAddress(),
+                user.getPort(), user.getAppCtx(), user.getEntryAddress(),
+                init.getConfiguration().getSoTimeout(), init.getConfiguration().getConnTimeout() );
     }
     /**
      * Implements Runnable interface. Runs frame delivery task in a separate thread.
      */
     public void run() {
-        // prepare frame header
-        String header = baltradFrameHandler.createDataHdr( BaltradFrameHandler.MIME_MULTIPART,
-            InitAppUtil.getNodeName(), dataSource, fileEntry.uuid() + ".h5" );
-        // prepare frame
-        BaltradFrame baltradFrame = new BaltradFrame( header, fileItem.getAbsolutePath() );
-        // handle the frame
-        int httpStatusCode = baltradFrameHandler.handleBF( baltradFrame,
-                InitAppUtil.getConnTimeout(), InitAppUtil.getSoTimeout() );
-        // update data delivery register
-        String status = ( ( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) ?
-            DeliveryRegisterEntry.MSG_SUCCESS : DeliveryRegisterEntry.MSG_FAILURE );
-        DeliveryRegisterEntry drEntry = new DeliveryRegisterEntry( user.getId(), fileEntry.uuid(),
-                user.getName(), new Date(), status );
-        deliveryRegisterManager.addEntry( drEntry );
-        if( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) {
-            log.info( "FileEntry " + fileEntry.uuid() + " sent to user " + user.getName() );
-        } else {
-            log.error( "Failed to send FileEntry " + fileEntry.uuid() + " to user " + user.getName() );
+        try {
+            String header = BaltradFrameHandler.createDataHdr( BaltradFrameHandler.MIME_MULTIPART,
+                init.getConfiguration().getNodeName(), dataSource, fileEntry.uuid() + ".h5" );
+            BaltradFrame baltradFrame = new BaltradFrame( bfHandler.getServletPath(), header,
+                    fileItem );
+            int httpStatusCode = bfHandler.handleBF( baltradFrame );
+            // update data delivery register
+            String status = ( ( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) ?
+                DeliveryRegisterEntry.MSG_SUCCESS : DeliveryRegisterEntry.MSG_FAILURE );
+            DeliveryRegisterEntry drEntry = new DeliveryRegisterEntry( user.getId(), 
+                    fileEntry.uuid(), user.getName(), new Date(), status );
+            deliveryRegisterManager.addEntry( drEntry );
+            if( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) {
+                log.info( "FileEntry " + fileEntry.uuid() + " sent to user " + user.getName() );
+            } else {
+                log.error( "Failed to send FileEntry " + fileEntry.uuid() + " to user " +
+                        user.getName() );
+            }
+        } catch( FileNotFoundException e ) {
+            log.error( "Failed to complete handle frame task: " + e.getMessage() );
         }
     }
 }

@@ -82,19 +82,11 @@ public class SaveMessagesConfigurationController extends SimpleFormController {
      */
     @Override
     protected Object formBackingObject( HttpServletRequest request ) {
-        LogConfiguration logConf = null;
-        try {
-            logConf = configurationManager.getLogConfiguration(
-                LogConfiguration.LOG_SYSTEM_MESSAGES );
-        } catch( SQLException e ) {
-            log.error( "Error while loading log configuration from database: " + e.getMessage() );
-        } catch( Exception e ) {
-            log.error( "Error while loading log configuration from database: " + e.getMessage() );
+        LogConfiguration msgConf = configurationManager.loadMsgConf();
+        if( msgConf == null ) {
+            msgConf = new LogConfiguration();
         }
-        if( logConf == null ) {
-            logConf = new LogConfiguration();
-        }
-        return logConf;
+        return msgConf;
     }
     /**
      * Initialize the given binder instance with custom property editors.
@@ -121,17 +113,16 @@ public class SaveMessagesConfigurationController extends SimpleFormController {
     @Override
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors ) throws Exception {
-        LogConfiguration logConf = ( LogConfiguration )command;
-        logConf.setLogId( LogConfiguration.LOG_SYSTEM_MESSAGES );
+        LogConfiguration msgConf = ( LogConfiguration )command;
         try {
-            configurationManager.saveOrUpdate( logConf );
-            if( logConf.getTrimByNumber() ) {
-                logManager.setTrimmer( logConf.getRecordLimit() );
+            configurationManager.saveMsgConf( msgConf );
+            if( msgConf.getTrimByNumber() ) {
+                logManager.setTrimmer( msgConf.getRecordLimit() );
             } else {
                 logManager.removeTrimmer( LogManager.TRIM_MSG_BY_NUMBER_FUNC );
             }
-            if( logConf.getTrimByDate() ) {
-                logManager.setTrimmer( df.format( logConf.getDateLimit() ) );
+            if( msgConf.getTrimByDate() ) {
+                logManager.setTrimmer( df.format( msgConf.getDateLimit() ) );
             } else {
                 logManager.removeTrimmer( LogManager.TRIM_MSG_BY_DATE_FUNC );
             }

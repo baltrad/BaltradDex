@@ -62,16 +62,16 @@ public class UserManager {
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_users WHERE" +
-                    " id = " + id + ";" );
+            String sql = "SELECT * FROM dex_users usr, dex_node_address addr, dex_user_address " +
+                    "usr_addr WHERE usr.id = " + id + " AND usr.id = usr_addr.user_id " +
+                    "AND addr.id = usr_addr.address_id";
+            ResultSet resultSet = stmt.executeQuery( sql );
             while( resultSet.next() ) {
                 int userId = resultSet.getInt( "id" );
                 String name = resultSet.getString( "name" );
                 String nameHash = resultSet.getString( "name_hash" );
                 String role = resultSet.getString( "role_name" );
                 String passwd = resultSet.getString( "password" );
-                String address = resultSet.getString( "short_address" );
-                String port = resultSet.getString( "port" );
                 String factory = resultSet.getString( "factory" );
                 String country = resultSet.getString( "country" );
                 String city = resultSet.getString( "city" );
@@ -80,8 +80,14 @@ public class UserManager {
                 String number = resultSet.getString( "number" );
                 String phone = resultSet.getString( "phone" );
                 String email = resultSet.getString( "email" );
-                user = new User( userId, name, nameHash, role, passwd, address, port, factory,
-                        country, city, cityCode, street, number, phone, email );
+                String scheme = resultSet.getString( "scheme" );
+                String hostAddress = resultSet.getString( "host_address" );
+                int port = resultSet.getInt( "port" );
+                String appCtx = resultSet.getString( "app_context" );
+                String entryAddress = resultSet.getString( "entry_address" );
+                user = new User( userId, name, nameHash, role, passwd, factory, country, city,
+                        cityCode, street, number, phone, email, scheme, hostAddress, port, appCtx,
+                        entryAddress );
             }
             stmt.close();
         } catch( SQLException e ) {
@@ -105,16 +111,16 @@ public class UserManager {
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_users WHERE" +
-                    " name = '" + userName + "';" );
+            String sql = "SELECT * FROM dex_users usr, dex_node_address addr, dex_user_address " +
+                    "usr_addr WHERE usr.name = '" + userName + "' AND usr.id = usr_addr.user_id " +
+                    "AND addr.id = usr_addr.address_id";
+            ResultSet resultSet = stmt.executeQuery( sql );
             while( resultSet.next() ) {
                 int userId = resultSet.getInt( "id" );
                 String name = resultSet.getString( "name" );
                 String nameHash = resultSet.getString( "name_hash" );
                 String role = resultSet.getString( "role_name" );
                 String passwd = resultSet.getString( "password" );
-                String address = resultSet.getString( "short_address" );
-                String port = resultSet.getString( "port" );
                 String factory = resultSet.getString( "factory" );
                 String country = resultSet.getString( "country" );
                 String city = resultSet.getString( "city" );
@@ -123,8 +129,14 @@ public class UserManager {
                 String number = resultSet.getString( "number" );
                 String phone = resultSet.getString( "phone" );
                 String email = resultSet.getString( "email" );
-                user = new User( userId, name, nameHash, role, passwd, address, port, factory,
-                        country, city, cityCode, street, number, phone, email );
+                String scheme = resultSet.getString( "scheme" );
+                String hostAddress = resultSet.getString( "host_address" );
+                int port = resultSet.getInt( "port" );
+                String appCtx = resultSet.getString( "app_context" );
+                String entryAddress = resultSet.getString( "entry_address" );
+                user = new User( userId, name, nameHash, role, passwd, factory, country, city,
+                        cityCode, street, number, phone, email, scheme, hostAddress, port, appCtx,
+                        entryAddress );
             }
             stmt.close();
         } catch( SQLException e ) {
@@ -148,16 +160,16 @@ public class UserManager {
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_users WHERE" +
-                    " name_hash = '" + userNameHash + "';" );
+            String sql = "SELECT * FROM dex_users usr, dex_node_address addr, dex_user_address " +
+                    "usr_addr WHERE usr.name_hash = '" + userNameHash + "' AND usr.id = " +
+                    "usr_addr.user_id AND addr.id = usr_addr.address_id";
+            ResultSet resultSet = stmt.executeQuery( sql );
             while( resultSet.next() ) {
                 int userId = resultSet.getInt( "id" );
                 String name = resultSet.getString( "name" );
                 String nameHash = resultSet.getString( "name_hash" );
                 String role = resultSet.getString( "role_name" );
                 String passwd = resultSet.getString( "password" );
-                String address = resultSet.getString( "short_address" );
-                String port = resultSet.getString( "port" );
                 String factory = resultSet.getString( "factory" );
                 String country = resultSet.getString( "country" );
                 String city = resultSet.getString( "city" );
@@ -166,8 +178,14 @@ public class UserManager {
                 String number = resultSet.getString( "number" );
                 String phone = resultSet.getString( "phone" );
                 String email = resultSet.getString( "email" );
-                user = new User( userId, name, nameHash, role, passwd, address, port, factory,
-                        country, city, cityCode, street, number, phone, email );
+                String scheme = resultSet.getString( "scheme" );
+                String hostAddress = resultSet.getString( "host_address" );
+                int port = resultSet.getInt( "port" );
+                String appCtx = resultSet.getString( "app_context" );
+                String entryAddress = resultSet.getString( "entry_address" );
+                user = new User( userId, name, nameHash, role, passwd, factory, country, city,
+                        cityCode, street, number, phone, email, scheme, hostAddress, port, appCtx,
+                        entryAddress );
             }
             stmt.close();
         } catch( SQLException e ) {
@@ -186,19 +204,19 @@ public class UserManager {
      */
     public List<User> getUsers() {
         Connection conn = null;
-        List<User> users = new ArrayList<User>();
+        List<User> allUsers = new ArrayList<User>();
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_users" );
+            String sql = "SELECT * FROM dex_users usr, dex_node_address addr, dex_user_address " +
+                    "usr_addr WHERE usr.id = usr_addr.user_id AND addr.id = usr_addr.address_id";
+            ResultSet resultSet = stmt.executeQuery( sql );
             while( resultSet.next() ) {
                 int userId = resultSet.getInt( "id" );
                 String name = resultSet.getString( "name" );
                 String nameHash = resultSet.getString( "name_hash" );
                 String role = resultSet.getString( "role_name" );
                 String passwd = resultSet.getString( "password" );
-                String address = resultSet.getString( "short_address" );
-                String port = resultSet.getString( "port" );
                 String factory = resultSet.getString( "factory" );
                 String country = resultSet.getString( "country" );
                 String city = resultSet.getString( "city" );
@@ -207,19 +225,25 @@ public class UserManager {
                 String number = resultSet.getString( "number" );
                 String phone = resultSet.getString( "phone" );
                 String email = resultSet.getString( "email" );
-                User user = new User( userId, name, nameHash, role, passwd, address, port, factory,
-                        country, city, cityCode, street, number, phone, email );
-                users.add( user );
+                String scheme = resultSet.getString( "scheme" );
+                String hostAddress = resultSet.getString( "host_address" );
+                int port = resultSet.getInt( "port" );
+                String appCtx = resultSet.getString( "app_context" );
+                String entryAddress = resultSet.getString( "entry_address" );
+                User user = new User( userId, name, nameHash, role, passwd, factory, country, city,
+                        cityCode, street, number, phone, email, scheme, hostAddress, port, appCtx,
+                        entryAddress );
+                allUsers.add( user );
             }
             stmt.close();
         } catch( SQLException e ) {
-            System.err.println( "Failed to select data channels: " + e.getMessage() );
+            System.err.println( "Failed to select users: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select data channels: " + e.getMessage() );
+            System.err.println( "Failed to select users: " + e.getMessage() );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
-        return users;
+        return allUsers;
     }
     /**
      * Gets all roles.
@@ -264,31 +288,56 @@ public class UserManager {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             String sql = "";
+            ResultSet generatedKeys = null;
+            int userId = 0;
+            int addressId = 0;
             // record does not exists, do insert
             if( user.getId() == 0 ) {
-                sql = "INSERT INTO dex_users (name, name_hash, role_name, password, " +
-                    "short_address, port, factory, country, city, city_code, street, number, " +
-                    "phone, email ) VALUES ('" + user.getName() + "', '" + 
-                    MessageDigestUtil.createHash( user.getName() ) + "', '" +
-                    user.getRoleName() + "', '" + MessageDigestUtil.createHash( user.getPassword() )
-                    + "', '" + user.getShortAddress() + "', '" + user.getPortNumber() + "', '" +
-                    user.getFactory() + "', '" + user.getCountry() + "', '" + user.getCity() +
-                    "', '" + user.getCityCode() + "', '" + user.getStreet() + "', '" +
-                    user.getNumber() + "', '" + user.getPhone() + "', '" + user.getEmail() + "');";
+                sql = "INSERT INTO dex_users (name, name_hash, role_name, password, factory, " +
+                    "country, city, city_code, street, number, phone, email ) VALUES ('" +
+                    user.getName() + "', '" + MessageDigestUtil.createHash( user.getName() ) +
+                    "', '" + user.getRoleName() + "', '" + MessageDigestUtil.createHash(
+                    user.getPassword() ) + "', '" + user.getFactory() + "', '" + user.getCountry() +
+                    "', '" + user.getCity() + "', '" + user.getCityCode() + "', '" +
+                    user.getStreet() + "', '" + user.getNumber() + "', '" + user.getPhone() +
+                    "', '" + user.getEmail() + "');";
+                update = stmt.executeUpdate( sql, Statement.RETURN_GENERATED_KEYS ) ;
+                generatedKeys = stmt.getGeneratedKeys();
+                if( generatedKeys.next() ) {
+                    userId = generatedKeys.getInt( 1 );
+                }
+                sql = "INSERT INTO dex_node_address (scheme, host_address, port, app_context, " +
+                    "entry_address) VALUES ('" + user.getScheme() + "', '" + user.getHostAddress() +
+                    "', " + user.getPort() + ", '" + user.getAppCtx() + "', '" +
+                    user.getEntryAddress() + "');";
+                update = stmt.executeUpdate( sql, Statement.RETURN_GENERATED_KEYS ) ;
+                generatedKeys = stmt.getGeneratedKeys();
+                if( generatedKeys.next() ) {
+                    addressId = generatedKeys.getInt( 1 );
+                }
+                sql = "INSERT INTO dex_user_address (user_id, address_id) VALUES (" + userId + ", "
+                        + addressId + ");";
+                update = stmt.executeUpdate( sql );
+                stmt.close();
             } else {
                 // record exists, do update
                 sql = "UPDATE dex_users SET name = '" + user.getName() + "', name_hash = '" +
                     MessageDigestUtil.createHash( user.getName() ) + "', role_name = '" +
                     user.getRoleName() + "', " + "password = '" + MessageDigestUtil.createHash(
-                    user.getPassword() ) + "', short_address = '" + user.getShortAddress() +
-                    "', port = '" + user.getPortNumber() + "', factory = '" + user.getFactory() +
-                    "', country = '" + user.getCountry() + "', city = '" + user.getCity() +
-                    "', city_code = '" + user.getCityCode() + "', street = '" + user.getStreet() +
-                    "', number = '" + user.getNumber() + "', phone = '" + user.getPhone() +
-                    "', email = '" + user.getEmail() + "' WHERE id = '" + user.getId() + "';";
+                    user.getPassword() ) + "', factory = '" + user.getFactory() + "', country = '" +
+                    user.getCountry() + "', city = '" + user.getCity() + "', city_code = '" +
+                    user.getCityCode() + "', street = '" + user.getStreet() + "', number = '" +
+                    user.getNumber() + "', phone = '" + user.getPhone() + "', email = '" +
+                    user.getEmail() + "' WHERE id = '" + user.getId() + "';";
+                update = stmt.executeUpdate( sql ) ;
+                sql = "UPDATE dex_node_address SET scheme = '" + user.getScheme() +
+                        "', host_address = '" + user.getHostAddress() + "', port = " +
+                        user.getPort() + ", app_context = '" + user.getAppCtx() +
+                        "', entry_address = '" + user.getEntryAddress() + "' WHERE id IN (SELECT " +
+                        "address_id FROM dex_user_address WHERE user_id = " + user.getId() + " );";
+                update = stmt.executeUpdate( sql );
+                stmt.close();
             }
-            update = stmt.executeUpdate( sql ) ;
-            stmt.close();
         } catch( SQLException e ) {
             System.err.println( "Failed to save user account: " + e.getMessage() );
             throw e;

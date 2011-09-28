@@ -22,13 +22,11 @@
 package eu.baltrad.dex.util;
 
 import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
-import eu.baltrad.dex.config.model.Configuration;
-import eu.baltrad.dex.core.model.NodeConnection;
 
 import org.apache.log4j.Logger;
 
-import java.sql.SQLException;
 import java.io.File;
 import java.io.InputStream;
 import java.io.FileInputStream;
@@ -38,7 +36,6 @@ import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.util.Date;
-import java.util.Properties;
 
 /**
  * Utility class used to initialize application on startup.
@@ -47,343 +44,104 @@ import java.util.Properties;
  * @version 1.0
  * @since 1.0
  */
-public class InitAppUtil {
+public class InitAppUtil extends NodeAddress {
 //---------------------------------------------------------------------------------------- Constants
-    // Properties file name
-    private static final String PROPS_FILE_NAME = "dex.init.properties";
-    // Temporary file prefix
+    /** Temporary file prefix */
     private final static String TEMP_FILE_PREFIX = "dex";
-    // Temporary file suffix
+    /** Temporary file suffix */
     private final static String TEMP_FILE_SUFFIX = ".dat";
-    /** HTTP connection timeout property */
-    private final static String CONN_TIMEOUT_PROP = "http.connection.timeout";
-    /** HTTP socket timeout property */
-    private final static String SO_TIMEOUT_PROP = "http.socket.timeout";
-    // Node version property
-    private final static String NODE_VERSION_PROP = "node.version";
-    // Image storage folder
-    private static final String IMAGE_STORAGE_FOLDER_PROP = "image.storage.folder";
-    // Image thumbs storage folder
-    private static final String THUMBS_STORAGE_FOLDER_PROP = "thumbs.storage.folder";
-    // Maximum age of temporary files in miliseconds, set to 3 minutes
+    /** Maximum age of temporary files in miliseconds, set to 3 minutes */
     private static final long TEMP_FILE_MAX_AGE = 180000;
 //---------------------------------------------------------------------------------------- Variables
-    // References logger object
+    /** References logger object */
     private static Logger log;
-    // Initialize Configuration manager
-    private static ConfigurationManager configurationManager = new ConfigurationManager();
-    // Node version
-    private static String nodeVersion;
-    // Node address
-    private static String nodeAddress;
-    // Node name
-    private static String nodeName;
-    // Node type
-    private static String nodeType;
-    // Organization name
-    private static String orgName;
-    // Organization address
-    private static String orgAddress;
-    // Time zone
-    private static String timeZone;
-    // Node administrator email
-    private static String adminEmail;
-    // Work directory
-    private static String workDir;
-    // Image storage folder
-    private static String imageStorageFolder;
-    // Thumbs storage folder
-    private static String thumbsStorageFolder;
-    // Image storage directory
-    private static String imageStorageDirectory;
-    // Thumbs storage directory
-    private static String thumbsStorageDirectory;
-    /** HTTP connection timeout in milliseconds */
-    private static int connTimeout;
-    /** HTTP socket timeout in milliseconds */
-    private static int soTimeout;
-    /** Numeric value used to determine if application was successfully initialized */
-    private static int initStatus;
+    /** Configuration object holding all necessary settings */
+    private static AppConfiguration config;
+    /** Absolute path to work directory */
+    private static String workDirPath;
+    /** Absolute path to image storage */
+    private static String imagesDirPath;
+    /** Absolute path to thumbs storage */
+    private static String thumbsDirPath;
+    /** Reference to the object of this class */
+    private static InitAppUtil initAppUtil;
+    /** Initialization status */
+    private static int status;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Constructor performs initialization task
+     * Private constructor invokes initializing method.
      */
-    public InitAppUtil() { 
-        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        initStatus = initApp();
+    private InitAppUtil() { initApp(); }
+    /**
+     * Initializes object of this class in case it is null, otherwise returns existing object.
+     *
+     * @return initAppUtil Instance of InitAppUtil class.
+     */
+    public static synchronized InitAppUtil getInstance() {
+        if( initAppUtil == null ) {
+            initAppUtil = new InitAppUtil();
+        }
+        return initAppUtil;
     }
     /**
      * Method initializes application by reading configuration from database.
-     *
-     * return
      */
-    public static int initApp() {
-        try {
-            Configuration conf = configurationManager.getNodeConfiguration(
-                    ConfigurationManager.CONF_REC_ID );
-            // reconstruct node's full address
-            setNodeAddress( NodeConnection.HTTP_PREFIX + conf.getShortAddress() +
-                    NodeConnection.PORT_SEPARATOR + conf.getPortNumber() +
-                    NodeConnection.ADDRESS_SEPARATOR + NodeConnection.APP_CONTEXT +
-                    NodeConnection.ADDRESS_SEPARATOR + NodeConnection.ENTRY_ADDRESS );
-            setNodeName( conf.getNodeName() );
-            setNodeType( conf.getNodeType() );
-            setOrgName( conf.getOrgName() );
-            setOrgAddress( conf.getOrgAddress() );
-            setTimeZone( conf.getTimeZone() );
-            setAdminEmail( conf.getAdminEmail() );
-            // Create relative or absolute work directory
-            String tmpDir = createDir( conf.getTempDir(), "Created work directory" );
-            setWorkDir( tmpDir );
-            InputStream is = InitAppUtil.class.getResourceAsStream( PROPS_FILE_NAME );
-            Properties props = new Properties();
-            props.load( is );
-            connTimeout = Integer.parseInt( props.getProperty( CONN_TIMEOUT_PROP ) );
-            soTimeout = Integer.parseInt( props.getProperty( SO_TIMEOUT_PROP ) );
-            nodeVersion = props.getProperty( NODE_VERSION_PROP );
-            imageStorageFolder = props.getProperty( IMAGE_STORAGE_FOLDER_PROP );
-            thumbsStorageFolder = props.getProperty( THUMBS_STORAGE_FOLDER_PROP );
-            // create image storage directory
-            imageStorageDirectory = createDir( getWorkDir() + File.separator +
-                imageStorageFolder, "New image storage directory created" );
-            // create thumbs storage directory
-            thumbsStorageDirectory = createDir( getWorkDir() + File.separator +
-                thumbsStorageFolder, "New thumbs storage directory created" );
+    private static void initApp() {
+        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        ConfigurationManager cm = new ConfigurationManager();
+        config = cm.loadAppConf();
+        if( config != null ) {
+            // Create work directory
+            workDirPath = createDir( config.getWorkDir(), "Created work directory" );
+            // Create image storage directory
+            imagesDirPath = createDir( config.getWorkDir() + File.separator + config.getImagesDir(),
+                    "New image storage directory created" );
+            // Create thumbs storage directory
+            thumbsDirPath = createDir( config.getWorkDir() + File.separator + config.getThumbsDir(),
+                    "New thumbs storage directory created" );
             log.info( "Application successfully initialized" );
-            return 0;
-        } catch( SQLException e ) {
-            log.error( "Failed to initialize application: " + e.getMessage() );
-            return 1;
-        } catch( IOException e ) {
-            log.error( "Failed to initialize application: " + e.getMessage() );
-            return 1;
-        } catch( Exception e ) {
-            log.error( "Failed to initialize application: " + e.getMessage() );
-            return 1;
+            setStatus( 0 );
+        } else {
+            log.error( "Failed to initialize application" );
+            setStatus( 1 );
         }
     }
     /**
-     * Gets application initialization status.
+     * Get initialization status.
      *
-     * @return Application initialization status
+     * @return status Initialization status
      */
-    public static int getInitStatus() {
-        return initStatus;
-    }
+    public static int getStatus() { return status; }
     /**
-     * Sets application initialization status.
+     * Set initialization status.
      *
-     * @param _initStatus Application initialization status to set
+     * @param _status Initialization status to set
      */
-    public static void setInitStatus( int _initStatus ) {
-        initStatus = _initStatus;
-    }
+    public static void setStatus( int _status ) { status = _status; }
     /**
-     * Gets HTTP connection timeout.
-     *
-     * @return connTimeout HTTP connection timeout in milliseconds
+     * Gets configuration object.
+     * 
+     * @return Configuration object
      */
-    public static int getConnTimeout() {
-        return connTimeout;
-    }
+    public AppConfiguration getConfiguration() { return config; }
     /**
-     * Sets HTTP connection timeout.
+     * Gets absolute work directory path.
      *
-     * @param _connTimeout HTTP connection timeout in milliseconds
+     * @return Work directory path
      */
-    public static void setConnTimeout( int _connTimeout ) {
-        connTimeout = _connTimeout;
-    }
+    public String getWorkDirPath() { return workDirPath; }
     /**
-     * Gets HTTP socket timeout.
+     * Gets absolute images storage folder path.
      *
-     * @return soTimeout HTTP socket timeout in milliseconds
+     * @return Path to images storage folder
      */
-    public static int getSoTimeout() {
-        return soTimeout;
-    }
+    public String getImagesDirPath() { return imagesDirPath; }
     /**
-     * Sets HTTP socket timeout.
+     * Gets absolute thumbnails storage folder path.
      *
-     * @param _soTimeout HTTP socket timeout in milliseconds
+     * @return Path to thumbnails storage folder
      */
-    public static void setSoTimeout( int _soTimeout ) {
-        soTimeout = _soTimeout;
-    }
-    /**
-     * Gets node version property.
-     *
-     * @return Node version property
-     */
-    public static String getNodeVersion() { return nodeVersion; }
-    /**
-     * Sets node version property
-     *
-     * @param _nodeVersion Node version property to set
-     */
-    public static void setNodeVersion(String _nodeVersion) { nodeVersion = _nodeVersion; }
-    /**
-     * Gets node address property.
-     *
-     * @return Node address property
-     */
-    public static String getNodeAddress() { return nodeAddress; }
-    /**
-     * Sets node address property.
-     *
-     * @param _nodeAddress Node address property to set
-     */
-    public static void setNodeAddress( String _nodeAddress ) { nodeAddress = _nodeAddress; }
-    /**
-     * Gets node name property.
-     *
-     * @return Node name property
-     */
-    public static String getNodeName() { return nodeName; }
-    /**
-     * Sets node name property.
-     *
-     * @param _nodeName Node name property to set
-     */
-    public static void setNodeName( String _nodeName ) { nodeName = _nodeName; }
-    /**
-     * Gets node type property.
-     *
-     * @return Node type property
-     */
-    public static String getNodeType() { return nodeType; }
-    /**
-     * Sets node type property.
-     *
-     * @param _nodeType Node type property to set
-     */
-    public static void setNodeType( String _nodeType ) { nodeType = _nodeType; }
-    /**
-     * Gets organization name property.
-     *
-     * @return Organization name property
-     */
-    public static String getOrgName() { return orgName; }
-    /**
-     * Sets organization name property.
-     *
-     * @param _orgName Organization name property to set
-     */
-    public static void setOrgName( String _orgName ) { orgName = _orgName; }
-    /**
-     * Gets organization address property.
-     *
-     * @return Organization address property
-     */
-    public static String getOrgAddress() { return orgAddress; }
-    /**
-     * Sets organization address property.
-     *
-     * @param _orgAddress Organization address property to set
-     */
-    public static void setOrgAddress( String _orgAddress ) { orgAddress = _orgAddress; }
-    /**
-     * Gets time zone property.
-     *
-     * @return Time zone property
-     */
-    public static String getTimeZone() { return timeZone; }
-    /**
-     * Sets time zone property.
-     *
-     * @param _timeZone Time zone property to set
-     */
-    public static void setTimeZone( String _timeZone ) { timeZone = _timeZone; }
-    /**
-     * Gets administrator email property.
-     *
-     * @return Administrator email property
-     */
-    public static String getAdminEmail() { return adminEmail; }
-    /**
-     * Sets administrator email property.
-     *
-     * @param _adminEmail Administrator email property to set
-     */
-    public static void setAdminEmail( String _adminEmail ) { adminEmail = _adminEmail; }
-    /**
-     * Method gets work directory name.
-     *
-     * @return The name of work directory
-     */
-    public static String getWorkDir() { return workDir; }
-    /**
-     * Method sets work directory name.
-     *
-     * @param _workDir The name of work directory
-     */
-    public static void setWorkDir( String _workDir ) { workDir = _workDir; }
-     /**
-     * Gets image storage folder extended with base directory / work directory.
-     *
-     * @return Image storage folder
-     */
-    public static String getImageStorageFolder() { 
-        String baseDir = getWorkDir().substring( getWorkDir().lastIndexOf( File.separator ) + 1,
-                getWorkDir().length() );
-        String imageFolder = baseDir + File.separator + imageStorageFolder;
-        return imageFolder;
-    }
-    /**
-     * Sets image storage folder.
-     *
-     * @param imageStorageFolder Image storage folder to set
-     */
-    public static void setImageStorageFolder( String _imageStorageFolder ) {
-        imageStorageFolder = _imageStorageFolder;
-    }
-    /**
-     * Gets thumbs storage folder extended with base directory / work directory.
-     *
-     * @return Thumbs storage folder
-     */
-    public static String getThumbsStorageFolder() {
-        String baseDir = getWorkDir().substring( getWorkDir().lastIndexOf( File.separator ) + 1,
-                getWorkDir().length() );
-        String thumbsFolder = baseDir + File.separator + thumbsStorageFolder;
-        return thumbsFolder;
-    }
-    /**
-     * Sets thumbs storage folder.
-     *
-     * @param thumbsStorageFolder Thumbs storage folder to set
-     */
-    public static void setThumbsStorageFolder( String _thumbsStorageFolder ) {
-        thumbsStorageFolder = _thumbsStorageFolder;
-    }
-     /**
-     * Gets image storage directory.
-     *
-     * @return Image storage directory
-     */
-    public static String getImageStorageDirectory() { return imageStorageDirectory; }
-    /**
-     * Sets image storage directory.
-     *
-     * @param imageStorageDirectory Image storage directory to set
-     */
-    public static void setImageStorageDirectory( String _imageStorageDirectory ) {
-        imageStorageDirectory = _imageStorageDirectory;
-    }
-    /**
-     * Gets thumbs storage directory.
-     *
-     * @return Thumbs storage directory
-     */
-    public static String getThumbsStorageDirectory() { return thumbsStorageDirectory; }
-    /**
-     * Sets thumbs storage directory.
-     *
-     * @param thumbsStorageDirectory Thumbs storage directory to set
-     */
-    public static void setThumbsStorageDirectory( String _thumbsStorageDirectory ) {
-        thumbsStorageDirectory = _thumbsStorageDirectory;
-    }
+    public String getThumbsDirPath() { return thumbsDirPath; }
     /**
      * Method extracts relative file name from absolute file path string.
      *
@@ -428,7 +186,7 @@ public class InitAppUtil {
     public static File createTempFile( File tempDir ) {
         File f = null;
         try {
-            f = File.createTempFile( TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX, tempDir );
+            f = File.createTempFile ( TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX, tempDir );
         } catch( IOException e ) {
             log.error( "Error while creating temporary file: \n" + e.getMessage() );
         }

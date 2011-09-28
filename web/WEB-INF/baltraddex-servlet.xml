@@ -777,7 +777,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <value>redirect:nodeProperties.htm</value>
         </property>
         <property name="commandClass">
-            <value>eu.baltrad.dex.config.model.Configuration</value>
+            <value>eu.baltrad.dex.config.model.AppConfiguration</value>
         </property>
         <property name="validator">
             <ref bean="saveConfigurationValidator"/>

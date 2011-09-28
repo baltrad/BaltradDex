@@ -72,7 +72,14 @@ public class BltImagePreviewController implements Controller {
     private String successView;
     private BltDataProcessor bltDataProcessor;
     private BltDataProcessorController bltDataProcessorController;
+    private InitAppUtil init;
 //------------------------------------------------------------------------------------------ Methods
+    /**
+     * Constructor.
+     */
+    public BltImagePreviewController() {
+        init = InitAppUtil.getInstance();
+    }
     /**
      * Creates image based on parameters retrieved from request.
      *
@@ -99,7 +106,7 @@ public class BltImagePreviewController implements Controller {
         String urLon = request.getParameter( "urLon" );
 
         // try to load image from disk before creating a new one
-        String filePath = InitAppUtil.getImageStorageDirectory() + File.separator + fileUuid
+        String filePath = init.getImagesDirPath() + File.separator + fileUuid
             + datasetPath.replaceAll( BltDataProcessor.H5_PATH_SEPARATOR, "_" ) +
             BltDataProcessor.IMAGE_FILE_EXT;
         File imageFile = new File( filePath );
@@ -122,10 +129,11 @@ public class BltImagePreviewController implements Controller {
         // reconstruct image URL
         StringBuffer requestURL = request.getRequestURL();
         String imageURL = requestURL.substring( 0, requestURL.lastIndexOf( URL_PATH_SEPARATOR )
-            + 1 ) + InitAppUtil.getImageStorageFolder() + URL_PATH_SEPARATOR + fileUuid
-            + datasetPath.replaceAll( BltDataProcessor.H5_PATH_SEPARATOR, "_" ) +
+            + 1 ) + init.getConfiguration().getWorkDir() + URL_PATH_SEPARATOR + 
+            init.getConfiguration().getImagesDir() + URL_PATH_SEPARATOR + fileUuid +
+            datasetPath.replaceAll( BltDataProcessor.H5_PATH_SEPARATOR, "_" ) +
             BltDataProcessor.IMAGE_FILE_EXT;
-
+        
         // create model
         HashMap model = new HashMap();
         model.put( RADAR_LAT_0_KEY, lat0 );

@@ -55,6 +55,12 @@ tomcat-users.xml file should look like the following:
     <user password="s3cret" roles="manager,admin" username="manager"/>
 </tomcat-users>
 
+--------------------------------------------------------------------------------
+IMPORTANT: Starting from v0.7.5, BaltradDex supports only secure communication 
+with SSL. Refer to SSL.CONFIG for detailed instructions on how to configure 
+your Apache Tomcat installation to use secure communication.    
+--------------------------------------------------------------------------------  
+
 Apache Ant build tool - version 1.7.1 or later. Build, deployment and other
 tasks are executed and controlled by Apache Ant build tool. 
 
@@ -94,8 +100,9 @@ $	ant javadocs
 
 Running BaltradDex
 --------------------------------------------------------------------------------
-Assuming that your Tomcat server is installed on local machine, in order to run 
-the application, open a web browser and type the following in the address bar:
+Assuming that your Tomcat server is installed on local machine and listening 
+on port 8084, in order to run the application, open a web browser and type 
+the following in the address bar:
 
 	http://localhost:8084/BaltradDex
 
@@ -104,12 +111,4 @@ Default user name is 'admin' with password 'baltrad'.
 Support and feedback
 --------------------------------------------------------------------------------
 maciej@baltrad.eu
-
-
-
-   
-
-
-
-
 
