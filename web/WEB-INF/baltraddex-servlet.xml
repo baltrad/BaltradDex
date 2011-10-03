@@ -1001,8 +1001,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <constructor-arg value="${database.uri}" />
     </bean>
     <bean id="bdb_storage" class="eu.baltrad.fc.CacheDirStorage" init-method="init" destroy-method="delete">
-        <constructor-arg value="${data.storage.folder}" />
-        <constructor-arg value="1000" /> <!-- cache size -->
+        <constructor-arg index="0" value="${data.storage.folder}" />
+        <constructor-arg index="1" value="1000" /> <!-- cache size -->
     </bean>
     <bean id="fileCatalog" class="eu.baltrad.fc.FileCatalog" destroy-method="delete">
         <constructor-arg ref="bdb_db" />
