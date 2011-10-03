@@ -680,7 +680,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         File swapFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
         InputStream fileStream = fileItem.openStream();
         InitAppUtil.saveFile( fileStream, swapFile );
-        
         FileEntry fileEntry = null;
         try {
             fileEntry = fileCatalog.store( swapFile.getAbsolutePath() );
@@ -693,7 +692,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             // exception while storing file in FileCatalog - set error code
             return BaltradFrameHandler.HTTP_STATUS_CODE_500;
         }
-
         IncomingFileNamer namer = new IncomingFileNamer();
         String friendlyName = namer.name(fileEntry);
 

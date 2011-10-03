@@ -395,18 +395,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </sql>
   </target>
 
-  <!-- fetch data from the database -->
-  <target name="fetch-data">
-    <sql classpath="${lib.dir}/${db.jar}"
-         driver="${db.driver}"
-         url="${db.url}"
-         userid="${db.user}" 
-         password="${db.pwd}"
-         print="true">
-      <transaction src="${etc.dir}/fetch_dex_data.sql"/>
-    </sql>
-  </target>
-
   <!-- installs the full data scheme used by dex, db and beast -->
   <target name="create-full-schema" description="Installs all schemes necessary">
     <sql classpath="${lib.dir}/${db.jar}"

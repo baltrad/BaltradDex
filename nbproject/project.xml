@@ -147,9 +147,6 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jbrfc.jar}</file>
-                </library>
-                <library dirs="200">
                     <file>${file.reference.beast.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
@@ -164,6 +161,9 @@
                 <library dirs="200">
                     <file>${file.reference.baltrad-frame-0.1.2.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.jbrfc.jar}</file>
                 </library>
             </web-module-libraries>
             <web-module-additional-libraries/>
