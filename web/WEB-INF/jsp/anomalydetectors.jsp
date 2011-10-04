@@ -61,7 +61,7 @@ List of anomaly detectors
                         </div>
                         <div class="blttext">
                             List of anomaly detectors. Click on name to modify or delete or click
-                            Create to create a new anomaly detector.
+                            create to create a new anomaly detector.
                         </div>
                         <div class="table">
                             <%if (request.getAttribute("emessage") != null) {%>

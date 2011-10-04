@@ -33,7 +33,7 @@ Create anomaly detectors
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Create adaptor</title>
+        <title>Baltrad | Modify anomaly detector</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -50,11 +50,11 @@ Create anomaly detectors
                     </div>
                     <div class="right">
                         <div class="blttitle">
-                            Create adaptor
+                            Modify anomaly detector
                         </div>
                         <div class="blttext">
-                            Create an adaptor. Depending on type of adaptor, different choices will
-                            be available. However, right now, you are only able to choose XMLRPC.
+                            Modify or delete an anomaly detector. The description should explain what
+                            the anomaly detector is doing.
                         </div>
                         <div class="table">
                             <%if (request.getAttribute("emessage") != null) {%>

@@ -33,7 +33,7 @@ Create anomaly detectors
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Create adaptor</title>
+        <title>Baltrad | Create anomaly detector</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -53,8 +53,9 @@ Create anomaly detectors
                             Create adaptor
                         </div>
                         <div class="blttext">
-                            Create an adaptor. Depending on type of adaptor, different choices will
-                            be available. However, right now, you are only able to choose XMLRPC.
+                            Create an anomaly detector string. The string is a PGF-specific value and
+                            must be supported by the targeted PGF. Add a describing text so that it is
+                            possible to see what the detector is supposed to be doing.
                         </div>
                         <div class="table">
                             <%if (request.getAttribute("emessage") != null) {%>
