@@ -700,7 +700,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         // file successfully stored in File Catalog
         // send message to Beast Framework
         BltDataMessage message = new BltDataMessage();
-        message.setFileEntry(fileCatalog.database().entry_by_uuid(fileEntry.uuid()));
+        message.setFileEntry(fileEntry.clone());
         bltMessageManager.manage( message );
         
         Oh5MetadataMatcher metadataMatcher = new Oh5MetadataMatcher();
