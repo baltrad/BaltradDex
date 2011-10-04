@@ -81,6 +81,8 @@ Creates a composite route
                                             Boolean active = (Boolean)request.getAttribute("active");
                                             String description = (String)request.getAttribute("description");
                                             Boolean byscan = (Boolean)request.getAttribute("byscan");
+                                            String method = (String)request.getAttribute("method");
+                                            String prodpar = (String)request.getAttribute("prodpar");
                                             Integer selection_method = (Integer)request.getAttribute("selection_method");
                                             List<String> recipients = (List<String>)request.getAttribute("recipients");
                                             String areaid = (String)request.getAttribute("areaid");
@@ -88,7 +90,12 @@ Creates a composite route
                                             Integer timeout = (Integer)request.getAttribute("timeout");
                                             List<String> sources = (List<String>)request.getAttribute("sources");
                                             List<String> detectors = (List<String>)request.getAttribute("detectors");
-                                            
+                                            if (method == null || method.equals("")) {
+                                              method = "pcappi";
+                                            }
+                                            if (prodpar == null) {
+                                              prodpar = "";
+                                            }
                                             String activestr = (active == true)?"checked":"";
                                             String byscanstr = (byscan == true)?"checked":"";
                                         %>
@@ -97,6 +104,8 @@ Creates a composite route
                                         <div class="row">Active</div>
                                         <div class="row">Description</div>
                                         <div class="row">Scan based</div>
+                                        <div class="row">Method</div>
+                                        <div class="row">Product parameter</div>
                                         <div class="row">Selection method</div>
                                         <div class="row4">Recipients</div>
                                         <div class="row">Areaid</div>
@@ -134,6 +143,22 @@ Creates a composite route
                                             <input type="checkbox" name="byscan" <%=byscanstr%>/>
                                             <div class="hint">
                                                Check to select scan-based route
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <select name="method">
+                                              <option value="pcappi" <%="pcappi".equals(method)?"selected":""%>>PCAPPI</option>
+                                              <option value="ppi" <%="ppi".equals(method)?"selected":""%>>PPI</option>
+                                              <option value="cappi" <%="cappi".equals(method)?"selected":""%>>CAPPI</option>
+                                            </select>
+                                            <div class="hint">
+                                              Choose a method to use for generating the composite.
+                                            </div>
+                                        </div>                                        
+                                        <div class="row">
+                                            <input type="text" name="prodpar" value="<%=prodpar%>"/>
+                                            <div class="hint">
+                                               Product parameter associated with the method. E.g. for PPI, specify elevation angle.
                                             </div>
                                         </div>
                                         <div class="row">

@@ -20,7 +20,7 @@ import eu.baltrad.beast.rules.util.IRuleUtilities;
 public class CompositeRoutesControllerTest extends TestCase {
   private static interface MethodMocker {
     public String viewCreateRoute(Model model, String name, String author,
-        Boolean active, String description, List<String> recipients, Boolean byscan, Integer selection_method,
+        Boolean active, String description, List<String> recipients, Boolean byscan, String method, String prodpar, Integer selection_method,
         String areaid, Integer interval, Integer timeout, List<String> sources, List<String> detectors, String emessage);
     
     public List<String> getSources();
@@ -28,7 +28,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     public List<Integer> getIntervals();
     
     public CompositingRule createRule(String areaid, int interval,
-        List<String> sources, List<String> detectors, int timeout, boolean byscan, int selection_method);
+        List<String> sources, List<String> detectors, int timeout, boolean byscan, String method, String prodpar, int selection_method);
   }
   
   private CompositeRoutesController classUnderTest = null;
@@ -61,9 +61,10 @@ public class CompositeRoutesControllerTest extends TestCase {
     
     classUnderTest = new CompositeRoutesController() {
       protected String viewCreateRoute(Model model, String name, String author,
-          Boolean active, String description, List<String> recipients, Boolean byscan, Integer selection_method,
+          Boolean active, String description, List<String> recipients, Boolean byscan, 
+          String pmethod, String prodpar, Integer selection_method,
           String areaid, Integer interval, Integer timeout, List<String> sources, List<String> detectors, String emessage) {
-        return method.viewCreateRoute(model, name, author, active, description, recipients, byscan, selection_method, areaid,
+        return method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid,
             interval, timeout, sources, detectors, emessage);
       }
       protected List<Integer> getIntervals() {
@@ -111,11 +112,11 @@ public class CompositeRoutesControllerTest extends TestCase {
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
     
-    method.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null);
+    method.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
     methodControl.setReturnValue("somestring");
     replay();
     
-    String result = classUnderTest.createRoute(model, null, null, null, null, null,
+    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null,
         null, null, null, null, null, null, null);
 
     verify();
@@ -136,7 +137,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
 
-    method.createRule("areaid", 30, sources, detectors, 40, true, 0);
+    method.createRule("areaid", 30, sources, detectors, 40, true, CompositingRule.CAPPI, "500", 0);
     methodControl.setReturnValue(rule);
     manager.create("aname", "author", true, "a description", recipients, rule);
     managerControl.setReturnValue(def);
@@ -144,8 +145,8 @@ public class CompositeRoutesControllerTest extends TestCase {
     
     classUnderTest = new CompositeRoutesController() {
       protected CompositingRule createRule(String areaid, int interval,
-          List<String> sources, List<String> detectors, int timeout, boolean byscan, int selection_method) {
-        return method.createRule(areaid, interval, sources, detectors, timeout, byscan, selection_method);
+          List<String> sources, List<String> detectors, int timeout, boolean byscan, String pmethod, String prodpar, int selection_method) {
+        return method.createRule(areaid, interval, sources, detectors, timeout, byscan, pmethod, prodpar, selection_method);
       }
     };
     classUnderTest.setAdaptorManager(adaptorManager);
@@ -154,7 +155,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     
     replay();
     
-    String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, 0, "areaid", 30, 40, sources, detectors);
+    String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.CAPPI, "500", 0, "areaid", 30, 40, sources, detectors);
     
     verify();
     assertEquals("redirect:showroutes.htm", result);
@@ -171,7 +172,7 @@ public class CompositeRoutesControllerTest extends TestCase {
 
     replay();
 
-    String result = classUnderTest.createRoute(model, null, null, null, null, null,
+    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null,
         null, null, null, null, null, null, null);
 
     verify();
@@ -187,6 +188,8 @@ public class CompositeRoutesControllerTest extends TestCase {
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
     Boolean byscan = new Boolean(false);
+    String pmethod = CompositingRule.CAPPI;
+    String prodpar = "500";
     Integer selection_method = new Integer(0);
     String areaid = "xyz";
     Integer interval = 10;
@@ -199,12 +202,12 @@ public class CompositeRoutesControllerTest extends TestCase {
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
     
-    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, selection_method, areaid, interval, timeout, sources, detectors, emessage);
+    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
     methodControl.setReturnValue("somestring");
     
     replay();
     String result = classUnderTest.createRoute(model, name, author, active, description,
-        recipients, byscan, selection_method, areaid, interval, timeout, sources, detectors);
+        recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors);
     
     verify();
     assertEquals("somestring", result);
@@ -220,6 +223,8 @@ public class CompositeRoutesControllerTest extends TestCase {
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
     Boolean byscan = new Boolean(false);
+    String pmethod = CompositingRule.PCAPPI;
+    String prodpar = "600.0";
     Integer selection_method = new Integer(0);
     String areaid = null;
     Integer interval = 10;
@@ -231,12 +236,12 @@ public class CompositeRoutesControllerTest extends TestCase {
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
    
-    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, selection_method, areaid, interval, timeout, sources, detectors, emessage);
+    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
     methodControl.setReturnValue("somestring");
     
     replay();
     String result = classUnderTest.createRoute(model, name, author, active, description,
-        recipients, byscan, selection_method, areaid, interval, timeout, sources, detectors);
+        recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors);
     
     verify();
     assertEquals("somestring", result);
@@ -252,6 +257,8 @@ public class CompositeRoutesControllerTest extends TestCase {
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
     Boolean byscan = new Boolean(false);
+    String pmethod = CompositingRule.PPI;
+    String prodpar = "0.5";
     Integer selection_method = new Integer(0);
     String areaid = "area";
     Integer interval = 10;
@@ -263,12 +270,12 @@ public class CompositeRoutesControllerTest extends TestCase {
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
     
-    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, selection_method, areaid, interval, timeout, sources, detectors, emessage);
+    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
     methodControl.setReturnValue("somestring");
     
     replay();
     String result = classUnderTest.createRoute(model, name, author, active, description,
-        recipients, byscan, selection_method, areaid, interval, timeout, sources, detectors);
+        recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors);
     
     verify();
     assertEquals("somestring", result);
@@ -286,6 +293,8 @@ public class CompositeRoutesControllerTest extends TestCase {
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
     Boolean byscan = new Boolean(false);
+    String pmethod = CompositingRule.CAPPI;
+    String prodpar = "500.0";
     Integer selection_method = new Integer(0);
     String areaid = "blt_lambert";
     Integer interval = 10;
@@ -324,6 +333,10 @@ public class CompositeRoutesControllerTest extends TestCase {
     modelControl.setReturnValue(null);
     model.addAttribute("byscan", byscan);
     modelControl.setReturnValue(null);
+    model.addAttribute("method", pmethod);
+    modelControl.setReturnValue(null);
+    model.addAttribute("prodpar", "500.0");
+    modelControl.setReturnValue(null);
     model.addAttribute("selection_method", selection_method);
     modelControl.setReturnValue(null);
     model.addAttribute("areaid", areaid);
@@ -348,7 +361,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     classUnderTest.setAnomalyDetectorManager(anomalyManager);
     replay();
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
-        recipients, byscan, selection_method, areaid, interval, timeout, sources, detectors, emessage);
+        recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
     verify();
     assertEquals("compositeroute_create", result);
   }
@@ -365,6 +378,8 @@ public class CompositeRoutesControllerTest extends TestCase {
     String description = "descr";
     List<String> recipients = new ArrayList<String>();
     Boolean byscan = new Boolean(false);
+    String pmethod = CompositingRule.PCAPPI;
+    String prodpar = "600.0";
     Integer selection_method = new Integer(0);
     String areaid = "blt_lambert";
     Integer interval = 10;
@@ -403,6 +418,10 @@ public class CompositeRoutesControllerTest extends TestCase {
     modelControl.setReturnValue(null);
     model.addAttribute("byscan", byscan);
     modelControl.setReturnValue(null);
+    model.addAttribute("method", pmethod);
+    modelControl.setReturnValue(null);
+    model.addAttribute("prodpar", prodpar);
+    modelControl.setReturnValue(null);
     model.addAttribute("selection_method", selection_method);
     modelControl.setReturnValue(null);
     model.addAttribute("areaid", areaid);
@@ -430,7 +449,7 @@ public class CompositeRoutesControllerTest extends TestCase {
 
     replay();
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
-        recipients, byscan, selection_method, areaid, interval, timeout, sources, detectors, emessage);
+        recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
     verify();
     assertEquals("compositeroute_create", result);
   }
@@ -449,15 +468,26 @@ public class CompositeRoutesControllerTest extends TestCase {
     crule.setDetectors(detectors);
     crule.setTimeout(2);
     crule.setScanBased(false);
+    crule.setMethod(CompositingRule.CAPPI);
+    crule.setProdpar("500.0");
     crule.setSelectionMethod(0);
     
     replay();
     cruleControl.replay();
     
-    CompositingRule result = classUnderTest.createRule("abc", 1, sources, detectors, 2, false, 0);
+    CompositingRule result = classUnderTest.createRule("abc", 1, sources, detectors, 2, false, CompositingRule.CAPPI, "500.0", 0);
     
     verify();
     cruleControl.verify();
     assertSame(crule, result);
+  }
+  
+  public void testParseDouble() throws Exception {
+    try {
+      Double.parseDouble("abc");
+      fail("Expected NumberFormatException");
+    } catch (NumberFormatException e) {
+      System.out.println("Caught NFE");
+    }
   }
 }
