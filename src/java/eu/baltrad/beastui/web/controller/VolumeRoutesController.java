@@ -141,6 +141,8 @@ public class VolumeRoutesController {
       emessage = "Name must be specified.";
     } else if (sources == null || sources.size() <= 0) {
       emessage = "Must specify at least one source.";
+    } else if (recipients == null || recipients.size() <= 0) {
+      emessage = "You must specify at least one recipient";
     }
     
     if (emessage == null) {
@@ -387,6 +389,8 @@ public class VolumeRoutesController {
     
     if (newsources.size() <= 0) {
       emessage = "You must specify at least one source.";
+    } else if (newrecipients.size() <= 0) {
+      emessage = "You must specify at least one recipient.";
     }
     
     if (emessage == null) {
@@ -403,7 +407,7 @@ public class VolumeRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        ascending, mine, maxe, newrecipients, interval, timeout, sources, null);
+        ascending, mine, maxe, newrecipients, interval, timeout, sources, emessage);
   }
 
   
