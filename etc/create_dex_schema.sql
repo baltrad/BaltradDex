@@ -325,6 +325,25 @@ CREATE TABLE dex_data_source_filters
     filter_id INT NOT NULL,
     PRIMARY KEY(id)
 );
+-- create language plpgsql -------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION make_plpgsql()
+RETURNS VOID
+  LANGUAGE SQL
+AS $$
+  CREATE LANGUAGE plpgsql;
+$$;
+
+SELECT
+  CASE
+    WHEN EXISTS (
+      SELECT 1 from pg_catalog.pg_language where lanname='plpgsql'
+    ) THEN
+      NULL
+    ELSE make_plpgsql()
+  END;
+
+
+
 -- dex_trim_messages_by_number() -------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION dex_trim_messages_by_number() RETURNS trigger AS $$
     DECLARE
