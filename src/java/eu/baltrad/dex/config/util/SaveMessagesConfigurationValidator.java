@@ -26,8 +26,6 @@ import eu.baltrad.dex.config.model.LogConfiguration;
 import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
 
-import java.util.Date;
-
 /**
  * Validates log configuration form.
  *
@@ -57,14 +55,31 @@ public class SaveMessagesConfigurationValidator implements Validator {
         LogConfiguration logConf = ( LogConfiguration )command;
         if( logConf == null ) return;
         // Validate record limit number
-        if( logConf.getRecordLimit() <= 0 && logConf.getTrimByNumber() ) {
+        if( logConf.getTrimByNumber() && logConf.getRecordLimit() <= 0  ) {
             errors.rejectValue( "recordLimit", "error.recordlimit.zero" );
         }
-        // Validate date limit
-        if( logConf.getDateLimit() == null ) {
-            logConf.setDateLimit( new Date() );
+        // Validate age limit
+        if( logConf.getMaxAgeDays() < 0 ) {
+            errors.rejectValue( "maxAgeDays", "error.agelimit.invalid" );
         }
-
+        if( logConf.getMaxAgeHours() < 0 ) {
+            errors.rejectValue( "maxAgeHours", "error.agelimit.invalid" );
+        }
+        if( logConf.getMaxAgeHours() > 23 ) {
+            errors.rejectValue( "maxAgeHours", "error.agelimit.hours_exceeded" );
+        }
+        if( logConf.getMaxAgeMinutes() < 0 ) {
+            errors.rejectValue( "maxAgeMinutes", "error.agelimit.invalid" );
+        }
+        if( logConf.getMaxAgeMinutes() > 59 ) {
+            errors.rejectValue( "maxAgeMinutes", "error.agelimit.minutes_exceeded" );
+        }
+        if( logConf.getMaxAgeDays() == 0 && logConf.getMaxAgeHours() == 0 &&
+                logConf.getMaxAgeMinutes() == 0 ) {
+            errors.rejectValue( "maxAgeDays", "error.recordlimit.zero" );
+            errors.rejectValue( "maxAgeHours", "error.recordlimit.zero" );
+            errors.rejectValue( "maxAgeMinutes", "error.recordlimit.zero" );
+        }
     }
 }
 //--------------------------------------------------------------------------------------------------

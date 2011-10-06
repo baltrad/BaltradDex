@@ -21,8 +21,6 @@
 
 package eu.baltrad.dex.config.model;
 
-import java.util.Date;
-
 /**
  * Class implements log table configuration object.
  *
@@ -34,12 +32,16 @@ public class LogConfiguration {
 //---------------------------------------------------------------------------------------- Variables
     /** Trim by number toggle */
     private boolean trimByNumber;
-    /** Trim by date toggle */
-    private boolean trimByDate;
+    /** Trim by age toggle */
+    private boolean trimByAge;
     /** Record limit */
     private int recordLimit;
-    /** Date limit */
-    private Date dateLimit;
+    /** Age limit - number of days */
+    private int maxAgeDays;
+    /** Age limit - number of hours */
+    private int maxAgeHours;
+    /** Age limit - number of minutes */
+    private int maxAgeMinutes;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
@@ -49,16 +51,20 @@ public class LogConfiguration {
      * Constructor.
      *
      * @param trimByNumber Trim by number toggle
-     * @param trimByDate Trim by date toggle
+     * @param trimByAge Trim by age toggle
      * @param recordLimit Maximum number of records limit
-     * @param dateLimit Maximum date limit
+     * @param maxAgeDays Age limit - number of days
+     * @param maxAgeHours Age limit - number of hours
+     * @param maxAgeMinutes Age limit - number of minutes
      */
     public LogConfiguration( boolean trimByNumber, boolean trimByDate, int recordLimit,
-            Date dateLimit ) {
+            int maxAgeDays, int maxAgeHours, int maxAgeMinutes ) {
         this.trimByNumber = trimByNumber;
-        this.trimByDate = trimByDate;
+        this.trimByAge = trimByDate;
         this.recordLimit = recordLimit;
-        this.dateLimit = dateLimit;
+        this.maxAgeDays = maxAgeDays;
+        this.maxAgeHours = maxAgeHours;
+        this.maxAgeMinutes = maxAgeMinutes;
     }
     /**
      * Gets trim by number toggle.
@@ -73,17 +79,17 @@ public class LogConfiguration {
      */
     public void setTrimByNumber( boolean trimByNumber ) { this.trimByNumber = trimByNumber; }
     /**
-     * Gets trim by date toggle.
+     * Gets trim by age toggle.
      *
-     * @return trimByDate Trim by date toggle
+     * @return trimByAge Trim by age toggle
      */
-    public boolean getTrimByDate() { return trimByDate; }
+    public boolean getTrimByAge() { return trimByAge; }
     /**
-     * Sets trim by date toggle.
+     * Sets trim by age toggle.
      *
-     * @param trimByDate Trim by date toggle to set
+     * @param trimByAge Trim by age toggle to set
      */
-    public void setTrimByDate( boolean trimByDate ) { this.trimByDate = trimByDate; }
+    public void setTrimByAge( boolean trimByAge ) { this.trimByAge = trimByAge; }
     /**
      * Gets number of records limit.
      *
@@ -97,16 +103,40 @@ public class LogConfiguration {
      */
     public void setRecordLimit( int recordLimit ) { this.recordLimit = recordLimit; }
     /**
-     * Gets date limit.
+     * Get number of days in age limit.
      *
-     * @return dateLimit Date limit
+     * @return maxAgeDays Number of days
      */
-    public Date getDateLimit() { return dateLimit; }
+    public int getMaxAgeDays() { return maxAgeDays; }
     /**
-     * Sets date limit.
+     * Set number of days in age limit.
      *
-     * @param dateLimit Date limit to set
+     * @param maxAgeDays Number of days to set
      */
-    public void setDateLimit( Date dateLimit ) { this.dateLimit = dateLimit; }
+    public void setMaxAgeDays( int maxAgeDays ) { this.maxAgeDays = maxAgeDays; }
+    /**
+     * Get number of hours in age limit.
+     *
+     * @return maxAgeHours Number of hours
+     */
+    public int getMaxAgeHours() { return maxAgeHours; }
+    /**
+     * Set number of hours in age limit.
+     *
+     * @param maxAgeHours Number of hours to set
+     */
+    public void setMaxAgeHours( int maxAgeHours ) { this.maxAgeHours = maxAgeHours; }
+    /**
+     * Get number of minutes in age limit.
+     *
+     * @return maxAgeMinutes Number of minutes
+     */
+    public int getMaxAgeMinutes() { return maxAgeMinutes; }
+    /**
+     * Set number of minutes in age limit.
+     *
+     * @param maxAgeMinutes Number of minutes to set
+     */
+    public void setMaxAgeMinutes( int maxAgeMinutes ) { this.maxAgeMinutes = maxAgeMinutes; }
 }
 //--------------------------------------------------------------------------------------------------

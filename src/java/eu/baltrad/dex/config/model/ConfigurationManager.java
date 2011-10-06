@@ -22,17 +22,13 @@
 package eu.baltrad.dex.config.model;
 
 import eu.baltrad.dex.log.model.MessageLogger;
-import java.io.FileOutputStream;
 
 import org.apache.log4j.Logger;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Properties;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
-
 import java.net.URL;
 
 /**
@@ -91,40 +87,39 @@ public class ConfigurationManager {
     /** Trim by number toggle */
     private static final String MSG_TRIM_BY_NUMBER = "messages.trim_by_number";
     /** Trim by date toggle */
-    private static final String MSG_TRIM_BY_DATE = "messages.trim_by_date";
+    private static final String MSG_TRIM_BY_AGE = "messages.trim_by_age";
     /** Records limit */
     private static final String MSG_REC_LIMIT = "messages.rec_limit";
-    /** Date limit */
-    private static final String MSG_DATE_LIMIT = "messages.date_limit";
+    /** Age limit - days */
+    private static final String MSG_MAX_AGE_DAYS = "messages.max_age_days";
+    /** Age limit - hours */
+    private static final String MSG_MAX_AGE_HOURS = "messages.max_age_hours";
+    /** Age limit - minutes */
+    private static final String MSG_MAX_AGE_MINUTES = "messages.max_age_minutes";
 
     // Delivery registry configuration
 
     /** Trim by number toggle */
     private static final String REG_TRIM_BY_NUMBER = "registry.trim_by_number";
     /** Trim by date toggle */
-    private static final String REG_TRIM_BY_DATE = "registry.trim_by_date";
+    private static final String REG_TRIM_BY_AGE = "registry.trim_by_age";
     /** Records limit */
     private static final String REG_REC_LIMIT = "registry.rec_limit";
-    /** Date limit */
-    private static final String REG_DATE_LIMIT = "registry.date_limit";
-
-    /** Date format string */
-    private final static String DATE_FORMAT = "yyyy/MM/dd";
-    /** Time format string */
-    private final static String TIME_FORMAT = "HH:mm:ss";
-
+    /** Age limit - days */
+    private static final String REG_MAX_AGE_DAYS = "registry.max_age_days";
+    /** Age limit - hours */
+    private static final String REG_MAX_AGE_HOURS = "registry.max_age_hours";
+    /** Age limit - minutes */
+    private static final String REG_MAX_AGE_MINUTES = "registry.max_age_minutes";
 //---------------------------------------------------------------------------------------- Variables
     /** References logger object */
     private static Logger log;
-    /** Date format */
-    private static DateFormat df;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor
      */
     public ConfigurationManager() {
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        df = new SimpleDateFormat( DATE_FORMAT + " " + TIME_FORMAT );
     }
     /**
      * Loads system configuration from properties file.
@@ -209,8 +204,10 @@ public class ConfigurationManager {
             props.load( url.openStream() );
             LogConfiguration conf = new LogConfiguration( Boolean.parseBoolean( props.getProperty(
                     MSG_TRIM_BY_NUMBER ) ), Boolean.parseBoolean( props.getProperty(
-                    MSG_TRIM_BY_DATE ) ), Integer.parseInt( props.getProperty( MSG_REC_LIMIT ) ),
-                    df.parse( props.getProperty( MSG_DATE_LIMIT ) ) );
+                    MSG_TRIM_BY_AGE ) ), Integer.parseInt( props.getProperty( MSG_REC_LIMIT ) ),
+                    Integer.parseInt( props.getProperty( MSG_MAX_AGE_DAYS ) ),
+                    Integer.parseInt( props.getProperty( MSG_MAX_AGE_HOURS ) ),
+                    Integer.parseInt( props.getProperty( MSG_MAX_AGE_MINUTES ) ) );
             return conf;
         } catch( IOException e ) {
             log.error( "Failed to load properties: " + e.getMessage() );
@@ -234,9 +231,11 @@ public class ConfigurationManager {
             props.load( url.openStream() );
             //
             props.setProperty( MSG_TRIM_BY_NUMBER, Boolean. toString( msgConf.getTrimByNumber() ) );
-            props.setProperty( MSG_TRIM_BY_DATE, Boolean.toString( msgConf.getTrimByDate() ) );
+            props.setProperty( MSG_TRIM_BY_AGE, Boolean.toString( msgConf.getTrimByAge() ) );
             props.setProperty( MSG_REC_LIMIT, Integer.toString( msgConf.getRecordLimit() ) );
-            props.setProperty( MSG_DATE_LIMIT, df.format( msgConf.getDateLimit() ) );
+            props.setProperty( MSG_MAX_AGE_DAYS, Integer.toString( msgConf.getMaxAgeDays() ) );
+            props.setProperty( MSG_MAX_AGE_HOURS, Integer.toString( msgConf.getMaxAgeHours() ) );
+            props.setProperty( MSG_MAX_AGE_MINUTES, Integer.toString( msgConf.getMaxAgeMinutes() ) );
             //
             OutputStream os = new FileOutputStream( url.getPath() );
             props.store( os, DEX_PROPS_FILE_COMMENT );
@@ -260,8 +259,10 @@ public class ConfigurationManager {
             props.load( url.openStream() );
             LogConfiguration conf = new LogConfiguration( Boolean.parseBoolean( props.getProperty(
                     REG_TRIM_BY_NUMBER ) ), Boolean.parseBoolean( props.getProperty(
-                    REG_TRIM_BY_DATE ) ), Integer.parseInt( props.getProperty( REG_REC_LIMIT ) ),
-                    df.parse( props.getProperty( REG_DATE_LIMIT ) ) );
+                    REG_TRIM_BY_AGE ) ), Integer.parseInt( props.getProperty( REG_REC_LIMIT ) ),
+                    Integer.parseInt( props.getProperty( REG_MAX_AGE_DAYS ) ),
+                    Integer.parseInt( props.getProperty( REG_MAX_AGE_HOURS ) ),
+                    Integer.parseInt( props.getProperty( REG_MAX_AGE_MINUTES ) ) );
             return conf;
         } catch( IOException e ) {
             log.error( "Failed to load properties: " + e.getMessage() );
@@ -285,9 +286,11 @@ public class ConfigurationManager {
             props.load( url.openStream() );
             //
             props.setProperty( REG_TRIM_BY_NUMBER, Boolean. toString( regConf.getTrimByNumber() ) );
-            props.setProperty( REG_TRIM_BY_DATE, Boolean.toString( regConf.getTrimByDate() ) );
+            props.setProperty( REG_TRIM_BY_AGE, Boolean.toString( regConf.getTrimByAge() ) );
             props.setProperty( REG_REC_LIMIT, Integer.toString( regConf.getRecordLimit() ) );
-            props.setProperty( REG_DATE_LIMIT, df.format( regConf.getDateLimit() ) );
+            props.setProperty( REG_MAX_AGE_DAYS, Integer.toString( regConf.getMaxAgeDays() ) );
+            props.setProperty( REG_MAX_AGE_HOURS, Integer.toString( regConf.getMaxAgeHours() ) );
+            props.setProperty( REG_MAX_AGE_MINUTES, Integer.toString( regConf.getMaxAgeMinutes() ) );
             //
             OutputStream os = new FileOutputStream( url.getPath() );
             props.store( os, DEX_PROPS_FILE_COMMENT );

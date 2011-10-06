@@ -44,10 +44,10 @@ Author     : szewczenko
                         </div>
                         <div class="row">
                             <div class="leftcol">
-                                <div class="col">
+                                <div class="inner-leftcol">
                                     Limit
                                 </div>
-                                <div class="col">
+                                <div class="inner-rightcol">
                                     <form:input path="command.recordLimit"
                                                 title="Maximum number of registry entries"/>
                                     <div class="hint">
@@ -72,19 +72,15 @@ Author     : szewczenko
                         </div>
                         <div class="row">
                             <div class="leftcol">
-                                <div class="col">
-                                    Limit
+                                <div class="inner-leftcol">
+                                    Days
                                 </div>
-                                <div class="col">
-                                    <form:input path="command.dateLimit" id="dateLimit"
-                                                title="Maximum age of registry entries"/>
-                                    <img src="includes/images/cal.gif" onclick="javascript:NewCssCal(
-                                        'dateLimit','yyyyMMdd','arrow',true,'24',true)"
-                                        style="cursor:pointer"/>
+                                <div class="inner-rightcol">
+                                    <form:input path="command.maxAgeDays" title="Set number of days"/>
                                     <div class="hint">
-                                        Max age of registry entries
+                                        Number of days
                                     </div>
-                                    <form:errors path="command.dateLimit" cssClass="error"/>
+                                    <form:errors path="command.maxAgeDays" cssClass="error"/>
                                 </div>
                             </div>
                             <div class="rightcol">
@@ -92,8 +88,38 @@ Author     : szewczenko
                                     Set active
                                 </div>
                                 <div class="col">
-                                    <form:checkbox path="command.trimByDate"
+                                    <form:checkbox path="command.trimByAge"
                                                    title="Set active/inactive"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="leftcol">
+                                <div class="inner-leftcol">
+                                    Hours
+                                </div>
+                                <div class="inner-rightcol">
+                                    <form:input path="command.maxAgeHours"
+                                                title="Set number of hours"/>
+                                    <div class="hint">
+                                        Number of hours
+                                    </div>
+                                    <form:errors path="command.maxAgeHours" cssClass="error"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="leftcol">
+                                <div class="inner-leftcol">
+                                    Minutes
+                                </div>
+                                <div class="inner-rightcol">
+                                    <form:input path="command.maxAgeMinutes"
+                                                title="Set number of minutes"/>
+                                    <div class="hint">
+                                        Number of minutes
+                                    </div>
+                                    <form:errors path="command.maxAgeMinutes" cssClass="error"/>
                                 </div>
                             </div>
                         </div>

@@ -52,17 +52,18 @@ public class LogManager {
         " BEGIN records_limit = TG_ARGV[0]; DELETE FROM dex_messages WHERE " +
         "id IN (SELECT id FROM dex_messages ORDER BY timestamp DESC OFFSET records_limit); " +
         "RETURN NEW; END; $$ LANGUAGE plpgsql;";
-
     /** SQL script creating trimmer function */
-    private static final String SQL_TRIM_MSG_BY_DATE = "DROP FUNCTION IF EXISTS " +
-        "dex_trim_messages_by_date() CASCADE; CREATE OR REPLACE FUNCTION " +
-        "dex_trim_messages_by_date() RETURNS trigger AS $$ DECLARE date_limit TIMESTAMP; " +
-        "BEGIN date_limit = to_timestamp(TG_ARGV[0], 'YYYY/MM/DD HH24:MI:SS'); DELETE FROM " +
-        "dex_messages where timestamp < date_limit; RETURN NEW; END; $$ LANGUAGE plpgsql;";
+    private static final String SQL_TRIM_MSG_BY_AGE = "DROP FUNCTION IF EXISTS " +
+        "dex_trim_messages_by_age() CASCADE; CREATE OR REPLACE FUNCTION " + 
+        "dex_trim_messages_by_age() RETURNS trigger AS $$ DECLARE max_age INTERVAL; BEGIN SELECT " +
+        "(TG_ARGV[0] || ' days ' || TG_ARGV[1] || ' hours ' || TG_ARGV[2] || ' " +
+        "minutes')::INTERVAL INTO max_age; DELETE FROM dex_messages WHERE timestamp IN (SELECT " +
+        "timestamp FROM dex_messages WHERE age(now(), timestamp) > max_age); RETURN NEW; END; " +
+        "$$ LANGUAGE plpgsql;";
     /** Trim messages by number function name */
     public static final String TRIM_MSG_BY_NUMBER_FUNC = "dex_trim_messages_by_number()";
     /** Trim messages by date function name */
-    public static final String TRIM_MSG_BY_DATE_FUNC = "dex_trim_messages_by_date()";
+    public static final String TRIM_MSG_BY_AGE_FUNC = "dex_trim_messages_by_age()";
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
@@ -273,21 +274,24 @@ public class LogManager {
     }
     /**
      * Creates trigger on messages table. Trigger activates trimmer function which deletes records
-     * from messages table.
+     * older than a given age limit.
      *
-     * @param dateLimit Trimmer function is activated if message timestamp is older than timestamp
-     * given by this parameter
+     * @param maxAgeDays Age limit - number of days
+     * @param maxAgeHours Age limit - number of hours
+     * @param maxAgeMinutes Age limit - number of minutes
      * @throws SQLException
      * @throws Exception
      */
-    public void setTrimmer( String dateLimit ) throws SQLException, Exception {
+    public void setTrimmer( int maxAgeDays, int maxAgeHours, int maxAgeMinutes )
+            throws SQLException, Exception {
         Connection conn = null;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = SQL_TRIM_MSG_BY_DATE + " CREATE TRIGGER dex_trim_messages_by_date_tg " +
+            String sql = SQL_TRIM_MSG_BY_AGE + " CREATE TRIGGER dex_trim_messages_by_age_tg " +
                 "AFTER INSERT ON " + "dex_messages FOR EACH ROW EXECUTE PROCEDURE " +
-                "dex_trim_messages_by_date('" + dateLimit + "');";
+                "dex_trim_messages_by_age(" + maxAgeDays + ", " + maxAgeHours + ", " + maxAgeMinutes
+                + ");";
             stmt.execute( sql );
             stmt.close();
         } catch( SQLException e ) {

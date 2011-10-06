@@ -1195,8 +1195,15 @@ input:focus, textarea:focus {
     float:left;
     padding-right:8px;
 }
-
-
+.logconf .inner-leftcol {
+    float:left;
+    width:25%;
+    text-align:left;
+}
+.logconf .inner-rightcol {
+    float:left;
+    width:60%;
+}
 
 /*------------------------------------------------------------------------------------------------*/
 

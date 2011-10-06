@@ -31,15 +31,11 @@ import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.validation.BindException;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.beans.propertyeditors.CustomNumberEditor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.SQLException;
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.text.DecimalFormat;
 
 /**
@@ -55,8 +51,6 @@ public class SaveRegistryConfigurationController extends SimpleFormController {
     private static final String OK_MSG_KEY = "message";
     /** Error message key */
     private static final String ERROR_MSG_KEY = "error";
-    /** Date format string */
-    private static final String DATE_FORMAT_STR = "yyyy/MM/dd HH:mm:ss";
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to configuration manager */
     private ConfigurationManager configurationManager;
@@ -64,15 +58,12 @@ public class SaveRegistryConfigurationController extends SimpleFormController {
     private DeliveryRegisterManager deliveryRegisterManager;
     /** Reference to logger object */
     private Logger log;
-    /** Date format */
-    private DateFormat df;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      */
     public SaveRegistryConfigurationController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        df = new SimpleDateFormat( DATE_FORMAT_STR );
     }
     /**
      * Retrieve a backing object for the current form from the given request.
@@ -96,7 +87,6 @@ public class SaveRegistryConfigurationController extends SimpleFormController {
      */
     @Override
     protected void initBinder( HttpServletRequest request, ServletRequestDataBinder binder ) {
-        binder.registerCustomEditor( Date.class, new CustomDateEditor( df, true ) );
         binder.registerCustomEditor( Integer.class, new CustomNumberEditor( Integer.class,
                 new DecimalFormat( "#" ), true ) );
     }
@@ -122,11 +112,12 @@ public class SaveRegistryConfigurationController extends SimpleFormController {
                 deliveryRegisterManager.removeTrimmer(
                         DeliveryRegisterManager.TRIM_REG_BY_NUMBER_FUNC );
             }
-            if( regConf.getTrimByDate() ) {
-                deliveryRegisterManager.setTrimmer( df.format( regConf.getDateLimit() ) );
+            if( regConf.getTrimByAge() ) {
+                deliveryRegisterManager.setTrimmer( regConf.getMaxAgeDays(),
+                        regConf.getMaxAgeHours(), regConf.getMaxAgeMinutes() );
             } else {
                 deliveryRegisterManager.removeTrimmer(
-                        DeliveryRegisterManager.TRIM_REG_BY_DATE_FUNC );
+                        DeliveryRegisterManager.TRIM_REG_BY_AGE_FUNC );
             }
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveregconf.savesuccess" ) );

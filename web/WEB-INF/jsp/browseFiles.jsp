@@ -140,7 +140,7 @@ Author     : szewczenko
                         <input type="text" name="startHour" title="Start hour (24 hour format)"
                                value="${startHour}" onchange="validateStartHour()">
                         : <input type="text" name="startMinute" title="Start minute"
-                               value="${startMinute}" onchange="validateStartMinute()" va>
+                               value="${startMinute}" onchange="validateStartMinute()">
                         : <input type="text" name="startSecond" title="Start second"
                                value="${startSecond}" onchange="validateStartSecond()">
                         <div class="hint">
