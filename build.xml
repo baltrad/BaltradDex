@@ -379,7 +379,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
          driver="${db.driver}"
          url="${db.url}"
          userid="${db.user}" 
-         password="${db.pwd}">
+         password="${db.pwd}"
+         escapeprocessing="false"
+         expandproperties="false"
+         delimitertype="row">
       <transaction src="${etc.dir}/create_dex_schema.sql"/>
     </sql>
   </target>
@@ -401,7 +404,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
          driver="${db.driver}"
          url="${db.url}"
          userid="${db.user}" 
-         password="${db.pwd}" >
+         password="${db.pwd}"
+         escapeprocessing="false"
+         expandproperties="false"
+         delimitertype="row">
       <transaction src="${etc.dir}/drop_dex_schema.sql"/>
       <transaction src="${baltrad.db.path}/share/baltrad-db/sql/postgresql/drop.sql"/>
       <transaction src="${baltrad.db.path}/share/baltrad-db/sql/postgresql/create.sql"/>

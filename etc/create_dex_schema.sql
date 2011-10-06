@@ -61,7 +61,11 @@ DROP SEQUENCE IF EXISTS data_quantity_id_seq CASCADE;
 DROP SEQUENCE IF EXISTS product_id_seq;
 DROP SEQUENCE IF EXISTS product_parameter_id_seq;
 DROP SEQUENCE IF EXISTS data_source_id_seq;
-
+-- drop functions if exist -------------------------------------------------------------------------
+DROP FUNCTION IF EXISTS dex_trim_messages_by_number() CASCADE;
+DROP FUNCTION IF EXISTS dex_trim_messages_by_age() CASCADE;
+DROP FUNCTION IF EXISTS dex_trim_registry_by_number() CASCADE;
+DROP FUNCTION IF EXISTS dex_trim_registry_by_age() CASCADE;
 -- create tables -----------------------------------------------------------------------------------
 
 -- dex_roles ---------------------------------------------------------------------------------------
@@ -321,4 +325,50 @@ CREATE TABLE dex_data_source_filters
     filter_id INT NOT NULL,
     PRIMARY KEY(id)
 );
+-- dex_trim_messages_by_number() -------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION dex_trim_messages_by_number() RETURNS trigger AS $$
+    DECLARE
+        records_limit INTEGER;
+    BEGIN
+        records_limit = TG_ARGV[0];
+        DELETE FROM dex_messages WHERE id IN (SELECT id FROM dex_messages ORDER BY timestamp DESC
+            OFFSET records_limit);
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+-- dex_trim_messages_by_age() ----------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION dex_trim_messages_by_age() RETURNS trigger AS $$
+    DECLARE
+        max_age INTERVAL;
+    BEGIN
+        SELECT (TG_ARGV[0] || ' days ' || TG_ARGV[1] || ' hours ' || TG_ARGV[2] ||
+            ' minutes')::INTERVAL INTO max_age;
+        DELETE FROM dex_messages WHERE timestamp IN (SELECT timestamp FROM dex_messages WHERE
+            age(now(), timestamp) > max_age);
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+-- dex_trim_registry_by_number() -------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION dex_trim_registry_by_number() RETURNS trigger AS $$ 
+    DECLARE
+        records_limit INTEGER;
+    BEGIN
+        records_limit = TG_ARGV[0];
+        DELETE FROM dex_delivery_register WHERE id IN (SELECT id FROM dex_delivery_register
+            ORDER BY timestamp DESC OFFSET records_limit);
+        RETURN NEW; 
+    END;
+$$ LANGUAGE plpgsql;
+-- dex_trim_registry_by_age() ----------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION dex_trim_registry_by_age() RETURNS trigger AS $$ 
+    DECLARE
+        max_age INTERVAL;
+    BEGIN
+        SELECT (TG_ARGV[0] || ' days ' || TG_ARGV[1] || ' hours ' || TG_ARGV[2] ||
+            ' minutes')::INTERVAL INTO max_age;
+        DELETE FROM dex_delivery_register WHERE timestamp IN (SELECT timestamp FROM
+            dex_delivery_register WHERE age(now(), timestamp) > max_age);
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
 ----------------------------------------------------------------------------------------------------

@@ -624,6 +624,52 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- create trimmer functions ------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION dex_trim_messages_by_number() RETURNS trigger AS $$
+    DECLARE
+        records_limit INTEGER;
+    BEGIN
+        records_limit = TG_ARGV[0];
+        DELETE FROM dex_messages WHERE id IN (SELECT id FROM dex_messages ORDER BY timestamp DESC
+            OFFSET records_limit);
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION dex_trim_messages_by_age() RETURNS trigger AS $$
+    DECLARE
+        max_age INTERVAL;
+    BEGIN
+        SELECT (TG_ARGV[0] || ' days ' || TG_ARGV[1] || ' hours ' || TG_ARGV[2] ||
+            ' minutes')::INTERVAL INTO max_age;
+        DELETE FROM dex_messages WHERE timestamp IN (SELECT timestamp FROM dex_messages WHERE
+            age(now(), timestamp) > max_age);
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION dex_trim_registry_by_number() RETURNS trigger AS $$
+    DECLARE
+        records_limit INTEGER;
+    BEGIN
+        records_limit = TG_ARGV[0];
+        DELETE FROM dex_delivery_register WHERE id IN (SELECT id FROM dex_delivery_register
+            ORDER BY timestamp DESC OFFSET records_limit);
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION dex_trim_registry_by_age() RETURNS trigger AS $$
+    DECLARE
+        max_age INTERVAL;
+    BEGIN
+        SELECT (TG_ARGV[0] || ' days ' || TG_ARGV[1] || ' hours ' || TG_ARGV[2] ||
+            ' minutes')::INTERVAL INTO max_age;
+        DELETE FROM dex_delivery_register WHERE timestamp IN (SELECT timestamp FROM
+            dex_delivery_register WHERE age(now(), timestamp) > max_age);
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
 
 SELECT split_dex_node_connections_address();
 SELECT split_dex_node_configuration_address();

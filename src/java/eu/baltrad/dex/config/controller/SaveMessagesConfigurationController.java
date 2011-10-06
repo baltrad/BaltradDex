@@ -109,13 +109,13 @@ public class SaveMessagesConfigurationController extends SimpleFormController {
             if( msgConf.getTrimByNumber() ) {
                 logManager.setTrimmer( msgConf.getRecordLimit() );
             } else {
-                logManager.removeTrimmer( LogManager.TRIM_MSG_BY_NUMBER_FUNC );
+                logManager.removeTrimmer( LogManager.TRIM_MSG_BY_NUMBER_TG );
             }
             if( msgConf.getTrimByAge() ) {
                 logManager.setTrimmer( msgConf.getMaxAgeDays(), msgConf.getMaxAgeHours(),
                         msgConf.getMaxAgeMinutes() );
             } else {
-                logManager.removeTrimmer( LogManager.TRIM_MSG_BY_AGE_FUNC );
+                logManager.removeTrimmer( LogManager.TRIM_MSG_BY_AGE_TG );
             }
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.savelogconf.savesuccess" ) );

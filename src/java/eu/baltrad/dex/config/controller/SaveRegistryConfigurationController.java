@@ -110,14 +110,14 @@ public class SaveRegistryConfigurationController extends SimpleFormController {
                 deliveryRegisterManager.setTrimmer( regConf.getRecordLimit() );
             } else {
                 deliveryRegisterManager.removeTrimmer(
-                        DeliveryRegisterManager.TRIM_REG_BY_NUMBER_FUNC );
+                        DeliveryRegisterManager.TRIM_REG_BY_NUMBER_TG );
             }
             if( regConf.getTrimByAge() ) {
                 deliveryRegisterManager.setTrimmer( regConf.getMaxAgeDays(),
                         regConf.getMaxAgeHours(), regConf.getMaxAgeMinutes() );
             } else {
                 deliveryRegisterManager.removeTrimmer(
-                        DeliveryRegisterManager.TRIM_REG_BY_AGE_FUNC );
+                        DeliveryRegisterManager.TRIM_REG_BY_AGE_TG );
             }
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveregconf.savesuccess" ) );

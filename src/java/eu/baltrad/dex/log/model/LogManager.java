@@ -45,25 +45,10 @@ public class LogManager {
     public final static int ENTRIES_PER_PAGE = 12;
     /** Number of pages in the scroll bar, must be an odd number >= 3 */
     public final static int SCROLL_RANGE = 11;
-    /** SQL script creating trimmer function */
-    private static final String SQL_TRIM_MSG_BY_NUMBER = "DROP FUNCTION IF EXISTS " +
-        "dex_trim_messages_by_number() CASCADE; CREATE OR REPLACE FUNCTION " +
-        "dex_trim_messages_by_number() RETURNS trigger AS $$ DECLARE records_limit INTEGER; " +
-        " BEGIN records_limit = TG_ARGV[0]; DELETE FROM dex_messages WHERE " +
-        "id IN (SELECT id FROM dex_messages ORDER BY timestamp DESC OFFSET records_limit); " +
-        "RETURN NEW; END; $$ LANGUAGE plpgsql;";
-    /** SQL script creating trimmer function */
-    private static final String SQL_TRIM_MSG_BY_AGE = "DROP FUNCTION IF EXISTS " +
-        "dex_trim_messages_by_age() CASCADE; CREATE OR REPLACE FUNCTION " + 
-        "dex_trim_messages_by_age() RETURNS trigger AS $$ DECLARE max_age INTERVAL; BEGIN SELECT " +
-        "(TG_ARGV[0] || ' days ' || TG_ARGV[1] || ' hours ' || TG_ARGV[2] || ' " +
-        "minutes')::INTERVAL INTO max_age; DELETE FROM dex_messages WHERE timestamp IN (SELECT " +
-        "timestamp FROM dex_messages WHERE age(now(), timestamp) > max_age); RETURN NEW; END; " +
-        "$$ LANGUAGE plpgsql;";
-    /** Trim messages by number function name */
-    public static final String TRIM_MSG_BY_NUMBER_FUNC = "dex_trim_messages_by_number()";
-    /** Trim messages by date function name */
-    public static final String TRIM_MSG_BY_AGE_FUNC = "dex_trim_messages_by_age()";
+    /** Trim messages by number trigger */
+    public static final String TRIM_MSG_BY_NUMBER_TG = "dex_trim_messages_by_number_tg";
+    /** Trim messages by date trigger */
+    public static final String TRIM_MSG_BY_AGE_TG = "dex_trim_messages_by_age_tg";
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
@@ -257,9 +242,10 @@ public class LogManager {
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = SQL_TRIM_MSG_BY_NUMBER + " CREATE TRIGGER dex_trim_messages_by_number_tg "
-                + "AFTER INSERT ON dex_messages FOR EACH ROW EXECUTE PROCEDURE " +
-                "dex_trim_messages_by_number(" + recordLimit + ");";
+            String sql = "DROP TRIGGER IF EXISTS dex_trim_messages_by_number_tg ON dex_messages; " +
+                "CREATE TRIGGER dex_trim_messages_by_number_tg AFTER INSERT ON " +
+                "dex_messages FOR EACH ROW EXECUTE PROCEDURE dex_trim_messages_by_number(" +
+                recordLimit + ");";
             stmt.execute( sql );
             stmt.close();
         } catch( SQLException e ) {
@@ -288,10 +274,10 @@ public class LogManager {
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = SQL_TRIM_MSG_BY_AGE + " CREATE TRIGGER dex_trim_messages_by_age_tg " +
-                "AFTER INSERT ON " + "dex_messages FOR EACH ROW EXECUTE PROCEDURE " +
-                "dex_trim_messages_by_age(" + maxAgeDays + ", " + maxAgeHours + ", " + maxAgeMinutes
-                + ");";
+            String sql = "DROP TRIGGER IF EXISTS dex_trim_messages_by_age_tg ON dex_messages; " +
+                "CREATE TRIGGER dex_trim_messages_by_age_tg AFTER INSERT ON dex_messages" +
+                " FOR EACH ROW EXECUTE PROCEDURE dex_trim_messages_by_age(" + maxAgeDays + ", " +
+                maxAgeHours + ", " + maxAgeMinutes + ");";
             stmt.execute( sql );
             stmt.close();
         } catch( SQLException e ) {
@@ -305,18 +291,18 @@ public class LogManager {
         }
     }
     /**
-     * Removes function and the calling trigger on message table.
+     * Removes trigger on message table.
      *
-     * @param functionName Name of the function
+     * @param triggerName Name of the trigger
      * @throws SQLException
      * @throws Exception
      */
-    public void removeTrimmer( String functionName ) throws SQLException, Exception {
+    public void removeTrimmer( String triggerName ) throws SQLException, Exception {
         Connection conn = null;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = "DROP FUNCTION IF EXISTS " + functionName + " CASCADE;";
+            String sql = "DROP TRIGGER IF EXISTS " + triggerName + " ON dex_messages;";
             stmt.execute( sql );
             stmt.close();
         } catch( SQLException e ) {

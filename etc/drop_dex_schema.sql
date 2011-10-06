@@ -1,5 +1,5 @@
 /***************************************************************************************************
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -64,4 +64,9 @@ DROP SEQUENCE IF EXISTS data_quantity_id_seq;
 DROP SEQUENCE IF EXISTS product_id_seq;
 DROP SEQUENCE IF EXISTS product_parameter_id_seq;
 DROP SEQUENCE IF EXISTS data_source_id_seq;
+-- drop functions ----------------------------------------------------------------------------------
+DROP FUNCTION IF EXISTS dex_trim_messages_by_number() CASCADE;
+DROP FUNCTION IF EXISTS dex_trim_messages_by_age() CASCADE;
+DROP FUNCTION IF EXISTS dex_trim_registry_by_number() CASCADE;
+DROP FUNCTION IF EXISTS dex_trim_registry_by_age() CASCADE;
 ----------------------------------------------------------------------------------------------------
