@@ -39,7 +39,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.util.List;
-import java.sql.SQLException;
 
 /**
  * Multi-action controller for handling delivery register functionality.
@@ -149,14 +148,10 @@ public class RegisterController extends MultiActionController implements ITableS
                     + " registry entries.";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             log.warn( msg );
-        } catch( SQLException e ) {
-            String msg = "Failed to clear data delivery registry:" + e.getMessage();
-            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
         } catch( Exception e ) {
-            String msg = "Failed to clear data delivery registry:" + e.getMessage();
+            String msg = "Failed to clear data delivery registry";
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
+            log.error( msg, e );
         }
         return new ModelAndView( SHOW_CLEAR_REGISTER_STATUS_VIEW );
     }

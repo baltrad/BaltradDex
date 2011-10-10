@@ -81,7 +81,7 @@ public class BltFileDownloadController implements Controller {
             try {
                 in = new BufferedInputStream( new FileInputStream( file ) );
             } catch( FileNotFoundException e ) {
-                log.warn( "File not found: " + e.getMessage() );
+                log.warn( "File not found", e );
             }
             String mimeType = servletContext.getMimeType( filePath );
             response.setBufferSize( fileSize );
@@ -94,7 +94,7 @@ public class BltFileDownloadController implements Controller {
                 response.getOutputStream().flush();
                 response.getOutputStream().close();
             } catch( IOException e ) {
-                log.error( "Error downloading file: " + e.getMessage() );
+                log.error( "Error downloading file" + e );
             }
             log.info( "User " + user.getName() + " downloading file: " + file.getName() );
         } else {

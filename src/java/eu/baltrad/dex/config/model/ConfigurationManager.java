@@ -143,11 +143,8 @@ public class ConfigurationManager {
                 props.getProperty( ORG_ADDRESS_PROP ), props.getProperty( TIME_ZONE_PROP ),
                 props.getProperty( EMAIL_PROP ) );
             return conf;
-        } catch( IOException e ) {
-            log.error( "Failed to load properties: " + e.getMessage() );
-            return null;
         } catch( Exception e ) {
-            log.error( "Failed to load properties: " + e.getMessage() );
+            log.error( "Failed to load properties", e );
             return null;
         }
     }
@@ -155,10 +152,9 @@ public class ConfigurationManager {
      * Saves system configuration in properties file.
      *
      * @param appConf Application configuration object
-     * @throws IOException
      * @throws Exception
      */
-    public void saveAppConf( AppConfiguration appConf ) throws IOException, Exception {
+    public void saveAppConf( AppConfiguration appConf ) throws Exception {
         try {
             URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
             Properties props = new Properties();
@@ -184,11 +180,8 @@ public class ConfigurationManager {
             //
             OutputStream os = new FileOutputStream( url.getPath() );
             props.store( os, DEX_PROPS_FILE_COMMENT );
-        } catch( IOException e ) {
-            log.error( "Failed to save properties: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            log.error( "Failed to save properties: " + e.getMessage() );
+            log.error( "Failed to save properties", e );
             throw e;
         }
     }
@@ -209,11 +202,8 @@ public class ConfigurationManager {
                     Integer.parseInt( props.getProperty( MSG_MAX_AGE_HOURS ) ),
                     Integer.parseInt( props.getProperty( MSG_MAX_AGE_MINUTES ) ) );
             return conf;
-        } catch( IOException e ) {
-            log.error( "Failed to load properties: " + e.getMessage() );
-            return null;
         } catch( Exception e ) {
-            log.error( "Failed to load properties: " + e.getMessage() );
+            log.error( "Failed to load properties", e );
             return null;
         }
     }
@@ -224,7 +214,7 @@ public class ConfigurationManager {
      * @throws IOException
      * @throws Exception
      */
-    public void saveMsgConf( LogConfiguration msgConf ) throws IOException, Exception {
+    public void saveMsgConf( LogConfiguration msgConf ) throws Exception {
         try {
             URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
             Properties props = new Properties();
@@ -239,11 +229,8 @@ public class ConfigurationManager {
             //
             OutputStream os = new FileOutputStream( url.getPath() );
             props.store( os, DEX_PROPS_FILE_COMMENT );
-        } catch( IOException e ) {
-            log.error( "Failed to save messages properties: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            log.error( "Failed to save messages properties: " + e.getMessage() );
+            log.error( "Failed to save messages properties", e );
             throw e;
         }
     }
@@ -264,11 +251,8 @@ public class ConfigurationManager {
                     Integer.parseInt( props.getProperty( REG_MAX_AGE_HOURS ) ),
                     Integer.parseInt( props.getProperty( REG_MAX_AGE_MINUTES ) ) );
             return conf;
-        } catch( IOException e ) {
-            log.error( "Failed to load properties: " + e.getMessage() );
-            return null;
         } catch( Exception e ) {
-            log.error( "Failed to load properties: " + e.getMessage() );
+            log.error( "Failed to load properties", e );
             return null;
         }
     }
@@ -276,10 +260,9 @@ public class ConfigurationManager {
      * Save delivery registry configuration.
      *
      * @param regConf Delivery registry configuration
-     * @throws IOException
      * @throws Exception
      */
-    public void saveRegConf( LogConfiguration regConf ) throws IOException, Exception {
+    public void saveRegConf( LogConfiguration regConf ) throws Exception {
         try {
             URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
             Properties props = new Properties();
@@ -294,11 +277,8 @@ public class ConfigurationManager {
             //
             OutputStream os = new FileOutputStream( url.getPath() );
             props.store( os, DEX_PROPS_FILE_COMMENT );
-        } catch( IOException e ) {
-            log.error( "Failed to save messages properties: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            log.error( "Failed to save messages properties: " + e.getMessage() );
+            log.error( "Failed to save messages properties", e );
             throw e;
         }
     }

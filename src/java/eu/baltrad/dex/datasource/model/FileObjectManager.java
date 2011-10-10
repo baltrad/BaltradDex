@@ -22,11 +22,13 @@
 package eu.baltrad.dex.datasource.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -42,12 +44,15 @@ public class FileObjectManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public FileObjectManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets all file objects.
@@ -69,10 +74,8 @@ public class FileObjectManager {
                 fileObjects.add( fileObject );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select file objects: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select file objects: " + e.getMessage() );
+            log.error( "Failed to select file objects", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -99,10 +102,8 @@ public class FileObjectManager {
                 fileObject = new FileObject( fileObjectId, identifier, description );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select file object: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select file object: " + e.getMessage() );
+            log.error( "Failed to select file object", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -129,10 +130,8 @@ public class FileObjectManager {
                 fileObject = new FileObject( fileObjectId, foIdentifier, description );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select file object: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select file object: " + e.getMessage() );
+            log.error( "Failed to select file object", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -143,10 +142,9 @@ public class FileObjectManager {
      *
      * @param fileObject File object
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveOrUpdate( FileObject fileObject ) throws SQLException, Exception {
+    public int saveOrUpdate( FileObject fileObject ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -165,11 +163,8 @@ public class FileObjectManager {
             }
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save file object: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save file object: " + e.getMessage() );
+            log.error( "Failed to save file object", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -181,10 +176,9 @@ public class FileObjectManager {
      *
      * @param id File object ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteFileObject( int id ) throws SQLException, Exception {
+    public int deleteFileObject( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -193,11 +187,8 @@ public class FileObjectManager {
             String sql = "DELETE FROM dex_file_objects WHERE id = " + id + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete file objects: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete file objects: " + e.getMessage() );
+            log.error( "Failed to delete file objects", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );

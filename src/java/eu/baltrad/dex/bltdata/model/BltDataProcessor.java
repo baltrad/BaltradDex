@@ -131,7 +131,7 @@ public class BltDataProcessor {
             h5File = ( H5File )fileFormat.createInstance( fileName, FileFormat.READ );
             h5File.open();
         } catch( Exception e ) {
-            log.error( "Exception while opening HDF5 file: " + e.getMessage() );
+            log.error( "Exception while opening HDF5 file", e );
             e.printStackTrace();
         }
         return h5File;
@@ -149,7 +149,7 @@ public class BltDataProcessor {
             res = 0;
         } catch( HDF5Exception hdf5e ) {
             res = 1;
-            log.error( "Error while closing HDF5 file: " + hdf5e.getMessage() );
+            log.error( "Error while closing HDF5 file", hdf5e );
         }
         return res;
     }
@@ -164,7 +164,7 @@ public class BltDataProcessor {
         try {
             root = ( Group )( ( DefaultMutableTreeNode )h5File.getRootNode() ).getUserObject();
         } catch( Exception e ) {
-            log.error( "Error while accessing HDF5 file's root: " + e.getMessage() );
+            log.error( "Error while accessing HDF5 file's root", e );
         }
         return root;
     }
@@ -265,8 +265,7 @@ public class BltDataProcessor {
                             }
                         }
                     } catch( Exception e ){
-                        log.error( "Get HDF5 attribute failed to get metadata: "
-                                + e.getMessage() );
+                        log.error( "Get HDF5 attribute failed to get metadata", e );
                     }
                 }
                 if( group.getMemberList().size() > 0 ) {
@@ -299,7 +298,7 @@ public class BltDataProcessor {
         try {
             buff = ( byte[] )dataset.read();
         } catch( Exception e ) {
-            log.error( "Failed to convert polar HDF5 dataset to image: " + e.getMessage() );
+            log.error( "Failed to convert polar HDF5 dataset to image", e );
         }
         // radar range is determined based on the number of bins
         int range = ( int )nbins;
@@ -451,7 +450,7 @@ public class BltDataProcessor {
             }
             br.close();
         } catch( IOException e ) {
-            log.error( "Failed to create color palette: " + e.getMessage() );
+            log.error( "Failed to create color palette", e );
         }
 	return palette;
     }
@@ -471,7 +470,7 @@ public class BltDataProcessor {
             ImageIO.write( image, "png", f );
             res = 0;
         } catch( IOException e ) {
-            log.error( "Failed to save image to file: " + e.getMessage() );
+            log.error( "Failed to save image to file", e );
             res = 1;
         }
         return res;

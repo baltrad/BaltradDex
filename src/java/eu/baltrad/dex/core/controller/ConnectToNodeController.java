@@ -38,7 +38,6 @@ import org.springframework.validation.BindException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 
 /**
@@ -142,10 +141,8 @@ public class ConnectToNodeController extends SimpleFormController {
                 nodeConn.setConnectionName( frameDispatcherController.getRemNodeName() );
                 try {
                     nodeConnectionManager.saveOrUpdate( nodeConn );
-                } catch( SQLException e ) {
-                    log.error( "Failed to save node connection: " + e.getMessage() );
                 } catch( Exception e ) {
-                    log.error( "Failed to save node connection: " + e.getMessage() );
+                    log.error( "Failed to save node connection", e );
                 }
             }
         }

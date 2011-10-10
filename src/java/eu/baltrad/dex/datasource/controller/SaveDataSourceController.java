@@ -47,7 +47,6 @@ import org.apache.log4j.Logger;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.sql.SQLException;
 
 /**
  * Allows to configure new data source or to modify an existing one.
@@ -309,15 +308,11 @@ public class SaveDataSourceController extends MultiActionController {
                     selectedUsers.add( userManager.getUserById( userIds.get( i ) ) );
                 }
                 numSelectedUsers = selectedUsers.size();
-            } catch( SQLException e ) {
-                String msg = "Failed to recover data source parameters: " + e.getMessage();
-                modelAndView.addObject( ERROR_MSG_KEY, msg );
-                log.error( msg );
             } catch( Exception e ) {
-                String msg = "Failed to recover data source parameters: " + e.getMessage();
+                String msg = "Failed to recover data source parameters";
                 modelAndView.addObject( ERROR_MSG_KEY, msg );
-                log.error( msg );
-            }
+                log.error( msg, e );
+            } 
         }
         modelAndView.setViewName( DS_SAVE_NAME_VIEW );
         return modelAndView;
@@ -568,14 +563,10 @@ public class SaveDataSourceController extends MultiActionController {
                 String msg = "Data source successfully saved: " + dataSource.getName();
                 modelAndView.addObject( OK_MSG_KEY, msg );
                 log.warn( msg );
-            } catch( SQLException e ) {
-                String msg = "Failed to save data source: " + e.getMessage();
-                modelAndView.addObject( ERROR_MSG_KEY, msg );
-                log.error( msg );
             } catch( Exception e ) {
-                String msg = "Failed to save data source: " + e.getMessage();
+                String msg = "Failed to save data source";
                 modelAndView.addObject( ERROR_MSG_KEY, msg );
-                log.error( msg );
+                log.error( msg, e );
             }
             resetModel();
             modelAndView.setViewName( DS_SAVE_VIEW );

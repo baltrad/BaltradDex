@@ -35,7 +35,6 @@ import org.springframework.beans.propertyeditors.CustomNumberEditor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 
 /**
@@ -122,19 +121,11 @@ public class SaveRegistryConfigurationController extends SimpleFormController {
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveregconf.savesuccess" ) );
             log.warn( getMessageSourceAccessor().getMessage( "message.saveregconf.savesuccess" ) );
-        } catch( SQLException e ) {
-            request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                    "message.saveregconf.savefail" ) );
-            log.error( getMessageSourceAccessor().getMessage( "message.saveregconf.savefail" ) +
-                    ": " + e.getMessage() );
-            errors.reject( "message.saveregconf.savefail" );
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveregconf.savefail" ) );
-            log.error( getMessageSourceAccessor().getMessage( "message.saveregconf.savefail" ) +
-                    ": " + e.getMessage() );
+            log.error( getMessageSourceAccessor().getMessage( "message.saveregconf.savefail" ), e );
             errors.reject( "message.saveregconf.savefail" );
         }
         return new ModelAndView( getSuccessView() );

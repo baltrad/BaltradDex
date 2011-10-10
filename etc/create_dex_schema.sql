@@ -332,7 +332,6 @@ RETURNS VOID
 AS $$
   CREATE LANGUAGE plpgsql;
 $$;
-
 SELECT
   CASE
     WHEN EXISTS (
@@ -341,9 +340,6 @@ SELECT
       NULL
     ELSE make_plpgsql()
   END;
-
-
-
 -- dex_trim_messages_by_number() -------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION dex_trim_messages_by_number() RETURNS trigger AS $$
     DECLARE

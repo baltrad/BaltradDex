@@ -25,7 +25,6 @@ import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.frame.model.BaltradFrameHandler;
 
 import junit.framework.TestCase;
-import org.apache.commons.httpclient.HttpStatus;
 
 import java.io.File;
 import java.io.FileNotFoundException;

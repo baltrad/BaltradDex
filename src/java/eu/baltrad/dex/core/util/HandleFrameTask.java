@@ -102,7 +102,7 @@ public class HandleFrameTask implements Runnable {
                         user.getName() );
             }
         } catch( FileNotFoundException e ) {
-            log.error( "Failed to complete handle frame task: " + e.getMessage() );
+            log.error( "Failed to complete handle frame task", e );
         }
     }
 }

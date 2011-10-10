@@ -60,7 +60,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.util.Streams;
 
@@ -574,7 +573,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 }
                             } catch( NullPointerException e ) {
                                 log.error( "Failed to synchronize subscribed data source: "
-                                        + subs.getDataSourceName() );
+                                        + subs.getDataSourceName(), e );
                             }
 
                             // send subscription back to requesting node
@@ -641,15 +640,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             // clean work directory from temporary files
             InitAppUtil.cleanUpTempFiles( init.getWorkDirPath() );
 
-        } catch( FileUploadException e ) {
-            log.error( "Frame dispatcher error: " + e.getMessage() );
-            e.printStackTrace();
-        } catch( IOException e ) {
-            log.error( "Frame dispatcher error: " + e.getMessage() );
-            e.printStackTrace();
         } catch( Exception e ) {
-            log.error( "Frame dispatcher error: " + e.getMessage() );
-            e.printStackTrace();
+            log.error( "Frame dispatcher error", e );
         }
     }
 
@@ -684,11 +676,11 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         try {
             fileEntry = fileCatalog.store( swapFile.getAbsolutePath() );
         } catch (DuplicateEntry e) {
-            log.error("Duplicate entry error: " + e.getMessage());
+            log.error("Duplicate entry error", e );
             // exception while storing file in FileCatalog - set error code
             return BaltradFrameHandler.HTTP_STATUS_CODE_500;
         } catch (FileCatalogError e) {
-            log.error("File catalog error: " + e.getMessage());
+            log.error("File catalog error", e );
             // exception while storing file in FileCatalog - set error code
             return BaltradFrameHandler.HTTP_STATUS_CODE_500;
         }

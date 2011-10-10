@@ -32,7 +32,6 @@ import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
@@ -109,16 +108,11 @@ public class SaveUserController extends SimpleFormController {
             String msg = "User account successfully saved: " + user.getName();
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             log.warn( msg );
-        } catch( SQLException e ) {
-            String msg = "Failed to save user account: " + e.getMessage();
-            request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
         } catch( Exception e ) {
-            String msg = "Failed to save user account: " + e.getMessage();
+            String msg = "Failed to save user account";
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
+            log.error( msg, e );
         }
         return new ModelAndView( getSuccessView() );
     }

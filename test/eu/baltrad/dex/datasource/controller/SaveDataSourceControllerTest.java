@@ -27,7 +27,6 @@ import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.radar.model.Radar;
 import eu.baltrad.dex.radar.model.RadarManager;
-import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 
 import java.sql.SQLException;

@@ -22,11 +22,13 @@
 package eu.baltrad.dex.datasource.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -42,12 +44,15 @@ public class ProductParameterManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public ProductParameterManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets all product parameters.
@@ -70,10 +75,8 @@ public class ProductParameterManager {
                 productParameters.add( productParameter );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select product parameters: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select product parameters: " + e.getMessage() );
+            log.error( "Failed to select product parameters", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -101,10 +104,8 @@ public class ProductParameterManager {
                         description );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select product parameter: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select product parameter: " + e.getMessage() );
+            log.error( "Failed to select product parameter", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -132,10 +133,8 @@ public class ProductParameterManager {
                         description );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select product parameter: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select product parameter: " + e.getMessage() );
+            log.error( "Failed to select product parameter", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -146,10 +145,9 @@ public class ProductParameterManager {
      *
      * @param productParameter Product parameter
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveOrUpdate( ProductParameter productParameter ) throws SQLException, Exception {
+    public int saveOrUpdate( ProductParameter productParameter ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -170,11 +168,8 @@ public class ProductParameterManager {
             }
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save product parameter: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save product parameter: " + e.getMessage() );
+            log.error( "Failed to save product parameter", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -186,10 +181,9 @@ public class ProductParameterManager {
      *
      * @param id Product parameter ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteProductParameter( int id ) throws SQLException, Exception {
+    public int deleteProductParameter( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -198,11 +192,8 @@ public class ProductParameterManager {
             String sql = "DELETE FROM dex_product_parameters WHERE id = " + id + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete product parameter: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete product parameter: " + e.getMessage() );
+            log.error( "Failed to delete product parameter", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -215,11 +206,9 @@ public class ProductParameterManager {
      * @param dataSourceId Data source ID
      * @param parameterId Product parameter ID
      * @return Product parameter value as string
-     * @throws SQLException
      * @throws Exception
      */
-    public String getProductParameterValue( int dataSourceId, int parameterId )
-            throws SQLException, Exception {
+    public String getProductParameterValue( int dataSourceId, int parameterId ) throws Exception {
         Connection conn = null;
         String parameterValue = null;
         try {
@@ -232,11 +221,8 @@ public class ProductParameterManager {
                 parameterValue = resultSet.getString( "parameter_value" );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select product parameter value: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to select product parameter value: " + e.getMessage() );
+            log.error( "Failed to select product parameter value", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );

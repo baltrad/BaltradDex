@@ -25,6 +25,9 @@ import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.util.JDBCConnectionManager;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
@@ -46,7 +49,6 @@ import java.util.Date;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Time;
 
 import java.io.File;
@@ -100,6 +102,8 @@ public class BltFileManager {
     private JDBCConnectionManager jdbcConnectionManager;
     /** Initialization utility */
     private InitAppUtil init;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor
@@ -107,6 +111,7 @@ public class BltFileManager {
     public BltFileManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
         this.init = InitAppUtil.getInstance();
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets filter associated with a given data source.
@@ -120,10 +125,8 @@ public class BltFileManager {
             DataSource dataSource = dataSourceManager.getDataSource( dsName );
             attributeFilter = coreFilterManager.load( dataSourceManager.getFilterId(
                 dataSource.getId() ) );
-        } catch( SQLException e ){
-            System.out.println( "getFilter(): Failed to get filter ID: " + e.getMessage() );
         } catch( Exception e ) {
-            System.out.println( "getFilter(): Failed to get filter ID: " + e.getMessage() );
+            log.error( "getFilter(): Failed to get filter ID:", e );
         }
         return attributeFilter;
     }
@@ -187,7 +190,7 @@ public class BltFileManager {
             try {
                 bltFiles.add( fileEntryToBltFile( r.entry() ) );
             } catch( ParseException e ) {
-                System.err.println( "Error while parsing file's timestamp: " + e.getMessage() );
+                log.error( "Error while parsing file's timestamp", e );
             }
         }
         // delete the result set
@@ -213,7 +216,7 @@ public class BltFileManager {
             try {
                 bltFile = fileEntryToBltFile( r.entry() );
             } catch( ParseException e ) {
-                System.err.println( "Error while parsing file's timestamp: " + e.getMessage() );
+                log.error( "Error while parsing file's timestamp", e );
             }
         }
         // delete the result set
@@ -240,10 +243,8 @@ public class BltFileManager {
                 sourceNames.add( value );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select distinct radar stations: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select distinct radar stations: " + e.getMessage() );
+            log.error( "Failed to select distinct radar stations", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -343,10 +344,8 @@ public class BltFileManager {
                 count = resultSet.getLong( 1 );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to count file entries: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to count file entries: " + e.getMessage() );
+            log.error( "Failed to count file entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -368,19 +367,8 @@ public class BltFileManager {
             BltFile bltFile = null;
             while( resultSet.next() ) {
                 String uuid = resultSet.getString( "uuid" );
-//<<<<<<< HEAD
-                //String path = FileCatalogConnector.getDataStorageDirectory() + File.separator +
-                //        uuid + H5_FILE_EXT;
-                //String thumbPath = init.getThumbsDirPath();
-//=======
-                // XXX: this is not correct. If the result is larger than the size of
-                // LocalStorage used by FileCatalog, old files might get deleted and the
-                // paths become invalid. Path to the local file should only be asked
-                // when it's actually used.
                 String path = fileCatalog.local_path_for_uuid(uuid);
-                String thumbPath = /*InitAppUtil.getThumbsStorageDirectory();*/
-                        init.getConfiguration().getThumbsDir();
-//>>>>>>> 34fc6621d01e2768d3ed7f4e729163474f1d1149
+                String thumbPath = init.getConfiguration().getThumbsDir();
                 Date storageTime = resultSet.getTimestamp( "stored_at" );
                 String type = resultSet.getString( "what_object" );
                 Date sqlDate = resultSet.getDate( "what_date" );
@@ -402,10 +390,8 @@ public class BltFileManager {
                         thumbPath );
                 bltFiles.add( bltFile );
             }
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select file entries: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select file entries: " + e.getMessage() );
+            log.error( "Failed to select file entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }

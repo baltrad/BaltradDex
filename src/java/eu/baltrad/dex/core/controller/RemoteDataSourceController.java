@@ -215,9 +215,9 @@ public class RemoteDataSourceController extends MultiActionController {
             modelAndView.addObject( DS_SUBSCRIBE_MSG_KEY, msg );
             log.warn( msg );
         } catch( Exception e ) {
-            String msg = "Failed to complete subscription request: " + e.getMessage();
+            String msg = "Failed to complete subscription request";
             modelAndView.addObject( DS_SUBSCRIBE_ERROR_KEY, msg );
-            log.error( msg );
+            log.error( msg, e );
         }
         modelAndView.setViewName( SUBSCRIBED_DATA_SOURCES_VIEW );
         return modelAndView;

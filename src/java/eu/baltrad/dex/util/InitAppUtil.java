@@ -188,7 +188,7 @@ public class InitAppUtil extends NodeAddress {
         try {
             f = File.createTempFile ( TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX, tempDir );
         } catch( IOException e ) {
-            log.error( "Error while creating temporary file: \n" + e.getMessage() );
+            log.error( "Error while creating temporary file\n", e );
         }
         return f;
     }
@@ -211,10 +211,8 @@ public class InitAppUtil extends NodeAddress {
             }
             is.close();
             fos.close();
-        } catch( FileNotFoundException e ) {
-            log.error( "Error while saving file: \n" + e.getMessage() );
-        } catch( IOException e ) {
-            log.error( "Error while saving file: \n" + e.getMessage() );
+        } catch( Exception e ) {
+            log.error( "Error while saving file\n", e );
         }
         return dstFile;
     }
@@ -236,9 +234,9 @@ public class InitAppUtil extends NodeAddress {
             is.close();
             fos.close();
         } catch( FileNotFoundException e ) {
-            log.error( "Error while saving file: \n" + e.getMessage() );
+            log.error( "Error while saving file\n", e );
         } catch( IOException e ) {
-            log.error( "Error while saving file: \n" + e.getMessage() );
+            log.error( "Error while saving file\n", e );
         }
         return dstFile;
     }
@@ -252,7 +250,7 @@ public class InitAppUtil extends NodeAddress {
             File f = new File( filePath );
             f.delete();
         } catch( Exception e ) {
-            log.error( "Error while deleting file: \n" + e.getMessage() );
+            log.error( "Error while deleting file\n", e );
         }
     }
     /**
@@ -262,7 +260,7 @@ public class InitAppUtil extends NodeAddress {
      */
     public static void deleteFile( File f ) {
         if( !f.delete() ) {
-            log.error( "Error while deleting file: \n" + f.getName() );
+            log.error( "Error while deleting file:\n" + f.getName() );
         }
     }
     /**
@@ -298,10 +296,8 @@ public class InitAppUtil extends NodeAddress {
             ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream( f ) );
             oos.writeObject( obj );
             oos.close();
-        } catch( FileNotFoundException e )  {
-            log.error( "Error while writing object to stream: " + e.getMessage() );
-        } catch( IOException e ) {
-            log.error( "Error while writing object to stream: " + e.getMessage() );
+        } catch( Exception e )  {
+            log.error( "Error while writing object to stream", e );
         }
     }
     /**
@@ -316,10 +312,8 @@ public class InitAppUtil extends NodeAddress {
             ObjectInputStream ois = new ObjectInputStream( new FileInputStream( f ) );
             obj = ois.readObject();
             ois.close();
-        } catch( ClassNotFoundException e ) {
-            log.error( "Error while reading object from stream: " + e.getMessage() );
-        } catch( IOException e ) {
-            log.error( "Error while reading object from stream: " + e.getMessage() );
+        } catch( Exception e ) {
+            log.error( "Error while reading object from stream", e );
         }
         return obj;
     }

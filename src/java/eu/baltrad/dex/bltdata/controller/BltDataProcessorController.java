@@ -93,7 +93,7 @@ public class BltDataProcessorController {
                     rangeRingsColor, rangeMaskColor );
             bltDataProcessor.saveImageToFile( bi, imageFileName );
         } catch( ArrayIndexOutOfBoundsException e ) {
-            log.error( "Failed to create image from polar dataset" );
+            log.error( "Failed to create image from polar dataset", e );
         } finally {
             bltDataProcessor.closeH5File( h5File );
         }
@@ -133,7 +133,7 @@ public class BltDataProcessorController {
                     rangeRingsColor, rangeMaskColor );
             bltDataProcessor.saveImageToFile( bi, imageFileName );
         } catch( ArrayIndexOutOfBoundsException e ) {
-            log.error( "Failed to create image from polar dataset" );
+            log.error( "Failed to create image from polar dataset", e );
         }
     }
     /**

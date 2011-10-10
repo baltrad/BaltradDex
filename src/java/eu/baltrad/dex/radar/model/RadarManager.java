@@ -22,11 +22,13 @@
 package eu.baltrad.dex.radar.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -42,12 +44,15 @@ public class RadarManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods    
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public RadarManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets all data channels.
@@ -69,10 +74,8 @@ public class RadarManager {
                 channels.add( channel );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select data channels: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select data channels: " + e.getMessage() );
+            log.error( "Failed to select data channels", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -99,10 +102,8 @@ public class RadarManager {
                 channel = new Radar( chnlId, name, wmoNumber );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select data channels: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select data channels: " + e.getMessage() );
+            log.error( "Failed to select data channels", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -129,10 +130,8 @@ public class RadarManager {
                 channel = new Radar( chnlId, name, wmoNumber );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select data channels: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select data channels: " + e.getMessage() );
+            log.error( "Failed to select data channels", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -143,10 +142,9 @@ public class RadarManager {
      *
      * @param channel Data channel
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveOrUpdate( Radar channel ) throws SQLException, Exception {
+    public int saveOrUpdate( Radar channel ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -165,11 +163,8 @@ public class RadarManager {
             }
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save data channel: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save data channel: " + e.getMessage() );
+            log.error( "Failed to save data channel", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -181,10 +176,9 @@ public class RadarManager {
      *
      * @param id Channel ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteChannel( int id ) throws SQLException, Exception {
+    public int deleteChannel( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -193,11 +187,8 @@ public class RadarManager {
             String sql = "DELETE FROM dex_radars WHERE id = " + id + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete data channel: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete data channel: " + e.getMessage() );
+            log.error( "Failed to delete data channel", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );

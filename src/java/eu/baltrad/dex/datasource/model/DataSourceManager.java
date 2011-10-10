@@ -22,11 +22,13 @@
 package eu.baltrad.dex.datasource.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -42,12 +44,15 @@ public class DataSourceManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public DataSourceManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets all data sources.
@@ -69,10 +74,8 @@ public class DataSourceManager {
                 dataSources.add( dataSource );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select data sources: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select data sources: " + e.getMessage() );
+            log.error( "Failed to select data sources", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -83,8 +86,9 @@ public class DataSourceManager {
      *
      * @param id Data source ID
      * @return Data source with a given ID
+     * @throws Exception
      */
-    public DataSource getDataSource( int id ) throws SQLException, Exception {
+    public DataSource getDataSource( int id ) throws Exception {
         Connection conn = null;
         DataSource dataSource = null;
         try {
@@ -99,11 +103,8 @@ public class DataSourceManager {
                 dataSource = new DataSource( dataSourceId, identifier, description );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select data source: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to select data source: " + e.getMessage() );
+            log.error( "Failed to select data source", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -115,8 +116,9 @@ public class DataSourceManager {
      *
      * @param identifier Data source identifier
      * @return Data source matching a given identifier
+     * @throws Exception
      */
-    public DataSource getDataSource( String identifier ) throws SQLException, Exception {
+    public DataSource getDataSource( String identifier ) throws Exception {
         Connection conn = null;
         DataSource dataSource = null;
         try {
@@ -131,11 +133,8 @@ public class DataSourceManager {
                 dataSource = new DataSource( dataSourceId, dsIdentifier, description );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select data source: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to select data source: " + e.getMessage() );
+            log.error( "Failed to select data source", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -147,10 +146,9 @@ public class DataSourceManager {
      *
      * @param dataSource Data source
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveOrUpdate( DataSource dataSource ) throws SQLException, Exception {
+    public int saveOrUpdate( DataSource dataSource ) throws Exception {
         Connection conn = null;
         long count = 0;
         int update = 0;
@@ -175,11 +173,8 @@ public class DataSourceManager {
             }
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save data source: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save data source: " + e.getMessage() );
+            log.error( "Failed to save data source", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -191,10 +186,9 @@ public class DataSourceManager {
      *
      * @param id Data source ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteDataSource( int id ) throws SQLException, Exception {
+    public int deleteDataSource( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -203,11 +197,8 @@ public class DataSourceManager {
             String sql = "DELETE FROM dex_data_sources WHERE id = " + id + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete data source: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete data source: " + e.getMessage() );
+            log.error( "Failed to delete data source", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -220,10 +211,9 @@ public class DataSourceManager {
      * @param dataSourceId Data source ID
      * @param radarId Radar station ID
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveRadar( int dataSourceId, int radarId ) throws SQLException, Exception {
+    public int saveRadar( int dataSourceId, int radarId ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -234,11 +224,8 @@ public class DataSourceManager {
                     + dataSourceId + ", " + radarId + ");";
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save data source radar parameter: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save data source radar parameter: " + e.getMessage() );
+            log.error( "Failed to save data source radar parameter", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -250,10 +237,9 @@ public class DataSourceManager {
      * 
      * @param dataSourceId Data source ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteRadars( int dataSourceId ) throws SQLException, Exception {
+    public int deleteRadars( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -263,13 +249,8 @@ public class DataSourceManager {
                     dataSourceId + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete radars for a given data source ID: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete radars for a given data source ID: " +
-                    e.getMessage() );
+            log.error( "Failed to delete radars for a given data source ID", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -281,10 +262,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return Radar IDs for a given data source
-     * @throws SQLException
      * @throws Exception
      */
-    public List<Integer> getRadarIds( int dataSourceId ) throws SQLException, Exception {
+    public List<Integer> getRadarIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> radarIds = new ArrayList<Integer>();
         try {
@@ -296,13 +276,8 @@ public class DataSourceManager {
                 radarIds.add( resultSet.getInt( "radar_id" ) );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select radar IDs for a given data source: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to select radar IDs for a given data source: " +
-                    e.getMessage() );
+            log.error( "Failed to select radar IDs for a given data source", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -315,10 +290,9 @@ public class DataSourceManager {
      * @param dataSourceId Data source ID
      * @param fileObjectId File object ID
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveFileObject( int dataSourceId, int fileObjectId ) throws SQLException, Exception {
+    public int saveFileObject( int dataSourceId, int fileObjectId ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -329,13 +303,8 @@ public class DataSourceManager {
                     "VALUES ( " + dataSourceId + ", " + fileObjectId + ");";
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save data source file object parameter: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save data source file object parameter: " +
-                    e.getMessage() );
+            log.error( "Failed to save data source file object parameter", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -347,10 +316,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteFileObjects( int dataSourceId ) throws SQLException, Exception {
+    public int deleteFileObjects( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -360,13 +328,8 @@ public class DataSourceManager {
                     dataSourceId + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete file objects for a given data source ID: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete file objects for a given data source ID: " +
-                    e.getMessage() );
+            log.error( "Failed to delete file objects for a given data source ID", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -378,10 +341,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return File object IDs for a given data source
-     * @throws SQLException
      * @throws Exception
      */
-    public List<Integer> getFileObjectIds( int dataSourceId ) throws SQLException, Exception {
+    public List<Integer> getFileObjectIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> fileObjectIds = new ArrayList<Integer>();
         try {
@@ -393,13 +355,8 @@ public class DataSourceManager {
                 fileObjectIds.add( resultSet.getInt( "file_object_id" ) );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select file object IDs for a given data source: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to select file object IDs for a given data source: " +
-                    e.getMessage() );
+            log.error( "Failed to select file object IDs for a given data source", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -412,11 +369,9 @@ public class DataSourceManager {
      * @param dataSourceId Data source ID
      * @param dataQuantityId Quantity ID
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveDataQuantity( int dataSourceId, int dataQuantityId ) throws SQLException,
-            Exception {
+    public int saveDataQuantity( int dataSourceId, int dataQuantityId ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -427,13 +382,8 @@ public class DataSourceManager {
                     "VALUES ( " + dataSourceId + ", " + dataQuantityId + ");";
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save data source quantity parameter: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save data source quantity parameter: " +
-                    e.getMessage() );
+            log.error( "Failed to save data source quantity parameter", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -445,10 +395,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteDataQuantities( int dataSourceId ) throws SQLException, Exception {
+    public int deleteDataQuantities( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -458,13 +407,8 @@ public class DataSourceManager {
                     dataSourceId + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete quantities for a given data source ID: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete quantities for a given data source ID: " +
-                    e.getMessage() );
+            log.error( "Failed to delete quantities for a given data source ID", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -476,10 +420,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return Data quantity IDs for a given data source
-     * @throws SQLException
      * @throws Exception
      */
-    public List<Integer> getDataQuantityIds( int dataSourceId ) throws SQLException, Exception {
+    public List<Integer> getDataQuantityIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> dataQuantityIds = new ArrayList<Integer>();
         try {
@@ -491,13 +434,8 @@ public class DataSourceManager {
                 dataQuantityIds.add( resultSet.getInt( "data_quantity_id" ) );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select data quantity IDs for a given data source: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to select data quantity IDs for a given data source: " +
-                    e.getMessage() );
+            log.error( "Failed to select data quantity IDs for a given data source", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -510,10 +448,9 @@ public class DataSourceManager {
      * @param dataSourceId Data source ID
      * @param productId Product ID
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveProduct( int dataSourceId, int productId ) throws SQLException, Exception {
+    public int saveProduct( int dataSourceId, int productId ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -524,13 +461,8 @@ public class DataSourceManager {
                     "VALUES ( " + dataSourceId + ", " + productId + ");";
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save data source product parameter: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save data source product parameter: " +
-                    e.getMessage() );
+            log.error( "Failed to save data source product parameter", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -542,10 +474,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteProducts( int dataSourceId ) throws SQLException, Exception {
+    public int deleteProducts( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -555,13 +486,8 @@ public class DataSourceManager {
                     dataSourceId + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete products for a given data source ID: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete products for a given data source ID: " +
-                    e.getMessage() );
+            log.error( "Failed to delete products for a given data source ID", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -573,10 +499,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return Product IDs for a given data source
-     * @throws SQLException
      * @throws Exception
      */
-    public List<Integer> getProductIds( int dataSourceId ) throws SQLException, Exception {
+    public List<Integer> getProductIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> productIds = new ArrayList<Integer>();
         try {
@@ -588,13 +513,8 @@ public class DataSourceManager {
                 productIds.add( resultSet.getInt( "product_id" ) );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select product IDs for a given data source: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to select product IDs for a given data source: " +
-                    e.getMessage() );
+            log.error( "Failed to select product IDs for a given data source" + e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -608,11 +528,10 @@ public class DataSourceManager {
      * @param parameterId Parameter ID
      * @param parameterValue Parameter value
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
     public int saveProductParameter( int dataSourceId, int parameterId, String parameterValue ) 
-            throws SQLException, Exception {
+            throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -624,13 +543,8 @@ public class DataSourceManager {
                     parameterId + ", '" + parameterValue + "');";
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save data source product parameter: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save data source product parameter: " +
-                    e.getMessage() );
+            log.error( "Failed to save data source product parameter", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -642,10 +556,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteProductParameters( int dataSourceId ) throws SQLException, Exception {
+    public int deleteProductParameters( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -655,13 +568,9 @@ public class DataSourceManager {
                     "data_source_id = " + dataSourceId + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete products parameter values for a given " +
-                    " data source ID: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete products parameter values for a given " +
-                    " data source ID: " + e.getMessage() );
+            log.error( "Failed to delete products parameter values for a given data source ID",
+                    e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -673,10 +582,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return Product parameter IDs for a given data source
-     * @throws SQLException
      * @throws Exception
      */
-    public List<Integer> getProductParameterIds( int dataSourceId ) throws SQLException, Exception {
+    public List<Integer> getProductParameterIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> productParameterIds = new ArrayList<Integer>();
         try {
@@ -689,13 +597,8 @@ public class DataSourceManager {
                 productParameterIds.add( resultSet.getInt( "parameter_id" ) );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select product parameter IDs for a given data source: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to select product parameter IDs for a given data source: " +
-                    e.getMessage() );
+            log.error( "Failed to select product parameter IDs for a given data source", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -708,10 +611,9 @@ public class DataSourceManager {
      * @param dataSourceId Data source ID
      * @param userId User ID
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveUser( int dataSourceId, int userId ) throws SQLException, Exception {
+    public int saveUser( int dataSourceId, int userId ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -722,11 +624,8 @@ public class DataSourceManager {
                     "VALUES ( " + dataSourceId + ", " + userId + ");";
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save data source user: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save data source user: " + e.getMessage() );
+            log.error( "Failed to save data source user", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -738,10 +637,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteUsers( int dataSourceId ) throws SQLException, Exception {
+    public int deleteUsers( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -751,13 +649,8 @@ public class DataSourceManager {
                     dataSourceId + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete data source users for a given data source ID: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete data source users for a given data source ID: " +
-                    e.getMessage() );
+            log.error( "Failed to delete data source users for a given data source ID", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -769,10 +662,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return User IDs for a given data source
-     * @throws SQLException
      * @throws Exception
      */
-    public List<Integer> getUserIds( int dataSourceId ) throws SQLException, Exception {
+    public List<Integer> getUserIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> userIds = new ArrayList<Integer>();
         try {
@@ -784,13 +676,8 @@ public class DataSourceManager {
                 userIds.add( resultSet.getInt( "user_id" ) );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select user IDs for a given data source: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to select user IDs for a given data source: " +
-                    e.getMessage() );
+            log.error( "Failed to select user IDs for a given data source" + e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -802,10 +689,9 @@ public class DataSourceManager {
      *
      * @param userId User ID
      * @return Data source IDs for a given user
-     * @throws SQLException
      * @throws Exception
      */
-    public List<Integer> getDataSourceIds( int userId ) throws SQLException, Exception {
+    public List<Integer> getDataSourceIds( int userId ) throws Exception {
         Connection conn = null;
         List<Integer> dataSourceIds = new ArrayList<Integer>();
         try {
@@ -817,13 +703,8 @@ public class DataSourceManager {
                 dataSourceIds.add( resultSet.getInt( "data_source_id" ) );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select data source IDs for a given user: " +
-                    e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to select data source IDs for a given user: " +
-                    e.getMessage() );
+            log.error( "Failed to select data source IDs for a given user", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -836,10 +717,9 @@ public class DataSourceManager {
      * @param dataSourceId Data source ID
      * @param filterId Filter ID
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveFilter( int dataSourceId, int filterId ) throws SQLException, Exception {
+    public int saveFilter( int dataSourceId, int filterId ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -850,11 +730,8 @@ public class DataSourceManager {
                     "VALUES ( " + dataSourceId + ", " + filterId + ");";
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save data source filter: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save data source filter: " + e.getMessage() );
+            log.error( "Failed to save data source filter", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -866,10 +743,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return Filter ID
-     * @throws SQLException
      * @throws Exception
      */
-    public int getFilterId( int dataSourceId ) throws SQLException, Exception {
+    public int getFilterId( int dataSourceId ) throws Exception {
         Connection conn = null;
         int filterId = 0;
         try {
@@ -881,10 +757,8 @@ public class DataSourceManager {
                 filterId = resultSet.getInt( "filter_id" );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select filter ID: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select filter ID: " + e.getMessage() );
+            log.error( "Failed to select filter ID", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -895,10 +769,9 @@ public class DataSourceManager {
      *
      * @param dataSourceId Data source ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteFilters( int dataSourceId ) throws SQLException, Exception {
+    public int deleteFilters( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -908,13 +781,8 @@ public class DataSourceManager {
                     dataSourceId + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete data source filters for a given data source ID: "
-                    + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete data source filters for a given data source ID: "
-                    + e.getMessage() );
+            log.error( "Failed to delete data source filters for a given data source ID", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );

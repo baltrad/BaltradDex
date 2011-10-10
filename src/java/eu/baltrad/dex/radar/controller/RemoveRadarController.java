@@ -33,7 +33,6 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -123,16 +122,11 @@ public class RemoveRadarController extends MultiActionController {
             }
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeradar.removesuccess" ) );
-        } catch( SQLException e ) {
-            request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                    "message.removeradar.removefail" ) );
-            log.warn( "Failed to remove local radar station: " + e.getMessage() );
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.removeradar.removefail" ) );
-            log.warn( "Failed to remove local radar station: " + e.getMessage() );
+            log.warn( "Failed to remove local radar station", e );
         }
         return new ModelAndView( REMOVED_CHANNELS_VIEW );
     }

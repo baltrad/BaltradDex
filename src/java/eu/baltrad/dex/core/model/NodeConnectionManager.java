@@ -22,11 +22,13 @@
 package eu.baltrad.dex.core.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -42,12 +44,15 @@ public class NodeConnectionManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public NodeConnectionManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets all existing node connections.
@@ -79,10 +84,8 @@ public class NodeConnectionManager {
                 nodeConnections.add( nodeConn );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select node connections: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select node connections: " + e.getMessage() );
+            log.error( "Failed to select node connections", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -118,10 +121,8 @@ public class NodeConnectionManager {
                         appCtx, entryAddress, userName, passwd );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select node connections: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select node connections: " + e.getMessage() );
+            log.error( "Failed to select node connections", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -157,10 +158,8 @@ public class NodeConnectionManager {
                         appCtx, entryAddress, userName, passwd );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select node connections: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select node connections: " + e.getMessage() );
+            log.error( "Failed to select node connections", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -171,10 +170,9 @@ public class NodeConnectionManager {
      *
      * @param nodeConn Node connection
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveOrUpdate( NodeConnection nodeConn ) throws SQLException, Exception {
+    public int saveOrUpdate( NodeConnection nodeConn ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -223,11 +221,8 @@ public class NodeConnectionManager {
                 update = stmt.executeUpdate( sql );
                 stmt.close();
             }
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save node connection: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save node connection: " + e.getMessage() );
+            log.error( "Failed to save node connection", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -239,10 +234,9 @@ public class NodeConnectionManager {
      *
      * @param id Node connection ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteConnection( int id ) throws SQLException, Exception {
+    public int deleteConnection( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -251,11 +245,8 @@ public class NodeConnectionManager {
             String sql = "DELETE FROM dex_node_connections WHERE id = " + id + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete node connection: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete node connection: " + e.getMessage() );
+            log.error( "Failed to delete node connection", e);
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -266,8 +257,9 @@ public class NodeConnectionManager {
      * Deletes all node connections.
      *
      * @return Number of deleted entries
+     * @throws Exception
      */
-    public int deleteConnections() {
+    public int deleteConnections() throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -276,10 +268,9 @@ public class NodeConnectionManager {
             String sql = "DELETE FROM dex_node_connections;";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete node connections: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to delete node connections: " + e.getMessage() );
+            log.error( "Failed to delete node connections", e );
+            throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }

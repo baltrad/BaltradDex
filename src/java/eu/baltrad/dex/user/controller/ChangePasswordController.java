@@ -33,7 +33,6 @@ import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
 
-import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
 /**
@@ -96,16 +95,11 @@ public class ChangePasswordController extends SimpleFormController {
             String msg = "Password successfully changed for user " + user.getName();
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             log.warn( msg );
-        } catch( SQLException e ) {
-            String msg = "Failed change password for user " + user.getName() + ": " + e.getMessage();
-            request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
         } catch( Exception e ) {
-            String msg = "Failed change password for user " + user.getName() + ": " + e.getMessage();
+            String msg = "Failed change password for user " + user.getName();
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
+            log.error( msg, e );
         }
         return new ModelAndView( getSuccessView() );
     }

@@ -23,10 +23,11 @@ package eu.baltrad.dex.log.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
 
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import java.util.List;
@@ -52,12 +53,15 @@ public class LogManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager and Log4j Logger.
      */
     public LogManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Adds log entry to the system log stored in the database
@@ -74,10 +78,8 @@ public class LogManager {
                 "', '" + entry.getMessage() + "');";
             stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to add log entry: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to add log entry: " + e.getMessage() );
+            log.error( "Failed to add log entry", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -98,10 +100,8 @@ public class LogManager {
                 count = resultSet.getLong( 1 );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to determine number of entries: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to determine number of entries: " + e.getMessage() );
+            log.error( "Failed to determine number of entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -129,10 +129,8 @@ public class LogManager {
                 entries.add( entry );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select log entries: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select log entries: " + e.getMessage() );
+            log.error( "Failed to select log entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -161,10 +159,8 @@ public class LogManager {
                 entries.add( entry );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select log entries: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select log entries: " + e.getMessage() );
+            log.error( "Failed to select log entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -194,10 +190,8 @@ public class LogManager {
                 entries.add( entry );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select log entries: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select log entries: " + e.getMessage() );
+            log.error( "Failed to select log entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -208,7 +202,7 @@ public class LogManager {
      *
      * @return Number of deleted entries
      */
-    public int deleteEntries() throws SQLException, Exception {
+    public int deleteEntries() {
         Connection conn = null;
         int delete = 0;
         try {
@@ -217,12 +211,8 @@ public class LogManager {
             String sql = "DELETE FROM dex_messages;";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete log entries: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete log entries: " + e.getMessage() );
-            throw e;
+            log.error( "Failed to delete log entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -234,10 +224,9 @@ public class LogManager {
      * 
      * @param recordLimit Trimmer function is activated if records number given by this parameter
      * is exceeded
-     * @throws SQLException
      * @throws Exception
      */
-    public void setTrimmer( int recordLimit ) throws SQLException, Exception {
+    public void setTrimmer( int recordLimit ) throws Exception {
         Connection conn = null;
         try {
             conn = jdbcConnectionManager.getConnection();
@@ -248,11 +237,8 @@ public class LogManager {
                 recordLimit + ");";
             stmt.execute( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to set message log trimmer: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to set message log trimmer: " + e.getMessage() );
+            log.error( "Failed to set message log trimmer", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -265,11 +251,10 @@ public class LogManager {
      * @param maxAgeDays Age limit - number of days
      * @param maxAgeHours Age limit - number of hours
      * @param maxAgeMinutes Age limit - number of minutes
-     * @throws SQLException
      * @throws Exception
      */
     public void setTrimmer( int maxAgeDays, int maxAgeHours, int maxAgeMinutes )
-            throws SQLException, Exception {
+            throws Exception {
         Connection conn = null;
         try {
             conn = jdbcConnectionManager.getConnection();
@@ -280,11 +265,8 @@ public class LogManager {
                 maxAgeHours + ", " + maxAgeMinutes + ");";
             stmt.execute( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to set message log trimmer: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to set message log trimmer: " + e.getMessage() );
+            log.error( "Failed to set message log trimmer", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -294,10 +276,9 @@ public class LogManager {
      * Removes trigger on message table.
      *
      * @param triggerName Name of the trigger
-     * @throws SQLException
      * @throws Exception
      */
-    public void removeTrimmer( String triggerName ) throws SQLException, Exception {
+    public void removeTrimmer( String triggerName ) throws Exception {
         Connection conn = null;
         try {
             conn = jdbcConnectionManager.getConnection();
@@ -305,11 +286,8 @@ public class LogManager {
             String sql = "DROP TRIGGER IF EXISTS " + triggerName + " ON dex_messages;";
             stmt.execute( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to remove message log trimmer: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to remove message log trimmer: " + e.getMessage() );
+            log.error( "Failed to remove message log trimmer", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );

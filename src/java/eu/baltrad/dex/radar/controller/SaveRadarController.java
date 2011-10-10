@@ -34,8 +34,6 @@ import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.validation.BindException;
 
-import java.sql.SQLException;
-
 /**
  * Controller class registers new channel in the system or modifies existing data channel.
  *
@@ -96,18 +94,11 @@ public class SaveRadarController extends SimpleFormController {
             String msg = "Local radar station successfully saved: " + channel.getChannelName();
             request.setAttribute( OK_MSG_KEY, msg  );
             log.warn( msg );
-        } catch( SQLException e ) {
-            request.removeAttribute( OK_MSG_KEY );
-            String msg = "Failed to save local radar station " + channel.getChannelName() + ": "
-                    + e.getMessage();
-            request.setAttribute( ERROR_MSG_KEY, msg  );
-            log.error( msg );
         } catch( Exception e ) {
             request.removeAttribute( OK_MSG_KEY );
-            String msg = "Failed to save local radar station " + channel.getChannelName() + ": "
-                    + e.getMessage();
-            request.setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
+            String msg = "Failed to save local radar station " + channel.getChannelName();
+            request.setAttribute( ERROR_MSG_KEY, msg  );
+            log.error( msg, e );
         }
         return new ModelAndView( getSuccessView() );
     }

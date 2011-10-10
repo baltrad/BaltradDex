@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -121,14 +120,10 @@ public class NodeConnectionController extends MultiActionController {
             String msg = "Selected node connections successfully removed";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             log.warn( msg );
-        } catch( SQLException e ) {
-            String msg = "Failed to remove selected node connections:" + e.getMessage();
-            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
         } catch( Exception e ) {
-            String msg = "Failed to remove selected node connections:" + e.getMessage();
+            String msg = "Failed to remove selected node connections";
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
+            log.error( msg, e );
         }
         return new ModelAndView( SHOW_REM_CONN_VIEW );
     }

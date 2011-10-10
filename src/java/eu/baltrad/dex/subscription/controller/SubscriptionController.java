@@ -38,7 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import java.sql.SQLException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -134,7 +133,7 @@ public class SubscriptionController extends MultiActionController {
                 frameDispatcherController.setBfHandler( bfHandler );
                 frameDispatcherController.doPost( request, response, baltradFrame );
             } catch( FileNotFoundException e ) {
-                log.error( "Failed to collect subscription information: " + e.getMessage() );
+                log.error( "Failed to collect subscription information", e );
             }
             if( frameDispatcherController.getSynkronizedSubscription() != null ) {
                 // check if current subscription matches sunchronized subscription
@@ -262,9 +261,8 @@ public class SubscriptionController extends MultiActionController {
             } catch( Exception e ) {
                 log.error( "Error while processing subscription change request for " +
                     getChangedSubscriptions().get( i ).getOperatorName() + ", channel " +
-                    getChangedSubscriptions().get( i ).getDataSourceName() + ": " +
-                    e.getMessage() );
-                String msg = "Failed to complete subscription request: " + e.getMessage();
+                    getChangedSubscriptions().get( i ).getDataSourceName(), e );
+                String msg = "Failed to complete subscription request";
                 modelAndView.addObject( ERROR_MSG_KEY, msg );
             }
         }
@@ -301,7 +299,7 @@ public class SubscriptionController extends MultiActionController {
             try {
                 response.sendRedirect( REDIRECT_VIEW );
             } catch( IOException e ) {
-                log.error( "Error while redirecting to " + REDIRECT_VIEW + ": " + e.getMessage() );
+                log.error( "Error while redirecting to " + REDIRECT_VIEW, e );
             }
         } else {
             // determines whether user has selected an active subscription
@@ -321,8 +319,7 @@ public class SubscriptionController extends MultiActionController {
                         "error.removesubscription.active" ) );
                     response.sendRedirect( REDIRECT_VIEW );
                 } catch( IOException e ) {
-                    log.error( "Error while redirecting to " + REDIRECT_VIEW + ": " +
-                            e.getMessage() );
+                    log.error( "Error while redirecting to " + REDIRECT_VIEW, e );
                 }
             } else {
                 List< Subscription > currentSubs = new ArrayList< Subscription >();
@@ -361,14 +358,10 @@ public class SubscriptionController extends MultiActionController {
             String msg = "Selected subscriptions successfully removed";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             log.warn( msg );
-        } catch( SQLException e ) {
-            String msg = "Failed to remove selected subscriptions: " + e.getMessage();
-            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
         } catch( Exception e ) {
-            String msg = "Failed to remove selected subscriptions: " + e.getMessage();
+            String msg = "Failed to remove selected subscriptions";
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
+            log.error( msg, e );
         }
         modelAndView.setViewName( SUBSCRIPTION_REMOVAL_STATUS_VIEW );
         return modelAndView;
@@ -404,8 +397,7 @@ public class SubscriptionController extends MultiActionController {
             try {
                 response.sendRedirect( SHOW_PEERS_SUBSCRIPTIONS_VIEW + ".htm" );
             } catch( IOException e ) {
-                log.error( "Error while redirecting to " + SHOW_PEERS_SUBSCRIPTIONS_VIEW + ": " +
-                    e.getMessage() );
+                log.error( "Error while redirecting to " + SHOW_PEERS_SUBSCRIPTIONS_VIEW, e );
             }
         } else {
             List< Subscription > currentSubs = new ArrayList< Subscription >();
@@ -443,14 +435,10 @@ public class SubscriptionController extends MultiActionController {
             String msg = "Selected peer subscriptions successfully removed";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             log.warn( msg );
-        } catch( SQLException e ) {
-            String msg = "Failed to remove selected peer subscriptions: " + e.getMessage();
-            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
         } catch( Exception e ) {
-            String msg = "Failed to remove selected peer subscriptions: " + e.getMessage();
+            String msg = "Failed to remove selected peer subscriptions";
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
+            log.error( msg, e );
         }
         modelAndView.setViewName( SHOW_REMOVED_PEERS_SUBSCRIPTIONS_VIEW );
         return modelAndView;

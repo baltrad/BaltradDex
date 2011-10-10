@@ -32,7 +32,6 @@ import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -135,16 +134,11 @@ public class RemoveUserController extends MultiActionController {
                 userName = user.getName();
                 userManager.deleteUser( Integer.parseInt( userIds[ i ] ) );
                 log.warn( "User account removed from the system: " + userName );
-            } catch( SQLException e ) {
-                String msg = "Failed to remove user account: " + e.getMessage();
-                request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-                log.error( msg );
             } catch( Exception e ) {
-                String msg = "Failed to remove user account: " + e.getMessage();
+                String msg = "Failed to remove user account";
                 request.getSession().removeAttribute( OK_MSG_KEY );
                 request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-                log.error( msg );
+                log.error( msg, e );
             }
         }
         String msg = "Selected user account successfully removed.";

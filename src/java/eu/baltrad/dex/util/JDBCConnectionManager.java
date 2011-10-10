@@ -21,13 +21,16 @@
 
 package eu.baltrad.dex.util;
 
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
+
 import java.util.Properties;
 import java.util.Vector;
 import java.io.InputStream;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 
@@ -70,6 +73,8 @@ public class JDBCConnectionManager {
     private static Vector<Connection> connectionPool;
     /** Reference to the object of this class */
     private static JDBCConnectionManager jdbcConnectionManager;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Initializes object of this class in case it is null, otherwise returns existing object.
@@ -92,6 +97,7 @@ public class JDBCConnectionManager {
      * Reads properties from stream, loads driver and initializes connection pool.
      */
     private void init() {
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
         try {
             InputStream is = this.getClass().getResourceAsStream( PROPS_FILE_NAME );
             Properties props = new Properties();
@@ -108,13 +114,12 @@ public class JDBCConnectionManager {
                      // Initialize connection pool
                     connectionPool = new Vector<Connection>();
                     initializeConnectionPool();
-
                 } catch( ClassNotFoundException e ) {
-                    System.out.println( "Failed to load JDBC driver: " + e.getMessage() );
+                    log.error( "Failed to load JDBC driver", e );
                 }
             }
         } catch( Exception e ) {
-            System.out.println( "Failed to initialize JDBC connector: " + e.getMessage() );
+            log.error( "Failed to initialize JDBC connector", e );
         }
     }
     /**
@@ -146,8 +151,8 @@ public class JDBCConnectionManager {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection( dbUri, userName, passwd );
-        } catch( SQLException e ) {
-            System.out.println( "Failed to establish JDBC connection: " + e.getMessage() );
+        } catch( Exception e ) {
+            log.error( "Failed to establish JDBC connection", e );
         }
         return conn;
     }
@@ -203,8 +208,8 @@ public class JDBCConnectionManager {
                 Connection c = connectionPool.get( i );
                 try {
                     c.close();
-                } catch( SQLException e ) {
-                    System.out.println( "Failed to close invalid connection: " + e.getMessage() );
+                } catch( Exception e ) {
+                    log.error( "Failed to close invalid connection", e );
                 }
             }
         }

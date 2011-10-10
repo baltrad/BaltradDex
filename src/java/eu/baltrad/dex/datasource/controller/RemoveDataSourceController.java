@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.sql.SQLException;
 
 /**
  * Allows to select and remove existing data source.
@@ -110,14 +109,10 @@ public class RemoveDataSourceController extends MultiActionController {
                     try {
                         dataSources.add( dataSourceManager.getDataSource(
                                 Integer.parseInt( parameterValues[ i ] ) ) );
-                    } catch( SQLException e ) {
-                        String msg = "Failed to fetch data sources: " + e.getMessage();
-                        modelAndView.addObject( DS_REMOVE_ERROR_KEY, msg );
-                        log.error( msg );
                     } catch( Exception e ) {
-                        String msg = "Failed to fetch data sources: " + e.getMessage();
+                        String msg = "Failed to fetch data sources";
                         modelAndView.addObject( DS_REMOVE_ERROR_KEY, msg );
-                        log.error( msg );
+                        log.error( msg, e );
                     }
                 }
                 modelAndView = new ModelAndView( DS_TO_REMOVE_VIEW, DS_SELECT_REMOVE_KEY,
@@ -157,12 +152,9 @@ public class RemoveDataSourceController extends MultiActionController {
                                 parameterValues[ i ] ) );
                         String msg = "Data source successfully removed: " + dataSourceName;
                         log.warn( msg );
-                    } catch( SQLException e ) {
-                        modelAndView.addObject( DS_REMOVE_ERROR_KEY, "SQL exception" );
-                        log.error( "Failed to remove data source: SQL Exception " + e.getMessage() );
                     } catch( Exception e ) {
-                        modelAndView.addObject( DS_REMOVE_ERROR_KEY, "Exception" );
-                        log.error( "Failed to remove data source: Exception " + e.getMessage() );
+                        modelAndView.addObject( DS_REMOVE_ERROR_KEY, "SQL exception" );
+                        log.error( "Failed to remove data source", e );
                     }
                 }
                 String msg = "Selected data sources have been removed.";

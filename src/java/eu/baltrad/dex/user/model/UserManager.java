@@ -23,11 +23,13 @@ package eu.baltrad.dex.user.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.dex.util.MessageDigestUtil;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -43,12 +45,15 @@ public class UserManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public UserManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets user with a given ID.
@@ -90,10 +95,8 @@ public class UserManager {
                         entryAddress );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select user: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select user: " + e.getMessage() );
+            log.error( "Failed to select user", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -139,10 +142,8 @@ public class UserManager {
                         entryAddress );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select user: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select user: " + e.getMessage() );
+            log.error( "Failed to select user", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -188,10 +189,8 @@ public class UserManager {
                         entryAddress );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select user: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select user: " + e.getMessage() );
+            log.error( "Failed to select user", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -236,10 +235,8 @@ public class UserManager {
                 allUsers.add( user );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select users: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select users: " + e.getMessage() );
+            log.error( "Failed to select users", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -264,10 +261,8 @@ public class UserManager {
                 roles.add( role );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select user role: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select user role: " + e.getMessage() );
+            log.error( "Failed to select user role", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -278,10 +273,9 @@ public class UserManager {
      *
      * @param user User account
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveOrUpdate( User user ) throws SQLException, Exception {
+    public int saveOrUpdate( User user ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -338,11 +332,8 @@ public class UserManager {
                 update = stmt.executeUpdate( sql );
                 stmt.close();
             }
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save user account: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save user account: " + e.getMessage() );
+            log.error( "Failed to save user account", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -354,10 +345,9 @@ public class UserManager {
      *
      * @param id User account ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteUser( int id ) throws SQLException, Exception {
+    public int deleteUser( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -366,11 +356,8 @@ public class UserManager {
             String sql = "DELETE FROM dex_users WHERE id = " + id + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete user account: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete user account: " + e.getMessage() );
+            log.error( "Failed to delete user account", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );

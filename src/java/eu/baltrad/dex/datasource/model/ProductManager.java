@@ -22,11 +22,13 @@
 package eu.baltrad.dex.datasource.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -42,12 +44,15 @@ public class ProductManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public ProductManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets all products.
@@ -69,10 +74,8 @@ public class ProductManager {
                 products.add( product );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select products: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select products: " + e.getMessage() );
+            log.error( "Failed to select products", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -99,10 +102,8 @@ public class ProductManager {
                 product = new Product( productId, identifier, description );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select product: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select product: " + e.getMessage() );
+            log.error( "Failed to select product", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -129,10 +130,8 @@ public class ProductManager {
                 product = new Product( productId, pIdentifier, description );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select product: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select product: " + e.getMessage() );
+            log.error( "Failed to select product", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -143,10 +142,9 @@ public class ProductManager {
      *
      * @param product Product
      * @return Number of saved or updated records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveOrUpdate( Product product ) throws SQLException, Exception {
+    public int saveOrUpdate( Product product ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -165,11 +163,8 @@ public class ProductManager {
             }
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save product: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save product: " + e.getMessage() );
+            log.error( "Failed to save product", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -181,10 +176,9 @@ public class ProductManager {
      *
      * @param id Product ID
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteProduct( int id ) throws SQLException, Exception {
+    public int deleteProduct( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -193,11 +187,8 @@ public class ProductManager {
             String sql = "DELETE FROM dex_products WHERE id = " + id + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete product: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete product: " + e.getMessage() );
+            log.error( "Failed to delete product", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );

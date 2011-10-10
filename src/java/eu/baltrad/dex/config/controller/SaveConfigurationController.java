@@ -124,7 +124,7 @@ public class SaveConfigurationController extends SimpleFormController {
                 timeZones.add( strLine );
             }
         } catch( IOException e ) {
-            log.error( "Failed to load time zones configuration file: " + e.getMessage() );
+            log.error( "Failed to load time zones configuration file", e );
         }
         model.put( NODE_TYPES, nodeTypes );
         model.put( TIME_ZONES, timeZones );
@@ -148,19 +148,11 @@ public class SaveConfigurationController extends SimpleFormController {
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveconf.savesuccess" ) );
             log.warn( getMessageSourceAccessor().getMessage( "message.saveconf.savesuccess" ) );
-        } catch( IOException e ) {
-            request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                    "message.saveconf.savefail" ) );
-            log.error( getMessageSourceAccessor().getMessage( "message.saveconf.savefail" ) + ": " +
-                e.getMessage() );
-            errors.reject( "message.saveconf.savefail" );
         } catch( Exception e ) {
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveconf.savefail" ) );
-            log.error( getMessageSourceAccessor().getMessage( "message.saveconf.savefail" ) + ": " +
-                e.getMessage() );
+            log.error( getMessageSourceAccessor().getMessage( "message.saveconf.savefail" ), e );
             errors.reject( "message.saveconf.savefail" );
         }
         return new ModelAndView( getSuccessView() );

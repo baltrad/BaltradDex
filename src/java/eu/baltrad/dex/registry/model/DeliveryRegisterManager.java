@@ -22,11 +22,13 @@
 package eu.baltrad.dex.registry.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -52,12 +54,15 @@ public class DeliveryRegisterManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public DeliveryRegisterManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets number of delivery register entries stored in a table.
@@ -76,12 +81,8 @@ public class DeliveryRegisterManager {
                 count = resultSet.getLong( 1 );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to determine number of delivery register entries: " + 
-                    e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to determine number of delivery register entries: " + 
-                    e.getMessage() );
+            log.error( "Failed to determine number of delivery register entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -113,10 +114,8 @@ public class DeliveryRegisterManager {
                         timestamp, status );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select delivery register entry: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select delivery register entry: " + e.getMessage() );
+            log.error( "Failed to select delivery register entry", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -146,10 +145,8 @@ public class DeliveryRegisterManager {
                 entries.add( entry );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to fetch delivery register: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to fetch delivery register: " + e.getMessage() );
+            log.error( "Failed to fetch delivery register", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -182,12 +179,8 @@ public class DeliveryRegisterManager {
                 entries.add( entry );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select data delivery register entries: " +
-                    e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select data delivery register entries: " +
-                    e.getMessage() );
+            log.error( "Failed to select data delivery register entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -211,10 +204,8 @@ public class DeliveryRegisterManager {
                     entry.getDeliveryStatus() + "');";
             insert = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to insert delivery register entries: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to insert delivery register entries: " + e.getMessage() );
+            log.error( "Failed to insert delivery register entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -234,10 +225,8 @@ public class DeliveryRegisterManager {
             String sql = "DELETE FROM dex_delivery_register WHERE id = " + id + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete delivery register entry: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to delete delivery register entry: " + e.getMessage() );
+            log.error( "Failed to delete delivery register entry", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -247,8 +236,9 @@ public class DeliveryRegisterManager {
      * Deletes all entries from the delivery register.
      *
      * @return Number of deleted entries
+     * @throws Exception
      */
-    public int deleteEntries() throws SQLException, Exception {
+    public int deleteEntries() throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -257,11 +247,8 @@ public class DeliveryRegisterManager {
             String sql = "DELETE FROM dex_delivery_register;";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete delivery register entries: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete delivery register entries: " + e.getMessage() );
+            log.error( "Failed to delete delivery register entries", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -274,10 +261,9 @@ public class DeliveryRegisterManager {
      *
      * @param recordLimit Trimmer function is activated if records number given by this parameter
      * is exceeded
-     * @throws SQLException
      * @throws Exception
      */
-    public void setTrimmer( int recordLimit ) throws SQLException, Exception {
+    public void setTrimmer( int recordLimit ) throws Exception {
         Connection conn = null;
         try {
             conn = jdbcConnectionManager.getConnection();
@@ -289,11 +275,8 @@ public class DeliveryRegisterManager {
                 + recordLimit + ");";
             stmt.execute( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to set delivery registry trimmer: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to set delivery registry trimmer: " + e.getMessage() );
+            log.error( "Failed to set delivery registry trimmer", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -306,11 +289,9 @@ public class DeliveryRegisterManager {
      * @param maxAgeDays Age limit - number of days
      * @param maxAgeHours Age limit - number of hours
      * @param maxAgeMinutes Age limit - number of minutes
-     * @throws SQLException
      * @throws Exception
      */
-    public void setTrimmer( int maxAgeDays, int maxAgeHours, int maxAgeMinutes )
-            throws SQLException, Exception {
+    public void setTrimmer( int maxAgeDays, int maxAgeHours, int maxAgeMinutes ) throws Exception {
         Connection conn = null;
         try {
             conn = jdbcConnectionManager.getConnection();
@@ -322,11 +303,8 @@ public class DeliveryRegisterManager {
                 maxAgeDays + ", " + maxAgeHours + ", " + maxAgeMinutes + ");";
             stmt.execute( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to set delivery registry trimmer: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to set delivery registry trimmer: " + e.getMessage() );
+            log.error( "Failed to set delivery registry trimmer", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -336,10 +314,9 @@ public class DeliveryRegisterManager {
      * Removes trigger on delivery registry table.
      *
      * @param triggerName Name of the trigger
-     * @throws SQLException
      * @throws Exception
      */
-    public void removeTrimmer( String triggerName ) throws SQLException, Exception {
+    public void removeTrimmer( String triggerName ) throws Exception {
         Connection conn = null;
         try {
             conn = jdbcConnectionManager.getConnection();
@@ -347,11 +324,8 @@ public class DeliveryRegisterManager {
             String sql = "DROP TRIGGER IF EXISTS " + triggerName + " ON dex_delivery_register;";
             stmt.execute( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to remove delivery registry trimmer: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to remove delivery registry trimmer: " + e.getMessage() );
+            log.error( "Failed to remove delivery registry trimmer", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );

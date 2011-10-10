@@ -33,7 +33,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import org.apache.log4j.Logger;
 
-import java.sql.SQLException;
 import java.io.IOException;
 
 /**
@@ -76,14 +75,10 @@ public class RemoveMessagesController implements Controller {
                     + " message(s).";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             log.warn( msg );
-        } catch( SQLException e ) {
-            String msg = "Failed to remove system messages:" + e.getMessage();
-            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
         } catch( Exception e ) {
-            String msg = "Failed to remove system messages:" + e.getMessage();
+            String msg = "Failed to remove system messages";
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg );
+            log.error( msg, e );
         }
         return new ModelAndView( getSuccessView() );
     }

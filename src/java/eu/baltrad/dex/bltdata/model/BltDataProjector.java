@@ -62,7 +62,7 @@ public class BltDataProjector {
             proj.initialize();
             res = 0;
         } catch( ProjectionException e ) {
-            log.error( "Failed to initialize projection: " + e.getMessage() );
+            log.error( "Failed to initialize projection", e );
             res = 1;
         }
         return res;

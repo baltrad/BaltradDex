@@ -22,11 +22,13 @@
 package eu.baltrad.dex.subscription.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
+import eu.baltrad.dex.log.model.MessageLogger;
+
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -43,12 +45,15 @@ public class SubscriptionManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** Logger */
+    private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public SubscriptionManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets all existing subscriptions.
@@ -85,10 +90,8 @@ public class SubscriptionManager {
                 subscriptions.add( sub );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
+            log.error( "Failed to select subscriptions", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -130,10 +133,8 @@ public class SubscriptionManager {
                 subscriptions.add( sub );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
+            log.error( "Failed to select subscriptions", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -176,10 +177,8 @@ public class SubscriptionManager {
                         entryAddress );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
+            log.error( "Failed to select subscriptions", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -223,10 +222,8 @@ public class SubscriptionManager {
                         entryAddress );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
+            log.error( "Failed to select subscriptions", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -252,10 +249,8 @@ public class SubscriptionManager {
                 fieldValues.add( fieldValue );
             }
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
         } catch( Exception e ) {
-            System.err.println( "Failed to select subscriptions: " + e.getMessage() );
+            log.error( "Failed to select subscriptions", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -266,10 +261,9 @@ public class SubscriptionManager {
      *
      * @param sub Subscription to be saved
      * @return Number of inserted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int saveSubscription( Subscription sub ) throws SQLException, Exception {
+    public int saveSubscription( Subscription sub ) throws Exception {
         Connection conn = null;
         int insert = 0;
         try {
@@ -301,11 +295,8 @@ public class SubscriptionManager {
                     subId + ", " + addressId + ");";
             insert = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to save subscription: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to save subscription: " + e.getMessage() );
+            log.error( "Failed to save subscription", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -319,11 +310,10 @@ public class SubscriptionManager {
      * @param subscriptionType Subscription type
      * @param active Active toggle
      * @return Number of inserted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int updateSubscription( String dataSourceName, String subscriptionType, boolean active )
-            throws SQLException, Exception {
+    public int updateSubscription( String dataSourceName, String subscriptionType,
+            boolean active ) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
@@ -334,11 +324,8 @@ public class SubscriptionManager {
                     "';";
             update = stmt.executeUpdate( sql ) ;
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to update subscription: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to update subscription: " + e.getMessage() );
+            log.error( "Failed to update subscription", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -353,7 +340,7 @@ public class SubscriptionManager {
      * @throws SQLException
      * @throws Exception
      */
-    public int deleteSubscription( int id ) throws SQLException, Exception {
+    public int deleteSubscription( int id ) {
         Connection conn = null;
         int delete = 0;
         try {
@@ -362,12 +349,8 @@ public class SubscriptionManager {
             String sql = "DELETE FROM dex_subscriptions WHERE id = " + id + ";";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete subscription: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete subscription: " + e.getMessage() );
-            throw e;
+            log.error( "Failed to delete subscription", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -379,11 +362,10 @@ public class SubscriptionManager {
      * @param dataSourceName Name of subscribed data source
      * @param subscriptionType Subscription type
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
     public int deleteSubscription( String dataSourceName, String subscriptionType )
-            throws SQLException, Exception {
+            throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -393,11 +375,8 @@ public class SubscriptionManager {
                     dataSourceName + "' AND type = '" + subscriptionType + "';";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete subscription: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete subscription: " + e.getMessage() );
+            log.error( "Failed to delete subscription", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -411,11 +390,10 @@ public class SubscriptionManager {
      * @param dataSourceName Name of subscribed data source
      * @param subscriptionType Subscription type
      * @return Number of deleted records
-     * @throws SQLException
      * @throws Exception
      */
-    public int deleteSubscription( String userName, String dataSourceName, String subscriptionType )
-            throws SQLException, Exception {
+    public int deleteSubscription( String userName, String dataSourceName,
+            String subscriptionType ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
@@ -426,11 +404,8 @@ public class SubscriptionManager {
                     subscriptionType + "';";
             delete = stmt.executeUpdate( sql );
             stmt.close();
-        } catch( SQLException e ) {
-            System.err.println( "Failed to delete subscription: " + e.getMessage() );
-            throw e;
         } catch( Exception e ) {
-            System.err.println( "Failed to delete subscription: " + e.getMessage() );
+            log.error( "Failed to delete subscription", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -461,7 +436,7 @@ public class SubscriptionManager {
                 }
             }
         } catch( Exception e ) {
-            System.err.println( "Failed to compare subscriptions lists: " + e.getMessage() );
+            log.error( "Failed to compare subscriptions lists", e );
         }
         return res;
     }
@@ -482,7 +457,7 @@ public class SubscriptionManager {
                 res = false;
             }
         } catch( Exception e ) {
-            System.err.println( "Failed to compare subscriptions: " + e.getMessage() );
+            log.error( "Failed to compare subscriptions", e );
         }
         return res;
     }
