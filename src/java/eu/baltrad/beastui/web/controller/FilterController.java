@@ -73,41 +73,9 @@ class FilterController {
     writeJson(rsp, json);
   }
 
-  @RequestMapping(value="/filter_comboMatchTypes.json",
-                  method=RequestMethod.GET)
-  public void comboMatchTypes(HttpServletRequest req,
-                              HttpServletResponse rsp)
-      throws java.io.IOException {
-    writeJson(rsp, enumToJson(CombinedFilter.MatchType.class));
-  }
-
-  @RequestMapping(value="/filter_attrOperators.json",
-                  method=RequestMethod.GET)
-  public void attrOperators(HttpServletRequest req,
-                            HttpServletResponse rsp)
-      throws java.io.IOException {
-    writeJson(rsp, enumToJson(AttributeFilter.Operator.class));
-  }
-
-  @RequestMapping(value="/filter_attrValueTypes.json",
-                  method=RequestMethod.GET)
-  public void attrOperatorTypes(HttpServletRequest req,
-                                HttpServletResponse rsp)
-      throws java.io.IOException {
-    writeJson(rsp, enumToJson(AttributeFilter.ValueType.class));
-  }
-
   protected void writeJson(HttpServletResponse rsp, Object json)
       throws java.io.IOException {
     rsp.setHeader("content-type", "application/json");
     mapper.writeValue(rsp.getOutputStream(), json);
-  }
-
-  protected static <E extends Enum<E>> ArrayNode enumToJson(Class<E> enumType) {
-    ArrayNode json = JsonNodeFactory.instance.arrayNode();
-    for (E e : enumType.getEnumConstants()) {
-      json.add(e.toString());
-    }
-    return json;
   }
 }

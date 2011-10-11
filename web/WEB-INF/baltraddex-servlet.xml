@@ -1041,17 +1041,20 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="attributeFilterManager" class="eu.baltrad.beast.db.AttributeFilterManager"
             autowire="byName"/>
     <bean id="combinedFilterManager" class="eu.baltrad.beast.db.CombinedFilterManager"
-            autowire=" byName">
+            autowire="byName">
         <property name="childManager"> 
             <ref bean="coreFilterManager"/>
         </property>        
     </bean>
+    <bean id="alwaysMatchFilterManager" class="eu.baltrad.beast.db.AlwaysMatchFilterManager"
+          autowire="byName"/>
     <bean id="coreFilterManager" class="eu.baltrad.beast.db.CoreFilterManager"
             autowire="byName">
         <property name="subManagers">
             <map>
                 <entry key="attr" value-ref="attributeFilterManager"/>
                 <entry key="combined" value-ref="combinedFilterManager"/>
+                <entry key="always" value-ref="alwaysMatchFilterManager"/>
             </map>
         </property>
     </bean>

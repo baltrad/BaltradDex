@@ -1,414 +1,242 @@
-"use strict";
-
-jQuery.template("filter-template-common",
-  '<input type="hidden" name="id" value="${$item.data.id}"/>' +
-  '<input type="hidden" name="type" value="${$item.data.type}"/>'
+jQuery.template("bdb_filter_select_option",
+  '<option value="${value}" {{if value == $item.current}} selected="selected"{{/if}}>${name}</option>'
 );
 
-jQuery.template("select-option-template",
-  '<option value="${$data}" {{if $data == $item.current}} selected="selected"{{/if}}>${$data}</option>'
+jQuery.template("bdb_filter_common",
+  '<input type="hidden" name="id" value="${$data.id}"/>' +
+  '<input type="hidden" name="type" value="${$data.type}"/>'
 );
 
-jQuery.template("filter-template-attr",
-  '<div><form>' +
-  '  {{tmpl(null, $item) "filter-template-common"}}' +
-  '  <div>' +
-  '    <label for="attribute">attribute</label>' +
-  '    <input type="text" name="attribute"/>' +
-  '  </div>' +
-  '  <div>' +
-  '    <label for="operator">operator</label>' +
-  '    <select name="operator">' +
-  '      {{tmpl($item.operators, {current: $item.data.operator}) "select-option-template"}}' +
-  '    </select>' +
-  '  </div>' +
-  '  <div>' +
-  '    <label for="valueType">value type</label>' +
-  '    <select name="valueType">' +
-  '      {{tmpl($item.valueTypes, {current: $item.data.valueType}) "select-option-template"}}' +
-  '    </select>' +
-  '  </div>' +
-  '  <div>' +
-  '    <label for="value">value</label>' +
-  '    <input type="text" name="value" />' +
-  '  </div>' +
-  '  <div>' +
-  '    <label for="negated">negated</label>' +
-  '    <input type="checkbox" name="negated" value="true"/>' +
-  '  </div>' +
-  '</form></div>'
-);
 
-jQuery.template("filter-template-combined",
-  '<div>' +
-  '  <form>' +
-  '    {{tmpl(null, $item) "filter-template-common"}}' +
-  '    <div>' +
-  '      <label for="matchType">match</label>' +
-  '      <select name="matchType">' +
-  '        {{tmpl($item.matchTypes, {current: $item.data.matchType}) "select-option-template"}}' +
-  '      </select>' +
-  '    </div>' +
-  '  </form>' +
-  '  <div id="childFilters">' +
-  '  </div>' +
-  '  {{tmpl "filter-template-create"}}' +
-  '</div>'
-);
-
-jQuery.template("filter-template-create",
-  '<div>' +
-  '  <select id="filter-type" name="type">' +
-  '    <option value="combined" selected="selected">CombinedFilter</option>' +
-  '    <option value="attr">AttributeFilter</option>' +
+jQuery.template("bdb_filter_attr",
+  '<span class="bdbAttributeFilter">' +
+  '  {{tmpl($data) "bdb_filter_common"}}' +
+  '  <label for="negated">NOT</label>' +
+  '  <input type="checkbox" name="negated" value="true" {{if $data.negated}} checked="checked" {{/if}}/>' +
+  '  <input type="text" name="attribute" value="${$data.attribute}"/>' +
+  '  <select name="operator">' +
+  '    {{tmpl($item.operators, {current: $data.operator}) "bdb_filter_select_option"}}' +
   '  </select>' +
-  '  <input id="filter-create" type="button" value="Create">' +
+  '  <select name="valueType">' +
+  '    {{tmpl($item.valueTypes, {current: $data.valueType}) "bdb_filter_select_option"}}' +
+  '  </select>' +
+  '  <input type="text" name="value" value="${$data.value}"/>' +
+  '</span>'
+);
+
+jQuery.template("bdb_filter_combined",
+  '<div class="bdbCombinedFilter"> ' +
+  '  {{tmpl($data) "bdb_filter_common"}} ' +
+  '  <select name="matchType">' +
+  '    {{tmpl($item.matchTypes, {current: $data.matchType}) "bdb_filter_select_option"}}' +
+  '  </select>' +
+  '  <ul></ul>' +
   '</div>'
 );
 
-jQuery.template("filter-template-edit",
-  '<div>' +
-  '  <div>${$item.getExpressionString()}</div>' +
-  '  <div>' +
-  '    <input id="filter-edit", type="button", value="Edit">' +
-  '    <input id="filter-remove", type="button", value="Remove">' +
-  '  </div>' +
-  '</div>'
+jQuery.template("bdb_filter_add_child",
+  '<input class="bdbFilterAdd" type="image" src="includes/images/icons/circle-plus.png">' +
+  '<select name="filterType">' +
+  '  {{tmpl($item.filterTypes) "bdb_filter_select_option"}}' +
+  '</select>'
 );
 
-function _createFilterDialog(flt) {
-  if (typeof _createFilterDialog.counter === 'undefined') {
-    _createFilterDialog.counter = 0;
+jQuery.template("bdb_filter_always",
+  '<span>' +
+  '  {{tmpl($data) "bdb_filter_common"}}' +
+  '  ALWAYS MATCH' +
+  '</span>'
+);
+
+function BdbCombinedFilter(data) {
+  var default_data = {
+    type: "combined",
+    matchType: "ANY",
+    childFilters: []
+  };
+  
+  this.data = $.extend(default_data, data);
+  this.dom = null;
+  this.children = [];
+
+  this.wrapChildFilterDom = function (childFilter) {
+    var dom = childFilter.dom.wrapAll("<li/>").parent();
+    dom.prepend("<input type='image' class='bdbFilterRemove' src='includes/images/icons/circle-delete.png'/>");
+    createChildRemovalCallback(dom, this, childFilter);
+    return dom;
+  };
+
+  this.updateDomFromData = function() {
+    this.dom = $.tmpl(
+      "bdb_filter_combined",
+      this.data,
+      {matchTypes: this.MATCH_TYPES}
+    );
+
+    var childFilters = this.dom.children().filter("ul");
+    childFilters.empty();
+    for (var i = 0; i < this.data.childFilters.length; i++) {
+      var filter = createBdbFilter(this.data.childFilters[i]);
+      this.children.push(filter);
+      this.wrapChildFilterDom(filter).appendTo(childFilters);
+    }
+
+    var addChildDom = $.tmpl(
+      "bdb_filter_add_child",
+      null,
+      {filterTypes : this.FILTER_TYPES}
+    );
+    addChildDom.wrapAll("<li>");
+    addChildDom = addChildDom.parent();
+    createChildAdditionCallback(addChildDom, this);
+    addChildDom.appendTo(childFilters);
+  };
+  this.updateDomFromData();
+
+  this.updateDataFromDom = function() {
+    var vals = {};
+    $.map(this.dom.children().serializeArray(), function(item, i) {
+      vals[item['name']] = item['value'];
+    });
+    vals.childFilters = [];
+    for (var i=0; i < this.children.length; i++) {
+      var child = this.children[i];
+      child.updateDataFromDom();
+      vals.childFilters.push(child.data);
+    }
+    this.data = vals;
   }
-  _createFilterDialog.counter++;
-  var name = "beast-db-filter-" + _createFilterDialog.counter;
-  var dlg = $.tmpl("filter-template-" + flt.data.type, null, flt);
-  dlg.attr("id", name)
-  dlg.appendTo("body");
-  dlg.dialog({
-    autoOpen: false,
-    closeOnEscape: false,
-    modal: true,
-    title: "Edit Filter: " + name,
-    buttons: [{
-        text: "Cancel",
-        click: function() {
-	  flt.reset();
-          flt.close();
-        }
-      }, {
-        text: "Save",
-        click: function() {
-          if (!flt.isValid()) {
-            alert("invalid filter");
-            return;
-          }
-          if (typeof flt.onSave === "function") {
-            if (!flt.onSave())
-              return;
-          }
-	  flt.updateData();
-          flt.close();
-        }
-    }]
-  });
 
-  return dlg;
+  return this;
+};
+
+function createChildAdditionCallback(addChildDom, filter) {
+  var addChildFilterButton = addChildDom.find("input.bdbFilterAdd");
+
+  addChildFilterButton.click(function(evt) {
+    evt.preventDefault();
+    var filterType = addChildDom.find("[name='filterType']").val();
+    var childFilter = createBdbFilter({type: filterType});
+    filter.children.push(childFilter);
+    var childDom = filter.wrapChildFilterDom(childFilter);
+    addChildDom.first().before(childDom);
+  });
 }
 
-/**
- * Base filter construction
- */
-function BaseFilter(data) {
+function createChildRemovalCallback(childDom, filter, childFilter) {
+  childDom.children().first().click(function(evt) {
+    evt.preventDefault();
+    childDom.remove();
+    for (var i=0; i < filter.children.length; i++) {
+      if (filter.children[i] == childFilter)
+        filter.children.splice(i, 1);
+    }
+  });
+}
+
+BdbCombinedFilter.prototype.MATCH_TYPES = [
+  {name: "match ANY", value: "ANY"},
+  {name: "match ALL", value: "ALL"},
+];
+
+BdbCombinedFilter.prototype.FILTER_TYPES = [
+  {name: "Always match", value: "always"},
+  {name: "Attribute filter", value: "attr"},
+  {name: "Combined filter", value: "combined"},
+]
+
+
+function BdbAttributeFilter(data) {
+  var default_data = {
+    type: "attr",
+    negated: false,
+    attribute: "",
+    operator: "EQ",
+    valueType: "STRING",
+    value: "",
+  };
+
+  this.data = $.extend(default_data, data);
+  this.dom = null;
+
+  this.updateDomFromData = function() {
+    this.dom = $.tmpl(
+      "bdb_filter_attr",
+      this.data,
+      {
+        operators: this.OPERATORS,
+        valueTypes : this.VALUE_TYPES,
+      }
+    );
+    return this.dom;
+  };
+  this.updateDomFromData();
+
+  this.updateDataFromDom = function() {
+    var vals = {};
+    $.map(this.dom.children().serializeArray(), function(item, i) {
+      vals[item['name']] = item['value'];
+    });
+    this.data = vals;
+  };
+
+  return this;
+};
+
+BdbAttributeFilter.prototype.OPERATORS = [
+  {name: "=", value: "EQ"},
+  {name: "<", value: "LT"},
+  {name: "<=", value: "LE"},
+  {name: ">", value: "GT"},
+  {name: ">=", value: "GE"},
+  {name: "in", value: "IN"},
+];
   
+BdbAttributeFilter.prototype.VALUE_TYPES = [
+  {name: "string", value: "STRING"},
+  {name: "long", value: "LONG"},
+  {name: "double", value: "DOUBLE"},
+  {name: "bool", value: "BOOL"},
+];
+
+function BdbAlwaysMatchFilter(data) {
   this.data = data;
   
-  // create the actual dialog
-  var dlg = _createFilterDialog(this);
-  
-  /**
-   * display the dialog
-   */
-  this.display = function() {
-    dlg.dialog("open");
-  };
-  
-  /**
-   * close the dialog
-   */
-  this.close = function() {
-    dlg.dialog("close");
-  };
-  
-  /**
-   * reset the dialog form from this.data
-   */
-  this.reset = function() {
-    dlg.find("form").populate(this.data);
-  }
+  this.dom = $.tmpl("bdb_filter_always", this.data);
+  this.updateDataFromDom = function() { }
+  this.updateDomFromData = function() { }
 
-  this.reset();
-  
-  /**
-   * update this.data from dialog form
-   */
-  this.updateData = function() {
-    this.data = this.toJSON();
-  }
-  
-  /**
-   * access the dialog form
-   */
-  this.getDialog = function() {
-    return dlg;
-  }
-  
-  /**
-   * get expression string formed by this filter
-   *
-   * fetches synchronously from `filter_expressionString.json`
-   */
-  this.getExpressionString = function() {
-    var r;
-    $.fn.postJSON({
-      url: "filter_expressionString.json",
-      async: false,
-      data: this.toJSON(),
-      success: function(result) {
-        r = result;
-      }
-    });
-    return r;
-  };
-  
-  /**
-   * test if the filter is valid
-   *
-   * test synchronously using `filter_isValid.json`
-   *
-   * @return true if the filter is valid
-   */
-  this.isValid = function() {
-    var r;
-    $.fn.postJSON({
-      url: "filter_isValid.json",
-      async: false,
-      data: this.toJSON(),
-      success: function(result) {
-        r = result;
-      }
-    });
-    return r;
-  };
-  
-  /**
-   * json representation of this filter
-   */
-  this.toJSON = function() {
-    return dlg.find("form").serializeJSON();
-  };
-}
+  return this;
+};
 
-/**
- * Create CombinedFilter dialog
- *
- * @constructor
- */
-function CombinedFilter(data) {
-  var default_data = {
-    "type": "combined",
-    "childFilters": []
-  }
-
-  if (data) {
-    $.extend(default_data, data);
-  }
-
-  var childFilters = default_data["childFilters"];
-  delete default_data["childFilters"];
-
-  // create base filter instance to enhance
-  var that = new BaseFilter(default_data);
-  var childDiv = that.getDialog().find("div#childFilters");
-
-  /**
-   * add a child filter
-   * @param {child} the child filter instance
-   */
-  this.addChildFilter = function(child) {
-    var childDom = $.tmpl("filter-template-edit", null, child);
-    childDom.data("filter", child);
-    childDom.find("#filter-edit").click(function() {
-      child.display();
-    });
-    childDom.find("#filter-remove").click(function() {
-      childDom.remove();
-    });
-    childDiv.append(childDom);
-  }
-
-  for (var i = 0; i < childFilters.length; i++) {
-    var child = makeFilterDialog(childFilters[i]);
-    this.addChildFilter(child);
-  }
-  
-  var thisRef = this;
-
-  that.getDialog().find("#filter-create").click(function() {
-    var dialog = makeFilterDialog({
-      "type": that.getDialog().find("#filter-type option:selected").val()
-    });
-    dialog.onSave = function() {
-      thisRef.addChildFilter(dialog);
-      return true;
-    }
-    dialog.display();
-  });
-
-  that.toJSON = function() {
-    var json = that.getDialog().find("form").serializeJSON();
-    var childFilters = [];
-    childDiv.children().each(function(index) {
-      childFilters.push($(this).data("filter").toJSON());
-    });
-    json['childFilters'] = childFilters;
-    return json;
-  }
-
-  return that;
-}
-
-/**
- * Create AttributeFilter dialog
- *
- * @constructor
- */
-function AttributeFilter(data) {
-  var defaults = {
-    "type": "attr"
-  }
-  if (data)
-    $.extend(defaults, data);
-
-  var that = new BaseFilter(defaults);
-
-  return that;
-}
-
-/**
- * load enums
- */
-function load(flt) {
-  $.ajax({
-    url: "filter_comboMatchTypes.json",
-    async: false,
-    success: function(result) {
-      flt.matchTypes = result;
-    }
-  });
-
-  $.ajax({
-    url: "filter_attrOperators.json",
-    async: false,
-    success: function(result) {
-      flt.operators = result;
-    }
-  });
-
-  $.ajax({
-    url: "filter_attrValueTypes.json",
-    async: false,
-    success: function(result) {
-      flt.valueTypes = result;
-    }
-  });
-}
-// load and attach to the prototype
-load(BaseFilter.prototype)
-
-
-/**
- * filter dialog factory method
- *
- * @constructor
- * @param {data} json data of the filter. data.type is used to
- *               look up concrete object to create.
- */
-function makeFilterDialog(data) {
+function createBdbFilter(data) {
   switch (data.type) {
     case "attr":
-      return new AttributeFilter(data);
+      return new BdbAttributeFilter(data);
     case "combined":
-      return new CombinedFilter(data);
-    default:
-      throw "unknown filter type: " + data.type;
+      return new BdbCombinedFilter(data);
+    case "always":
+      return new BdbAlwaysMatchFilter(data);
   }
-}
+};
 
 /**
- * create top level filter management controls
+ * test if the filter is valid
  *
- * @constructor
- * @param {elm} the DOM element whose content to replace with
- *              top level filter controls
- * @param {data} Filter data. If present, will create controls
- *               to edit a filter, otherwise, will create controls
- *               to create a new filter.
- * @param {target} (optional) form field whose value will be set to the
- *               stringified JSON value of this filter on modification.
+ * test synchronously using `filter_isValid.json`
  *
- * the intended setup is along these lines:
- *
- * <body>
- *   <script type="text/javascript">
- *     $(document).ready(function() {
- *       createTopLevelFilter($("#filterElm"), null, $("#filterJson"));
- *     }
- *   </script>
- *   <form>
- *    <div id="filterElm">
- *    <input type="hidden" name="filterJson" id="filterJson"
- *   </form>
- * </body>
- *
- * the filter can additionally be accessed through:
- * $("#filterElm").data("filter");
- *
+ * @return true if the filter is valid
  */
-function createTopLevelFilter(elm, data, target) {
-  if (data) {
-    var dialog = makeFilterDialog(data);
-    var div = $.tmpl("filter-template-edit", null, dialog);
-    div.find("#filter-edit").click(function() {
-      dialog.display();
-      dialog.onSave = function() {
-        createTopLevelFilter(elm, dialog.toJSON(), target);
-        return true;
-      }
-    });
-    div.find("#filter-remove").click(function() {
-      createTopLevelFilter(elm, null, target);
-      if (typeof(target) !== "undefined") {
-        $(target).val("");
-      }
-    });
-    if (typeof(target) !== "undefined") {
-      $(target).val(JSON.stringify(dialog.toJSON()));
+function isValidBdbFilter(filter) {
+  var r;
+  $.fn.postJSON({
+    url: "filter_isValid.json",
+    async: false,
+    data: filter,
+    success: function(result) {
+      r = result;
     }
-    $(elm).empty().append(div);
-    $(elm).data("filter", dialog);
-  } else {
-    var div = $.tmpl("filter-template-create");
-    div.find("#filter-create").click(function() {
-      var dialog = makeFilterDialog({
-        "type": div.find("#filter-type option:selected").val()
-      });
-      dialog.onSave = function() {
-        createTopLevelFilter(elm, dialog.toJSON(), target);
-        return true;
-      };
-      dialog.display();
-    });
-    $(elm).empty().append(div);
-  }
-}
+  });
+  return r;
+};
+

@@ -1059,6 +1059,9 @@ input:focus, textarea:focus {
     height:128px;
     padding:4px;
 }
+.modifyroute .bdbFilterRow {
+    height:100%;
+}
 .modifyroute input, .modifyroute select, .modifyjob input, .modifyjob select {
     width:260px;
 }
@@ -1204,6 +1207,38 @@ input:focus, textarea:focus {
     float:left;
     width:60%;
 }
+/* BDB filters -----------------------------------------------------------------------------------*/
 
+.bdbCombinedFilter ul {
+  list-style-type: none;
+}
+
+.bdbCombinedFilter li {
+  margin-left: 1.25em;
+}
+
+.bdbAttributeFilter {
+ white-space: nowrap;
+}
+
+.bdbAttributeFilter input,
+.bdbAttributeFilter select {
+    width:auto;
+}
+
+.bdbCombinedFilter .bdbFilterRemove {
+  height: 20px;
+  width: 20px;
+  border: none;
+  float: left;
+  clear: left;
+}
+
+.bdbCombinedFilter .bdbFilterAdd {
+  height: 20px;
+  width: 20px;
+  border: none;
+  float: left;
+  clear: left;
+}
 /*------------------------------------------------------------------------------------------------*/
-
