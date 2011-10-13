@@ -23,44 +23,55 @@ Creates a distribution route
 
 <t:page_tabbed pageTitle="${create ? 'Create' : 'Modify'} distribution route" activeTab="processing">
   <jsp:attribute name="extraHeader">
-        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/themes/base/jquery-ui.css"
-              rel="stylesheet"
-              type="text/css" />
-        <script type="text/javascript"
-                src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js">
-        </script>
-        <script type="text/javascript"
-                src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js">
-        </script>
-        <script type="text/javascript"
-                src="includes/js/jquery.serializeJSON.js">
-        </script>
-        <script type="text/javascript"
-                src="includes/js/json2.js">
-        </script>
-        <script type="text/javascript"
-                src="includes/js/jquery.postJSON.js">
-        </script>
-        <script type="text/javascript"
-                src="includes/js/jquery.populate.js">
-        </script>
-        <script type="text/javascript"
-                src="includes/js/filter.js">
-        </script>
+    <script type="text/javascript"
+            src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js">
+    </script>
+    <script type="text/javascript"
+            src="includes/js/jquery.serializeJSON.js">
+    </script>
+    <script type="text/javascript"
+            src="includes/js/json2.js">
+    </script>
+    <script type="text/javascript"
+            src="includes/js/jquery.postJSON.js">
+    </script>
+    <script type="text/javascript"
+            src="includes/js/filter.js">
+    </script>
  </jsp:attribute>
  <jsp:attribute name="extraBottom">
-        <script type="text/javascript">
-          $(document).ready(function() {
-          <c:choose>
-            <c:when test="${!empty filterJson}">
-              createTopLevelFilter($("#filter1"), ${filterJson}, $("#filterJson"));
-            </c:when>
-            <c:otherwise>
-              createTopLevelFilter($("#filter1"), null, $("#filterJson"));
-            </c:otherwise>
-          </c:choose>
-          });
-        </script>
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var filter = null;
+        <c:choose>
+          <c:when test="${!empty filterJson}">
+            filter = createBdbFilter(${filterJson});
+          </c:when>
+          <c:otherwise>
+            filter = createBdbFilter({
+              type: "combined",
+              matchType: "ALL",
+              childFilters: [{
+                type: "always"
+              }]
+            });
+          </c:otherwise>
+        </c:choose>
+        $("#filter").append(filter.dom);
+
+        var submit = $("[name='submitButton']");
+        submit.click(function(evt) {
+          filter.updateDataFromDom();
+          if (!isValidBdbFilter(filter.data)) {
+            evt.preventDefault();
+            alert("invalid filter");
+          } else {
+            $("#filterJson").val(JSON.stringify(filter.data));
+            $("#filter").empty();
+          }
+        });
+      });
+    </script>
   </jsp:attribute>
   <jsp:body>
      <div class="left">
@@ -81,7 +92,7 @@ Creates a distribution route
                                       formAction="distributionroute.htm">
                      <jsp:attribute name="extraLeft">
                          <div class="row">Destination</div>
-                         <div class="row">Filter</div>
+                         <div class="bdbFilterrow">Filter</div>
                      </jsp:attribute>
                      <jsp:attribute name="extraRight">
                          <div class="row">
@@ -90,8 +101,8 @@ Creates a distribution route
                                  url of the destination to send files to
                              </div>
                          </div>
-                         <div class="row">
-                             <div id="filter1"></div>
+                         <div class="bdbFilterrow">
+                             <div id="filter"></div>
                              <input type="hidden" name="filterJson" id="filterJson" />
                              <div class="hint">
                                filter to match incoming files against ${!empty filterJson}
