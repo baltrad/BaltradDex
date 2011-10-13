@@ -83,14 +83,14 @@ Author     : szewczenko
         <t:menu_home/>
     </div>
     <div class="right">
-        <div class="blttitle">
-            Browse files 
-        </div>
-        <div class="blttext">
-            Use the following parameters to select and browse data files.
-        </div>
-        <div class="filebrowser">
-            <form method="post" name="fileBrowser">
+        <form method="post" name="fileBrowser">
+            <div class="blttitle">
+                Browse files
+            </div>
+            <div class="blttext">
+                Use the following parameters to select and browse data files.
+            </div>
+            <div class="filebrowser">
                 <div class="row">
                     <div class="leftcol">
                         <select name="radarsList" title="Select source radar station name">
@@ -116,7 +116,7 @@ Author     : szewczenko
                             <c:forEach items="${file_objects}" var="fobject">
                                 <option value="${fobject.fileObject}"
                                     <c:if test="${fobject.fileObject == fileObject}">
-                                        SELECTED</c:if>>    
+                                        SELECTED</c:if>>
                                     <c:out value="${fobject.description}"/>
                                 </option>
                             </c:forEach>
@@ -177,15 +177,13 @@ Author     : szewczenko
                         </div>
                     </div>
                 </div>
-            </form>
-        </div>
-        <div class="bltseparator"></div>
-            <c:choose>
-                <c:when test="${dataStatus == 1}">
-                    <div class="table">
-                        <div class="dsfiles">
-                            <div id="tablecontrol">
-                                <form action="browseFiles.htm" method="post">
+            </div>
+            <div class="bltseparator"></div>
+                <c:choose>
+                    <c:when test="${dataStatus == 1}">
+                        <div class="table">
+                            <div class="dsfiles">
+                                <div id="tablecontrol">
                                     <input type="submit" name="pagenum" value="<<"
                                            title="First page">
                                     <span></span>
@@ -210,61 +208,65 @@ Author     : szewczenko
                                     <span></span>
                                     <input type="submit" name="pagenum" value=">>"
                                            title="Last page">
-                                </form>
-                            </div>
-                            <div class="tableheader">
-                                <div id="cell" class="date">
-                                    Date
                                 </div>
-                                <div id="cell" class="time">
-                                    Time
-                                </div>
-                                <div id="cell" class="source">
-                                    Source
-                                </div>
-                                <div id="cell" class="type">
-                                    Type
-                                </div>
-                                <div id="cell" class="details">&nbsp;</div>
-                                <div id="cell" class="download">&nbsp;</div>
-                            </div>
-                            <c:forEach var="entry" items="${fileEntries}">
-                                <div class="entry">
+                                <div class="tableheader">
                                     <div id="cell" class="date">
-                                        <fmt:formatDate pattern="yyyy-MM-dd"
-                                            value="${entry.timeStamp}"/>
+                                        <input name="sortByDate" type="submit" value="Date"
+                                               title="Sort result set by date">
                                     </div>
                                     <div id="cell" class="time">
-                                        <fmt:formatDate pattern="HH:mm:ss"
-                                            value="${entry.timeStamp}"/>
+                                        <input name="sortByTime" type="submit" value="Time"
+                                               title="Sort result set by time">
                                     </div>
                                     <div id="cell" class="source">
-                                        <c:out value="${entry.source}"></c:out>
+                                        <input name="sortBySource" type="submit" value="Source"
+                                               title="Sort result set by data source">
                                     </div>
                                     <div id="cell" class="type">
-                                        <c:out value="${entry.type}"></c:out>
+                                        <input name="sortByType" type="submit" value="Type"
+                                               title="Sort result set by file object type">
                                     </div>
-                                    <div id="cell" class="details">
-                                        <a href="fileDetails.htm?uuid=${entry.uuid}">
-                                            <c:out value="Details"/>
-                                        </a>
-                                    </div>
-                                    <div id="cell" class="download">
-                                        <a href="download.htm?path=${entry.path}">
-                                            <c:out value="Download"/>
-                                        </a>
-                                    </div>
+                                    <div id="cell" class="details">&nbsp;</div>
+                                    <div id="cell" class="download">&nbsp;</div>
                                 </div>
-                            </c:forEach>
+                                <c:forEach var="entry" items="${fileEntries}">
+                                    <div class="entry">
+                                        <div id="cell" class="date">
+                                            <fmt:formatDate pattern="yyyy-MM-dd"
+                                                value="${entry.timeStamp}"/>
+                                        </div>
+                                        <div id="cell" class="time">
+                                            <fmt:formatDate pattern="HH:mm:ss"
+                                                value="${entry.timeStamp}"/>
+                                        </div>
+                                        <div id="cell" class="source">
+                                            <c:out value="${entry.source}"></c:out>
+                                        </div>
+                                        <div id="cell" class="type">
+                                            <c:out value="${entry.type}"></c:out>
+                                        </div>
+                                        <div id="cell" class="details">
+                                            <a href="fileDetails.htm?uuid=${entry.uuid}">
+                                                <c:out value="Details"/>
+                                            </a>
+                                        </div>
+                                        <div id="cell" class="download">
+                                            <a href="download.htm?path=${entry.path}">
+                                                <c:out value="Download"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
                         </div>
-                    </div>
-                </c:when>
-                <c:otherwise>
-                    <div class="blttext">
-                        Result set is empty.
-                    </div>
-                </c:otherwise>
-            </c:choose>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="blttext">
+                            Result set is empty.
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+            </form>
         </div>
     </jsp:body>
 </t:page_tabbed>

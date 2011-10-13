@@ -43,7 +43,6 @@ import eu.baltrad.fc.Oh5Metadata;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 
 import java.sql.Connection;
@@ -153,20 +152,16 @@ public class BltFileManager {
      * Convert a FileEntry instance to a BltFile instance
      */
     protected BltFile fileEntryToBltFile(FileEntry entry) throws ParseException {
-        // XXX: this method does too much!
         Oh5Metadata metadata = entry.metadata();
         return new BltFile(
             entry.uuid(), fileCatalog.storage().store( entry ),
             format.parse( metadata.what_date().to_iso_string() + "T" +
-                          metadata.what_time().to_iso_string() ),
-            format.parse( entry.stored_at().to_iso_string() ),
-            metadata.what_source(), metadata.what_object(),
-            /*InitAppUtil.getThumbsStorageFolder()*/ init.getConfiguration().getThumbsDir() +
+            metadata.what_time().to_iso_string() ),
+            format.parse( entry.stored_at().to_iso_string() ), metadata.what_source(),
+            metadata.what_object(), init.getConfiguration().getThumbsDir() +
             File.separator + entry.uuid() + IMAGE_FILE_EXT
         );
     }
-
-
     /**
      * Gets data set for a given data source.
      *
@@ -179,7 +174,6 @@ public class BltFileManager {
         ExpressionFactory xpr = new ExpressionFactory();
         FileQuery q = new FileQuery();
         IFilter attributeFilter = getFilter( dsName );
-        // set offset and limit
         q.limit( limit );
         q.skip( offset );
         q.order_by( xpr.combined_datetime( FC_DATE_ATTR, FC_TIME_ATTR ), FileQuery.SortDir.DESC );
@@ -193,10 +187,7 @@ public class BltFileManager {
                 log.error( "Error while parsing file's timestamp", e );
             }
         }
-        // delete the result set
         r.delete();
-        // sort data list
-        Collections.sort( bltFiles );
         return bltFiles;
     }
     /**
@@ -266,58 +257,109 @@ public class BltFileManager {
      */
     public String buildQuery( boolean select, String radarStation, String fileObject,
             String startDate, String startTime, String endDate, String endTime, String offset,
-            String limit ) {
+            String limit, boolean sortByDateAsc, boolean sortByDateDesc, boolean sortByTimeAsc,
+            boolean sortByTimeDesc, boolean sortBySourceAsc, boolean sortBySourceDesc,
+            boolean sortByTypeAsc, boolean sortByTypeDesc ) {
         StringBuffer stmt = new StringBuffer();
-        if( select ) {
-            stmt.append( "SELECT * FROM bdb_files" );
-        } else {
-            stmt.append( "SELECT COUNT(*) FROM bdb_files" );
-        }
         int numberOfParameters = 0;
         if( radarStation != null && !radarStation.isEmpty() ) {
-            stmt.append( " WHERE source_id IN (SELECT source_id FROM bdb_source_kvs WHERE value = '" +
-                    radarStation + "' AND key = 'PLC')" );
+            if( select ) {
+                stmt.append( "SELECT uuid, what_date, what_time, value, what_object, stored_at " +
+                    "FROM bdb_files f, bdb_source_kvs k WHERE f.source_id = k.source_id AND " +
+                    "k.key = 'PLC' AND value = '" + radarStation + "'" );
+            } else {
+                stmt.append( "SELECT COUNT(*) FROM bdb_files f, bdb_source_kvs k WHERE " +
+                    "f.source_id = k.source_id AND k.key = 'PLC' AND value = '" + radarStation +
+                    "'" );
+            }
             numberOfParameters++;
+        } else {
+            if( select ) {
+                stmt.append( "SELECT uuid, what_date, what_time, value, what_object, stored_at " +
+                    "FROM bdb_files f, bdb_source_kvs k WHERE f.source_id = k.source_id AND " +
+                    "k.key = 'PLC'" );
+            } else {
+                stmt.append( "SELECT COUNT(*) FROM bdb_files f, bdb_source_kvs k WHERE " +
+                    "f.source_id = k.source_id AND k.key = 'PLC'" );
+            }
         }
         if( fileObject != null && !fileObject.isEmpty() ) {
-            if( numberOfParameters > 0 ) {
-                stmt.append( " AND what_object = '" + fileObject + "'" );
-            } else {
-                stmt.append( " WHERE what_object = '" + fileObject + "'" );
-                numberOfParameters++;
-            }
+            stmt.append( " AND what_object = '" + fileObject + "'" );
         }
         if( startDate != null && !startDate.isEmpty() ) {
-            if( numberOfParameters > 0 ) {
-                stmt.append( " AND what_date >= '" + startDate + "'" );
-            } else {
-                stmt.append( " WHERE what_date >= '" + startDate + "'"  );
-                numberOfParameters++;
-            }
+            stmt.append( " AND what_date >= '" + startDate + "'" );
         }
         if( startTime != null && !startTime.isEmpty() ) {
-            if( numberOfParameters > 0 ) {
-                stmt.append( " AND what_time >= '" + startTime + "'" );
-            } else {
-                stmt.append( " WHERE what_time >= '" + startTime + "'" );
-                numberOfParameters++;
-            }
+            stmt.append( " AND what_time >= '" + startTime + "'" );
         }
         if( endDate != null && !endDate.isEmpty() ) {
-            if( numberOfParameters > 0 ) {
-                stmt.append( " AND what_date <= '" + endDate + "'" );
-            } else {
-                stmt.append( " WHERE what_date <= '" + endDate + "'" );
-                numberOfParameters++;
-            }
+            stmt.append( " AND what_date <= '" + endDate + "'" );
         }
         if( endTime != null && !endTime.isEmpty() ) {
-            if( numberOfParameters > 0 ) {
-                stmt.append( " AND what_time <= '" + endTime + "'" );
+            stmt.append( " AND what_time <= '" + endTime + "'" );
+        }
+        if( select ) {
+            String sortParams = "";
+            if( sortByDateAsc || sortByDateDesc || sortByTimeAsc || sortByTimeDesc ||
+                    sortBySourceAsc || sortBySourceDesc || sortByTypeAsc || sortByTypeDesc ) {
+                if( sortByDateDesc ) {
+                    if( sortParams.isEmpty() ) {
+                        sortParams = " ORDER BY what_date DESC";
+                    }
+                }
+                if( sortByDateAsc ) {
+                    if( sortParams.isEmpty() ) {
+                        sortParams = " ORDER BY what_date ASC";
+                    }
+                }
+                if( sortByTimeDesc ) {
+                    if( sortParams.isEmpty() ) {
+                        sortParams = " ORDER BY what_time DESC";
+                    } else {
+                        sortParams += ", what_time DESC";
+                    }
+                }
+                if( sortByTimeAsc ) {
+                    if( sortParams.isEmpty() ) {
+                        sortParams = " ORDER BY what_time ASC";
+                    } else {
+                        sortParams += ", what_time ASC";
+                    }
+                }
+                if( sortBySourceDesc ) {
+                    if( sortParams.isEmpty() ) {
+                        sortParams = " ORDER BY value DESC";
+                    } else {
+                        sortParams += ", value DESC";
+                    }
+                } 
+                if( sortBySourceAsc ) {
+                    if( sortParams.isEmpty() ) {
+                        sortParams = " ORDER BY value ASC";
+                    } else {
+                        sortParams += ", value ASC";
+                    }
+                }
+                if( sortByTypeDesc ) {
+                    if( sortParams.isEmpty() ) {
+                        sortParams = " ORDER BY what_object DESC";
+                    } else {
+                        sortParams += ", what_object DESC";
+                    }
+                } 
+                if( sortByTypeAsc ) {
+                    if( sortParams.isEmpty() ) {
+                        sortParams = " ORDER BY what_object ASC";
+                    } else {
+                        sortParams += ", what_object ASC";
+                    }
+                }
             } else {
-                stmt.append( " WHERE what_time <= '" + endTime + "'" );
-                numberOfParameters++;
+                // if no parameters are selected, records are sorted by date and time
+                // in descending order
+                sortParams = " ORDER BY what_date DESC, what_time DESC ";
             }
+            stmt.append( sortParams );
         }
         if( offset != null && !offset.isEmpty() ) {
             stmt.append( " OFFSET " + offset );
@@ -367,7 +409,7 @@ public class BltFileManager {
             BltFile bltFile = null;
             while( resultSet.next() ) {
                 String uuid = resultSet.getString( "uuid" );
-                String path = fileCatalog.local_path_for_uuid(uuid);
+                String path = fileCatalog.local_path_for_uuid( uuid );
                 String thumbPath = init.getConfiguration().getThumbsDir();
                 Date storageTime = resultSet.getTimestamp( "stored_at" );
                 String type = resultSet.getString( "what_object" );
@@ -375,17 +417,7 @@ public class BltFileManager {
                 Time sqlTime = resultSet.getTime( "what_time" );
                 DateFormat df = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss");
                 Date timeStamp = df.parse( sqlDate.toString() + " " + sqlTime.toString() );
-                int sourceId = resultSet.getInt( "source_id" );
-                String source = "";
-                String subQuery = "SELECT value FROM bdb_source_kvs WHERE source_id = " +
-                        sourceId + " AND key ='PLC';";
-                Statement subStmt = conn.createStatement();
-                ResultSet subResultSet = subStmt.executeQuery( subQuery );
-                while( subResultSet.next() ) {
-                    String value = subResultSet.getString( 1 );
-                    source = value;
-                }
-                subStmt.close();
+                String source = resultSet.getString( "value" );
                 bltFile = new BltFile( uuid, path, timeStamp, storageTime, source, type,
                         thumbPath );
                 bltFiles.add( bltFile );
@@ -427,11 +459,17 @@ public class BltFileManager {
     public void setCoreFilterManager( CoreFilterManager coreFilterManager ) {
         this.coreFilterManager = coreFilterManager;
     }
-
+    /**
+     * Get reference to FileCatalog
+     *
+     * @return Reference to file catalog
+     */
     public FileCatalog getFileCatalog() { return fileCatalog; }
-
-    public void setFileCatalog(FileCatalog fileCatalog) {
-      this.fileCatalog = fileCatalog;
-    }
+    /**
+     * Set reference to file catalog
+     *
+     * @param fileCatalog Reference to file catalog
+     */
+    public void setFileCatalog( FileCatalog fileCatalog ) { this.fileCatalog = fileCatalog; }
 }
 //--------------------------------------------------------------------------------------------------

@@ -1176,6 +1176,25 @@ input:focus, textarea:focus {
 .filebrowser .midcol input {
     width:26px;
 }
+.tableheader .date input, .tableheader .time input, .tableheader .source input,
+        .tableheader .type input {
+    background:none;
+    border:0;
+    padding-bottom:1px;
+    text-decoration:underline;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:bold;
+    color:#4C6EB3;
+}
+.tableheader .date input:hover, .tableheader .time input:hover, .tableheader .source input:hover,
+        .tableheader .type input:hover {
+    border-top:0;
+    border-right:0;
+    border-left:0;
+    border-bottom:1px solid #4C6EB3;
+    padding-bottom:0px;
+}
 /* Log configuration page ------------------------------------------------------------------------*/
 .logconf .leftcol {
     float:left;

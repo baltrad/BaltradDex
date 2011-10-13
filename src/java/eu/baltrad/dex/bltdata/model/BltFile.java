@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -32,7 +32,7 @@ import java.util.Date;
  * @version 1.0
  * @since 1.0
  */
-public class BltFile implements Serializable, Comparable<BltFile> {
+public class BltFile implements Serializable {
 //---------------------------------------------------------------------------------------- Variables
     private String uuid;
     private String path;
@@ -66,15 +66,6 @@ public class BltFile implements Serializable, Comparable<BltFile> {
         this.source = source;
         this.type = type;
         this.thumbPath = thumbPath;
-    }
-    /**
-     * Method implementing comparable interface. Allows to sort files based on date and time.
-     *
-     * @param File to compare with current file
-     * @return 0 if objects are equal, 1 if current file is later than compared entry, -1 otherwise
-     */
-    public int compareTo( BltFile bltFile ) {
-        return -this.getTimeStamp().compareTo( bltFile.getTimeStamp() );
     }
     /**
      * Method gets file's identity string.

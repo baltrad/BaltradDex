@@ -75,6 +75,14 @@ public class BltFileBrowserController extends SimpleFormController implements IT
     private static final String END_MINUTE_PARAM = "endMinute";
     /** End second parameter */
     private static final String END_SECOND_PARAM = "endSecond";
+    /** Sort by date parameter */
+    private static final String SORT_BY_DATE_PARAM = "sortByDate";
+    /** Sort by time parameter */
+    private static final String SORT_BY_TIME_PARAM = "sortByTime";
+    /** Sort by source parameter */
+    private static final String SORT_BY_SRC_PARAM = "sortBySource";
+    /** Sort by type parameter */
+    private static final String SORT_BY_TYPE_PARAM = "sortByType";
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to file object manager */
     private FileObjectManager fileObjectManager;
@@ -108,6 +116,22 @@ public class BltFileBrowserController extends SimpleFormController implements IT
     private static int currentPage;
     /** Number of selected file entries */
     private static long numEntries;
+    /** Sort by date in ascending order */
+    private static boolean sortByDateAsc;
+    /** Sort by date in descending order */
+    private static boolean sortByDateDesc;
+    /** Sort by time in ascending order */
+    private static boolean sortByTimeAsc;
+    /** Sort by time in descending order */
+    private static boolean sortByTimeDesc;
+    /** Sort by source in ascending order  */
+    private static boolean sortBySourceAsc;
+    /** Sort by source in descending order */
+    private static boolean sortBySourceDesc;
+    /** Sort by type in ascending order */
+    private static boolean sortByTypeAsc;
+    /** Sort by type in descending order */
+    private static boolean sortByTypeDesc;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Retrieve a backing object for the current form from the given request.
@@ -167,8 +191,13 @@ public class BltFileBrowserController extends SimpleFormController implements IT
     @Override
     protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
             Object command, BindException errors ) throws Exception {
-        List<BltFile> fileEntries = null;
         String pageNum = request.getParameter( PAGE_NUM_PARAM );
+        // set sort parameters
+        setSortByDate( request );
+        setSortByTime( request );
+        setSortBySource( request );
+        setSortByType( request );
+        List<BltFile> fileEntries = null;
         /* File selection option */
         if( pageNum == null ) {
             setRadarStation(request.getParameter(RADARS_LIST_PARAM) );
@@ -189,22 +218,31 @@ public class BltFileBrowserController extends SimpleFormController implements IT
             setCurrentPage( 1 );
             /* Count selected files */
             String countQuery = bltFileManager.buildQuery( false, getRadarStation(), 
-                getFileObject(), getStartDate(), startTime, getEndDate(), endTime, null, null );
+                getFileObject(), getStartDate(), startTime, getEndDate(), endTime, null, null,
+                getSortByDateAsc(), getSortByDateDesc(), getSortByTimeAsc(), getSortByTimeDesc(),
+                getSortBySourceAsc(), getSortBySourceDesc(), getSortByTypeAsc(),
+                getSortByTypeDesc() );
             /* Set number of selected files */
-            setNumEntries(bltFileManager.countSelectedFileEntries( countQuery) );
+            setNumEntries( bltFileManager.countSelectedFileEntries( countQuery ) );
             /* Select files */
             String selectQuery = bltFileManager.buildQuery( true, getRadarStation(), 
                 getFileObject(), getStartDate(), startTime, getEndDate(), endTime,
-                Integer.toString( 0 ), Integer.toString( BltFileManager.ENTRIES_PER_PAGE ) );
+                Integer.toString( 0 ), Integer.toString( BltFileManager.ENTRIES_PER_PAGE),
+                getSortByDateAsc(), getSortByDateDesc(), getSortByTimeAsc(), getSortByTimeDesc(),
+                getSortBySourceAsc(), getSortBySourceDesc(), getSortByTypeAsc(),
+                getSortByTypeDesc() );
             fileEntries = bltFileManager.getFileEntries( selectQuery );
         } else {
             /* Page scrolling option */
             if( pageNum.matches( "<<" ) ) {
                 firstPage();
-                String selectQuery = bltFileManager.buildQuery( true, getRadarStation(), getFileObject(), getStartDate(),
-                    startTime, getEndDate(), endTime, Integer.toString( 0 ), Integer.toString(
-                        BltFileManager.ENTRIES_PER_PAGE ) );
-                    fileEntries = bltFileManager.getFileEntries( selectQuery );
+                String selectQuery = bltFileManager.buildQuery( true, getRadarStation(), 
+                    getFileObject(), getStartDate(), startTime, getEndDate(), endTime,
+                    Integer.toString( 0 ), Integer.toString( BltFileManager.ENTRIES_PER_PAGE),
+                    getSortByDateAsc(), getSortByDateDesc(), getSortByTimeAsc(), getSortByTimeDesc(),
+                    getSortBySourceAsc(), getSortBySourceDesc(), getSortByTypeAsc(),
+                    getSortByTypeDesc() );
+                fileEntries = bltFileManager.getFileEntries( selectQuery );
             } else {
                 if( pageNum.matches( ">>" ) ) {
                     lastPage();
@@ -218,9 +256,12 @@ public class BltFileBrowserController extends SimpleFormController implements IT
                 }
                 int offset = ( getCurrentPage() * BltFileManager.ENTRIES_PER_PAGE )
                         - BltFileManager.ENTRIES_PER_PAGE;
-                String selectQuery = bltFileManager.buildQuery( true, getRadarStation(), getFileObject(), getStartDate(),
-                    startTime, getEndDate(), endTime, Integer.toString( offset ),
-                    Integer.toString( BltFileManager.ENTRIES_PER_PAGE ) );
+                String selectQuery = bltFileManager.buildQuery( true, getRadarStation(), 
+                    getFileObject(), getStartDate(), startTime, getEndDate(), endTime,
+                    Integer.toString( offset ), Integer.toString(
+                    BltFileManager.ENTRIES_PER_PAGE ), getSortByDateAsc(), getSortByDateDesc(),
+                    getSortByTimeAsc(), getSortByTimeDesc(), getSortBySourceAsc(),
+                    getSortBySourceDesc(), getSortByTypeAsc(), getSortByTypeDesc() );
                 fileEntries = bltFileManager.getFileEntries( selectQuery );
             }
         }
@@ -474,6 +515,118 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      */
     public void setBltFileManager( BltFileManager bltFileManager ) {
         this.bltFileManager = bltFileManager;
+    }
+    /**
+     * Get sort by date toggle.
+     *
+     * @return Sort by date toggle
+     */
+    public static boolean getSortByDateAsc() { return sortByDateAsc; }
+    /**
+     * Get sort by date toggle.
+     *
+     * @return Sort by date toggle
+     */
+    public static boolean getSortByDateDesc() { return sortByDateDesc; }
+    /**
+     * Set sort by date toggle
+     *
+     * @param request Http servlet request
+     */
+    public static void setSortByDate( HttpServletRequest request ) {
+        if( request.getParameter( SORT_BY_DATE_PARAM ) != null ) {
+            if( sortByDateAsc ) {
+                sortByDateAsc = false;
+                sortByDateDesc = true;
+            } else {
+                sortByDateAsc = true;
+                sortByDateDesc = false;
+            }
+        } 
+    }
+    /**
+     * Get sort by time toggle.
+     *
+     * @return Sort by time toggle
+     */
+    public static boolean getSortByTimeAsc() { return sortByTimeAsc; }
+    /**
+     * Get sort by time toggle.
+     * 
+     * @return Sort by time toggle
+     */
+    public static boolean getSortByTimeDesc() { return sortByTimeDesc; }
+    /**
+     * Set sort by time toggle.
+     * 
+     * @param request Http servlet request
+     */
+    public static void setSortByTime( HttpServletRequest request ) {
+        if( request.getParameter( SORT_BY_TIME_PARAM ) != null ) {
+            if( sortByTimeAsc ) {
+                sortByTimeAsc = false;
+                sortByTimeDesc = true;
+            } else {
+                sortByTimeAsc = true;
+                sortByTimeDesc = false;
+            }
+        } 
+    }
+    /**
+     * Get sort by source toggle.
+     *
+     * @return Sort by source toggle
+     */
+    public boolean getSortBySourceAsc() { return sortBySourceAsc; }
+    /**
+     * Get sort by source toggle.
+     * 
+     * @return Sort by source toggle
+     */
+    public boolean getSortBySourceDesc() { return sortBySourceDesc; }
+    /**
+     * Set sort by source toggle.
+     * 
+     * @param request Http servlet request
+     */
+    public static void setSortBySource( HttpServletRequest request ) {
+        if( request.getParameter( SORT_BY_SRC_PARAM ) != null ) {
+            if( sortBySourceAsc ) {
+                sortBySourceAsc = false;
+                sortBySourceDesc = true;
+            } else {
+                sortBySourceAsc = true;
+                sortBySourceDesc = false;
+            }
+        } 
+    }
+    /**
+     * Get sort by type toggle
+     *
+     * @return Sort by time toggle
+     */
+    public static boolean getSortByTypeAsc() { return sortByTypeAsc; }
+    /**
+     * Get sort by type toggle
+     * 
+     * @return Sort by time toggle
+     */
+    public static boolean getSortByTypeDesc() { return sortByTypeDesc; }
+    /**
+     * Set sort by time toggle.
+     * 
+     * @param request Http servlet request
+     */
+    public static void setSortByType( HttpServletRequest request ) {
+        if( request.getParameter( SORT_BY_TYPE_PARAM ) != null ) {
+            if( sortByTypeAsc ) {
+                sortByTypeAsc = false;
+                sortByTypeDesc = true;
+            } else {
+                sortByTypeAsc = true;
+                sortByTypeDesc = false;
+            }
+        }
     }
 }
 //--------------------------------------------------------------------------------------------------
