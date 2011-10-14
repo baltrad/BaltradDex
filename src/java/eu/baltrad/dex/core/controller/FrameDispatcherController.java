@@ -170,7 +170,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             FileItemIterator iterator = upload.getItemIterator( request );
             FileItemStream hdrItem = iterator.next();
 
-            if( hdrItem.getFieldName().equals( BaltradFrame.getHeaderTag() ) ) {
+            if( hdrItem.getFieldName().equals( BaltradFrame.XML_PART ) ) {
                 InputStream hdrStream = hdrItem.openStream();
                 // Handle form field / message XML header
                 if( hdrItem.isFormField() ) {
@@ -212,32 +212,19 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 InitAppUtil.writeObjectToStream( dataSources, tempFile );
 
                                 // set the return address
-                                bfHandler = new BaltradFrameHandler(
-                                    BaltradFrameHandler.getSenderScheme(header),
-                                    BaltradFrameHandler.getSenderHostAddress( header ),
-                                    BaltradFrameHandler.getSenderPort( header ),
-                                    BaltradFrameHandler.getSenderAppCtx( header ),
-                                    BaltradFrameHandler.getSenderEntryAddress( header ),
-                                    init.getConfiguration().getSoTimeout(),
-                                    init.getConfiguration().getConnTimeout() );
+                                String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
 
                                 // prepare the return message header
                                 String retHeader = BaltradFrameHandler.createObjectHdr(
                                         BaltradFrameHandler.MIME_MULTIPART,
-                                        init.getConfiguration().getScheme(),
-                                        init.getConfiguration().getHostAddress(),
-                                        init.getConfiguration().getPort(),
-                                        init.getConfiguration().getAppCtx(),
-                                        init.getConfiguration().getEntryAddress(),
+                                        init.getConfiguration().getNodeAddress(),
                                         init.getConfiguration().getNodeName(),
                                         BaltradFrameHandler.CHNL_LIST,
                                         tempFile.getAbsolutePath() );
                                 //
-                                BaltradFrame baltradFrame = new BaltradFrame( 
-                                        BaltradFrameHandler.getSenderServletPath( header ),
-                                        retHeader, tempFile );
+                                BaltradFrame baltradFrame = new BaltradFrame( retHeader, tempFile );
                                 // process the frame
-                                bfHandler.handleBF( baltradFrame );
+                                bfHandler.handleBF( remoteNodeAddress, baltradFrame );
                                 // delete temporary file
                                 InitAppUtil.deleteFile( tempFile );
                             } else {
@@ -274,12 +261,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // set channel listing
                             setDataSourceListing( remoteDataSources );
                             setRemNodeName( BaltradFrameHandler.getSenderNodeName( header ) );
+                            /*
+                             XXX: is this important?
                             setRemScheme( BaltradFrameHandler.getSenderScheme( header ) );
                             setRemHostAddress( BaltradFrameHandler.getSenderHostAddress( header ) );
                             setRemPort( BaltradFrameHandler.getSenderPort( header ) );
                             setRemAppCtx( BaltradFrameHandler.getSenderAppCtx( header ) );
                             setRemEntryAddress( BaltradFrameHandler.getSenderEntryAddress(
                                     header ) );
+                            */
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                         }
@@ -349,30 +339,18 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // write object to the stream
                             InitAppUtil.writeObjectToStream( confirmedDataSources, tempFile );
                             // set the return address
-                            bfHandler.setScheme( BaltradFrameHandler.getSenderScheme( header ) );
-                            bfHandler.setHostAddress( BaltradFrameHandler.getSenderHostAddress(
-                                    header ) );
-                            bfHandler.setPort( BaltradFrameHandler.getSenderPort( header ) );
-                            bfHandler.setAppCtx( BaltradFrameHandler.getSenderAppCtx( header ) );
-                            bfHandler.setEntryAddress( BaltradFrameHandler.getSenderEntryAddress(
-                                    header ) );
+                            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
                             // prepare the return message header
                             String retHeader = BaltradFrameHandler.createObjectHdr(
                                     BaltradFrameHandler.MIME_MULTIPART,
-                                    init.getConfiguration().getScheme(),
-                                    init.getConfiguration().getHostAddress(),
-                                    init.getConfiguration().getPort(),
-                                    init.getConfiguration().getAppCtx(),
-                                    init.getConfiguration().getEntryAddress(),
+                                    init.getConfiguration().getNodeAddress(),
                                     init.getConfiguration().getNodeName(),
                                     BaltradFrameHandler.CHNL_SBN_CFN,
                                     tempFile.getAbsolutePath() );
                             //
-                            BaltradFrame baltradFrame = new BaltradFrame(
-                                    BaltradFrameHandler.getSenderServletPath( header ), retHeader,
-                                    tempFile );
+                            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile);
                             // process the frame
-                            bfHandler.handleBF( baltradFrame );
+                            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                         }
@@ -462,47 +440,28 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             tempFile = InitAppUtil.createTempFile( 
                                     new File( init.getWorkDirPath() ) );
                             // set the return address
-                            bfHandler.setScheme( BaltradFrameHandler.getSenderScheme( header ) );
-                            bfHandler.setHostAddress( BaltradFrameHandler.getSenderHostAddress(
-                                    header ) );
-                            bfHandler.setPort( BaltradFrameHandler.getSenderPort( header ) );
-                            bfHandler.setAppCtx( BaltradFrameHandler.getSenderAppCtx( header ) );
-                            bfHandler.setEntryAddress( BaltradFrameHandler.getSenderEntryAddress(
-                                    header ) );
+                            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
 
-                            String retHeader = null;
-                            if( confirmedSub != null ) {
-                                retHeader = BaltradFrameHandler.createObjectHdr(
-                                    BaltradFrameHandler.MIME_MULTIPART,
-                                    init.getConfiguration().getScheme(),
-                                    init.getConfiguration().getHostAddress(),
-                                    init.getConfiguration().getPort(),
-                                    init.getConfiguration().getAppCtx(),
-                                    init.getConfiguration().getEntryAddress(),
-                                    init.getConfiguration().getNodeName(),
-                                    BaltradFrameHandler.SBN_CHNG_OK,
-                                    tempFile.getAbsolutePath() );
-                                // write object to the stream
-                                InitAppUtil.writeObjectToStream( confirmedSub, tempFile );
+                            String returnMessage = null;
+                            if (confirmedSub != null) {
+                                returnMessage = BaltradFrameHandler.SBN_CHNG_OK;
                             } else {
-                                retHeader = BaltradFrameHandler.createMsgHdr(
-                                    BaltradFrameHandler.MIME_MULTIPART,
-                                    init.getConfiguration().getScheme(),
-                                    init.getConfiguration().getHostAddress(),
-                                    init.getConfiguration().getPort(),
-                                    init.getConfiguration().getAppCtx(),
-                                    init.getConfiguration().getEntryAddress(),
-                                    init.getConfiguration().getNodeName(),
-                                    BaltradFrameHandler.SBN_CHNG_FAIL,
-                                    tempFile.getAbsolutePath() );
-                                // write object to the stream
-                                InitAppUtil.writeObjectToStream( subs, tempFile );
+                                returnMessage = BaltradFrameHandler.SBN_CHNG_FAIL;
                             }
-                            BaltradFrame baltradFrame = new BaltradFrame(
-                                    BaltradFrameHandler.getSenderServletPath( header ), retHeader,
-                                    tempFile );
+
+                            String retHeader = BaltradFrameHandler.createObjectHdr(
+                                    BaltradFrameHandler.MIME_MULTIPART,
+                                    init.getConfiguration().getNodeAddress(),
+                                    init.getConfiguration().getNodeName(),
+                                    returnMessage,
+                                    tempFile.getAbsolutePath()
+                            );
+                            // write object to the stream
+                            InitAppUtil.writeObjectToStream( confirmedSub, tempFile );
+
+                            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile);
                             // process the frame
-                            bfHandler.handleBF( baltradFrame );
+                            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                         }
@@ -584,29 +543,17 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             // write object to the stream
                             InitAppUtil.writeObjectToStream( subs, tempFile );
                             // set the return address
-                            bfHandler.setScheme( BaltradFrameHandler.getSenderScheme( header ) );
-                            bfHandler.setHostAddress( BaltradFrameHandler.getSenderHostAddress(
-                                    header ) );
-                            bfHandler.setPort( BaltradFrameHandler.getSenderPort( header ) );
-                            bfHandler.setAppCtx( BaltradFrameHandler.getSenderAppCtx( header ) );
-                            bfHandler.setEntryAddress( BaltradFrameHandler.getSenderEntryAddress(
-                                    header ) );
+                            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
                             // prepare the return message header
                             String retHeader = BaltradFrameHandler.createObjectHdr(
                                     BaltradFrameHandler.MIME_MULTIPART,
-                                    init.getConfiguration().getScheme(),
-                                    init.getConfiguration().getHostAddress(),
-                                    init.getConfiguration().getPort(),
-                                    init.getConfiguration().getAppCtx(),
-                                    init.getConfiguration().getEntryAddress(),
+                                    init.getConfiguration().getNodeAddress(),
                                     init.getConfiguration().getNodeName(),
                                     BaltradFrameHandler.CHNL_SYNC_RSPNS,
                                     tempFile.getAbsolutePath() );
-                            BaltradFrame baltradFrame = new BaltradFrame(
-                                    BaltradFrameHandler.getSenderServletPath( header ), retHeader,
-                                    tempFile );
+                            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile );
                             // process the frame
-                            bfHandler.handleBF( baltradFrame );
+                            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
                             // delete temporary file
                             InitAppUtil.deleteFile( tempFile );
                         }
@@ -646,16 +593,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     }
 
     /**
-     * Wraps BaltradFrameHandler's frame handling functionality.
+     * Post a baltrad frame to a remote node
      *
-     * @param request HTTP servlet request
-     * @param response HTTP servlet response
+     * @param remoteNodeAddress address this frame should be posted to
      * @param baltradFrame Reference to BaltradFrame object
      */
-    public void doPost( HttpServletRequest request, HttpServletResponse response, 
-            BaltradFrame baltradFrame ) {
-        bfHandler.handleBF( baltradFrame );
+    public void doPost(String remoteNodeAddress, BaltradFrame baltradFrame) {
+        bfHandler.handleBF(remoteNodeAddress, baltradFrame);
     }
+
     /**
      *
      * @param header

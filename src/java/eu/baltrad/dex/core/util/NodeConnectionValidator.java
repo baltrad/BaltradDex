@@ -60,24 +60,9 @@ public class NodeConnectionValidator implements Validator {
                 ValidationUtils.rejectIfEmptyOrWhitespace( errors, "connectionName",
                     "error.select.connection" );
             } else {
-                if( conn.getHostAddress().isEmpty() || conn.getPort() == 0 ) {
-                    ValidationUtils.rejectIfEmptyOrWhitespace( errors, "hostAddress",
+                if( conn.getNodeAddress().isEmpty() || conn.getPort() == 0 ) {
+                    ValidationUtils.rejectIfEmptyOrWhitespace( errors, "nodeAddress",
                         "error.address.invalid" );
-                }
-                if( conn.getUserName().isEmpty() ) {
-                    ValidationUtils.rejectIfEmptyOrWhitespace( errors, "userName",
-                        "error.missing.username" );
-                }
-                if( conn.getPassword().isEmpty() ) {
-                    ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password",
-                        "error.missing.password" );
-                }
-                // Validate port number
-                if( errors.hasFieldErrors( "port") ) {
-                    errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
-                }
-                if( conn.getPort() <= 0 ) {
-                    errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
                 }
             }
         }

@@ -171,24 +171,20 @@ public class RemoteDataSourceController extends MultiActionController {
             File tempFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
             InitAppUtil.writeObjectToStream( getSelectedDataSources(), tempFile );
             // prepare frame
-            BaltradFrameHandler bfHandler = new BaltradFrameHandler( getSenderScheme(),
-                    getSenderHostAddress(), getSenderPort(), getSenderAppCtx(),
-                    getSenderEntryAddress(), init.getConfiguration().getSoTimeout(),
+            BaltradFrameHandler bfHandler = new BaltradFrameHandler( 
+                    init.getConfiguration().getSoTimeout(),
                     init.getConfiguration().getConnTimeout() );
             //
             String hdrStr = BaltradFrameHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
-                init.getConfiguration().getScheme(), init.getConfiguration().getHostAddress(),
-                init.getConfiguration().getPort(), init.getConfiguration().getAppCtx(), 
-                init.getConfiguration().getEntryAddress(), init.getConfiguration().getNodeName(),
+                init.getConfiguration().getNodeAddress(),
+                init.getConfiguration().getNodeName(),
                 frameDispatcherController.getLocUsrName(), BaltradFrameHandler.CHNL_SBN_RQST,
                 tempFile.getAbsolutePath() );
             //
-            BaltradFrame baltradFrame = new BaltradFrame( NodeAddress.ADDR_SEPARATOR +
-                    getSenderAppCtx() + NodeAddress.ADDR_SEPARATOR + getSenderEntryAddress(),
-                    hdrStr, tempFile );
+            BaltradFrame baltradFrame = new BaltradFrame( hdrStr, tempFile );
             // handle the frame
             frameDispatcherController.setBfHandler( bfHandler );
-            frameDispatcherController.doPost( request, response, baltradFrame );
+            frameDispatcherController.doPost( getSenderHostAddress(), baltradFrame );
             // delete temporary file
             InitAppUtil.deleteFile( tempFile );
             // check subscription operation status

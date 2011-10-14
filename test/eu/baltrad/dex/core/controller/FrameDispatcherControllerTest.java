@@ -36,6 +36,8 @@ import java.io.FileNotFoundException;
  * @version 1.6
  * @since 1.6
  */
+
+/*
 public class FrameDispatcherControllerTest extends TestCase {
 //---------------------------------------------------------------------------------------- Constants
     private static final String SCHEME = "https";
@@ -88,7 +90,7 @@ public class FrameDispatcherControllerTest extends TestCase {
         }
     }
 
-    /*public void testHttpPost() {
+    public void testHttpPost() {
         int statusCode = 0;
         for( int i = 0; i < testFrames.length; i++ ) {
             if( testFrames[ i ] != null ) {
@@ -96,6 +98,7 @@ public class FrameDispatcherControllerTest extends TestCase {
                 assertEquals( HttpStatus.SC_OK, statusCode );
             }
         }
-    }*/
+    }
 }
+*/
 //--------------------------------------------------------------------------------------------------

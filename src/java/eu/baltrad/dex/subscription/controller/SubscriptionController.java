@@ -113,26 +113,27 @@ public class SubscriptionController extends MultiActionController {
         for( int i = 0; i < subscriptions.size(); i++ ) {
             File tempFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
             InitAppUtil.writeObjectToStream( subscriptions.get( i ), tempFile );
-            //
+
             BaltradFrameHandler bfHandler = new BaltradFrameHandler(
-                    subscriptions.get( i ).getScheme(), subscriptions.get( i ).getHostAddress(),
-                    subscriptions.get( i ).getPort(), subscriptions.get( i ).getAppCtx(),
-                    subscriptions.get( i ).getEntryAddress(), init.getConfiguration().getSoTimeout(),
-                    init.getConfiguration().getConnTimeout() );
-            //
-            String hdrStr = BaltradFrameHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
-                    init.getConfiguration().getScheme(), init.getConfiguration().getHostAddress(),
-                    init.getConfiguration().getPort(), init.getConfiguration().getAppCtx(),
-                    init.getConfiguration().getEntryAddress(),
-                    init.getConfiguration().getNodeName(), BaltradFrameHandler.CHNL_SYNC_RQST,
-                    tempFile.getAbsolutePath() );
+                init.getConfiguration().getSoTimeout(),
+                init.getConfiguration().getConnTimeout()
+            );
+
+            String hdrStr = BaltradFrameHandler.createObjectHdr(
+                BaltradFrameHandler.MIME_MULTIPART,
+                init.getConfiguration().getNodeAddress(),
+                init.getConfiguration().getNodeName(),
+                BaltradFrameHandler.CHNL_SYNC_RQST,
+                tempFile.getAbsolutePath()
+            );
+
             try {
-                BaltradFrame baltradFrame = new BaltradFrame( bfHandler.getServletPath(), hdrStr,
-                        tempFile );
+                BaltradFrame baltradFrame = new BaltradFrame(hdrStr, tempFile);
                 // handle the frame
                 frameDispatcherController.setBfHandler( bfHandler );
-                frameDispatcherController.doPost( request, response, baltradFrame );
-            } catch( FileNotFoundException e ) {
+                String remoteNodeAddress = subscriptions.get(i).getNodeAddress();
+                frameDispatcherController.doPost( remoteNodeAddress, baltradFrame );
+            } catch( Exception e ) {
                 log.error( "Failed to collect subscription information", e );
             }
             if( frameDispatcherController.getSynkronizedSubscription() != null ) {
@@ -226,29 +227,22 @@ public class SubscriptionController extends MultiActionController {
                 InitAppUtil.writeObjectToStream( getChangedSubscriptions().get( i ), tempFile );
                 // prepare the frame
                 BaltradFrameHandler bfHandler = new BaltradFrameHandler(
-                        getChangedSubscriptions().get( i ).getScheme(),
-                        getChangedSubscriptions().get( i ).getHostAddress(),
-                        getChangedSubscriptions().get( i ).getPort(),
-                        getChangedSubscriptions().get( i ).getAppCtx(),
-                        getChangedSubscriptions().get( i ).getEntryAddress(),
                         init.getConfiguration().getSoTimeout(),
                         init.getConfiguration().getConnTimeout() );
                 //
                 String hdrStr = BaltradFrameHandler.createObjectHdr(
-                        BaltradFrameHandler.MIME_MULTIPART, init.getConfiguration().getScheme(),
-                        init.getConfiguration().getHostAddress(),
-                        init.getConfiguration().getPort(), init.getConfiguration().getAppCtx(),
-                        init.getConfiguration().getEntryAddress(),
+                        BaltradFrameHandler.MIME_MULTIPART,
+                        init.getConfiguration().getNodeAddress(),
                         init.getConfiguration().getNodeName(),
                         getChangedSubscriptions().get( i ).getUserName(),
                         BaltradFrameHandler.SBN_CHNG_RQST,
                         tempFile.getAbsolutePath() );
                 //
-                BaltradFrame baltradFrame = new BaltradFrame( bfHandler.getServletPath(),
-                        hdrStr, tempFile );
+                BaltradFrame baltradFrame = new BaltradFrame( hdrStr, tempFile );
                 // handle the frame
                 frameDispatcherController.setBfHandler( bfHandler );
-                frameDispatcherController.doPost( request, response, baltradFrame );
+                String remoteNodeAddress = getChangedSubscriptions().get( i ).getNodeAddress();
+                frameDispatcherController.doPost( remoteNodeAddress, baltradFrame );
 
                 // update local subscription status
 

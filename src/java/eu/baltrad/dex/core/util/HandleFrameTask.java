@@ -49,6 +49,7 @@ public class HandleFrameTask implements Runnable {
     private BaltradFrameHandler bfHandler;
     private Logger log;
     private User user;
+    private String remoteNodeAddress;
     private String dataSource;
     private FileEntry fileEntry;
     private File fileItem;
@@ -75,9 +76,11 @@ public class HandleFrameTask implements Runnable {
         this.fileEntry = fileEntry;
         this.fileItem = fileItem;
         this.init = InitAppUtil.getInstance();
-        this.bfHandler = new BaltradFrameHandler( user.getScheme(), user.getHostAddress(),
-                user.getPort(), user.getAppCtx(), user.getEntryAddress(),
-                init.getConfiguration().getSoTimeout(), init.getConfiguration().getConnTimeout() );
+        this.remoteNodeAddress = user.getNodeAddress();
+        this.bfHandler = new BaltradFrameHandler(
+            init.getConfiguration().getSoTimeout(),
+            init.getConfiguration().getConnTimeout()
+        );
     }
     /**
      * Implements Runnable interface. Runs frame delivery task in a separate thread.
@@ -86,9 +89,8 @@ public class HandleFrameTask implements Runnable {
         try {
             String header = BaltradFrameHandler.createDataHdr( BaltradFrameHandler.MIME_MULTIPART,
                 init.getConfiguration().getNodeName(), dataSource, fileEntry.uuid() + ".h5" );
-            BaltradFrame baltradFrame = new BaltradFrame( bfHandler.getServletPath(), header,
-                    fileItem );
-            int httpStatusCode = bfHandler.handleBF( baltradFrame );
+            BaltradFrame baltradFrame = new BaltradFrame( header, fileItem );
+            int httpStatusCode = bfHandler.handleBF( remoteNodeAddress, baltradFrame );
             // update data delivery register
             String status = ( ( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) ?
                 DeliveryRegisterEntry.MSG_SUCCESS : DeliveryRegisterEntry.MSG_FAILURE );
@@ -101,7 +103,7 @@ public class HandleFrameTask implements Runnable {
                 log.error( "Failed to send FileEntry " + fileEntry.uuid() + " to user " +
                         user.getName() );
             }
-        } catch( FileNotFoundException e ) {
+        } catch( Exception e ) {
             log.error( "Failed to complete handle frame task", e );
         }
     }

@@ -105,31 +105,26 @@ public class ConnectToNodeController extends SimpleFormController {
             nodeConn = nodeConnectionManager.getConnection( formConn.getConnectionName() );
         } else {
             nodeConn = formConn;
-            // Temporary solution. Should be set via connect to node GUI
-            nodeConn.setScheme( init.getConfiguration().getScheme() );
-            nodeConn.setAppCtx( init.getConfiguration().getAppCtx() );
-            nodeConn.setEntryAddress( init.getConfiguration().getEntryAddress() );
         }
         // prepare BaltradFrame
-        BaltradFrameHandler bfHandler = new BaltradFrameHandler( nodeConn.getScheme(),
-                nodeConn.getHostAddress(), nodeConn.getPort(), nodeConn.getAppCtx(),
-                nodeConn.getEntryAddress(), init.getConfiguration().getSoTimeout(),
+        BaltradFrameHandler bfHandler = new BaltradFrameHandler(
+                init.getConfiguration().getSoTimeout(),
                 init.getConfiguration().getConnTimeout() );
         // prepare data source request frame holding user name, password and node address
         // this frame will be validated and authenticated upon reception
         String hdrStr = BaltradFrameHandler.createMsgHdr( BaltradFrameHandler.MIME_MULTIPART,
                 MessageDigestUtil.createHash( nodeConn.getUserName() ),
                 MessageDigestUtil.createHash( nodeConn.getPassword() ),
-                init.getConfiguration().getScheme(), init.getConfiguration().getHostAddress(),
-                init.getConfiguration().getPort(), init.getConfiguration().getAppCtx(),
-                init.getConfiguration().getEntryAddress(), init.getConfiguration().getNodeName(),
+                init.getConfiguration().getNodeAddress(),
+                init.getConfiguration().getNodeName(),
                 BaltradFrameHandler.LEVEL_INFO.toString(), BaltradFrameHandler.CHNL_LIST_RQST );
         // set local user name in frame dispatcher
         frameDispatcherController.setLocUsrName( nodeConn.getUserName() );
-        BaltradFrame baltradFrame = new BaltradFrame( bfHandler.getServletPath(), hdrStr );
+        BaltradFrame baltradFrame = new BaltradFrame( hdrStr );
         frameDispatcherController.setBfHandler( bfHandler );
+        String remoteNodeAddress = nodeConn.getNodeAddress();
         // post remote data source request
-        frameDispatcherController.doPost( request, response, baltradFrame );
+        frameDispatcherController.doPost( remoteNodeAddress, baltradFrame );
 
         // add connection to the database
         if( frameDispatcherController.getDataSourceListing() != null &&

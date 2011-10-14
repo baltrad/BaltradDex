@@ -104,23 +104,14 @@ Author     : szewczenko
                                     </div>
                                     <div class="rightcol">
                                         <div class="row">
-                                            <div class="protocol-prefix">https://</div>
                                             <div class="shortaddress">
-                                               <form:input path="command.hostAddress"
+                                               <form:input path="command.nodeAddress"
                                                    title="Enter node address"/>
                                                <div class="hint">
-                                                   Host address, e.g. baltrad.org
+                                                   Host address, e.g. http://baltrad.eu:8084/BaltradDex/dispatch.htm
                                                </div>
                                             </div>
-                                            <div class="port-separator">:</div>
-                                            <div class="portnumber">
-                                                <form:input path="command.port"
-                                                    title="Enter port number"/>
-                                                <div class="hint">
-                                                    Port number
-                                                </div>
-                                            </div>
-                                            <form:errors path="command.hostAddress" cssClass="error"/>
+                                            <form:errors path="command.nodeAddress" cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="username">

@@ -21,6 +21,10 @@
 
 package eu.baltrad.dex.util;
 
+import java.io.File;
+import java.net.URL;
+import java.net.MalformedURLException;
+
 /**
  * Implements node address manager.
  *
@@ -36,6 +40,8 @@ public class NodeAddress {
     public static final String PORT_SEPARATOR = ":";
     /** Address separator */
     public static final String ADDR_SEPARATOR = "/";
+    /** Default node port */ 
+    public static int DEFAULT_PORT = 8084;
 //---------------------------------------------------------------------------------------- Variables
     /** Communication scheme */
     protected String scheme;
@@ -133,6 +139,23 @@ public class NodeAddress {
                 Integer.toString( port ) + ADDR_SEPARATOR + appCtx + ADDR_SEPARATOR + entryAddress;
             return nodeAddress;
         }
+    }
+
+    public void setNodeAddress(String urlString) {
+        URL url = null;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("malformed url: " + urlString);
+        }
+        this.scheme = url.getProtocol();
+        this.hostAddress = url.getHost();
+        this.port = url.getPort();
+        if (this.port == -1)
+          this.port = DEFAULT_PORT;
+        File path = new File(url.getPath());
+        this.appCtx = path.getParent().substring(1);
+        this.entryAddress = path.getName();
     }
 }
 //--------------------------------------------------------------------------------------------------
