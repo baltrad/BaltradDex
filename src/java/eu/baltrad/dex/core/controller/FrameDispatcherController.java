@@ -202,75 +202,96 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
     protected void processIncomingFrame(String header, File file, HttpServletResponse response) throws Exception {
         String contentType = BaltradFrameHandler.getContentType(header);
+        
+        String userName = BaltradFrameHandler.getUserName(header);
+        User user = null;
+        if (userName == null) {
+            // Not all frames set user information. This is for backwards compatibility.
+            // XXX: this should be fixed ASAP!
+            log.warn("Allowing frame with no user data to pass");
+        } else {
+            user = userManager.getUserByNameHash(userName);
+            if (user == null) {
+                log.error("received frame from unknown user: " + userName);
+                response.setStatus(response.SC_FORBIDDEN);
+                return;
+            }
+
+            if (!authenticateFrame(user, header)) {
+                log.error("failed to authenticate frame from user: " + userName);
+                response.setStatus(response.SC_UNAUTHORIZED);
+                return;
+            }
+
+            if (!authorizeUser(user)) {
+                log.error("unauthorized frame from user: " + userName);
+                response.setStatus(response.SC_FORBIDDEN);
+                return;
+            }
+        }
 
         if (contentType.equals(BaltradFrameHandler.MSG)) {
-            processIncomingMessageFrame(header, file, response);
+            processIncomingMessageFrame(user, header, file, response);
         } else if (contentType.equals(BaltradFrameHandler.OBJECT)) {
-            processIncomingObjectFrame(header, file, response);
+            processIncomingObjectFrame(user, header, file, response);
         } else if (contentType.equals(BaltradFrameHandler.FILE)) {
-            response.setStatus(processIncomingDataFrame(header, file));
+            response.setStatus(processIncomingDataFrame(user, header, file));
         } else {
             log.warn("unhandled baltrad frame type: " + contentType);
             response.setStatus(BaltradFrameHandler.HTTP_STATUS_CODE_500);
         }
     }
 
-    protected void processIncomingMessageFrame(String header, File file, HttpServletResponse response) throws Exception {
+    protected void processIncomingMessageFrame(User user, String header, File file, HttpServletResponse response) throws Exception {
         String messageText = BaltradFrameHandler.getMessageText(header);
 
         // channel listing request - has to be authenticated
         if (messageText.equals(BaltradFrameHandler.CHNL_LIST_RQST)) {
-            // user ID set upon authentication
-            int userId;
-            if( ( userId = authenticateFrame( header ) ) != 0 ) {
-                log.info( "Data source listing request received from " +
-                    "user " + getUserName( BaltradFrameHandler.getUserName( header ) ) + " ("
-                     + BaltradFrameHandler.getSenderNodeName( header ) + ")" );
-                
-                // process channel listing request
+            log.info( "Data source listing request received from " +
+                "user " + getUserName( BaltradFrameHandler.getUserName( header ) ) + " ("
+                 + BaltradFrameHandler.getSenderNodeName( header ) + ")" );
+            
+            // process channel listing request
 
-                // create a list of data sources that user is allowed to subscribe
-                List<Integer> dataSourceIds = dataSourceManager.getDataSourceIds( 
-                        userId );
+            // create a list of data sources that user is allowed to subscribe
+            List<Integer> dataSourceIds = dataSourceManager.getDataSourceIds( 
+                    user.getId() );
 
-                // data sources allowed to be used by a given user
-                List<DataSource> dataSources = new ArrayList<DataSource>();
-                for( int i = 0; i < dataSourceIds.size(); i++ ) {
-                    dataSources.add( dataSourceManager.getDataSource(
-                            dataSourceIds.get( i ) ) );
-                }
-                // write list to temporary file
-                File tempFile = InitAppUtil.createTempFile(
-                        new File( init.getWorkDirPath() ) );
-                // write object to stream
-                InitAppUtil.writeObjectToStream( dataSources, tempFile );
-
-                // set the return address
-                String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
-
-                // prepare the return message header
-                String retHeader = BaltradFrameHandler.createObjectHdr(
-                        BaltradFrameHandler.MIME_MULTIPART,
-                        init.getConfiguration().getNodeAddress(),
-                        init.getConfiguration().getNodeName(),
-                        BaltradFrameHandler.CHNL_LIST,
-                        tempFile.getAbsolutePath() );
-                //
-                BaltradFrame baltradFrame = new BaltradFrame( retHeader, tempFile );
-                // process the frame
-                bfHandler.handleBF( remoteNodeAddress, baltradFrame );
-                // delete temporary file
-                InitAppUtil.deleteFile( tempFile );
-            } else {
-                log.warn( "Incoming frame could not be authenticated" );
+            // data sources allowed to be used by a given user
+            List<DataSource> dataSources = new ArrayList<DataSource>();
+            for( int i = 0; i < dataSourceIds.size(); i++ ) {
+                dataSources.add( dataSourceManager.getDataSource(
+                        dataSourceIds.get( i ) ) );
             }
+            // write list to temporary file
+            File tempFile = InitAppUtil.createTempFile(
+                    new File( init.getWorkDirPath() ) );
+            // write object to stream
+            InitAppUtil.writeObjectToStream( dataSources, tempFile );
+
+            // set the return address
+            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
+
+            // prepare the return message header
+            String retHeader = BaltradFrameHandler.createObjectHdr(
+                    BaltradFrameHandler.MIME_MULTIPART,
+                    init.getConfiguration().getNodeAddress(),
+                    init.getConfiguration().getNodeName(),
+                    BaltradFrameHandler.CHNL_LIST,
+                    tempFile.getAbsolutePath() );
+            //
+            BaltradFrame baltradFrame = new BaltradFrame( retHeader, tempFile );
+            // process the frame
+            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
+            // delete temporary file
+            InitAppUtil.deleteFile( tempFile );
         } else {
             // regular message frame - display message
             log.info( BaltradFrameHandler.getMessageText( header ) );
         }
     }
 
-    protected void processIncomingObjectFrame(String header, File file, HttpServletResponse response) throws Exception {
+    protected void processIncomingObjectFrame(User user, String header, File file, HttpServletResponse response) throws Exception {
         String messageText = BaltradFrameHandler.getMessageText(header);
 
         // incoming channel listing
@@ -293,9 +314,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             // retrieve subscription list
             List subscribedDataSources = ( List )InitAppUtil.readObjectFromStream(file);
 
-            // identify user by name
-            User user = userManager.getUserByName(
-                    BaltradFrameHandler.getUserName( header ) );
             // return data source list sent back to user to confirm
             // subscription completion
             List confirmedDataSources = new ArrayList();
@@ -513,7 +531,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @return
      * @throws IOException
      */
-    protected int processIncomingDataFrame( String header, File file )
+    protected int processIncomingDataFrame(User user, String header, File file)
             throws IOException {
         String frameSource = BaltradFrameHandler.getSenderNodeName( header ) + "/" +
                 BaltradFrameHandler.getChannel( header );
@@ -552,17 +570,17 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             IFilter filter = bltFileManager.getFilter( dataSourceName );
             boolean matches = metadataMatcher.match(fileEntry.metadata(), filter.getExpression());
             // make sure that user exists locally
-            User user = userManager.getUserByName(sub.getUserName());
+            User receivingUser = userManager.getUserByName(sub.getUserName());
             DeliveryRegisterEntry dre =
-                deliveryRegisterManager.getEntry(user.getId(), fileEntry.uuid());
+                deliveryRegisterManager.getEntry(receivingUser.getId(), fileEntry.uuid());
 
             if (matches && dre == null) {
                 // create frame delivery task
                 HandleFrameTask task = new HandleFrameTask(getDeliveryRegisterManager(),
-                                                           log, user, dataSourceName,
+                                                           log, receivingUser, dataSourceName,
                                                            fileEntry, file);
                 // add task to publisher manager
-                framePublisherManager.getFramePublisher(user.getName()).addTask(task);
+                framePublisherManager.getFramePublisher(receivingUser.getName()).addTask(task);
             }
         }
         return BaltradFrameHandler.HTTP_STATUS_CODE_200;
@@ -579,22 +597,35 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     }
 
     /**
-     * Autheticates incoming frame by verifying user name and password encoded in frame header.
-     * WARNING: Only users belonging to groups ADMIN and PEER are authorized to exchange data.
+     * Check if the frame is indeed from the user
      *
+     * @param user the user to check against
      * @param header Frame header
-     * @return User ID once a frame is successfully authenticated, 0 otherwise
+     * @return true if the frame is from the user
+     *
+     * check if the password contained in the frame is correct
      */
-    public int authenticateFrame( String header ) {
-        String userNameHash = BaltradFrameHandler.getUserName( header );
+    public boolean authenticateFrame( User user, String header ) {
         String passwd = BaltradFrameHandler.getPassword( header );
-        User user = userManager.getUserByNameHash( userNameHash );
-        if( user != null && user.getNameHash().equals( userNameHash )
-            && user.getPassword().equals( passwd ) && ( user.getRoleName().equals( User.ROLE_ADMIN )
-            || user.getRoleName().equals( User.ROLE_PEER ) ) ) return user.getId();
-        else
-            return 0;
+        return user.getPassword().equals(passwd);
     }
+    
+    /**
+     * check if the user is allowed to send messages to this node
+     *
+     * @param user the user to authorize
+     * @return true if the user is authorized
+     *
+     * Only users belonging to groups ADMIN and PEER are authorized to exchange data.
+     */
+    public boolean authorizeUser(User user) {
+        String userRole = user.getRoleName();
+        if (userRole.equals(User.ROLE_ADMIN) || userRole.equals(User.ROLE_PEER)) {
+            return true;
+        }
+        return false;
+    }
+    
     /**
      * Gets user name matching a given user name hash
      * 
@@ -605,6 +636,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         User user = userManager.getUserByNameHash( userNameHash );
         return user.getName();
     }
+  
     /**
      * Gets the list of data sources available for a given remote node.
      *
