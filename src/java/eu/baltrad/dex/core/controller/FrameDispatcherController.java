@@ -114,16 +114,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private List confirmedSubscriptions;
     // synchronized subscription
     private Subscription synkronizedSubscription;
-    /** Remote node's communication scheme */
-    private String remScheme;
-    /** Remote node's host address */
-    private String remHostAddress;
-    /** Remote node's port number */
-    private int remPort;
-    /** Remote node's application context */
-    private String remAppCtx;
-    /** Remote node's entry point address */
-    private String remEntryAddress;
+    /** Remote node's address */
+    private String remNodeAddress;
     // remote node name
     private String remNodeName;
     // remote user name
@@ -168,438 +160,350 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         try {
             ServletFileUpload upload = new ServletFileUpload();
             FileItemIterator iterator = upload.getItemIterator( request );
-            FileItemStream hdrItem = iterator.next();
+            FileItemStream itemStream = null;
 
-            if( hdrItem.getFieldName().equals( BaltradFrame.XML_PART ) ) {
-                InputStream hdrStream = hdrItem.openStream();
-                // Handle form field / message XML header
-                if( hdrItem.isFormField() ) {
-                    // Get header string
-                    String header = Streams.asString( hdrStream );
+            String frameHeader = null;
+            File frameFile = null;
 
-                    // process message frame
-
-                    if( BaltradFrameHandler.getContentType( header ).equals(
-                            BaltradFrameHandler.MSG) ) {
-
-                        // channel listing request - has to be authenticated
-
-                        if( BaltradFrameHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.CHNL_LIST_RQST ) ) {
-                            // user ID set upon authentication
-                            int userId;
-                            if( ( userId = authenticateFrame( header ) ) != 0 ) {
-                                log.info( "Data source listing request received from " +
-                                    "user " + getUserName( BaltradFrameHandler.getUserName( header ) ) + " ("
-                                     + BaltradFrameHandler.getSenderNodeName( header ) + ")" );
-                                
-                                // process channel listing request
-
-                                // create a list of data sources that user is allowed to subscribe
-                                List<Integer> dataSourceIds = dataSourceManager.getDataSourceIds( 
-                                        userId );
-
-                                // data sources allowed to be used by a given user
-                                List<DataSource> dataSources = new ArrayList<DataSource>();
-                                for( int i = 0; i < dataSourceIds.size(); i++ ) {
-                                    dataSources.add( dataSourceManager.getDataSource(
-                                            dataSourceIds.get( i ) ) );
-                                }
-                                // write list to temporary file
-                                File tempFile = InitAppUtil.createTempFile(
-                                        new File( init.getWorkDirPath() ) );
-                                // write object to stream
-                                InitAppUtil.writeObjectToStream( dataSources, tempFile );
-
-                                // set the return address
-                                String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
-
-                                // prepare the return message header
-                                String retHeader = BaltradFrameHandler.createObjectHdr(
-                                        BaltradFrameHandler.MIME_MULTIPART,
-                                        init.getConfiguration().getNodeAddress(),
-                                        init.getConfiguration().getNodeName(),
-                                        BaltradFrameHandler.CHNL_LIST,
-                                        tempFile.getAbsolutePath() );
-                                //
-                                BaltradFrame baltradFrame = new BaltradFrame( retHeader, tempFile );
-                                // process the frame
-                                bfHandler.handleBF( remoteNodeAddress, baltradFrame );
-                                // delete temporary file
-                                InitAppUtil.deleteFile( tempFile );
-                            } else {
-                                log.warn( "Incoming frame could not be authenticated" );
-                            }
-                        } else {
-                            // regular message frame - display message
-                            log.info( BaltradFrameHandler.getMessageText( header ) );
-                        }
-                    }
-
-                    // process object frame
-
-                    if( BaltradFrameHandler.getContentType( header ).equals(
-                            BaltradFrameHandler.OBJECT ) ) {
-                        // incoming channel listing
-
-                        if( BaltradFrameHandler.getMessageText( header ).equals(
-                            BaltradFrameHandler.CHNL_LIST ) ) {
-                            log.info( "Data source listing received from " +
-                                BaltradFrameHandler.getSenderNodeName( header ) );
-
-                            // process incoming data source listing
-
-                            FileItemStream fileItem = iterator.next();
-                            InputStream fileStream = fileItem.openStream();
-                            // write list to temporary file
-                            File tempFile = InitAppUtil.createTempFile( new File(
-                                    init.getWorkDirPath() ) );
-                            InitAppUtil.saveFile( fileStream, tempFile );
-                            // retrieve channel list and save it to class field
-                            List remoteDataSources = ( List )InitAppUtil.readObjectFromStream(
-                                    tempFile );
-                            // set channel listing
-                            setDataSourceListing( remoteDataSources );
-                            setRemNodeName( BaltradFrameHandler.getSenderNodeName( header ) );
-                            /*
-                             XXX: is this important?
-                            setRemScheme( BaltradFrameHandler.getSenderScheme( header ) );
-                            setRemHostAddress( BaltradFrameHandler.getSenderHostAddress( header ) );
-                            setRemPort( BaltradFrameHandler.getSenderPort( header ) );
-                            setRemAppCtx( BaltradFrameHandler.getSenderAppCtx( header ) );
-                            setRemEntryAddress( BaltradFrameHandler.getSenderEntryAddress(
-                                    header ) );
-                            */
-                            // delete temporary file
-                            InitAppUtil.deleteFile( tempFile );
-                        }
-
-                        // incoming channel subscription request
-
-                        if( BaltradFrameHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.CHNL_SBN_RQST ) ) {
-                            log.info( "Data source subscription request received from " +
-                                BaltradFrameHandler.getSenderNodeName( header ) );
-
-                            // process incoming subscription request
-
-                            FileItemStream fileItem = iterator.next();
-                            InputStream fileStream = fileItem.openStream();
-                            // write subscription request to temporary file
-                            // write list to temporary file
-                            File tempFile = InitAppUtil.createTempFile(
-                                        new File( init.getWorkDirPath() ) );
-                            InitAppUtil.saveFile( fileStream, tempFile );
-                            // retrieve subscription list
-                            List subscribedDataSources = ( List )InitAppUtil.readObjectFromStream(
-                                    tempFile );
-
-                            // delete temporary file
-                            InitAppUtil.deleteFile( tempFile );
-                            // identify user by name
-                            User user = userManager.getUserByName(
-                                    BaltradFrameHandler.getUserName( header ) );
-                            // return data source list sent back to user to confirm
-                            // subscription completion
-                            List confirmedDataSources = new ArrayList();
-                            if( subscribedDataSources != null ) {
-                                for( int i = 0; i < subscribedDataSources.size(); i++ ) {
-                                    DataSource requestedDataSource =
-                                            ( DataSource )subscribedDataSources.get( i );
-                                    DataSource localDataSource = dataSourceManager.getDataSource(
-                                            requestedDataSource.getName() );
-                                    Subscription subs = null;
-                                    // make sure user hasn't already subscribed the channels
-                                    if( subscriptionManager.getSubscription( user.getName(),
-                                            localDataSource.getName(),
-                                            Subscription.REMOTE_SUBSCRIPTION ) != null ) {
-                                        log.warn( "User " + user.getName() + " has already " +
-                                            "subscribed " + localDataSource.getName() );
-                                    } else {
-                                        // add subscription
-                                        subs = new Subscription( System.currentTimeMillis(),
-                                            user.getName(), localDataSource.getName(),
-                                            init.getConfiguration().getNodeName(),
-                                            Subscription.REMOTE_SUBSCRIPTION, false, false,
-                                            init.getConfiguration().getScheme(),
-                                            init.getConfiguration().getHostAddress(),
-                                            init.getConfiguration().getPort(),
-                                            init.getConfiguration().getAppCtx(),
-                                            init.getConfiguration().getEntryAddress() );
-                                        subscriptionManager.saveSubscription( subs );
-                                        confirmedDataSources.add( requestedDataSource );
-                                    }
-                                }
-                            }
-                            // send subscription confirmation
-
-                            // write list to temporary file
-                            tempFile = InitAppUtil.createTempFile(
-                                    new File( init.getWorkDirPath() ) );
-                            // write object to the stream
-                            InitAppUtil.writeObjectToStream( confirmedDataSources, tempFile );
-                            // set the return address
-                            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
-                            // prepare the return message header
-                            String retHeader = BaltradFrameHandler.createObjectHdr(
-                                    BaltradFrameHandler.MIME_MULTIPART,
-                                    init.getConfiguration().getNodeAddress(),
-                                    init.getConfiguration().getNodeName(),
-                                    BaltradFrameHandler.CHNL_SBN_CFN,
-                                    tempFile.getAbsolutePath() );
-                            //
-                            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile);
-                            // process the frame
-                            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
-                            // delete temporary file
-                            InitAppUtil.deleteFile( tempFile );
-                        }
-                        // incoming channel subscription confirmation
-
-                        if( BaltradFrameHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.CHNL_SBN_CFN ) ) {
-                            log.info( "Data source subscription confirmation received " +
-                                " from " + BaltradFrameHandler.getSenderNodeName( header ) );
-
-                            // process incoming subscription confirmation
-
-                            FileItemStream fileItem = iterator.next();
-                            InputStream fileStream = fileItem.openStream();
-                            // write list of confirmed subscriptions to temporary file
-                            File tempFile = InitAppUtil.createTempFile(
-                                        new File( init.getWorkDirPath() ) );
-                            InitAppUtil.saveFile( fileStream, tempFile );
-                            // retrieve list of confirmed channels
-                            List confirmedDataSources = ( List )InitAppUtil.readObjectFromStream(
-                                    tempFile );
-                            setConfirmedSubscriptions( confirmedDataSources );
-                            // delete temporary file
-                            InitAppUtil.deleteFile( tempFile );
-                        }
-
-                        // incoming channel subscription change request
-
-                        if( BaltradFrameHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.SBN_CHNG_RQST ) ) {
-                            log.info( "Data source subscription change request received from " +
-                                    BaltradFrameHandler.getSenderNodeName( header ) );
-
-                            // process incoming subscription change request
-
-                            FileItemStream fileItem = iterator.next();
-                            InputStream fileStream = fileItem.openStream();
-                            // write subscription change request to temporary file
-                            File tempFile = InitAppUtil.createTempFile(
-                                        new File( init.getWorkDirPath() ) );
-                            InitAppUtil.saveFile( fileStream, tempFile );
-                            // retrieve subscription object
-                            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
-                                    tempFile );
-                            // delete temporary file
-                            InitAppUtil.deleteFile( tempFile );
-
-                            // create new subscription object
-                            Subscription s = new Subscription( System.currentTimeMillis(),
-                                    subs.getUserName(), subs.getDataSourceName(),
-                                    subs.getOperatorName(), Subscription.REMOTE_SUBSCRIPTION,
-                                    false, false, subs.getScheme(), subs.getHostAddress(),
-                                    subs.getPort(), subs.getAppCtx(), subs.getEntryAddress() );
-                            // subscription object serves as confirmation
-                            Subscription confirmedSub = null;
-                            if( subs.getActive() ) {
-                                if( subscriptionManager.getSubscription( s.getUserName(), 
-                                    s.getDataSourceName(), Subscription.REMOTE_SUBSCRIPTION ) == null) {
-                                    // subscription doesn't exist in the database - add as new
-                                    // subscription
-                                    subscriptionManager.saveSubscription( s );
-                                    confirmedSub = s;
-                                    confirmedSub.setActive( true );
-                                    log.info( "User " + s.getUserName() + " subscribed " +
-                                            s.getDataSourceName() );
-                                } else {
-                                    // subscription exists in the database - modify subscription
-                                    subscriptionManager.updateSubscription( s.getDataSourceName(),
-                                            Subscription.REMOTE_SUBSCRIPTION, true );
-                                    confirmedSub = s;
-                                    confirmedSub.setActive( true );
-                                    log.info( "User " + s.getUserName() + " subscribed " +
-                                            s.getDataSourceName() );
-                                }
-                            } else {
-                                // remove remote subscription
-                                subscriptionManager.deleteSubscription( s.getUserName(),
-                                        s.getDataSourceName(), s.getType() );
-                                confirmedSub = s;
-                                log.info( "User " + s.getUserName() + " cancelled subscription of "
-                                        + s.getDataSourceName() );
-                            }
-
-                            // send subscription change confirmation
-
-                            // write subscription object to temporary file
-                            tempFile = InitAppUtil.createTempFile( 
-                                    new File( init.getWorkDirPath() ) );
-                            // set the return address
-                            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
-
-                            String returnMessage = null;
-                            if (confirmedSub != null) {
-                                returnMessage = BaltradFrameHandler.SBN_CHNG_OK;
-                            } else {
-                                returnMessage = BaltradFrameHandler.SBN_CHNG_FAIL;
-                            }
-
-                            String retHeader = BaltradFrameHandler.createObjectHdr(
-                                    BaltradFrameHandler.MIME_MULTIPART,
-                                    init.getConfiguration().getNodeAddress(),
-                                    init.getConfiguration().getNodeName(),
-                                    returnMessage,
-                                    tempFile.getAbsolutePath()
-                            );
-                            // write object to the stream
-                            InitAppUtil.writeObjectToStream( confirmedSub, tempFile );
-
-                            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile);
-                            // process the frame
-                            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
-                            // delete temporary file
-                            InitAppUtil.deleteFile( tempFile );
-                        }
-
-                        // incoming channel subscription change confirmation - success
-
-                        if( BaltradFrameHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.SBN_CHNG_OK ) ) {
-                            FileItemStream fileItem = iterator.next();
-                            InputStream fileStream = fileItem.openStream();
-                            // write subscription change request to temporary file
-                            File tempFile = InitAppUtil.createTempFile(
-                                        new File( init.getWorkDirPath() ) );
-                            InitAppUtil.saveFile( fileStream, tempFile );
-                            // retrieve subscription object
-                            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
-                                    tempFile );
-                            // delete temporary file
-                            InitAppUtil.deleteFile( tempFile );
-                            String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
-                            log.info( "Remote node " + BaltradFrameHandler.getSenderNodeName(
-                                    header ) + " changed your subscription status of " +
-                                    subs.getDataSourceName() + " to: " + selected );
-                        }
-
-                        // incoming channel subscription change confirmation - failure
-
-                        if( BaltradFrameHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.SBN_CHNG_FAIL ) ) {
-                            FileItemStream fileItem = iterator.next();
-                            InputStream fileStream = fileItem.openStream();
-                            // write subscription change request to temporary file
-                            File tempFile = InitAppUtil.createTempFile(
-                                        new File( init.getWorkDirPath() ) );
-                            InitAppUtil.saveFile( fileStream, tempFile );
-                            // retrieve subscription object
-                            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
-                                    tempFile );
-                            // delete temporary file
-                            InitAppUtil.deleteFile( tempFile );
-                            String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
-                            log.error( "Remote node " + BaltradFrameHandler.getSenderNodeName(
-                                    header )  + " failed to change your subscription status of "
-                                + subs.getDataSourceName() + " to: " + selected );
-                        }
-
-                        // channel synchronization request
-
-                        if( BaltradFrameHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.CHNL_SYNC_RQST ) ) {
-                            FileItemStream fileItem = iterator.next();
-                            InputStream fileStream = fileItem.openStream();
-                            // write subscription object to temporary file
-                            File tempFile = InitAppUtil.createTempFile(
-                                        new File( init.getWorkDirPath() ) );
-                            InitAppUtil.saveFile( fileStream, tempFile );
-                            // retrieve subscription object from stream
-                            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
-                                    tempFile );
-                            // delete temporary file
-                            InitAppUtil.deleteFile( tempFile );
-                            // check if the subscribed channel is available
-                            try {
-                                DataSource dataSource = dataSourceManager.getDataSource(
-                                        subs.getDataSourceName() );
-                                if( dataSource == null ) {
-                                    subs.setSynkronized( false );
-                                }
-                            } catch( NullPointerException e ) {
-                                log.error( "Failed to synchronize subscribed data source: "
-                                        + subs.getDataSourceName(), e );
-                            }
-
-                            // send subscription back to requesting node
-
-                            // write list to temporary file
-                            tempFile = InitAppUtil.createTempFile(
-                                    new File( init.getWorkDirPath() ) );
-                            // write object to the stream
-                            InitAppUtil.writeObjectToStream( subs, tempFile );
-                            // set the return address
-                            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
-                            // prepare the return message header
-                            String retHeader = BaltradFrameHandler.createObjectHdr(
-                                    BaltradFrameHandler.MIME_MULTIPART,
-                                    init.getConfiguration().getNodeAddress(),
-                                    init.getConfiguration().getNodeName(),
-                                    BaltradFrameHandler.CHNL_SYNC_RSPNS,
-                                    tempFile.getAbsolutePath() );
-                            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile );
-                            // process the frame
-                            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
-                            // delete temporary file
-                            InitAppUtil.deleteFile( tempFile );
-                        }
-                        // channel synchronization response
-
-                        if( BaltradFrameHandler.getMessageText( header ).equals(
-                                BaltradFrameHandler.CHNL_SYNC_RSPNS ) ) {
-                            FileItemStream fileItem = iterator.next();
-                            InputStream fileStream = fileItem.openStream();
-                            // write subscription object to temporary file
-                            File tempFile = InitAppUtil.createTempFile(
-                                        new File( init.getWorkDirPath() ) );
-                            InitAppUtil.saveFile( fileStream, tempFile );
-                            // retrieve subscription object from stream
-                            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(
-                                    tempFile );
-                            // delete temporary file
-                            InitAppUtil.deleteFile( tempFile );
-                            setSynkronizedSubscription( subs );
-                        }
-                    }
-
-                    // incoming data frame
-                    if( BaltradFrameHandler.getContentType( header ).equals(
-                            BaltradFrameHandler.FILE ) ) {
-                        FileItemStream fileItem = iterator.next();
-                        response.setStatus(handleIncomingDataFrame(header, fileItem));
+            if (iterator.hasNext()) {
+                itemStream = iterator.next();
+                if (itemStream.getFieldName().equals(BaltradFrame.XML_PART)) {
+                    InputStream hdrStream = itemStream.openStream();
+                    // Handle form field / message XML header
+                    if (itemStream.isFormField()) {
+                        // Get header string
+                        frameHeader = Streams.asString(hdrStream);
                     }
                 }
             }
+
+            if (iterator.hasNext()) {
+                itemStream = iterator.next();
+                InputStream fileStream = itemStream.openStream();
+                // write to a temporary file
+                frameFile = InitAppUtil.createTempFile(new File(init.getWorkDirPath()));
+                InitAppUtil.saveFile(fileStream, frameFile);
+            }
+
+            if (frameHeader != null) {
+                processIncomingFrame(frameHeader, frameFile, response);
+            } else {
+                log.error("Invalid baltrad frame (no header parsed from request)");
+                response.setStatus(BaltradFrameHandler.HTTP_STATUS_CODE_500);
+            }
+        } catch (Exception e) {
+            log.error("Frame dispatcher error", e);
+            response.setStatus(BaltradFrameHandler.HTTP_STATUS_CODE_500);
+        } finally {
             // clean work directory from temporary files
             InitAppUtil.cleanUpTempFiles( init.getWorkDirPath() );
-
-        } catch( Exception e ) {
-            log.error( "Frame dispatcher error", e );
         }
     }
 
-    /**
-     * Post a baltrad frame to a remote node
-     *
-     * @param remoteNodeAddress address this frame should be posted to
-     * @param baltradFrame Reference to BaltradFrame object
-     */
-    public void doPost(String remoteNodeAddress, BaltradFrame baltradFrame) {
-        bfHandler.handleBF(remoteNodeAddress, baltradFrame);
+    protected void processIncomingFrame(String header, File file, HttpServletResponse response) throws Exception {
+        String contentType = BaltradFrameHandler.getContentType(header);
+
+        if (contentType.equals(BaltradFrameHandler.MSG)) {
+            processIncomingMessageFrame(header, file, response);
+        } else if (contentType.equals(BaltradFrameHandler.OBJECT)) {
+            processIncomingObjectFrame(header, file, response);
+        } else if (contentType.equals(BaltradFrameHandler.FILE)) {
+            response.setStatus(processIncomingDataFrame(header, file));
+        } else {
+            log.warn("unhandled baltrad frame type: " + contentType);
+            response.setStatus(BaltradFrameHandler.HTTP_STATUS_CODE_500);
+        }
+    }
+
+    protected void processIncomingMessageFrame(String header, File file, HttpServletResponse response) throws Exception {
+        String messageText = BaltradFrameHandler.getMessageText(header);
+
+        // channel listing request - has to be authenticated
+        if (messageText.equals(BaltradFrameHandler.CHNL_LIST_RQST)) {
+            // user ID set upon authentication
+            int userId;
+            if( ( userId = authenticateFrame( header ) ) != 0 ) {
+                log.info( "Data source listing request received from " +
+                    "user " + getUserName( BaltradFrameHandler.getUserName( header ) ) + " ("
+                     + BaltradFrameHandler.getSenderNodeName( header ) + ")" );
+                
+                // process channel listing request
+
+                // create a list of data sources that user is allowed to subscribe
+                List<Integer> dataSourceIds = dataSourceManager.getDataSourceIds( 
+                        userId );
+
+                // data sources allowed to be used by a given user
+                List<DataSource> dataSources = new ArrayList<DataSource>();
+                for( int i = 0; i < dataSourceIds.size(); i++ ) {
+                    dataSources.add( dataSourceManager.getDataSource(
+                            dataSourceIds.get( i ) ) );
+                }
+                // write list to temporary file
+                File tempFile = InitAppUtil.createTempFile(
+                        new File( init.getWorkDirPath() ) );
+                // write object to stream
+                InitAppUtil.writeObjectToStream( dataSources, tempFile );
+
+                // set the return address
+                String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
+
+                // prepare the return message header
+                String retHeader = BaltradFrameHandler.createObjectHdr(
+                        BaltradFrameHandler.MIME_MULTIPART,
+                        init.getConfiguration().getNodeAddress(),
+                        init.getConfiguration().getNodeName(),
+                        BaltradFrameHandler.CHNL_LIST,
+                        tempFile.getAbsolutePath() );
+                //
+                BaltradFrame baltradFrame = new BaltradFrame( retHeader, tempFile );
+                // process the frame
+                bfHandler.handleBF( remoteNodeAddress, baltradFrame );
+                // delete temporary file
+                InitAppUtil.deleteFile( tempFile );
+            } else {
+                log.warn( "Incoming frame could not be authenticated" );
+            }
+        } else {
+            // regular message frame - display message
+            log.info( BaltradFrameHandler.getMessageText( header ) );
+        }
+    }
+
+    protected void processIncomingObjectFrame(String header, File file, HttpServletResponse response) throws Exception {
+        String messageText = BaltradFrameHandler.getMessageText(header);
+
+        // incoming channel listing
+        if (messageText.equals(BaltradFrameHandler.CHNL_LIST)) {
+            log.info( "Data source listing received from " +
+                BaltradFrameHandler.getSenderNodeName( header ) );
+
+            // process incoming data source listing
+
+            List remoteDataSources = ( List )InitAppUtil.readObjectFromStream(file);
+            // set channel listing
+            setDataSourceListing( remoteDataSources );
+            setRemNodeAddress( BaltradFrameHandler.getSenderNodeAddress( header ) );
+
+        // incoming channel subscription request
+        } else if (messageText.equals(BaltradFrameHandler.CHNL_SBN_RQST)) {
+            log.info( "Data source subscription request received from " +
+                BaltradFrameHandler.getSenderNodeName( header ) );
+
+            // retrieve subscription list
+            List subscribedDataSources = ( List )InitAppUtil.readObjectFromStream(file);
+
+            // identify user by name
+            User user = userManager.getUserByName(
+                    BaltradFrameHandler.getUserName( header ) );
+            // return data source list sent back to user to confirm
+            // subscription completion
+            List confirmedDataSources = new ArrayList();
+            if( subscribedDataSources != null ) {
+                for( int i = 0; i < subscribedDataSources.size(); i++ ) {
+                    DataSource requestedDataSource =
+                            ( DataSource )subscribedDataSources.get( i );
+                    DataSource localDataSource = dataSourceManager.getDataSource(
+                            requestedDataSource.getName() );
+                    Subscription subs = null;
+                    // make sure user hasn't already subscribed the channels
+                    if( subscriptionManager.getSubscription( user.getName(),
+                            localDataSource.getName(),
+                            Subscription.REMOTE_SUBSCRIPTION ) != null ) {
+                        log.warn( "User " + user.getName() + " has already " +
+                            "subscribed " + localDataSource.getName() );
+                    } else {
+                        // add subscription
+                        subs = new Subscription( System.currentTimeMillis(),
+                            user.getName(), localDataSource.getName(),
+                            init.getConfiguration().getNodeName(),
+                            Subscription.REMOTE_SUBSCRIPTION, false, false,
+                            init.getConfiguration().getScheme(),
+                            init.getConfiguration().getHostAddress(),
+                            init.getConfiguration().getPort(),
+                            init.getConfiguration().getAppCtx(),
+                            init.getConfiguration().getEntryAddress() );
+                        subscriptionManager.saveSubscription( subs );
+                        confirmedDataSources.add( requestedDataSource );
+                    }
+                }
+            }
+            // send subscription confirmation
+
+            // write list to temporary file
+            File tempFile = InitAppUtil.createTempFile(
+                    new File( init.getWorkDirPath() ) );
+            // write object to the stream
+            InitAppUtil.writeObjectToStream( confirmedDataSources, tempFile );
+            // set the return address
+            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
+            // prepare the return message header
+            String retHeader = BaltradFrameHandler.createObjectHdr(
+                    BaltradFrameHandler.MIME_MULTIPART,
+                    init.getConfiguration().getNodeAddress(),
+                    init.getConfiguration().getNodeName(),
+                    BaltradFrameHandler.CHNL_SBN_CFN,
+                    tempFile.getAbsolutePath() );
+            //
+            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile);
+            // process the frame
+            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
+            // delete temporary file
+            InitAppUtil.deleteFile( tempFile );
+
+        // incoming channel subscription confirmation
+        } else if (messageText.equals(BaltradFrameHandler.CHNL_SBN_CFN)) {
+            log.info( "Data source subscription confirmation received " +
+                " from " + BaltradFrameHandler.getSenderNodeName( header ) );
+
+            // process incoming subscription confirmation
+
+            // retrieve list of confirmed channels
+            List confirmedDataSources = ( List )InitAppUtil.readObjectFromStream(file);
+            setConfirmedSubscriptions( confirmedDataSources );
+
+        // incoming channel subscription change request
+        } else if (messageText.equals(BaltradFrameHandler.SBN_CHNG_RQST)) {
+            log.info( "Data source subscription change request received from " +
+                    BaltradFrameHandler.getSenderNodeName( header ) );
+
+            // process incoming subscription change request
+
+            // retrieve subscription object
+            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(file);
+
+            // create new subscription object
+            Subscription s = new Subscription( System.currentTimeMillis(),
+                    subs.getUserName(), subs.getDataSourceName(),
+                    subs.getOperatorName(), Subscription.REMOTE_SUBSCRIPTION,
+                    false, false, subs.getScheme(), subs.getHostAddress(),
+                    subs.getPort(), subs.getAppCtx(), subs.getEntryAddress() );
+            // subscription object serves as confirmation
+            Subscription confirmedSub = null;
+            if( subs.getActive() ) {
+                if( subscriptionManager.getSubscription( s.getUserName(), 
+                    s.getDataSourceName(), Subscription.REMOTE_SUBSCRIPTION ) == null) {
+                    // subscription doesn't exist in the database - add as new
+                    // subscription
+                    subscriptionManager.saveSubscription( s );
+                    confirmedSub = s;
+                    confirmedSub.setActive( true );
+                    log.info( "User " + s.getUserName() + " subscribed " +
+                            s.getDataSourceName() );
+                } else {
+                    // subscription exists in the database - modify subscription
+                    subscriptionManager.updateSubscription( s.getDataSourceName(),
+                            Subscription.REMOTE_SUBSCRIPTION, true );
+                    confirmedSub = s;
+                    confirmedSub.setActive( true );
+                    log.info( "User " + s.getUserName() + " subscribed " +
+                            s.getDataSourceName() );
+                }
+            } else {
+                // remove remote subscription
+                subscriptionManager.deleteSubscription( s.getUserName(),
+                        s.getDataSourceName(), s.getType() );
+                confirmedSub = s;
+                log.info( "User " + s.getUserName() + " cancelled subscription of "
+                        + s.getDataSourceName() );
+            }
+
+            // send subscription change confirmation
+
+            // write subscription object to temporary file
+            File tempFile = InitAppUtil.createTempFile( 
+                    new File( init.getWorkDirPath() ) );
+            // set the return address
+            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
+
+            String returnMessage = null;
+            if (confirmedSub != null) {
+                returnMessage = BaltradFrameHandler.SBN_CHNG_OK;
+            } else {
+                returnMessage = BaltradFrameHandler.SBN_CHNG_FAIL;
+            }
+
+            String retHeader = BaltradFrameHandler.createObjectHdr(
+                    BaltradFrameHandler.MIME_MULTIPART,
+                    init.getConfiguration().getNodeAddress(),
+                    init.getConfiguration().getNodeName(),
+                    returnMessage,
+                    tempFile.getAbsolutePath()
+            );
+            // write object to the stream
+            InitAppUtil.writeObjectToStream( confirmedSub, tempFile );
+
+            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile);
+            // process the frame
+            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
+            // delete temporary file
+            InitAppUtil.deleteFile( tempFile );
+
+        // incoming channel subscription change confirmation - success
+        } else if (messageText.equals(BaltradFrameHandler.SBN_CHNG_OK)) {
+            // retrieve subscription object
+            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(file);
+            String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
+            log.info( "Remote node " + BaltradFrameHandler.getSenderNodeName(
+                    header ) + " changed your subscription status of " +
+                    subs.getDataSourceName() + " to: " + selected );
+
+        // incoming channel subscription change confirmation - failure
+        } else if (messageText.equals(BaltradFrameHandler.SBN_CHNG_FAIL)) {
+            // retrieve subscription object
+            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(file);
+            // delete temporary file
+            String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
+            log.error( "Remote node " + BaltradFrameHandler.getSenderNodeName(
+                    header )  + " failed to change your subscription status of "
+                + subs.getDataSourceName() + " to: " + selected );
+
+        // channel synchronization request
+        } else if (messageText.equals(BaltradFrameHandler.CHNL_SYNC_RQST)) {
+            // retrieve subscription object from stream
+            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(file);
+            // check if the subscribed channel is available
+            try {
+                DataSource dataSource = dataSourceManager.getDataSource(
+                        subs.getDataSourceName() );
+                if( dataSource == null ) {
+                    subs.setSynkronized( false );
+                }
+            } catch( NullPointerException e ) {
+                log.error( "Failed to synchronize subscribed data source: "
+                        + subs.getDataSourceName(), e );
+            }
+
+            // send subscription back to requesting node
+
+            // write list to temporary file
+            File tempFile = InitAppUtil.createTempFile(
+                    new File( init.getWorkDirPath() ) );
+            // write object to the stream
+            InitAppUtil.writeObjectToStream( subs, tempFile );
+            // set the return address
+            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
+            // prepare the return message header
+            String retHeader = BaltradFrameHandler.createObjectHdr(
+                    BaltradFrameHandler.MIME_MULTIPART,
+                    init.getConfiguration().getNodeAddress(),
+                    init.getConfiguration().getNodeName(),
+                    BaltradFrameHandler.CHNL_SYNC_RSPNS,
+                    tempFile.getAbsolutePath() );
+            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile );
+            // process the frame
+            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
+            // delete temporary file
+            InitAppUtil.deleteFile( tempFile );
+
+        // channel synchronization response
+        } else if (messageText.equals(BaltradFrameHandler.CHNL_SYNC_RSPNS)) {
+            // retrieve subscription object from stream
+            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(file);
+            setSynkronizedSubscription( subs );
+        } else {
+            log.error("unhandled object message: " + messageText);
+        }
     }
 
     /**
@@ -609,18 +513,14 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @return
      * @throws IOException
      */
-    protected int handleIncomingDataFrame( String header, FileItemStream fileItem )
+    protected int processIncomingDataFrame( String header, File file )
             throws IOException {
         String frameSource = BaltradFrameHandler.getSenderNodeName( header ) + "/" +
                 BaltradFrameHandler.getChannel( header );
         log.info("New data frame received from " + frameSource);
-        // write data to swap file
-        File swapFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
-        InputStream fileStream = fileItem.openStream();
-        InitAppUtil.saveFile( fileStream, swapFile );
         FileEntry fileEntry = null;
         try {
-            fileEntry = fileCatalog.store( swapFile.getAbsolutePath() );
+            fileEntry = fileCatalog.store( file.getAbsolutePath() );
         } catch (DuplicateEntry e) {
             log.error("Duplicate entry error", e );
             // exception while storing file in FileCatalog - set error code
@@ -660,12 +560,22 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 // create frame delivery task
                 HandleFrameTask task = new HandleFrameTask(getDeliveryRegisterManager(),
                                                            log, user, dataSourceName,
-                                                           fileEntry, swapFile);
+                                                           fileEntry, file);
                 // add task to publisher manager
                 framePublisherManager.getFramePublisher(user.getName()).addTask(task);
             }
         }
         return BaltradFrameHandler.HTTP_STATUS_CODE_200;
+    }
+
+    /**
+     * Post a baltrad frame to a remote node
+     *
+     * @param remoteNodeAddress address this frame should be posted to
+     * @param baltradFrame Reference to BaltradFrame object
+     */
+    public void doPost(String remoteNodeAddress, BaltradFrame baltradFrame) {
+        bfHandler.handleBF(remoteNodeAddress, baltradFrame);
     }
 
     /**
@@ -748,87 +658,21 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public void resetRemNodeName() { this.remNodeName = ""; }
     /**
-     * Get remote node's communication scheme.
+     * Get remote node's address.
      *
-     * @return remScheme Remote node's communication scheme
+     * @return Remote node'saddress
      */
-    public String getRemScheme() { return remScheme; }
+    public String getRemNodeAddress() { return remNodeAddress; }
     /**
-     * Set remote node's communication scheme
+     * Set remote node's address.
      *
-     * @param remScheme Remote node's communication scheme to set
+     * @param  Remote node's address to set
      */
-    public void setRemScheme( String remScheme ) { this.remScheme = remScheme; }
+    public void setRemNodeAddress( String remNodeAddress ) { this.remNodeAddress = remNodeAddress; }
     /**
-     * Reset remote node's communication scheme.
+     * Reset remote node's address.
      */
-    public void resetRemScheme() { this.remScheme = ""; }
-    /**
-     * Get remote node's host address.
-     *
-     * @return remHostAddress Remote node's host address
-     */
-    public String getRemHostAddress() { return remHostAddress; }
-    /**
-     * Set remote node's host address.
-     *
-     * @param remHostAddress Remote node's host address to set
-     */
-    public void setRemHostAddress( String remHostAddress ) { this.remHostAddress = remHostAddress; }
-    /**
-     * Reset remote node's host address.
-     */
-    public void resetRemHostAddress() { this.remHostAddress = ""; }
-    /**
-     * Get remote node's port number.
-     *
-     * @return remPort Remote node's port number
-     */
-    public int getRemPort() { return remPort; }
-    /**
-     * Set remote node's port number.
-     *
-     * @param remPort Remote node's port number to set
-     */
-    public void setRemPort(int remPort) { this.remPort = remPort; }
-    /**
-     * Reset remote node's port number.
-     */
-    public void resetRemPort() { this.remPort = 0; }
-    /**
-     * Get remote node's application context.
-     *
-     * @return remAppCtx Remote node's application context
-     */
-    public String getRemAppCtx() { return remAppCtx; }
-    /**
-     * Set remote node's application context.
-     *
-     * @param remAppCtx Remote node's application context to set
-     */
-    public void setRemAppCtx(String remAppCtx) { this.remAppCtx = remAppCtx; }
-    /**
-     * Reset remote node's application context.
-     */
-    public void resetRemAppCtx() { this.remAppCtx = ""; }
-    /**
-     * Get remote node's entry point address.
-     *
-     * @return remEntryAddress Remote node's entry point address
-     */
-    public String getRemEntryAddress() { return remEntryAddress; }
-    /**
-     * Set remote node's entry point address.
-     *
-     * @param remEntryAddress Remote node's entry point address to set.
-     */
-    public void setRemEntryAddress( String remEntryAddress ) {
-        this.remEntryAddress = remEntryAddress;
-    }
-    /**
-     * Reset remote node's entry point address.
-     */
-    public void resetRemEntryAddress() { this.remEntryAddress = ""; }
+    public void resetRemNodeAddress() { this.remNodeAddress = ""; }
     /**
      * Gets local user name.
      *

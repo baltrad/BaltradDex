@@ -77,16 +77,8 @@ public class RemoteDataSourceController extends MultiActionController {
     private List subscribedDataSources;
     // remote node name
     private String senderNodeName;
-     /** Sender communication scheme */
-    private String senderScheme;
-    /** Sender host address */
-    private String senderHostAddress;
-    /** Sender port number */
-    private int senderPort;
-    /** Sender application context */
-    private String senderAppCtx;
-    /** Sender entry point address */
-    private String senderEntryAddress;
+    /** Sender node address */
+    private String senderNodeAddress;
     // user name
     private String userName;
     // user's password
@@ -113,19 +105,10 @@ public class RemoteDataSourceController extends MultiActionController {
         // set sender node name
         setSenderNodeName( frameDispatcherController.getRemNodeName() );
         // set sender node address
-        setSenderScheme( frameDispatcherController.getRemScheme() );
-        setSenderHostAddress( frameDispatcherController.getRemHostAddress() );
-        setSenderPort( frameDispatcherController.getRemPort() );
-        setSenderAppCtx( frameDispatcherController.getRemAppCtx() );
-        setSenderEntryAddress( frameDispatcherController.getRemEntryAddress() );
+        setSenderNodeAddress( frameDispatcherController.getRemNodeAddress() );
         // reset remote data source list, node name and address stored in FrameDispatcherController
         frameDispatcherController.resetDataSourceListing();
-        frameDispatcherController.resetRemNodeName();
-        frameDispatcherController.resetRemScheme();
-        frameDispatcherController.resetRemHostAddress();
-        frameDispatcherController.resetRemPort();
-        frameDispatcherController.resetRemAppCtx();
-        frameDispatcherController.resetRemEntryAddress();
+        frameDispatcherController.resetRemNodeAddress();
         // set sender node name
         request.setAttribute( SENDER_NODE_NAME_KEY, getSenderNodeName() );
         return new ModelAndView( DATA_SOURCES_VIEW, DATA_SOURCES_KEY, getRemoteDataSources() );
@@ -184,7 +167,7 @@ public class RemoteDataSourceController extends MultiActionController {
             BaltradFrame baltradFrame = new BaltradFrame( hdrStr, tempFile );
             // handle the frame
             frameDispatcherController.setBfHandler( bfHandler );
-            frameDispatcherController.doPost( getSenderHostAddress(), baltradFrame );
+            frameDispatcherController.doPost( getSenderNodeAddress(), baltradFrame );
             // delete temporary file
             InitAppUtil.deleteFile( tempFile );
             // check subscription operation status
@@ -199,11 +182,12 @@ public class RemoteDataSourceController extends MultiActionController {
                     log.warn( "You have already subscribed to " + dataSource.getName() );
                 } else {
                     // add local subscription
+                    NodeAddress senderAddress = new NodeAddress(senderNodeAddress);
                     Subscription subs = new Subscription( System.currentTimeMillis(),
                         frameDispatcherController.getLocUsrName(), dataSource.getName(),
                         getSenderNodeName(), Subscription.LOCAL_SUBSCRIPTION, true, true,
-                        getSenderScheme(), getSenderHostAddress(), getSenderPort(),
-                        getSenderAppCtx(), getSenderEntryAddress() );
+                        senderAddress.getScheme(), senderAddress.getHostAddress(), senderAddress.getPort(),
+                        senderAddress.getAppCtx(), senderAddress.getEntryAddress() );
                     subscriptionManager.saveSubscription( subs );
                 }
             }
@@ -277,68 +261,18 @@ public class RemoteDataSourceController extends MultiActionController {
      */
     public void setSenderNodeName( String senderNodeName ) { this.senderNodeName = senderNodeName; }
     /**
-     * Get sender's communication scheme.
+     * Get sender's node address.
      *
-     * @return senderScheme Sender's communication scheme
+     * @return Sender's node address
      */
-    public String getSenderScheme() { return senderScheme; }
-    /**
-     * Set sender's communication scheme
-     *
-     * @param senderScheme Sender's communication scheme to set
-     */
-    public void setSenderScheme( String senderScheme ) { this.senderScheme = senderScheme; }
-    /**
-     * Get sender's host address.
-     *
-     * @return senderHostAddress Sender's host address
-     */
-    public String getSenderHostAddress() { return senderHostAddress; }
+    public String getSenderNodeAddress() { return senderNodeAddress; }
     /**
      * Set sender's host address.
      *
-     * @param senderHostAddress Sender's host address to set
+     * @param senderNodeAddress Sender's host address to set
      */
-    public void setSenderHostAddress( String senderHostAddress ) {
-        this.senderHostAddress = senderHostAddress;
-    }
-    /**
-     * Get sender's port number.
-     *
-     * @return senderPort Sender's port number
-     */
-    public int getSenderPort() { return senderPort; }
-    /**
-     * Set sender's port number.
-     *
-     * @param senderPort Remote node's port number to set
-     */
-    public void setSenderPort(int senderPort) { this.senderPort = senderPort; }
-    /**
-     * Get sender's application context.
-     *
-     * @return senderAppCtx Sender's application context
-     */
-    public String getSenderAppCtx() { return senderAppCtx; }
-    /**
-     * Set sender's application context.
-     *
-     * @param senderAppCtx Sender's application context to set
-     */
-    public void setSenderAppCtx( String senderAppCtx ) { this.senderAppCtx = senderAppCtx; }
-    /**
-     * Get sender's entry point address.
-     *
-     * @return senderEntryAddress Sender's entry point address
-     */
-    public String getSenderEntryAddress() { return senderEntryAddress; }
-    /**
-     * Set sender's entry point address.
-     *
-     * @param senderEntryAddress Sender's entry point address to set.
-     */
-    public void setSenderEntryAddress( String senderEntryAddress ) {
-        this.senderEntryAddress = senderEntryAddress;
+    public void setSenderNodeAddress( String senderNodeAddress ) {
+        this.senderNodeAddress = senderNodeAddress;
     }
     /**
      * Gets user name.
@@ -394,6 +328,6 @@ public class RemoteDataSourceController extends MultiActionController {
      */
     public void setSubscriptionManager( SubscriptionManager subscriptionManager ) {
         this.subscriptionManager = subscriptionManager;
-    }
+    }    
 }
 //--------------------------------------------------------------------------------------------------
