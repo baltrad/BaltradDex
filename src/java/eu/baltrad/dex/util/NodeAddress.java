@@ -56,6 +56,20 @@ public class NodeAddress {
     /** Complete node addres */
     private String nodeAddress;
 //------------------------------------------------------------------------------------------ Methods
+    public NodeAddress() { }
+
+    public NodeAddress(String url) {
+      setNodeAddress(url);
+    }
+
+    public NodeAddress(String scheme, String hostAddress, int port, String appCtx, String entryAddress) {
+        this.scheme = scheme;
+        this.hostAddress = hostAddress;
+        this.port = port;
+        this.appCtx = appCtx;
+        this.entryAddress = entryAddress;
+    }
+
     /** 
      * Gets communication scheme
      *

@@ -35,9 +35,10 @@ import java.sql.Timestamp;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class Subscription extends NodeAddress implements Serializable,
-        Comparable< Subscription > {
+public class Subscription implements Serializable, Comparable< Subscription > {
 //---------------------------------------------------------------------------------------- Constants
+    private static final long serialVersionUID = -7278861424267045555L;
+
     /** Local subscriptions key */
     public static final String LOCAL_SUBSCRIPTION = "local";
     /** Remote subscriptions key */
@@ -60,7 +61,7 @@ public class Subscription extends NodeAddress implements Serializable,
     /** Data source name */
     private String dataSourceName;
     /** Node's address */
-    //private String nodeAddress;
+    private String nodeAddress;
     /** Node's operator name */
     private String operatorName;
     /** Subscription type */
@@ -104,11 +105,7 @@ public class Subscription extends NodeAddress implements Serializable,
         SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
         this.dateStr = dateFormat.format( timeStamp );
         this.timeStr = timeFormat.format( timeStamp );
-        this.scheme = scheme;
-        this.hostAddress = hostAddress;
-        this.port = port;
-        this.appCtx = appCtx;
-        this.entryAddress = entryAddress;
+        this.nodeAddress = new NodeAddress(scheme, hostAddress, port, appCtx, entryAddress).getNodeAddress();
     }
     /**
      * Constructor creating new subscription object with given field values.
@@ -142,11 +139,7 @@ public class Subscription extends NodeAddress implements Serializable,
         SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
         this.dateStr = dateFormat.format( timeStamp );
         this.timeStr = timeFormat.format( timeStamp );
-        this.scheme = scheme;
-        this.hostAddress = hostAddress;
-        this.port = port;
-        this.appCtx = appCtx;
-        this.entryAddress = entryAddress;
+        this.nodeAddress = new NodeAddress(scheme, hostAddress, port, appCtx, entryAddress).getNodeAddress();
     }
     /**
      * Constructor creating new subscription object with given field values.
@@ -180,11 +173,7 @@ public class Subscription extends NodeAddress implements Serializable,
         SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
         this.dateStr = dateFormat.format( timeStamp );
         this.timeStr = timeFormat.format( timeStamp );
-        this.scheme = scheme;
-        this.hostAddress = hostAddress;
-        this.port = port;
-        this.appCtx = appCtx;
-        this.entryAddress = entryAddress;
+        this.nodeAddress = new NodeAddress(scheme, hostAddress, port, appCtx, entryAddress).getNodeAddress();
     }
     /**
      * Method gets subscription id.
@@ -316,5 +305,12 @@ public class Subscription extends NodeAddress implements Serializable,
     public int compareTo( Subscription s ) {
         return getDataSourceName().compareTo( s.getDataSourceName() );
     }
+
+    public String getNodeAddress() { return this.nodeAddress; }
+    public String getScheme() { return new NodeAddress(this.nodeAddress).getScheme(); }
+    public String getHostAddress() { return new NodeAddress(this.nodeAddress).getHostAddress(); }
+    public int getPort() { return new NodeAddress(this.nodeAddress).getPort(); }
+    public String getAppCtx() { return new NodeAddress(this.nodeAddress).getAppCtx(); }
+    public String getEntryAddress() { return new NodeAddress(this.nodeAddress).getEntryAddress(); }
 }
 //--------------------------------------------------------------------------------------------------
