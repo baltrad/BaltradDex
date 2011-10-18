@@ -457,7 +457,7 @@ BEGIN
             CREATE TABLE dex_node_address
             (
                 id SERIAL NOT NULL,
-                scheme VARCHAR(16) NOT NULL DEFAULT 'https',
+                scheme VARCHAR(16) NOT NULL DEFAULT 'http',
                 host_address VARCHAR(128) NOT NULL,
                 port INT NOT NULL DEFAULT 8084,
                 app_context VARCHAR(64) NOT NULL DEFAULT 'BaltradDex',
