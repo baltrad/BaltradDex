@@ -34,16 +34,19 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="javadocs.src.dir" value="${src.dir}/java/eu/baltrad/dex"/>
   <property name="web.dir" value="web"/>
   <property name="webinf.dir" value="${web.dir}/WEB-INF"/>
+  <property name="webinf.dir" value="${web.dir}/WEB-INF"/>
   <property name="etc.dir" value="etc"/>
   <property name="dist.dir" value="${root.dir}/dist"/>
   <property name="build.dir" value="build"/>
   <property name="build.web.dir" value="${build.dir}/web"/>
   <property name="build.metainf.dir" value="${build.web.dir}/META-INF"/>
   <property name="build.webinf.dir" value="${build.web.dir}/WEB-INF"/>
+  <property name="build.conf.dir" value="${build.webinf.dir}/conf"/>
   <property name="build.jsp.dir" value="${build.webinf.dir}/jsp"/>
   <property name="build.classes.dir" value="${build.webinf.dir}/classes"/>
   <property name="build.lib.dir" value="${build.webinf.dir}/lib"/>
   <property name="build.test.dir" value="${build.dir}/test" />
+  <property name="test.conf.dir" value="${build.test.dir}/conf" />
   <property name="test.data.dir" value="test-data" />
   <property name="compile.debug" value="true"/>
   <property name="compile.includeAntRuntime" value="no"/>
@@ -107,11 +110,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fileset dir="${beast.path}/libs">
       <include name="*.jar"/>
     </fileset>
-    
-    <!--fileset dir="/opt/apache-tomcat-6.0.26/lib">
-      <include name="*.jar"/>
-    </fileset-->
-
     <fileset dir="${javahdf.path}/lib">
       <include name="*.jar"/>
     </fileset>
@@ -142,6 +140,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <mkdir dir="${build.web.dir}"/>
     <mkdir dir="${build.metainf.dir}"/>
     <mkdir dir="${build.webinf.dir}"/>
+    <mkdir dir="${build.conf.dir}"/>
     <mkdir dir="${build.jsp.dir}"/>
     <mkdir dir="${build.classes.dir}"/>
     <mkdir dir="${build.lib.dir}"/>
@@ -233,6 +232,16 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="log4j.properties" />
       </fileset>
     </copy>
+    
+    <!-- copy application properties files -->
+    <copy todir="${build.conf.dir}">
+      <fileset dir="${etc.dir}">
+        <include name="dex.default.properties"/>
+        <include name="dex.user.properties"/>
+        <include name="dex.version.properties"/>
+      </fileset>
+    </copy>
+    
 
     <!-- copy manifest and context definition files -->
     <copy todir="${build.metainf.dir}">
@@ -251,8 +260,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="baltraddex-servlet.xml" />
         <include name="web.xml" />
         <include name="jsp/**/*.jsp" />
-	<include name="tags/**/*.tag" />
-	<include name="**/*.tld" />
+        <include name="tags/**/*.tag" />
+        <include name="**/*.tld" />
       </fileset>
     </copy>
 
@@ -309,6 +318,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <!-- UNIT TEST PART -->
   <target name="compile.test">
     <mkdir dir="${build.test.dir}"/>
+    <mkdir dir="${test.conf.dir}"/>
     <javac srcdir="${root.dir}/test"
            encoding="8859_1"
            deprecation="on"
@@ -327,6 +337,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="**/*.xml"/>
         <include name="**/*.properties"/>
       	<include name="**/*.groovy"/>
+      </fileset>
+    </copy>
+    <copy todir="${test.conf.dir}">
+      <fileset dir="${etc.dir}">
+        <include name="dex.default.properties"/>
+        <include name="dex.user.properties"/>
+        <include name="dex.version.properties"/>
       </fileset>
     </copy>
   </target>

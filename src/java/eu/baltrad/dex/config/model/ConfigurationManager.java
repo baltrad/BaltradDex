@@ -23,16 +23,17 @@ package eu.baltrad.dex.config.model;
 
 import eu.baltrad.dex.log.model.MessageLogger;
 
+import eu.baltrad.dex.util.ServletContextUtil;
 import org.apache.log4j.Logger;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Properties;
-import java.net.URL;
+import java.util.HashMap;
 
 /**
- * Class implemens configuration object handling functionality.
+ * Class implements configuration object handling functionality.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
@@ -40,8 +41,17 @@ import java.net.URL;
  */
 public class ConfigurationManager {
 //---------------------------------------------------------------------------------------- Constants
-    /** Properties file name */
-    private static final String DEX_INIT_PROPS = "dex.init.properties";
+    /** Default properties file name */
+    private static final String DEX_DEFAULT_PROPS = "WEB-INF/conf/dex.default.properties";
+    /** User-defined properties file name */
+    private static final String DEX_USER_PROPS = "WEB-INF/conf/dex.user.properties";
+    /** Version properties file name */
+    private static final String DEX_VERSION_PROPS = "WEB-INF/conf/dex.version.properties";
+    
+    private static String DEFAULT_PROPS_KEY = "default_props";
+    private static String USER_PROPS_KEY = "user_props";
+    private static String VERSION_PROPS_KEY = "version_props";
+    
     /** Properties file comment */
     private static final String DEX_PROPS_FILE_COMMENT = "BaltradDex configuration file";
     
@@ -55,7 +65,7 @@ public class ConfigurationManager {
     private static final String SOFT_VERSION_PROP = "software.version";
     /** Communication scheme property */
     private static final String COM_SCHEME_PROP = "communication.scheme";
-    /** Host afddress property */
+    /** Host address property */
     private static final String HOST_ADDRESS_PROP = "host.address";
     /** Port number property */
     private static final String PORT_NUMBER_PROP = "port.number";
@@ -114,6 +124,8 @@ public class ConfigurationManager {
 //---------------------------------------------------------------------------------------- Variables
     /** References logger object */
     private static Logger log;
+    
+    
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor
@@ -122,26 +134,55 @@ public class ConfigurationManager {
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
+     * 
+     * 
+     * @throws IOException 
+     */
+    public HashMap<String, Properties> loadProperties() throws IOException {
+        HashMap<String, Properties> props = new HashMap<String, Properties>();
+        FileInputStream in = new FileInputStream( ServletContextUtil.getServletContextPath() + 
+                DEX_DEFAULT_PROPS );
+        Properties defaultProps = new Properties();
+        defaultProps.load( in );
+        in.close();
+        props.put( DEFAULT_PROPS_KEY, defaultProps );
+        //
+        in = new FileInputStream( ServletContextUtil.getServletContextPath() + DEX_USER_PROPS );
+        Properties userProps = new Properties( defaultProps );
+        userProps.load( in );
+        in.close();
+        props.put( USER_PROPS_KEY, userProps );
+        //
+        in = new FileInputStream( ServletContextUtil.getServletContextPath() + DEX_VERSION_PROPS );
+        Properties versionProps = new Properties();
+        versionProps.load( in );
+        in.close();
+        props.put( VERSION_PROPS_KEY, versionProps );
+        //
+        return props;
+    }
+    /**
      * Loads system configuration from properties file.
      *
      * @return Configuration object
      */
     public AppConfiguration loadAppConf() {
         try {
-            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
-            Properties props = new Properties();
-            props.load( url.openStream() );
-            AppConfiguration conf = new AppConfiguration( props.getProperty( NODE_NAME_PROP ),
-                props.getProperty( NODE_TYPE_PROP ), props.getProperty( SOFT_VERSION_PROP ),
-                props.getProperty( COM_SCHEME_PROP ), props.getProperty( HOST_ADDRESS_PROP ),
-                Integer.parseInt( props.getProperty( PORT_NUMBER_PROP ) ),
-                props.getProperty( APP_CTX_PROP ), props.getProperty( ENTRY_ADDRESS_PROP ),
-                Integer.parseInt( props.getProperty( SO_TIMEOUT_PROP ) ),
-                Integer.parseInt( props.getProperty( CONN_TIMEOUT_PROP ) ),
-                props.getProperty( WORK_DIR_PROP ), props.getProperty( IMAGES_DIR_PROP ),
-                props.getProperty( THUMBNAILS_DIR_PROP ), props.getProperty( ORG_NAME_PROP),
-                props.getProperty( ORG_ADDRESS_PROP ), props.getProperty( TIME_ZONE_PROP ),
-                props.getProperty( EMAIL_PROP ) );
+            HashMap<String, Properties> props = loadProperties();
+            Properties userProps = props.get( USER_PROPS_KEY );
+            Properties versionProps = props.get( VERSION_PROPS_KEY );
+            
+            AppConfiguration conf = new AppConfiguration( userProps.getProperty( NODE_NAME_PROP ),
+                userProps.getProperty( NODE_TYPE_PROP ), versionProps.getProperty( 
+                SOFT_VERSION_PROP ), userProps.getProperty( COM_SCHEME_PROP ), 
+                userProps.getProperty( HOST_ADDRESS_PROP ), Integer.parseInt( userProps.getProperty( 
+                PORT_NUMBER_PROP ) ), userProps.getProperty( APP_CTX_PROP ), userProps.getProperty( 
+                ENTRY_ADDRESS_PROP ), Integer.parseInt( userProps.getProperty( SO_TIMEOUT_PROP ) ),
+                Integer.parseInt( userProps.getProperty( CONN_TIMEOUT_PROP ) ),
+                userProps.getProperty( WORK_DIR_PROP ), userProps.getProperty( IMAGES_DIR_PROP ),
+                userProps.getProperty( THUMBNAILS_DIR_PROP ), userProps.getProperty( ORG_NAME_PROP),
+                userProps.getProperty( ORG_ADDRESS_PROP ), userProps.getProperty( TIME_ZONE_PROP ),
+                userProps.getProperty( EMAIL_PROP ) );
             return conf;
         } catch( Exception e ) {
             log.error( "Failed to load properties", e );
@@ -156,30 +197,30 @@ public class ConfigurationManager {
      */
     public void saveAppConf( AppConfiguration appConf ) throws Exception {
         try {
-            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
-            Properties props = new Properties();
-            props.load( url.openStream() );
+            HashMap<String, Properties> props = loadProperties();
+            Properties userProps = props.get( USER_PROPS_KEY );
             //
-            props.setProperty( NODE_NAME_PROP, appConf.getNodeName() );
-            props.setProperty( NODE_TYPE_PROP, appConf.getNodeType() );
-            props.setProperty( SOFT_VERSION_PROP, appConf.getVersion() );
-            props.setProperty( COM_SCHEME_PROP, appConf.getScheme() );
-            props.setProperty( HOST_ADDRESS_PROP, appConf.getHostAddress() );
-            props.setProperty( PORT_NUMBER_PROP, Integer.toString( appConf.getPort() ) );
-            props.setProperty( APP_CTX_PROP, appConf.getAppCtx() );
-            props.setProperty( ENTRY_ADDRESS_PROP, appConf.getEntryAddress() );
-            props.setProperty( SO_TIMEOUT_PROP, Integer.toString( appConf.getSoTimeout() ) );
-            props.setProperty( CONN_TIMEOUT_PROP, Integer.toString( appConf.getConnTimeout()) );
-            props.setProperty( WORK_DIR_PROP, appConf.getWorkDir() );
-            props.setProperty( IMAGES_DIR_PROP, appConf.getImagesDir() );
-            props.setProperty( THUMBNAILS_DIR_PROP, appConf.getThumbsDir() );
-            props.setProperty( ORG_NAME_PROP, appConf.getOrganization() );
-            props.setProperty( ORG_ADDRESS_PROP, appConf.getAddress() );
-            props.setProperty( TIME_ZONE_PROP, appConf.getTimeZone() );
-            props.setProperty( EMAIL_PROP, appConf.getEmail() );
+            userProps.setProperty( NODE_NAME_PROP, appConf.getNodeName() );
+            userProps.setProperty( NODE_TYPE_PROP, appConf.getNodeType() );
+            userProps.setProperty( COM_SCHEME_PROP, appConf.getScheme() );
+            userProps.setProperty( HOST_ADDRESS_PROP, appConf.getHostAddress() );
+            userProps.setProperty( PORT_NUMBER_PROP, Integer.toString( appConf.getPort() ) );
+            userProps.setProperty( APP_CTX_PROP, appConf.getAppCtx() );
+            userProps.setProperty( ENTRY_ADDRESS_PROP, appConf.getEntryAddress() );
+            userProps.setProperty( SO_TIMEOUT_PROP, Integer.toString( appConf.getSoTimeout() ) );
+            userProps.setProperty( CONN_TIMEOUT_PROP, Integer.toString( appConf.getConnTimeout()) );
+            userProps.setProperty( WORK_DIR_PROP, appConf.getWorkDir() );
+            userProps.setProperty( IMAGES_DIR_PROP, appConf.getImagesDir() );
+            userProps.setProperty( THUMBNAILS_DIR_PROP, appConf.getThumbsDir() );
+            userProps.setProperty( ORG_NAME_PROP, appConf.getOrganization() );
+            userProps.setProperty( ORG_ADDRESS_PROP, appConf.getAddress() );
+            userProps.setProperty( TIME_ZONE_PROP, appConf.getTimeZone() );
+            userProps.setProperty( EMAIL_PROP, appConf.getEmail() );
             //
-            OutputStream os = new FileOutputStream( url.getPath() );
-            props.store( os, DEX_PROPS_FILE_COMMENT );
+            FileOutputStream out = new FileOutputStream( ServletContextUtil.getServletContextPath()
+                    + DEX_USER_PROPS );
+            userProps.store( out, DEX_PROPS_FILE_COMMENT );
+            out.close();
         } catch( Exception e ) {
             log.error( "Failed to save properties", e );
             throw e;
@@ -192,15 +233,15 @@ public class ConfigurationManager {
      */
     public LogConfiguration loadMsgConf() {
         try {
-            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
-            Properties props = new Properties();
-            props.load( url.openStream() );
-            LogConfiguration conf = new LogConfiguration( Boolean.parseBoolean( props.getProperty(
-                    MSG_TRIM_BY_NUMBER ) ), Boolean.parseBoolean( props.getProperty(
-                    MSG_TRIM_BY_AGE ) ), Integer.parseInt( props.getProperty( MSG_REC_LIMIT ) ),
-                    Integer.parseInt( props.getProperty( MSG_MAX_AGE_DAYS ) ),
-                    Integer.parseInt( props.getProperty( MSG_MAX_AGE_HOURS ) ),
-                    Integer.parseInt( props.getProperty( MSG_MAX_AGE_MINUTES ) ) );
+            HashMap<String, Properties> props = loadProperties();
+            Properties userProps = props.get( USER_PROPS_KEY );
+            LogConfiguration conf = new LogConfiguration( Boolean.parseBoolean( 
+                userProps.getProperty( MSG_TRIM_BY_NUMBER ) ), Boolean.parseBoolean(
+                userProps.getProperty( MSG_TRIM_BY_AGE ) ), Integer.parseInt( 
+                userProps.getProperty( MSG_REC_LIMIT ) ), Integer.parseInt( 
+                userProps.getProperty( MSG_MAX_AGE_DAYS ) ), Integer.parseInt( 
+                userProps.getProperty( MSG_MAX_AGE_HOURS ) ), Integer.parseInt( 
+                    userProps.getProperty( MSG_MAX_AGE_MINUTES ) ) );
             return conf;
         } catch( Exception e ) {
             log.error( "Failed to load properties", e );
@@ -216,19 +257,23 @@ public class ConfigurationManager {
      */
     public void saveMsgConf( LogConfiguration msgConf ) throws Exception {
         try {
-            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
-            Properties props = new Properties();
-            props.load( url.openStream() );
+            HashMap<String, Properties> props = loadProperties();
+            Properties userProps = props.get( USER_PROPS_KEY );
             //
-            props.setProperty( MSG_TRIM_BY_NUMBER, Boolean. toString( msgConf.getTrimByNumber() ) );
-            props.setProperty( MSG_TRIM_BY_AGE, Boolean.toString( msgConf.getTrimByAge() ) );
-            props.setProperty( MSG_REC_LIMIT, Integer.toString( msgConf.getRecordLimit() ) );
-            props.setProperty( MSG_MAX_AGE_DAYS, Integer.toString( msgConf.getMaxAgeDays() ) );
-            props.setProperty( MSG_MAX_AGE_HOURS, Integer.toString( msgConf.getMaxAgeHours() ) );
-            props.setProperty( MSG_MAX_AGE_MINUTES, Integer.toString( msgConf.getMaxAgeMinutes() ) );
+            userProps.setProperty( MSG_TRIM_BY_NUMBER, Boolean. toString( 
+                    msgConf.getTrimByNumber() ) );
+            userProps.setProperty( MSG_TRIM_BY_AGE, Boolean.toString( msgConf.getTrimByAge() ) );
+            userProps.setProperty( MSG_REC_LIMIT, Integer.toString( msgConf.getRecordLimit() ) );
+            userProps.setProperty( MSG_MAX_AGE_DAYS, Integer.toString( msgConf.getMaxAgeDays() ) );
+            userProps.setProperty( MSG_MAX_AGE_HOURS, Integer.toString( 
+                    msgConf.getMaxAgeHours() ) );
+            userProps.setProperty( MSG_MAX_AGE_MINUTES, Integer.toString( 
+                    msgConf.getMaxAgeMinutes() ) );
             //
-            OutputStream os = new FileOutputStream( url.getPath() );
-            props.store( os, DEX_PROPS_FILE_COMMENT );
+            FileOutputStream out = new FileOutputStream( ServletContextUtil.getServletContextPath()
+                    + DEX_USER_PROPS );
+            userProps.store( out, DEX_PROPS_FILE_COMMENT );
+            out.close();
         } catch( Exception e ) {
             log.error( "Failed to save messages properties", e );
             throw e;
@@ -241,15 +286,14 @@ public class ConfigurationManager {
      */
     public LogConfiguration loadRegConf() {
         try {
-            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
-            Properties props = new Properties();
-            props.load( url.openStream() );
-            LogConfiguration conf = new LogConfiguration( Boolean.parseBoolean( props.getProperty(
-                    REG_TRIM_BY_NUMBER ) ), Boolean.parseBoolean( props.getProperty(
-                    REG_TRIM_BY_AGE ) ), Integer.parseInt( props.getProperty( REG_REC_LIMIT ) ),
-                    Integer.parseInt( props.getProperty( REG_MAX_AGE_DAYS ) ),
-                    Integer.parseInt( props.getProperty( REG_MAX_AGE_HOURS ) ),
-                    Integer.parseInt( props.getProperty( REG_MAX_AGE_MINUTES ) ) );
+            HashMap<String, Properties> props = loadProperties();
+            Properties userProps = props.get( USER_PROPS_KEY );
+            LogConfiguration conf = new LogConfiguration( Boolean.parseBoolean( 
+                userProps.getProperty( REG_TRIM_BY_NUMBER ) ), Boolean.parseBoolean( 
+                userProps.getProperty( REG_TRIM_BY_AGE ) ), Integer.parseInt( 
+                userProps.getProperty( REG_REC_LIMIT ) ), Integer.parseInt( userProps.getProperty( 
+                REG_MAX_AGE_DAYS ) ), Integer.parseInt( userProps.getProperty( REG_MAX_AGE_HOURS ) ),
+                Integer.parseInt( userProps.getProperty( REG_MAX_AGE_MINUTES ) ) );
             return conf;
         } catch( Exception e ) {
             log.error( "Failed to load properties", e );
@@ -264,19 +308,23 @@ public class ConfigurationManager {
      */
     public void saveRegConf( LogConfiguration regConf ) throws Exception {
         try {
-            URL url = ConfigurationManager.class.getResource ( DEX_INIT_PROPS );
-            Properties props = new Properties();
-            props.load( url.openStream() );
+            HashMap<String, Properties> props = loadProperties();
+            Properties userProps = props.get( USER_PROPS_KEY );
             //
-            props.setProperty( REG_TRIM_BY_NUMBER, Boolean. toString( regConf.getTrimByNumber() ) );
-            props.setProperty( REG_TRIM_BY_AGE, Boolean.toString( regConf.getTrimByAge() ) );
-            props.setProperty( REG_REC_LIMIT, Integer.toString( regConf.getRecordLimit() ) );
-            props.setProperty( REG_MAX_AGE_DAYS, Integer.toString( regConf.getMaxAgeDays() ) );
-            props.setProperty( REG_MAX_AGE_HOURS, Integer.toString( regConf.getMaxAgeHours() ) );
-            props.setProperty( REG_MAX_AGE_MINUTES, Integer.toString( regConf.getMaxAgeMinutes() ) );
+            userProps.setProperty( REG_TRIM_BY_NUMBER, Boolean. toString( 
+                    regConf.getTrimByNumber() ) );
+            userProps.setProperty( REG_TRIM_BY_AGE, Boolean.toString( regConf.getTrimByAge() ) );
+            userProps.setProperty( REG_REC_LIMIT, Integer.toString( regConf.getRecordLimit() ) );
+            userProps.setProperty( REG_MAX_AGE_DAYS, Integer.toString( regConf.getMaxAgeDays() ) );
+            userProps.setProperty( REG_MAX_AGE_HOURS, Integer.toString( 
+                    regConf.getMaxAgeHours() ) );
+            userProps.setProperty( REG_MAX_AGE_MINUTES, Integer.toString( 
+                    regConf.getMaxAgeMinutes() ) );
             //
-            OutputStream os = new FileOutputStream( url.getPath() );
-            props.store( os, DEX_PROPS_FILE_COMMENT );
+            FileOutputStream out = new FileOutputStream( ServletContextUtil.getServletContextPath()
+                    + DEX_USER_PROPS );
+            userProps.store( out, DEX_PROPS_FILE_COMMENT );
+            out.close();
         } catch( Exception e ) {
             log.error( "Failed to save messages properties", e );
             throw e;
