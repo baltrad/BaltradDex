@@ -222,9 +222,13 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 return;
             }
 
-            if (!authenticateFrame(user, header)) {
+            // XXX: some frames contain a user, but no password, skip authn for these
+            String passwd = BaltradFrameHandler.getPassword( header );
+            if (passwd == null) {
+                log.warn("skipping authentication for frame with no password from user: " + userName);
+            } else if (!authenticateFrame(user, header)) {
                 log.error("failed to authenticate frame from user: " + userName);
-                response.setStatus(response.SC_UNAUTHORIZED);
+                response.setStatus(response.SC_FORBIDDEN);
                 return;
             }
 
