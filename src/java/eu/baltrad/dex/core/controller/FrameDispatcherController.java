@@ -202,6 +202,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
     protected void processIncomingFrame(String header, File file, HttpServletResponse response) throws Exception {
         String contentType = BaltradFrameHandler.getContentType(header);
+        log.debug("Received frame with contentType: " + contentType);
         
         String userName = BaltradFrameHandler.getUserName(header);
         User user = null;
