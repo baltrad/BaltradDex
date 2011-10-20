@@ -674,7 +674,6 @@ $$ LANGUAGE plpgsql;
 SELECT split_dex_node_connections_address();
 SELECT split_dex_node_configuration_address();
 SELECT split_dex_users_node_address();
-SELECT restart_seq_with_max('dex_messages', 'id');
 SELECT upgrade_dex_schema();
 SELECT create_data_sources();
 SELECT create_node_address_schema();
