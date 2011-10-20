@@ -48,7 +48,7 @@ public class ApplicationSecurityManager {
      * WARNING: Only users belonging to group ADMIN, OPERATOR and USER are allowed to log in
      * to local node.
      *
-     * @param formUser Current user signin in
+     * @param formUser Current user signing in
      * @param dbUser User in the database
      * @return True if users are the same, false otherwise
      */
@@ -57,7 +57,7 @@ public class ApplicationSecurityManager {
             return false;
         } else {
             String formUserName = formUser.getName().trim();
-            String formUserPassword = MessageDigestUtil.createHash( formUser.getPassword().trim() );
+            String formUserPassword = /*MessageDigestUtil.createHash(*/ formUser.getPassword().trim() /*)*/;
             String dbUserName = dbUser.getName().trim();
             String dbUserPassword = dbUser.getPassword().trim();
             if( formUserName.equals( dbUserName ) && formUserPassword.equals( dbUserPassword ) && (
@@ -109,7 +109,7 @@ public class ApplicationSecurityManager {
     /**
      * Method sets user session attribute.
      *
-     * @param request Http request
+     * @param request HTTP request
      * @param user User object
      */
     public static void setUser( HttpServletRequest request, Object user ) {

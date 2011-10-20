@@ -22,9 +22,9 @@
 package eu.baltrad.dex.user.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
-import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.log.model.MessageLogger;
 
+import eu.baltrad.dex.util.MessageDigestUtil;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -289,12 +289,11 @@ public class UserManager {
             if( user.getId() == 0 ) {
                 sql = "INSERT INTO dex_users (name, name_hash, role_name, password, factory, " +
                     "country, city, city_code, street, number, phone, email ) VALUES ('" +
-                    user.getName() + "', '" + MessageDigestUtil.createHash( user.getName() ) +
-                    "', '" + user.getRoleName() + "', '" + MessageDigestUtil.createHash(
-                    user.getPassword() ) + "', '" + user.getFactory() + "', '" + user.getCountry() +
-                    "', '" + user.getCity() + "', '" + user.getCityCode() + "', '" +
-                    user.getStreet() + "', '" + user.getNumber() + "', '" + user.getPhone() +
-                    "', '" + user.getEmail() + "');";
+                    user.getName() + "', '" + MessageDigestUtil.createHash( user.getName() ) + 
+                    "', '" + user.getRoleName() + "', '" + user.getPassword() + "', '" + 
+                    user.getFactory() + "', '" + user.getCountry() + "', '" + user.getCity() + 
+                    "', '" + user.getCityCode() + "', '" + user.getStreet() + "', '" + 
+                    user.getNumber() + "', '" + user.getPhone() + "', '" + user.getEmail() + "');";
                 update = stmt.executeUpdate( sql, Statement.RETURN_GENERATED_KEYS ) ;
                 generatedKeys = stmt.getGeneratedKeys();
                 if( generatedKeys.next() ) {
@@ -316,13 +315,13 @@ public class UserManager {
             } else {
                 // record exists, do update
                 sql = "UPDATE dex_users SET name = '" + user.getName() + "', name_hash = '" +
-                    MessageDigestUtil.createHash( user.getName() ) + "', role_name = '" +
-                    user.getRoleName() + "', " + "password = '" + MessageDigestUtil.createHash(
-                    user.getPassword() ) + "', factory = '" + user.getFactory() + "', country = '" +
-                    user.getCountry() + "', city = '" + user.getCity() + "', city_code = '" +
-                    user.getCityCode() + "', street = '" + user.getStreet() + "', number = '" +
-                    user.getNumber() + "', phone = '" + user.getPhone() + "', email = '" +
-                    user.getEmail() + "' WHERE id = '" + user.getId() + "';";
+                    MessageDigestUtil.createHash( user.getName() ) + "', role_name = '" + 
+                    user.getRoleName() + "', " + "password = '" + user.getPassword() + 
+                    "', factory = '" + user.getFactory() + "', country = '" + user.getCountry() + 
+                    "', city = '" + user.getCity() + "', city_code = '" + user.getCityCode() + 
+                    "', street = '" + user.getStreet() + "', number = '" + user.getNumber() + 
+                    "', phone = '" + user.getPhone() + "', email = '" + user.getEmail() + 
+                    "' WHERE id = '" + user.getId() + "';";
                 update = stmt.executeUpdate( sql ) ;
                 sql = "UPDATE dex_node_address SET scheme = '" + user.getScheme() +
                         "', host_address = '" + user.getHostAddress() + "', port = " +

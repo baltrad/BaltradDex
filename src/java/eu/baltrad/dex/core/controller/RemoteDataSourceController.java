@@ -175,6 +175,7 @@ public class RemoteDataSourceController extends MultiActionController {
             // reset confirmed subscriptions list stored in FrameDispatcherController
             frameDispatcherController.resetConfirmedSubscriptions();
             // once subscription is confirmed, add requested data source to local subscription list
+            
             for( int i = 0; i < getSubscribedDataSources().size(); i++ ) {
                 DataSource dataSource = ( DataSource )getSubscribedDataSources().get( i );
                 if( subscriptionManager.getSubscription( dataSource.getName(),

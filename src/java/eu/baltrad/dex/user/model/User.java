@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.user.model;
 
+import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.NodeAddress;
 
 /**
@@ -165,25 +166,25 @@ public class User extends NodeAddress {
         this.entryAddress = entryAddress;
     }
     /**
-     * Method gets user id.
+     * Gets user id.
      *
      * @return User id
      */
     public int getId() { return id; }
     /**
-     * Method sets user id.
+     * Sets user id.
      *
      * @param id User id
      */
     public void setId( int id ) { this.id = id; }
     /**
-     * Method gets role name.
+     * Gets role name.
      *
      * @return Role name
      */
     public String getRoleName() { return roleName; }
     /**
-     * Method sets role name.
+     * Sets role name.
      *
      * @param roleName Role name
      */
@@ -193,59 +194,84 @@ public class User extends NodeAddress {
      *
      * @return User name
      */
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
     /**
      * Method sets user name.
      *
      * @param name User name
      */
-    public void setName( String name ) {
-        this.name = name;
-    }
-
+    public void setName( String name ) { this.name = name; }
     /**
-     * @return the password
+     * Gets user name as hash.
+     * 
+     * @return nameHash User name as hash
      */
-    public String getPassword() {
-        return password;
-    }
-
+    public String getNameHash() { return nameHash; }
     /**
-     * @param password the password to set
+     * Sets user name as hash.
+     * 
+     * @param name User name
      */
-    public void setPassword(String password) {
-        this.password = password;
+    public void setNameHash( String name ) {
+        this.nameHash = MessageDigestUtil.createHash( name );
     }
     /**
-     * @return the factory
+     * Gets password.
+     * 
+     * @return Password
      */
-    public String getFactory() {
-        return factory;
-    }
-
+    public String getPassword() { return password; }
     /**
-     * @param factory the factory to set
+     * Sets password as hash.
+     * 
+     * @param password Password to set
      */
-    public void setFactory(String factory) {
-        this.factory = factory;
+    public void setPassword( String password ) {
+        this.password = MessageDigestUtil.createHash( password );
     }
-
     /**
-     * @return the country
+     * Gets confirmed password.
+     * 
+     * @return confirmPassword Confirmed password
      */
-    public String getCountry() {
-        return country;
-    }
-
+    public String getConfirmPassword() { return confirmPassword; }
     /**
-     * @param country the country to set
+     * Sets confirmed password as hash.
+     * 
+     * @param confirmPassword Confirmed password to set
      */
-    public void setCountry(String country) {
-        this.country = country;
+    public void setConfirmPassword( String confirmPassword ) {
+        this.confirmPassword = MessageDigestUtil.createHash( confirmPassword );
     }
+    /**
+     * Gets organization name.
+     * 
+     * @return Organization name
+     */
+    public String getFactory() { return factory; }
+    /**
+     * Sets organization name.
+     * 
+     * @param factory Organization name to set
+     */
+    public void setFactory( String factory ) { this.factory = factory; }
+    /**
+     * Gets name of the country.
+     * 
+     * @return Name of the country
+     */
+    public String getCountry() { return country; }
+    /**
+     * Sets name of the country.
+     * 
+     * @param country Name of the country to set
+     */
+    public void setCountry( String country ) { this.country = country; }
 
+    
+    
+    
+    
     /**
      * @return the city
      */
@@ -330,33 +356,9 @@ public class User extends NodeAddress {
         this.email = email;
     }
 
-    /**
-     * @return the confirmPassword
-     */
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
+    
 
-    /**
-     * @param confirmPassword the confirmPassword to set
-     */
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
-    }
-
-    /**
-     * @return the nameHash
-     */
-    public String getNameHash() {
-        return nameHash;
-    }
-
-    /**
-     * @param nameHash the nameHash to set
-     */
-    public void setNameHash(String nameHash) {
-        this.nameHash = nameHash;
-    }
+    
 
     /**
      * @return the checked

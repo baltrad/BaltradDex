@@ -48,8 +48,11 @@ public class ConfigurationManager {
     /** Version properties file name */
     private static final String DEX_VERSION_PROPS = "WEB-INF/conf/dex.version.properties";
     
+    /** Default properties key */
     private static String DEFAULT_PROPS_KEY = "default_props";
+    /** User properties key */
     private static String USER_PROPS_KEY = "user_props";
+    /** Version properties key  */
     private static String VERSION_PROPS_KEY = "version_props";
     
     /** Properties file comment */
@@ -124,8 +127,6 @@ public class ConfigurationManager {
 //---------------------------------------------------------------------------------------- Variables
     /** References logger object */
     private static Logger log;
-    
-    
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor
@@ -134,11 +135,12 @@ public class ConfigurationManager {
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
+     * Loads properties from files into hash map object.
      * 
-     * 
+     * @return Hash map containing a set of properties 
      * @throws IOException 
      */
-    public HashMap<String, Properties> loadProperties() throws IOException {
+    private HashMap<String, Properties> loadProperties() throws IOException {
         HashMap<String, Properties> props = new HashMap<String, Properties>();
         FileInputStream in = new FileInputStream( ServletContextUtil.getServletContextPath() + 
                 DEX_DEFAULT_PROPS );

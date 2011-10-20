@@ -45,11 +45,11 @@ INSERT INTO dex_users (name, name_hash, role_name, password, factory, country, c
 
 -- dex_node_address --------------------------------------------------------------------------------
 INSERT INTO dex_node_address (scheme, host_address, port, app_context, entry_address) VALUES
-    ('https', 'localhost', 8084, 'BaltradDex', 'dispatch.htm'),
-    ('https', 'localhost', 8084, 'BaltradDex', 'dispatch.htm'),
-    ('https', 'se.baltrad.eu', 8084, 'BaltradDex', 'dispatch.htm'),
-    ('https', 'localhost', 8084, 'BaltradDex', 'dispatch.htm'),
-    ('https', 'localhost', 8084, 'BaltradDex', 'dispatch.htm');
+    ('http', 'localhost', 8084, 'BaltradDex', 'dispatch.htm'),
+    ('http', 'localhost', 8084, 'BaltradDex', 'dispatch.htm'),
+    ('http', 'se.baltrad.eu', 8084, 'BaltradDex', 'dispatch.htm'),
+    ('http', 'localhost', 8084, 'BaltradDex', 'dispatch.htm'),
+    ('http', 'localhost', 8084, 'BaltradDex', 'dispatch.htm');
 
 -- dex_user_address --------------------------------------------------------------------------------
 INSERT INTO dex_user_address (user_id, address_id) VALUES (1,1), (2,2), (3,3), (4,4), (5,5);
