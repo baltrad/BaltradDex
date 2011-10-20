@@ -202,11 +202,37 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
     protected void processIncomingFrame(String header, File file, HttpServletResponse response) throws Exception {
         String contentType = BaltradFrameHandler.getContentType(header);
-
+        log.debug("Received frame with contentType: " + contentType);
+        
         String userName = BaltradFrameHandler.getUserName(header);
         User user = null;
-        if (userName != null) {
+        if (userName == null) {
+            // Not all frames set user information. This is for backwards compatibility.
+            // XXX: this should be fixed ASAP!
+            log.warn("Allowing frame with no user data to pass");
+        } else {
+            // XXX: we are in a messy state where some frames contain user by name
+            // and some by hash
             user = userManager.getUserByNameHash(userName);
+            if (user == null)
+                user = userManager.getUserByName(userName);
+            if (user == null) {
+                log.error("received frame from unknown user: " + userName);
+                response.setStatus(response.SC_FORBIDDEN);
+                return;
+            }
+
+            if (!authenticateFrame(user, header)) {
+                log.error("failed to authenticate frame from user: " + userName);
+                response.setStatus(response.SC_UNAUTHORIZED);
+                return;
+            }
+
+            if (!authorizeUser(user)) {
+                log.error("unauthorized frame from user: " + userName);
+                response.setStatus(response.SC_FORBIDDEN);
+                return;
+            }
         }
 
         if (contentType.equals(BaltradFrameHandler.MSG)) {
@@ -225,12 +251,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         String messageText = BaltradFrameHandler.getMessageText(header);
 
         // channel listing request - has to be authenticated
-        if (user == null || !authorizeUser(user) || !authenticateFrame(user, header)) {
-            log.error("Data source listing request denied");
-            response.setStatus(BaltradFrameHandler.HTTP_STATUS_CODE_500);
-            return;
-        }
-
         if (messageText.equals(BaltradFrameHandler.CHNL_LIST_RQST)) {
             log.info( "Data source listing request received from " +
                 "user " + getUserName( BaltradFrameHandler.getUserName( header ) ) + " ("
