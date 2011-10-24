@@ -26,31 +26,35 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Data exchange</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
-            </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/exchangeTab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/exchangeMenu.jsp"%>
-                    </div>
-                    <div class="right"></div>
-                </div>
-            </div>
+<%@page import="eu.baltrad.dex.util.InitAppUtil"%>
+<%@page import="eu.baltrad.dex.user.model.User" %>
+
+<jsp:useBean id="securityManager" scope="session"
+             class="eu.baltrad.dex.util.ApplicationSecurityManager">
+</jsp:useBean>
+
+<%
+    InitAppUtil init = InitAppUtil.getInstance();
+    User user = (User)securityManager.getUser(request);
+    HttpSession sess = request.getSession();
+    String userName = user.getName();
+    sess.setAttribute("userName", userName);
+    sess.setAttribute("nodeName", init.getConfiguration().getNodeName());
+    sess.setAttribute("operator", init.getConfiguration().getOrganization());
+    sess.setAttribute("nodeVersion", init.getConfiguration().getVersion());
+    sess.setAttribute("nodeType", init.getConfiguration().getNodeType());
+    sess.setAttribute("address", init.getConfiguration().getAddress());
+    sess.setAttribute("timeZone", init.getConfiguration().getTimeZone());
+    sess.setAttribute("adminEmail", init.getConfiguration().getEmail());
+%>
+
+<t:page_tabbed pageTitle="Data exchange" activeTab="exchange">
+    <jsp:body>
+        <div class="left">
+            <t:menu_exchange/>
         </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
+        <div class="right">
+            <t:welcome_page/>
         </div>
-    </body>
-</html>
+    </jsp:body>    
+</t:page_tabbed>

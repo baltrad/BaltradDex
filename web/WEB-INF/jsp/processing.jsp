@@ -23,9 +23,33 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
+<%@page import="eu.baltrad.dex.util.InitAppUtil"%>
+<%@page import="eu.baltrad.dex.user.model.User" %>
+
+<jsp:useBean id="securityManager" scope="session"
+             class="eu.baltrad.dex.util.ApplicationSecurityManager">
+</jsp:useBean>
+
+<%
+    InitAppUtil init = InitAppUtil.getInstance();
+    User user = (User)securityManager.getUser(request);
+    HttpSession sess = request.getSession();
+    String userName = user.getName();
+    sess.setAttribute("userName", userName);
+    sess.setAttribute("nodeName", init.getConfiguration().getNodeName());
+    sess.setAttribute("operator", init.getConfiguration().getOrganization());
+    sess.setAttribute("nodeVersion", init.getConfiguration().getVersion());
+    sess.setAttribute("nodeType", init.getConfiguration().getNodeType());
+    sess.setAttribute("address", init.getConfiguration().getAddress());
+    sess.setAttribute("timeZone", init.getConfiguration().getTimeZone());
+    sess.setAttribute("adminEmail", init.getConfiguration().getEmail());
+%>
+
 <t:page_tabbed pageTitle="Data processing" activeTab="processing">
     <div class="left">
       <t:menu_processing/>
     </div>
-    <div class="right"></div>
+    <div class="right">
+        <t:welcome_page/>
+    </div>
 </t:page_tabbed>
