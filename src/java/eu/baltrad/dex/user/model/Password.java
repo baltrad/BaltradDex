@@ -32,10 +32,6 @@ public class Password {
 //---------------------------------------------------------------------------------------- Variables
     /* User name associated with a given account */
     private String userName;
-    /* Password currently set for this account*/
-    private String currentPasswd;
-    /* Current password confirmed */
-    private String confirmCurrentPasswd;
     /* New password */
     private String newPasswd;
     /* New password confirmed */
@@ -45,12 +41,8 @@ public class Password {
      * Constructor.
      * 
      * @param userName User name
-     * @param currentPasswd Current password
      */
-    public Password( String userName, String currentPasswd ) {
-        this.userName = userName;
-        this.currentPasswd = currentPasswd;
-    }
+    public Password( String userName ) { this.userName = userName; }
     /**
      * Gets user name.
      *
@@ -64,32 +56,6 @@ public class Password {
      */
     public void setUserName( String userName ) {
         this.userName = userName;
-    }
-    /**
-     * Gets current password.
-     *
-     * @return Current password
-     */
-    public String getCurrentPasswd() { return currentPasswd; }
-    /**
-     * Sets current password.
-     *
-     * @param currentPasswd Current password to set
-     */
-    public void setCurrentPasswd( String currentPasswd ) { this.currentPasswd = currentPasswd; }
-    /**
-     * Gets confirmed current password.
-     *
-     * @return Confirmed current password
-     */
-    public String getConfirmCurrentPasswd() { return confirmCurrentPasswd; }
-    /**
-     * Sets confirmed current password.
-     *
-     * @param confirmCurrentPasswd Confirmed current password to set
-     */
-    public void setConfirmCurrentPasswd( String confirmCurrentPasswd ) {
-        this.confirmCurrentPasswd = confirmCurrentPasswd;
     }
     /**
      * Gets new password.

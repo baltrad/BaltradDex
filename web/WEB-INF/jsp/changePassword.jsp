@@ -58,7 +58,6 @@ Author     : szewczenko
                                 <form method="post">
                                     <div class="leftcol">
                                         <div class="row">User name</div>
-                                        <div class="row">Current password</div>
                                         <div class="row">New password</div>
                                         <div class="row">Confirm new password</div>
                                     </div>
@@ -71,17 +70,6 @@ Author     : szewczenko
                                                 </div>
                                             </div>
                                             <form:errors path="command.userName" cssClass="error"/>
-                                        </div>
-                                        <div class="row">
-                                            <div class="password">
-                                                <form:password path="command.confirmCurrentPasswd"
-                                                    title="Enter current password for this account"/>
-                                                <div class="hint">
-                                                   Current password for this account
-                                                </div>
-                                            </div>
-                                            <form:errors path="command.confirmCurrentPasswd"
-                                                         cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="password">

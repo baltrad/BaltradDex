@@ -22,7 +22,6 @@
 package eu.baltrad.dex.user.util;
 
 import eu.baltrad.dex.user.model.Password;
-import eu.baltrad.dex.util.MessageDigestUtil;
 
 import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
@@ -60,17 +59,9 @@ public class ChangePasswordValidator implements Validator {
         // Password object is null
         if( passwd == null ) return;
         // User submits empty fields
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "confirmCurrentPasswd", 
-                "error.missing.currentpasswd" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "newPasswd", "error.missing.newpasswd" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "confirmNewPasswd",
                 "error.missing.confirmnewpasswd" );
-        // Current password is invalid
-        if( !errors.hasFieldErrors( "confirmCurrentPasswd" ) &&
-                !passwd.getCurrentPasswd().equals( MessageDigestUtil.createHash( 
-                    passwd.getConfirmCurrentPasswd() ) ) ) {
-            errors.rejectValue( "confirmCurrentPasswd", "error.field.passwd.mismatch" );
-        }
         // New password is too short
         if( !errors.hasFieldErrors( "newPasswd") ) {
             if( passwd.getNewPasswd().trim().length() < MIN_PASSWD_LENGTH ) {

@@ -73,7 +73,7 @@ public class ChangePasswordController extends SimpleFormController {
     @Override
     protected Object formBackingObject( HttpServletRequest request ) {
         user = userManager.getUserById( Integer.parseInt( request.getParameter( USER_ID ) ) );
-        Password passwd = new Password( user.getName(), user.getPassword() );
+        Password passwd = new Password( user.getName() );
         return passwd;
     }
     /**
