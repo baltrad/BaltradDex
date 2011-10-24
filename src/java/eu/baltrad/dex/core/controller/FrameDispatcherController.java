@@ -176,7 +176,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     }
                 }
             }
-
+            
             if (iterator.hasNext()) {
                 itemStream = iterator.next();
                 InputStream fileStream = itemStream.openStream();
@@ -313,8 +313,10 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             List remoteDataSources = ( List )InitAppUtil.readObjectFromStream(file);
             // set channel listing
             setDataSourceListing( remoteDataSources );
+            // Set remote node address
             setRemNodeAddress( BaltradFrameHandler.getSenderNodeAddress( header ) );
-
+            // Set remote node name
+            setRemNodeName( BaltradFrameHandler.getSenderNodeName( header ) );
         // incoming channel subscription request
         } else if (messageText.equals(BaltradFrameHandler.CHNL_SBN_RQST)) {
             log.info( "Data source subscription request received from " +
