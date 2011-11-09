@@ -101,7 +101,7 @@ Author     : szewczenko
                                     </div>
                                     <div class="tablefooter">
                                         <div class="buttons">
-                                           <button class="rounded" type="submit" name="backButton">
+                                            <button class="rounded" type="submit" name="backButton">
                                                 <span>Back</span>
                                             </button>
                                             <button class="rounded" type="submit" name="nextButton">

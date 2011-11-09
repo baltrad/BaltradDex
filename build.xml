@@ -122,6 +122,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <include name="ant-junit/*.jar"/>
       <include name="easymock/*.jar"/>
       <include name="cglib/*.jar"/>
+      <include name="jetty/*.jar"/>
+      <include name="jakarta-commons/commons-fileupload-1.2.1.jar"/>
     </fileset>
     <fileset dir="${beast.path}/libs">
       <include name="commons-dbcp.jar"/>
@@ -182,7 +184,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="lib/catalina-ant">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="lib/baltrad-frame">
+      <fileset dir="lib/baltrad-frame-0.1.3">
         <include name="*.jar"/>
       </fileset>
       <fileset dir="lib/proj4">
