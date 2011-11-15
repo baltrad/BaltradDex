@@ -33,7 +33,7 @@ Create anomaly detectors
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Modify anomaly detector</title>
+        <title>Baltrad | Modify quality control</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -50,11 +50,11 @@ Create anomaly detectors
                     </div>
                     <div class="right">
                         <div class="blttitle">
-                            Modify anomaly detector
+                            Modify quality control
                         </div>
                         <div class="blttext">
-                            Modify or delete an anomaly detector. The description should explain what
-                            the anomaly detector is doing.
+                            Modify or delete quality control. The description should explain what
+                            the quality control is doing.
                         </div>
                         <div class="table">
                             <%if (request.getAttribute("emessage") != null) {%>
@@ -85,7 +85,7 @@ Create anomaly detectors
                                                 <input type="text" name="name" value="<%=name%>" disabled/>
                                                 <input type="hidden" name="name" value="<%=name%>"/>
                                                 <div class="hint">
-                                                   Anomaly detector name
+                                                   Quality controls name
                                                 </div>
                                             </div>
                                         </div>
@@ -93,7 +93,7 @@ Create anomaly detectors
                                             <div class="description">
                                                 <input type="text" name="description" value="<%=description%>"/>
                                                 <div class="hint">
-                                                   Description of the anomaly detector
+                                                   Description of the quality control
                                                 </div>
                                             </div>
                                         </div>

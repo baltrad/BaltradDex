@@ -40,7 +40,7 @@ List of anomaly detectors
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Anomaly detectors</title>
+        <title>Baltrad | Quality controls</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -57,11 +57,11 @@ List of anomaly detectors
                     </div>
                     <div class="right">
                         <div class="blttitle">
-                            Anomaly detectors
+                            Quality controls
                         </div>
                         <div class="blttext">
-                            List of anomaly detectors. Click on name to modify or delete or click
-                            create to create a new anomaly detector.
+                            List of quality controls. Click on name to modify or delete or click
+                            create to create a new quality control.
                         </div>
                         <div class="table">
                             <%if (request.getAttribute("emessage") != null) {%>

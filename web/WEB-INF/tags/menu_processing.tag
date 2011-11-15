@@ -6,7 +6,7 @@
         </li>
         <li>
           <img src="includes/images/icons/anomalydetectors.png" alt=""/>
-          <a href="anomalydetectors.htm">Anomaly detectors</a>
+          <a href="anomalydetectors.htm">Quality controls</a>
         </li>
         <li>
             <img src="includes/images/icons/route.png" alt="">

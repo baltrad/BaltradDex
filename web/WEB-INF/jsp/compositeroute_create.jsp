@@ -112,7 +112,7 @@ Creates a composite route
                                         <div class="row">Interval</div>
                                         <div class="row">Timeout</div>
                                         <div class="row6">Sources</div>
-                                        <div class="row6">Detectors</div>
+                                        <div class="row6">Quality controls</div>
                                     </div>
                                     <div class="rightcol">
                                         <div class="row">
@@ -252,7 +252,7 @@ Creates a composite route
                                             %>
                                             </select>
                                             <div class="hint">
-                                               Select anomaly detectors to be used
+                                               Select quality controls to be used
                                             </div>
                                         </div>                                        
                                     </div>

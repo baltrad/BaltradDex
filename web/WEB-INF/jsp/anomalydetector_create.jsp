@@ -33,7 +33,7 @@ Create anomaly detectors
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Create anomaly detector</title>
+        <title>Baltrad | Create quality control</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -50,12 +50,12 @@ Create anomaly detectors
                     </div>
                     <div class="right">
                         <div class="blttitle">
-                            Create adaptor
+                            Create quality control
                         </div>
                         <div class="blttext">
-                            Create an anomaly detector string. The string is a PGF-specific value and
+                            Create quality control string. The string is a PGF-specific value and
                             must be supported by the targeted PGF. Add a describing text so that it is
-                            possible to see what the detector is supposed to be doing.
+                            possible to see what the control is supposed to be doing.
                         </div>
                         <div class="table">
                             <%if (request.getAttribute("emessage") != null) {%>
@@ -85,7 +85,7 @@ Create anomaly detectors
                                             <div class="name">
                                                 <input type="text" name="name" value="<%=name%>"/>
                                                 <div class="hint">
-                                                   Anomaly detector name, valid characters are [A-Za-z0-9_.-]+
+                                                   Quality controls name, valid characters are [A-Za-z0-9_.-]+
                                                 </div>
                                             </div>
                                         </div>
@@ -93,7 +93,7 @@ Create anomaly detectors
                                             <div class="description">
                                                 <input type="text" name="description" value="<%=description%>"/>
                                                 <div class="hint">
-                                                   Description of the anomaly detector
+                                                   Description of the quality control
                                                 </div>
                                             </div>
                                         </div>
