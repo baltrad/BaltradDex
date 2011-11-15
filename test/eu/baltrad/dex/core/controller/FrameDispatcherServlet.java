@@ -47,6 +47,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.BufferedInputStream;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -54,6 +55,9 @@ import java.util.HashMap;
 
 import java.security.*;
 import java.security.spec.*;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.security.cert.CertificateFactory;
 
 /**
  *
@@ -95,7 +99,8 @@ public class FrameDispatcherServlet extends HttpServlet {
             throws ServletException, IOException {
         System.out.println( "_POST request received" );
         // verify post message request
-        HashMap parms = parseMultipartRequest( request, "_data.h5", "_sigfile", "_pkfile" );
+        HashMap parms = parseMultipartRequest( request, "_data.h5", "_sigfile", "_pkfile", 
+                "_certfile.cer" );
         String userName = ( String )parms.get( BF_USER_NAME );
         String passwd = ( String )parms.get( BF_PASSWORD );
         // authenticate request
@@ -143,6 +148,31 @@ public class FrameDispatcherServlet extends HttpServlet {
                     response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
                 }
             }
+            // Certificate post 
+            if( requestType.equals( BF_POST_CERT ) ) {
+                System.out.println( "_CERT post request received" );
+                String fingerprint = getCertFingerprint( ( File )parms.get( BF_CERT_FILE ), "SHA-1" );
+                System.out.println("_CERT fingerprint: " + fingerprint );
+                Certificate cert = loadCertFromFile( ( File )parms.get( BF_CERT_FILE ) );
+                // we are using the same keystore, so the certificate is stored with 
+                // a new alias
+                storeCertInKS( ".keystore", new char[]{ 's', '3', 'c', 'r', 'e', 't' }, cert,
+                        "testuser" );
+                System.out.println("_CERT stored in the keystore" );
+                response.setStatus( HttpServletResponse.SC_OK );
+            }
+            // Certificate authentication
+            if( requestType.equals( BF_CERT_AUTH ) ) {
+                System.out.println( "_CERT authentication request received" );
+                if( certAuth( ( File )parms.get( BF_SIG_FILE ), ( String )parms.get( 
+                        BF_MESSAGE_FIELD ) ) ) {
+                    System.out.println( "_CERT authentication successfull" );
+                    response.setStatus( HttpServletResponse.SC_OK );
+                } else {
+                    System.out.println( "_CERT authentication failed" );
+                    response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
+                }
+            }
         } else {
             System.out.println( "_Basic authentication failed" );
             response.setStatus( HttpServletResponse.SC_UNAUTHORIZED );
@@ -154,10 +184,11 @@ public class FrameDispatcherServlet extends HttpServlet {
      * @param dataFileName
      * @param sigFileName
      * @param pkFileName
+     * @param certFileName 
      * @return 
      */
     private synchronized HashMap<String, Object> parseMultipartRequest( HttpServletRequest request,
-            String dataFileName, String sigFileName, String pkFileName ) {
+            String dataFileName, String sigFileName, String pkFileName, String certFileName ) {
         HashMap<String, Object> parms = new HashMap<String, Object>();
         try {
             ServletFileUpload upload = new ServletFileUpload();
@@ -187,6 +218,11 @@ public class FrameDispatcherServlet extends HttpServlet {
                     if( fis.getFieldName().equals( BF_PK_FILE_FIELD ) ) {
                         File f = readFileFromStream( is, pkFileName );
                         parms.put( BF_PK_FILE, f );
+                    }
+                    // save certificate to file
+                    if( fis.getFieldName().equals( BF_CERT_FILE_FIELD ) ) {
+                        File f = readFileFromStream( is, certFileName );
+                        parms.put( BF_CERT_FILE, f );
                     }
                 }
             }
@@ -230,6 +266,28 @@ public class FrameDispatcherServlet extends HttpServlet {
             res = sig.verify( sigToVerify );
         } catch( Exception e ) {
             System.out.println( "failed to perform PK authentication " + e.getMessage() );
+        }
+        return res;
+    }
+    /**
+     * 
+     * @param sigFile
+     * @param message
+     * @return 
+     */
+    private boolean certAuth( File sigFile, String message ) {
+        boolean res = false;
+        try {
+            Certificate cert = loadCertFromKS( ".keystore", "testuser", 
+                    new char[]{ 's', '3', 'c', 'r', 'e', 't' } );
+            PublicKey pubKey = cert.getPublicKey();
+            Signature sig = Signature.getInstance( "SHA1withDSA", "SUN" );
+            sig.initVerify( pubKey );
+            signMessage( sig, message );
+            byte[] sigToVerify = readBytesFromFile( sigFile );
+            res = sig.verify( sigToVerify );
+        } catch( Exception e ) {
+            System.out.println( "failed to perform certificate authentication " + e.getMessage() );
         }
         return res;
     }
@@ -335,7 +393,7 @@ public class FrameDispatcherServlet extends HttpServlet {
                 int bytesRead;
                 while( ( bytesRead = bis.read( buff ) ) >= 0 ) {
                     sig.update( buff, 0, bytesRead );
-                };
+                }
             } finally {
                 bis.close();
             }
@@ -365,6 +423,110 @@ public class FrameDispatcherServlet extends HttpServlet {
             System.out.println( "failed to read bytes from file " + e.getMessage() );
         }
         return bytes;
-    } 
+    }
+    /**
+     * 
+     * @param certFileName
+     * @param ksFileName
+     * @param passwd
+     * @param alias
+     * @return 
+     */
+    private Certificate loadCertFromKS( String ksFileName, String certAlias, char[] passwd ) {
+        Certificate cer = null;
+        try {
+            KeyStore ks = KeyStore.getInstance( "JKS" );
+            FileInputStream fis = new FileInputStream( ksFileName ); 
+            BufferedInputStream bis = new BufferedInputStream( fis );
+            ks.load( bis, passwd );
+            cer = ks.getCertificate( certAlias );
+        } catch( Exception e ) {
+            System.out.println( "failed to load certificate from keystore " + e.getMessage() );
+        }
+        return cer;
+    }
+    /**
+     * 
+     * @param certFileName
+     * @param algorithm
+     * @return 
+     */
+    private String getCertFingerprint( File certFile, String algorithm ) {
+        byte[] digest = null;
+        try {
+            X509Certificate cert = loadCertFromFile( certFile );
+            MessageDigest md = MessageDigest.getInstance( algorithm );
+            byte[] der = cert.getEncoded();
+            md.update( der );
+            digest = md.digest();
+        } catch( Exception e ) {
+            System.out.println( "failed to get certificate's fingerprint " + e.getMessage() );    
+        }
+        return hexify( digest );
+    }
+    /**
+     * 
+     * @param bytes
+     * @return 
+     */
+    private String hexify( byte bytes[] ) {
+        char[] hexDigits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 
+            'e', 'f'};
+        StringBuilder sb = new StringBuilder( bytes.length * 2 );
+        for( int i = 0; i < bytes.length; ++i ) {
+            sb.append( hexDigits[(bytes[i] & 0xf0 ) >> 4] );
+            sb.append( hexDigits[bytes[i] & 0x0f] );
+        }
+        return sb.toString();
+    }
+    /**
+     * 
+     * @param ksFileName
+     * @param passwd
+     * @param cert 
+     * @param alias
+     */
+    private void storeCertInKS( String ksFileName, char[] passwd, Certificate cert, String alias ) {
+        try {
+            FileInputStream fis = null;
+            FileOutputStream fos = null;
+            try {
+                KeyStore ks = KeyStore.getInstance( "JKS" );
+                fis = new FileInputStream( ksFileName ); 
+                BufferedInputStream bis = new BufferedInputStream( fis );
+                ks.load( bis, passwd );
+                ks.setCertificateEntry( alias, cert );
+                fos = new FileOutputStream( new File( ksFileName ) );
+                ks.store( fos, new char[]{ 's', '3', 'c', 'r', 'e', 't' } );
+            } finally {
+                fis.close();
+                fos.close();
+            }
+        } catch( Exception e ) {
+            System.out.println( "failed to store certificate in keystore " + e.getMessage() );  
+        }    
+    }
+    /**
+     * 
+     * @param certFile
+     * @return 
+     */
+    private X509Certificate loadCertFromFile( File certFile ) {
+        X509Certificate cert = null;
+        try {
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream( certFile );
+                CertificateFactory x509CertFact = CertificateFactory.getInstance( "X.509" );
+                cert = ( X509Certificate )x509CertFact.generateCertificate( fis );
+            } finally {
+                fis.close();
+            }    
+        } catch( Exception e ) {
+            System.out.println( "failed to load certificate from file " + e.getMessage() );  
+        }
+        return cert;
+    }
+    
 }
 //--------------------------------------------------------------------------------------------------

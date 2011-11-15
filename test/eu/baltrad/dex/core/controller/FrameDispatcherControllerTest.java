@@ -56,6 +56,7 @@ import javax.net.ssl.TrustManager;
 import java.io.*;
 import java.util.*;
 import java.security.*;
+import java.security.cert.Certificate;
 
 /**
  *
@@ -80,7 +81,9 @@ public class FrameDispatcherControllerTest extends TestCase {
     private static Signature dsa;
     private static byte[] signature;
     private static byte[] publicKey;
-    private static byte[] publicKeyStub; 
+    private static byte[] publicKeyStub;
+    private static Certificate cert;
+    private static PrivateKey privateKey;
 //------------------------------------------------------------------------------------------ Methods    
     @Override
     public void setUp() throws Exception {
@@ -266,6 +269,128 @@ public class FrameDispatcherControllerTest extends TestCase {
         assertEquals( HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode() );
     }
     
+    public void testLoadCertFromKS() {
+        cert = loadCertFromKS( ".keystore", "szewczenko", 
+                new char[]{ 's', '3', 'c', 'r', 'e', 't' } );
+        
+        assertNotNull( cert );
+    }
+    
+    public void testSaveCertToFile() {
+        saveCertToFile( cert, "szewczenko.cer" );
+        File f = new File( "szewczenko.cer" );
+        
+        assertNotNull( f );
+        assertTrue( f.length() > 0 );
+    }
+    
+    public void testExtractPublicKey() {
+        PublicKey pk = cert.getPublicKey();
+        
+        assertNotNull( pk );
+    }
+    
+    public void testLoadPrivateKeyFromKS() {
+        privateKey = loadPrivateKeyFromKS( ".keystore", "szewczenko", 
+                new char[]{ 's', '3', 'c', 'r', 'e', 't' } );
+        
+        assertNotNull( privateKey );
+    }
+    
+    /**
+     * Certificate authentication request. Certificate is attached to the message body. 
+     * Server will verify the certificate (e.g. by comparing its fingerprints) and store 
+     * it in the trusted keystore.  
+     */
+    public void testPostCertRequest() throws IOException {
+        HttpPost post = new HttpPost( context + SERVLET_PATH );
+        MultipartEntity me = new MultipartEntity();
+        me.addPart( BF_USER_NAME, new StringBody( MessageDigestUtil.createHash( "TestUser" ) ) );
+        me.addPart( BF_PASSWORD, new StringBody( MessageDigestUtil.createHash( "s3cret" ) ) );
+        me.addPart( BF_REQUEST_TYPE, new StringBody( BF_POST_CERT ) );
+        me.addPart( BF_MESSAGE_FIELD, new StringBody( "Sending certificate so you can verify it" ) );
+        Certificate cer = loadCertFromKS( ".keystore", "testcert", 
+                new char[]{ 's', '3', 'c', 'r', 'e', 't' } );
+        
+        assertNotNull( cer );
+        
+        saveCertToFile( cer, "testcert.cer" );
+        me.addPart( BF_CERT_FILE_FIELD, new FileBody( new File( "testcert.cer" ) ) );
+        post.setEntity( me );
+        HttpResponse response = client.execute( post );
+        
+        assertEquals( HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode() );
+    }
+    
+    /**
+     * Authenticate using certificate existing in server's trusted keystore. We send only message
+     * and a signature. The certificate and its public key is extracted from the keystore 
+     * based on alias (in production code user name will be used as alias).
+     */
+    public void testCertAuthFail() throws IOException, Exception {
+        HttpPost post = new HttpPost( context + SERVLET_PATH );
+        MultipartEntity me = new MultipartEntity();
+        me.addPart( BF_USER_NAME, new StringBody( MessageDigestUtil.createHash( "TestUser" ) ) );
+        me.addPart( BF_PASSWORD, new StringBody( MessageDigestUtil.createHash( "s3cret" ) ) );
+        me.addPart( BF_REQUEST_TYPE, new StringBody( BF_CERT_AUTH ) );
+        me.addPart( BF_MESSAGE_FIELD, new StringBody( MSG_TO_SIGN ) );
+        // try to authenticate with an invalid certificate
+        PrivateKey priv = loadPrivateKeyFromKS( ".keystore", "szewczenko", 
+                new char[]{ 's', '3', 'c', 'r', 'e', 't' } );
+        
+        assertNotNull( priv );
+        
+        Signature sig = Signature.getInstance( "SHA1withDSA", "SUN" );
+        
+        assertNotNull( sig );
+        
+        sig.initSign( priv );
+        byte[] sigBytes = signMessage( sig, MSG_TO_SIGN );
+        
+        assertNotNull( sigBytes );
+        
+        writeByteArrayToFile( sigBytes, SIG_FILE );
+        me.addPart( BF_SIG_FILE_FIELD, new FileBody( new File( SIG_FILE ) ) );
+        post.setEntity( me );
+        HttpResponse response = client.execute( post );
+        
+        assertEquals( HttpServletResponse.SC_UNAUTHORIZED, response.getStatusLine().getStatusCode() );
+    }
+    
+    /**
+     * Authenticate using certificate existing in server's trusted keystore. We send only message
+     * and a signature. The certificate and its public key is extracted from the keystore 
+     * based on alias (in production code user name will be used as alias).
+     */
+    public void testCertAuthSuccess() throws IOException, Exception {
+        HttpPost post = new HttpPost( context + SERVLET_PATH );
+        MultipartEntity me = new MultipartEntity();
+        me.addPart( BF_USER_NAME, new StringBody( MessageDigestUtil.createHash( "TestUser" ) ) );
+        me.addPart( BF_PASSWORD, new StringBody( MessageDigestUtil.createHash( "s3cret" ) ) );
+        me.addPart( BF_REQUEST_TYPE, new StringBody( BF_CERT_AUTH ) );
+        me.addPart( BF_MESSAGE_FIELD, new StringBody( MSG_TO_SIGN ) );
+        PrivateKey priv = loadPrivateKeyFromKS( ".keystore", "testcert", 
+                new char[]{ 's', '3', 'c', 'r', 'e', 't' } );
+        
+        assertNotNull( priv );
+        
+        Signature sig = Signature.getInstance( "SHA1withDSA", "SUN" );
+        
+        assertNotNull( sig );
+        
+        sig.initSign( priv );
+        byte[] sigBytes = signMessage( sig, MSG_TO_SIGN );
+        
+        assertNotNull( sigBytes );
+        
+        writeByteArrayToFile( sigBytes, SIG_FILE );
+        me.addPart( BF_SIG_FILE_FIELD, new FileBody( new File( SIG_FILE ) ) );
+        post.setEntity( me );
+        HttpResponse response = client.execute( post );
+        
+        assertEquals( HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode() );
+    }
+    
     @Override
     public void tearDown() throws Exception {
         client.getConnectionManager().shutdown();
@@ -351,10 +476,17 @@ public class FrameDispatcherControllerTest extends TestCase {
      * @throws NoSuchAlgorithmException
      * @throws NoSuchProviderException 
      */
-    public KeyPair generateKeys() throws NoSuchAlgorithmException, NoSuchProviderException {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance( "DSA", "SUN" );
-        SecureRandom random = SecureRandom.getInstance( "SHA1PRNG", "SUN" );
-        keyGen.initialize( 1024, random );
+    public KeyPair generateKeys() {
+        KeyPairGenerator keyGen = null;
+        try {
+            keyGen = KeyPairGenerator.getInstance( "DSA", "SUN" );
+            SecureRandom random = SecureRandom.getInstance( "SHA1PRNG", "SUN" );
+            keyGen.initialize( 1024, random );
+        } catch( NoSuchAlgorithmException e ) {
+            System.out.println( "failed to generate keys " + e.getMessage() );
+        } catch( NoSuchProviderException e ) {
+            System.out.println( "failed to generate keys " + e.getMessage() );
+        }
         return keyGen.generateKeyPair();
     }
     /**
@@ -397,8 +529,66 @@ public class FrameDispatcherControllerTest extends TestCase {
                 fos.close();
             }
         } catch( IOException e ) {
-            System.out.println( "failed to write byte array to file" );
+            System.out.println( "failed to write byte array to file " + e.getMessage() );
         }
+    }
+    /**
+     * 
+     * @param certFileName
+     * @param ksFileName
+     * @param passwd
+     * @param alias
+     * @return 
+     */
+    public Certificate loadCertFromKS( String ksFileName, String certAlias, char[] passwd ) {
+        Certificate cer = null;
+        try {
+            KeyStore ks = KeyStore.getInstance( "JKS" );
+            FileInputStream fis = new FileInputStream( ksFileName ); 
+            BufferedInputStream bis = new BufferedInputStream( fis );
+            ks.load( bis, passwd );
+            cer = ks.getCertificate( certAlias );
+        } catch( Exception e ) {
+            System.out.println( "failed to load certificate from keystore " + e.getMessage() );
+        }
+        return cer;
+    }
+    /**
+     * 
+     * @param cert
+     * @param certFileName 
+     */
+    public void saveCertToFile( Certificate cert, String certFileName ) {
+        try {
+            FileOutputStream fos = new FileOutputStream( new File( certFileName ) );
+            try { 
+                fos.write( cert.getEncoded() );
+            } finally {
+                fos.close();
+            }
+        } catch( Exception e ) {
+            System.out.println( "failed to save certificate to file " + e.getMessage() );
+        }
+    }
+    /**
+     * 
+     * @param ksFileName
+     * @param keyAlias
+     * @param passwd
+     * @return 
+     */
+    public PrivateKey loadPrivateKeyFromKS( String ksFileName, String keyAlias, char[] passwd ) {
+        PrivateKey priv = null;
+        try {
+            KeyStore ks = KeyStore.getInstance( "JKS" );
+            FileInputStream fis = new FileInputStream( ksFileName ); 
+            BufferedInputStream bis = new BufferedInputStream( fis );
+            ks.load( bis, passwd );
+            priv = ( PrivateKey )ks.getKey( keyAlias, passwd );
+        } catch( Exception e ) {
+            System.out.println( "failed to load private key from keystore " + e.getMessage() );
+        }
+        return priv;
     }
 }
 //--------------------------------------------------------------------------------------------------

@@ -228,7 +228,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="includes/**/*.jpg" />
         <include name="includes/**/*.txt" />
       </fileset>
-      
       <fileset dir="${etc.dir}">
         <include name="db.properties" />
         <include name="log4j.properties" />
@@ -275,7 +274,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </copy>
 
     <copy todir="${build.test.dir}">
-      <fileset dir="${test.data.dir}"/>
+      <fileset dir="${test.data.dir}"/>    
     </copy>
 
   </target>
