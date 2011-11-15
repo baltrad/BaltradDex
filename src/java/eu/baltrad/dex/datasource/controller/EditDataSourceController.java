@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.util.List;
+import java.util.Collections;
 
 /**
  * Allows to edit data source selected from the list.
@@ -58,6 +59,7 @@ public class EditDataSourceController implements Controller {
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response ) {
         List<DataSource> dataSources = dataSourceManager.getDataSources();
+        Collections.sort( dataSources );
         return new ModelAndView( getSuccessView(), DS_SELECT_EDIT_KEY, dataSources );
     }
     /**

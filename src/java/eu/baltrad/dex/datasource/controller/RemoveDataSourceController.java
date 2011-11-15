@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Collections;
 
 /**
  * Allows to select and remove existing data source.
@@ -88,6 +89,7 @@ public class RemoveDataSourceController extends MultiActionController {
      */
     public ModelAndView dsSelectRemove( HttpServletRequest request, HttpServletResponse response ) {
         List<DataSource> dataSources = dataSourceManager.getDataSources();
+        Collections.sort( dataSources );
         return new ModelAndView( DS_SELECT_REMOVE_VIEW, DS_SELECT_REMOVE_KEY, dataSources );
     }
     /**

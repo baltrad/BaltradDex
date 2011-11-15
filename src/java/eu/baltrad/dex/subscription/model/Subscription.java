@@ -35,7 +35,7 @@ import java.sql.Timestamp;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class Subscription implements Serializable, Comparable< Subscription > {
+public class Subscription implements Serializable, Comparable<Subscription> {
 //---------------------------------------------------------------------------------------- Constants
     private static final long serialVersionUID = -7278861424267045555L;
 

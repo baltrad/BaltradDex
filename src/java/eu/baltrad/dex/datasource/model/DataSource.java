@@ -30,7 +30,7 @@ import java.io.Serializable;
  * @version 0.6.4
  * @since 0.6.4
  */
-public class DataSource implements Serializable {
+public class DataSource implements Serializable, Comparable<DataSource> {
 //---------------------------------------------------------------------------------------- Variables
     /** Data source ID */
     private int id;
@@ -126,5 +126,13 @@ public class DataSource implements Serializable {
      * @param description Data source description to set
      */
     public void setDescription( String description ) { this.description = description; }
+    /**
+     * Implements comparable interface. Allows to sort data source objects based 
+     * on data source name.
+     *
+     * @param ds DataSource
+     * @return 0 if objects are equal
+     */
+    public int compareTo( DataSource ds ) { return getName().compareTo( ds.getName() ); }
 }
 //--------------------------------------------------------------------------------------------------
