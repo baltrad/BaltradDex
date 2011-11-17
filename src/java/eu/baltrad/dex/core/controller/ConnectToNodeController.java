@@ -61,7 +61,7 @@ public class ConnectToNodeController extends SimpleFormController {
      */
     public ConnectToNodeController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        this.init = InitAppUtil.getInstance();
+        this.init = new InitAppUtil();
     }
     /**
      * Cretes new connection parameters object.

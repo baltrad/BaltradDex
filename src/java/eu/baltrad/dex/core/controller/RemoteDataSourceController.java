@@ -89,7 +89,7 @@ public class RemoteDataSourceController extends MultiActionController {
      */
     public RemoteDataSourceController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        this.init = InitAppUtil.getInstance();
+        this.init = new InitAppUtil();
     }
      /**
      * Creates list of remote data source available for a given node.

@@ -75,7 +75,7 @@ public class HandleFrameTask implements Runnable {
         this.dataSource = dataSource;
         this.fileEntry = fileEntry;
         this.fileItem = fileItem;
-        this.init = InitAppUtil.getInstance();
+        this.init = new InitAppUtil();
         this.remoteNodeAddress = user.getNodeAddress();
         this.bfHandler = new BaltradFrameHandler(
             init.getConfiguration().getSoTimeout(),

@@ -95,7 +95,7 @@ public class BltFileDetailsController implements Controller {
      */
     public BltFileDetailsController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        init = InitAppUtil.getInstance();
+        init = new InitAppUtil();
     }
     /**
      * Fetches detailed information about a file and prepares dataset image thumbs.

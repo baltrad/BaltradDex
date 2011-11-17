@@ -31,7 +31,7 @@ Author     : szewczenko
 </jsp:useBean>
 
 <%
-    InitAppUtil init = InitAppUtil.getInstance();
+    InitAppUtil init = new InitAppUtil();
     User user = (User)securityManager.getUser(request);
     HttpSession sess = request.getSession();
     String userName = user.getName();

@@ -33,7 +33,7 @@ Author     : szewczenko
     Date now = new Date();
     SimpleDateFormat format = new SimpleDateFormat( "dd MMMM yyyy, h:mm aa" );
     String dateAndTime = format.format( now );
-    InitAppUtil init = InitAppUtil.getInstance();
+    InitAppUtil init = new InitAppUtil();
     request.getSession().setAttribute( "init_status", InitAppUtil.getStatus() );
     String adminEmail = init.getConfiguration().getEmail();
 %>

@@ -134,7 +134,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public FrameDispatcherController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        this.init = InitAppUtil.getInstance();
+        this.init = new InitAppUtil();
     }
     /**
      * Required by the Spring's Controller interface, wraps actual doGet method used to

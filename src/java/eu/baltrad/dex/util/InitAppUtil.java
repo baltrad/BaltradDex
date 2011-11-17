@@ -69,24 +69,13 @@ public class InitAppUtil extends NodeAddress {
     private static int status;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Private constructor invokes initializing method.
+     * Constructor invokes initializing method.
      */
-    private InitAppUtil() { initApp(); }
-    /**
-     * Initializes object of this class in case it is null, otherwise returns existing object.
-     *
-     * @return initAppUtil Instance of InitAppUtil class.
-     */
-    public static synchronized InitAppUtil getInstance() {
-        if( initAppUtil == null ) {
-            initAppUtil = new InitAppUtil();
-        }
-        return initAppUtil;
-    }
+    public InitAppUtil() { initApp(); }
     /**
      * Method initializes application by reading configuration from database.
      */
-    private static void initApp() {
+    public static synchronized void initApp() {
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
         ConfigurationManager cm = new ConfigurationManager();
         config = cm.loadAppConf();

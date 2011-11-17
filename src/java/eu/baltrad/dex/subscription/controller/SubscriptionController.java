@@ -94,7 +94,7 @@ public class SubscriptionController extends MultiActionController {
      */
     public SubscriptionController() {
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        init = InitAppUtil.getInstance();
+        init = new InitAppUtil();
     }
     /**
      * Shows list of all subscriptions.

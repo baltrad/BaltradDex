@@ -80,7 +80,7 @@ public class BltImagePreviewController implements Controller {
      * Constructor.
      */
     public BltImagePreviewController() {
-        init = InitAppUtil.getInstance();
+        init = new InitAppUtil();
     }
     /**
      * Creates image based on parameters retrieved from request.

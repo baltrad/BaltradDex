@@ -109,7 +109,7 @@ public class BltFileManager {
      */
     public BltFileManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.init = InitAppUtil.getInstance();
+        this.init = new InitAppUtil();
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
