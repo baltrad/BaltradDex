@@ -34,18 +34,17 @@ Author     : szewczenko
 </jsp:useBean>
 
 <%
-    InitAppUtil init = new InitAppUtil();
     User user = (User)securityManager.getUser(request);
     HttpSession sess = request.getSession();
     String userName = user.getName();
     sess.setAttribute("userName", userName);
-    sess.setAttribute("nodeName", init.getConfiguration().getNodeName());
-    sess.setAttribute("operator", init.getConfiguration().getOrganization());
-    sess.setAttribute("nodeVersion", init.getConfiguration().getVersion());
-    sess.setAttribute("nodeType", init.getConfiguration().getNodeType());
-    sess.setAttribute("address", init.getConfiguration().getAddress());
-    sess.setAttribute("timeZone", init.getConfiguration().getTimeZone());
-    sess.setAttribute("adminEmail", init.getConfiguration().getEmail());
+    sess.setAttribute("nodeName", InitAppUtil.getConf().getNodeName());
+    sess.setAttribute("operator", InitAppUtil.getConf().getOrganization());
+    sess.setAttribute("nodeVersion", InitAppUtil.getConf().getVersion());
+    sess.setAttribute("nodeType", InitAppUtil.getConf().getNodeType());
+    sess.setAttribute("address", InitAppUtil.getConf().getAddress());
+    sess.setAttribute("timeZone", InitAppUtil.getConf().getTimeZone());
+    sess.setAttribute("adminEmail", InitAppUtil.getConf().getEmail());
 %>
 
 <t:page_tabbed pageTitle="Data exchange" activeTab="exchange">

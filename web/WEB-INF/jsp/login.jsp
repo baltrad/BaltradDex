@@ -29,13 +29,21 @@ Author     : szewczenko
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="eu.baltrad.dex.util.InitAppUtil"%>
+<%@page import="eu.baltrad.dex.config.model.AppConfiguration"%>"
+
+
 <%
     Date now = new Date();
     SimpleDateFormat format = new SimpleDateFormat( "dd MMMM yyyy, h:mm aa" );
     String dateAndTime = format.format( now );
-    InitAppUtil init = new InitAppUtil();
-    request.getSession().setAttribute( "init_status", InitAppUtil.getStatus() );
-    String adminEmail = init.getConfiguration().getEmail();
+    
+    AppConfiguration appConf = InitAppUtil.loadAppConf();
+    if( appConf == null ) {
+        request.getSession().setAttribute( "init_status", 1 );
+    } else {
+        request.getSession().setAttribute( "init_status", 0 );
+    }
+    String adminEmail = appConf.getEmail();
 %>
 
 <html>

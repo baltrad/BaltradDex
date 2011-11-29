@@ -101,7 +101,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private UserManager userManager;
     private DataSourceManager dataSourceManager;
     private SubscriptionManager subscriptionManager;
-    private InitAppUtil init;
     private Logger log;
     private BltDataProcessorController bltDataProcessorController;
     // Reference to file catalog object
@@ -134,7 +133,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public FrameDispatcherController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        this.init = new InitAppUtil();
     }
     /**
      * Required by the Spring's Controller interface, wraps actual doGet method used to
@@ -181,7 +179,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 itemStream = iterator.next();
                 InputStream fileStream = itemStream.openStream();
                 // write to a temporary file
-                frameFile = InitAppUtil.createTempFile(new File(init.getWorkDirPath()));
+                frameFile = InitAppUtil.createTempFile(new File(InitAppUtil.getWorkDir()));
                 InitAppUtil.saveFile(fileStream, frameFile);
             }
 
@@ -196,7 +194,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             response.setStatus(BaltradFrameHandler.HTTP_STATUS_CODE_500);
         } finally {
             // clean work directory from temporary files
-            InitAppUtil.cleanUpTempFiles( init.getWorkDirPath() );
+            InitAppUtil.cleanUpTempFiles( InitAppUtil.getWorkDir() );
         }
     }
 
@@ -274,7 +272,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             }
             // write list to temporary file
             File tempFile = InitAppUtil.createTempFile(
-                    new File( init.getWorkDirPath() ) );
+                    new File( InitAppUtil.getWorkDir() ) );
             // write object to stream
             InitAppUtil.writeObjectToStream( dataSources, tempFile );
 
@@ -284,8 +282,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             // prepare the return message header
             String retHeader = BaltradFrameHandler.createObjectHdr(
                     BaltradFrameHandler.MIME_MULTIPART,
-                    init.getConfiguration().getNodeAddress(),
-                    init.getConfiguration().getNodeName(),
+                    InitAppUtil.getConf().getNodeAddress(),
+                    InitAppUtil.getConf().getNodeName(),
                     BaltradFrameHandler.CHNL_LIST,
                     tempFile.getAbsolutePath() );
             //
@@ -345,13 +343,13 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         // add subscription
                         subs = new Subscription( System.currentTimeMillis(),
                             user.getName(), localDataSource.getName(),
-                            init.getConfiguration().getNodeName(),
+                            InitAppUtil.getConf().getNodeName(),
                             Subscription.REMOTE_SUBSCRIPTION, false, false,
-                            init.getConfiguration().getScheme(),
-                            init.getConfiguration().getHostAddress(),
-                            init.getConfiguration().getPort(),
-                            init.getConfiguration().getAppCtx(),
-                            init.getConfiguration().getEntryAddress() );
+                            InitAppUtil.getConf().getScheme(),
+                            InitAppUtil.getConf().getHostAddress(),
+                            InitAppUtil.getConf().getPort(),
+                            InitAppUtil.getConf().getAppCtx(),
+                            InitAppUtil.getConf().getEntryAddress() );
                         subscriptionManager.saveSubscription( subs );
                         confirmedDataSources.add( requestedDataSource );
                     }
@@ -361,7 +359,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
             // write list to temporary file
             File tempFile = InitAppUtil.createTempFile(
-                    new File( init.getWorkDirPath() ) );
+                    new File( InitAppUtil.getWorkDir() ) );
             // write object to the stream
             InitAppUtil.writeObjectToStream( confirmedDataSources, tempFile );
             // set the return address
@@ -369,8 +367,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             // prepare the return message header
             String retHeader = BaltradFrameHandler.createObjectHdr(
                     BaltradFrameHandler.MIME_MULTIPART,
-                    init.getConfiguration().getNodeAddress(),
-                    init.getConfiguration().getNodeName(),
+                    InitAppUtil.getConf().getNodeAddress(),
+                    InitAppUtil.getConf().getNodeName(),
                     BaltradFrameHandler.CHNL_SBN_CFN,
                     tempFile.getAbsolutePath() );
             //
@@ -441,7 +439,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
             // write subscription object to temporary file
             File tempFile = InitAppUtil.createTempFile( 
-                    new File( init.getWorkDirPath() ) );
+                    new File( InitAppUtil.getWorkDir() ) );
             // set the return address
             String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
 
@@ -454,8 +452,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
             String retHeader = BaltradFrameHandler.createObjectHdr(
                     BaltradFrameHandler.MIME_MULTIPART,
-                    init.getConfiguration().getNodeAddress(),
-                    init.getConfiguration().getNodeName(),
+                    InitAppUtil.getConf().getNodeAddress(),
+                    InitAppUtil.getConf().getNodeName(),
                     returnMessage,
                     tempFile.getAbsolutePath()
             );
@@ -507,7 +505,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
 
             // write list to temporary file
             File tempFile = InitAppUtil.createTempFile(
-                    new File( init.getWorkDirPath() ) );
+                    new File( InitAppUtil.getWorkDir() ) );
             // write object to the stream
             InitAppUtil.writeObjectToStream( subs, tempFile );
             // set the return address
@@ -515,8 +513,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             // prepare the return message header
             String retHeader = BaltradFrameHandler.createObjectHdr(
                     BaltradFrameHandler.MIME_MULTIPART,
-                    init.getConfiguration().getNodeAddress(),
-                    init.getConfiguration().getNodeName(),
+                    InitAppUtil.getConf().getNodeAddress(),
+                    InitAppUtil.getConf().getNodeName(),
                     BaltradFrameHandler.CHNL_SYNC_RSPNS,
                     tempFile.getAbsolutePath() );
             BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile );

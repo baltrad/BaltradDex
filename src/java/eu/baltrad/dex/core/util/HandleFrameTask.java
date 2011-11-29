@@ -53,7 +53,6 @@ public class HandleFrameTask implements Runnable {
     private String dataSource;
     private FileEntry fileEntry;
     private File fileItem;
-    private InitAppUtil init;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
@@ -75,12 +74,9 @@ public class HandleFrameTask implements Runnable {
         this.dataSource = dataSource;
         this.fileEntry = fileEntry;
         this.fileItem = fileItem;
-        this.init = new InitAppUtil();
         this.remoteNodeAddress = user.getNodeAddress();
-        this.bfHandler = new BaltradFrameHandler(
-            init.getConfiguration().getSoTimeout(),
-            init.getConfiguration().getConnTimeout()
-        );
+        this.bfHandler = new BaltradFrameHandler( InitAppUtil.getConf().getSoTimeout(),
+            InitAppUtil.getConf().getConnTimeout() );
     }
     /**
      * Implements Runnable interface. Runs frame delivery task in a separate thread.
@@ -88,7 +84,7 @@ public class HandleFrameTask implements Runnable {
     public void run() {
         try {
             String header = BaltradFrameHandler.createDataHdr( BaltradFrameHandler.MIME_MULTIPART,
-                init.getConfiguration().getNodeName(), dataSource, fileEntry.uuid() + ".h5" );
+                InitAppUtil.getConf().getNodeName(), dataSource, fileEntry.uuid() + ".h5" );
             BaltradFrame baltradFrame = new BaltradFrame( header, fileItem );
             int httpStatusCode = bfHandler.handleBF( remoteNodeAddress, baltradFrame );
             // update data delivery register

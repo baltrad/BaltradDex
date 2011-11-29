@@ -86,15 +86,12 @@ public class SubscriptionController extends MultiActionController {
     private List< Subscription > removedSubscriptions;
     // removed peers subscriptions
     private List< Subscription > removedPeersSubscriptions;
-    /** Reference to InitAppUtil */
-    private InitAppUtil init;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      */
     public SubscriptionController() {
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        init = new InitAppUtil();
     }
     /**
      * Shows list of all subscriptions.
@@ -110,18 +107,16 @@ public class SubscriptionController extends MultiActionController {
 
         // synchronize local and remote subscriptions
         for( int i = 0; i < subscriptions.size(); i++ ) {
-            File tempFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
+            File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getWorkDir() ) );
             InitAppUtil.writeObjectToStream( subscriptions.get( i ), tempFile );
 
             BaltradFrameHandler bfHandler = new BaltradFrameHandler(
-                init.getConfiguration().getSoTimeout(),
-                init.getConfiguration().getConnTimeout()
-            );
+                InitAppUtil.getConf().getSoTimeout(), InitAppUtil.getConf().getConnTimeout() );
 
             String hdrStr = BaltradFrameHandler.createObjectHdr(
                 BaltradFrameHandler.MIME_MULTIPART,
-                init.getConfiguration().getNodeAddress(),
-                init.getConfiguration().getNodeName(),
+                InitAppUtil.getConf().getNodeAddress(),
+                InitAppUtil.getConf().getNodeName(),
                 BaltradFrameHandler.CHNL_SYNC_RQST,
                 tempFile.getAbsolutePath()
             );
@@ -222,17 +217,17 @@ public class SubscriptionController extends MultiActionController {
         ModelAndView modelAndView = new ModelAndView();
         for( int i = 0; i < getChangedSubscriptions().size(); i++ ) {
             try {
-                File tempFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
+                File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getWorkDir() ) );
                 InitAppUtil.writeObjectToStream( getChangedSubscriptions().get( i ), tempFile );
                 // prepare the frame
                 BaltradFrameHandler bfHandler = new BaltradFrameHandler(
-                        init.getConfiguration().getSoTimeout(),
-                        init.getConfiguration().getConnTimeout() );
+                        InitAppUtil.getConf().getSoTimeout(),
+                        InitAppUtil.getConf().getConnTimeout() );
                 //
                 String hdrStr = BaltradFrameHandler.createObjectHdr(
                         BaltradFrameHandler.MIME_MULTIPART,
-                        init.getConfiguration().getNodeAddress(),
-                        init.getConfiguration().getNodeName(),
+                        InitAppUtil.getConf().getNodeAddress(),
+                        InitAppUtil.getConf().getNodeName(),
                         getChangedSubscriptions().get( i ).getUserName(),
                         BaltradFrameHandler.SBN_CHNG_RQST,
                         tempFile.getAbsolutePath() );

@@ -35,12 +35,16 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.io.BufferedInputStream;
 import java.util.Date;
+
+import java.security.KeyStore;
+import java.security.cert.Certificate;
 
 /**
  * Utility class used to initialize application on startup.
  *
- * @author Maciej Szewczykowski :: maciej@baltrad.eu
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */
@@ -54,83 +58,74 @@ public class InitAppUtil extends NodeAddress {
     private static final long TEMP_FILE_MAX_AGE = 180000;
 //---------------------------------------------------------------------------------------- Variables
     /** References logger object */
-    private static Logger log;
+    private static Logger log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     /** Configuration object holding all necessary settings */
-    private static AppConfiguration config;
-    /** Absolute path to work directory */
-    private static String workDirPath;
-    /** Absolute path to image storage */
-    private static String imagesDirPath;
-    /** Absolute path to thumbs storage */
-    private static String thumbsDirPath;
-    /** Reference to the object of this class */
-    private static InitAppUtil initAppUtil;
-    /** Initialization status */
-    private static int status;
+    private static AppConfiguration appConf; 
+    /** Work directory */
+    private static String workDir;
+    /** Images directory */
+    private static String imagesDir;
+    /** Thumbnails directory */
+    private static String thumbsDir;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Constructor invokes initializing method.
+     * Load application settings.
      */
-    public InitAppUtil() { initApp(); }
-    /**
-     * Method initializes application by reading configuration from database.
-     */
-    public static synchronized void initApp() {
-        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        ConfigurationManager cm = new ConfigurationManager();
-        config = cm.loadAppConf();
-        if( config != null ) {
-            // Create work directory
-            workDirPath = createDir( config.getWorkDir(), "Created work directory" );
-            // Create image storage directory
-            imagesDirPath = createDir( config.getWorkDir() + File.separator + config.getImagesDir(),
-                    "New image storage directory created" );
-            // Create thumbs storage directory
-            thumbsDirPath = createDir( config.getWorkDir() + File.separator + config.getThumbsDir(),
-                    "New thumbs storage directory created" );
-            log.info( "Application successfully initialized" );
-            setStatus( 0 );
-        } else {
-            log.error( "Failed to initialize application" );
-            setStatus( 1 );
+    public static AppConfiguration loadAppConf() {
+        if( appConf == null ) {
+            ConfigurationManager cm = new ConfigurationManager();
+            appConf = cm.loadAppConf();
+            createDirs();
+            log.info( "Application successfully initialized" );   
         }
+        return appConf;
     }
     /**
-     * Get initialization status.
-     *
-     * @return status Initialization status
+     * Save modified application settings.
+     * 
+     * @param _appConf Application settings to save
      */
-    public static int getStatus() { return status; }
+    public static void saveAppConf( AppConfiguration _appConf ) {
+        if( !appConf.equals( _appConf ) ) {
+            appConf = _appConf;
+            createDirs();
+            log.info( "Application successfully initialized" );   
+        }   
+    }
     /**
-     * Set initialization status.
-     *
-     * @param _status Initialization status to set
+     * Create necessary directories and initialize variables. 
      */
-    public static void setStatus( int _status ) { status = _status; }
+    private static void createDirs() {
+        workDir = createDir( appConf.getWorkDir(), "Created work directory" );
+        imagesDir = createDir( appConf.getWorkDir() + File.separator + 
+                appConf.getImagesDir(), "New image storage directory created" );
+        thumbsDir = createDir( appConf.getWorkDir() + File.separator + 
+                appConf.getThumbsDir(), "New thumbs storage directory created" );
+    }
     /**
      * Gets configuration object.
      * 
      * @return Configuration object
      */
-    public AppConfiguration getConfiguration() { return config; }
+    public static AppConfiguration getConf() { return appConf; }
     /**
-     * Gets absolute work directory path.
+     * Gets work directory.
      *
-     * @return Work directory path
+     * @return Work directory
      */
-    public String getWorkDirPath() { return workDirPath; }
+    public static String getWorkDir() { return workDir; }
     /**
-     * Gets absolute images storage folder path.
+     * Gets images directory.
      *
-     * @return Path to images storage folder
+     * @return Images directory
      */
-    public String getImagesDirPath() { return imagesDirPath; }
+    public static String getImagesDir() { return imagesDir; }
     /**
-     * Gets absolute thumbnails storage folder path.
+     * Gets thumbnails directory.
      *
-     * @return Path to thumbnails storage folder
+     * @return Thumbnails directory
      */
-    public String getThumbsDirPath() { return thumbsDirPath; }
+    public static String getThumbsDir() { return thumbsDir; }
     /**
      * Method extracts relative file name from absolute file path string.
      *
@@ -305,6 +300,49 @@ public class InitAppUtil extends NodeAddress {
             log.error( "Error while reading object from stream", e );
         }
         return obj;
+    }
+    /**
+     * Loads certificate from keystore.
+     * 
+     * @param ksFileName Keystore file name
+     * @param certAlias Certificate alias 
+     * @param passwd Keystore password
+     * @return Certificate fetched from the keystore 
+     */
+    public static Certificate loadCertFromKS( String ksFileName, String certAlias, String passwd ) {
+        Certificate cer = null;
+        try {
+            KeyStore ks = KeyStore.getInstance( "JKS" );
+            FileInputStream fis = new FileInputStream( ksFileName ); 
+            BufferedInputStream bis = new BufferedInputStream( fis );
+            ks.load( bis, passwd.toCharArray() );
+            cer = ks.getCertificate( certAlias );
+        } catch( Exception e ) {
+            log.error( "Failed to load certificate from keystore", e );
+        }
+        return cer;
+    }
+    /**
+     * Saves certificate to a file.
+     * 
+     * @param cert Certificate to save
+     * @param certFileName Certificate file name
+     * @return Reference to certificate file
+     */
+    public static File saveCertToFile( Certificate cert, String certFileName ) {
+        File certFile = null;
+        try {
+            certFile = new File( certFileName );
+            FileOutputStream fos = new FileOutputStream( new File( certFileName ) );
+            try { 
+                fos.write( cert.getEncoded() );
+            } finally {
+                fos.close();
+            }
+        } catch( Exception e ) {
+            log.error( "Failed to save certificate to file", e );
+        }
+        return certFile;
     }
 }
 //--------------------------------------------------------------------------------------------------

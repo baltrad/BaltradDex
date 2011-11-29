@@ -99,8 +99,6 @@ public class BltFileManager {
     private CoreFilterManager coreFilterManager;
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
-    /** Initialization utility */
-    private InitAppUtil init;
     /** Logger */
     private Logger log;
 //------------------------------------------------------------------------------------------ Methods
@@ -109,7 +107,6 @@ public class BltFileManager {
      */
     public BltFileManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.init = new InitAppUtil();
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
@@ -158,7 +155,7 @@ public class BltFileManager {
             format.parse( metadata.what_date().to_iso_string() + "T" +
             metadata.what_time().to_iso_string() ),
             format.parse( entry.stored_at().to_iso_string() ), metadata.what_source(),
-            metadata.what_object(), init.getConfiguration().getThumbsDir() +
+            metadata.what_object(), InitAppUtil.getConf().getThumbsDir() +
             File.separator + entry.uuid() + IMAGE_FILE_EXT
         );
     }
@@ -410,7 +407,7 @@ public class BltFileManager {
             while( resultSet.next() ) {
                 String uuid = resultSet.getString( "uuid" );
                 String path = fileCatalog.local_path_for_uuid( uuid );
-                String thumbPath = init.getConfiguration().getThumbsDir();
+                String thumbPath = InitAppUtil.getConf().getThumbsDir();
                 Date storageTime = resultSet.getTimestamp( "stored_at" );
                 String type = resultSet.getString( "what_object" );
                 Date sqlDate = resultSet.getDate( "what_date" );

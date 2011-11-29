@@ -68,7 +68,6 @@ public class RemoteDataSourceController extends MultiActionController {
     private FrameDispatcherController frameDispatcherController;
     private SubscriptionManager subscriptionManager;
     private Logger log;
-    private InitAppUtil init;
     // remote data source object list
     private List remoteDataSources;
     // selected data source list
@@ -89,7 +88,6 @@ public class RemoteDataSourceController extends MultiActionController {
      */
     public RemoteDataSourceController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        this.init = new InitAppUtil();
     }
      /**
      * Creates list of remote data source available for a given node.
@@ -151,16 +149,16 @@ public class RemoteDataSourceController extends MultiActionController {
     public ModelAndView dsSubscribed( HttpServletRequest request, HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         try {
-            File tempFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
+            File tempFile = InitAppUtil.createTempFile( new File( InitAppUtil.getWorkDir() ) );
             InitAppUtil.writeObjectToStream( getSelectedDataSources(), tempFile );
             // prepare frame
             BaltradFrameHandler bfHandler = new BaltradFrameHandler( 
-                    init.getConfiguration().getSoTimeout(),
-                    init.getConfiguration().getConnTimeout() );
+                    InitAppUtil.getConf().getSoTimeout(),
+                    InitAppUtil.getConf().getConnTimeout() );
             //
             String hdrStr = BaltradFrameHandler.createObjectHdr( BaltradFrameHandler.MIME_MULTIPART,
-                init.getConfiguration().getNodeAddress(),
-                init.getConfiguration().getNodeName(),
+                InitAppUtil.getConf().getNodeAddress(),
+                InitAppUtil.getConf().getNodeName(),
                 frameDispatcherController.getLocUsrName(), BaltradFrameHandler.CHNL_SBN_RQST,
                 tempFile.getAbsolutePath() );
             //

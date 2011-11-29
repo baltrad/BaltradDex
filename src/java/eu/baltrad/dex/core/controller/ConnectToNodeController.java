@@ -54,14 +54,12 @@ public class ConnectToNodeController extends SimpleFormController {
     private FrameDispatcherController frameDispatcherController;
     private NodeConnectionManager nodeConnectionManager;
     private Logger log;
-    private InitAppUtil init;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      */
     public ConnectToNodeController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        this.init = new InitAppUtil();
     }
     /**
      * Cretes new connection parameters object.
@@ -108,15 +106,15 @@ public class ConnectToNodeController extends SimpleFormController {
         }
         // prepare BaltradFrame
         BaltradFrameHandler bfHandler = new BaltradFrameHandler(
-                init.getConfiguration().getSoTimeout(),
-                init.getConfiguration().getConnTimeout() );
+                InitAppUtil.getConf().getSoTimeout(),
+                InitAppUtil.getConf().getConnTimeout() );
         // prepare data source request frame holding user name, password and node address
         // this frame will be validated and authenticated upon reception
         String hdrStr = BaltradFrameHandler.createMsgHdr( BaltradFrameHandler.MIME_MULTIPART,
                 MessageDigestUtil.createHash( nodeConn.getUserName() ),
                 MessageDigestUtil.createHash( nodeConn.getPassword() ),
-                init.getConfiguration().getNodeAddress(),
-                init.getConfiguration().getNodeName(),
+                InitAppUtil.getConf().getNodeAddress(),
+                InitAppUtil.getConf().getNodeName(),
                 BaltradFrameHandler.LEVEL_INFO.toString(), BaltradFrameHandler.CHNL_LIST_RQST );
         // set local user name in frame dispatcher
         frameDispatcherController.setLocUsrName( nodeConn.getUserName() );
