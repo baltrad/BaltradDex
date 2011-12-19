@@ -953,6 +953,18 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- rule property manager-->
     <bean id="rulepropertymanager" class="eu.baltrad.beast.rules.PropertyManager" autowire="byType"/>
 
+    <!-- The log message repository -->
+    <bean id="logmessagerepository" class="eu.baltrad.beast.log.LogMessageRepository" autowire="byType">
+      <property name="filenames">
+        <list>
+          <value>classpath:beast-log-messages.xml</value>
+        </list>
+      </property>
+    </bean>
+
+    <!-- The beast reporter that will send error messages so that they are presented in dex system messages -->
+    <bean id="beastreporter" class="eu.baltrad.beast.log.BeastReporter" autowire="byType" /> 
+
     <!-- Create the router -->
     <bean id="groovymgr" class="eu.baltrad.beast.rules.groovy.GroovyRuleManager" autowire="byType"/>
     <bean id="bltcompositemgr" class="eu.baltrad.beast.rules.composite.CompositingRuleManager" autowire="byType"/>

@@ -273,6 +273,20 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </fileset>
     </copy>
 
+  	<!-- First copy the dex version of the beast-log messages.xml into the classpath -->
+    <copy todir="${build.classes.dir}">
+      <fileset dir="${etc.dir}">
+        <include name="beast-log-messages.xml"/>
+      </fileset>
+    </copy>
+  	
+    <!-- But since the beast version might contain changes, we preferrably use that one instead -->
+    <copy todir="${build.classes.dir}" overwrite="true">
+      <fileset dir="${beast.path}/etc">
+    	<include name="beast-log-messages.xml"/>
+      </fileset>
+    </copy>
+  	
     <copy todir="${build.test.dir}">
       <fileset dir="${test.data.dir}"/>    
     </copy>

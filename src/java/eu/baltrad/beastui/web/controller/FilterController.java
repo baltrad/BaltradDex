@@ -18,29 +18,18 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 ------------------------------------------------------------------------*/
 package eu.baltrad.beastui.web.controller;
 
-import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.ObjectNode;
 import org.codehaus.jackson.node.JsonNodeFactory;
-
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import eu.baltrad.beast.db.AttributeFilter;
-import eu.baltrad.beast.db.CombinedFilter;
 import eu.baltrad.beast.db.IFilter;
 
 @Controller
