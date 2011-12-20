@@ -963,7 +963,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!-- The beast reporter that will send error messages so that they are presented in dex system messages -->
-    <bean id="beastreporter" class="eu.baltrad.beast.log.BeastReporter" autowire="byType" /> 
+    <bean id="alertreporter" class="eu.baltrad.beast.log.AlertMessageReporter" autowire="byType" /> 
 
     <!-- Create the router -->
     <bean id="groovymgr" class="eu.baltrad.beast.rules.groovy.GroovyRuleManager" autowire="byType"/>
@@ -973,6 +973,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="bdbtrimagemgr" class="eu.baltrad.beast.rules.bdb.BdbTrimAgeRuleManager" autowire="byType"/>
     <bean id="bdbtrimcountmgr" class="eu.baltrad.beast.rules.bdb.BdbTrimCountRuleManager" autowire="byType"/>
 
+    <bean id="log4jalertmessagerule" class="eu.baltrad.beast.rules.system.Log4jAlertMessageRule" autowire="byType"/>
+    <bean id="systemrules" class="eu.baltrad.beast.router.SystemRulesDefinition">
+      <property name="rules">
+        <list>
+          <ref bean="log4jalertmessagerule"/>
+        </list>
+      </property>
+    </bean>
   
     <bean id="router" class="eu.baltrad.beast.router.impl.BltRouter" autowire="byType">
         <property name="ruleManagers">
