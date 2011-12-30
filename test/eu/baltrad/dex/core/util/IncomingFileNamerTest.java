@@ -29,58 +29,57 @@ import junit.framework.TestCase;
 import org.easymock.MockControl;
 import org.easymock.classextension.MockClassControl;
 
-import eu.baltrad.fc.Date;
-import eu.baltrad.fc.FileEntry;
-import eu.baltrad.fc.Oh5Attribute;
-import eu.baltrad.fc.Oh5Group;
-import eu.baltrad.fc.Oh5Metadata;
-import eu.baltrad.fc.Oh5Node;
-import eu.baltrad.fc.Oh5Scalar;
-import eu.baltrad.fc.Oh5Source;
-import eu.baltrad.fc.Time;
+import eu.baltrad.bdb.db.FileEntry;
+import eu.baltrad.bdb.oh5.Attribute;
+import eu.baltrad.bdb.oh5.Group;
+import eu.baltrad.bdb.oh5.Metadata;
+import eu.baltrad.bdb.oh5.Source;
+import eu.baltrad.bdb.util.Date;
+import eu.baltrad.bdb.util.Time;
 
 public class IncomingFileNamerTest extends TestCase {
   private IncomingFileNamer classUnderTest;
-  private Oh5Metadata metadata;
+  private Metadata metadata;
 
   public void setUp() {
     classUnderTest = new IncomingFileNamer();
-    metadata = new Oh5Metadata();
+    metadata = new Metadata();
   }
 
   public void testNameMetadata_Pvol() {
-    Oh5Node what = metadata.root().add(new Oh5Group("what"));
-    what.add(new Oh5Attribute("object", new Oh5Scalar("PVOL")));
-    what.add(new Oh5Attribute("date", new Oh5Scalar(new Date(2011, 6, 22))));
-    what.add(new Oh5Attribute("time", new Oh5Scalar(new Time(13, 14, 15))));
-    what.add(new Oh5Attribute("source", new Oh5Scalar("_name:seang")));
+    metadata.addNode("/", new Group("what"));
+    metadata.addNode("/what", new Attribute("object", "PVOL"));
+    metadata.addNode("/what", new Attribute("date", "20110622"));
+    metadata.addNode("/what", new Attribute("time", "131415"));
+    metadata.addNode("/what", new Attribute("source", "NOD:seang"));
     
-    assertEquals("PVOL _name:seang 2011-06-22T13:14:15",
+    assertEquals("PVOL NOD:seang 2011-06-22T13:14:15",
                  classUnderTest.nameMetadata(metadata));
   }
 
   public void testNameMetadata_Scan() {
-    Oh5Node what = metadata.root().add(new Oh5Group("what"));
-    what.add(new Oh5Attribute("object", new Oh5Scalar("SCAN")));
-    what.add(new Oh5Attribute("date", new Oh5Scalar(new Date(2011, 6, 22))));
-    what.add(new Oh5Attribute("time", new Oh5Scalar(new Time(13, 14, 15))));
-    what.add(new Oh5Attribute("source", new Oh5Scalar("_name:seang"))); 
-    Oh5Node ds1 = metadata.root().add(new Oh5Group("dataset1"));
-    Oh5Node ds1w = ds1.add(new Oh5Group("where"));
-    ds1w.add(new Oh5Attribute("elangle", new Oh5Scalar(12.5)));
+    metadata.addNode("/", new Group("what"));
+    metadata.addNode("/what", new Attribute("object", "SCAN"));
+    metadata.addNode("/what", new Attribute("date", "20110622"));
+    metadata.addNode("/what", new Attribute("time", "131415"));
+    metadata.addNode("/what", new Attribute("source", "NOD:seang"));
 
-    assertEquals("SCAN _name:seang 2011-06-22T13:14:15 elangle=12.5",
+    metadata.addNode("/", new Group("dataset1"));
+    metadata.addNode("/dataset1", new Group("where"));
+    metadata.addNode("/dataset1/where", new Attribute("elangle", 12.5));
+
+    assertEquals("SCAN NOD:seang 2011-06-22T13:14:15 elangle=12.5",
                  classUnderTest.nameMetadata(metadata));
   }
 
   public void testNameMetadata_ScanWithoutElangle() {
-    Oh5Node what = metadata.root().add(new Oh5Group("what"));
-    what.add(new Oh5Attribute("object", new Oh5Scalar("SCAN")));
-    what.add(new Oh5Attribute("date", new Oh5Scalar(new Date(2011, 6, 22))));
-    what.add(new Oh5Attribute("time", new Oh5Scalar(new Time(13, 14, 15))));
-    what.add(new Oh5Attribute("source", new Oh5Scalar("_name:seang"))); 
+    metadata.addNode("/", new Group("what"));
+    metadata.addNode("/what", new Attribute("object", "SCAN"));
+    metadata.addNode("/what", new Attribute("date", "20110622"));
+    metadata.addNode("/what", new Attribute("time", "131415"));
+    metadata.addNode("/what", new Attribute("source", "NOD:seang"));
 
-    assertEquals("SCAN _name:seang 2011-06-22T13:14:15 elangle=?",
+    assertEquals("SCAN NOD:seang 2011-06-22T13:14:15 elangle=?",
                  classUnderTest.nameMetadata(metadata));
   }
   
@@ -90,38 +89,37 @@ public class IncomingFileNamerTest extends TestCase {
     keyPriorities.add("NOD");
     classUnderTest.setSourceKeyPriorities(keyPriorities);
 
-    Oh5Source src = Oh5Source.from_string("NOD:n,PLC:p");
+    Source src = Source.fromString("NOD:n,PLC:p");
 
     assertEquals("PLC:p", classUnderTest.getSourceRepr(src));
   }
   
   public void testGetSourceRepr_noSourceKey() {
-    Oh5Source src = new Oh5Source();
-    src.add("QWE", "asd");
+    Source src = new Source();
+    src.put("QWE", "asd");
     assertEquals("unknown", classUnderTest.getSourceRepr(src));
   }
 
   public void testName_fileEntry() {
-    Oh5Node what = metadata.root().add(new Oh5Group("what"));
-    what.add(new Oh5Attribute("object", new Oh5Scalar("PVOL")));
-    what.add(new Oh5Attribute("date", new Oh5Scalar(new Date(2011, 6, 22))));
-    what.add(new Oh5Attribute("time", new Oh5Scalar(new Time(13, 14, 15))));
-    what.add(new Oh5Attribute("source", new Oh5Scalar("WMO:12345")));
-    Oh5Source src = Oh5Source.from_string("_name:seang");
+    metadata.addNode("/", new Group("what"));
+    metadata.addNode("/what", new Attribute("object", "PVOL"));
+    metadata.addNode("/what", new Attribute("date", "20110622"));
+    metadata.addNode("/what", new Attribute("time", "131415"));
+    metadata.addNode("/what", new Attribute("source", "WMO:12345"));
+
+    Source src = Source.fromString("NOD:seang");
     
-    MockControl entryControl = MockClassControl.createControl(FileEntry.class);
+    MockControl entryControl = MockControl.createControl(FileEntry.class);
     FileEntry entry = (FileEntry)entryControl.getMock();
 
-    entry.metadata();
+    entry.getMetadata();
     entryControl.setReturnValue(metadata, MockControl.ONE_OR_MORE);
-    entry.source();
+    entry.getSource();
     entryControl.setReturnValue(src, MockControl.ONE_OR_MORE);
-
     entryControl.replay();
 
-    assertEquals("PVOL _name:seang 2011-06-22T13:14:15",
-                 classUnderTest.do_name(entry));
-    
+    assertEquals("PVOL NOD:seang 2011-06-22T13:14:15",
+                 classUnderTest.name(entry));
     entryControl.verify();
   }
 }

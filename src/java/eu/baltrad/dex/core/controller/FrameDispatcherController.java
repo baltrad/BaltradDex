@@ -39,11 +39,10 @@ import eu.baltrad.dex.core.util.IncomingFileNamer;
 import eu.baltrad.dex.registry.model.*;
 import eu.baltrad.dex.bltdata.model.BltFileManager;
 
-import eu.baltrad.fc.FileCatalog;
-import eu.baltrad.fc.FileEntry;
-import eu.baltrad.fc.DuplicateEntry;
-import eu.baltrad.fc.FileCatalogError;
-import eu.baltrad.fc.Oh5MetadataMatcher;
+import eu.baltrad.bdb.FileCatalog;
+import eu.baltrad.bdb.db.FileEntry;
+import eu.baltrad.bdb.db.DuplicateEntry;
+import eu.baltrad.bdb.oh5.MetadataMatcher;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;
@@ -58,12 +57,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
+
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.util.Streams;
 
 import java.io.InputStream;
+import java.io.FileInputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -547,12 +549,18 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         log.info("New data frame received from " + frameSource);
         FileEntry fileEntry = null;
         try {
-            fileEntry = fileCatalog.store( file.getAbsolutePath() );
+            InputStream fileContentStream = new FileInputStream(file.getAbsolutePath());
+            try {
+              fileEntry = fileCatalog.store(fileContentStream);
+            } finally {
+              IOUtils.closeQuietly(fileContentStream);
+            }
+            fileEntry = fileCatalog.store(new FileInputStream(file.getAbsolutePath()));
         } catch (DuplicateEntry e) {
             log.error("Duplicate entry error", e );
             // exception while storing file in FileCatalog - set error code
             return BaltradFrameHandler.HTTP_STATUS_CODE_500;
-        } catch (FileCatalogError e) {
+        } catch (RuntimeException e) {
             log.error("File catalog error", e );
             // exception while storing file in FileCatalog - set error code
             return BaltradFrameHandler.HTTP_STATUS_CODE_500;
@@ -560,15 +568,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         IncomingFileNamer namer = new IncomingFileNamer();
         String friendlyName = namer.name(fileEntry);
 
-        log.info(friendlyName + " stored with UUID " + fileEntry.uuid());
+        log.info(friendlyName + " stored with UUID " + fileEntry.getUuid());
 
         // file successfully stored in File Catalog
         // send message to Beast Framework
         BltDataMessage message = new BltDataMessage();
-        message.setFileEntry(fileEntry.clone());
+        message.setFileEntry(fileEntry);
         bltMessageManager.manage( message );
         
-        Oh5MetadataMatcher metadataMatcher = new Oh5MetadataMatcher();
+        MetadataMatcher metadataMatcher = new MetadataMatcher();
 
         // iterate through subscriptions list to send data to subscribers
         List<Subscription> subs =
@@ -577,11 +585,11 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             // check if file entry matches the subscribed data source's filter
             String dataSourceName = sub.getDataSourceName();
             IFilter filter = bltFileManager.getFilter( dataSourceName );
-            boolean matches = metadataMatcher.match(fileEntry.metadata(), filter.getExpression());
+            boolean matches = metadataMatcher.match(fileEntry.getMetadata(), filter.getExpression());
             // make sure that user exists locally
             User receivingUser = userManager.getUserByName(sub.getUserName());
             DeliveryRegisterEntry dre =
-                deliveryRegisterManager.getEntry(receivingUser.getId(), fileEntry.uuid());
+                deliveryRegisterManager.getEntry(receivingUser.getId(), fileEntry.getUuid().toString());
 
             if (matches && dre == null) {
                 // create frame delivery task

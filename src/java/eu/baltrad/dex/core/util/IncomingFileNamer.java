@@ -24,19 +24,17 @@ package eu.baltrad.dex.core.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.baltrad.fc.FileEntry;
-import eu.baltrad.fc.FileNamer;
-import eu.baltrad.fc.Oh5Attribute;
-import eu.baltrad.fc.Oh5File;
-import eu.baltrad.fc.Oh5Metadata;
-import eu.baltrad.fc.Oh5Source;
+import eu.baltrad.bdb.db.FileEntry;
+import eu.baltrad.bdb.oh5.Attribute;
+import eu.baltrad.bdb.oh5.Metadata;
+import eu.baltrad.bdb.oh5.Source;
+import eu.baltrad.bdb.util.FileNamer;
 
-public class IncomingFileNamer extends FileNamer {
+public class IncomingFileNamer implements FileNamer {
   private List<String> sourceKeyPriorities;
 
   public IncomingFileNamer() {
     sourceKeyPriorities = new ArrayList<String>();
-    sourceKeyPriorities.add("_name");
     sourceKeyPriorities.add("NOD");
     sourceKeyPriorities.add("PLC");
     sourceKeyPriorities.add("WMO");
@@ -53,36 +51,31 @@ public class IncomingFileNamer extends FileNamer {
   }
 
   @Override
-  protected String do_name(Oh5File file) {
-    return nameMetadata(file.metadata());
+  public String name(FileEntry entry) {
+    return nameMetadata(entry.getMetadata(), entry.getSource());
   }
 
-  @Override
-  protected String do_name(FileEntry entry) {
-    return nameMetadata(entry.metadata(), entry.source());
-  }
-
-  protected String nameMetadata(Oh5Metadata meta) {
-    return nameMetadata(meta, meta.source());
+  protected String nameMetadata(Metadata meta) {
+    return nameMetadata(meta, meta.getSource());
   }
 
   /**
    * Give names similar to `(PVOL seang 2011-06-13T13:14)`
    */
-  protected String nameMetadata(Oh5Metadata meta, Oh5Source source) {
+  protected String nameMetadata(Metadata meta, Source source) {
     String name = "";
-    name += meta.what_object();
+    name += meta.getWhatObject();
     name += " ";
     name += getSourceRepr(source);
     name += " ";
-    name += meta.what_date().to_iso_string(true);
+    name += meta.getWhatDate().toExtendedIsoString();
     name += "T";
-    name += meta.what_time().to_iso_string(true);
-    if (meta.what_object().equals("SCAN")) {
+    name += meta.getWhatTime().toExtendedIsoString();
+    if (meta.getWhatObject().equals("SCAN")) {
       name += " elangle=";
-      Oh5Attribute elangle = meta.attribute("/dataset1/where/elangle");
+      Attribute elangle = meta.getAttribute("/dataset1/where/elangle");
       if (elangle != null) {
-        name += String.valueOf(elangle.value().to_double());
+        name += elangle.toString();
       } else {
         name += "?";
       }
@@ -90,7 +83,7 @@ public class IncomingFileNamer extends FileNamer {
     return name;
   }
 
-  protected String getSourceRepr(Oh5Source src) {
+  protected String getSourceRepr(Source src) {
     for (String key : sourceKeyPriorities) {
       if (src.has(key)) {
         return key + ":" + src.get(key);

@@ -24,7 +24,7 @@ package eu.baltrad.dex.bltdata.controller;
 import eu.baltrad.dex.bltdata.model.BltDataProcessor;
 import eu.baltrad.dex.util.InitAppUtil;
 
-import eu.baltrad.fc.FileCatalog;
+import eu.baltrad.bdb.FileCatalog;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.File;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * Implements data visualization and preview functionality.
@@ -110,7 +111,7 @@ public class BltImagePreviewController implements Controller {
             if( fileObject.equals( BltDataProcessor.ODIMH5_SCAN_OBJ ) || fileObject.equals(
                     BltDataProcessor.ODIMH5_PVOL_OBJ ) ) {
                 bltDataProcessorController.polarH5Dataset2Image(
-                    fileCatalog.local_path_for_uuid(fileUuid),
+                    fileCatalog.getLocalPathForUuid(UUID.fromString(fileUuid)).toString(),
                     datasetPath, datasetWhere,
                     Integer.parseInt( datasetWidth ), ( short )0, 1.0f, IMAGE_RANGE_RINGS_COLOR,
                     IMAGE_RANGE_MASK_COLOR, filePath );

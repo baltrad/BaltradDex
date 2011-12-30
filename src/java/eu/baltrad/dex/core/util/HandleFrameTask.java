@@ -28,7 +28,7 @@ import eu.baltrad.frame.model.BaltradFrame;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.InitAppUtil;
 
-import eu.baltrad.fc.FileEntry;
+import eu.baltrad.bdb.db.FileEntry;
 
 import org.apache.log4j.Logger;
 
@@ -83,20 +83,29 @@ public class HandleFrameTask implements Runnable {
      */
     public void run() {
         try {
-            String header = BaltradFrameHandler.createDataHdr( BaltradFrameHandler.MIME_MULTIPART,
-                InitAppUtil.getConf().getNodeName(), dataSource, fileEntry.uuid() + ".h5" );
+            String header = BaltradFrameHandler.createDataHdr(
+                BaltradFrameHandler.MIME_MULTIPART,
+                InitAppUtil.getConf().getNodeName(),
+                dataSource,
+                fileEntry.getUuid().toString() + ".h5"
+            );
             BaltradFrame baltradFrame = new BaltradFrame( header, fileItem );
             int httpStatusCode = bfHandler.handleBF( remoteNodeAddress, baltradFrame );
             // update data delivery register
             String status = ( ( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) ?
                 DeliveryRegisterEntry.MSG_SUCCESS : DeliveryRegisterEntry.MSG_FAILURE );
-            DeliveryRegisterEntry drEntry = new DeliveryRegisterEntry( user.getId(), 
-                    fileEntry.uuid(), user.getName(), new Date(), status );
+            DeliveryRegisterEntry drEntry = new DeliveryRegisterEntry(
+                user.getId(), 
+                fileEntry.getUuid().toString(),
+                user.getName(),
+                new Date(),
+                status
+            );
             deliveryRegisterManager.addEntry( drEntry );
             if( httpStatusCode == BaltradFrameHandler.HTTP_STATUS_CODE_200 ) {
-                log.info( "FileEntry " + fileEntry.uuid() + " sent to user " + user.getName() );
+                log.info( "FileEntry " + fileEntry.getUuid() + " sent to user " + user.getName() );
             } else {
-                log.error( "Failed to send FileEntry " + fileEntry.uuid() + " to user " +
+                log.error( "Failed to send FileEntry " + fileEntry.getUuid() + " to user " +
                         user.getName() );
             }
         } catch( Exception e ) {
