@@ -305,7 +305,7 @@ public class SaveDataSourceController extends MultiActionController {
                 // Recover users parameter
                 List<Integer> userIds = dataSourceManager.getUserIds( dataSource.getId() );
                 for( int i = 0; i< userIds.size(); i++ ){
-                    selectedUsers.add( userManager.getUserById( userIds.get( i ) ) );
+                    selectedUsers.add( userManager.get( userIds.get( i ) ) );
                 }
                 numSelectedUsers = selectedUsers.size();
             } catch( Exception e ) {
@@ -533,7 +533,7 @@ public class SaveDataSourceController extends MultiActionController {
                     dataSourceManager.deleteUsers( dsId );
                     for( int i = 0; i < selectedUsers.size(); i++ ) {
                         String userName = selectedUsers.get( i ).getName();
-                        int userId = ( userManager.getUserByName( userName ) ).getId();
+                        int userId = ( userManager.getByName( userName ) ).getId();
                         dataSourceManager.saveUser( dsId, userId );
                     }
                     // Configure filters
@@ -616,8 +616,8 @@ public class SaveDataSourceController extends MultiActionController {
      * @param modelAndView ModelAndView to be filled
      */
     private void setDSUsersModel( ModelAndView modelAndView ) {
-        modelAndView.addObject( DS_AVAILABLE_USERS_KEY, userManager.getUsers() );
-        modelAndView.addObject( DS_NUM_AVAILABLE_USERS_KEY, userManager.getUsers().size() );
+        modelAndView.addObject( DS_AVAILABLE_USERS_KEY, userManager.get() );
+        modelAndView.addObject( DS_NUM_AVAILABLE_USERS_KEY, userManager.get().size() );
         modelAndView.addObject( DS_SELECTED_USERS_KEY, selectedUsers );
         modelAndView.addObject( DS_NUM_SELECTED_USERS_KEY, numSelectedUsers );
     }
@@ -686,11 +686,11 @@ public class SaveDataSourceController extends MultiActionController {
      * @param userName User name
      */
     public void addSelectedUser( String userName ) {
-        if( numSelectedUsers < userManager.getUsers().size() &&
+        if( numSelectedUsers < userManager.get().size() &&
                 !userName.equals( DEFAULT_LIST_OPTION_KEY ) ) {
-            if( !selectedUsers.contains( userManager.getUserByName( userName ) ) ) {
+            if( !selectedUsers.contains( userManager.getByName( userName ) ) ) {
                 ++numSelectedUsers;
-                selectedUsers.add( userManager.getUserByName( userName ) );
+                selectedUsers.add( userManager.getByName( userName ) );
             }
         }
     }

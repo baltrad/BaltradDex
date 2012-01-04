@@ -124,7 +124,7 @@ public class ApplicationSecurityManager {
      */
     public static String getUserRole( HttpServletRequest request ) {
         User sessionUser = ( User )request.getSession( true ).getAttribute( USER );
-        User dbUser = userManager.getUserByName( sessionUser.getName() );
+        User dbUser = userManager.getByName( sessionUser.getName() );
         return dbUser.getRoleName();
     }
     /**

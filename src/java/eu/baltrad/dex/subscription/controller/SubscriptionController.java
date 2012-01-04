@@ -25,10 +25,12 @@ import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
 import eu.baltrad.dex.core.controller.FrameDispatcherController;
-import eu.baltrad.frame.model.BaltradFrame;
-import eu.baltrad.frame.model.BaltradFrameHandler;
+import eu.baltrad.frame.model.*;
+import static eu.baltrad.frame.model.Protocol.*;
 import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.util.ServletContextUtil;
 import eu.baltrad.dex.util.InitAppUtil;
+import static eu.baltrad.dex.util.InitAppUtil.deleteFile;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
@@ -37,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.http.HttpResponse;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,13 +64,17 @@ public class SubscriptionController extends MultiActionController {
     private static final String REQUEST_STATUS_KEY = "request_status";
     private static final String OK_MSG_KEY = "message";
     private static final String ERROR_MSG_KEY = "error";
+    private static final String OK_MSG = "Subscription update successfully completed";
+    private static final String ERROR_MSG = "Failed to complete subscription update. See system " +
+            "log for details.";
     // view names
     private static final String SHOW_SUBSCRIPTIONS_VIEW = "showSubscriptions";
     private static final String SELECTED_SUBSCRIPTIONS_VIEW = "showSelectedSubscriptions";
     private static final String SUBSCRIPTION_STATUS_VIEW = "showSubscriptionStatus";
     private static final String REMOVE_SUBSCRIPTIONS_VIEW = "removeDownloadSubscriptions";
     private static final String SELECT_REMOVE_SUBSCRIPTION_VIEW = "downloadSubscriptionsToRemove";
-    private static final String SUBSCRIPTION_REMOVAL_STATUS_VIEW = "downloadSubscriptionsRemovalStatus";
+    private static final String SUBSCRIPTION_REMOVAL_STATUS_VIEW = 
+            "downloadSubscriptionsRemovalStatus";
     private static final String REDIRECT_VIEW = "removeDownloadSubscriptions.htm";
     private static final String SHOW_PEERS_SUBSCRIPTIONS_VIEW = "removeUploadSubscriptions";
     private static final String SHOW_SELECTED_PEERS_SUBSCRIPTIONS_VIEW =
@@ -81,20 +88,17 @@ public class SubscriptionController extends MultiActionController {
     private FrameDispatcherController frameDispatcherController;
     private Logger log;
     // subscription change request
-    private List< Subscription > changedSubscriptions;
+    private List<Subscription> changedSubscriptions;
     // removed subscriptions
-    private List< Subscription > removedSubscriptions;
+    private List<Subscription> removedSubscriptions;
     // removed peers subscriptions
-    private List< Subscription > removedPeersSubscriptions;
-    /** Reference to InitAppUtil */
-    private InitAppUtil init;
+    private List<Subscription> removedPeersSubscriptions;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      */
     public SubscriptionController() {
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        init = new InitAppUtil();
     }
     /**
      * Shows list of all subscriptions.
@@ -103,52 +107,46 @@ public class SubscriptionController extends MultiActionController {
      * @param response Http response
      * @return Model and view containing list of all subscriptions
      */
-    public ModelAndView showSubscriptions( HttpServletRequest request,
-            HttpServletResponse response ) {
-        List< Subscription > subscriptions = subscriptionManager.getSubscriptions(
-                Subscription.LOCAL_SUBSCRIPTION );
-
-        // synchronize local and remote subscriptions
-        for( int i = 0; i < subscriptions.size(); i++ ) {
-            File tempFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
-            InitAppUtil.writeObjectToStream( subscriptions.get( i ), tempFile );
-
-            BaltradFrameHandler bfHandler = new BaltradFrameHandler(
-                init.getConfiguration().getSoTimeout(),
-                init.getConfiguration().getConnTimeout()
-            );
-
-            String hdrStr = BaltradFrameHandler.createObjectHdr(
-                BaltradFrameHandler.MIME_MULTIPART,
-                init.getConfiguration().getNodeAddress(),
-                init.getConfiguration().getNodeName(),
-                BaltradFrameHandler.CHNL_SYNC_RQST,
-                tempFile.getAbsolutePath()
-            );
-
-            try {
-                BaltradFrame baltradFrame = new BaltradFrame(hdrStr, tempFile);
-                // handle the frame
-                frameDispatcherController.setBfHandler( bfHandler );
-                String remoteNodeAddress = subscriptions.get(i).getNodeAddress();
-                frameDispatcherController.doPost( remoteNodeAddress, baltradFrame );
-            } catch( Exception e ) {
-                log.error( "Failed to collect subscription information", e );
+    public ModelAndView showSubscriptions(HttpServletRequest request, 
+            HttpServletResponse response) {
+        ModelAndView modelAndView = new ModelAndView();
+        List <Subscription> subscriptions = subscriptionManager.get(
+                Subscription.SUBSCRIPTION_DOWNLOAD);
+        for (int i = 0; i < subscriptions.size(); i++) {
+            File subFile = writeObjectToFile(subscriptions.get(i), 
+                    InitAppUtil.getWorkDir());
+            HttpResponse res = postSubsciptionSyncRequest(subscriptions.get(i).getNodeAddress(), 
+                    subFile);
+            int code = res.getStatusLine().getStatusCode();
+            if (code == HttpServletResponse.SC_UNAUTHORIZED) {
+                log.error("Remote node failed to authenticate your subscription synchronization"
+                        + " request");
             }
-            if( frameDispatcherController.getSynkronizedSubscription() != null ) {
-                // check if current subscription matches sunchronized subscription
-                if( subscriptionManager.compareSubscriptions( subscriptions.get( i ),
-                        frameDispatcherController.getSynkronizedSubscription() ) ) {
-                    subscriptions.get( i ).setSynkronized(
-                        frameDispatcherController.getSynkronizedSubscription().getSynkronized() );
-                    frameDispatcherController.resetSynkronizedSubscription();
+            if (code == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
+                log.error("Failed to access remote node due to internal server error"); 
+            }
+            if (code == HttpServletResponse.SC_OK) {
+                    SerialFrame serialFrame = (SerialFrame) readObjectFromStream(res);
+                if (authenticate(ServletContextUtil.getServletContextPath() 
+                        + InitAppUtil.KS_FILE_PATH, serialFrame.getNodeName(), 
+                        InitAppUtil.getConf().getKeystorePass(), serialFrame.getSignature(),
+                        serialFrame.getTimestamp())) {
+                    Subscription sub = (Subscription) serialFrame.getItem();
+                    if (sub != null) {
+                        // Check if current subscription matches sunchronized subscription
+                        if( subscriptionManager.compare(subscriptions.get( i ), sub)) {
+                            subscriptions.get(i).setSynkronized(sub.getSynkronized());
+                        }
+                    }
+                } else {
+                    log.error("Failed to authenticate subscription synchronization reply");
                 }
-
             }
-            // delete temporary file
-            InitAppUtil.deleteFile( tempFile );
+            deleteFile(subFile);
         }
-        return new ModelAndView( SHOW_SUBSCRIPTIONS_VIEW, SHOW_SUBSCRIPTIONS_KEY, subscriptions );
+        modelAndView.setViewName(SHOW_SUBSCRIPTIONS_VIEW);
+        modelAndView.addObject(SHOW_SUBSCRIPTIONS_KEY, subscriptions);
+        return modelAndView;
     }
     /**
      * Shows list of data channels selected for subscription.
@@ -162,10 +160,10 @@ public class SubscriptionController extends MultiActionController {
         // get the list of data sources selected for subscription by the user
         String[] selDataSources = request.getParameterValues( SELECTED_DATA_SOURCES_KEY );
         // get the list of all available channels
-        List< Subscription > currentSubs = subscriptionManager.getSubscriptions(
-                Subscription.LOCAL_SUBSCRIPTION );
-        List< Subscription > selectedSubs = subscriptionManager.getSubscriptions(
-                Subscription.LOCAL_SUBSCRIPTION );
+        List< Subscription > currentSubs = subscriptionManager.get(
+                Subscription.SUBSCRIPTION_DOWNLOAD);
+        List< Subscription > selectedSubs = subscriptionManager.get(
+                Subscription.SUBSCRIPTION_DOWNLOAD);
         // make sure the list of selected data sources is not null
         if( selDataSources != null ) {
             // create subscription list based on chosen data sources
@@ -192,7 +190,7 @@ public class SubscriptionController extends MultiActionController {
         Collections.sort( currentSubs );
         Collections.sort( selectedSubs );
         // determine subscription status
-        if( subscriptionManager.compareSubscriptionLists( currentSubs, selectedSubs ) ) {
+        if( subscriptionManager.compare( currentSubs, selectedSubs ) ) {
             request.setAttribute( REQUEST_STATUS_KEY, 0 );
         } else {
             request.setAttribute( REQUEST_STATUS_KEY, 1 );
@@ -200,7 +198,7 @@ public class SubscriptionController extends MultiActionController {
         // submit only changes - remove unchanged elements from the list of subscriptions
         List< Subscription > changedSubs = new ArrayList< Subscription >();
         for( int i = 0; i < currentSubs.size(); i++ ) {
-            if( !subscriptionManager.compareSubscriptions( currentSubs.get( i ),
+            if( !subscriptionManager.compare( currentSubs.get( i ),
                     selectedSubs.get( i ) ) ) {
                 changedSubs.add( selectedSubs.get( i ) );
             }
@@ -217,49 +215,66 @@ public class SubscriptionController extends MultiActionController {
      * @param response Http response
      * @return Model and view containing list of subscribed data channels
      */
-    public ModelAndView showSubscriptionStatus( HttpServletRequest request,
-            HttpServletResponse response ) {
+    public ModelAndView showSubscriptionStatus(HttpServletRequest request,
+            HttpServletResponse response) {
         ModelAndView modelAndView = new ModelAndView();
-        for( int i = 0; i < getChangedSubscriptions().size(); i++ ) {
+        boolean result = false;
+        for (int i = 0; i < getChangedSubscriptions().size(); i++) {
             try {
-                File tempFile = InitAppUtil.createTempFile( new File( init.getWorkDirPath() ) );
-                InitAppUtil.writeObjectToStream( getChangedSubscriptions().get( i ), tempFile );
-                // prepare the frame
-                BaltradFrameHandler bfHandler = new BaltradFrameHandler(
-                        init.getConfiguration().getSoTimeout(),
-                        init.getConfiguration().getConnTimeout() );
-                //
-                String hdrStr = BaltradFrameHandler.createObjectHdr(
-                        BaltradFrameHandler.MIME_MULTIPART,
-                        init.getConfiguration().getNodeAddress(),
-                        init.getConfiguration().getNodeName(),
-                        getChangedSubscriptions().get( i ).getUserName(),
-                        BaltradFrameHandler.SBN_CHNG_RQST,
-                        tempFile.getAbsolutePath() );
-                //
-                BaltradFrame baltradFrame = new BaltradFrame( hdrStr, tempFile );
-                // handle the frame
-                frameDispatcherController.setBfHandler( bfHandler );
-                String remoteNodeAddress = getChangedSubscriptions().get( i ).getNodeAddress();
-                frameDispatcherController.doPost( remoteNodeAddress, baltradFrame );
-
-                // update local subscription status
-
-                subscriptionManager.updateSubscription(
-                        getChangedSubscriptions().get( i ).getDataSourceName(),
-                        Subscription.LOCAL_SUBSCRIPTION,
-                        getChangedSubscriptions().get( i ).getActive() );
-                String msg = "Subscription request successfully completed";
-                modelAndView.addObject( OK_MSG_KEY, msg );
-            } catch( Exception e ) {
-                log.error( "Error while processing subscription change request for " +
-                    getChangedSubscriptions().get( i ).getOperatorName() + ", channel " +
-                    getChangedSubscriptions().get( i ).getDataSourceName(), e );
-                String msg = "Failed to complete subscription request";
-                modelAndView.addObject( ERROR_MSG_KEY, msg );
+                File subUpdate = writeObjectToFile(getChangedSubscriptions().get(i), 
+                        InitAppUtil.getWorkDir());
+                HttpResponse res = postSubscriptionUpdateRequest(
+                        getChangedSubscriptions().get(i).getNodeAddress(), subUpdate);
+                int code = res.getStatusLine().getStatusCode();
+                if (code == HttpServletResponse.SC_UNAUTHORIZED) {
+                    log.error("Remote node failed to authenticate your subscription update request");
+                }
+                if (code == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
+                    log.error("Failed to access remote node due to internal server error"); 
+                }
+                if (code == HttpServletResponse.SC_OK) {
+                    SerialFrame serialFrame = (SerialFrame) readObjectFromStream(res);
+                    if (authenticate(ServletContextUtil.getServletContextPath() 
+                            + InitAppUtil.KS_FILE_PATH, serialFrame.getNodeName(), 
+                            InitAppUtil.getConf().getKeystorePass(), serialFrame.getSignature(),
+                            serialFrame.getTimestamp())) {
+                        Subscription sub = (Subscription) serialFrame.getItem();
+                        if (sub != null) {
+                            // Check if current subscription matches sunchronized subscription
+                            if (getChangedSubscriptions().get(i).getDataSourceName().equals(
+                                    sub.getDataSourceName())) {
+                                subscriptionManager.update(
+                                    getChangedSubscriptions().get(i).getDataSourceName(),
+                                    Subscription.SUBSCRIPTION_DOWNLOAD,
+                                    getChangedSubscriptions().get(i).getActive());
+                                result = true;
+                            } else {
+                                log.error( "Failed to update subscription for " +
+                                    getChangedSubscriptions().get(i).getOperatorName() + "/" +
+                                    getChangedSubscriptions().get(i).getDataSourceName());
+                            }
+                        } else {
+                            log.error( "Failed to update subscription for " +
+                                getChangedSubscriptions().get(i).getOperatorName() + "/" +
+                                getChangedSubscriptions().get(i).getDataSourceName());
+                        }
+                    } else {
+                        log.error("Failed to authenticate subscription update reply");
+                    }
+                }
+                deleteFile(subUpdate);
+            } catch (Exception e) {
+                log.error( "Failed to update subscription for " +
+                    getChangedSubscriptions().get(i).getOperatorName() + "/" +
+                    getChangedSubscriptions().get(i).getDataSourceName());
             }
         }
-        modelAndView.setViewName( SUBSCRIPTION_STATUS_VIEW );
+        if (result) {
+            modelAndView.addObject(OK_MSG_KEY, OK_MSG);
+        } else {
+            modelAndView.addObject(ERROR_MSG_KEY, ERROR_MSG);
+        }
+        modelAndView.setViewName(SUBSCRIPTION_STATUS_VIEW);
         return modelAndView;
     }
     /**
@@ -272,8 +287,8 @@ public class SubscriptionController extends MultiActionController {
      */
     public ModelAndView removeDownloadSubscriptions( HttpServletRequest request,
             HttpServletResponse response ) {
-        List subscriptions = subscriptionManager.getSubscriptions(
-                Subscription.LOCAL_SUBSCRIPTION );
+        List subscriptions = subscriptionManager.get(
+                Subscription.SUBSCRIPTION_DOWNLOAD);
         return new ModelAndView( REMOVE_SUBSCRIPTIONS_VIEW, SHOW_SUBSCRIPTIONS_KEY, subscriptions );
     }
     /**
@@ -298,8 +313,8 @@ public class SubscriptionController extends MultiActionController {
             // determines whether user has selected an active subscription
             boolean isActive = false;
             for( int i = 0; i < selDataSources.length; i++ ) {
-                Subscription subs = subscriptionManager.getSubscription( selDataSources[ i ],
-                        Subscription.LOCAL_SUBSCRIPTION );
+                Subscription subs = subscriptionManager.get( selDataSources[ i ],
+                        Subscription.SUBSCRIPTION_DOWNLOAD);
                 if( subs.getActive() ) {
                     isActive = true;
                 }
@@ -318,8 +333,8 @@ public class SubscriptionController extends MultiActionController {
                 List< Subscription > currentSubs = new ArrayList< Subscription >();
                 // create subscription list based on chosen channels
                 for( int i = 0; i < selDataSources.length; i++ ) {
-                    Subscription subs = subscriptionManager.getSubscription( selDataSources[ i ],
-                            Subscription.LOCAL_SUBSCRIPTION );
+                    Subscription subs = subscriptionManager.get( selDataSources[ i ],
+                            Subscription.SUBSCRIPTION_DOWNLOAD);
                     if( subs != null ) {
                         currentSubs.add( subs );
                     }
@@ -344,9 +359,9 @@ public class SubscriptionController extends MultiActionController {
         ModelAndView modelAndView = new ModelAndView();
         try {
             for( int i = 0; i < getRemovedSubscriptions().size(); i++ ) {
-                subscriptionManager.deleteSubscription(
+                subscriptionManager.delete(
                     getRemovedSubscriptions().get( i ).getDataSourceName(),
-                    Subscription.LOCAL_SUBSCRIPTION );
+                    Subscription.SUBSCRIPTION_DOWNLOAD);
             }
             String msg = "Selected subscriptions successfully removed";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
@@ -368,8 +383,8 @@ public class SubscriptionController extends MultiActionController {
      */
     public ModelAndView removeUploadSubscriptions( HttpServletRequest request,
             HttpServletResponse response ) {
-        List subscriptions = subscriptionManager.getSubscriptions(
-                Subscription.REMOTE_SUBSCRIPTION );
+        List subscriptions = subscriptionManager.get(
+                Subscription.SUBSCRIPTION_UPLOAD);
         return new ModelAndView( SHOW_PEERS_SUBSCRIPTIONS_VIEW, SHOW_SUBSCRIPTIONS_KEY,
                 subscriptions );
     }
@@ -396,8 +411,8 @@ public class SubscriptionController extends MultiActionController {
             List< Subscription > currentSubs = new ArrayList< Subscription >();
             // create subscription list based on chosen channels
             for( int i = 0; i < selDataSources.length; i++ ) {
-                Subscription subs = subscriptionManager.getSubscription( selDataSources[ i ],
-                        Subscription.REMOTE_SUBSCRIPTION );
+                Subscription subs = subscriptionManager.get( selDataSources[ i ],
+                        Subscription.SUBSCRIPTION_UPLOAD);
                 if( subs != null ) {
                     currentSubs.add( subs );
                 }
@@ -421,9 +436,9 @@ public class SubscriptionController extends MultiActionController {
         ModelAndView modelAndView = new ModelAndView();
         try {
             for( int i = 0; i < getRemovedPeersSubscriptions().size(); i++ ) {
-                subscriptionManager.deleteSubscription(
+                subscriptionManager.delete(
                     getRemovedPeersSubscriptions().get( i ).getDataSourceName(),
-                    Subscription.REMOTE_SUBSCRIPTION );
+                    Subscription.SUBSCRIPTION_UPLOAD);
             }
             String msg = "Selected peer subscriptions successfully removed";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
@@ -435,6 +450,56 @@ public class SubscriptionController extends MultiActionController {
         }
         modelAndView.setViewName( SHOW_REMOVED_PEERS_SUBSCRIPTIONS_VIEW );
         return modelAndView;
+    }
+    /**
+     * Post subscription synchronization request.
+     * 
+     * @param remoteNodeAddress Remote node address
+     * @param payloadFile Payload file
+     * @return HTTP response 
+     */
+    private HttpResponse postSubsciptionSyncRequest(String remoteNodeAddress, File payloadFile) {
+        HttpResponse response = null;
+        long timestamp = System.currentTimeMillis();
+        File sigFile = saveSignatureToFile(
+                getSignatureBytes(
+                ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
+                timestamp), InitAppUtil.getWorkDir());
+        Frame frame = Frame.postSubscriptionSyncRequest(remoteNodeAddress, 
+                InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
+                timestamp, sigFile, payloadFile);
+        Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
+                InitAppUtil.getConf().getSoTimeout());
+        response = handler.post(frame);
+        deleteFile(sigFile);
+        deleteFile(payloadFile);
+        return response;
+    }
+    /**
+     * Post subscription change request.
+     * 
+     * @param remoteNodeAddress Remote node address
+     * @param payloadFile Payload file
+     * @return HTTP response 
+     */
+    private HttpResponse postSubscriptionUpdateRequest(String remoteNodeAddress, File payloadFile) {
+        HttpResponse response = null;
+        long timestamp = System.currentTimeMillis();
+        File sigFile = saveSignatureToFile(
+                getSignatureBytes(
+                ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
+                timestamp), InitAppUtil.getWorkDir());
+        Frame frame = Frame.postSubscriptionUpdateRequest(remoteNodeAddress, 
+                InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
+                timestamp, sigFile, payloadFile);
+        Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
+                InitAppUtil.getConf().getSoTimeout());
+        response = handler.post(frame);
+        deleteFile(sigFile);
+        deleteFile(payloadFile);
+        return response;
     }
     /**
      * Gets reference to data source manager object.
@@ -486,7 +551,7 @@ public class SubscriptionController extends MultiActionController {
      *
      * @return List of changed subscriptions
      */
-    public List< Subscription > getChangedSubscriptions() { return changedSubscriptions; }
+    public List<Subscription> getChangedSubscriptions() { return changedSubscriptions; }
     /**
      * Sets a list of changed subscriptions.
      *
@@ -500,7 +565,7 @@ public class SubscriptionController extends MultiActionController {
      *
      * @return List of removed subscriptions
      */
-    public List< Subscription > getRemovedSubscriptions() { return removedSubscriptions; }
+    public List<Subscription> getRemovedSubscriptions() { return removedSubscriptions; }
     /**
      * Sets a list of removed subscriptions.
      *

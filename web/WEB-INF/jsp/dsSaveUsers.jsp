@@ -64,7 +64,7 @@ Author     : szewczenko
                                                 Name:&nbsp;<c:out value="${user.name}"></c:out>&nbsp;
                                                 Role: <c:out value="${user.roleName}"></c:out>
                                                 &nbsp;Organization:
-                                                <c:out value="${user.factory}"></c:out>
+                                                <c:out value="${user.organizationName}"></c:out>
                                             </div>
                                         </c:forEach>
                                         <div class="row">

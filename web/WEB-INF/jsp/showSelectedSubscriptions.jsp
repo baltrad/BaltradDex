@@ -29,128 +29,108 @@ Author     : szewczenko
     int request_status = ( Integer )request.getAttribute( "request_status" );
 %>
 
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Subscriptions</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
+<t:page_tabbed pageTitle="Subscriptions" activeTab="exchange">
+    <jsp:body>
+        <div class="left">
+            <t:menu_exchange/>
+        </div>
+        <div class="right">
+            <div class="blttitle">
+                Subscription management
             </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/exchangeTab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/exchangeMenu.jsp"%>
+            <c:choose>
+                <c:when test="${request_status == 1}">
+                    <div class="blttext">
+                        Confirm your subscription request.
                     </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            Subscription management
+                    <div class="table">
+                        <div class="subscriptions">
+                            <form action="showSubscriptionStatus.htm" method="post">
+                                <div class="tableheader">
+                                    <div id="cell" class="count">&nbsp;</div>
+                                    <div id="cell" class="name">
+                                        Data source
+                                    </div>
+                                    <div id="cell" class="operator">
+                                        Operator
+                                    </div>
+                                    <div id="cell" class="active">
+                                        Request
+                                    </div>
+                                </div>
+                                <c:set var="count" scope="page" value="1"/>
+                                <c:forEach items="${selectedSubscriptions}" var="sub">
+                                    <div class="entry">
+                                        <div id="cell" class="count">
+                                            <c:out value="${count}"/>
+                                            <c:set var="count" value="${count + 1}"/>
+                                        </div>
+                                        <div id="cell" class="name">
+                                            <c:out value="${sub.dataSourceName}"/>
+                                        </div>
+                                        <div id="cell" class="operator">
+                                            <c:out value="${sub.operatorName}"/>
+                                        </div>
+                                        <div id="cell" class="active">
+                                            <c:choose>
+                                                <c:when test="${sub.active == true}">
+                                                    <img src="includes/images/icons/download.png" 
+                                                         alt="Start" title="Start subscription">
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <img src="includes/images/icons/stop.png" 
+                                                         alt="Stop" title="Stop subscription">
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                                <div class="tablefooter">
+                                    <button class="rounded" type="button"
+                                        onclick="window.location='showSubscriptions.htm'">
+                                        <span>Back</span>
+                                    </button>
+                                    <button class="rounded" type="submit">
+                                        <span>OK</span>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                        <c:choose>
-                            <c:when test="${request_status == 1}">
-                                <div class="blttext">
-                                    Confirm your subscription request.
-                                </div>
-                                <div class="table">
-                                    <div class="subscriptions">
-                                        <form action="showSubscriptionStatus.htm" method="post">
-                                            <div class="tableheader">
-                                                <div id="cell" class="count">&nbsp;</div>
-                                                <div id="cell" class="name">
-                                                    Data source
-                                                </div>
-                                                <div id="cell" class="operator">
-                                                    Operator
-                                                </div>
-                                                <div id="cell" class="active">
-                                                    Request
-                                                </div>
-                                            </div>
-                                            <c:set var="count" scope="page" value="1"/>
-                                            <c:forEach items="${selectedSubscriptions}" var="sub">
-                                                <div class="entry">
-                                                    <div id="cell" class="count">
-                                                        <c:out value="${count}"/>
-                                                        <c:set var="count" value="${count + 1}"/>
-                                                    </div>
-                                                    <div id="cell" class="name">
-                                                        <c:out value="${sub.dataSourceName}"/>
-                                                    </div>
-                                                    <div id="cell" class="operator">
-                                                        <c:out value="${sub.operatorName}"/>
-                                                    </div>
-                                                    <div id="cell" class="active">
-                                                        <c:choose>
-                                                            <c:when test="${sub.active == true}">
-                                                                <img src="includes/images/icons/download.png" 
-                                                                     alt="Start" title="Start subscription">
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <img src="includes/images/icons/stop.png" 
-                                                                     alt="Stop" title="Stop subscription">
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </div>
-                                                </div>
-                                            </c:forEach>
-                                            <div class="tablefooter">
-                                                <button class="rounded" type="button"
-                                                    onclick="window.location='showSubscriptions.htm'">
-                                                    <span>Back</span>
-                                                </button>
-                                                <button class="rounded" type="submit">
-                                                    <span>OK</span>
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </c:when>
-                            <c:when test="${request_status == 2}">
-                                <div class="blttext">
-                                    Confirm your request in order to cancel all your
-                                    active subscriptions.
-                                </div>
-                                <div class="table">
-                                    <div class="tablefooter">
-                                        <div class="buttons">
-                                            <button class="rounded" type="button"
-                                                onclick="window.location.href='showSubscriptionStatus.htm'">
-                                                <span>OK</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <div class="blttext">
-                                    Your subscription status was not changed.
-                                    Click OK to go back to subscription management page.
-                                </div>
-                                <div class="table">
-                                    <div class="tablefooter">
-                                        <div class="buttons">
-                                            <button class="rounded" type="button"
-                                                onclick="window.location.href='showSubscriptions.htm'">
-                                                <span>OK</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
                     </div>
-                </div>
-            </div>
+                </c:when>
+                <c:when test="${request_status == 2}">
+                    <div class="blttext">
+                        Confirm your request in order to cancel all your
+                        active subscriptions.
+                    </div>
+                    <div class="table">
+                        <div class="tablefooter">
+                            <div class="buttons">
+                                <button class="rounded" type="button"
+                                    onclick="window.location.href='showSubscriptionStatus.htm'">
+                                    <span>OK</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="blttext">
+                        Your subscription status was not changed.
+                        Click OK to go back to subscription management page.
+                    </div>
+                    <div class="table">
+                        <div class="tablefooter">
+                            <div class="buttons">
+                                <button class="rounded" type="button"
+                                    onclick="window.location.href='showSubscriptions.htm'">
+                                    <span>OK</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </c:otherwise>
+            </c:choose>
         </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
-        </div>
-    </body>
-</html>
+    </jsp:body>    
+</t:page_tabbed>

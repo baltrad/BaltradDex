@@ -38,7 +38,7 @@ Author     : szewczenko
 <%
     Logger log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     User sessionUser = ( User )applicationSecurityManager.getUser( request );
-    User dbUser = userManager.getUserByName( sessionUser.getName() );
+    User dbUser = userManager.getByName( sessionUser.getName() );
     if( !applicationSecurityManager.authenticateSessionUser( sessionUser, dbUser ) ) {
         log.warn( "User failed to access restricted system area" );
     } else {

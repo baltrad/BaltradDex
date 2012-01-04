@@ -108,7 +108,7 @@ public class BltImagePreviewController implements Controller {
         String urLon = request.getParameter( "urLon" );
 
         // try to load image from disk before creating a new one
-        String filePath = init.getImagesDirPath() + File.separator + fileUuid
+        String filePath = init.getImagesDir() + File.separator + fileUuid
             + datasetPath.replaceAll( BltDataProcessor.H5_PATH_SEPARATOR, "_" ) +
             BltDataProcessor.IMAGE_FILE_EXT;
         File imageFile = new File( filePath );
@@ -131,8 +131,8 @@ public class BltImagePreviewController implements Controller {
         // reconstruct image URL
         StringBuffer requestURL = request.getRequestURL();
         String imageURL = requestURL.substring( 0, requestURL.lastIndexOf( URL_PATH_SEPARATOR )
-            + 1 ) + init.getConfiguration().getWorkDir() + URL_PATH_SEPARATOR + 
-            init.getConfiguration().getImagesDir() + URL_PATH_SEPARATOR + fileUuid +
+            + 1 ) + init.getConf().getWorkDir() + URL_PATH_SEPARATOR + 
+            init.getConf().getImagesDir() + URL_PATH_SEPARATOR + fileUuid +
             datasetPath.replaceAll( BltDataProcessor.H5_PATH_SEPARATOR, "_" ) +
             BltDataProcessor.IMAGE_FILE_EXT;
         

@@ -25,132 +25,78 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@page import="eu.baltrad.dex.util.InitAppUtil"%>
 
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Connect</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
+<t:page_tabbed pageTitle="Connect" activeTab="exchange">
+    <jsp:body>
+        <div class="left">
+            <t:menu_exchange/>
+        </div>
+        <div class="right">
+            <div class="blttitle">
+                <img src="includes/images/icons/connection.png" alt="">
+                Connect to remote node
             </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/exchangeTab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/exchangeMenu.jsp"%>
-                    </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            <img src="includes/images/icons/connection.png" alt="">
-                            Connect to remote node
-                        </div>
-                        <div class="blttext">
-                            Select existing node connection or define new connection in order
-                            to access data sources available at the remote node.
-                        </div>
-                        <div class="table">
-                            <div class="connect">
-                                <%@include file="/WEB-INF/jsp/formMessages.jsp"%>
-                                <div class="bltseparator">Select connection</div>
-                                <form method="post">
-                                    <div class="rightcol">
-                                        <div class="row">
-                                            <div class="selectconnection">
-                                                <spring:bind path="command.connectionName">
-                                                    <select name='<c:out value="${status.expression}"/>'
-                                                            title="Select node connection">
-                                                        <c:forEach items="${connection_list}" var="connection">
-                                                            <option value='<c:out value="${connection.connectionName}"/>'
-                                                                <c:if test="${connection.connectionName == status.value}">
-                                                                     SELECTED</c:if>>
-                                                                <c:out value="${connection.connectionName}"/>
-                                                            </option>
-                                                        </c:forEach>
-                                                    </select>
-                                                </spring:bind>
-                                                <div class="hint">
-                                                    Node name to connect
-                                                </div>
-                                            </div>
-                                            <form:errors path="command.connectionName" cssClass="error"/>
-                                        </div>
+            <div class="blttext">
+                Select existing node connection or define new connection in order
+                to access data sources available at the remote node.
+            </div>
+            <div class="table">
+                <div class="connect">
+                    <form method="post" action="dsConnect.htm">
+                        <div class="bltseparator">Select connection</div>
+                        <br>
+                        <div class="rightcol">
+                            <div class="row">
+                                <div class="selectconnection">
+                                    <select name="selectAddress"
+                                            title="Select connection from the list">
+                                        <c:forEach items="${connections}"
+                                                   var="conn">
+                                            <option value="${conn.nodeName}">
+                                                <c:out value="${conn.nodeName}"/>
+                                            </option>
+                                        </c:forEach>
+                                    </select>    
+                                    <div class="hint">
+                                        Select existing connection
                                     </div>
-                                    <div class="tablefooter">
-                                        <div class="buttons">
-                                            <button class="rounded" type="submit">
-                                                <span>Connect</span>
-                                            </button>
+                                    <c:if test="${not empty selectAddressError}">
+                                        <div class="error">
+                                            <c:out value="${selectAddressError}"/>
                                         </div>
-                                    </div>
-                                </form>
+                                    </c:if>          
+                                </div>
                             </div>
                         </div>
-                        <div class="table">
-                            <div class="connect">
-                                <div class="bltseparator">Define new connection</div>
-                                <br>
-                                <form method="post">
-                                    <div class="leftcol">
-                                        <div class="row">Node address</div>
-                                        <div class="row">User name</div>
-                                        <div class="row">Password</div>
+                        <div class="bltseparator">Define new connection</div>
+                        <br>
+                        <div class="rightcol">
+                            <div class="row">
+                                <div class="nodeaddress">
+                                    <input type="text" name="enterAddress" 
+                                           title="Enter node address">
+                                    <div class="hint">
+                                       Enter node's address, e.g. 
+                                       http://baltrad.eu:8084/BaltradDex/dispatch.htm
                                     </div>
-                                    <div class="rightcol">
-                                        <div class="row">
-                                            <div class="shortaddress">
-                                               <form:input path="command.nodeAddress"
-                                                   title="Enter node address"/>
-                                               <div class="hint">
-                                                   Host address, e.g. http://baltrad.eu:8084/BaltradDex/dispatch.htm
-                                               </div>
-                                            </div>
-                                            <form:errors path="command.nodeAddress" cssClass="error"/>
+                                    <c:if test="${not empty enterAddressError}">
+                                        <div class="error">
+                                            <c:out value="${enterAddressError}"/>
                                         </div>
-                                        <div class="row">
-                                            <div class="username">
-                                                <form:input path="command.userName"
-                                                            title="Enter user name"/>
-                                                <div class="hint">
-                                                   User name on remote node
-                                                </div>
-                                            </div>
-                                            <form:errors path="command.userName" cssClass="error"/>
-                                        </div>
-                                        <div class="row">
-                                            <div class="password">
-                                                <form:password path="command.password"
-                                                               title="Enter password"/>
-                                                <div class="hint">
-                                                   Password
-                                               </div>
-                                            </div>
-                                            <form:errors path="command.password" cssClass="error"/>
-                                        </div>
-                                    </div>
-                                    <div class="tablefooter">
-                                       <div class="buttons">
-                                           <button class="rounded" type="submit">
-                                               <span>Connect</span>
-                                           </button>
-                                       </div>
-                                   </div>
-                               </form>
+                                    </c:if> 
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tablefooter">
+                           <div class="buttons">
+                               <button class="rounded" type="submit">
+                                   <span>Connect</span>
+                               </button>
                            </div>
-                       </div>    
-                    </div>
+                        </div>
+                    </form>
                 </div>
-            </div>
+            </div>      
         </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
-        </div>
-    </body>
-</html>
-               
+    </jsp:body>
+</t:page_tabbed>

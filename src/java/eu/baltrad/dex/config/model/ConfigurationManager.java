@@ -124,6 +124,16 @@ public class ConfigurationManager {
     private static final String REG_MAX_AGE_HOURS = "registry.max_age_hours";
     /** Age limit - minutes */
     private static final String REG_MAX_AGE_MINUTES = "registry.max_age_minutes";
+    
+    // Keystore configuration
+    
+    /** Keystore password */
+    private static final String KEYSTORE_PASS_PROP = "keystore.pass";
+    /** Certificate alias */ 
+    private static final String KEY_ALIAS_PROP = "key.alias";
+    /** Certificates directory */
+    private static final String CERTS_DIR_PROP = "certificates.directory";
+    
 //---------------------------------------------------------------------------------------- Variables
     /** References logger object */
     private static Logger log;
@@ -173,7 +183,7 @@ public class ConfigurationManager {
             HashMap<String, Properties> props = loadProperties();
             Properties userProps = props.get( USER_PROPS_KEY );
             Properties versionProps = props.get( VERSION_PROPS_KEY );
-            
+            //
             AppConfiguration conf = new AppConfiguration( userProps.getProperty( NODE_NAME_PROP ),
                 userProps.getProperty( NODE_TYPE_PROP ), versionProps.getProperty( 
                 SOFT_VERSION_PROP ), userProps.getProperty( COM_SCHEME_PROP ), 
@@ -184,7 +194,8 @@ public class ConfigurationManager {
                 userProps.getProperty( WORK_DIR_PROP ), userProps.getProperty( IMAGES_DIR_PROP ),
                 userProps.getProperty( THUMBNAILS_DIR_PROP ), userProps.getProperty( ORG_NAME_PROP),
                 userProps.getProperty( ORG_ADDRESS_PROP ), userProps.getProperty( TIME_ZONE_PROP ),
-                userProps.getProperty( EMAIL_PROP ) );
+                userProps.getProperty( EMAIL_PROP ), userProps.getProperty( KEYSTORE_PASS_PROP ),
+                userProps.getProperty( KEY_ALIAS_PROP ), userProps.getProperty( CERTS_DIR_PROP ) );
             return conf;
         } catch( Exception e ) {
             log.error( "Failed to load properties", e );
@@ -218,6 +229,9 @@ public class ConfigurationManager {
             userProps.setProperty( ORG_ADDRESS_PROP, appConf.getAddress() );
             userProps.setProperty( TIME_ZONE_PROP, appConf.getTimeZone() );
             userProps.setProperty( EMAIL_PROP, appConf.getEmail() );
+            userProps.setProperty( KEYSTORE_PASS_PROP, appConf.getKeystorePass() );
+            userProps.setProperty( KEY_ALIAS_PROP, appConf.getCertAlias() );
+            userProps.setProperty( CERTS_DIR_PROP, appConf.getCertsDir() );
             //
             FileOutputStream out = new FileOutputStream( ServletContextUtil.getServletContextPath()
                     + DEX_USER_PROPS );

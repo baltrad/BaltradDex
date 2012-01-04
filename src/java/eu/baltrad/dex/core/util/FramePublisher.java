@@ -69,8 +69,8 @@ public class FramePublisher {
      *
      * @param task Task class implementing Runnable interface
      */
-    public void addTask( Runnable task ) {
-        executor.execute( task );
+    public void addTask(Runnable task) {
+        executor.execute(task);
     }  
 }
 //--------------------------------------------------------------------------------------------------

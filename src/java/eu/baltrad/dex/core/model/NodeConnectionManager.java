@@ -52,42 +52,33 @@ public class NodeConnectionManager {
      */
     public NodeConnectionManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     /**
      * Gets all existing node connections.
      *
      * @return List of all existing node connections
      */
-    public List<NodeConnection> getConnections() {
+    public List<NodeConnection> get() {
         Connection conn = null;
         List<NodeConnection> nodeConnections = new ArrayList<NodeConnection>();
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_node_connections conn, dex_node_address addr, " +
-                    "dex_node_connection_address conn_addr WHERE conn.id = conn_addr.connection_id"
-                    + " AND addr.id = conn_addr.address_id";
-            ResultSet resultSet = stmt.executeQuery( sql );
-            while( resultSet.next() ) {
-                int connId = resultSet.getInt( "id" );
-                String name = resultSet.getString( "name" );
-                String userName = resultSet.getString( "user_name" );
-                String passwd = resultSet.getString( "password" );
-                String scheme = resultSet.getString( "scheme" );
-                String hostAddress = resultSet.getString( "host_address" );
-                int port = resultSet.getInt( "port" );
-                String appCtx = resultSet.getString( "app_context" );
-                String entryAddress = resultSet.getString( "entry_address" );
-                NodeConnection nodeConn = new NodeConnection( connId, name, scheme, hostAddress,
-                        port, appCtx, entryAddress, userName, passwd );
-                nodeConnections.add( nodeConn );
+            String sql = "SELECT * FROM dex_node_connections";
+            ResultSet resultSet = stmt.executeQuery(sql);
+            while (resultSet.next()) {
+                int connId = resultSet.getInt("id");
+                String nodeName = resultSet.getString("node_name");
+                String nodeAddress = resultSet.getString("node_address");
+                NodeConnection nodeConn = new NodeConnection(connId, nodeName, nodeAddress);
+                nodeConnections.add(nodeConn);
             }
             stmt.close();
-        } catch( Exception e ) {
-            log.error( "Failed to select node connections", e );
+        } catch(Exception e) {
+            log.error("Failed to select node connections", e);
         } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            jdbcConnectionManager.returnConnection(conn);
         }
         return nodeConnections;
     }
@@ -97,71 +88,53 @@ public class NodeConnectionManager {
      * @param id Node connection ID
      * @return Node connection with a given ID
      */
-    public NodeConnection getConnection( int id ) {
+    public NodeConnection get(int id) {
         Connection conn = null;
         NodeConnection nodeConnection = null;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_node_connections conn, dex_node_address addr, " +
-                    "dex_node_connection_address conn_addr WHERE conn.id = " + id + " AND conn.id ="
-                    + " conn_addr.connection_id AND addr.id = conn_addr.address_id";
-            ResultSet resultSet = stmt.executeQuery( sql );
-            while( resultSet.next() ) {
-                int connId = resultSet.getInt( "id" );
-                String name = resultSet.getString( "name" );
-                String userName = resultSet.getString( "user_name" );
-                String passwd = resultSet.getString( "password" );
-                String scheme = resultSet.getString( "scheme" );
-                String hostAddress = resultSet.getString( "host_address" );
-                int port = resultSet.getInt( "port" );
-                String appCtx = resultSet.getString( "app_context" );
-                String entryAddress = resultSet.getString( "entry_address" );
-                nodeConnection = new NodeConnection( connId, name, scheme, hostAddress, port,
-                        appCtx, entryAddress, userName, passwd );
+            String sql = "SELECT * FROM dex_node_connections WHERE id = " + id + ";";
+            ResultSet resultSet = stmt.executeQuery(sql);
+            while (resultSet.next()) {
+                int connId = resultSet.getInt("id");
+                String nodeName = resultSet.getString("node_name");
+                String nodeAddress = resultSet.getString("node_address");
+                nodeConnection = new NodeConnection(connId, nodeName, nodeAddress);
             }
             stmt.close();
-        } catch( Exception e ) {
-            log.error( "Failed to select node connections", e );
+        } catch(Exception e) {
+            log.error("Failed to select node connections", e);
         } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            jdbcConnectionManager.returnConnection(conn);
         }
         return nodeConnection;
     }
     /**
      * Gets node connection with a given name.
      *
-     * @param connName Node connection name
+     * @param nodeName Node name
      * @return Node connection with a given name
      */
-    public NodeConnection getConnection( String connName ) {
+    public NodeConnection get(String nodeName) {
         Connection conn = null;
         NodeConnection nodeConnection = null;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_node_connections conn, dex_node_address addr, " +
-                    "dex_node_connection_address conn_addr WHERE conn.name = '" + connName +
-                    "' AND conn.id = conn_addr.connection_id AND addr.id = conn_addr.address_id";
-            ResultSet resultSet = stmt.executeQuery( sql );
-            while( resultSet.next() ) {
-                int connId = resultSet.getInt( "id" );
-                String name = resultSet.getString( "name" );
-                String userName = resultSet.getString( "user_name" );
-                String passwd = resultSet.getString( "password" );
-                String scheme = resultSet.getString( "scheme" );
-                String hostAddress = resultSet.getString( "host_address" );
-                int port = resultSet.getInt( "port" );
-                String appCtx = resultSet.getString( "app_context" );
-                String entryAddress = resultSet.getString( "entry_address" );
-                nodeConnection = new NodeConnection( connId, name, scheme, hostAddress, port,
-                        appCtx, entryAddress, userName, passwd );
+            String sql = "SELECT * FROM dex_node_connections WHERE node_name = '" + nodeName + "';";
+            ResultSet resultSet = stmt.executeQuery(sql);
+            while (resultSet.next()) {
+                int connId = resultSet.getInt("id");
+                String name = resultSet.getString("node_name");
+                String nodeAddress = resultSet.getString("node_address");
+                nodeConnection = new NodeConnection(connId, name, nodeAddress);
             }
             stmt.close();
-        } catch( Exception e ) {
-            log.error( "Failed to select node connections", e );
+        } catch(Exception e) {
+            log.error("Failed to select node connections", e);
         } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            jdbcConnectionManager.returnConnection(conn);
         }
         return nodeConnection;
     }
@@ -172,60 +145,34 @@ public class NodeConnectionManager {
      * @return Number of saved or updated records
      * @throws Exception
      */
-    public int saveOrUpdate( NodeConnection nodeConn ) throws Exception {
+    public int saveOrUpdate(NodeConnection nodeConn) throws Exception {
         Connection conn = null;
         int update = 0;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             String sql = "";
-            ResultSet generatedKeys = null;
             int connId = 0;
             int addressId = 0;
             // record does not exists, do insert
-            if( nodeConn.getId() == 0 ) {
-                sql = "INSERT INTO dex_node_connections (name, user_name, password) VALUES ('" + 
-                    nodeConn.getConnectionName() + "', '" + nodeConn.getUserName() + "', '" +
-                    nodeConn.getPassword() + "');";
-                update = stmt.executeUpdate( sql, Statement.RETURN_GENERATED_KEYS ) ;
-                generatedKeys = stmt.getGeneratedKeys();
-                if( generatedKeys.next() ) {
-                    connId = generatedKeys.getInt( 1 );
-                }
-                sql = "INSERT INTO dex_node_address (scheme, host_address, port, app_context, " +
-                    "entry_address) VALUES ('" + nodeConn.getScheme() + "', '" +
-                    nodeConn.getHostAddress() + "', " + nodeConn.getPort() + ", '" +
-                    nodeConn.getAppCtx() + "', '" + nodeConn.getEntryAddress() + "');";
-                update = stmt.executeUpdate( sql, Statement.RETURN_GENERATED_KEYS ) ;
-                generatedKeys = stmt.getGeneratedKeys();
-                if( generatedKeys.next() ) {
-                    addressId = generatedKeys.getInt( 1 );
-                }
-                sql = "INSERT INTO dex_node_connection_address (connection_id, address_id) VALUES ("
-                        + connId + ", " + addressId + ");";
-                update = stmt.executeUpdate( sql );
+            if (nodeConn.getId() == 0) {
+                sql = "INSERT INTO dex_node_connections (node_name, node_address) VALUES ('" + 
+                    nodeConn.getNodeName() + "', '" + nodeConn.getNodeAddress() + "');";
+                update = stmt.executeUpdate(sql);
                 stmt.close();
             } else {
                 // record exists, do update
-                sql = "UPDATE dex_node_connections SET name = '" + nodeConn.getConnectionName() +
-                    "', user_name = '" + nodeConn.getUserName() + 
-                    "', password = '" + nodeConn.getPassword() + "' WHERE id = " +
+                sql = "UPDATE dex_node_connections SET node_name = '" + nodeConn.getNodeName() +
+                    "', node_address = '" + nodeConn.getNodeAddress() + "' WHERE id = " +
                     nodeConn.getId() + ";";
-                update = stmt.executeUpdate( sql ) ;
-                sql = "UPDATE dex_node_address SET scheme = '" + nodeConn.getScheme() +
-                        "', host_address = '" + nodeConn.getHostAddress() + "', port = " +
-                        nodeConn.getPort() + ", app_context = '" + nodeConn.getAppCtx() +
-                        "', entry_address = '" + nodeConn.getEntryAddress() + "' WHERE id IN " +
-                        "(SELECT address_id FROM dex_node_connection_address WHERE connection_id = "
-                        + nodeConn.getId() + " );";
-                update = stmt.executeUpdate( sql );
+                update = stmt.executeUpdate(sql);
                 stmt.close();
             }
-        } catch( Exception e ) {
-            log.error( "Failed to save node connection", e );
+        } catch(Exception e) {
+            log.error("Failed to save node connection", e);
             throw e;
         } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            jdbcConnectionManager.returnConnection(conn);
         }
         return update;
     }
@@ -236,20 +183,20 @@ public class NodeConnectionManager {
      * @return Number of deleted records
      * @throws Exception
      */
-    public int deleteConnection( int id ) throws Exception {
+    public int delete(int id) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             String sql = "DELETE FROM dex_node_connections WHERE id = " + id + ";";
-            delete = stmt.executeUpdate( sql );
+            delete = stmt.executeUpdate(sql);
             stmt.close();
-        } catch( Exception e ) {
-            log.error( "Failed to delete node connection", e);
+        } catch(Exception e) {
+            log.error("Failed to delete node connection", e);
             throw e;
         } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            jdbcConnectionManager.returnConnection(conn);
         }
         return delete;
     }
@@ -259,20 +206,20 @@ public class NodeConnectionManager {
      * @return Number of deleted entries
      * @throws Exception
      */
-    public int deleteConnections() throws Exception {
+    public int delete() throws Exception {
         Connection conn = null;
         int delete = 0;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
             String sql = "DELETE FROM dex_node_connections;";
-            delete = stmt.executeUpdate( sql );
+            delete = stmt.executeUpdate(sql);
             stmt.close();
-        } catch( Exception e ) {
-            log.error( "Failed to delete node connections", e );
+        } catch(Exception e) {
+            log.error("Failed to delete node connections", e);
             throw e;
         } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            jdbcConnectionManager.returnConnection(conn);
         }
         return delete;
     }

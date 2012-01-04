@@ -63,7 +63,7 @@ public class LoginController extends SimpleFormController {
     @Override
     protected Object formBackingObject( HttpServletRequest request ) throws Exception {
         //return new User();
-        return userManager.getUserById(1);
+        return userManager.get(1);
     }
 
     /**
@@ -81,7 +81,7 @@ public class LoginController extends SimpleFormController {
                                     Object command, BindException errors ) throws Exception {
         User formUser = ( User )command;
         // Look for user in the database
-        User dbUser = userManager.getUserByName( formUser.getName() );
+        User dbUser = userManager.getByName( formUser.getName() );
         if( ApplicationSecurityManager.authenticateFormUser( formUser, dbUser ) ) {
             // Set user variable for this session
             ApplicationSecurityManager.setUser( request, dbUser );

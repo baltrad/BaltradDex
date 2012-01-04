@@ -609,21 +609,18 @@ input:focus, textarea:focus {
 }
 .selectconnection {
     float:left;
+    margin-left:12px;
 }
 .selectconnection select {
-    width:200px;
+    width:360px;
+    height:24px;
 }
-.connect .username {
+.connect .nodeaddress {
     float:left;
+    margin-left:12px;
 }
-.connect .username input {
-    width:240px;
-}
-.connect .password {
-    float:left;
-}
-.connect .password input {
-    width:240px;
+.connect .nodeaddress input {
+    width:360px;
 }
 /* Add radar page --------------------------------------------------------------------------------*/
 .addradar .row {
@@ -811,6 +808,14 @@ input:focus, textarea:focus {
 }
 .addaccount .email input {
     width:200px;
+}
+.addaccount .nodeaddress {
+    float:left;
+    width:340px;
+}
+.addaccount .nodeaddress input {
+    float:left;
+    width:340px;
 }
 /* Edit user account page ------------------------------------------------------------------------*/
 .editaccount .username {
@@ -1225,6 +1230,16 @@ input:focus, textarea:focus {
 .logconf .inner-rightcol {
     float:left;
     width:60%;
+}
+/* Certificate management page--------------------------------------------------------------------*/
+.certs .alias {
+    width:40%;
+    margin-right:2%;
+}
+.certs .check {
+    width:40%;
+    margin-right:2%;
+    text-align:center; 
 }
 /* BDB filters -----------------------------------------------------------------------------------*/
 

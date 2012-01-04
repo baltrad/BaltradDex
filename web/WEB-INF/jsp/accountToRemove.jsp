@@ -81,7 +81,7 @@ Author     : szewczenko
                                                 <c:out value="${user.roleName}"/>
                                             </div>
                                             <div id="cell" class="orgname">
-                                                <c:out value="${user.factory}"/>
+                                                <c:out value="${user.organizationName}"/>
                                             </div>
                                             <div class="hidden">
                                                 <input type="checkbox" name="removed_users"

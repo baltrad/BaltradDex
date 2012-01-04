@@ -75,7 +75,7 @@ public class NodeConnectionController extends MultiActionController {
      */
     public ModelAndView removeNodeConnections( HttpServletRequest request,
             HttpServletResponse response ) {
-        List nodeConnections = nodeConnectionManager.getConnections();
+        List nodeConnections = nodeConnectionManager.get();
         return new ModelAndView( SHOW_CONN_VIEW, SHOW_CONN_MODEL, nodeConnections );
     }
     /**
@@ -92,14 +92,13 @@ public class NodeConnectionController extends MultiActionController {
         if( connectionIds != null ) {
             List< NodeConnection > selConns = new ArrayList< NodeConnection >();
             for( int i = 0; i < connectionIds.length; i++ ) {
-                selConns.add( nodeConnectionManager.getConnection(
-                        Integer.parseInt( connectionIds[ i ] ) ) );
+                selConns.add( nodeConnectionManager.get(Integer.parseInt(connectionIds[i])));
             }
             // set list of node connections selected for removal
             setSelectedConns( selConns );
             modelAndView = new ModelAndView( SHOW_SEL_CONN_VIEW, SHOW_SEL_CONN_MODEL, selConns );
         } else {
-            List connections = nodeConnectionManager.getConnections();
+            List connections = nodeConnectionManager.get();
             modelAndView = new ModelAndView( SHOW_CONN_VIEW, SHOW_CONN_MODEL, connections );
         }
         return modelAndView;
@@ -115,7 +114,7 @@ public class NodeConnectionController extends MultiActionController {
             HttpServletResponse response ) {
         try {
             for( int i = 0; i < getSelectedConns().size(); i++ ) {
-                nodeConnectionManager.deleteConnection( getSelectedConns().get( i ).getId() );
+                nodeConnectionManager.delete(getSelectedConns().get( i ).getId());
             }
             String msg = "Selected node connections successfully removed";
             request.getSession().setAttribute( OK_MSG_KEY, msg );

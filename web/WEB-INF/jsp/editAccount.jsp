@@ -99,13 +99,15 @@ Author     : szewczenko
                                                     <c:out value="${user.roleName}"/>
                                                 </div>
                                                 <div id="cell" class="orgname">
-                                                    <c:out value="${user.factory}"/>
+                                                    <c:out value="${user.organizationName}"/>
                                                 </div>
-                                                <div id="cell" class="passwdchange">
-                                                    <a href="changePassword.htm?userId=${user.id}">
-                                                        Change
-                                                    </a>
-                                                </div>
+                                                <c:if test="${user.roleName != 'peer'}">
+                                                    <div id="cell" class="passwdchange">
+                                                        <a href="changePassword.htm?userId=${user.id}">
+                                                            Change
+                                                        </a>
+                                                    </div>
+                                                </c:if>        
                                             </div>
                                         </c:forEach>
                                         <div class="tablefooter">

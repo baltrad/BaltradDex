@@ -27,6 +27,22 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property file="develop.properties" />
   <property name="app.name" value="Baltrad Data Exchange System: BaltradDex"/>
   <property name="root.dir" value="${basedir}"/>
+  <property name="script.dir" value="${root.dir}/script"/>
+  <property name="keys.dir" value="keys"/>
+  <!-- !!! do not override this property -->
+  <property name="keystore.file" value=".dex_keystore.jks"/>
+  
+  <!-- keystore and key parameters to be overridden by node installation script-->
+  <property name="keystore.pass" value="s3cret"/>
+  <property name="key.alias" value="baltrad.imgw.pl"/>
+  <property name="key.owner" value="Maciej Szewczykowski"/>
+  <property name="key.unit" value="Remote Sensing Department"/>
+  <property name="key.org" value="Institute of Meteorology and Water Management"/>
+  <property name="key.city" value="Warsaw"/>
+  <property name="key.state" value="Poland"/>
+  <property name="key.code" value="PL"/>
+  <!-- -->
+  
   <property name="lib.dir" value="lib"/>
   <property name="extralib.dir" value="extralib"/>
   <property name="src.dir" value="src"/>
@@ -136,7 +152,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </fileset>
   </path>  
   
-  <target name="init">
+<target name="init">
     <!-- create directory structure -->
     <delete dir="${build.dir}"/>
     <mkdir dir="${build.web.dir}"/>
@@ -184,7 +200,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="lib/catalina-ant">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="lib/baltrad-frame-0.1.3">
+      <fileset dir="lib/baltrad-frame-0.1.4">
         <include name="*.jar"/>
       </fileset>
       <fileset dir="lib/proj4">
@@ -233,16 +249,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="log4j.properties" />
       </fileset>
     </copy>
-    
-    <!-- copy application properties files -->
-    <copy todir="${build.conf.dir}">
-      <fileset dir="${etc.dir}">
-        <include name="dex.default.properties"/>
-        <include name="dex.user.properties"/>
-        <include name="dex.version.properties"/>
-      </fileset>
-    </copy>
-    
 
     <!-- copy manifest and context definition files -->
     <copy todir="${build.metainf.dir}">
@@ -272,18 +278,46 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="**/*.properties"/>
       </fileset>
     </copy>
-
+    
+    <!-- Copy test data -->
     <copy todir="${build.test.dir}">
-      <fileset dir="${test.data.dir}"/>    
+      <fileset dir="${test.data.dir}"/>
+      <fileset dir="${etc.dir}/${keys.dir}"/>    
+    </copy>
+    
+    <!-- Initialize keystore, create and store certificate -->
+    <exec executable="${script.dir}/init-keystore.sh">
+        <arg value="${key.alias}"/>
+        <arg value="${root.dir}/${etc.dir}/${keys.dir}/${keystore.file}"/>
+        <arg value="${keystore.pass}"/>
+        <arg value="${key.owner}"/>
+        <arg value="${key.unit}"/>
+        <arg value="${key.org}"/>
+        <arg value="${key.city}"/>
+        <arg value="${key.state}"/>
+        <arg value="${key.code}"/>
+    </exec>    
+  
+    <!-- Copy keystore to runtime configuration directory -->
+    <copy todir="${build.conf.dir}" file="${root.dir}/${etc.dir}/${keys.dir}/${keystore.file}"/>
+    
+    <!-- copy application properties files -->
+    <copy todir="${build.conf.dir}">
+      <fileset dir="${etc.dir}">
+        <include name="dex.default.properties"/>
+        <include name="dex.user.properties"/>
+        <include name="dex.version.properties"/>
+      </fileset>
     </copy>
 
-  </target>
+</target>
 
   <!-- compile source files -->
   <target name="compile" depends="init">
     <javac encoding="8859_1" srcdir="${src.dir}" deprecation="on"
            destdir="${build.classes.dir}"
-	   debug="${compile.debug}">
+	   debug="${compile.debug}" 
+           includeAntRuntime="${compile.includeAntRuntime}">
       <include name="**/*.java"/>
       <classpath refid="lib.path"/>
     </javac>

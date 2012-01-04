@@ -24,7 +24,10 @@ package eu.baltrad.dex.config.controller;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.util.ServletContextUtil;
+import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.core.model.CertManager;
+import static eu.baltrad.frame.model.Protocol.*;
 
 import org.apache.log4j.Logger;
 
@@ -46,6 +49,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.text.DecimalFormat;
 
+import java.security.cert.Certificate;
+
 /**
  * Controller class creates new system configuration or modifies existing configuration.
  *
@@ -65,6 +70,8 @@ public class SaveConfigurationController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Variables
     private ConfigurationManager configurationManager;
     private Logger log;
+     /** Certificate manager */
+    private CertManager certManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
@@ -85,7 +92,7 @@ public class SaveConfigurationController extends SimpleFormController {
             conf = new AppConfiguration( "Node name", PRIMARY_NODE, "0.7.3", "https", "localhost",
                     8443, "BaltradDex", "dispatch.htm", 60000, 60000, "work", "images",
                     "thumbs", "My Organization", "Organization's address", "Time zone",
-                    "Node admin's email" );
+                    "Node admin's email", "passwd", "alias", "certs" );
         }
         return conf;
     }
@@ -144,7 +151,21 @@ public class SaveConfigurationController extends SimpleFormController {
             Object command, BindException errors ) {
         AppConfiguration appConf = ( AppConfiguration )command;
         try {
+            //AppConfiguration oldConf = configurationManager.loadAppConf();
             configurationManager.saveAppConf( appConf );
+            // Update certificate configuration / alias if node name has been changed  
+            /*Certificate cert = loadCert(ServletContextUtil.getServletContextPath() + 
+                    InitAppUtil.KS_FILE_PATH, oldConf.getNodeName(),
+                    InitAppUtil.getConf().getKeystorePass());
+            certManager.storePrivateEntry(ServletContextUtil.getServletContextPath() +
+                    InitAppUtil.KS_FILE_PATH, InitAppUtil.getConf().getKeystorePass(), cert, 
+                    appConf.getNodeName());
+            // Delete obsolete certificate  
+            certManager.deleteFromKS(ServletContextUtil.getServletContextPath() +
+                    InitAppUtil.KS_FILE_PATH, InitAppUtil.getConf().getKeystorePass(), 
+                    oldConf.getNodeName());
+            */
+            InitAppUtil.saveAppConf( appConf );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveconf.savesuccess" ) );
             log.warn( getMessageSourceAccessor().getMessage( "message.saveconf.savesuccess" ) );
@@ -171,5 +192,17 @@ public class SaveConfigurationController extends SimpleFormController {
     public void setConfigurationManager( ConfigurationManager configurationManager ) {
         this.configurationManager = configurationManager;
     }
+    /**
+     * Certificate manager getter.
+     * 
+     * @return Reference to certificate manager
+     */
+    public CertManager getCertManager() { return certManager; }
+    /**
+     * Certificate manager setter.
+     * 
+     * @param certManager Reference to certificate manager to set
+     */
+    public void setCertManager(CertManager certManager) { this.certManager = certManager; }
 }
 //--------------------------------------------------------------------------------------------------

@@ -24,7 +24,11 @@ package eu.baltrad.dex.user.controller;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.core.model.CertManager;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
+import eu.baltrad.dex.util.ServletContextUtil;
+import eu.baltrad.dex.util.InitAppUtil;
+import eu.baltrad.dex.core.model.Cert;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -60,6 +64,8 @@ public class RemoveUserController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Variables
     // User manager
     private UserManager userManager;
+    /** Certificate manager */
+    private CertManager certManager;
     // Logger object
     private Logger log;
 //------------------------------------------------------------------------------------------ Methods
@@ -77,7 +83,7 @@ public class RemoveUserController extends MultiActionController {
      * @return Model and view containing list of all user accounts registered in the system
      */
     public ModelAndView removeAccount( HttpServletRequest request, HttpServletResponse response ) {
-        List users = userManager.getUsers();
+        List users = userManager.get();
         User signedUser = ( User )ApplicationSecurityManager.getUser( request );
         for( int i = 0; i < users.size(); i++ ) {
             User user = ( User )users.get( i );
@@ -101,11 +107,11 @@ public class RemoveUserController extends MultiActionController {
         if( userIds != null ) {
             List< User > users = new ArrayList< User >();
             for( int i = 0; i < userIds.length; i++ ) {
-                users.add( userManager.getUserById( Integer.parseInt( userIds[ i ] ) ) );
+                users.add( userManager.get( Integer.parseInt( userIds[ i ] ) ) );
             }
             modelAndView = new ModelAndView( ACCOUNT_TO_REMOVE_VIEW, ACCOUNT_TO_REMOVE_KEY, users );
         } else {
-            List users = userManager.getUsers();
+            List users = userManager.get();
             User signedUser = ( User )ApplicationSecurityManager.getUser( request );
             for( int i = 0; i < users.size(); i++ ) {
                 User user = ( User )users.get( i );
@@ -130,19 +136,29 @@ public class RemoveUserController extends MultiActionController {
         String userName = "";
         for( int i = 0; i < userIds.length; i++ ) {
             try {
-                User user = userManager.getUserById( Integer.parseInt( userIds[ i ] ) );
+                User user = userManager.get( Integer.parseInt( userIds[ i ] ) );
                 userName = user.getName();
                 userManager.deleteUser( Integer.parseInt( userIds[ i ] ) );
+                // Remove user certificate if user is peer
+                if (user.getRoleName().equals(User.ROLE_PEER)) {
+                    String ksFileName = ServletContextUtil.getServletContextPath() + 
+                        InitAppUtil.KS_FILE_PATH;
+                    String ksPasswd = InitAppUtil.getConf().getKeystorePass();
+                    certManager.deleteFromKS(ksFileName, ksPasswd, user.getName());
+                    Cert cert = certManager.get(user.getName());
+                    cert.setTrusted(false);
+                    certManager.saveOrUpdate(cert);
+                }
                 log.warn( "User account removed from the system: " + userName );
             } catch( Exception e ) {
                 String msg = "Failed to remove user account";
-                request.getSession().removeAttribute( OK_MSG_KEY );
-                request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-                log.error( msg, e );
+                request.getSession().removeAttribute(OK_MSG_KEY);
+                request.getSession().setAttribute(ERROR_MSG_KEY, msg);
+                log.error(msg, e);
             }
         }
         String msg = "Selected user account successfully removed.";
-        return new ModelAndView( REMOVED_ACCOUNT_VIEW, OK_MSG_KEY, msg );
+        return new ModelAndView(REMOVED_ACCOUNT_VIEW, OK_MSG_KEY, msg);
     }
     /**
      * Method gets reference to user manager object.
@@ -156,5 +172,17 @@ public class RemoveUserController extends MultiActionController {
      * @param userManager Reference to user manager object
      */
     public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
+    /**
+     * Certificate manager getter.
+     * 
+     * @return Reference to certificate manager
+     */
+    public CertManager getCertManager() { return certManager; }
+    /**
+     * Certificate manager setter.
+     * 
+     * @param certManager Reference to certificate manager to set
+     */
+    public void setCertManager(CertManager certManager) { this.certManager = certManager; }
 }
 //--------------------------------------------------------------------------------------------------

@@ -48,17 +48,17 @@ public class EditUserController implements Controller {
     private UserManager userManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
+     * Creates list of registered users.
      * 
-     * 
-     * @param request
-     * @param response
-     * @return
+     * @param request HTTP servlet request
+     * @param response HTTP servlet response 
+     * @return Model and view
      * @throws ServletException
      * @throws IOException
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
-         List users = userManager.getUsers();
+         List users = userManager.get();
          return new ModelAndView( getSuccessView(), MODEL_KEY, users );
     }
     /**

@@ -23,7 +23,6 @@ package eu.baltrad.dex.core.controller;
 
 import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.EasyX509TrustManager;
-import static eu.baltrad.frame.model.BaltradFrameProtocol.*; 
 
 import junit.framework.TestCase;
 
@@ -66,6 +65,20 @@ import java.security.cert.Certificate;
  */
 public class FrameDispatcherControllerTest extends TestCase {
 //---------------------------------------------------------------------------------------- Constants    
+    private static final String BF_USER_NAME = "BF_UserName";
+    private static final String BF_PASSWORD = "BF_Password";
+    private static final String BF_REQUEST_TYPE = "BF_RequestType";
+    private static final String BF_POST_MESSAGE = "BF_PostMessage";
+    private static final String BF_MESSAGE_FIELD = "BF_MessageField";
+    private static final String BF_POST_DATA_FILE = "BF_PostDataFile";
+    private static final String BF_DATA_FILE_FIELD = "BF_DataFileField";
+    private static final String BF_GET_DS_LIST = "BF_GetDSList";
+    private static final String BF_PK_AUTH = "BF_PKAuth";
+    private static final String BF_SIG_FILE_FIELD = "BF_SignatureFileField";
+    private static final String BF_PK_FILE_FIELD = "BF_PKFileField";
+    private static final String BF_POST_CERT = "BF_PostCertificate";
+    private static final String BF_CERT_FILE_FIELD = "BF_CertFileField";
+    private static final String BF_CERT_AUTH = "BF_CertAuth";
     private static final String SERVLET_PATH = "/FrameDispatcherServlet";
     private static final String TEST_DATA_FILE = "test_1.h5";
     private static final String SIG_FILE = "sigfile";
@@ -75,7 +88,6 @@ public class FrameDispatcherControllerTest extends TestCase {
 //---------------------------------------------------------------------------------------- Variables    
     private static ServletTester tester;
     private static HttpClient client;
-    
     private static String context;
     private static KeyPair pair;
     private static Signature dsa;

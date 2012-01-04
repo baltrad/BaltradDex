@@ -56,6 +56,12 @@ public class AppConfiguration extends NodeAddress {
     private String thumbsDir;
     /** Node administrator's email */
     private String email;
+    /** Keystore password */
+    private String keystorePass;
+    /** Certificate alias */
+    private String certAlias;
+    /** Certificates directory */
+    private String certsDir;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor
@@ -77,11 +83,15 @@ public class AppConfiguration extends NodeAddress {
      * @param address Organization's address
      * @param timeZone Time zone
      * @param email Node admin's email
+     * @param keystorePass Keystore password  
+     * @param certAlias Certificate alias
+     * @param certsDir Certificates directory
      */
     public AppConfiguration( String nodeName, String nodeType, String version, String scheme,
             String hostAddress, int port, String appCtx, String entryAddress, int soTimeout,
             int connTimeout, String workDir, String imagesDir, String thumbsDir, String organization,
-            String address, String timeZone, String email ) {
+            String address, String timeZone, String email, String keystorePass, 
+            String certAlias, String certsDir  ) {
         this.nodeName = nodeName;
         this.nodeType = nodeType;
         this.version = version;
@@ -99,6 +109,44 @@ public class AppConfiguration extends NodeAddress {
         this.address= address;
         this.timeZone = timeZone;
         this.email = email;
+        this.keystorePass = keystorePass;
+        this.certAlias = certAlias;
+        this.certsDir = certsDir;
+    }
+    /**
+     * Used to compare application configuration objects.
+     * 
+     * @param obj Application configuration object
+     * @return True if all fields are equal, false otherwise 
+     */
+    @Override
+    public boolean equals( Object obj ) {
+        if( this == obj ) return true;
+        if( obj instanceof AppConfiguration ) {
+            AppConfiguration appConf = ( AppConfiguration )obj;
+            return appConf.getNodeName().equals( this.getNodeName() ) &&
+                appConf.getNodeType().equals( this.getNodeType() ) &&
+                appConf.getVersion().equals( this.getVersion() ) &&
+                appConf.getScheme().equals( this.getScheme() ) &&
+                appConf.getHostAddress().equals(this.getHostAddress() ) &&
+                appConf.getPort() == this.getPort() &&
+                appConf.getAppCtx().equals( this.getAppCtx() ) &&
+                appConf.getEntryAddress().equals( this.getEntryAddress() ) &&
+                appConf.getSoTimeout() == this.getSoTimeout() &&
+                appConf.getConnTimeout() == this.getConnTimeout() &&
+                appConf.getWorkDir().equals( this.getWorkDir() ) &&
+                appConf.getImagesDir().equals( this.getImagesDir() ) &&
+                appConf.getThumbsDir().equals( this.getThumbsDir() ) &&
+                appConf.getOrganization().equals( this.getOrganization() ) &&
+                appConf.getAddress().equals( this.getAddress() ) &&
+                appConf.getTimeZone().equals( this.getTimeZone() ) &&
+                appConf.getEmail().equals( this.getEmail() ) &&
+                appConf.getKeystorePass().equals( this.getKeystorePass() ) &&
+                appConf.getCertAlias().equals( this.getCertAlias() ) &&
+                appConf.getCertsDir().equals( this.getCertsDir() );
+        } else {
+            return false;
+        }
     }
     /**
      * Gets node name.
@@ -244,5 +292,41 @@ public class AppConfiguration extends NodeAddress {
      * @param email Node administrator's email
      */
     public void setEmail( String email ) { this.email = email; }
+    /**
+     * Gets keystore password.
+     * 
+     * @return Keystore password
+     */
+    public String getKeystorePass() { return keystorePass; }
+    /**
+     * Sets keystore password.
+     * 
+     * @param Keystore password to set
+     */
+    public void setKeystorePass( String keystorePass ) { this.keystorePass = keystorePass; }
+    /**
+     * Gets certificate alias. 
+     * 
+     * @return Certificate alias
+     */
+    public String getCertAlias() { return certAlias; }
+    /**
+     * Sets certificate alias. 
+     * 
+     * @param certAlias Certificate alias to set
+     */
+    public void setCertAlias( String certAlias ) { this.certAlias = certAlias; }
+    /**
+     * Gets certificates directory.
+     * 
+     * @return Certificates directory
+     */
+    public String getCertsDir() { return certsDir; }
+    /**
+     * Sets certificates directory.
+     * 
+     * @param certsDir Certificates directory to set
+     */
+    public void setCertsDir( String certsDir ) { this.certsDir = certsDir; }
 }
 //--------------------------------------------------------------------------------------------------

@@ -67,11 +67,11 @@ public class DownloadStatusController implements Controller {
         ModelAndView modelAndView = new ModelAndView( getSuccessView() );
         // get operators
         List<String> operators = subscriptionManager.getDistinct( OPERATOR_NAME_FIELD,
-                Subscription.LOCAL_SUBSCRIPTION );
+                Subscription.SUBSCRIPTION_DOWNLOAD);
         modelAndView.addObject( OPERATORS, operators );
         // get local subscriptions
-        List<Subscription> localSubscriptions = subscriptionManager.getSubscriptions(
-                Subscription.LOCAL_SUBSCRIPTION );
+        List<Subscription> localSubscriptions = subscriptionManager.get(
+                Subscription.SUBSCRIPTION_DOWNLOAD);
         modelAndView.addObject( LOCAL_SUBSCRIPTION, localSubscriptions );
         return modelAndView;
     }

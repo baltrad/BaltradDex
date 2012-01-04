@@ -28,19 +28,13 @@ import eu.baltrad.dex.config.model.ConfigurationManager;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.InputStream;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.IOException;
-import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Date;
 
 /**
  * Utility class used to initialize application on startup.
  *
- * @author Maciej Szewczykowski :: maciej@baltrad.eu
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
  * @since 1.0
  */
@@ -52,85 +46,88 @@ public class InitAppUtil extends NodeAddress {
     private final static String TEMP_FILE_SUFFIX = ".dat";
     /** Maximum age of temporary files in miliseconds, set to 3 minutes */
     private static final long TEMP_FILE_MAX_AGE = 180000;
+    /** Keystore file path */
+    public static final String KS_FILE_PATH = "WEB-INF/conf/.dex_keystore.jks";
 //---------------------------------------------------------------------------------------- Variables
     /** References logger object */
-    private static Logger log;
+    private static Logger log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     /** Configuration object holding all necessary settings */
-    private static AppConfiguration config;
-    /** Absolute path to work directory */
-    private static String workDirPath;
-    /** Absolute path to image storage */
-    private static String imagesDirPath;
-    /** Absolute path to thumbs storage */
-    private static String thumbsDirPath;
-    /** Reference to the object of this class */
-    private static InitAppUtil initAppUtil;
-    /** Initialization status */
-    private static int status;
+    private static AppConfiguration appConf; 
+    /** Work directory */
+    private static String workDir;
+    /** Images directory */
+    private static String imagesDir;
+    /** Thumbnails directory */
+    private static String thumbsDir;
+    /** Certificates directory */
+    private static String certsDir;
 //------------------------------------------------------------------------------------------ Methods
     /**
-     * Constructor invokes initializing method.
+     * Load application settings.
      */
-    public InitAppUtil() { initApp(); }
-    /**
-     * Method initializes application by reading configuration from database.
-     */
-    public static synchronized void initApp() {
-        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        ConfigurationManager cm = new ConfigurationManager();
-        config = cm.loadAppConf();
-        if( config != null ) {
-            // Create work directory
-            workDirPath = createDir( config.getWorkDir(), "Created work directory" );
-            // Create image storage directory
-            imagesDirPath = createDir( config.getWorkDir() + File.separator + config.getImagesDir(),
-                    "New image storage directory created" );
-            // Create thumbs storage directory
-            thumbsDirPath = createDir( config.getWorkDir() + File.separator + config.getThumbsDir(),
-                    "New thumbs storage directory created" );
-            log.info( "Application successfully initialized" );
-            setStatus( 0 );
-        } else {
-            log.error( "Failed to initialize application" );
-            setStatus( 1 );
+    public static AppConfiguration loadAppConf() {
+        if( appConf == null ) {
+            ConfigurationManager cm = new ConfigurationManager();
+            appConf = cm.loadAppConf();
+            createDirs();
+            log.info( "Application successfully initialized" );   
         }
+        return appConf;
     }
     /**
-     * Get initialization status.
-     *
-     * @return status Initialization status
+     * Save modified application settings.
+     * 
+     * @param _appConf Application settings to save
      */
-    public static int getStatus() { return status; }
+    public static void saveAppConf( AppConfiguration _appConf ) {
+        if( !appConf.equals( _appConf ) ) {
+            appConf = _appConf;
+            createDirs();
+            log.info( "Application successfully initialized" );   
+        }   
+    }
     /**
-     * Set initialization status.
-     *
-     * @param _status Initialization status to set
+     * Create necessary directories and initialize variables. 
      */
-    public static void setStatus( int _status ) { status = _status; }
+    private static void createDirs() {
+        workDir = createDir( appConf.getWorkDir(), "Created work directory" );
+        imagesDir = createDir( appConf.getWorkDir() + File.separator + 
+                appConf.getImagesDir(), "New image storage directory created" );
+        thumbsDir = createDir( appConf.getWorkDir() + File.separator + 
+                appConf.getThumbsDir(), "New thumbs storage directory created" );
+        certsDir = createDir( appConf.getWorkDir() + File.separator + 
+                appConf.getCertsDir(), "New certificate storage directory created" );
+    }
     /**
      * Gets configuration object.
      * 
      * @return Configuration object
      */
-    public AppConfiguration getConfiguration() { return config; }
+    public static AppConfiguration getConf() { return appConf; }
     /**
-     * Gets absolute work directory path.
+     * Gets work directory.
      *
-     * @return Work directory path
+     * @return Work directory
      */
-    public String getWorkDirPath() { return workDirPath; }
+    public static String getWorkDir() { return workDir; }
     /**
-     * Gets absolute images storage folder path.
+     * Gets images directory.
      *
-     * @return Path to images storage folder
+     * @return Images directory
      */
-    public String getImagesDirPath() { return imagesDirPath; }
+    public static String getImagesDir() { return imagesDir; }
     /**
-     * Gets absolute thumbnails storage folder path.
+     * Gets thumbnails directory.
      *
-     * @return Path to thumbnails storage folder
+     * @return Thumbnails directory
      */
-    public String getThumbsDirPath() { return thumbsDirPath; }
+    public static String getThumbsDir() { return thumbsDir; }
+    /**
+     * Gets certificates directory.
+     * 
+     * @return Certificates directory
+     */
+    public static String getCertsDir() { return certsDir; }
     /**
      * Method extracts relative file name from absolute file path string.
      *
@@ -167,96 +164,50 @@ public class InitAppUtil extends NodeAddress {
         return dir;
     }
     /**
-     * Creates temporary file.
-     *
-     * @param tempDir Temporary directory
-     * @return Reference to temporary file
-     */
-    public static File createTempFile( File tempDir ) {
-        File f = null;
-        try {
-            f = File.createTempFile ( TEMP_FILE_PREFIX, TEMP_FILE_SUFFIX, tempDir );
-        } catch( IOException e ) {
-            log.error( "Error while creating temporary file\n", e );
-        }
-        return f;
-    }
-    /**
-     * Method saves data from input stream to file with a given name.
-     *
-     * @param is Input data stream
-     * @param dstFileName Output file name
-     * @retunr dstFile Reference to saved file
-     */
-    public static File saveFile( InputStream is, String dstFileName ) {
-        File dstFile = null;
-        try {
-            dstFile = new File( dstFileName );
-            FileOutputStream fos = new FileOutputStream( dstFile );
-            byte[] bytes = new byte[ 1024 ];
-            int len;
-            while( ( len = is.read( bytes ) ) > 0 ) {
-                fos.write( bytes, 0, len);
-            }
-            is.close();
-            fos.close();
-        } catch( Exception e ) {
-            log.error( "Error while saving file\n", e );
-        }
-        return dstFile;
-    }
-    /**
-     * Method saves data from input stream to file with a given name.
-     *
-     * @param is Input data stream
-     * @param dstFile Output file
-     * @return dstFile Refernce to saved file
-     */
-    public static File saveFile( InputStream is, File dstFile ) {
-        try {
-            FileOutputStream fos = new FileOutputStream( dstFile );
-            byte[] bytes = new byte[ 1024 ];
-            int len;
-            while( ( len = is.read( bytes ) ) > 0 ) {
-                fos.write( bytes, 0, len );
-            }
-            is.close();
-            fos.close();
-        } catch( FileNotFoundException e ) {
-            log.error( "Error while saving file\n", e );
-        } catch( IOException e ) {
-            log.error( "Error while saving file\n", e );
-        }
-        return dstFile;
-    }
-    /**
-     * Deletes file.
-     *
-     * @param filePath Absolute file path
-     */
-    public static void deleteFile( String filePath ) {
-        try {
-            File f = new File( filePath );
-            f.delete();
-        } catch( Exception e ) {
-            log.error( "Error while deleting file\n", e );
-        }
-    }
-    /**
-     * Deletes file.
+     * Deletes a file.
      * 
-     * @param f File object
+     * @param f File to delete 
+     * @return True if file was successfully deleted
      */
-    public static void deleteFile( File f ) {
-        if( !f.delete() ) {
-            log.error( "Error while deleting file:\n" + f.getName() );
+    public static boolean deleteFile(File f) {
+        return f.delete();
+    }
+    /**
+     * Validates a string parameter.
+     * 
+     * @param param String parameter
+     * @return True upon successful validation
+     */
+    public static boolean validate(String param) {
+        boolean result = false;
+        if (param != null) {
+            if (!param.trim().isEmpty()) {
+                result = true;
+            }
         }
+        return result;
+    }
+    /**
+     * Validates a list parameter.
+     * 
+     * @param param List parameter
+     * @return True upon successful validation
+     */
+    public static boolean validate(List list) {
+        boolean result = false;
+        if (list != null) {
+            if (list.size() > 0) {
+                result = true;
+            }
+        }
+        return result;
     }
     /**
      * Deletes temporary files from a given directory. Files must be older than a given age.
      *
      * @param directory Directory where temporary files are stored
      * @param maxAge Maximum age of temporary file
+     * @deprecated Use deleteFile() instead
      */
     public static void cleanUpTempFiles( String directory ) {
         File dir = new File( directory );
@@ -273,38 +224,6 @@ public class InitAppUtil extends NodeAddress {
                 }
             }
         }
-    }
-    /**
-     * Creates ObjectOutputStream connected to a given file and writes given object to the stream.
-     *
-     * @param o Input object to write
-     * @param f Input file for writing object
-     */
-    public static void writeObjectToStream( Object obj, File f ) {
-        try {
-            ObjectOutputStream oos = new ObjectOutputStream( new FileOutputStream( f ) );
-            oos.writeObject( obj );
-            oos.close();
-        } catch( Exception e )  {
-            log.error( "Error while writing object to stream", e );
-        }
-    }
-    /**
-     * Creates ObjectInputStream connected to a given file and reads object from the stream.
-     *
-     * @param f Input file
-     * @return Object read from file upon success, null in case of a failure
-     */
-    public static Object readObjectFromStream( File f ) {
-        Object obj = null;
-        try {
-            ObjectInputStream ois = new ObjectInputStream( new FileInputStream( f ) );
-            obj = ois.readObject();
-            ois.close();
-        } catch( Exception e ) {
-            log.error( "Error while reading object from stream", e );
-        }
-        return obj;
     }
 }
 //--------------------------------------------------------------------------------------------------

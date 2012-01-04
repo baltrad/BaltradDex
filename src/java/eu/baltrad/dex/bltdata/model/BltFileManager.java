@@ -158,7 +158,7 @@ public class BltFileManager {
             format.parse( metadata.what_date().to_iso_string() + "T" +
             metadata.what_time().to_iso_string() ),
             format.parse( entry.stored_at().to_iso_string() ), metadata.what_source(),
-            metadata.what_object(), init.getConfiguration().getThumbsDir() +
+            metadata.what_object(), init.getConf().getThumbsDir() +
             File.separator + entry.uuid() + IMAGE_FILE_EXT
         );
     }
@@ -410,7 +410,7 @@ public class BltFileManager {
             while( resultSet.next() ) {
                 String uuid = resultSet.getString( "uuid" );
                 String path = fileCatalog.local_path_for_uuid( uuid );
-                String thumbPath = init.getConfiguration().getThumbsDir();
+                String thumbPath = init.getConf().getThumbsDir();
                 Date storageTime = resultSet.getTimestamp( "stored_at" );
                 String type = resultSet.getString( "what_object" );
                 Date sqlDate = resultSet.getDate( "what_date" );

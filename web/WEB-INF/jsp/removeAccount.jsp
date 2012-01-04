@@ -97,7 +97,7 @@ Author     : szewczenko
                                                         <c:out value="${user.roleName}"/>
                                                     </div>
                                                     <div id="cell" class="orgname">
-                                                        <c:out value="${user.factory}"/>
+                                                        <c:out value="${user.organizationName}"/>
                                                     </div>
                                                     <div id="cell" class="check">
                                                         <input type="checkbox" name="selected_users"

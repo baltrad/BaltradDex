@@ -67,8 +67,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="mappings">
             <props>
-                <!--prop key="connectToNode.htm">connectToNodeController</prop>
-                <prop key="dsConnect.htm">remoteDataSourceController</prop>
+                <!--<prop key="dsConnect.htm">remoteDataSourceController</prop>
                 <prop key="dsToConnect.htm">remoteDataSourceController</prop>
                 <prop key="dsSubscribed.htm">remoteDataSourceController</prop>
                 <prop key="download.htm">bltFileDownloadController</prop>
@@ -93,7 +92,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <props>
                 <prop key="exchange.htm">urlFilenameController</prop>
                 <prop key="processing.htm">urlFilenameController</prop>
-                <prop key="connectToNode.htm">connectToNodeController</prop>
+                <prop key="connectToNode.htm">remoteDataSourceController</prop>
                 <prop key="dsConnect.htm">remoteDataSourceController</prop>
                 <prop key="dsToConnect.htm">remoteDataSourceController</prop>
                 <prop key="dsSubscribed.htm">remoteDataSourceController</prop>
@@ -164,6 +163,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="removeNodeConnections.htm">nodeConnectionController</prop>
                 <prop key="nodeConnectionsToRemove.htm">nodeConnectionController</prop>
                 <prop key="nodeConnectionsRemovalStatus.htm">nodeConnectionController</prop>
+                
+                <prop key="showCertificates.htm">certificateController</prop>
+                <prop key="showCertificateDetails.htm">certificateDetailsController</prop>
             </props>
         </property>
     </bean>
@@ -463,8 +465,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="bltFileManager" />
         </property>
         <property name="fileCatalog">
-	    <ref bean="fileCatalog" />
-	</property>
+            <ref bean="fileCatalog" />
+        </property>
+        <property name="certManager">
+            <ref bean="certManager"/>
+        </property>
     </bean>
 
     <!--
@@ -654,6 +659,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="userManager">
             <ref bean="userManager" />
         </property>
+        <property name="certManager">
+            <ref bean="certManager"/>
+        </property>
     </bean>
 
     <!--
@@ -710,48 +718,26 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="radarManager" />
         </property>
     </bean>
-    
-    <!--
-        Connect to node controller
-    -->
-    <bean id="connectToNodeController"
-        class="eu.baltrad.dex.core.controller.ConnectToNodeController">
-        <property name="commandClass">
-            <value>eu.baltrad.dex.core.model.NodeConnection</value>
-        </property>
-        <property name="successView">
-            <value>redirect:dsConnect.htm</value>
-        </property>
-        <property name="nodeConnectionManager">
-            <ref bean="nodeConnectionManager" />
-        </property>
-        <property name="validator">
-            <ref bean="connectToNodeValidator"/>
-        </property>
-        <property name="frameDispatcherController">
-            <ref bean="frameDispatcherController"/>
-        </property>
-    </bean>
 
     <!--
         Remote data source controller
     -->
     <bean id="remoteDataSourceController"
             class="eu.baltrad.dex.core.controller.RemoteDataSourceController">
-        <property name="frameDispatcherController">
+        <property name="dispatcher">
             <ref bean="frameDispatcherController"/>
         </property>
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
+        </property>
+        <property name="connMgr">
+            <ref bean="nodeConnectionManager" />
         </property>
     </bean>
 
     <!-- Node manager -->
 
     <bean name="nodeConnectionManager" class="eu.baltrad.dex.core.model.NodeConnectionManager"/>
-
-    <!-- Connect to node validator -->
-    <bean name="connectToNodeValidator" class="eu.baltrad.dex.core.util.NodeConnectionValidator"/>
 
     <!--
         Message digest utility.
@@ -796,6 +782,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="formView">
             <value>nodeProperties</value>
+        </property>
+        <property name="certManager">
+            <ref bean="certManager"/>
         </property>
     </bean>
 
@@ -893,7 +882,40 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="dataSourceManager"/>
         </property>
     </bean>
-
+    
+    <!-- Certificate manager -->
+    <bean name="certManager" class="eu.baltrad.dex.core.model.CertManager"/>
+    
+    <!-- Certificate controller -->
+    <bean name="certificateController" class="eu.baltrad.dex.core.controller.CertificateController">
+        <property name="certManager">
+            <ref bean="certManager"/>
+        </property>
+        <property name="userManager">
+            <ref bean="userManager"/>
+        </property>
+        <property name="formView">
+            <value>showCertificates</value>
+        </property>
+        <property name="successView">
+            <value>redirect:showCertificates.htm</value>
+        </property>
+        <property name="commandClass">
+            <value>eu.baltrad.dex.core.model.Cert</value>
+        </property>
+    </bean>
+    
+    <!-- Certificate details controller -->
+    <bean name="certificateDetailsController" 
+          class="eu.baltrad.dex.core.controller.CertificateDetailsController">
+        <property name="certManager">
+            <ref bean="certManager"/>
+        </property>
+        <property name="successView">
+            <value>showCertificateDetails</value>
+        </property>
+    </bean>
+    
     <!--
         Message resources.
     -->

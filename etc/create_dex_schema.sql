@@ -43,11 +43,7 @@ DROP TABLE IF EXISTS dex_data_source_product_parameter_values CASCADE;
 DROP TABLE IF EXISTS dex_data_source_radars CASCADE;
 DROP TABLE IF EXISTS dex_data_source_users CASCADE;
 DROP TABLE IF EXISTS dex_data_source_filters;
-DROP TABLE IF EXISTS dex_node_address CASCADE;
-DROP TABLE IF EXISTS dex_user_address;
-DROP TABLE IF EXISTS dex_node_connection_address;
-DROP TABLE IF EXISTS dex_subscription_address;
-
+DROP TABLE IF EXISTS dex_certificates;
 -- drop sequences if exist -------------------------------------------------------------------------
 DROP SEQUENCE IF EXISTS log_entry_id_seq;
 DROP SEQUENCE IF EXISTS radar_id_seq;
@@ -74,17 +70,6 @@ CREATE TABLE dex_roles
     id SERIAL NOT NULL,
     role VARCHAR(32) PRIMARY KEY
 );
--- dex_node_address --------------------------------------------------------------------------------
-CREATE TABLE dex_node_address
-(
-    id SERIAL NOT NULL,
-    scheme VARCHAR(16) NOT NULL DEFAULT 'https',
-    host_address VARCHAR(128) NOT NULL,
-    port INT NOT NULL DEFAULT 8084,
-    app_context VARCHAR(64) NOT NULL DEFAULT 'BaltradDex',
-    entry_address VARCHAR(64) NOT NULL DEFAULT 'dispatch.htm',
-    PRIMARY KEY (id)
-);
 -- user_id_seq -------------------------------------------------------------------------------------
 CREATE SEQUENCE user_id_seq;
 -- dex_users ---------------------------------------------------------------------------------------
@@ -94,23 +79,13 @@ CREATE TABLE dex_users
     name VARCHAR(64) NOT NULL UNIQUE,
     name_hash VARCHAR(32) NOT NULL UNIQUE,
     role_name VARCHAR(32) NOT NULL REFERENCES dex_roles (role),
-    password VARCHAR(32) NOT NULL,
-    factory VARCHAR(256) NOT NULL,
-    country VARCHAR(64) NOT NULL,
-    city VARCHAR(64) NOT NULL,
-    city_code VARCHAR(12) NOT NULL,
-    street VARCHAR(64) NOT NULL,
-    number VARCHAR(12) NOT NULL,
-    phone VARCHAR(32) NOT NULL,
-    email VARCHAR(64) NOT NULL,
-    PRIMARY KEY (id)
-);
--- dex_user_address --------------------------------------------------------------------------------
-CREATE TABLE dex_user_address
-(
-    id SERIAL NOT NULL,
-    user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE,
-    address_id INT NOT NULL REFERENCES dex_node_address (id) ON DELETE CASCADE,
+    password VARCHAR(32),
+    org_name VARCHAR(256) NOT NULL,
+    org_unit VARCHAR(256) NOT NULL,
+    locality VARCHAR(64) NOT NULL,
+    state VARCHAR(64) NOT NULL,
+    country_code VARCHAR(2) NOT NULL,
+    node_address VARCHAR(256) NOT NULL,
     PRIMARY KEY (id)
 );
 -- log_entry_id_seq --------------------------------------------------------------------------------
@@ -163,14 +138,7 @@ CREATE TABLE dex_subscriptions
     type VARCHAR(16),
     active BOOLEAN DEFAULT false,
     synkronized BOOLEAN DEFAULT false,
-    PRIMARY KEY (id)
-);
--- dex_subscription_address ------------------------------------------------------------------------
-CREATE TABLE dex_subscription_address
-(
-    id SERIAL NOT NULL,
-    subscription_id INT NOT NULL REFERENCES dex_subscriptions (id) ON DELETE CASCADE,
-    address_id INT NOT NULL REFERENCES dex_node_address (id) ON DELETE CASCADE,
+    node_address VARCHAR(256) NOT NULL,
     PRIMARY KEY (id)
 );
 -- delivery_register_id_seq ------------------------------------------------------------------------
@@ -195,17 +163,8 @@ CREATE SEQUENCE node_connection_id_seq;
 CREATE TABLE dex_node_connections
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('node_connection_id_seq'),
-    name VARCHAR(64) NOT NULL UNIQUE,
-    user_name VARCHAR(64) NOT NULL,
-    password VARCHAR(32) NOT NULL,
-    PRIMARY KEY (id)
-);
--- dex_node_connection_address ---------------------------------------------------------------------
-CREATE TABLE dex_node_connection_address
-(
-    id SERIAL NOT NULL,
-    connection_id INT NOT NULL REFERENCES dex_node_connections (id) ON DELETE CASCADE,
-    address_id INT NOT NULL REFERENCES dex_node_address (id) ON DELETE CASCADE,
+    node_name VARCHAR(128) NOT NULL UNIQUE,
+    node_address VARCHAR(256) NOT NULL,
     PRIMARY KEY (id)
 );
 -- file object id sequence -------------------------------------------------------------------------
@@ -324,6 +283,16 @@ CREATE TABLE dex_data_source_filters
     data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
     filter_id INT NOT NULL,
     PRIMARY KEY(id)
+);
+-- dex_certificates --------------------------------------------------------------------------------
+CREATE TABLE dex_certificates
+(
+    id SERIAL NOT NULL,
+    cert_alias VARCHAR(128) NOT NULL UNIQUE,
+    node_address VARCHAR(256) NOT NULL,
+    cert_file_path VARCHAR(256) NOT NULL,
+    trusted BOOLEAN DEFAULT false,
+    PRIMARY KEY (id)
 );
 -- create language plpgsql -------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION make_plpgsql()

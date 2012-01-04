@@ -21,8 +21,6 @@
 
 package eu.baltrad.dex.subscription.model;
 
-import eu.baltrad.dex.util.NodeAddress;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 
@@ -37,12 +35,10 @@ import java.sql.Timestamp;
  */
 public class Subscription implements Serializable, Comparable<Subscription> {
 //---------------------------------------------------------------------------------------- Constants
-    private static final long serialVersionUID = -7278861424267045555L;
-
-    /** Local subscriptions key */
-    public static final String LOCAL_SUBSCRIPTION = "local";
-    /** Remote subscriptions key */
-    public static final String REMOTE_SUBSCRIPTION = "remote";
+    /** Data download - subscribed remote data sources */
+    public static final String SUBSCRIPTION_DOWNLOAD = "download";
+    /** Data upload - subscribed local data sources */
+    public static final String SUBSCRIPTION_UPLOAD = "upload";
     /** Date format string */
     private final static String DATE_FORMAT = "yyyy/MM/dd";
     /** Time format string */
@@ -85,15 +81,10 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      * @param type Subscription type
      * @param active Subscription activation toggle
      * @param synkronized Synchronization toggle
-     * @param scheme Communication scheme
-     * @param hostAddress Host address
-     * @param port Port number
-     * @param appCtx Application context
-     * @param entryAddress Entry point address
+     * @param nodeAddress Node address
      */
-    public Subscription( long time, String userName, String dataSourceName, String operatorName,
-            String type, boolean active, boolean synkronized, String scheme,
-            String hostAddress, int port, String appCtx, String entryAddress ) {
+    public Subscription(long time, String userName, String dataSourceName, String operatorName,
+            String type, boolean active, boolean synkronized, String nodeAddress) {
         this.timeStamp = new Timestamp( time );
         this.userName = userName;
         this.dataSourceName = dataSourceName;
@@ -105,7 +96,7 @@ public class Subscription implements Serializable, Comparable<Subscription> {
         SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
         this.dateStr = dateFormat.format( timeStamp );
         this.timeStr = timeFormat.format( timeStamp );
-        this.nodeAddress = new NodeAddress(scheme, hostAddress, port, appCtx, entryAddress).getNodeAddress();
+        this.nodeAddress = nodeAddress;
     }
     /**
      * Constructor creating new subscription object with given field values.
@@ -118,15 +109,11 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      * @param type Subscription type
      * @param active Subscription activation toggle
      * @param synkronized Synchronization toggle
-     * @param scheme Communication scheme
-     * @param hostAddress Host address
-     * @param port Port number
-     * @param appCtx Application context
-     * @param entryAddress Entry point address
+     * @param nodeAddress Node address
      */
-    public Subscription( int id, long time, String userName, String dataSourceName,
-            String operatorName, String type, boolean active, boolean synkronized, String scheme,
-            String hostAddress, int port, String appCtx, String entryAddress ) {
+    public Subscription(int id, long time, String userName, String dataSourceName,
+            String operatorName, String type, boolean active, boolean synkronized, 
+            String nodeAddress) {
         this.id = id;
         this.timeStamp = new Timestamp( time );
         this.userName = userName;
@@ -139,7 +126,7 @@ public class Subscription implements Serializable, Comparable<Subscription> {
         SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
         this.dateStr = dateFormat.format( timeStamp );
         this.timeStr = timeFormat.format( timeStamp );
-        this.nodeAddress = new NodeAddress(scheme, hostAddress, port, appCtx, entryAddress).getNodeAddress();
+        this.nodeAddress = nodeAddress;
     }
     /**
      * Constructor creating new subscription object with given field values.
@@ -152,15 +139,11 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      * @param type Subscription type
      * @param active Subscription activation toggle
      * @param synkronized Synchronization toggle
-     * @param scheme Communication scheme
-     * @param hostAddress Host address
-     * @param port Port number
-     * @param appCtx Application context
-     * @param entryAddress Entry point address
+     * @param nodeAddress Node address
      */
-    public Subscription( int id, Timestamp timeStamp, String userName, String dataSourceName,
-            String operatorName, String type, boolean active, boolean synkronized, String scheme,
-            String hostAddress, int port, String appCtx, String entryAddress ) {
+    public Subscription(int id, Timestamp timeStamp, String userName, String dataSourceName,
+            String operatorName, String type, boolean active, boolean synkronized,
+            String nodeAddress) {
         this.id = id;
         this.timeStamp = timeStamp;
         this.userName = userName;
@@ -173,7 +156,7 @@ public class Subscription implements Serializable, Comparable<Subscription> {
         SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
         this.dateStr = dateFormat.format( timeStamp );
         this.timeStr = timeFormat.format( timeStamp );
-        this.nodeAddress = new NodeAddress(scheme, hostAddress, port, appCtx, entryAddress).getNodeAddress();
+        this.nodeAddress = nodeAddress;
     }
     /**
      * Method gets subscription id.
@@ -186,7 +169,7 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      *
      * @param id Dubscription id
      */
-    public void setId( int id ) { this.id = id; }
+    public void setId(int id) { this.id = id; }
      /**
      * Gets subscription's timestamp.
      *
@@ -198,7 +181,7 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      *
      * @param Subscription's timestamp.
      */
-    public void setTimeStamp( Timestamp timeStamp ) { this.timeStamp = timeStamp; }
+    public void setTimeStamp(Timestamp timeStamp) { this.timeStamp = timeStamp; }
     /**
      * Gets date string.
      *
@@ -210,7 +193,7 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      *
      * @param dateStr Date string to set
      */
-    public void setDateStr( String dateStr ) { this.dateStr = dateStr; }
+    public void setDateStr(String dateStr) { this.dateStr = dateStr; }
     /**
      * Gets time string.
      *
@@ -222,7 +205,7 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      *
      * @param timeStr Time string to set
      */
-    public void setTimeStr( String timeStr ) { this.timeStr = timeStr; }
+    public void setTimeStr(String timeStr) { this.timeStr = timeStr; }
     /**
      * Method gets user name.
      *
@@ -234,7 +217,7 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      *
      * @param userName User name
      */
-    public void setUserName( String userName ) { this.userName = userName; }
+    public void setUserName(String userName) { this.userName = userName; }
      /**
      * Gets data source name.
      *
@@ -246,7 +229,7 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      *
      * @param dataSourceName Data source name
      */
-    public void setDataSourceName( String dataSourceName ) { this.dataSourceName = dataSourceName; }
+    public void setDataSourceName(String dataSourceName) { this.dataSourceName = dataSourceName; }
     /**
      * Gets subscription type
      *
@@ -258,7 +241,7 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      * 
      * @param type Subscription type
      */
-    public void setType( String type ) { this.type = type; }
+    public void setType(String type) { this.type = type; }
     /**
      * Gets operator name.
      *
@@ -270,7 +253,7 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      *
      * @param operatorName Operator name
      */
-    public void setOperatorName( String operatorName ) { this.operatorName = operatorName; }
+    public void setOperatorName(String operatorName) { this.operatorName = operatorName; }
     /**
      * Method gets subscription activation toggle state.
      *
@@ -294,7 +277,19 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      *
      * @param synkronized Subscription synchronization toggle state
      */
-    public void setSynkronized( boolean synkronized ) { this.synkronized = synkronized; }
+    public void setSynkronized(boolean synkronized) { this.synkronized = synkronized; }
+    /**
+     * Get node address.
+     * 
+     * @return Node address
+     */
+    public String getNodeAddress() { return nodeAddress; }
+    /**
+     * Set node address
+     * 
+     * @param nodeAddress Node address to set
+     */
+    public void setNodeAddress(String nodeAddress) { this.nodeAddress = nodeAddress; }
     /**
      * Method implementing comparable interface. Sorts subscription objects based
      * on data source name.
@@ -302,15 +297,8 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      * @param s Subscription
      * @return 0 if objects are equal
      */
-    public int compareTo( Subscription s ) {
-        return getDataSourceName().compareTo( s.getDataSourceName() );
+    public int compareTo(Subscription s) {
+        return getDataSourceName().compareTo(s.getDataSourceName());
     }
-
-    public String getNodeAddress() { return this.nodeAddress; }
-    public String getScheme() { return new NodeAddress(this.nodeAddress).getScheme(); }
-    public String getHostAddress() { return new NodeAddress(this.nodeAddress).getHostAddress(); }
-    public int getPort() { return new NodeAddress(this.nodeAddress).getPort(); }
-    public String getAppCtx() { return new NodeAddress(this.nodeAddress).getAppCtx(); }
-    public String getEntryAddress() { return new NodeAddress(this.nodeAddress).getEntryAddress(); }
 }
 //--------------------------------------------------------------------------------------------------

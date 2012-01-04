@@ -46,10 +46,7 @@ DROP TABLE IF EXISTS dex_data_source_product_parameter_values CASCADE;
 DROP TABLE IF EXISTS dex_data_source_radars CASCADE;
 DROP TABLE IF EXISTS dex_data_source_users CASCADE;
 DROP TABLE IF EXISTS dex_data_source_filters;
-DROP TABLE IF EXISTS dex_node_address CASCADE;
-DROP TABLE IF EXISTS dex_user_address;
-DROP TABLE IF EXISTS dex_node_connection_address;
-DROP TABLE IF EXISTS dex_subscription_address;
+DROP TABLE IF EXISTS dex_certificates;
 -- drop sequences ----------------------------------------------------------------------------------
 DROP SEQUENCE IF EXISTS log_entry_id_seq;
 DROP SEQUENCE IF EXISTS radar_id_seq;

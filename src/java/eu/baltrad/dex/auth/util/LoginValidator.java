@@ -62,7 +62,7 @@ public class LoginValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name", "error.missing.username" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "password", "error.missing.password" );
         // Look for user in the database
-        User dbUser = userManager.getUserByName( formUser.getName() );
+        User dbUser = userManager.getByName( formUser.getName() );
         String userName = formUser.getName().trim();
         String password = formUser.getPassword().trim();
         if( userName != null && password != null && !userName.isEmpty() && !password.isEmpty() &&

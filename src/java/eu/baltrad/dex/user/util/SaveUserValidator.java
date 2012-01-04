@@ -27,7 +27,6 @@ import org.springframework.validation.ValidationUtils;
 
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.util.WebUtil;
 
 /**
  * Validator class used to validate input from add user form.
@@ -38,7 +37,8 @@ import eu.baltrad.dex.util.WebUtil;
  */
 public class SaveUserValidator implements Validator {
 //---------------------------------------------------------------------------------------- Constants
-    private static final int MIN_FIELD_LENGTH = 6;
+    private static final int MIN_PASSWD_LENGTH = 6;
+    private static final int COUNTRY_CODE_LENGTH = 2;
 //---------------------------------------------------------------------------------------- Variables
     private UserManager userManager;
 //------------------------------------------------------------------------------------------ Methods
@@ -67,41 +67,32 @@ public class SaveUserValidator implements Validator {
             ValidationUtils.rejectIfEmptyOrWhitespace( errors, "confirmPassword",
                 "error.missing.confirmpassword" );
         }
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "factory", "error.missing.organization" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "country", "error.missing.country" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "city", "error.missing.city" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "cityCode", "error.missing.zipcode" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "street", "error.missing.street" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "number", "error.missing.addressnumber" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "phone", "error.missing.phone" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", "error.missing.email" );
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "organizationName", 
+                "error.missing.organization_name");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "organizationUnit", 
+                "error.missing.organization_unit");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "localityName", 
+                "error.missing.locality_name");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "stateName", "error.missing.state_name");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "countryCode", 
+                "error.missing.country_code");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nodeAddress", 
+                "error.missing.node_address");
         // Password is only validated for new accounts
         if( user.getId() == 0 ) {
-            if( !errors.hasFieldErrors( "password" ) && !errors.hasFieldErrors( "confirmPassword" ) ) {
-                if( !user.getPassword().trim().equals( user.getConfirmPassword().trim() ) ) {
-                    errors.rejectValue( "confirmPassword", "error.field.passwd.mismatch" );
+            if( !errors.hasFieldErrors("password") && !errors.hasFieldErrors("confirmPassword")) {
+                if(!user.getPassword().trim().equals(user.getConfirmPassword().trim())) {
+                    errors.rejectValue("confirmPassword", "error.field.passwd.mismatch");
                 }
             }
-            if( user.getPassword().trim().length() > 0 && user.getPassword().trim().length()
-                    < MIN_FIELD_LENGTH ) {
-                errors.rejectValue( "password", "error.field.passwd.tooshort" );
+            if(user.getPassword().trim().length() > 0 && user.getPassword().trim().length()
+                    < MIN_PASSWD_LENGTH) {
+                errors.rejectValue("password", "error.field.passwd.tooshort");
             }
         }
-        // Validate host address
-        if( user.getHostAddress().isEmpty() ) {
-            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "hostAddress",
-                "error.address.invalid" );
-        }
-        // Validate port number
-        if( errors.hasFieldErrors( "port") ) {
-            errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
-        }
-        if( user.getPort() <= 0 ) {
-            errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
-        }
-        // validate email address
-        if( user.getEmail().trim().length() > 0 && !WebUtil.validateEmailAddress( user.getEmail() ) ) {
-            errors.rejectValue( "email", "error.address.invalid" );
+        if (user.getCountryCode().trim().length() > 0 && 
+                user.getCountryCode().trim().length() != COUNTRY_CODE_LENGTH) {
+            errors.rejectValue("countryCode", "error.field.countrycode.invalid");
         }
     }
     /**

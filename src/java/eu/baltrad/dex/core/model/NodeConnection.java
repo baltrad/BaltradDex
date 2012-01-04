@@ -21,7 +21,6 @@
 
 package eu.baltrad.dex.core.model;
 
-import eu.baltrad.dex.util.NodeAddress;
 import java.io.Serializable;
 
 /**
@@ -32,67 +31,46 @@ import java.io.Serializable;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class NodeConnection extends NodeAddress implements Serializable {
+public class NodeConnection implements Serializable {
 //---------------------------------------------------------------------------------------- Variables
-    // Connection id
+    /** Connection id */
     private int id;
-    // Connection name
-    private String connectionName;
-    // Full address of node's entry point
-    // User's name on the remote node
-    private String userName;
-    // User's password on the remote node
-    private String password;
+    /** Node name */
+    private String nodeName;
+    /** Node address */
+    private String nodeAddress;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Default constructor.
      */
     public NodeConnection() {}
     /**
-     * Constructor sets node address, user name and password field values.
-     *
-     * @param scheme Communication scheme identifier
-     * @param hostAddress Host address
-     * @param port Port number
-     * @param appCtx Application context
-     * @param entryAddress Entry point address
-     * @param userName User's name
-     * @param password User's password
+     * Constructor.
+     * 
+     * @param nodeAddress Node address 
      */
-    public NodeConnection( String scheme, String hostAddress, int port, String appCtx,
-            String entryAddress, String userName, String password ) {
-        this.scheme = scheme;
-        this.hostAddress = hostAddress;
-        this.port = port;
-        this.appCtx = appCtx;
-        this.entryAddress = entryAddress;
-        this.userName = userName;
-        this.password = password;
+    public NodeConnection(String nodeAddress) { this.nodeAddress = nodeAddress; }
+    /**
+     * Constructor.
+     * 
+     * @param nodeName Node name
+     * @param nodeAddress Node address
+     */
+    public NodeConnection(String nodeName, String nodeAddress) {
+        this.nodeName = nodeName;
+        this.nodeAddress = nodeAddress;
     }
     /**
-     * Constructor sets all field values.
-     *
-     * @param id Node connection ID
-     * @param connectionName Connection name
-     * @param scheme Communication scheme
-     * @param hostAddress Host address
-     * @param port Port number
-     * @param appCtx Application context
-     * @param entryAddress Entry point address
-     * @param userName User's name
-     * @param password User's password
+     * Constructor.
+     * 
+     * @param id Record ID
+     * @param nodeName Node name
+     * @param nodeAddress Node address
      */
-    public NodeConnection( int id, String connectionName, String scheme, String hostAddress,
-            int port, String appCtx, String entryAddress, String userName, String password ) {
+    public NodeConnection(int id, String nodeName, String nodeAddress) {
         this.id = id;
-        this.connectionName = connectionName;
-        this.scheme = scheme;
-        this.hostAddress = hostAddress;
-        this.port = port;
-        this.appCtx = appCtx;
-        this.entryAddress = entryAddress;
-        this.userName = userName;
-        this.password = password;
+        this.nodeName = nodeName;
+        this.nodeAddress = nodeAddress;
     }
     /**
      * Gets connection ID.
@@ -105,42 +83,30 @@ public class NodeConnection extends NodeAddress implements Serializable {
      *
      * @param id Connection ID
      */
-    public void setId( int id ) { this.id = id; }
+    public void setId(int id) { this.id = id; }
     /**
-     * Gets connection name.
+     * Gets node name.
      *
-     * @return Connection name
+     * @return Node name
      */
-    public String getConnectionName() { return connectionName; }
+    public String getNodeName() { return nodeName; }
     /**
-     * Sets connection name.
+     * Sets node name.
      *
-     * @param connectionName Connection name
+     * @param nodeName Node name
      */
-    public void setConnectionName( String connectionName ) { this.connectionName = connectionName; }
+    public void setNodeName(String nodeName) { this.nodeName = nodeName; }
     /**
-     * Gets user name.
+     * Gets node address.
      *
-     * @return User name
+     * @return Node address
      */
-    public String getUserName() { return userName; }
+    public String getNodeAddress() { return nodeAddress; }
     /**
-     * Sets user name.
+     * Sets nodeAddress.
      *
-     * @param userName User name
+     * @param nodeAddress Node address
      */
-    public void setUserName( String userName ) { this.userName = userName; }
-    /**
-     * Gets user's password.
-     *
-     * @return User's password
-     */
-    public String getPassword() { return password; }
-    /**
-     * Sets user's password.
-     *
-     * @param password User's password
-     */
-    public void setPassword( String password ) { this.password = password; }
+    public void setNodeAddress(String nodeAddress) { this.nodeAddress = nodeAddress; }
 }
 //--------------------------------------------------------------------------------------------------

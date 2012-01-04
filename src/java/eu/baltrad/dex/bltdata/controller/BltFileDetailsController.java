@@ -211,8 +211,8 @@ public class BltFileDetailsController implements Controller {
                 BltDataset bltDataset = new BltDataset( datasetFullNames.get( i ),
                     whereGroup, quantity_val, nbins_val * 2, nbins_val * 2,
                     lat0_val, lon0_val, llLatLon.getY(), llLatLon.getX(), urLatLon.getY(),
-                    urLatLon.getX(), elangle_val, init.getConfiguration().getWorkDir() +
-                    File.separator + init.getConfiguration().getThumbsDir() + File.separator +
+                    urLatLon.getX(), elangle_val, init.getConf().getWorkDir() +
+                    File.separator + init.getConf().getThumbsDir() + File.separator +
                     uuid + datasetFullNames.get( i ).replaceAll( BltDataProcessor.H5_PATH_SEPARATOR,
                     "_" ) + BltDataProcessor.IMAGE_FILE_EXT );
 
@@ -220,7 +220,7 @@ public class BltFileDetailsController implements Controller {
                 bltDatasets.add( bltDataset );
 
                 // try to load thumb from disk before creating a new one
-                String thumbPath = init.getThumbsDirPath() + File.separator
+                String thumbPath = init.getThumbsDir() + File.separator
                     + uuid + datasetFullNames.get( i ).replaceAll(
                         BltDataProcessor.H5_PATH_SEPARATOR, "_" )  + BltDataProcessor.IMAGE_FILE_EXT;
 

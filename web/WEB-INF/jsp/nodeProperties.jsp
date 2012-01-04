@@ -101,7 +101,7 @@ Author     : szewczenko
                                             <form:errors path="command.nodeType" cssClass="error"/>
                                         </div>
                                         <div class="row">
-                                            <div class="protocol-prefix">https://</div>
+                                            <div class="protocol-prefix">http://</div>
                                             <div class="shortaddress">
                                                 <form:input path="command.hostAddress"
                                                     title="Enter host address"/>

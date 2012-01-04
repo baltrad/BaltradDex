@@ -21,16 +21,17 @@
 
 package eu.baltrad.dex.core.controller;
 
-import eu.baltrad.frame.model.BaltradFrame;
-import eu.baltrad.frame.model.BaltradFrameHandler;
+import eu.baltrad.frame.model.*;
+import static eu.baltrad.frame.model.Protocol.*;
+import static eu.baltrad.dex.util.InitAppUtil.validate;
+import static eu.baltrad.dex.util.InitAppUtil.deleteFile;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
-import eu.baltrad.dex.subscription.model.Subscription;
-import eu.baltrad.dex.subscription.model.SubscriptionManager;
+import eu.baltrad.dex.subscription.model.*;
 import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 import eu.baltrad.dex.core.util.FramePublisherManager;
 import eu.baltrad.dex.core.util.FramePublisher;
@@ -38,6 +39,9 @@ import eu.baltrad.dex.core.util.HandleFrameTask;
 import eu.baltrad.dex.core.util.IncomingFileNamer;
 import eu.baltrad.dex.registry.model.*;
 import eu.baltrad.dex.bltdata.model.BltFileManager;
+import eu.baltrad.dex.util.ServletContextUtil;
+import eu.baltrad.dex.core.model.Cert;
+import eu.baltrad.dex.core.model.CertManager;
 
 import eu.baltrad.fc.FileCatalog;
 import eu.baltrad.fc.FileEntry;
@@ -49,26 +53,22 @@ import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.db.IFilter;
 
+import java.security.cert.Certificate;
+
 import org.apache.log4j.Logger;
 
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.util.Streams;
-
-import java.io.InputStream;
-import java.io.File;
-import java.io.IOException;
-
 import java.util.List;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.io.File;
 
 /**
  * Class implements frame dispatching controller. This controller handles all incoming and outgoing
@@ -81,7 +81,7 @@ import java.util.ArrayList;
 public class FrameDispatcherController extends HttpServlet implements Controller {
 //---------------------------------------------------------------------------------------- Constants
     // path to HDF5 dataset used to generate image thumb
-    private static final String H5_THUMB_DATASET_PATH = "/dataset1/data1/data";
+    /*private static final String H5_THUMB_DATASET_PATH = "/dataset1/data1/data";
     // path to HDF5 metadata group used to generate image thumb
     private static final String H5_THUMB_GROUP_PATH = "/dataset1/where";
     // image thumb size
@@ -95,46 +95,34 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     // range mask color string
     private static final String THUMB_RANGE_MASK_COLOR = "#FFFFFF";
     // image file extension
-    private static final String IMAGE_FILE_EXT = ".png";
+    private static final String IMAGE_FILE_EXT = ".png";*/
 //---------------------------------------------------------------------------------------- Variables
-    private BaltradFrameHandler bfHandler;
+    //private BaltradFrameHandler bfHandler;
     private UserManager userManager;
     private DataSourceManager dataSourceManager;
     private SubscriptionManager subscriptionManager;
-    private InitAppUtil init;
     private Logger log;
     private BltDataProcessorController bltDataProcessorController;
     // Reference to file catalog object
     private FileCatalog fileCatalog;
     // Beast message manager
     private IBltMessageManager bltMessageManager;
-    // remote data source listing
-    private List dataSourceListing;
-    // confirmed subscription list
-    private List confirmedSubscriptions;
-    // synchronized subscription
-    private Subscription synkronizedSubscription;
-    /** Remote node's address */
-    private String remNodeAddress;
-    // remote node name
-    private String remNodeName;
-    // remote user name
-    private String locUsrName;
     // Frame publisher manager
     private FramePublisherManager framePublisherManager;
     // Frame publisher object
     private FramePublisher framePublisher;
-    /** References delivery register manager object @see DeliveryRegisterManager */
+    /** References delivery register manager */
     private DeliveryRegisterManager deliveryRegisterManager;
     /** Reference to BltFileManager */
     private BltFileManager bltFileManager;
+    /** Certificate manager */
+    private CertManager certManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      */
     public FrameDispatcherController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        this.init = new InitAppUtil();
     }
     /**
      * Required by the Spring's Controller interface, wraps actual doGet method used to
@@ -149,619 +137,398 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         return new ModelAndView();
     }
     /**
-     * Handles all frame traffic, implements single point of entry concept. Handles incoming
-     * and outgoing frames and distinguishes between particular frame types.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
+     * Handles all types of requests by calling handler methods depending on the request type.
+     * 
+     * @param request HTTP servlet request
+     * @param response HTTP servlet response
      */
     @Override
     public void doGet( HttpServletRequest request, HttpServletResponse response ) {
-        try {
-            ServletFileUpload upload = new ServletFileUpload();
-            FileItemIterator iterator = upload.getItemIterator( request );
-            FileItemStream itemStream = null;
-
-            String frameHeader = null;
-            File frameFile = null;
-
-            if (iterator.hasNext()) {
-                itemStream = iterator.next();
-                if (itemStream.getFieldName().equals(BaltradFrame.XML_PART)) {
-                    InputStream hdrStream = itemStream.openStream();
-                    // Handle form field / message XML header
-                    if (itemStream.isFormField()) {
-                        // Get header string
-                        frameHeader = Streams.asString(hdrStream);
-                    }
-                }
-            }
-            
-            if (iterator.hasNext()) {
-                itemStream = iterator.next();
-                InputStream fileStream = itemStream.openStream();
-                // write to a temporary file
-                frameFile = InitAppUtil.createTempFile(new File(init.getWorkDirPath()));
-                InitAppUtil.saveFile(fileStream, frameFile);
-            }
-
-            if (frameHeader != null) {
-                processIncomingFrame(frameHeader, frameFile, response);
-            } else {
-                log.error("Invalid baltrad frame (no header parsed from request)");
-                response.setStatus(BaltradFrameHandler.HTTP_STATUS_CODE_500);
-            }
-        } catch (Exception e) {
-            log.error("Frame dispatcher error", e);
-            response.setStatus(BaltradFrameHandler.HTTP_STATUS_CODE_500);
-        } finally {
-            // clean work directory from temporary files
-            InitAppUtil.cleanUpTempFiles( init.getWorkDirPath() );
+        // Create new session to avoid comitting response too early 
+        HttpSession session = request.getSession(true);
+        // Parse incoming baltrad frame
+        HashMap parms = parse(request, InitAppUtil.getWorkDir(), InitAppUtil.getWorkDir(), 
+                InitAppUtil.getCertsDir());
+        // Handle post certificate request
+        if (Frame.getRequestType(parms).equals(BF_POST_CERT)) {
+            handleCertRequest(parms, response);
+        }
+        // Handle data source listing request
+        if (Frame.getRequestType(parms).equals(BF_GET_DS_LIST)) {
+            handleDSListRequest(parms, response);
+        }
+        // Handle subscription request
+        if (Frame.getRequestType(parms).equals(BF_POST_SUBSCRIPTION_REQUEST)) {
+            handleSubscriptionRequest(parms, response);
+        }
+        // Handle subscription synchronization request
+        if (Frame.getRequestType(parms).equals(BF_POST_SUBSCRIPTION_SYNC_REQUEST)) {
+            handleSubscriptionSyncRequest(parms, response);
+        }
+        // Handle subscription update request
+        if (Frame.getRequestType(parms).equals(BF_POST_SUBSCRIPTION_UPDATE_REQUEST)) {
+            handleSubscriptionUpdateRequest(parms, response);
+        }
+        // Handle data delivery request
+        if (Frame.getRequestType(parms).equals(BF_POST_DATA_DELIVERY_REQUEST)) {
+            handleDataDeliveryRequest(parms, response);
+        }
+         // Handle message delivery request
+        if (Frame.getRequestType(parms).equals(BF_POST_MESSAGE_DELIVERY_REQUEST)) {
+            handleMessageDeliveryRequest(parms, request);
         }
     }
-
-    protected void processIncomingFrame(String header, File file, HttpServletResponse response) throws Exception {
-        String contentType = BaltradFrameHandler.getContentType(header);
-        log.debug("Received frame with contentType: " + contentType);
-        
-        String userName = BaltradFrameHandler.getUserName(header);
-        User user = null;
-        if (userName == null) {
-            // Not all frames set user information. This is for backwards compatibility.
-            // XXX: this should be fixed ASAP!
-            log.warn("Allowing frame with no user data to pass");
-        } else {
-            // XXX: we are in a messy state where some frames contain user by name
-            // and some by hash
-            user = userManager.getUserByNameHash(userName);
-            if (user == null)
-                user = userManager.getUserByName(userName);
-            if (user == null) {
-                log.error("received frame from unknown user: " + userName);
-                response.setStatus(response.SC_FORBIDDEN);
-                return;
-            }
-
-            // XXX: some frames contain a user, but no password, skip authn for these
-            String passwd = BaltradFrameHandler.getPassword( header );
-            if (passwd == null) {
-                log.warn("skipping authentication for frame with no password from user: " + userName);
-            } else if (!authenticateFrame(user, header)) {
-                log.error("failed to authenticate frame from user: " + userName);
-                response.setStatus(response.SC_FORBIDDEN);
-                return;
-            }
-
-            if (!authorizeUser(user)) {
-                log.error("unauthorized frame from user: " + userName);
-                response.setStatus(response.SC_FORBIDDEN);
-                return;
-            }
-        }
-
-        if (contentType.equals(BaltradFrameHandler.MSG)) {
-            processIncomingMessageFrame(user, header, file, response);
-        } else if (contentType.equals(BaltradFrameHandler.OBJECT)) {
-            processIncomingObjectFrame(user, header, file, response);
-        } else if (contentType.equals(BaltradFrameHandler.FILE)) {
-            response.setStatus(processIncomingDataFrame(user, header, file));
-        } else {
-            log.warn("unhandled baltrad frame type: " + contentType);
-            response.setStatus(BaltradFrameHandler.HTTP_STATUS_CODE_500);
-        }
-    }
-
-    protected void processIncomingMessageFrame(User user, String header, File file, HttpServletResponse response) throws Exception {
-        String messageText = BaltradFrameHandler.getMessageText(header);
-
-        // channel listing request - has to be authenticated
-        if (messageText.equals(BaltradFrameHandler.CHNL_LIST_RQST)) {
-            log.info( "Data source listing request received from " +
-                "user " + getUserName( BaltradFrameHandler.getUserName( header ) ) + " ("
-                 + BaltradFrameHandler.getSenderNodeName( header ) + ")" );
-            
-            // process channel listing request
-
-            // create a list of data sources that user is allowed to subscribe
-            List<Integer> dataSourceIds = dataSourceManager.getDataSourceIds( 
-                    user.getId() );
-
-            // data sources allowed to be used by a given user
-            List<DataSource> dataSources = new ArrayList<DataSource>();
-            for( int i = 0; i < dataSourceIds.size(); i++ ) {
-                dataSources.add( dataSourceManager.getDataSource(
-                        dataSourceIds.get( i ) ) );
-            }
-            // write list to temporary file
-            File tempFile = InitAppUtil.createTempFile(
-                    new File( init.getWorkDirPath() ) );
-            // write object to stream
-            InitAppUtil.writeObjectToStream( dataSources, tempFile );
-
-            // set the return address
-            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
-
-            // prepare the return message header
-            String retHeader = BaltradFrameHandler.createObjectHdr(
-                    BaltradFrameHandler.MIME_MULTIPART,
-                    init.getConfiguration().getNodeAddress(),
-                    init.getConfiguration().getNodeName(),
-                    BaltradFrameHandler.CHNL_LIST,
-                    tempFile.getAbsolutePath() );
-            //
-            BaltradFrame baltradFrame = new BaltradFrame( retHeader, tempFile );
-            // process the frame
-            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
-            // delete temporary file
-            InitAppUtil.deleteFile( tempFile );
-        } else {
-            // regular message frame - display message
-            log.info( BaltradFrameHandler.getMessageText( header ) );
-        }
-    }
-
-    protected void processIncomingObjectFrame(User user, String header, File file, HttpServletResponse response) throws Exception {
-        String messageText = BaltradFrameHandler.getMessageText(header);
-
-        // incoming channel listing
-        if (messageText.equals(BaltradFrameHandler.CHNL_LIST)) {
-            log.info( "Data source listing received from " +
-                BaltradFrameHandler.getSenderNodeName( header ) );
-
-            // process incoming data source listing
-
-            List remoteDataSources = ( List )InitAppUtil.readObjectFromStream(file);
-            // set channel listing
-            setDataSourceListing( remoteDataSources );
-            // Set remote node address
-            setRemNodeAddress( BaltradFrameHandler.getSenderNodeAddress( header ) );
-            // Set remote node name
-            setRemNodeName( BaltradFrameHandler.getSenderNodeName( header ) );
-        // incoming channel subscription request
-        } else if (messageText.equals(BaltradFrameHandler.CHNL_SBN_RQST)) {
-            log.info( "Data source subscription request received from " +
-                BaltradFrameHandler.getSenderNodeName( header ) );
-
-            // retrieve subscription list
-            List subscribedDataSources = ( List )InitAppUtil.readObjectFromStream(file);
-
-            // return data source list sent back to user to confirm
-            // subscription completion
-            List confirmedDataSources = new ArrayList();
-            if( subscribedDataSources != null ) {
-                for( int i = 0; i < subscribedDataSources.size(); i++ ) {
-                    DataSource requestedDataSource =
-                            ( DataSource )subscribedDataSources.get( i );
-                    DataSource localDataSource = dataSourceManager.getDataSource(
-                            requestedDataSource.getName() );
-                    Subscription subs = null;
-                    // make sure user hasn't already subscribed the channels
-                    if( subscriptionManager.getSubscription( user.getName(),
-                            localDataSource.getName(),
-                            Subscription.REMOTE_SUBSCRIPTION ) != null ) {
-                        log.warn( "User " + user.getName() + " has already " +
-                            "subscribed " + localDataSource.getName() );
-                    } else {
-                        // add subscription
-                        subs = new Subscription( System.currentTimeMillis(),
-                            user.getName(), localDataSource.getName(),
-                            init.getConfiguration().getNodeName(),
-                            Subscription.REMOTE_SUBSCRIPTION, false, false,
-                            init.getConfiguration().getScheme(),
-                            init.getConfiguration().getHostAddress(),
-                            init.getConfiguration().getPort(),
-                            init.getConfiguration().getAppCtx(),
-                            init.getConfiguration().getEntryAddress() );
-                        subscriptionManager.saveSubscription( subs );
-                        confirmedDataSources.add( requestedDataSource );
-                    }
-                }
-            }
-            // send subscription confirmation
-
-            // write list to temporary file
-            File tempFile = InitAppUtil.createTempFile(
-                    new File( init.getWorkDirPath() ) );
-            // write object to the stream
-            InitAppUtil.writeObjectToStream( confirmedDataSources, tempFile );
-            // set the return address
-            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
-            // prepare the return message header
-            String retHeader = BaltradFrameHandler.createObjectHdr(
-                    BaltradFrameHandler.MIME_MULTIPART,
-                    init.getConfiguration().getNodeAddress(),
-                    init.getConfiguration().getNodeName(),
-                    BaltradFrameHandler.CHNL_SBN_CFN,
-                    tempFile.getAbsolutePath() );
-            //
-            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile);
-            // process the frame
-            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
-            // delete temporary file
-            InitAppUtil.deleteFile( tempFile );
-
-        // incoming channel subscription confirmation
-        } else if (messageText.equals(BaltradFrameHandler.CHNL_SBN_CFN)) {
-            log.info( "Data source subscription confirmation received " +
-                " from " + BaltradFrameHandler.getSenderNodeName( header ) );
-
-            // process incoming subscription confirmation
-
-            // retrieve list of confirmed channels
-            List confirmedDataSources = ( List )InitAppUtil.readObjectFromStream(file);
-            setConfirmedSubscriptions( confirmedDataSources );
-
-        // incoming channel subscription change request
-        } else if (messageText.equals(BaltradFrameHandler.SBN_CHNG_RQST)) {
-            log.info( "Data source subscription change request received from " +
-                    BaltradFrameHandler.getSenderNodeName( header ) );
-
-            // process incoming subscription change request
-
-            // retrieve subscription object
-            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(file);
-
-            // create new subscription object
-            Subscription s = new Subscription( System.currentTimeMillis(),
-                    subs.getUserName(), subs.getDataSourceName(),
-                    subs.getOperatorName(), Subscription.REMOTE_SUBSCRIPTION,
-                    false, false, subs.getScheme(), subs.getHostAddress(),
-                    subs.getPort(), subs.getAppCtx(), subs.getEntryAddress() );
-            // subscription object serves as confirmation
-            Subscription confirmedSub = null;
-            if( subs.getActive() ) {
-                if( subscriptionManager.getSubscription( s.getUserName(), 
-                    s.getDataSourceName(), Subscription.REMOTE_SUBSCRIPTION ) == null) {
-                    // subscription doesn't exist in the database - add as new
-                    // subscription
-                    subscriptionManager.saveSubscription( s );
-                    confirmedSub = s;
-                    confirmedSub.setActive( true );
-                    log.info( "User " + s.getUserName() + " subscribed " +
-                            s.getDataSourceName() );
-                } else {
-                    // subscription exists in the database - modify subscription
-                    subscriptionManager.updateSubscription( s.getDataSourceName(),
-                            Subscription.REMOTE_SUBSCRIPTION, true );
-                    confirmedSub = s;
-                    confirmedSub.setActive( true );
-                    log.info( "User " + s.getUserName() + " subscribed " +
-                            s.getDataSourceName() );
-                }
-            } else {
-                // remove remote subscription
-                subscriptionManager.deleteSubscription( s.getUserName(),
-                        s.getDataSourceName(), s.getType() );
-                confirmedSub = s;
-                log.info( "User " + s.getUserName() + " cancelled subscription of "
-                        + s.getDataSourceName() );
-            }
-
-            // send subscription change confirmation
-
-            // write subscription object to temporary file
-            File tempFile = InitAppUtil.createTempFile( 
-                    new File( init.getWorkDirPath() ) );
-            // set the return address
-            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
-
-            String returnMessage = null;
-            if (confirmedSub != null) {
-                returnMessage = BaltradFrameHandler.SBN_CHNG_OK;
-            } else {
-                returnMessage = BaltradFrameHandler.SBN_CHNG_FAIL;
-            }
-
-            String retHeader = BaltradFrameHandler.createObjectHdr(
-                    BaltradFrameHandler.MIME_MULTIPART,
-                    init.getConfiguration().getNodeAddress(),
-                    init.getConfiguration().getNodeName(),
-                    returnMessage,
-                    tempFile.getAbsolutePath()
-            );
-            // write object to the stream
-            InitAppUtil.writeObjectToStream( confirmedSub, tempFile );
-
-            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile);
-            // process the frame
-            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
-            // delete temporary file
-            InitAppUtil.deleteFile( tempFile );
-
-        // incoming channel subscription change confirmation - success
-        } else if (messageText.equals(BaltradFrameHandler.SBN_CHNG_OK)) {
-            // retrieve subscription object
-            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(file);
-            String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
-            log.info( "Remote node " + BaltradFrameHandler.getSenderNodeName(
-                    header ) + " changed your subscription status of " +
-                    subs.getDataSourceName() + " to: " + selected );
-
-        // incoming channel subscription change confirmation - failure
-        } else if (messageText.equals(BaltradFrameHandler.SBN_CHNG_FAIL)) {
-            // retrieve subscription object
-            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(file);
-            // delete temporary file
-            String selected = subs.getActive() ? "Subscribed" : "Unsubscribed";
-            log.error( "Remote node " + BaltradFrameHandler.getSenderNodeName(
-                    header )  + " failed to change your subscription status of "
-                + subs.getDataSourceName() + " to: " + selected );
-
-        // channel synchronization request
-        } else if (messageText.equals(BaltradFrameHandler.CHNL_SYNC_RQST)) {
-            // retrieve subscription object from stream
-            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(file);
-            // check if the subscribed channel is available
-            try {
-                DataSource dataSource = dataSourceManager.getDataSource(
-                        subs.getDataSourceName() );
-                if( dataSource == null ) {
-                    subs.setSynkronized( false );
-                }
-            } catch( NullPointerException e ) {
-                log.error( "Failed to synchronize subscribed data source: "
-                        + subs.getDataSourceName(), e );
-            }
-
-            // send subscription back to requesting node
-
-            // write list to temporary file
-            File tempFile = InitAppUtil.createTempFile(
-                    new File( init.getWorkDirPath() ) );
-            // write object to the stream
-            InitAppUtil.writeObjectToStream( subs, tempFile );
-            // set the return address
-            String remoteNodeAddress = BaltradFrameHandler.getSenderNodeAddress(header);
-            // prepare the return message header
-            String retHeader = BaltradFrameHandler.createObjectHdr(
-                    BaltradFrameHandler.MIME_MULTIPART,
-                    init.getConfiguration().getNodeAddress(),
-                    init.getConfiguration().getNodeName(),
-                    BaltradFrameHandler.CHNL_SYNC_RSPNS,
-                    tempFile.getAbsolutePath() );
-            BaltradFrame baltradFrame = new BaltradFrame(retHeader, tempFile );
-            // process the frame
-            bfHandler.handleBF( remoteNodeAddress, baltradFrame );
-            // delete temporary file
-            InitAppUtil.deleteFile( tempFile );
-
-        // channel synchronization response
-        } else if (messageText.equals(BaltradFrameHandler.CHNL_SYNC_RSPNS)) {
-            // retrieve subscription object from stream
-            Subscription subs = ( Subscription )InitAppUtil.readObjectFromStream(file);
-            setSynkronizedSubscription( subs );
-        } else {
-            log.error("unhandled object message: " + messageText);
-        }
-    }
-
     /**
-     *
-     * @param header
-     * @param fileItem
-     * @return
-     * @throws IOException
-     */
-    protected int processIncomingDataFrame(User user, String header, File file)
-            throws IOException {
-        String frameSource = BaltradFrameHandler.getSenderNodeName( header ) + "/" +
-                BaltradFrameHandler.getChannel( header );
-        log.info("New data frame received from " + frameSource);
-        FileEntry fileEntry = null;
-        try {
-            fileEntry = fileCatalog.store( file.getAbsolutePath() );
-        } catch (DuplicateEntry e) {
-            log.error("Duplicate entry error", e );
-            // exception while storing file in FileCatalog - set error code
-            return BaltradFrameHandler.HTTP_STATUS_CODE_500;
-        } catch (FileCatalogError e) {
-            log.error("File catalog error", e );
-            // exception while storing file in FileCatalog - set error code
-            return BaltradFrameHandler.HTTP_STATUS_CODE_500;
-        }
-        IncomingFileNamer namer = new IncomingFileNamer();
-        String friendlyName = namer.name(fileEntry);
-
-        log.info(friendlyName + " stored with UUID " + fileEntry.uuid());
-
-        // file successfully stored in File Catalog
-        // send message to Beast Framework
-        BltDataMessage message = new BltDataMessage();
-        message.setFileEntry(fileEntry.clone());
-        bltMessageManager.manage( message );
-        
-        Oh5MetadataMatcher metadataMatcher = new Oh5MetadataMatcher();
-
-        // iterate through subscriptions list to send data to subscribers
-        List<Subscription> subs =
-            subscriptionManager.getSubscriptions(Subscription.REMOTE_SUBSCRIPTION);
-        for (Subscription sub : subs) {
-            // check if file entry matches the subscribed data source's filter
-            String dataSourceName = sub.getDataSourceName();
-            IFilter filter = bltFileManager.getFilter( dataSourceName );
-            boolean matches = metadataMatcher.match(fileEntry.metadata(), filter.getExpression());
-            // make sure that user exists locally
-            User receivingUser = userManager.getUserByName(sub.getUserName());
-            DeliveryRegisterEntry dre =
-                deliveryRegisterManager.getEntry(receivingUser.getId(), fileEntry.uuid());
-
-            if (matches && dre == null) {
-                // create frame delivery task
-                HandleFrameTask task = new HandleFrameTask(getDeliveryRegisterManager(),
-                                                           log, receivingUser, dataSourceName,
-                                                           fileEntry, file);
-                // add task to publisher manager
-                framePublisherManager.getFramePublisher(receivingUser.getName()).addTask(task);
-            }
-        }
-        return BaltradFrameHandler.HTTP_STATUS_CODE_200;
-    }
-
-    /**
-     * Post a baltrad frame to a remote node
-     *
-     * @param remoteNodeAddress address this frame should be posted to
-     * @param baltradFrame Reference to BaltradFrame object
-     */
-    public void doPost(String remoteNodeAddress, BaltradFrame baltradFrame) {
-        bfHandler.handleBF(remoteNodeAddress, baltradFrame);
-    }
-
-    /**
-     * Check if the frame is indeed from the user
-     *
-     * @param user the user to check against
-     * @param header Frame header
-     * @return true if the frame is from the user
-     *
-     * check if the password contained in the frame is correct
-     */
-    public boolean authenticateFrame( User user, String header ) {
-        String passwd = BaltradFrameHandler.getPassword( header );
-        return user.getPassword().equals(passwd);
-    }
-    
-    /**
-     * check if the user is allowed to send messages to this node
-     *
-     * @param user the user to authorize
-     * @return true if the user is authorized
-     *
-     * Only users belonging to groups ADMIN and PEER are authorized to exchange data.
-     */
-    public boolean authorizeUser(User user) {
-        String userRole = user.getRoleName();
-        if (userRole.equals(User.ROLE_ADMIN) || userRole.equals(User.ROLE_PEER)) {
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-     * Gets user name matching a given user name hash
+     * Handles certificate post request.
      * 
-     * @param userNameHash User name hash
-     * @return User name
+     * @param parms Request parameters
+     * @param response HTTP response
      */
-    public String getUserName( String userNameHash ) {
-        User user = userManager.getUserByNameHash( userNameHash );
-        return user.getName();
-    }
-  
-    /**
-     * Gets the list of data sources available for a given remote node.
-     *
-     * @return List of data sources available for a given remote node
-     */
-    public List getDataSourceListing() { return dataSourceListing; }
-    /**
-     * Sets the list of data sources available for a given remote node.
-     *
-     * @param dataSourceListing List of data sources available for a given remote node
-     */
-    public void setDataSourceListing( List dataSourceListing ) {
-        this.dataSourceListing = dataSourceListing;
-    }
-    /**
-     * Resets the list of remote data sources
-     */
-    public void resetDataSourceListing() { this.dataSourceListing = null; }
-    /**
-     * Gets list of subscriptions confirmed by remote node.
-     *
-     * @return List of subscriptions confirmed by remote node
-     */
-    public List getConfirmedSubscriptions() { return confirmedSubscriptions; }
-    /**
-     * Sets list of subscriptions confirmed by remote node.
-     *
-     * @param confirmedSubscriptions List of subscriptions confirmed by remote node
-     */
-    public void setConfirmedSubscriptions( List confirmedSubscriptions ) {
-        this.confirmedSubscriptions = confirmedSubscriptions;
-    }
-    /**
-     * Resets the list of confirmed subscriptions.
-     */
-    public void resetConfirmedSubscriptions() { this.confirmedSubscriptions = null; }
-    /**
-     * Gets remote node name.
-     *
-     * @return Remote node name
-     */
-    public String getRemNodeName() { return remNodeName; }
-    /**
-     * Set remote node name.
-     *
-     * @param remoteNodeName Remote node name
-     */
-    public void setRemNodeName( String remNodeName ) { this.remNodeName = remNodeName; }
-    /**
-     * Resets remote node name.
-     */
-    public void resetRemNodeName() { this.remNodeName = ""; }
-    /**
-     * Get remote node's address.
-     *
-     * @return Remote node'saddress
-     */
-    public String getRemNodeAddress() { return remNodeAddress; }
-    /**
-     * Set remote node's address.
-     *
-     * @param  Remote node's address to set
-     */
-    public void setRemNodeAddress( String remNodeAddress ) { this.remNodeAddress = remNodeAddress; }
-    /**
-     * Reset remote node's address.
-     */
-    public void resetRemNodeAddress() { this.remNodeAddress = ""; }
-    /**
-     * Gets local user name.
-     *
-     * @return Local user name
-     */
-    public String getLocUsrName() { return locUsrName; }
-    /**
-     * Sets local user name.
-     *
-     * @param locUsrName Local user name
-     */
-    public void setLocUsrName( String locUsrName ) { this.locUsrName = locUsrName; }
-    /**
-     * Resets local user name.
-     */
-    public void resetLocUsrName() { this.locUsrName = ""; }
-    /**
-     * Gets synchronized subscription.
-     *
-     * @return Synchronized subscription
-     */
-    public Subscription getSynkronizedSubscription() { return synkronizedSubscription; }
-    /**
-     * Sets synchronized subscription.
-     *
-     * @param synkronizedSubscription Synchronized subscription
-     */
-    public void setSynkronizedSubscription( Subscription synkronizedSubscription ) {
-        this.synkronizedSubscription = synkronizedSubscription;
+    private void handleCertRequest(HashMap parms, HttpServletResponse response) {
+        try {
+            // Check if certificate exists both in the keystore and in the database  
+            Certificate x509Cert = loadCert(
+                ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                        Frame.getNodeName(parms), InitAppUtil.getConf().getKeystorePass());
+            Cert cert = certManager.get(Frame.getNodeName(parms));
+            String msg = "";
+            if (cert == null) {
+                msg = "New certificate received from " + Frame.getNodeName(parms);
+                log.info(msg);
+                int update = certManager.saveOrUpdate(new Cert(Frame.getNodeName(parms), 
+                        Frame.getLocalUri(parms), Frame.getCertFile(parms).getAbsolutePath(), 
+                        false));
+                if (update > 0) {
+                    // Certificate successfully stored, but authentication needed
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                } else {
+                    // Failed to store certificate
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                } 
+            }
+            if (x509Cert == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
+            if (x509Cert != null && cert != null) {
+                msg = "Certificate already exists in the keystore";
+                log.warn(msg);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            }
+            // Set node name as response header
+            addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
+        } catch(Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            log.error("Failed to save certificate configuration", e);
+        }
     }
     /**
-     * Resets synchronized subscription object.
+     * Handles data source listing request
+     * 
+     * @param parms Request parameters
+     * @param response HTTP response
      */
-    public void resetSynkronizedSubscription() { this.synkronizedSubscription = null; }
+    private void handleDSListRequest(HashMap parms, HttpServletResponse response) {
+        if (authenticate(ServletContextUtil.getServletContextPath() 
+                + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
+                InitAppUtil.getConf().getKeystorePass(), Frame.getSigFile(parms),
+                Frame.getTimestamp(parms))) {
+            try {
+                log.info(Frame.getNodeName(parms) + " requested data source listing");
+                // Set node name as response header
+                addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
+                response.setStatus(HttpServletResponse.SC_OK);
+                // Send data source listing to the client
+                User user = userManager.getByName(Frame.getNodeName(parms));
+                List<Integer> dataSourceIds = dataSourceManager.getDataSourceIds(user.getId());
+                List<DataSource> dsList = new ArrayList<DataSource>();
+                for (int i = 0; i < dataSourceIds.size(); i++) {
+                    dsList.add(dataSourceManager.getDataSource(dataSourceIds.get(i)));
+                }
+                long timestamp = System.currentTimeMillis();
+                byte[] sigBytes = getSignatureBytes(
+                    ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                    InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
+                    timestamp); 
+                SerialFrame serialFrame = SerialFrame.postDSListResponse(user.getNodeAddress(), 
+                        InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
+                        timestamp, sigBytes, dsList);
+                writeObjectToStream(response, serialFrame);
+            } catch(Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                log.error("Failed to send data source listing", e);
+            }
+        } else { 
+            log.error("Failed to authenticate frame");
+            // Set node name as response header
+            addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+        // Delete temporary files 
+        deleteFile(Frame.getSigFile(parms));
+    }
     /**
-     * Gets reference to BaltradFrameHandler object.
-     *
-     * @return Reference to BaltradFrameHandler object
+     * Handles data source subscription request
+     * 
+     * @param parms Request parameters
+     * @param response HTTP response 
      */
-    public BaltradFrameHandler getBfHandler() { return bfHandler; }
+    private void handleSubscriptionRequest(HashMap parms, HttpServletResponse response) {
+        if (authenticate(ServletContextUtil.getServletContextPath() 
+                + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
+                InitAppUtil.getConf().getKeystorePass(), Frame.getSigFile(parms),
+                Frame.getTimestamp(parms))) {
+            try {
+                log.info(Frame.getNodeName(parms) + " requested data source subscription");
+                List<DataSource> subRequest = (List<DataSource>) readObjectFromFile(
+                        Frame.getPayloadFile(parms));
+                List<DataSource> subConfirm = new ArrayList<DataSource>();
+                if (validate(subRequest)) {
+                    for (int i = 0; i < subRequest.size(); i++) {
+                        DataSource dsRequest = subRequest.get(i);
+                        DataSource dsLocal = dataSourceManager.getDataSource(dsRequest.getName());
+                        User user = userManager.getByName(Frame.getNodeName(parms));
+                        // make sure user hasn't already subscribed the selected data sources
+                        if (subscriptionManager.get(user.getName(), dsLocal.getName(),
+                                Subscription.SUBSCRIPTION_UPLOAD) != null) {
+                            log.warn("User " + user.getName() + " has already subscribed " + 
+                                    dsLocal.getName() );
+                        } else {
+                            // add subscription
+                            Subscription sub = new Subscription(System.currentTimeMillis(),
+                                user.getName(), dsLocal.getName(), 
+                                InitAppUtil.getConf().getNodeName(),
+                                Subscription.SUBSCRIPTION_UPLOAD, false, false,
+                                InitAppUtil.getConf().getNodeAddress());
+                            subscriptionManager.save(sub);
+                            subConfirm.add(dsRequest);
+                            log.info("User " + user.getName() + " subscribed " + 
+                                    dsLocal.getName());
+                        }
+                    }
+                }
+                // Send subscription confirmation                
+                response.setStatus(HttpServletResponse.SC_OK);
+                User user = userManager.getByName(Frame.getNodeName(parms));
+                long timestamp = System.currentTimeMillis();
+                byte[] sigBytes = getSignatureBytes(
+                    ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                    InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
+                    timestamp); 
+                SerialFrame serialFrame = SerialFrame.postSubscriptionResponse(
+                        user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
+                        InitAppUtil.getConf().getNodeName(), timestamp, sigBytes, subConfirm);
+                writeObjectToStream(response, serialFrame);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                log.error("Failed to handle subscription request", e);
+            }
+        } else { 
+            log.error("Failed to authenticate frame");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+        // Delete temporary files 
+        deleteFile(Frame.getSigFile(parms));
+        deleteFile(Frame.getPayloadFile(parms));
+    }
     /**
-     * Sets reference to BaltradFrameHandler object.
-     *
-     * @param bfHandler Reference to BaltradFrameHandler object
+     * Handles subscription synchronization request
+     * 
+     * @param parms Request parameters
+     * @param response HTTP response 
      */
-    public void setBfHandler( BaltradFrameHandler bfHandler ) { this.bfHandler = bfHandler; }
+    private void handleSubscriptionSyncRequest(HashMap parms, HttpServletResponse response) {
+        if (authenticate(ServletContextUtil.getServletContextPath() 
+                + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
+                InitAppUtil.getConf().getKeystorePass(), Frame.getSigFile(parms),
+                Frame.getTimestamp(parms))) {
+            try {
+                Subscription sub = (Subscription) readObjectFromFile(Frame.getPayloadFile(parms));
+                // Check if subscribed data source is available
+                try {
+                    DataSource dataSource = dataSourceManager.getDataSource(
+                            sub.getDataSourceName());
+                    if (dataSource == null) {
+                        sub.setSynkronized(false);
+                    }
+                } catch (NullPointerException e) {
+                    log.error("Failed to synchronize subscribed data source: "
+                            + sub.getDataSourceName(), e);
+                }
+                // Send response
+                response.setStatus(HttpServletResponse.SC_OK);
+                User user = userManager.getByName(Frame.getNodeName(parms));
+                long timestamp = System.currentTimeMillis();
+                byte[] sigBytes = getSignatureBytes(
+                    ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                    InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
+                    timestamp); 
+                SerialFrame serialFrame = SerialFrame.postSubscriptionSyncResponse(
+                        user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
+                        InitAppUtil.getConf().getNodeName(), timestamp, sigBytes, sub);
+                writeObjectToStream(response, serialFrame);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                log.error("Failed to handle subscription synchronization request", e);
+            }
+        } else { 
+            log.error("Failed to authenticate frame");
+            // Set node name as response header
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+        // Delete temporary files 
+        deleteFile(Frame.getSigFile(parms));
+        deleteFile(Frame.getPayloadFile(parms));
+    }
+    /**
+     * Handles subscription update request.
+     * 
+     * @param parms Request parameters
+     * @param response HTTP response 
+     */
+    private void handleSubscriptionUpdateRequest(HashMap parms, HttpServletResponse response) {
+        if (authenticate(ServletContextUtil.getServletContextPath() 
+                + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
+                InitAppUtil.getConf().getKeystorePass(), Frame.getSigFile(parms),
+                Frame.getTimestamp(parms))) {
+            try {
+                log.info(Frame.getNodeName(parms) + " updated subscription status");
+                Subscription sub = (Subscription) readObjectFromFile(Frame.getPayloadFile(parms));
+                // Create new subscription object
+
+                Subscription s = new Subscription(System.currentTimeMillis(),
+                    sub.getUserName(), sub.getDataSourceName(),
+                    sub.getOperatorName(), Subscription.SUBSCRIPTION_UPLOAD,
+                    false, false, sub.getNodeAddress());
+                // This subscription object serves asa confirrmation
+                Subscription confirmedSub = new Subscription();
+                if (sub.getActive()) {
+                    if (subscriptionManager.get(s.getUserName(), s.getDataSourceName(), 
+                            Subscription.SUBSCRIPTION_UPLOAD) == null) {
+                        // Subscription doesn't exist in the database - add as new subscription
+                        subscriptionManager.save(s);
+                        confirmedSub = s;
+                        confirmedSub.setActive(true);
+                        log.info("User " + s.getUserName() + " subscribed " + s.getDataSourceName());
+                    } else {
+                        // Subscription exists in the database - update subscription
+
+                        subscriptionManager.update(s.getDataSourceName(), 
+                                Subscription.SUBSCRIPTION_UPLOAD, true);
+                        confirmedSub = s;
+                        confirmedSub.setActive(true);
+                        log.info("User " + s.getUserName() + " subscribed " + s.getDataSourceName());
+                    }                    
+                } else {
+                    // Delete remote subscription
+                    int ii = subscriptionManager.delete(s.getUserName(), s.getDataSourceName(), s.getType());
+                    confirmedSub = s;
+                    log.info("User " + s.getUserName() + " cancelled subscription of "
+                            + s.getDataSourceName());
+                }
+                // Send response
+                response.setStatus(HttpServletResponse.SC_OK);
+                User user = userManager.getByName(Frame.getNodeName(parms));
+                long timestamp = System.currentTimeMillis();
+                byte[] sigBytes = getSignatureBytes(
+                    ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                    InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
+                    timestamp); 
+                SerialFrame serialFrame = SerialFrame.postSubscriptionUpdateResponse(
+                        user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
+                        InitAppUtil.getConf().getNodeName(), timestamp, sigBytes, confirmedSub);
+                writeObjectToStream(response, serialFrame);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                log.error("Failed to handle subscription update request", e);
+            }
+        } else {
+            log.error("Failed to authenticate frame");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+    }
+    /**
+     * Handles data delivery request.
+     * 
+     * @param parms Request parameters
+     * @param response HTTP response 
+     */
+    private void handleDataDeliveryRequest(HashMap parms, HttpServletResponse response) {
+        if (authenticate(ServletContextUtil.getServletContextPath() 
+                + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
+                InitAppUtil.getConf().getKeystorePass(), Frame.getSigFile(parms),
+                Frame.getTimestamp(parms))) {
+            try {
+                log.info("New data frame received from " + Frame.getNodeName(parms));
+                File payloadFile = Frame.getPayloadFile(parms);
+                FileEntry fileEntry = null;
+                fileEntry = fileCatalog.store(payloadFile.getAbsolutePath());
+                IncomingFileNamer namer = new IncomingFileNamer();
+                String friendlyName = namer.name(fileEntry);
+                log.info(friendlyName + " stored with UUID " + fileEntry.uuid());
+                // Send message to the Beast framework
+                BltDataMessage message = new BltDataMessage();
+                message.setFileEntry(fileEntry.clone());
+                bltMessageManager.manage(message);
+                Oh5MetadataMatcher metadataMatcher = new Oh5MetadataMatcher();
+                // Iterate through subscriptions list to send data to the users
+                List<Subscription> subs = subscriptionManager.get(Subscription.SUBSCRIPTION_UPLOAD);
+                for (Subscription sub : subs) {
+                    // Check if file entry matches the subscribed data source's filter
+                    String dataSourceName = sub.getDataSourceName();
+                    IFilter filter = bltFileManager.getFilter(dataSourceName);
+                    boolean matches = metadataMatcher.match(fileEntry.metadata(), 
+                            filter.getExpression());
+                    // Make sure that user exists locally
+                    User receiver = userManager.getByName(sub.getUserName());
+                    DeliveryRegisterEntry dre = deliveryRegisterManager.getEntry(
+                            receiver.getId(), fileEntry.uuid());
+                    if (matches && dre == null) {
+                        long timestamp = System.currentTimeMillis();
+                        File sigFile = saveSignatureToFile( getSignatureBytes(
+                            ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                            InitAppUtil.getConf().getCertAlias(), 
+                            InitAppUtil.getConf().getKeystorePass(), 
+                            timestamp), InitAppUtil.getWorkDir());
+                        Frame frame = Frame.postDataDeliveryRequest(receiver.getNodeAddress(), 
+                            InitAppUtil.getConf().getNodeAddress(),
+                            InitAppUtil.getConf().getNodeName(), timestamp, sigFile, payloadFile);
+                        // Create frame delivery task
+                        HandleFrameTask task = new HandleFrameTask(getDeliveryRegisterManager(),
+                            log, receiver, fileEntry, frame);
+                        // Add task to publisher manager
+                        framePublisherManager.getFramePublisher(
+                                receiver.getName()).addTask(task);
+                    }
+                }
+                // delete temporary files here
+                
+                
+                
+                response.setStatus(HttpServletResponse.SC_OK);
+            } catch (DuplicateEntry e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                log.error("Duplicate entry error", e);
+            } catch (FileCatalogError e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                log.error("File catalog error", e);
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            log.error("Failed to authenticate frame");
+        }
+    }
+    /**
+     * Handles message delivery request.
+     * 
+     * @param parms Request parameters
+     * @param response HTTP response 
+     */
+    private void handleMessageDeliveryRequest(HashMap parms, HttpServletRequest request) {
+        
+    }
+    
+    private void postDataDeliveryRequest() {}
+    
     /**
      * Method gets reference to user manager object.
      *
@@ -897,11 +664,24 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     public void setBltFileManager( BltFileManager bltFileManager ) {
         this.bltFileManager = bltFileManager;
     }
-
+    /**
+     * 
+     * @return 
+     */
     public FileCatalog getFileCatalog() { return fileCatalog; }
+    /**
+     * 
+     * @param fileCatalog 
+     */
+    public void setFileCatalog(FileCatalog fileCatalog) { this.fileCatalog = fileCatalog; }
+    /**
+     * @return the certificateManager
+     */
+    public CertManager getCertManager() { return certManager; }
 
-    public void setFileCatalog(FileCatalog fileCatalog) {
-        this.fileCatalog = fileCatalog;
-    }
+    /**
+     * @param certificateManager the certificateManager to set
+     */
+    public void setCertManager(CertManager certManager) { this.certManager = certManager; }
 }
 //--------------------------------------------------------------------------------------------------

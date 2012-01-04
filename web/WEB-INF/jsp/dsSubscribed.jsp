@@ -22,55 +22,36 @@ Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
+   "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Connect to data source</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
-            </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/exchangeTab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/exchangeMenu.jsp"%>
-                    </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            Connect to data source
-                        </div>
-                        <div class="blttext">
-                            Data source subscription status.
-                        </div>
-                        <div class="table">
-                            <div class="addradar">
-                                <%@include file="/WEB-INF/jsp/genericMessages.jsp"%>
-                                <div class="tablefooter">
-                                   <div class="buttons">
-                                       <button class="rounded" type="button"
-                                            onclick="window.location.href='showSubscriptions.htm'">
-                                            <span>OK</span>
-                                       </button>
-                                   </div>
-                               </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<t:page_tabbed pageTitle="Connect" activeTab="exchange">
+    <jsp:body>
+        <div class="left">
+            <t:menu_exchange/>
         </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
-        </div>
-    </body>
-</html>
+        <div class="right">
+            <div class="blttitle">
+                <img src="includes/images/icons/connection.png" alt="">
+                Connected to <c:out value="${remoteNodeName}"/>
+            </div>
+            <div class="blttext">
+                Data source subscription status.
+            </div>
+            <div class="table">
+                <div class="addradar">
+                    <%@include file="/WEB-INF/jsp/genericMessages.jsp"%>
+                    <div class="tablefooter">
+                       <div class="buttons">
+                           <button class="rounded" type="button"
+                                onclick="window.location.href='showSubscriptions.htm'">
+                                <span>OK</span>
+                           </button>
+                       </div>
+                   </div>
+                </div>
+            </div>                
+        </div>      
+    </jsp:body>
+</t:page_tabbed>

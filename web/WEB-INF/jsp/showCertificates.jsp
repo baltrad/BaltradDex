@@ -16,104 +16,100 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 ----------------------------------------------------------------------------------------------------
-Document   : Subscription management page
-Created on : Sep 30, 2010, 16:34 PM
+Document   : Certificate management page
+Created on : Dec 13, 2011, 10:00 PM
 Author     : szewczenko
 --------------------------------------------------------------------------------------------------%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
-
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@ page import="java.util.List" %>
+
+<%@page import="java.util.List" %>
 <%
-    // Check if list of available subscriptions is not empty
-    List avSubs = ( List )request.getAttribute( "subscriptions" );
-    if( avSubs == null || avSubs.size() <= 0 ) {
-        request.getSession().setAttribute( "av_subs_status", 0 );
+    List certs = (List)request.getAttribute("allCerts");
+    if(certs == null || certs.size() <= 0) {
+        request.getSession().setAttribute("certs_status", 0);
     } else {
-        request.getSession().setAttribute( "av_subs_status", 1 );
+        request.getSession().setAttribute("certs_status", 1);
     }
 %>
 
-<t:page_tabbed pageTitle="Subscriptions" activeTab="exchange">
+<t:page_tabbed pageTitle="Certificate management" activeTab="settings">
     <jsp:body>
         <div class="left">
-            <t:menu_exchange/>
+            <t:menu_settings/>
         </div>
         <div class="right">
             <div class="blttitle">
-                Subscription management
+                Certificate management
             </div>
             <c:choose>
-                <c:when test="${av_subs_status == 1}">
+                <c:when test="${certs_status == 1}">
                     <div class="blttext">
-                        Click on a check box to start or cancel subscription of a 
-                        selected data source.
+                        List of submitted certificates. Click certificate alias for details.
+                        Use check boxes to accept or revoke a certificate.
                     </div>
-                    <div class="table">
-                        <div class="subscriptions">
-                            <form action="showSelectedSubscriptions.htm" method="post">
+                    <form method="post">
+                        <div class="table">
+                            <%@include file="/WEB-INF/jsp/formMessages.jsp"%>
+                            <div class="certs">
                                 <div class="tableheader">
                                     <div id="cell" class="count">&nbsp;</div>
-                                    <div id="cell" class="name">
-                                        Data source
+                                    <div id="cell" class="alias">
+                                        Certificate alias
                                     </div>
-                                    <div id="cell" class="operator">
-                                        Operator
-                                    </div>
-                                    <div id="cell" class="active">
-                                        Status
+                                    <div id="cell" class="check">
+                                        Trusted
                                     </div>
                                 </div>
                                 <c:set var="count" scope="page" value="1"/>
-                                <c:forEach items="${subscriptions}" var="sub">
+                                <c:forEach var="cert" items="${allCerts}">
                                     <div class="entry">
                                         <div id="cell" class="count">
                                             <c:out value="${count}"/>
                                             <c:set var="count" value="${count + 1}"/>
                                         </div>
-                                        <div id="cell" class="name">
-                                            <c:out value="${sub.dataSourceName}"/>
+                                        <div id="cell" class="alias">
+                                            <a href="showCertificateDetails.htm?certId=${cert.id}" 
+                                               title="Show certificate details">
+                                                <c:out value="${cert.alias}"/>
+                                            </a>
                                         </div>
-                                        <div id="cell" class="operator">
-                                            <c:out value="${sub.operatorName}"/>
-                                        </div>
-                                        <div id="cell" class="active">
+                                        <div id="cell" class="check">
                                             <c:choose>
-                                                <c:when test="${sub.active == true}">
-                                                    <input type="checkbox" name="selectedDataSources"
-                                                        value="${sub.dataSourceName}" checked/>
+                                                <c:when test="${cert.trusted == true}">
+                                                    <input type="checkbox" name="trustedCerts"
+                                                           title="Trust/revoke certificate" 
+                                                           value="${cert.id}" checked>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <input type="checkbox" name="selectedDataSources"
-                                                        value="${sub.dataSourceName}"/>
-                                                </c:otherwise>
-                                            </c:choose>
+                                                    <input type="checkbox" name="trustedCerts"
+                                                           title="Trust/revoke certificate"
+                                                           value="${cert.id}">    
+                                                </c:otherwise>    
+                                            </c:choose>    
                                         </div>
                                     </div>
                                 </c:forEach>
                                 <div class="tablefooter">
                                     <div class="buttons">
                                         <button class="rounded" type="submit">
-                                            <span>OK</span>
+                                            <span>Save</span>
                                         </button>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
-                    </div>
+                    </form>                
                 </c:when>
                 <c:otherwise>
                     <div class="blttext">
-                        List of subscribed data sources is currently empty.
-                        Use node connection functionality to add new data sources.
+                        No submitted certificates have been found.
                     </div>
                     <div class="table">
                         <div class="tablefooter">
                             <div class="buttons">
                                 <button class="rounded" type="button"
-                                    onclick="window.location.href='connectToNode.htm'">
+                                        onclick="window.location.href='settings.htm'">
                                     <span>OK</span>
                                 </button>
                             </div>
@@ -122,6 +118,5 @@ Author     : szewczenko
                 </c:otherwise>
             </c:choose>
         </div>
-    </jsp:body>    
-</t:page_tabbed>        
-  
+    </jsp:body>
+</t:page_tabbed>

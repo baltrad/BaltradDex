@@ -71,9 +71,10 @@ Author     : szewczenko
                 </li>
                 <li>
                     <img src="includes/images/icons/connection.png" alt="">
-                    <a href="#">Connections</a>
+                    <a href="#">Exchange</a>
                     <ul>
-                        <li><a href="removeNodeConnections.htm">Remove</a></li>
+                        <li><a href="showCertificates.htm">Certificates</a></li>
+                        <li><a href="removeNodeConnections.htm">Connections</a></li>
                     </ul>
                 </li>
                 <li>

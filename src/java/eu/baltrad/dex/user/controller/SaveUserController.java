@@ -71,7 +71,7 @@ public class SaveUserController extends SimpleFormController {
         User user = null;
         if( request.getParameter( USER_ID ) != null
                 && request.getParameter( USER_ID ).trim().length() > 0 ) {
-            user = userManager.getUserById( Integer.parseInt( request.getParameter( USER_ID ) ) );
+            user = userManager.get( Integer.parseInt( request.getParameter( USER_ID ) ) );
         } else {
             user = new User();
         }

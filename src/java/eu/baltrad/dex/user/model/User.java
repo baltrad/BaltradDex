@@ -22,7 +22,6 @@
 package eu.baltrad.dex.user.model;
 
 import eu.baltrad.dex.util.MessageDigestUtil;
-import eu.baltrad.dex.util.NodeAddress;
 
 /**
  * Class implements user object.
@@ -31,7 +30,7 @@ import eu.baltrad.dex.util.NodeAddress;
  * @version 1.0
  * @since 1.0
  */
-public class User extends NodeAddress {
+public class User {
 //---------------------------------------------------------------------------------------- Constants
     // Role key values
     public final static String ROLE_ADMIN = "admin";
@@ -45,14 +44,12 @@ public class User extends NodeAddress {
     private String roleName;
     private String password;
     private String confirmPassword;
-    private String factory;
-    private String country;
-    private String city;
-    private String cityCode;
-    private String street;
-    private String number;
-    private String phone;
-    private String email;
+    private String organizationName;
+    private String organizationUnit;
+    private String localityName;
+    private String stateName;
+    private String countryCode;
+    private String nodeAddress;
     private boolean checked;
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -70,100 +67,90 @@ public class User extends NodeAddress {
         this.password = password;
     }
     /**
-     * Constructor creates user object with field values provided as parameters.
-     *
-     * @param id User ID
-     * @param name User name
-     * @param nameHash User name hash
-     * @param roleName User role name
-     * @param password Password
-     * @param confirmPassword Password confirmed
-     * @param shortAddress User node's short address
-     * @param portNumber Port number
-     * @param factory Name of the organization
-     * @param country Country
-     * @param city City
-     * @param cityCode City code
-     * @param street Street name
-     * @param number Address number
-     * @param phone Phone number
-     * @param email Contact email
-     * @param scheme Communication scheme
-     * @param hostAddress Host address
-     * @param port Port number
-     * @param appCtx Application context
-     * @param entryAddress Entry point address
+     * 
+     * @param id
+     * @param name
+     * @param nameHash
+     * @param roleName
+     * @param password
+     * @param confirmPassword
+     * @param organizationName
+     * @param organizationUnit
+     * @param localityName
+     * @param stateName
+     * @param countryCode
+     * @param nodeAddress 
      */
-    public User( int id, String name, String nameHash, String roleName, String password,
-            String confirmPassword, String factory, String country, String city, String cityCode,
-            String street, String number, String phone, String email, String scheme,
-            String hostAddress, int port, String appCtx, String entryAddress ) {
+    public User(int id, String name, String nameHash, String roleName, String password,
+            String confirmPassword, String organizationName, String organizationUnit, 
+            String localityName, String stateName, String countryCode, String nodeAddress) {
         this.id = id;
         this.name = name;
         this.nameHash = nameHash;
         this.roleName = roleName;
         this.password = password;
         this.confirmPassword = confirmPassword;
-        this.factory = factory;
-        this.country = country;
-        this.city = city;
-        this.cityCode = cityCode;
-        this.street = street;
-        this.number = number;
-        this.phone = phone;
-        this.email = email;
-        this.scheme = scheme;
-        this.hostAddress = hostAddress;
-        this.port = port;
-        this.appCtx = appCtx;
-        this.entryAddress = entryAddress;
+        this.organizationName = organizationName;
+        this.organizationUnit = organizationUnit;
+        this.localityName = localityName;
+        this.stateName = stateName;
+        this.countryCode = countryCode;
+        this.nodeAddress = nodeAddress;
     }
     /**
-     * Constructor creates user object with field values provided as parameters.
-     *
-     * @param id User ID
-     * @param name User name
-     * @param nameHash User name hash
-     * @param roleName User role name
-     * @param password Password
-     * @param shortAddress User node's short address
-     * @param portNumber Port number
-     * @param factory Name of the organization
-     * @param country Country
-     * @param city City
-     * @param cityCode City code
-     * @param street Street name
-     * @param number Address number
-     * @param phone Phone number
-     * @param email Contact email
-     * @param scheme Communication scheme
-     * @param hostAddress Host address
-     * @param port Port number
-     * @param appCtx Application context
-     * @param entryAddress Entry point address
+     * 
+     * @param id
+     * @param name
+     * @param nameHash
+     * @param roleName
+     * @param password
+     * @param organizationName
+     * @param organizationUnit
+     * @param localityName
+     * @param stateName
+     * @param countryCode
+     * @param nodeAddress 
      */
-    public User( int id, String name, String nameHash, String roleName, String password, 
-            String factory, String country, String city, String cityCode, String street,
-            String number, String phone, String email, String scheme, String hostAddress,
-            int port, String appCtx, String entryAddress ) {
+    public User(int id, String name, String nameHash, String roleName, String password, 
+            String organizationName, String organizationUnit, String localityName, String stateName, 
+            String countryCode, String nodeAddress ) {
         this.id = id;
         this.name = name;
         this.nameHash = nameHash;
         this.roleName = roleName;
         this.password = password;
-        this.factory = factory;
-        this.country = country;
-        this.city = city;
-        this.cityCode = cityCode;
-        this.street = street;
-        this.number = number;
-        this.phone = phone;
-        this.email = email;
-        this.scheme = scheme;
-        this.hostAddress = hostAddress;
-        this.port = port;
-        this.appCtx = appCtx;
-        this.entryAddress = entryAddress;
+        this.organizationName = organizationName;
+        this.organizationUnit = organizationUnit;
+        this.localityName = localityName;
+        this.stateName = stateName;
+        this.countryCode = countryCode;
+        this.nodeAddress = nodeAddress;
+    }
+    /**
+     * 
+     * 
+     * @param name
+     * @param nameHash
+     * @param roleName
+     * @param organizationName
+     * @param organizationUnit
+     * @param localityName
+     * @param stateName
+     * @param countryCode
+     * @param nodeAddress 
+     */
+    public User(String name, String nameHash, String roleName, String organizationName, 
+            String organizationUnit, String localityName, String stateName, String countryCode, 
+            String nodeAddress ) {
+        this.name = name;
+        this.nameHash = nameHash;
+        this.roleName = roleName;
+        this.organizationName = organizationName;
+        this.organizationUnit = organizationUnit;
+        this.localityName = localityName;
+        this.stateName = stateName;
+        this.countryCode = countryCode;
+        this.nodeAddress = nodeAddress;
     }
     /**
      * Gets user id.
@@ -244,123 +231,6 @@ public class User extends NodeAddress {
         this.confirmPassword = MessageDigestUtil.createHash( confirmPassword );
     }
     /**
-     * Gets organization name.
-     * 
-     * @return Organization name
-     */
-    public String getFactory() { return factory; }
-    /**
-     * Sets organization name.
-     * 
-     * @param factory Organization name to set
-     */
-    public void setFactory( String factory ) { this.factory = factory; }
-    /**
-     * Gets name of the country.
-     * 
-     * @return Name of the country
-     */
-    public String getCountry() { return country; }
-    /**
-     * Sets name of the country.
-     * 
-     * @param country Name of the country to set
-     */
-    public void setCountry( String country ) { this.country = country; }
-
-    
-    
-    
-    
-    /**
-     * @return the city
-     */
-    public String getCity() {
-        return city;
-    }
-
-    /**
-     * @param city the city to set
-     */
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    /**
-     * @return the zipCode
-     */
-    public String getCityCode() {
-        return cityCode;
-    }
-
-    /**
-     * @param zipCode the zipCode to set
-     */
-    public void setCityCode(String cityCode) {
-        this.cityCode = cityCode;
-    }
-
-    /**
-     * @return the street
-     */
-    public String getStreet() {
-        return street;
-    }
-
-    /**
-     * @param street the street to set
-     */
-    public void setStreet(String street) {
-        this.street = street;
-    }
-
-    /**
-     * @return the number
-     */
-    public String getNumber() {
-        return number;
-    }
-
-    /**
-     * @param number the number to set
-     */
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    /**
-     * @return the phone
-     */
-    public String getPhone() {
-        return phone;
-    }
-
-    /**
-     * @param phone the phone to set
-     */
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    /**
-     * @return the email
-     */
-    public String getEmail() {
-        return email;
-    }
-
-    /**
-     * @param email the email to set
-     */
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    
-
-    
-
-    /**
      * @return the checked
      */
     public boolean isChecked() {
@@ -372,6 +242,90 @@ public class User extends NodeAddress {
      */
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    /**
+     * @return the organizationName
+     */
+    public String getOrganizationName() {
+        return organizationName;
+    }
+
+    /**
+     * @param organizationName the organizationName to set
+     */
+    public void setOrganizationName(String organizationName) {
+        this.organizationName = organizationName;
+    }
+
+    /**
+     * @return the organizationUnit
+     */
+    public String getOrganizationUnit() {
+        return organizationUnit;
+    }
+
+    /**
+     * @param organizationUnit the organizationUnit to set
+     */
+    public void setOrganizationUnit(String organizationUnit) {
+        this.organizationUnit = organizationUnit;
+    }
+
+    /**
+     * @return the localityName
+     */
+    public String getLocalityName() {
+        return localityName;
+    }
+
+    /**
+     * @param localityName the localityName to set
+     */
+    public void setLocalityName(String localityName) {
+        this.localityName = localityName;
+    }
+
+    /**
+     * @return the stateName
+     */
+    public String getStateName() {
+        return stateName;
+    }
+
+    /**
+     * @param stateName the stateName to set
+     */
+    public void setStateName(String stateName) {
+        this.stateName = stateName;
+    }
+
+    /**
+     * @return the countryCode
+     */
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    /**
+     * @param countryCode the countryCode to set
+     */
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    /**
+     * @return the nodeAddress
+     */
+    public String getNodeAddress() {
+        return nodeAddress;
+    }
+
+    /**
+     * @param nodeAddress the nodeAddress to set
+     */
+    public void setNodeAddress(String nodeAddress) {
+        this.nodeAddress = nodeAddress;
     }
 }
 //--------------------------------------------------------------------------------------------------

@@ -25,147 +25,88 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@ page import="java.util.List" %>
-<%
-    // Check if remote data sources list is not null
-    List remoteDataSources = ( List )request.getAttribute( "remoteDataSources" );
-    if( remoteDataSources == null ) {
-        // remote node is unavailable
-        request.getSession().setAttribute( "remote_node_status", 0 );
-    } else if( remoteDataSources.size() == 0 ) {
-        // remote node is available, but no permissions on data sources have been set
-        request.getSession().setAttribute( "remote_node_status", 1 );
-    } else {
-        // remote node is available
-        request.getSession().setAttribute( "remote_node_status", 2 );
-    }
-    // Get remote node name
-    String remoteNodeName = ( String )request.getAttribute( "sender_node_name" );
-    if( remoteNodeName != null && !remoteNodeName.isEmpty() ) {
-        remoteNodeName = " at " + remoteNodeName;
-    } else {
-        remoteNodeName = "";
-    }
-%>
 
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Connect to data source</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
+<t:page_tabbed pageTitle="Connect" activeTab="exchange">
+    <jsp:body>
+        <div class="left">
+            <t:menu_exchange/>
+        </div>
+        <div class="right">
+            <div class="blttitle">
+                <img src="includes/images/icons/connection.png" alt="">
+                Connected to <c:out value="${remoteNodeName}"/>
             </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/exchangeTab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/exchangeMenu.jsp"%>
+            <c:choose>
+                <c:when test="${not empty errorMsg}">
+                    <div class="blttext">
+                        <c:out value="${errorMsg}"/>
                     </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            Remote data sources available <%= remoteNodeName %>
+                    <div class="table">
+                        <div class="tablefooter">
+                            <div class="buttons">
+                                <button class="rounded" type="button"
+                                        onclick="window.location.href='connectToNode.htm'">
+                                    <span>OK</span>
+                                </button>
+                            </div>
                         </div>
-                        <c:choose>
-                            <c:when test="${remote_node_status == 2}">
-                                <div class="blttext">
-                                    List of remote data sources. Subscribe a desired data source
-                                    by selecting a corresponding check box.
-                                </div>
-                                <div class="table">
-                                    <div class="dsconnect">
-                                        <form action="dsToConnect.htm" method="post">
-                                            <div class="tableheader">
-                                                <div id="cell" class="count">&nbsp;</div>
-                                                <div id="cell" class="name">
-                                                    Name
-                                                </div>
-                                                <div id="cell" class="description">
-                                                    Description
-                                                </div>
-                                                <div id="cell" class="check">
-                                                    Select
-                                                </div>
-                                            </div>
-                                            <c:set var="count" scope="page" value="1"/>
-                                            <c:forEach items="${remoteDataSources}" var="dataSource">
-                                                <div class="entry">
-                                                    <div id="cell" class="count">
-                                                        <c:out value="${count}"/>
-                                                        <c:set var="count" value="${count + 1}"/>
-                                                    </div>
-                                                    <div id="cell" class="name">
-                                                        <c:out value="${dataSource.name}"/>
-                                                    </div>
-                                                    <div id="cell" class="description">
-                                                        <c:out value="${dataSource.description}"/>
-                                                    </div>
-                                                    <div id="cell" class="check">
-                                                        <input type="checkbox" name="selectedDataSources"
-                                                            value="${dataSource.name}"/>
-                                                    </div>
-                                                </div>
-                                            </c:forEach>
-                                            <div class="tablefooter">
-                                                <div class="buttons">
-                                                    <button class="rounded" type="submit">
-                                                        <span>OK</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </c:when>
-                            <c:when test="${remote_node_status == 1}">
-                                <div class="blttext">
-                                    You have successfully connected to the remote node, but you
-                                    don't seem to be allowed to subscribe any data sources at
-                                    this node.
-                                    <br><br>
-                                    Ask remote node administrator to make data sources available for
-                                    you to subscribe.
-                                </div>
-                                <div class="table">
-                                    <div class="tablefooter">
-                                        <div class="buttons">
-                                            <button class="rounded" type="button"
-                                                onclick="window.location.href='connectToNode.htm'">
-                                                <span>Back</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <div class="blttext">
-                                    Failed to access remote node. Check your user name
-                                    and/or password. In case the problem persists,
-                                    contact remote node administrator.
-                                </div>
-                                <div class="table">
-                                    <div class="tablefooter">
-                                        <div class="buttons">
-                                            <button class="rounded" type="button"
-                                                onclick="window.location.href='connectToNode.htm'">
-                                                <span>Back</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
+                    </div>    
+                </c:when>
+                <c:otherwise>
+                    <div class="blttext">
+                        Data sources available at <c:out value="${remoteNodeName}"/>. 
+                        Subscribe a desired data source by selecting a corresponding check box.
                     </div>
-                </div>
-            </div>
-        </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
-        </div>
-    </body>
-</html>
+                    <div class="table">
+                        <div class="dsconnect">
+                            <form action="dsToConnect.htm" method="post">
+                                <div class="tableheader">
+                                    <div id="cell" class="count">&nbsp;</div>
+                                    <div id="cell" class="name">
+                                        Name
+                                    </div>
+                                    <div id="cell" class="description">
+                                        Description
+                                    </div>
+                                    <div id="cell" class="check">
+                                        Select
+                                    </div>
+                                </div>
+                                <c:set var="count" scope="page" value="1"/>
+                                <c:forEach items="${remoteDataSources}" var="dataSource">
+                                    <div class="entry">
+                                        <div id="cell" class="count">
+                                            <c:out value="${count}"/>
+                                            <c:set var="count" value="${count + 1}"/>
+                                        </div>
+                                        <div id="cell" class="name">
+                                            <c:out value="${dataSource.name}"/>
+                                        </div>
+                                        <div id="cell" class="description">
+                                            <c:out value="${dataSource.description}"/>
+                                        </div>
+                                        <div id="cell" class="check">
+                                            <input type="checkbox" name="selectedDataSources"
+                                                value="${dataSource.name}"/>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                                <div class="tablefooter">
+                                    <div class="buttons">
+                                        <button class="rounded" type="button"
+                                                onclick="window.location.href='connectToNode.htm'">
+                                            <span>Back</span>
+                                        </button>
+                                        <button class="rounded" type="submit">
+                                            <span>OK</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </c:otherwise>
+            </c:choose>
+        </div>      
+    </jsp:body>
+</t:page_tabbed>

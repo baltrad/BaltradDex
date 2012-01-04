@@ -257,6 +257,71 @@ BEGIN
     EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'Failed to create index dex_delivery_register_timestamp_idx';
     END;
+    BEGIN
+        CREATE SEQUENCE certificate_id_seq;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create sequence "certificate_id_seq"';
+    END;
+    BEGIN
+        CREATE TABLE dex_certificates
+        (
+            id SERIAL NOT NULL,
+            cert_alias VARCHAR(128) NOT NULL UNIQUE,
+            cert_file_path VARCHAR(256) NOT NULL,
+            trusted BOOLEAN DEFAULT false,
+            PRIMARY KEY (id)
+        );
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'failed to create table "dex_certificates"';
+    END;
+    BEGIN
+        DROP TABLE IF EXISTS dex_node_connection_address;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to drop table dex_node_connection_address';
+    END;
+    BEGIN
+        ALTER TABLE dex_node_connections DROP COLUMN name;
+        ALTER TABLE dex_node_connections DROP COLUMN user_name;
+        ALTER TABLE dex_node_connections DROP COLUMN password;
+        ALTER TABLE dex_node_connections ADD COLUMN node_name VARCHAR(128) NOT NULL UNIQUE;
+        ALTER TABLE dex_node_connections ADD COLUMN node_address VARCHAR(256) NOT NULL;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to alter table dex_node_connections';
+    END;
+    BEGIN
+        ALTER TABLE dex_users DROP COLUMN factory;
+        ALTER TABLE dex_users DROP COLUMN country;
+        ALTER TABLE dex_users DROP COLUMN city;
+        ALTER TABLE dex_users DROP COLUMN city_code;
+        ALTER TABLE dex_users DROP COLUMN street;
+        ALTER TABLE dex_users DROP COLUMN number;
+        ALTER TABLE dex_users DROP COLUMN phone;
+        ALTER TABLE dex_users DROP COLUMN email;
+        ALTER TABLE dex_users ADD COLUMN org_name VARCHAR(256) NOT NULL;
+        ALTER TABLE dex_users ADD COLUMN org_unit VARCHAR(256) NOT NULL;
+        ALTER TABLE dex_users ADD COLUMN locality VARCHAR(64) NOT NULL;
+        ALTER TABLE dex_users ADD COLUMN state VARCHAR(64) NOT NULL;
+        ALTER TABLE dex_users ADD COLUMN country_code VARCHAR(2) NOT NULL;
+        ALTER TABLE dex_users ADD COLUMN node_address VARCHAR(256) NOT NULL;
+        ALTER TABLE dex_users ALTER COLUMN password DROP NOT NULL;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to alter table dex_users';
+    END;
+    BEGIN
+        DROP TABLE IF EXISTS dex_subscription_address;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to drop table dex_subscription_address';
+    END;
+    BEGIN
+        ALTER TABLE dex_subscriptions ADD COLUMN node_address VARCHAR(256) NOT NULL;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to alter table dex_subscriptions';
+    END;
+    BEGIN
+        DROP TABLE IF EXISTS dex_node_address;
+    EXCEPTION
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to drop table dex_node_address';
+    END;
 END;
 $$ LANGUAGE plpgsql;
 
