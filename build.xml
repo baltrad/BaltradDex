@@ -223,6 +223,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </fileset>
       <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java/libs">
         <include name="commons-lang3-3.1.jar"/>
+	<include name="joda-time-2.0.jar"/>
       </fileset>
       <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java/">
         <include name="*.jar"/>
