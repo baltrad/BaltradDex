@@ -109,7 +109,6 @@ public class RemoteDataSourceController extends MultiActionController {
     private SubscriptionManager subscriptionManager;
     private NodeConnectionManager connMgr;
     private Logger log;
-    private InitAppUtil init;
     // remote data source object list
     private List<DataSource> remoteDataSources;
     // selected data source list

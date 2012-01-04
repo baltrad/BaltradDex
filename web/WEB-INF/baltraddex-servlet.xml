@@ -975,6 +975,18 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- rule property manager-->
     <bean id="rulepropertymanager" class="eu.baltrad.beast.rules.PropertyManager" autowire="byType"/>
 
+    <!-- The log message repository -->
+    <bean id="logmessagerepository" class="eu.baltrad.beast.log.LogMessageRepository" autowire="byType">
+      <property name="filenames">
+        <list>
+          <value>classpath:beast-log-messages.xml</value>
+        </list>
+      </property>
+    </bean>
+
+    <!-- The beast reporter that will send error messages so that they are presented in dex system messages -->
+    <bean id="alertreporter" class="eu.baltrad.beast.log.AlertMessageReporter" autowire="byType" /> 
+
     <!-- Create the router -->
     <bean id="groovymgr" class="eu.baltrad.beast.rules.groovy.GroovyRuleManager" autowire="byType"/>
     <bean id="bltcompositemgr" class="eu.baltrad.beast.rules.composite.CompositingRuleManager" autowire="byType"/>
@@ -983,6 +995,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="bdbtrimagemgr" class="eu.baltrad.beast.rules.bdb.BdbTrimAgeRuleManager" autowire="byType"/>
     <bean id="bdbtrimcountmgr" class="eu.baltrad.beast.rules.bdb.BdbTrimCountRuleManager" autowire="byType"/>
 
+    <bean id="log4jalertmessagerule" class="eu.baltrad.beast.rules.system.Log4jAlertMessageRule" autowire="byType"/>
+    <bean id="systemrules" class="eu.baltrad.beast.router.SystemRulesDefinition">
+      <property name="rules">
+        <list>
+          <ref bean="log4jalertmessagerule"/>
+        </list>
+      </property>
+    </bean>
   
     <bean id="router" class="eu.baltrad.beast.router.impl.BltRouter" autowire="byType">
         <property name="ruleManagers">
@@ -1019,14 +1039,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="beastscheduler" class="eu.baltrad.beast.scheduler.BeastScheduler" autowire="byType"/>
 
     <!-- and the file catalog -->
-    <bean id="bdb_db" class="eu.baltrad.fc.Database" factory-method="create" destroy-method="delete">
+    <bean id="bdb_db" class="eu.baltrad.bdb.db.rest.RestfulDatabase" >
         <constructor-arg value="${database.uri}" />
     </bean>
-    <bean id="bdb_storage" class="eu.baltrad.fc.CacheDirStorage" init-method="init" destroy-method="delete">
+    <bean id="bdb_storage" class="eu.baltrad.bdb.storage.CacheDirStorage">
         <constructor-arg index="0" value="${data.storage.folder}" />
         <constructor-arg index="1" value="1000" /> <!-- cache size -->
     </bean>
-    <bean id="fileCatalog" class="eu.baltrad.fc.FileCatalog" destroy-method="delete">
+    <bean id="fileCatalog" class="eu.baltrad.bdb.FileCatalog">
         <constructor-arg ref="bdb_db" />
         <constructor-arg ref="bdb_storage" />
     </bean>

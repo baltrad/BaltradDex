@@ -29,7 +29,7 @@ import eu.baltrad.dex.bltdata.model.BltDataProjector;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 
-import eu.baltrad.fc.FileCatalog;
+import eu.baltrad.bdb.FileCatalog;
 
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.Group;
@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.UUID;
 import java.awt.geom.Point2D;
 
 /**
@@ -88,14 +89,12 @@ public class BltFileDetailsController implements Controller {
     private FileCatalog fileCatalog;
     private String successView;
     private Logger log;
-    private InitAppUtil init;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      */
     public BltFileDetailsController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        init = new InitAppUtil();
     }
     /**
      * Fetches detailed information about a file and prepares dataset image thumbs.
@@ -114,7 +113,7 @@ public class BltFileDetailsController implements Controller {
         // Determine data type
         String fileObject = bltFile.getType();
         // open file from storage dir
-        String filePath = fileCatalog.local_path_for_uuid(uuid);
+        String filePath = fileCatalog.getLocalPathForUuid(UUID.fromString(uuid)).toString();
         H5File h5File = bltDataProcessor.openH5File( filePath );
         HashMap model = new HashMap();
         // Process the file depending on file object / data type
@@ -211,8 +210,8 @@ public class BltFileDetailsController implements Controller {
                 BltDataset bltDataset = new BltDataset( datasetFullNames.get( i ),
                     whereGroup, quantity_val, nbins_val * 2, nbins_val * 2,
                     lat0_val, lon0_val, llLatLon.getY(), llLatLon.getX(), urLatLon.getY(),
-                    urLatLon.getX(), elangle_val, init.getConf().getWorkDir() +
-                    File.separator + init.getConf().getThumbsDir() + File.separator +
+                    urLatLon.getX(), elangle_val, InitAppUtil.getConf().getWorkDir() +
+                    File.separator + InitAppUtil.getConf().getThumbsDir() + File.separator +
                     uuid + datasetFullNames.get( i ).replaceAll( BltDataProcessor.H5_PATH_SEPARATOR,
                     "_" ) + BltDataProcessor.IMAGE_FILE_EXT );
 
@@ -220,7 +219,7 @@ public class BltFileDetailsController implements Controller {
                 bltDatasets.add( bltDataset );
 
                 // try to load thumb from disk before creating a new one
-                String thumbPath = init.getThumbsDir() + File.separator
+                String thumbPath = InitAppUtil.getThumbsDir() + File.separator
                     + uuid + datasetFullNames.get( i ).replaceAll(
                         BltDataProcessor.H5_PATH_SEPARATOR, "_" )  + BltDataProcessor.IMAGE_FILE_EXT;
 

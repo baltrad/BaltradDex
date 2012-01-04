@@ -53,6 +53,7 @@ public class LogManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    
     /** Logger */
     private Logger log;
 //------------------------------------------------------------------------------------------ Methods
@@ -61,25 +62,30 @@ public class LogManager {
      */
     public LogManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX ); // Probably not a good idea to send errors back to myself
     }
     /**
      * Adds log entry to the system log stored in the database
      *
      * @param event LogEntry
      */
-    public void addEntry( LogEntry entry ) {
+    public synchronized void addEntry( LogEntry entry ) {
         Connection conn = null;
         try {
             conn = jdbcConnectionManager.getConnection();
             Statement stmt = conn.createStatement();
+            String msg = entry.getMessage();
+            if (msg != null) {
+              msg = msg.replace('\'','"');
+            }
             String sql = "INSERT INTO dex_messages (timestamp, system, type, message) VALUES ('" +
                 entry.getTimeStamp() + "', '" + entry.getSystem() + "', '" + entry.getType() +
-                "', '" + entry.getMessage() + "');";
+                "', '" + msg + "');";
             stmt.executeUpdate( sql );
             stmt.close();
         } catch( Exception e ) {
-            log.error( "Failed to add log entry", e );
+          // We probably shouldn't send log messages if this goes wrong since we might end up here again
+          System.out.println("Failed to add log entry");
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -130,7 +136,7 @@ public class LogManager {
             }
             stmt.close();
         } catch( Exception e ) {
-            log.error( "Failed to select log entries", e );
+          log.error( "Failed to select log entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -160,7 +166,7 @@ public class LogManager {
             }
             stmt.close();
         } catch( Exception e ) {
-            log.error( "Failed to select log entries", e );
+          log.error( "Failed to select log entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -191,7 +197,7 @@ public class LogManager {
             }
             stmt.close();
         } catch( Exception e ) {
-            log.error( "Failed to select log entries", e );
+          log.error( "Failed to select log entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -212,7 +218,7 @@ public class LogManager {
             delete = stmt.executeUpdate( sql );
             stmt.close();
         } catch( Exception e ) {
-            log.error( "Failed to delete log entries", e );
+          log.error( "Failed to delete log entries", e );
         } finally {
             jdbcConnectionManager.returnConnection( conn );
         }
@@ -238,7 +244,7 @@ public class LogManager {
             stmt.execute( sql );
             stmt.close();
         } catch( Exception e ) {
-            log.error( "Failed to set message log trimmer", e );
+          log.error( "Failed to set message log trimmer", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -266,7 +272,7 @@ public class LogManager {
             stmt.execute( sql );
             stmt.close();
         } catch( Exception e ) {
-            log.error( "Failed to set message log trimmer", e );
+          log.error( "Failed to set message log trimmer", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );
@@ -287,7 +293,7 @@ public class LogManager {
             stmt.execute( sql );
             stmt.close();
         } catch( Exception e ) {
-            log.error( "Failed to remove message log trimmer", e );
+          log.error( "Failed to remove message log trimmer", e );
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection( conn );

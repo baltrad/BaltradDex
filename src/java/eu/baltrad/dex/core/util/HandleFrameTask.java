@@ -27,7 +27,7 @@ import eu.baltrad.frame.model.Frame;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.InitAppUtil;
 
-import eu.baltrad.fc.FileEntry;
+import eu.baltrad.bdb.db.FileEntry;
 
 import org.apache.log4j.Logger;
 import org.apache.http.HttpResponse;

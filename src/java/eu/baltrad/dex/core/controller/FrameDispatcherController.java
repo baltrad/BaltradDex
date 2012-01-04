@@ -43,11 +43,10 @@ import eu.baltrad.dex.util.ServletContextUtil;
 import eu.baltrad.dex.core.model.Cert;
 import eu.baltrad.dex.core.model.CertManager;
 
-import eu.baltrad.fc.FileCatalog;
-import eu.baltrad.fc.FileEntry;
-import eu.baltrad.fc.DuplicateEntry;
-import eu.baltrad.fc.FileCatalogError;
-import eu.baltrad.fc.Oh5MetadataMatcher;
+import eu.baltrad.bdb.FileCatalog;
+import eu.baltrad.bdb.db.FileEntry;
+import eu.baltrad.bdb.db.DuplicateEntry;
+import eu.baltrad.bdb.oh5.MetadataMatcher;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;

@@ -85,13 +85,16 @@ public class AppConfiguration extends NodeAddress {
      * @param email Node admin's email
      * @param keystorePass Keystore password  
      * @param certAlias Certificate alias
+<<<<<<< HEAD
      * @param certsDir Certificates directory
+=======
+>>>>>>> 1b17003392a5b172e56844f403f95c350eeb4a13
      */
     public AppConfiguration( String nodeName, String nodeType, String version, String scheme,
             String hostAddress, int port, String appCtx, String entryAddress, int soTimeout,
             int connTimeout, String workDir, String imagesDir, String thumbsDir, String organization,
-            String address, String timeZone, String email, String keystorePass, 
-            String certAlias, String certsDir  ) {
+            String address, String timeZone, String email, String keystorePass,
+            String certAlias, String certsDir) {
         this.nodeName = nodeName;
         this.nodeType = nodeType;
         this.version = version;

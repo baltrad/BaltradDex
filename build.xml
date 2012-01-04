@@ -80,12 +80,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
   <property name="beast.path" value="/opt/baltrad/beast" />
 
-  <available file="${baltrad.db.path}/share/baltrad-db/java/jbrfc.jar" property="jbrfc.jar.available" />
+  <available file="${baltrad.db.path}/share/baltrad-bdb/java/baltrad-bdb-client.jar" property="baltrad-bdb-client.jar.available" />
   <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
   <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
   <available file="${javahdf.path}/lib/jhdf5.jar" property="javahdf.lib.available"/>
 
-  <fail unless="jbrfc.jar.available" message="baltrad.db.path must specify the installation dir of baltrad-db" />
+  <fail unless="baltrad-bdb-client.jar.available" message="baltrad.db.path must specify the installation dir of baltrad-db" />
   <fail unless="beast.jar.available" message="beast.path must specify the installation dir of beast" />
   <fail unless="beast.libs.available" message="beast.path must specify the installation dir of beast" />
   <fail unless="javahdf.lib.available" message="javahdf.path must specify the installation dir of hdf-java" />
@@ -117,8 +117,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fileset dir="${extralib.dir}">
       <include name="**/*.jar"/>
     </fileset>
-    <fileset dir="${baltrad.db.path}/share/baltrad-db/java">
-      <include name="jbrfc.jar"/>
+    <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java">
+      <include name="baltrad-bdb-client.jar"/>
+    </fileset>
+    <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java/libs">
+      <include name="*.jar"/>
     </fileset>
     <fileset dir="${beast.path}/bin">
       <include name="*.jar"/>
@@ -217,6 +220,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="commons-dbcp.jar"/>
         <include name="commons-pool.jar"/>
         <include name="commons-net-2.2.jar"/>
+	<include name="httpclient-4.1.2.jar"/>
+	<include name="httpclient-cache-4.1.2.jar"/>
+	<include name="httpcore-4.1.2.jar"/>
+	<include name="httpmime-4.1.2.jar"/>
         <include name="groovy-all-1.6.4.jar"/>
         <include name="jackson-core-lgpl-1.8.2.jar"/>
         <include name="jackson-mapper-lgpl-1.8.2.jar"/>
@@ -278,8 +285,21 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="**/*.properties"/>
       </fileset>
     </copy>
-    
     <!-- Copy test data -->
+
+  	<!-- First copy the dex version of the beast-log messages.xml into the classpath -->
+    <copy todir="${build.classes.dir}">
+      <fileset dir="${etc.dir}">
+        <include name="beast-log-messages.xml"/>
+      </fileset>
+    </copy>
+  	
+    <!-- But since the beast version might contain changes, we preferrably use that one instead -->
+    <copy todir="${build.classes.dir}" overwrite="true">
+      <fileset dir="${beast.path}/etc">
+    	<include name="beast-log-messages.xml"/>
+      </fileset>
+    </copy>
     <copy todir="${build.test.dir}">
       <fileset dir="${test.data.dir}"/>
       <fileset dir="${etc.dir}/${keys.dir}"/>    

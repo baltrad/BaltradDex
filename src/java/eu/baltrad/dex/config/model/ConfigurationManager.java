@@ -132,8 +132,7 @@ public class ConfigurationManager {
     /** Certificate alias */ 
     private static final String KEY_ALIAS_PROP = "key.alias";
     /** Certificates directory */
-    private static final String CERTS_DIR_PROP = "certificates.directory";
-    
+    private static final String CERTS_DIR_PROP = "certificates.directory";    
 //---------------------------------------------------------------------------------------- Variables
     /** References logger object */
     private static Logger log;
