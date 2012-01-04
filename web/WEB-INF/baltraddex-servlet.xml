@@ -1046,7 +1046,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <constructor-arg index="0" value="${data.storage.folder}" />
         <constructor-arg index="1" value="1000" /> <!-- cache size -->
     </bean>
-    <bean id="fileCatalog" class="eu.baltrad.bdb.FileCatalog">
+    <bean id="fileCatalog" class="eu.baltrad.bdb.BasicFileCatalog">
         <constructor-arg ref="bdb_db" />
         <constructor-arg ref="bdb_storage" />
     </bean>
