@@ -221,7 +221,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="${beast.path}/bin">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java/lib">
+      <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java/libs">
         <include name="commons-lang3-3.1.jar"/>
       </fileset>
       <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java/">
