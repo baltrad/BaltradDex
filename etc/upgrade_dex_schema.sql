@@ -736,12 +736,12 @@ CREATE OR REPLACE FUNCTION dex_trim_registry_by_age() RETURNS trigger AS $$
     END;
 $$ LANGUAGE plpgsql;
 
-SELECT split_dex_node_connections_address();
-SELECT split_dex_node_configuration_address();
-SELECT split_dex_users_node_address();
+--SELECT split_dex_node_connections_address();
+--SELECT split_dex_node_configuration_address();
+--SELECT split_dex_users_node_address();
 SELECT upgrade_dex_schema();
 SELECT create_data_sources();
-SELECT create_node_address_schema();
+--SELECT create_node_address_schema();
 SELECT insert_dex_data();
 
 DROP FUNCTION make_plpgsql();
