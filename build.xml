@@ -28,7 +28,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="app.name" value="Baltrad Data Exchange System: BaltradDex"/>
   <property name="root.dir" value="${basedir}"/>
   <property name="script.dir" value="${root.dir}/script"/>
-  <property name="keys.dir" value="keys"/>
+  <property name="keystore.dir" value="keystore"/>
   <!-- !!! do not override this property -->
   <property name="keystore.file" value=".dex_keystore.jks"/>
   
@@ -167,6 +167,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <mkdir dir="${build.lib.dir}"/>
     <delete dir="${dist.dir}"/>
     <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${etc.dir}/${keystore.dir}"/>
     
     <!-- copy libraries -->
     <copy todir="${build.lib.dir}">
@@ -309,13 +310,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </copy>
     <copy todir="${build.test.dir}">
       <fileset dir="${test.data.dir}"/>
-      <fileset dir="${etc.dir}/${keys.dir}"/>    
+      <fileset dir="${etc.dir}/${keystore.dir}"/>    
     </copy>
     
     <!-- Initialize keystore, create and store certificate -->
     <exec executable="${script.dir}/init-keystore.sh">
         <arg value="${key.alias}"/>
-        <arg value="${root.dir}/${etc.dir}/${keys.dir}/${keystore.file}"/>
+        <arg value="${root.dir}/${etc.dir}/${keystore.dir}/${keystore.file}"/>
         <arg value="${keystore.pass}"/>
         <arg value="${key.owner}"/>
         <arg value="${key.unit}"/>
@@ -326,7 +327,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </exec>    
   
     <!-- Copy keystore to runtime configuration directory -->
-    <copy todir="${build.conf.dir}" file="${root.dir}/${etc.dir}/${keys.dir}/${keystore.file}"/>
+    <copy todir="${build.conf.dir}" file="${root.dir}/${etc.dir}/${keystore.dir}/${keystore.file}"/>
     
     <!-- copy application properties files -->
     <copy todir="${build.conf.dir}">
