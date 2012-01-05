@@ -47,6 +47,7 @@ import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.db.DuplicateEntry;
 import eu.baltrad.bdb.oh5.MetadataMatcher;
+import eu.baltrad.bdb.db.DatabaseError;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;
@@ -68,6 +69,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * Class implements frame dispatching controller. This controller handles all incoming and outgoing
@@ -456,31 +459,33 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
                 InitAppUtil.getConf().getKeystorePass(), Frame.getSigFile(parms),
                 Frame.getTimestamp(parms))) {
+            FileInputStream fis = null;
             try {
                 log.info("New data frame received from " + Frame.getNodeName(parms));
                 File payloadFile = Frame.getPayloadFile(parms);
                 FileEntry fileEntry = null;
-                fileEntry = fileCatalog.store(payloadFile.getAbsolutePath());
+                fis = new FileInputStream(payloadFile.getAbsolutePath());
+                fileEntry = fileCatalog.store(fis);
                 IncomingFileNamer namer = new IncomingFileNamer();
                 String friendlyName = namer.name(fileEntry);
-                log.info(friendlyName + " stored with UUID " + fileEntry.uuid());
+                log.info(friendlyName + " stored with UUID " + fileEntry.getUuid().toString());
                 // Send message to the Beast framework
                 BltDataMessage message = new BltDataMessage();
-                message.setFileEntry(fileEntry.clone());
+                message.setFileEntry(fileEntry);
                 bltMessageManager.manage(message);
-                Oh5MetadataMatcher metadataMatcher = new Oh5MetadataMatcher();
+                MetadataMatcher metadataMatcher = new MetadataMatcher();
                 // Iterate through subscriptions list to send data to the users
                 List<Subscription> subs = subscriptionManager.get(Subscription.SUBSCRIPTION_UPLOAD);
                 for (Subscription sub : subs) {
                     // Check if file entry matches the subscribed data source's filter
                     String dataSourceName = sub.getDataSourceName();
                     IFilter filter = bltFileManager.getFilter(dataSourceName);
-                    boolean matches = metadataMatcher.match(fileEntry.metadata(), 
+                    boolean matches = metadataMatcher.match(fileEntry.getMetadata(), 
                             filter.getExpression());
                     // Make sure that user exists locally
                     User receiver = userManager.getByName(sub.getUserName());
                     DeliveryRegisterEntry dre = deliveryRegisterManager.getEntry(
-                            receiver.getId(), fileEntry.uuid());
+                            receiver.getId(), fileEntry.getUuid().toString());
                     if (matches && dre == null) {
                         long timestamp = System.currentTimeMillis();
                         File sigFile = saveSignatureToFile( getSignatureBytes(
@@ -507,9 +512,19 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             } catch (DuplicateEntry e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("Duplicate entry error", e);
-            } catch (FileCatalogError e) {
+            } catch (DatabaseError e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("File catalog error", e);
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                log.error("File catalog error", e);
+            } finally {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    log.error("Failed to close the strem", e);
+                }
             }
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

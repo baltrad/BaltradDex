@@ -79,13 +79,14 @@ public class HandleFrameTask implements Runnable {
             HttpResponse response = handler.post(frame);
             DeliveryRegisterEntry dre = new DeliveryRegisterEntry();
             if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
-                dre = new DeliveryRegisterEntry(user.getId(), entry.uuid(), user.getName(), 
-                         new Date(), DeliveryRegisterEntry.MSG_SUCCESS);
-                log.info("File entry " + entry.uuid() + " sent to user " + user.getName());
+                dre = new DeliveryRegisterEntry(user.getId(), entry.getUuid().toString(), 
+                        user.getName(), new Date(), DeliveryRegisterEntry.MSG_SUCCESS);
+                log.info("File entry " + entry.getUuid().toString() + " sent to user " + 
+                        user.getName());
             } else {
-                dre = new DeliveryRegisterEntry(user.getId(), entry.uuid(), user.getName(), 
-                         new Date(), DeliveryRegisterEntry.MSG_FAILURE);
-                log.error("Failed to send file entry " + entry.uuid() + " to user " +
+                dre = new DeliveryRegisterEntry(user.getId(), entry.getUuid().toString(), 
+                        user.getName(), new Date(), DeliveryRegisterEntry.MSG_FAILURE);
+                log.error("Failed to send file entry " + entry.getUuid().toString() + " to user " +
                         user.getName());
             }
             drManager.addEntry(dre);

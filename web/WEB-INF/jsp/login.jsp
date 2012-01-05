@@ -29,12 +29,7 @@ Author     : szewczenko
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="eu.baltrad.dex.util.InitAppUtil"%>
-<<<<<<< HEAD
 <%@page import="eu.baltrad.dex.config.model.AppConfiguration"%>
-=======
-<%@page import="eu.baltrad.dex.config.model.AppConfiguration"%>"
-
->>>>>>> 1b17003392a5b172e56844f403f95c350eeb4a13
 
 <%
     Date now = new Date();

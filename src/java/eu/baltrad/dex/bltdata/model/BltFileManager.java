@@ -166,8 +166,8 @@ public class BltFileManager {
             ),
             metadata.getWhatSource(),
             metadata.getWhatObject(),
-            InitAppUtil.getConf().getThumbsDir() + File.separator + entry.getUuid().toString() + IMAGE_FILE_EXT
-        );
+            InitAppUtil.getConf().getThumbsDir() + File.separator + entry.getUuid().toString() + 
+                IMAGE_FILE_EXT);
     }
     /**
      * Gets data set for a given data source.

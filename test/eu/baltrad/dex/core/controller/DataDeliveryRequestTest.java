@@ -107,29 +107,28 @@ public class DataDeliveryRequestTest extends TestCase {
     }
     
     public void testPostCertRequest() throws Exception {
-        
+        /*
         HttpResponse response = handler.post(certFrame);
         
         assertNotNull(response);
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatusLine().getStatusCode());
-        
+        */
     }
     
     public void testPostDataDeliveryRequest() throws Exception {
-        
-        /*HttpResponse response = handler.post(dataFrame);
+        /*
+        HttpResponse response = handler.post(dataFrame);
         
         assertNotNull(response);
         assertEquals(HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode());
-        */ 
-         
+        */
     }
     
     @Override
     public void tearDown() throws Exception {
-        certFile.delete();
-        sigFile.delete();
-        dataFile.delete();
+        //certFile.delete();
+        //sigFile.delete();
+        //dataFile.delete();
     }
 }
 //--------------------------------------------------------------------------------------------------
