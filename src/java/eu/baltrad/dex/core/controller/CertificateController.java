@@ -122,16 +122,18 @@ public class CertificateController extends SimpleFormController {
                         // Store certificate in the keystore
                         certManager.storeTrustedEntry(ksFileName, ksPasswd, x509Cert, 
                                 cert.getAlias());
-                        // Create user account 
-                        userManager.saveOrUpdate(new User(cert.getAlias(), 
-                            MessageDigestUtil.createHash(cert.getAlias()), User.ROLE_PEER,
-                            certManager.getOrganization(principal.getName()),
-                            certManager.getOrganizationUnit(principal.getName()),
-                            certManager.getLocality(principal.getName()),
-                            certManager.getState(principal.getName()),
-                            certManager.getCountryCode(principal.getName()),
-                            cert.getNodeAddress()));
-                        log.warn("New peer account created: " + cert.getAlias());
+                        // Create user account if not exists
+                        if(userManager.getByName(cert.getAlias()) == null) { 
+                            userManager.saveOrUpdate(new User(cert.getAlias(), 
+                                MessageDigestUtil.createHash(cert.getAlias()), User.ROLE_PEER,
+                                certManager.getOrganization(principal.getName()),
+                                certManager.getOrganizationUnit(principal.getName()),
+                                certManager.getLocality(principal.getName()),
+                                certManager.getState(principal.getName()),
+                                certManager.getCountryCode(principal.getName()),
+                                cert.getNodeAddress()));
+                            log.warn("New peer account created: " + cert.getAlias());
+                        }
                     } else {
                         cert.setTrusted(false);
                         certManager.deleteFromKS(ksFileName, ksPasswd, cert.getAlias());

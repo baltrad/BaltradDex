@@ -321,12 +321,12 @@ public class FrameDispatcherControllerTest extends TestCase {
         me.addPart( BF_PASSWORD, new StringBody( MessageDigestUtil.createHash( "s3cret" ) ) );
         me.addPart( BF_REQUEST_TYPE, new StringBody( BF_POST_CERT ) );
         me.addPart( BF_MESSAGE_FIELD, new StringBody( "Sending certificate so you can verify it" ) );
-        Certificate cer = loadCertFromKS( ".keystore", "testcert", 
+        Certificate cert = loadCertFromKS( ".keystore", "testcert", 
                 new char[]{ 's', '3', 'c', 'r', 'e', 't' } );
         
-        assertNotNull( cer );
+        assertNotNull( cert );
         
-        saveCertToFile( cer, "testcert.cer" );
+        saveCertToFile( cert, "testcert.cer" );
         me.addPart( BF_CERT_FILE_FIELD, new FileBody( new File( "testcert.cer" ) ) );
         post.setEntity( me );
         HttpResponse response = client.execute( post );
