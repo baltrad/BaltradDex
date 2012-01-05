@@ -109,44 +109,47 @@ public class CertificateController extends SimpleFormController {
             List<Cert> certs = certManager.get();
             String certIdsParm[] = request.getParameterValues(TRUSTED_CERTS);
             List certIds = null;
-            if (certIdsParm != null) { 
+            if (certIdsParm != null) {
                 certIds = Arrays.asList(certIdsParm);
-            }
-            for (int i = 0; i < certs.size(); i++) {
-                Cert cert = certs.get(i);
-                if (certIds != null) {
-                    if (certIds.contains(Integer.toString(cert.getId()))) {
+                for (int i = 0; i < certs.size(); i++) {
+                    Cert cert = certs.get(i);
+                    if (certIds.contains(Integer.toString(cert.getId())) && 
+                            userManager.getByName(cert.getAlias()) == null) {
                         cert.setTrusted(true);
                         X509Certificate x509Cert = certManager.loadFromFile(cert.getFilePath());
                         Principal principal = x509Cert.getSubjectX500Principal();
-                        // Store certificate in the keystore
                         certManager.storeTrustedEntry(ksFileName, ksPasswd, x509Cert, 
-                                cert.getAlias());
-                        // Create user account if not exists
-                        if(userManager.getByName(cert.getAlias()) == null) { 
-                            userManager.saveOrUpdate(new User(cert.getAlias(), 
-                                MessageDigestUtil.createHash(cert.getAlias()), User.ROLE_PEER,
-                                certManager.getOrganization(principal.getName()),
-                                certManager.getOrganizationUnit(principal.getName()),
-                                certManager.getLocality(principal.getName()),
-                                certManager.getState(principal.getName()),
-                                certManager.getCountryCode(principal.getName()),
-                                cert.getNodeAddress()));
-                            log.warn("New peer account created: " + cert.getAlias());
-                        }
-                    } else {
+                                    cert.getAlias());
+                        userManager.saveOrUpdate(new User(cert.getAlias(), 
+                            MessageDigestUtil.createHash(cert.getAlias()), User.ROLE_PEER,
+                            certManager.getOrganization(principal.getName()),
+                            certManager.getOrganizationUnit(principal.getName()),
+                            certManager.getLocality(principal.getName()),
+                            certManager.getState(principal.getName()),
+                            certManager.getCountryCode(principal.getName()),
+                            cert.getNodeAddress()));
+                        log.warn("New peer account created: " + cert.getAlias());
+                    }
+                    if( !certIds.contains(Integer.toString(cert.getId())) &&
+                            userManager.getByName(cert.getAlias()) != null) {
                         cert.setTrusted(false);
                         certManager.deleteFromKS(ksFileName, ksPasswd, cert.getAlias());
                         userManager.deleteUser(userManager.getByName(cert.getAlias()).getId());
                         log.warn("Peer account removed: " + cert.getAlias());
                     }
-                } else {
-                    cert.setTrusted(false);
-                    certManager.deleteFromKS(ksFileName, ksPasswd, cert.getAlias());
-                    userManager.deleteUser(userManager.getByName(cert.getAlias()).getId());
-                    log.warn("Peer account removed: " + cert.getAlias());
+                    certManager.saveOrUpdate(cert);
                 }
-                certManager.saveOrUpdate(cert);
+            } else {
+                for (int i = 0; i < certs.size(); i++) {
+                    Cert cert = certs.get(i);
+                    if(userManager.getByName(cert.getAlias()) != null) {
+                        cert.setTrusted(false);
+                        certManager.deleteFromKS(ksFileName, ksPasswd, cert.getAlias());
+                        userManager.deleteUser(userManager.getByName(cert.getAlias()).getId());
+                        log.warn("Peer account removed: " + cert.getAlias());
+                    }
+                    certManager.saveOrUpdate(cert);
+                }
             }
             request.getSession().setAttribute(OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.savecert.savesuccess"));

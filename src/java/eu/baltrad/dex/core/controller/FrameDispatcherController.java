@@ -518,23 +518,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             } catch (DatabaseError e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("File catalog error", e);
-                
-                e.printStackTrace();
-                
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("File catalog error", e);
-                
-                e.printStackTrace();
-                
             } finally {
                 try {
                     fis.close();
                 } catch (IOException e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     log.error("Failed to close the strem", e);
-                    
-                    e.printStackTrace();
                 }
             }
         } else {
