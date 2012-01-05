@@ -76,6 +76,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property environment="env"/>
 
   <property name="install.prefix" value="/opt/baltrad"/>
+  <!--<property name="jksfile" value="" /> --> <!-- Specify jksfile on command line and we will use that file -->
 
   <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
   <property name="beast.path" value="/opt/baltrad/beast" />
@@ -84,6 +85,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
   <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
   <available file="${javahdf.path}/lib/jhdf5.jar" property="javahdf.lib.available"/>
+
+  <!-- If not -Djksfile=... has been specified, we don't have any file either -->
+  <available file="${jksfile}" property="jksfile.available"/>
 
   <fail unless="baltrad-bdb-client.jar.available" message="baltrad.db.path must specify the installation dir of baltrad-db" />
   <fail unless="beast.jar.available" message="beast.path must specify the installation dir of beast" />
@@ -155,6 +159,28 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </fileset>
   </path>  
   
+  <!-- Generate keystore if the -Djksfile= has not been provided or
+    if there is no such file -->
+  <target name="gen_keystore" unless="jksfile.available">
+    <!-- Initialize keystore, create and store certificate -->
+    <exec executable="${script.dir}/init-keystore.sh">
+        <arg value="${key.alias}"/>
+        <arg value="${root.dir}/${etc.dir}/${keystore.dir}/${keystore.file}"/>
+        <arg value="${keystore.pass}"/>
+        <arg value="${key.owner}"/>
+        <arg value="${key.unit}"/>
+        <arg value="${key.org}"/>
+        <arg value="${key.city}"/>
+        <arg value="${key.state}"/>
+        <arg value="${key.code}"/>
+    </exec>    
+  </target>
+
+  <!-- If -Djksfile= has been specified and the file exists, copy it --> 
+  <target name="copy_keystore" if="jksfile.available">
+  	<copy tofile="${root.dir}/${etc.dir}/${keystore.dir}/${keystore.file}" file="${jksfile}" />
+  </target>
+	
 <target name="init">
     <!-- create directory structure -->
     <delete dir="${build.dir}"/>
@@ -313,18 +339,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="${etc.dir}/${keystore.dir}"/>    
     </copy>
     
-    <!-- Initialize keystore, create and store certificate -->
-    <exec executable="${script.dir}/init-keystore.sh">
-        <arg value="${key.alias}"/>
-        <arg value="${root.dir}/${etc.dir}/${keystore.dir}/${keystore.file}"/>
-        <arg value="${keystore.pass}"/>
-        <arg value="${key.owner}"/>
-        <arg value="${key.unit}"/>
-        <arg value="${key.org}"/>
-        <arg value="${key.city}"/>
-        <arg value="${key.state}"/>
-        <arg value="${key.code}"/>
-    </exec>    
+	<!-- Seems a bit odd, but there is no real conditions in ant so we call both
+	  generate task and copy task and let the if=.. choose -->
+	<antcall target="gen_keystore" />
+	<antcall target="copy_keystore" />
   
     <!-- Copy keystore to runtime configuration directory -->
     <copy todir="${build.conf.dir}" file="${root.dir}/${etc.dir}/${keystore.dir}/${keystore.file}"/>
