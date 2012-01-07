@@ -65,7 +65,7 @@ public class InitAppUtil extends NodeAddress {
     /**
      * Load application settings.
      */
-    public static AppConfiguration loadAppConf() {
+    public static synchronized AppConfiguration loadAppConf() {
         if( appConf == null ) {
             ConfigurationManager cm = new ConfigurationManager();
             appConf = cm.loadAppConf();
