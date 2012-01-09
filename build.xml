@@ -206,6 +206,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="lib/jcip">
         <include name="*.jar"/>
       </fileset>
+      <fileset dir="lib/keyczar">
+        <include name="*.jar"/>
+      </fileset>
       <fileset dir="lib/spring">
         <include name="*.jar"/>
       </fileset>
