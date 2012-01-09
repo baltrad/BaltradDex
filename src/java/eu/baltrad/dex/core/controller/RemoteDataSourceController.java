@@ -47,8 +47,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
 
-import java.security.cert.Certificate;
-
 /**
  * Implements remote data source list controller.
  *
@@ -313,18 +311,12 @@ public class RemoteDataSourceController extends MultiActionController {
      */
     private HttpResponse postCertRequest(NodeConnection nodeConn) {
         HttpResponse response = null;
-        Certificate cert = loadCert(ServletContextUtil.getServletContextPath() + 
-                InitAppUtil.KS_FILE_PATH, InitAppUtil.getConf().getCertAlias(),
-                InitAppUtil.getConf().getKeystorePass());
-        File certFile = saveCertToFile(cert, InitAppUtil.getWorkDir(),
-                InitAppUtil.getConf().getNodeName());
         Frame frame = Frame.postCertRequest(nodeConn.getNodeAddress(), 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
-                certFile);
+                null);
         Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
         response = handler.post(frame);
-        deleteFile(certFile);
         return response;
     }
     /**

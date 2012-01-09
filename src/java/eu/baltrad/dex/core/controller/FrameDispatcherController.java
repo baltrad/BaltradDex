@@ -53,8 +53,6 @@ import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.db.IFilter;
 
-import java.security.cert.Certificate;
-
 import org.apache.log4j.Logger;
 
 import org.springframework.web.servlet.mvc.Controller;
@@ -189,34 +187,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     private void handleCertRequest(HashMap parms, HttpServletResponse response) {
         try {
-            // Check if certificate exists both in the keystore and in the database  
-            Certificate x509Cert = loadCert(
-                ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                        Frame.getNodeName(parms), InitAppUtil.getConf().getKeystorePass());
-            Cert cert = certManager.get(Frame.getNodeName(parms));
             String msg = "";
-            if (cert == null) {
-                msg = "New certificate received from " + Frame.getNodeName(parms);
-                log.info(msg);
-                int update = certManager.saveOrUpdate(new Cert(Frame.getNodeName(parms), 
-                        Frame.getLocalUri(parms), Frame.getCertFile(parms).getAbsolutePath(), 
-                        false));
-                if (update > 0) {
-                    // Certificate successfully stored, but authentication needed
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                } else {
-                    // Failed to store certificate
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                } 
-            }
-            if (x509Cert == null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            }
-            if (x509Cert != null && cert != null) {
-                msg = "Certificate already exists in the keystore";
-                log.warn(msg);
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            }
+            msg = "New certificate received from " + Frame.getNodeName(parms);
+            log.info(msg);
             // Set node name as response header
             addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
         } catch(Exception e) {
