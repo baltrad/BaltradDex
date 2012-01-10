@@ -28,6 +28,7 @@ Creates a volume route
 
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
+<%@page import="eu.baltrad.beast.qc.AnomalyDetector"%>
 
 <html>
     <head>
@@ -73,6 +74,7 @@ Creates a volume route
                                             List<String> adaptors = (List<String>)request.getAttribute("adaptors");
                                             List<String> sourceids = (List<String>)request.getAttribute("sourceids");
                                             List<Integer> intervals = (List<Integer>)request.getAttribute("intervals");
+                                            List<AnomalyDetector> anomaly_detectors = (List<AnomalyDetector>)request.getAttribute("anomaly_detectors");
 
                                             String name = (String)request.getAttribute("name");
                                             String author = (String)request.getAttribute("author");
@@ -85,6 +87,7 @@ Creates a volume route
                                             Integer interval = (Integer)request.getAttribute("interval");
                                             Integer timeout = (Integer)request.getAttribute("timeout");
                                             List<String> sources = (List<String>)request.getAttribute("sources");
+                                            List<String> detectors = (List<String>)request.getAttribute("detectors");
 
                                             String activestr = (active == true)?"checked":"";
                                             String ascendingstr = (ascending == true)?"checked":"";
@@ -100,6 +103,7 @@ Creates a volume route
                                         <div class="row">Interval</div>
                                         <div class="row">Timeout</div>
                                         <div class="row6">Sources</div>
+                                        <div class="row6">Quality controls</div>
                                     </div>
                                     <div class="rightcol">
                                         <div class="row">
@@ -204,6 +208,25 @@ Creates a volume route
                                                Select source radars
                                             </div>
                                         </div>
+                                        <div class="row6">
+                                            <select multiple size="6" name="detectors">
+                                            <%
+                                              for (AnomalyDetector detector : anomaly_detectors) {
+                                                String selectstr = "";
+                                                String detectorname = detector.getName();
+                                                if (detectors.contains(detectorname)) {
+                                                  selectstr = "selected";
+                                                }
+                                            %>
+                                                <option value="<%=detectorname%>" <%=selectstr%>><%=detectorname%></option>
+                                            <%
+                                              }
+                                            %>
+                                            </select>
+                                            <div class="hint">
+                                               Select quality controls to be used
+                                            </div>
+                                        </div>                                        
                                     </div>
                                     <div class="tablefooter">
                                        <div class="buttons">
