@@ -37,6 +37,7 @@ import eu.baltrad.dex.core.model.NodeConnection;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.http.HttpResponse;
 
@@ -107,6 +108,8 @@ public class RemoteDataSourceController extends MultiActionController {
     private SubscriptionManager subscriptionManager;
     private NodeConnectionManager connMgr;
     private Logger log;
+    private static Logger logger = LogManager.getLogger(RemoteDataSourceController.class); // log4j appender style...
+    
     // remote data source object list
     private List<DataSource> remoteDataSources;
     // selected data source list
@@ -143,7 +146,9 @@ public class RemoteDataSourceController extends MultiActionController {
         String nodeName = request.getParameter(SEL_ADDR_PARAM);
         String connAddress = request.getParameter(ENTER_ADDR_PARAM);
         NodeConnection nodeConn = null;
+        logger.debug("dsConnect: nodeName="+nodeName+", address="+connAddress);
         if (!validate(nodeName) && !validate(connAddress)) {
+          logger.debug("dsConnect: not valid: nodeName="+nodeName+", address="+connAddress);
             // Address was not specified
             modelAndView.addObject(SEL_ADDR_ERROR_KEY, SEL_ADDR_ERROR_MSG);
             modelAndView.addObject(ENTER_ADDR_ERROR_KEY, ENTER_ADDR_ERROR_MSG);
@@ -152,14 +157,18 @@ public class RemoteDataSourceController extends MultiActionController {
         } else {
             if (validate(nodeName) && validate(connAddress)) {
                 // use new address
+              logger.debug("dsConnect: Using address="+connAddress+", but name is valid as well: " + nodeName);
                 nodeConn = new NodeConnection(connAddress);
             }
             if (validate(nodeName) && !validate(connAddress)) {
                 // use connection selected from the list
+              logger.debug("dsConnect: Using name="+nodeName);
                 nodeConn = connMgr.get(nodeName);
             }
             if (!validate(nodeName) && validate(connAddress)) {
                 // use new address
+              logger.debug("dsConnect: Using address="+connAddress);
+
                 nodeConn = new NodeConnection(connAddress);
             }
             HttpResponse res = postDSListRequest(nodeConn);
@@ -171,12 +180,15 @@ public class RemoteDataSourceController extends MultiActionController {
                 modelAndView.addObject(ERROR_MSG_KEY, CONN_UNAUTHORIZED_MSG); 
             }
             if (code == HttpServletResponse.SC_OK) {
+              logger.debug("dsConnect: Response ok. Reading frame");
                 SerialFrame serialFrame = readFrameFromStream(res);
                 if (authenticate(/*ServletContextUtil.getServletContextPath() 
                         + InitAppUtil.KS_FILE_PATH,*/
                         InitAppUtil.getConf().getKeystoreDir(), serialFrame.getNodeName(), 
                         serialFrame.getSignature(), serialFrame.getTimestamp())) {                        
-                    List<DataSource> dsList = (List<DataSource>) serialFrame.getItemList();
+                  logger.debug("dsConnect: Authenticated. Validating data sources");
+
+                  List<DataSource> dsList = (List<DataSource>) serialFrame.getItemList();
                     if (validate(dsList)) {
                         modelAndView.addObject(DATA_SOURCES_KEY, dsList);
                         // make the list available to other methods
@@ -185,19 +197,27 @@ public class RemoteDataSourceController extends MultiActionController {
                         modelAndView.addObject(ERROR_MSG_KEY, DS_LIST_EMPTY_MSG);
                     }
                 } else {
-                    modelAndView.addObject(ERROR_MSG_KEY, DS_LIST_UNAUTHORIZED_MSG);
+                  logger.debug("dsConnect: Not authorized");
+
+                  modelAndView.addObject(ERROR_MSG_KEY, DS_LIST_UNAUTHORIZED_MSG);
                 }
             }
             modelAndView.addObject(REMOTE_NODE_NAME_KEY, getRemoteNodeName()); 
             modelAndView.setViewName(DATA_SOURCES_VIEW);
             
+            logger.debug("dsConnect: Remote name: " + getRemoteNodeName());
+            
             if (connMgr.get(getRemoteNodeName()) == null) {
+              logger.debug("dsConnect: Saving or updating node connection with name: " + getRemoteNodeName());
                 try {
                     nodeConn.setNodeName(getRemoteNodeName());
                     connMgr.saveOrUpdate(nodeConn);
                 } catch(Exception e) {
+                  logger.debug("Failed to save node connection", e);
                     log.error("Failed to save node connection", e);
                 }
+            } else {
+              logger.debug("dsConnect: No connection with name name: " + getRemoteNodeName());
             }
             
             /*
