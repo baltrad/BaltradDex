@@ -278,6 +278,42 @@ public class UserManager {
         return update;
     }
     /**
+     * Saves or updates user account.
+     *
+     * @param user User account
+     * @return Number of saved or updated records
+     * @throws Exception
+     */
+    public int saveOrUpdatePeer(User user) throws Exception {
+        Connection conn = null;
+        int update = 0;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            String sql = "";
+            // record does not exists, do insert
+            if (user.getId() == 0) {
+                sql = "INSERT INTO dex_users (name, role_name, node_address) VALUES ('" +
+                    user.getName() + "', '" + user.getRoleName() + "', '" + user.getNodeAddress() + 
+                    "');";
+                update = stmt.executeUpdate(sql);
+            } else {
+                // record exists, do update
+                sql = "UPDATE dex_users SET name = '" + user.getName() + "', role_name = '" + 
+                    user.getRoleName() + "', node_address = '" + user.getNodeAddress() + 
+                    "' WHERE id = " + user.getId() + ";";
+                update = stmt.executeUpdate(sql) ;
+                stmt.close();
+            }
+        } catch(Exception e) {
+            log.error("Failed to save user account", e);
+            throw e;
+        } finally {
+            jdbcConnectionManager.returnConnection(conn);
+        }
+        return update;
+    }
+    /**
      * Deletes user account with a given ID.
      *
      * @param id User account ID

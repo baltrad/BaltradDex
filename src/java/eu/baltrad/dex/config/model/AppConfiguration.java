@@ -62,6 +62,8 @@ public class AppConfiguration extends NodeAddress {
     private String certAlias;
     /** Certificates directory */
     private String certsDir;
+    /** Keystore directory */
+    private String keystoreDir;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor
@@ -89,12 +91,13 @@ public class AppConfiguration extends NodeAddress {
      * @param certsDir Certificates directory
 =======
 >>>>>>> 1b17003392a5b172e56844f403f95c350eeb4a13
+     * @param keystoreDir Keystore directory
      */
     public AppConfiguration( String nodeName, String nodeType, String version, String scheme,
             String hostAddress, int port, String appCtx, String entryAddress, int soTimeout,
             int connTimeout, String workDir, String imagesDir, String thumbsDir, String organization,
             String address, String timeZone, String email, String keystorePass,
-            String certAlias, String certsDir) {
+            String certAlias, String certsDir, String keystoreDir) {
         this.nodeName = nodeName;
         this.nodeType = nodeType;
         this.version = version;
@@ -115,6 +118,7 @@ public class AppConfiguration extends NodeAddress {
         this.keystorePass = keystorePass;
         this.certAlias = certAlias;
         this.certsDir = certsDir;
+        this.keystoreDir = keystoreDir;
     }
     /**
      * Used to compare application configuration objects.
@@ -146,7 +150,8 @@ public class AppConfiguration extends NodeAddress {
                 appConf.getEmail().equals( this.getEmail() ) &&
                 appConf.getKeystorePass().equals( this.getKeystorePass() ) &&
                 appConf.getCertAlias().equals( this.getCertAlias() ) &&
-                appConf.getCertsDir().equals( this.getCertsDir() );
+                appConf.getCertsDir().equals( this.getCertsDir() ) &&
+                appConf.getKeystoreDir().equals(this.getKeystoreDir());
         } else {
             return false;
         }
@@ -331,5 +336,19 @@ public class AppConfiguration extends NodeAddress {
      * @param certsDir Certificates directory to set
      */
     public void setCertsDir( String certsDir ) { this.certsDir = certsDir; }
+
+    /**
+     * @return the keystoreDir
+     */
+    public String getKeystoreDir() {
+        return keystoreDir;
+    }
+
+    /**
+     * @param keystoreDir the keystoreDir to set
+     */
+    public void setKeystoreDir(String keystoreDir) {
+        this.keystoreDir = keystoreDir;
+    }
 }
 //--------------------------------------------------------------------------------------------------

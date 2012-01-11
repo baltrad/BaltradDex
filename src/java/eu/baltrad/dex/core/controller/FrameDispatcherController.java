@@ -151,9 +151,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         HashMap parms = parse(request, InitAppUtil.getWorkDir(), InitAppUtil.getWorkDir(), 
                 InitAppUtil.getCertsDir());
         // Handle post certificate request
-        if (Frame.getRequestType(parms).equals(BF_POST_CERT)) {
+        /*if (Frame.getRequestType(parms).equals(BF_POST_CERT)) {
             handleCertRequest(parms, response);
-        }
+        }*/
         // Handle data source listing request
         if (Frame.getRequestType(parms).equals(BF_GET_DS_LIST)) {
             handleDSListRequest(parms, response);
@@ -184,17 +184,36 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * 
      * @param parms Request parameters
      * @param response HTTP response
-     */
+     *
     private void handleCertRequest(HashMap parms, HttpServletResponse response) {
-        try {
-            String msg = "";
-            msg = "New certificate received from " + Frame.getNodeName(parms);
-            log.info(msg);
+        if (authenticate(ServletContextUtil.getServletContextPath() 
+                + InitAppUtil.KS_FILE_PATH,
+                InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
+                Frame.getSignature(parms), Frame.getTimestamp(parms))) {
+            try {
+                String msg = "";
+                msg = "New certificate received from " + Frame.getNodeName(parms);
+                log.info(msg);
+                // create user account
+                User user = null;
+                if ((user = userManager.getByName(Frame.getNodeName(parms))) == null) {
+                    // Create user with just a name and address 
+                    user = new User(Frame.getNodeName(parms), User.ROLE_PEER,
+                            Frame.getLocalUri(parms));
+                    userManager.saveOrUpdatePeer(user);
+                    log.warn("New peer account created: " + user.getName());
+                }
+                // Set node name as response header
+                addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
+            } catch(Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                log.error("Failed to save certificate configuration", e);
+            }
+        } else { 
+            log.error("Failed to authenticate frame");
             // Set node name as response header
             addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
-        } catch(Exception e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            log.error("Failed to save certificate configuration", e);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
     /**
@@ -204,16 +223,26 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response
      */
     private void handleDSListRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
+        if (authenticate(/*ServletContextUtil.getServletContextPath() 
+                + InitAppUtil.KS_FILE_PATH,*/
+                InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
                 Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             try {
                 log.info(Frame.getNodeName(parms) + " requested data source listing");
+                // create user account
+                User user = null;
+                if ((user = userManager.getByName(Frame.getNodeName(parms))) == null) {
+                    // Create user with just a name and address 
+                    user = new User(Frame.getNodeName(parms), User.ROLE_PEER,
+                            Frame.getLocalUri(parms));
+                    userManager.saveOrUpdatePeer(user);
+                    log.warn("New peer account created: " + user.getName());
+                }
                 // Set node name as response header
                 addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
                 response.setStatus(HttpServletResponse.SC_OK);
                 // Send data source listing to the client
-                User user = userManager.getByName(Frame.getNodeName(parms));
+                //User user = userManager.getByName(Frame.getNodeName(parms));
                 List<Integer> dataSourceIds = dataSourceManager.getDataSourceIds(user.getId());
                 List<DataSource> dsList = new ArrayList<DataSource>();
                 for (int i = 0; i < dataSourceIds.size(); i++) {
@@ -221,12 +250,13 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 }
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(
-                    ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                    InitAppUtil.getConf().getCertAlias(), timestamp); 
+                    InitAppUtil.getConf().getKeystoreDir(),
+                    /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/ 
+                    InitAppUtil.getConf().getCertAlias(), timestamp);
                 SerialFrame serialFrame = SerialFrame.postDSListResponse(user.getNodeAddress(), 
                         InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
                         timestamp, signature, dsList);
-                writeObjectToStream(response, serialFrame);
+                writeFrameToStream(response, serialFrame);
             } catch(Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("Failed to send data source listing", e);
@@ -236,8 +266,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             // Set node name as response header
             addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        }
-        // Delete temporary files 
+        } 
     }
     /**
      * Handles data source subscription request
@@ -246,8 +275,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response 
      */
     private void handleSubscriptionRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
+        if (authenticate(/*ServletContextUtil.getServletContextPath() 
+                + InitAppUtil.KS_FILE_PATH,*/InitAppUtil.getConf().getKeystoreDir(),
+                Frame.getNodeName(parms), 
                 Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             try {
                 log.info(Frame.getNodeName(parms) + " requested data source subscription");
@@ -283,12 +313,13 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(
-                    ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                    /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH*/
+                    InitAppUtil.getConf().getKeystoreDir(), 
                     InitAppUtil.getConf().getCertAlias(), timestamp); 
                 SerialFrame serialFrame = SerialFrame.postSubscriptionResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
                         InitAppUtil.getConf().getNodeName(), timestamp, signature, subConfirm);
-                writeObjectToStream(response, serialFrame);
+                writeFrameToStream(response, serialFrame);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("Failed to handle subscription request", e);
@@ -307,8 +338,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response 
      */
     private void handleSubscriptionSyncRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
+        if (authenticate(/*ServletContextUtil.getServletContextPath() 
+                + InitAppUtil.KS_FILE_PATH,*/
+                InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
                 Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             try {
                 Subscription sub = (Subscription) readObjectFromFile(Frame.getPayloadFile(parms));
@@ -328,12 +360,13 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(
-                    ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                    /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/
+                    InitAppUtil.getConf().getKeystoreDir(),    
                     InitAppUtil.getConf().getCertAlias(), timestamp); 
                 SerialFrame serialFrame = SerialFrame.postSubscriptionSyncResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
                         InitAppUtil.getConf().getNodeName(), timestamp, signature, sub);
-                writeObjectToStream(response, serialFrame);
+                writeFrameToStream(response, serialFrame);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("Failed to handle subscription synchronization request", e);
@@ -353,8 +386,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response 
      */
     private void handleSubscriptionUpdateRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
+        if (authenticate(/*ServletContextUtil.getServletContextPath() 
+                + InitAppUtil.KS_FILE_PATH,*/
+                InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
                 Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             try {
                 log.info(Frame.getNodeName(parms) + " updated subscription status");
@@ -396,12 +430,13 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(
-                    ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                    /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/
+                    InitAppUtil.getConf().getKeystoreDir(),    
                     InitAppUtil.getConf().getCertAlias(), timestamp); 
                 SerialFrame serialFrame = SerialFrame.postSubscriptionUpdateResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
                         InitAppUtil.getConf().getNodeName(), timestamp, signature, confirmedSub);
-                writeObjectToStream(response, serialFrame);
+                writeFrameToStream(response, serialFrame);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("Failed to handle subscription update request", e);
@@ -418,8 +453,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response 
      */
     private void handleDataDeliveryRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
+        if (authenticate(/*ServletContextUtil.getServletContextPath() 
+                + InitAppUtil.KS_FILE_PATH,*/
+                InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
                 Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             FileInputStream fis = null;
             try {
@@ -451,7 +487,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     if (matches && dre == null) {
                         long timestamp = System.currentTimeMillis();
                         String signature = getSignatureString(
-                            ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                            /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/
+                            InitAppUtil.getConf().getKeystoreDir(),    
                             InitAppUtil.getConf().getCertAlias(), timestamp);
                         Frame frame = Frame.postDataDeliveryRequest(receiver.getNodeAddress(), 
                             InitAppUtil.getConf().getNodeAddress(),

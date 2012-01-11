@@ -67,6 +67,18 @@ public class User {
         this.password = password;
     }
     /**
+     * Constructor. 
+     * 
+     * @param name User name
+     * @param nodeAddress Node address
+     * @param roleName Role
+     */
+    public User(String name, String roleName, String nodeAddress) {
+        this.name = name;
+        this.roleName = roleName;
+        this.nodeAddress = nodeAddress;
+    }
+    /**
      * 
      * @param id
      * @param name

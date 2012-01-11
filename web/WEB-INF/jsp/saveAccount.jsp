@@ -73,11 +73,13 @@ Author     : szewczenko
                                             <div class="row">Confirm password</div>
                                         </c:if>
                                         <div class="row">Role</div>
-                                        <div class="row">Organization name</div>
-                                        <div class="row">Unit name</div>
-                                        <div class="row">Locality name (City)</div>
-                                        <div class="row">State name (Country)</div>
-                                        <div class="row">Country code</div>
+                                        <c:if test="${command.roleName != 'peer'}">
+                                            <div class="row">Organization name</div>
+                                            <div class="row">Unit name</div>
+                                            <div class="row">Locality name (City)</div>
+                                            <div class="row">State name (Country)</div>
+                                            <div class="row">Country code</div>
+                                        </c:if>
                                         <div class="row">Node address</div>
                                     </div>
                                     <div class="rightcol">
@@ -152,106 +154,73 @@ Author     : szewczenko
                                             </div>
                                             <form:errors path="command.roleName" cssClass="error"/>
                                         </div>
+                                        <c:if test="${command.roleName != 'peer'}">
+                                                         
                                         <div class="row">
                                             <div class="orgname">
-                                                <c:choose>
-                                                    <c:when test="${command.roleName != 'peer'}">
-                                                        <form:input path="command.organizationName"
-                                                            title="Enter organization name"/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <input type="text" 
-                                                               value="${command.organizationName}"
-                                                               readonly="true">
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <div class="hint">
-                                                    Name of organization
-                                                </div>
+                                                
+                                                    <form:input path="command.organizationName"
+                                                        title="Enter organization name"/>
+                                                    <div class="hint">
+                                                        Name of organization
+                                                    </div>
                                             </div>
                                             <form:errors path="command.organizationName" 
                                                          cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="orgname">
-                                                <c:choose>
-                                                    <c:when test="${command.roleName != 'peer'}">
-                                                        <form:input path="command.organizationUnit"
-                                                            title="Enter unit name"/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <input type="text" 
-                                                               value="${command.organizationUnit}"
-                                                               readonly="true">
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <div class="hint">
-                                                    Unit name, e.g. Forecast Department
-                                                </div>
+                                                
+                                                    <form:input path="command.organizationUnit"
+                                                        title="Enter unit name"/>
+                                                    <div class="hint">
+                                                        Unit name, e.g. Forecast Department
+                                                    </div>
+
                                             </div>
                                             <form:errors path="command.organizationUnit" 
                                                          cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="city">
-                                                <c:choose>
-                                                    <c:when test="${command.roleName != 'peer'}">
-                                                        <form:input path="command.localityName"
-                                                            title="Enter locality name (City)"/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <input type="text" 
-                                                               value="${command.localityName}"
-                                                               readonly="true">
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <div class="hint">
-                                                    Locality name (City)
-                                                </div>
+                                               
+                                                    <form:input path="command.localityName"
+                                                        title="Enter locality name (City)"/>
+                                                    <div class="hint">
+                                                        Locality name (City)
+                                                    </div>
+                                                
                                             </div>
                                             <form:errors path="command.localityName" 
                                                          cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="country">
-                                                <c:choose>
-                                                    <c:when test="${command.roleName != 'peer'}">
-                                                        <form:input path="command.stateName"
-                                                            title="Enter state name (Country)"/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <input type="text" 
-                                                               value="${command.stateName}"
-                                                               readonly="true">
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <div class="hint">
-                                                    State name (Country)
-                                                </div>
+                                               
+                                                    <form:input path="command.stateName"
+                                                        title="Enter state name (Country)"/>
+                                                    <div class="hint">
+                                                        State name (Country)
+                                                    </div>
+                                                
                                             </div>
                                             <form:errors path="command.stateName" 
                                                          cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="zipcode">
-                                                <c:choose>
-                                                    <c:when test="${command.roleName != 'peer'}">
-                                                        <form:input path="command.countryCode"
-                                                            title="Enter two-letter country code"/>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                        <input type="text" 
-                                                               value="${command.countryCode}"
-                                                               readonly="true">
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <div class="hint">
-                                                    Two-letter country code
-                                                </div>
+                                                
+                                                    <form:input path="command.countryCode"
+                                                        title="Enter two-letter country code"/>
+                                                    <div class="hint">
+                                                        Two-letter country code
+                                                    </div>
+                                                
                                             </div>
                                             <form:errors path="command.countryCode" 
                                                          cssClass="error"/>
                                         </div>
+                                        </c:if>          
                                         <div class="row">
                                             <div class="nodeaddress">
                                                 <c:choose>

@@ -297,13 +297,14 @@ BEGIN
         ALTER TABLE dex_users DROP COLUMN number;
         ALTER TABLE dex_users DROP COLUMN phone;
         ALTER TABLE dex_users DROP COLUMN email;
-        ALTER TABLE dex_users ADD COLUMN org_name VARCHAR(256) NOT NULL;
-        ALTER TABLE dex_users ADD COLUMN org_unit VARCHAR(256) NOT NULL;
-        ALTER TABLE dex_users ADD COLUMN locality VARCHAR(64) NOT NULL;
-        ALTER TABLE dex_users ADD COLUMN state VARCHAR(64) NOT NULL;
-        ALTER TABLE dex_users ADD COLUMN country_code VARCHAR(2) NOT NULL;
+        ALTER TABLE dex_users ADD COLUMN org_name VARCHAR(256);
+        ALTER TABLE dex_users ADD COLUMN org_unit VARCHAR(256);
+        ALTER TABLE dex_users ADD COLUMN locality VARCHAR(64);
+        ALTER TABLE dex_users ADD COLUMN state VARCHAR(64);
+        ALTER TABLE dex_users ADD COLUMN country_code VARCHAR(2);
         ALTER TABLE dex_users ADD COLUMN node_address VARCHAR(256) NOT NULL;
         ALTER TABLE dex_users ALTER COLUMN password DROP NOT NULL;
+        ALTER TABLE dex_users ALTER COLUMN name_hash DROP NOT NULL;
     EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'Failed to alter table dex_users';
     END;

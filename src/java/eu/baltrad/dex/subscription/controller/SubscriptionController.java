@@ -27,6 +27,7 @@ import eu.baltrad.dex.subscription.model.SubscriptionManager;
 import eu.baltrad.dex.core.controller.FrameDispatcherController;
 import eu.baltrad.frame.model.*;
 import static eu.baltrad.frame.model.Protocol.*;
+
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.ServletContextUtil;
 import eu.baltrad.dex.util.InitAppUtil;
@@ -126,9 +127,10 @@ public class SubscriptionController extends MultiActionController {
                 log.error("Failed to access remote node due to internal server error"); 
             }
             if (code == HttpServletResponse.SC_OK) {
-                    SerialFrame serialFrame = (SerialFrame) readObjectFromStream(res);
-                if (authenticate(ServletContextUtil.getServletContextPath() 
-                        + InitAppUtil.KS_FILE_PATH, serialFrame.getNodeName(), 
+                    SerialFrame serialFrame = readFrameFromStream(res);
+                if (authenticate(/*ServletContextUtil.getServletContextPath() 
+                        + InitAppUtil.KS_FILE_PATH,*/
+                        InitAppUtil.getConf().getKeystoreDir(), serialFrame.getNodeName(), 
                         serialFrame.getSignature(), serialFrame.getTimestamp())) {
                     Subscription sub = (Subscription) serialFrame.getItem();
                     if (sub != null) {
@@ -232,9 +234,10 @@ public class SubscriptionController extends MultiActionController {
                     log.error("Failed to access remote node due to internal server error"); 
                 }
                 if (code == HttpServletResponse.SC_OK) {
-                    SerialFrame serialFrame = (SerialFrame) readObjectFromStream(res);
-                    if (authenticate(ServletContextUtil.getServletContextPath() 
-                            + InitAppUtil.KS_FILE_PATH, serialFrame.getNodeName(), 
+                    SerialFrame serialFrame = readFrameFromStream(res);
+                    if (authenticate(/*ServletContextUtil.getServletContextPath() 
+                            + InitAppUtil.KS_FILE_PATH,*/
+                            InitAppUtil.getConf().getKeystoreDir(), serialFrame.getNodeName(), 
                             serialFrame.getSignature(), serialFrame.getTimestamp())) {
                         Subscription sub = (Subscription) serialFrame.getItem();
                         if (sub != null) {
@@ -461,7 +464,8 @@ public class SubscriptionController extends MultiActionController {
         long timestamp = System.currentTimeMillis();
 
         String signature = getSignatureString(
-                ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/
+                InitAppUtil.getConf().getKeystoreDir(),
                 InitAppUtil.getConf().getCertAlias(), timestamp);
         Frame frame = Frame.postSubscriptionSyncRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
@@ -483,7 +487,8 @@ public class SubscriptionController extends MultiActionController {
         HttpResponse response = null;
         long timestamp = System.currentTimeMillis();
         String signature = getSignatureString(
-                ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/
+                InitAppUtil.getConf().getKeystoreDir(),
                 InitAppUtil.getConf().getCertAlias(), timestamp);
         Frame frame = Frame.postSubscriptionUpdateRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 

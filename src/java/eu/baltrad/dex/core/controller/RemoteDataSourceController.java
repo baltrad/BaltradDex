@@ -150,6 +150,57 @@ public class RemoteDataSourceController extends MultiActionController {
             modelAndView.addObject(CONNECTIONS_KEY, connMgr.get());
             modelAndView.setViewName(CONNECT_TO_NODE_VIEW);
         } else {
+            if (validate(nodeName) && validate(connAddress)) {
+                // use new address
+                nodeConn = new NodeConnection(connAddress);
+            }
+            if (validate(nodeName) && !validate(connAddress)) {
+                // use connection selected from the list
+                nodeConn = connMgr.get(nodeName);
+            }
+            if (!validate(nodeName) && validate(connAddress)) {
+                // use new address
+                nodeConn = new NodeConnection(connAddress);
+            }
+            HttpResponse res = postDSListRequest(nodeConn);
+            // Get remote node name from response header
+            setRemoteNodeName(getHeader(res, HDR_NODE_NAME));
+            setRemoteNodeAddress(nodeConn.getNodeAddress());
+            int code = res.getStatusLine().getStatusCode();
+            if (code == HttpServletResponse.SC_UNAUTHORIZED) {
+                modelAndView.addObject(ERROR_MSG_KEY, CONN_UNAUTHORIZED_MSG); 
+            }
+            if (code == HttpServletResponse.SC_OK) {
+                SerialFrame serialFrame = readFrameFromStream(res);
+                if (authenticate(/*ServletContextUtil.getServletContextPath() 
+                        + InitAppUtil.KS_FILE_PATH,*/
+                        InitAppUtil.getConf().getKeystoreDir(), serialFrame.getNodeName(), 
+                        serialFrame.getSignature(), serialFrame.getTimestamp())) {                        
+                    List<DataSource> dsList = (List<DataSource>) serialFrame.getItemList();
+                    if (validate(dsList)) {
+                        modelAndView.addObject(DATA_SOURCES_KEY, dsList);
+                        // make the list available to other methods
+                        setRemoteDataSources(dsList);
+                    } else {
+                        modelAndView.addObject(ERROR_MSG_KEY, DS_LIST_EMPTY_MSG);
+                    }
+                } else {
+                    modelAndView.addObject(ERROR_MSG_KEY, DS_LIST_UNAUTHORIZED_MSG);
+                }
+            }
+            modelAndView.addObject(REMOTE_NODE_NAME_KEY, getRemoteNodeName()); 
+            modelAndView.setViewName(DATA_SOURCES_VIEW);
+            
+            if (connMgr.get(getRemoteNodeName()) == null) {
+                try {
+                    nodeConn.setNodeName(getRemoteNodeName());
+                    connMgr.saveOrUpdate(nodeConn);
+                } catch(Exception e) {
+                    log.error("Failed to save node connection", e);
+                }
+            }
+            
+            /*
             if (validate(connAddress)) {
                 // User defined new connection
                 nodeConn = new NodeConnection(connAddress);
@@ -195,7 +246,7 @@ public class RemoteDataSourceController extends MultiActionController {
                     modelAndView.addObject(ERROR_MSG_KEY, CONN_UNAUTHORIZED_MSG); 
                 }
                 if (code == HttpServletResponse.SC_OK) {
-                    SerialFrame serialFrame = (SerialFrame) readObjectFromStream(res);
+                    SerialFrame serialFrame = readFrameFromStream(res);
                     if (authenticate(ServletContextUtil.getServletContextPath() 
                             + InitAppUtil.KS_FILE_PATH, serialFrame.getNodeName(), 
                             serialFrame.getSignature(), serialFrame.getTimestamp())) {                        
@@ -214,7 +265,8 @@ public class RemoteDataSourceController extends MultiActionController {
             }
             modelAndView.addObject(REMOTE_NODE_NAME_KEY, getRemoteNodeName()); 
             modelAndView.setViewName(DATA_SOURCES_VIEW);
-        }
+        }*/
+        }    
         return modelAndView;
     }
     /**
@@ -264,9 +316,10 @@ public class RemoteDataSourceController extends MultiActionController {
             modelAndView.addObject(ERROR_KEY, INTERNAL_SERVER_ERROR_MSG); 
         }
         if (code == HttpServletResponse.SC_OK) {
-            SerialFrame serialFrame = (SerialFrame) readObjectFromStream(res);
-            if (authenticate(ServletContextUtil.getServletContextPath() 
-                    + InitAppUtil.KS_FILE_PATH, serialFrame.getNodeName(), 
+            SerialFrame serialFrame = readFrameFromStream(res);
+            if (authenticate(/*ServletContextUtil.getServletContextPath() 
+                    + InitAppUtil.KS_FILE_PATH,*/
+                    InitAppUtil.getConf().getKeystoreDir(), serialFrame.getNodeName(), 
                     serialFrame.getSignature(), serialFrame.getTimestamp())) {
                 List<DataSource> dsConfirm = (List<DataSource>) serialFrame.getItemList();
                 if (validate(dsConfirm)) {
@@ -308,17 +361,22 @@ public class RemoteDataSourceController extends MultiActionController {
      * 
      * @param nodeConn Node connection
      * @return Http response
-     */
+     *
     private HttpResponse postCertRequest(NodeConnection nodeConn) {
         HttpResponse response = null;
+        long timestamp = System.currentTimeMillis();
+        String signature = getSignatureString(
+                InitAppUtil.getConf().getKeystoreDir(),
+                ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                InitAppUtil.getConf().getCertAlias(), timestamp);
         Frame frame = Frame.postCertRequest(nodeConn.getNodeAddress(), 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
-                null);
+                timestamp, signature);
         Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
         response = handler.post(frame);
         return response;
-    }
+    }*/
     /**
      * Post data source listing request using a defined node connection.
      * 
@@ -329,7 +387,8 @@ public class RemoteDataSourceController extends MultiActionController {
         HttpResponse response = null;
         long timestamp = System.currentTimeMillis();
         String signature = getSignatureString(
-                ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                InitAppUtil.getConf().getKeystoreDir(),
+                /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/ 
                 InitAppUtil.getConf().getCertAlias(), timestamp);
         Frame frame = Frame.postDSListRequest(nodeConn.getNodeAddress(), 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
@@ -350,7 +409,8 @@ public class RemoteDataSourceController extends MultiActionController {
         HttpResponse response = null;
         long timestamp = System.currentTimeMillis();
         String signature = getSignatureString(
-                ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
+                InitAppUtil.getConf().getKeystoreDir(),
+                /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/ 
                 InitAppUtil.getConf().getCertAlias(), timestamp);
         Frame frame = Frame.postSubscriptionRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
