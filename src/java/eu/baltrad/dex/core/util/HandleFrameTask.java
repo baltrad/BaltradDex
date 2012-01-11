@@ -29,6 +29,7 @@ import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.bdb.db.FileEntry;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.http.HttpResponse;
 
@@ -50,6 +51,7 @@ public class HandleFrameTask implements Runnable {
     private User user;
     private FileEntry entry;
     private Frame frame;
+    private static Logger logger = LogManager.getLogger(HandleFrameTask.class);
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
@@ -91,6 +93,7 @@ public class HandleFrameTask implements Runnable {
             }
             drManager.addEntry(dre);
         } catch( Exception e ) {
+          logger.debug("Caught exception in HandleFrameTask", e);
             log.error("Failed to complete handle frame task", e);
         }
     }
