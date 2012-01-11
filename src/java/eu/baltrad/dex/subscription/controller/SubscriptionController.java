@@ -129,8 +129,7 @@ public class SubscriptionController extends MultiActionController {
                     SerialFrame serialFrame = (SerialFrame) readObjectFromStream(res);
                 if (authenticate(ServletContextUtil.getServletContextPath() 
                         + InitAppUtil.KS_FILE_PATH, serialFrame.getNodeName(), 
-                        InitAppUtil.getConf().getKeystorePass(), serialFrame.getSignature(),
-                        serialFrame.getTimestamp())) {
+                        serialFrame.getSignature(), serialFrame.getTimestamp())) {
                     Subscription sub = (Subscription) serialFrame.getItem();
                     if (sub != null) {
                         // Check if current subscription matches sunchronized subscription
@@ -236,8 +235,7 @@ public class SubscriptionController extends MultiActionController {
                     SerialFrame serialFrame = (SerialFrame) readObjectFromStream(res);
                     if (authenticate(ServletContextUtil.getServletContextPath() 
                             + InitAppUtil.KS_FILE_PATH, serialFrame.getNodeName(), 
-                            InitAppUtil.getConf().getKeystorePass(), serialFrame.getSignature(),
-                            serialFrame.getTimestamp())) {
+                            serialFrame.getSignature(), serialFrame.getTimestamp())) {
                         Subscription sub = (Subscription) serialFrame.getItem();
                         if (sub != null) {
                             // Check if current subscription matches sunchronized subscription
@@ -461,18 +459,16 @@ public class SubscriptionController extends MultiActionController {
     private HttpResponse postSubsciptionSyncRequest(String remoteNodeAddress, File payloadFile) {
         HttpResponse response = null;
         long timestamp = System.currentTimeMillis();
-        File sigFile = saveSignatureToFile(
-                getSignatureBytes(
+
+        String signature = getSignatureString(
                 ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
-                timestamp), InitAppUtil.getWorkDir());
+                InitAppUtil.getConf().getCertAlias(), timestamp);
         Frame frame = Frame.postSubscriptionSyncRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
-                timestamp, sigFile, payloadFile);
+                timestamp, signature, payloadFile);
         Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
         response = handler.post(frame);
-        deleteFile(sigFile);
         deleteFile(payloadFile);
         return response;
     }
@@ -486,18 +482,15 @@ public class SubscriptionController extends MultiActionController {
     private HttpResponse postSubscriptionUpdateRequest(String remoteNodeAddress, File payloadFile) {
         HttpResponse response = null;
         long timestamp = System.currentTimeMillis();
-        File sigFile = saveSignatureToFile(
-                getSignatureBytes(
+        String signature = getSignatureString(
                 ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
-                timestamp), InitAppUtil.getWorkDir());
+                InitAppUtil.getConf().getCertAlias(), timestamp);
         Frame frame = Frame.postSubscriptionUpdateRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
-                timestamp, sigFile, payloadFile);
+                timestamp, signature, payloadFile);
         Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
         response = handler.post(frame);
-        deleteFile(sigFile);
         deleteFile(payloadFile);
         return response;
     }

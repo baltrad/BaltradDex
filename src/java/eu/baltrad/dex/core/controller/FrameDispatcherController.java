@@ -53,8 +53,6 @@ import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.db.IFilter;
 
-import java.security.cert.Certificate;
-
 import org.apache.log4j.Logger;
 
 import org.springframework.web.servlet.mvc.Controller;
@@ -125,6 +123,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     public FrameDispatcherController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        InitAppUtil.loadAppConf();
     }
     /**
      * Required by the Spring's Controller interface, wraps actual doGet method used to
@@ -188,34 +187,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     private void handleCertRequest(HashMap parms, HttpServletResponse response) {
         try {
-            // Check if certificate exists both in the keystore and in the database  
-            Certificate x509Cert = loadCert(
-                ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                        Frame.getNodeName(parms), InitAppUtil.getConf().getKeystorePass());
-            Cert cert = certManager.get(Frame.getNodeName(parms));
             String msg = "";
-            if (cert == null) {
-                msg = "New certificate received from " + Frame.getNodeName(parms);
-                log.info(msg);
-                int update = certManager.saveOrUpdate(new Cert(Frame.getNodeName(parms), 
-                        Frame.getLocalUri(parms), Frame.getCertFile(parms).getAbsolutePath(), 
-                        false));
-                if (update > 0) {
-                    // Certificate successfully stored, but authentication needed
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                } else {
-                    // Failed to store certificate
-                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                } 
-            }
-            if (x509Cert == null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            }
-            if (x509Cert != null && cert != null) {
-                msg = "Certificate already exists in the keystore";
-                log.warn(msg);
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            }
+            msg = "New certificate received from " + Frame.getNodeName(parms);
+            log.info(msg);
             // Set node name as response header
             addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
         } catch(Exception e) {
@@ -232,8 +206,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private void handleDSListRequest(HashMap parms, HttpServletResponse response) {
         if (authenticate(ServletContextUtil.getServletContextPath() 
                 + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
-                InitAppUtil.getConf().getKeystorePass(), Frame.getSigFile(parms),
-                Frame.getTimestamp(parms))) {
+                Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             try {
                 log.info(Frame.getNodeName(parms) + " requested data source listing");
                 // Set node name as response header
@@ -247,13 +220,12 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     dsList.add(dataSourceManager.getDataSource(dataSourceIds.get(i)));
                 }
                 long timestamp = System.currentTimeMillis();
-                byte[] sigBytes = getSignatureBytes(
+                String signature = getSignatureString(
                     ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                    InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
-                    timestamp); 
+                    InitAppUtil.getConf().getCertAlias(), timestamp); 
                 SerialFrame serialFrame = SerialFrame.postDSListResponse(user.getNodeAddress(), 
                         InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
-                        timestamp, sigBytes, dsList);
+                        timestamp, signature, dsList);
                 writeObjectToStream(response, serialFrame);
             } catch(Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -266,7 +238,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
         // Delete temporary files 
-        deleteFile(Frame.getSigFile(parms));
     }
     /**
      * Handles data source subscription request
@@ -277,8 +248,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private void handleSubscriptionRequest(HashMap parms, HttpServletResponse response) {
         if (authenticate(ServletContextUtil.getServletContextPath() 
                 + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
-                InitAppUtil.getConf().getKeystorePass(), Frame.getSigFile(parms),
-                Frame.getTimestamp(parms))) {
+                Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             try {
                 log.info(Frame.getNodeName(parms) + " requested data source subscription");
                 List<DataSource> subRequest = (List<DataSource>) readObjectFromFile(
@@ -312,13 +282,12 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 response.setStatus(HttpServletResponse.SC_OK);
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
-                byte[] sigBytes = getSignatureBytes(
+                String signature = getSignatureString(
                     ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                    InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
-                    timestamp); 
+                    InitAppUtil.getConf().getCertAlias(), timestamp); 
                 SerialFrame serialFrame = SerialFrame.postSubscriptionResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
-                        InitAppUtil.getConf().getNodeName(), timestamp, sigBytes, subConfirm);
+                        InitAppUtil.getConf().getNodeName(), timestamp, signature, subConfirm);
                 writeObjectToStream(response, serialFrame);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -329,7 +298,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
         // Delete temporary files 
-        deleteFile(Frame.getSigFile(parms));
         deleteFile(Frame.getPayloadFile(parms));
     }
     /**
@@ -341,8 +309,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private void handleSubscriptionSyncRequest(HashMap parms, HttpServletResponse response) {
         if (authenticate(ServletContextUtil.getServletContextPath() 
                 + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
-                InitAppUtil.getConf().getKeystorePass(), Frame.getSigFile(parms),
-                Frame.getTimestamp(parms))) {
+                Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             try {
                 Subscription sub = (Subscription) readObjectFromFile(Frame.getPayloadFile(parms));
                 // Check if subscribed data source is available
@@ -360,13 +327,12 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 response.setStatus(HttpServletResponse.SC_OK);
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
-                byte[] sigBytes = getSignatureBytes(
+                String signature = getSignatureString(
                     ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                    InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
-                    timestamp); 
+                    InitAppUtil.getConf().getCertAlias(), timestamp); 
                 SerialFrame serialFrame = SerialFrame.postSubscriptionSyncResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
-                        InitAppUtil.getConf().getNodeName(), timestamp, sigBytes, sub);
+                        InitAppUtil.getConf().getNodeName(), timestamp, signature, sub);
                 writeObjectToStream(response, serialFrame);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -378,7 +344,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
         // Delete temporary files 
-        deleteFile(Frame.getSigFile(parms));
         deleteFile(Frame.getPayloadFile(parms));
     }
     /**
@@ -390,8 +355,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private void handleSubscriptionUpdateRequest(HashMap parms, HttpServletResponse response) {
         if (authenticate(ServletContextUtil.getServletContextPath() 
                 + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
-                InitAppUtil.getConf().getKeystorePass(), Frame.getSigFile(parms),
-                Frame.getTimestamp(parms))) {
+                Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             try {
                 log.info(Frame.getNodeName(parms) + " updated subscription status");
                 Subscription sub = (Subscription) readObjectFromFile(Frame.getPayloadFile(parms));
@@ -431,13 +395,12 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 response.setStatus(HttpServletResponse.SC_OK);
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
-                byte[] sigBytes = getSignatureBytes(
+                String signature = getSignatureString(
                     ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                    InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
-                    timestamp); 
+                    InitAppUtil.getConf().getCertAlias(), timestamp); 
                 SerialFrame serialFrame = SerialFrame.postSubscriptionUpdateResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
-                        InitAppUtil.getConf().getNodeName(), timestamp, sigBytes, confirmedSub);
+                        InitAppUtil.getConf().getNodeName(), timestamp, signature, confirmedSub);
                 writeObjectToStream(response, serialFrame);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -457,8 +420,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private void handleDataDeliveryRequest(HashMap parms, HttpServletResponse response) {
         if (authenticate(ServletContextUtil.getServletContextPath() 
                 + InitAppUtil.KS_FILE_PATH, Frame.getNodeName(parms), 
-                InitAppUtil.getConf().getKeystorePass(), Frame.getSigFile(parms),
-                Frame.getTimestamp(parms))) {
+                Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             FileInputStream fis = null;
             try {
                 log.info("New data frame received from " + Frame.getNodeName(parms));
@@ -488,14 +450,12 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             receiver.getId(), fileEntry.getUuid().toString());
                     if (matches && dre == null) {
                         long timestamp = System.currentTimeMillis();
-                        File sigFile = saveSignatureToFile( getSignatureBytes(
+                        String signature = getSignatureString(
                             ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                            InitAppUtil.getConf().getCertAlias(), 
-                            InitAppUtil.getConf().getKeystorePass(), 
-                            timestamp), InitAppUtil.getWorkDir());
+                            InitAppUtil.getConf().getCertAlias(), timestamp);
                         Frame frame = Frame.postDataDeliveryRequest(receiver.getNodeAddress(), 
                             InitAppUtil.getConf().getNodeAddress(),
-                            InitAppUtil.getConf().getNodeName(), timestamp, sigFile, payloadFile);
+                            InitAppUtil.getConf().getNodeName(), timestamp, signature, payloadFile);
                         // Create frame delivery task
                         HandleFrameTask task = new HandleFrameTask(getDeliveryRegisterManager(),
                             log, receiver, fileEntry, frame);

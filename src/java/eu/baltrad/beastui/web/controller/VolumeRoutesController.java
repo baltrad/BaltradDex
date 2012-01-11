@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.qc.IAnomalyDetectorManager;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.util.IRuleUtilities;
@@ -55,6 +56,11 @@ public class VolumeRoutesController {
    * The rule utilities
    */
   private IRuleUtilities utilities = null;
+  
+  /**
+   * The anomaly detector manager
+   */
+  private IAnomalyDetectorManager anomalymanager = null;
   
   /**
    * Default constructor
@@ -92,6 +98,14 @@ public class VolumeRoutesController {
   }
   
   /**
+   * @param anomalymanager the anomaly manager to set
+   */
+  @Autowired
+  public void setAnomalyDetectorManager(IAnomalyDetectorManager anomalymanager) {
+    this.anomalymanager = anomalymanager;
+  }
+  
+  /**
    * Handles create route requests 
    * @param model the model
    * @param name the name of the route
@@ -120,7 +134,8 @@ public class VolumeRoutesController {
       @RequestParam(value = "recipients", required = false) List<String> recipients,
       @RequestParam(value = "interval", required = false) Integer interval,
       @RequestParam(value = "timeout", required = false) Integer timeout,
-      @RequestParam(value = "sources", required = false) List<String> sources) {
+      @RequestParam(value = "sources", required = false) List<String> sources,
+      @RequestParam(value = "detectors", required = false) List<String> detectors) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     String emessage = null;
     
@@ -132,9 +147,9 @@ public class VolumeRoutesController {
     
     if (name == null && author == null && active == null && description == null &&
         recipients == null && interval == null && timeout == null &&
-        sources == null) {
+        sources == null && detectors == null) {
       return viewCreateRoute(model, name, author, active, description,
-          ascending, mine, maxe, recipients, interval, timeout, sources, null);
+          ascending, mine, maxe, recipients, interval, timeout, sources, detectors, null);
     }
     
     if (name == null || name.trim().equals("")) {
@@ -153,7 +168,7 @@ public class VolumeRoutesController {
         double dmaxe = (maxe == null) ? 90.0 : maxe.doubleValue();
         int iinterval = (interval == null) ? 15 : interval.intValue();
         int itimeout = (timeout == null) ? 15*60 : timeout.intValue();
-        VolumeRule rule = createRule(bascending, dmine, dmaxe, iinterval, sources, itimeout);
+        VolumeRule rule = createRule(bascending, dmine, dmaxe, iinterval, sources, detectors, itimeout);
         List<String> recip = (recipients == null) ? new ArrayList<String>() : recipients;
         RouteDefinition def = manager.create(name, author, bactive, description, recip, rule);
         manager.storeDefinition(def);
@@ -165,7 +180,7 @@ public class VolumeRoutesController {
     }
     
     return viewCreateRoute(model, name, author, active, description,
-        ascending, mine, maxe, recipients, interval, timeout, sources, emessage);
+        ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage);
   }
 
   /**
@@ -198,13 +213,14 @@ public class VolumeRoutesController {
       @RequestParam(value = "interval", required = false) Integer interval,
       @RequestParam(value = "timeout", required = false) Integer timeout,
       @RequestParam(value = "sources", required = false) List<String> sources,
+      @RequestParam(value = "detectors", required = false) List<String> detectors,
       @RequestParam(value = "submitButton", required = false) String operation) {
     RouteDefinition def = manager.getDefinition(name);
     if (def == null) {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
     if (operation != null && operation.equals("Modify")) {
-      return modifyRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources);
+      return modifyRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -217,7 +233,7 @@ public class VolumeRoutesController {
         VolumeRule vrule = (VolumeRule)def.getRule();
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             vrule.isAscending(), vrule.getElevationMin(), vrule.getElevationMax(), def.getRecipients(), 
-            vrule.getInterval(), vrule.getTimeout(), vrule.getSources(), null);
+            vrule.getInterval(), vrule.getTimeout(), vrule.getSources(), vrule.getDetectors(), null);
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a volume rule");
       }
@@ -253,11 +269,13 @@ public class VolumeRoutesController {
       Integer interval, 
       Integer timeout, 
       List<String> sources,
+      List<String> detectors,
       String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
     model.addAttribute("adaptors", adaptors);
+    model.addAttribute("anomaly_detectors", anomalymanager.list());    
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
     model.addAttribute("active", (active == null) ? new Boolean(true) : active);
@@ -271,6 +289,8 @@ public class VolumeRoutesController {
     model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
+    model.addAttribute("detectors",
+        (detectors == null) ? new ArrayList<String>() : detectors);
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
@@ -307,12 +327,14 @@ public class VolumeRoutesController {
       Integer interval,
       Integer timeout,
       List<String> sources,
+      List<String> detectors,
       String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     
     model.addAttribute("adaptors", adaptors);
     model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
+    model.addAttribute("anomaly_detectors", anomalymanager.list());
     
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
@@ -327,6 +349,8 @@ public class VolumeRoutesController {
     model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
+    model.addAttribute("detectors",
+        (detectors == null) ? new ArrayList<String>() : detectors);
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
@@ -376,9 +400,11 @@ public class VolumeRoutesController {
       List<String> recipients,
       Integer interval,
       Integer timeout,
-      List<String> sources) {
+      List<String> sources,
+      List<String> detectors) {
     List<String> newrecipients = (recipients == null) ? new ArrayList<String>() : recipients;
     List<String> newsources = (sources == null) ? new ArrayList<String>() : sources;
+    List<String> newdetectors = (detectors == null) ? new ArrayList<String>() : detectors;
     boolean isactive = (active != null) ? active.booleanValue() : false;
     int iinterval = (interval != null) ? interval.intValue() : 15;
     int itimeout = (timeout != null) ? timeout.intValue() : 15*60;
@@ -395,7 +421,7 @@ public class VolumeRoutesController {
     
     if (emessage == null) {
       try {
-        VolumeRule rule = createRule(bascending, dmine, dmaxe, iinterval, newsources, itimeout);
+        VolumeRule rule = createRule(bascending, dmine, dmaxe, iinterval, newsources, newdetectors, itimeout);
         RouteDefinition def = manager.create(name, author, isactive, description,
             newrecipients, rule);
         manager.updateDefinition(def);
@@ -407,7 +433,7 @@ public class VolumeRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        ascending, mine, maxe, newrecipients, interval, timeout, sources, emessage);
+        ascending, mine, maxe, newrecipients, interval, timeout, sources, detectors, emessage);
   }
 
   
@@ -433,13 +459,14 @@ public class VolumeRoutesController {
    * @param byscan
    * @return
    */
-  protected VolumeRule createRule(boolean ascending, double mine, double maxe, int interval, List<String> sources, int timeout) {
+  protected VolumeRule createRule(boolean ascending, double mine, double maxe, int interval, List<String> sources, List<String> detectors, int timeout) {
     VolumeRule rule = (VolumeRule)manager.createRule(VolumeRule.TYPE);
     rule.setAscending(ascending);
     rule.setElevationMin(mine);
     rule.setElevationMax(maxe);
     rule.setInterval(interval);
     rule.setSources(sources);
+    rule.setDetectors(detectors);
     rule.setTimeout(timeout);
     return rule;
   }

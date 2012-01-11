@@ -47,8 +47,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
 
-import java.security.cert.Certificate;
-
 /**
  * Implements remote data source list controller.
  *
@@ -200,8 +198,7 @@ public class RemoteDataSourceController extends MultiActionController {
                     SerialFrame serialFrame = (SerialFrame) readObjectFromStream(res);
                     if (authenticate(ServletContextUtil.getServletContextPath() 
                             + InitAppUtil.KS_FILE_PATH, serialFrame.getNodeName(), 
-                            InitAppUtil.getConf().getKeystorePass(), serialFrame.getSignature(),
-                            serialFrame.getTimestamp())) {                        
+                            serialFrame.getSignature(), serialFrame.getTimestamp())) {                        
                         List<DataSource> dsList = (List<DataSource>) serialFrame.getItemList();
                         if (validate(dsList)) {
                             modelAndView.addObject(DATA_SOURCES_KEY, dsList);
@@ -270,8 +267,7 @@ public class RemoteDataSourceController extends MultiActionController {
             SerialFrame serialFrame = (SerialFrame) readObjectFromStream(res);
             if (authenticate(ServletContextUtil.getServletContextPath() 
                     + InitAppUtil.KS_FILE_PATH, serialFrame.getNodeName(), 
-                    InitAppUtil.getConf().getKeystorePass(), serialFrame.getSignature(),
-                    serialFrame.getTimestamp())) {
+                    serialFrame.getSignature(), serialFrame.getTimestamp())) {
                 List<DataSource> dsConfirm = (List<DataSource>) serialFrame.getItemList();
                 if (validate(dsConfirm)) {
                     try {
@@ -315,18 +311,12 @@ public class RemoteDataSourceController extends MultiActionController {
      */
     private HttpResponse postCertRequest(NodeConnection nodeConn) {
         HttpResponse response = null;
-        Certificate cert = loadCert(ServletContextUtil.getServletContextPath() + 
-                InitAppUtil.KS_FILE_PATH, InitAppUtil.getConf().getCertAlias(),
-                InitAppUtil.getConf().getKeystorePass());
-        File certFile = saveCertToFile(cert, InitAppUtil.getWorkDir(),
-                InitAppUtil.getConf().getNodeName());
         Frame frame = Frame.postCertRequest(nodeConn.getNodeAddress(), 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
-                certFile);
+                null);
         Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
         response = handler.post(frame);
-        deleteFile(certFile);
         return response;
     }
     /**
@@ -338,18 +328,15 @@ public class RemoteDataSourceController extends MultiActionController {
     private HttpResponse postDSListRequest(NodeConnection nodeConn) {
         HttpResponse response = null;
         long timestamp = System.currentTimeMillis();
-        File sigFile = saveSignatureToFile(
-                getSignatureBytes(
+        String signature = getSignatureString(
                 ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
-                timestamp), InitAppUtil.getWorkDir());
+                InitAppUtil.getConf().getCertAlias(), timestamp);
         Frame frame = Frame.postDSListRequest(nodeConn.getNodeAddress(), 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
-                timestamp, sigFile);
+                timestamp, signature);
         Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
         response = handler.post(frame);
-        deleteFile(sigFile);
         return response;
     }
     /**
@@ -362,18 +349,15 @@ public class RemoteDataSourceController extends MultiActionController {
     private HttpResponse postSubsciptionRequest(String remoteNodeAddress, File payloadFile) {
         HttpResponse response = null;
         long timestamp = System.currentTimeMillis();
-        File sigFile = saveSignatureToFile(
-                getSignatureBytes(
+        String signature = getSignatureString(
                 ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH, 
-                InitAppUtil.getConf().getCertAlias(), InitAppUtil.getConf().getKeystorePass(), 
-                timestamp), InitAppUtil.getWorkDir());
+                InitAppUtil.getConf().getCertAlias(), timestamp);
         Frame frame = Frame.postSubscriptionRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
-                timestamp, sigFile, payloadFile);
+                timestamp, signature, payloadFile);
         Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
         response = handler.post(frame);
-        deleteFile(sigFile);
         deleteFile(payloadFile);
         return response;
     }
