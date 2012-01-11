@@ -512,9 +512,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             } catch (DuplicateEntry e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("Duplicate entry error", e);
-                
-                e.printStackTrace();
-                
             } catch (DatabaseError e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("File catalog error", e);
@@ -541,11 +538,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response 
      */
     private void handleMessageDeliveryRequest(HashMap parms, HttpServletRequest request) {
-        
+        // to be implemented
     }
-    
-    private void postDataDeliveryRequest() {}
-    
     /**
      * Method gets reference to user manager object.
      *
