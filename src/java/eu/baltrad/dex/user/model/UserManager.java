@@ -25,6 +25,8 @@ import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.dex.log.model.MessageLogger;
 
 import eu.baltrad.dex.util.MessageDigestUtil;
+
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -47,6 +49,8 @@ public class UserManager {
     private JDBCConnectionManager jdbcConnectionManager;
     /** Logger */
     private Logger log;
+    private static Logger logger = LogManager.getLogger(UserManager.class);
+    
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
@@ -293,13 +297,15 @@ public class UserManager {
             String sql = "";
             // record does not exists, do insert
             if (user.getId() == 0) {
+              logger.debug("Atempting to create peer user: " + user.getName() + ", address: " + user.getNodeAddress());
                 sql = "INSERT INTO dex_users (name, role_name, node_address) VALUES ('" +
                     user.getName() + "', '" + user.getRoleName() + "', '" + user.getNodeAddress() + 
                     "');";
                 update = stmt.executeUpdate(sql);
             } else {
                 // record exists, do update
-                sql = "UPDATE dex_users SET name = '" + user.getName() + "', role_name = '" + 
+              logger.debug("Updating peer user: " + user.getName() + ", address: " + user.getNodeAddress());
+              sql = "UPDATE dex_users SET name = '" + user.getName() + "', role_name = '" + 
                     user.getRoleName() + "', node_address = '" + user.getNodeAddress() + 
                     "' WHERE id = " + user.getId() + ";";
                 update = stmt.executeUpdate(sql) ;
@@ -307,6 +313,7 @@ public class UserManager {
             }
         } catch(Exception e) {
             log.error("Failed to save user account", e);
+            logger.debug("Failed to save user account", e);
             throw e;
         } finally {
             jdbcConnectionManager.returnConnection(conn);
