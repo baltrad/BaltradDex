@@ -71,13 +71,10 @@ Author     : szewczenko
                                             <div class="tableheader">
                                                 <div id="cell" class="count">&nbsp;</div>
                                                 <div id="cell" class="name">
-                                                    Name
+                                                    Node name
                                                 </div>
                                                 <div id="cell" class="address">
-                                                    Address
-                                                </div>
-                                                <div id="cell" class="user">
-                                                    User
+                                                    Node address
                                                 </div>
                                                 <div id="cell" class="check">
                                                     Select
@@ -91,13 +88,10 @@ Author     : szewczenko
                                                         <c:set var="count" value="${count + 1}"/>
                                                     </div>
                                                     <div id="cell" class="name">
-                                                        <c:out value="${conn.connectionName}"/>
+                                                        <c:out value="${conn.nodeName}"/>
                                                     </div>
                                                     <div id="cell" class="address">
-                                                        <c:out value="${conn.hostAddress}"/>
-                                                    </div>
-                                                    <div id="cell" class="user">
-                                                        <c:out value="${conn.userName}"/>
+                                                        <c:out value="${conn.nodeAddress}"/>
                                                     </div>
                                                     <div id="cell" class="check">
                                                         <input type="checkbox"
@@ -130,7 +124,7 @@ Author     : szewczenko
                                         <div class="buttons">
                                             <button class="rounded" type="button"
                                                 onclick="window.location.href='settings.htm'">
-                                                <span>Add</span>
+                                                <span>OK</span>
                                             </button>
                                         </div>
                                     </div>
