@@ -29,7 +29,6 @@ import eu.baltrad.frame.model.*;
 import static eu.baltrad.frame.model.Protocol.*;
 
 import eu.baltrad.dex.log.model.MessageLogger;
-import eu.baltrad.dex.util.ServletContextUtil;
 import eu.baltrad.dex.util.InitAppUtil;
 import static eu.baltrad.dex.util.InitAppUtil.deleteFile;
 

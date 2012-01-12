@@ -68,11 +68,15 @@ public class RemoveUserController extends MultiActionController {
     private CertManager certManager;
     // Logger object
     private Logger log;
+    /** List of user accounts to be removed */
+    private List<User> removeUsers;
+    
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
      */
     public RemoveUserController() {
+        removeUsers = new ArrayList<User>();
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
@@ -83,15 +87,21 @@ public class RemoveUserController extends MultiActionController {
      * @return Model and view containing list of all user accounts registered in the system
      */
     public ModelAndView removeAccount( HttpServletRequest request, HttpServletResponse response ) {
-        List users = userManager.get();
-        User signedUser = ( User )ApplicationSecurityManager.getUser( request );
+        List<User> allUsers = userManager.get();
+        removeUsers.clear();
+        for (int i = 0; i < allUsers.size(); i++) {
+            if (!allUsers.get(i).getRoleName().equals(User.ROLE_ADMIN)) {
+                removeUsers.add(allUsers.get(i));
+            }
+        }
+        /*User signedUser = ( User )ApplicationSecurityManager.getUser( request );
         for( int i = 0; i < users.size(); i++ ) {
             User user = ( User )users.get( i );
             if( ApplicationSecurityManager.authenticateSessionUser( signedUser, user ) ) {
                 users.remove( i );
             }
-        }
-        return new ModelAndView( REMOVE_ACCOUNT_VIEW, REMOVE_ACCOUNT_KEY, users );
+        }*/
+        return new ModelAndView( REMOVE_ACCOUNT_VIEW, REMOVE_ACCOUNT_KEY, removeUsers );
     }
     /**
      * Gets list of user accounts selected for removal.
@@ -111,15 +121,16 @@ public class RemoveUserController extends MultiActionController {
             }
             modelAndView = new ModelAndView( ACCOUNT_TO_REMOVE_VIEW, ACCOUNT_TO_REMOVE_KEY, users );
         } else {
-            List users = userManager.get();
+            
+            /*List users = userManager.get();
             User signedUser = ( User )ApplicationSecurityManager.getUser( request );
             for( int i = 0; i < users.size(); i++ ) {
                 User user = ( User )users.get( i );
                 if( ApplicationSecurityManager.authenticateSessionUser( signedUser, user ) ) {
                     users.remove( i );
                 }
-            }
-            modelAndView = new ModelAndView( REMOVE_ACCOUNT_VIEW, REMOVE_ACCOUNT_KEY, users );
+            }*/
+            modelAndView = new ModelAndView(REMOVE_ACCOUNT_VIEW, REMOVE_ACCOUNT_KEY, removeUsers);
         }
         return modelAndView;
     }
@@ -139,7 +150,7 @@ public class RemoveUserController extends MultiActionController {
                 User user = userManager.get( Integer.parseInt( userIds[ i ] ) );
                 userName = user.getName();
                 userManager.deleteUser( Integer.parseInt( userIds[ i ] ) );
-                // Remove user certificate if user is peer
+                /* Remove user certificate if user is peer
                 if (user.getRoleName().equals(User.ROLE_PEER)) {
                     String ksFileName = ServletContextUtil.getServletContextPath() + 
                         InitAppUtil.KS_FILE_PATH;
@@ -148,7 +159,7 @@ public class RemoveUserController extends MultiActionController {
                     Cert cert = certManager.get(user.getName());
                     cert.setTrusted(false);
                     certManager.saveOrUpdate(cert);
-                }
+                }*/
                 log.warn( "User account removed from the system: " + userName );
             } catch( Exception e ) {
                 String msg = "Failed to remove user account";
