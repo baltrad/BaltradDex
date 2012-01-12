@@ -30,7 +30,7 @@ import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.log.model.MessageLogger;
-import eu.baltrad.dex.util.ServletContextUtil;
+import eu.baltrad.dex.util.WebValidator;
 import eu.baltrad.dex.core.model.NodeConnectionManager;
 import eu.baltrad.dex.core.model.NodeConnection;
 
@@ -118,6 +118,8 @@ public class RemoteDataSourceController extends MultiActionController {
     private String remoteNodeName;
     /** Remote node address */
     private String remoteNodeAddress;
+    /** Web address validator */
+    private WebValidator webValidator;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
@@ -147,7 +149,7 @@ public class RemoteDataSourceController extends MultiActionController {
         String connAddress = request.getParameter(ENTER_ADDR_PARAM);
         NodeConnection nodeConn = null;
         logger.debug("dsConnect: nodeName="+nodeName+", address="+connAddress);
-        if (!validate(nodeName) && !validate(connAddress)) {
+        if (!validate(nodeName) && !webValidator.validateUrl(connAddress)) {
           logger.debug("dsConnect: not valid: nodeName="+nodeName+", address="+connAddress);
             // Address was not specified
             modelAndView.addObject(SEL_ADDR_ERROR_KEY, SEL_ADDR_ERROR_MSG);
@@ -155,17 +157,17 @@ public class RemoteDataSourceController extends MultiActionController {
             modelAndView.addObject(CONNECTIONS_KEY, connMgr.get());
             modelAndView.setViewName(CONNECT_TO_NODE_VIEW);
         } else {
-            if (validate(nodeName) && validate(connAddress)) {
+            if (validate(nodeName) && webValidator.validateUrl(connAddress)) {
                 // use new address
               logger.debug("dsConnect: Using address="+connAddress+", but name is valid as well: " + nodeName);
                 nodeConn = new NodeConnection(connAddress);
             }
-            if (validate(nodeName) && !validate(connAddress)) {
+            if (validate(nodeName) && !webValidator.validateUrl(connAddress)) {
                 // use connection selected from the list
               logger.debug("dsConnect: Using name="+nodeName);
                 nodeConn = connMgr.get(nodeName);
             }
-            if (!validate(nodeName) && validate(connAddress)) {
+            if (!validate(nodeName) && webValidator.validateUrl(connAddress)) {
                 // use new address
               logger.debug("dsConnect: Using address="+connAddress);
 
@@ -534,6 +536,19 @@ public class RemoteDataSourceController extends MultiActionController {
      */
     public void setSubscriptionManager( SubscriptionManager subscriptionManager ) {
         this.subscriptionManager = subscriptionManager;
+    }
+    /**
+     * @return the webValidator
+     */
+    public WebValidator getWebValidator() {
+        return webValidator;
+    }
+
+    /**
+     * @param webValidator the webValidator to set
+     */
+    public void setWebValidator(WebValidator webValidator) {
+        this.webValidator = webValidator;
     }
 }
 //--------------------------------------------------------------------------------------------------

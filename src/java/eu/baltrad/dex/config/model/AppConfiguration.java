@@ -21,8 +21,6 @@
 
 package eu.baltrad.dex.config.model;
 
-import eu.baltrad.dex.util.NodeAddress;
-
 /**
  * Class implements system configuration object.
  *
@@ -30,10 +28,12 @@ import eu.baltrad.dex.util.NodeAddress;
  * @version 1.0
  * @since 1.0
  */
-public class AppConfiguration extends NodeAddress {
+public class AppConfiguration {
 //---------------------------------------------------------------------------------------- Variables
     /** Node name, e.g. baltrad.imgw.pl */
     private String nodeName;
+    /** Fully qualified node address */
+    private String nodeAddress;
     /** Node type - primary / backup */
     private String nodeType;
     /** Software version */
@@ -69,13 +69,9 @@ public class AppConfiguration extends NodeAddress {
      * Constructor
      *
      * @param nodeName Node name
+     * @param nodeAddress Fully qualified node address
      * @param nodeType Node type
      * @param version Software version
-     * @param scheme Communication scheme
-     * @param hostAddress Host address
-     * @param port Port number
-     * @param appCtx Application context
-     * @param entryAddress Entry point address
      * @param soTimeout Socket timeout
      * @param connTimeout Connection timeout
      * @param workDir Work directory
@@ -87,25 +83,16 @@ public class AppConfiguration extends NodeAddress {
      * @param email Node admin's email
      * @param keystorePass Keystore password  
      * @param certAlias Certificate alias
-<<<<<<< HEAD
-     * @param certsDir Certificates directory
-=======
->>>>>>> 1b17003392a5b172e56844f403f95c350eeb4a13
      * @param keystoreDir Keystore directory
      */
-    public AppConfiguration( String nodeName, String nodeType, String version, String scheme,
-            String hostAddress, int port, String appCtx, String entryAddress, int soTimeout,
-            int connTimeout, String workDir, String imagesDir, String thumbsDir, String organization,
-            String address, String timeZone, String email, String keystorePass,
+    public AppConfiguration( String nodeName, String nodeAddress, String nodeType, String version, 
+            int soTimeout, int connTimeout, String workDir, String imagesDir, String thumbsDir, 
+            String organization, String address, String timeZone, String email, String keystorePass,
             String certAlias, String certsDir, String keystoreDir) {
         this.nodeName = nodeName;
+        this.nodeAddress = nodeAddress;
         this.nodeType = nodeType;
         this.version = version;
-        this.scheme = scheme;
-        this.hostAddress = hostAddress;
-        this.port = port;
-        this.appCtx = appCtx;
-        this.entryAddress = entryAddress;
         this.soTimeout = soTimeout;
         this.connTimeout = connTimeout;
         this.workDir = workDir;
@@ -132,13 +119,9 @@ public class AppConfiguration extends NodeAddress {
         if( obj instanceof AppConfiguration ) {
             AppConfiguration appConf = ( AppConfiguration )obj;
             return appConf.getNodeName().equals( this.getNodeName() ) &&
+                appConf.getNodeAddress().equals( this.getNodeAddress() ) &&    
                 appConf.getNodeType().equals( this.getNodeType() ) &&
                 appConf.getVersion().equals( this.getVersion() ) &&
-                appConf.getScheme().equals( this.getScheme() ) &&
-                appConf.getHostAddress().equals(this.getHostAddress() ) &&
-                appConf.getPort() == this.getPort() &&
-                appConf.getAppCtx().equals( this.getAppCtx() ) &&
-                appConf.getEntryAddress().equals( this.getEntryAddress() ) &&
                 appConf.getSoTimeout() == this.getSoTimeout() &&
                 appConf.getConnTimeout() == this.getConnTimeout() &&
                 appConf.getWorkDir().equals( this.getWorkDir() ) &&
@@ -168,6 +151,18 @@ public class AppConfiguration extends NodeAddress {
      * @param nodeName Short node name
      */
     public void setNodeName( String nodeName ) { this.nodeName = nodeName; }
+    /**
+     * Gets node address.
+     * 
+     * @return nodeAddress Fully qualified node address
+     */
+    public String getNodeAddress() { return nodeAddress; }
+    /**
+     * Sets node address.
+     * 
+     * @param nodeAddress Fully qualified node address
+     */
+    public void setNodeAddress(String nodeAddress) { this.nodeAddress = nodeAddress; }
     /**
      * Gets node type.
      *

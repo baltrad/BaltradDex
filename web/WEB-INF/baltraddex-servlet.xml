@@ -619,6 +619,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="userManager">
             <ref bean="userManager"/>
         </property>
+        <property name="webValidator">
+            <ref bean="webValidator"/>
+        </property>
     </bean>
 
     <!--
@@ -733,6 +736,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="connMgr">
             <ref bean="nodeConnectionManager" />
         </property>
+        <property name="webValidator">
+            <ref bean="webValidator"/>
+        </property>
     </bean>
 
     <!-- Node manager -->
@@ -753,11 +759,16 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
     <bean name="configurationManager" class="eu.baltrad.dex.config.model.ConfigurationManager"/>
 
+
+    <bean name="webValidator" class="eu.baltrad.dex.util.WebValidator"/>
     <!--
         Save configuration validator
     -->
     <bean name="saveConfigurationValidator"
             class="eu.baltrad.dex.config.util.SaveConfigurationValidator">
+        <property name="webValidator">
+            <ref bean="webValidator"/>
+        </property>        
     </bean>
 
     <!--

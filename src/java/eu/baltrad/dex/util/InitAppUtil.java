@@ -38,7 +38,7 @@ import java.util.Date;
  * @version 1.0
  * @since 1.0
  */
-public class InitAppUtil extends NodeAddress {
+public class InitAppUtil {
 //---------------------------------------------------------------------------------------- Constants
     /** Temporary file prefix */
     private final static String TEMP_FILE_PREFIX = "dex";
@@ -70,7 +70,7 @@ public class InitAppUtil extends NodeAddress {
             ConfigurationManager cm = new ConfigurationManager();
             appConf = cm.loadAppConf();
             createDirs();
-            log.info( "Application successfully initialized" );   
+            log.info( "Application successfully initialized" );
         }
         return appConf;
     }
@@ -83,7 +83,7 @@ public class InitAppUtil extends NodeAddress {
         if( !appConf.equals( _appConf ) ) {
             appConf = _appConf;
             createDirs();
-            log.info( "Application successfully initialized" );   
+            log.info( "Application successfully initialized" );
         }   
     }
     /**

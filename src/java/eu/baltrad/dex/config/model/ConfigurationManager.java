@@ -62,20 +62,12 @@ public class ConfigurationManager {
 
     /** Node name property */
     private static final String NODE_NAME_PROP = "node.name";
+    /** Fully qualified node address */
+    private static final String NODE_ADDRESS_PROP = "node.address";
     /** Node type property */
     private static final String NODE_TYPE_PROP = "node.type"; 
     /** Software version property */
     private static final String SOFT_VERSION_PROP = "software.version";
-    /** Communication scheme property */
-    private static final String COM_SCHEME_PROP = "communication.scheme";
-    /** Host address property */
-    private static final String HOST_ADDRESS_PROP = "host.address";
-    /** Port number property */
-    private static final String PORT_NUMBER_PROP = "port.number";
-    /** Application context property */
-    private static final String APP_CTX_PROP = "application.context";
-    /** Entry point property */
-    private static final String ENTRY_ADDRESS_PROP = "entry.address";
     /** Socket timeout property */
     private static final String SO_TIMEOUT_PROP = "socket.timeout";
     /** Connection timeout property */
@@ -187,18 +179,15 @@ public class ConfigurationManager {
             Properties userProps = props.get( USER_PROPS_KEY );
             Properties versionProps = props.get( VERSION_PROPS_KEY );
             //
-            AppConfiguration conf = new AppConfiguration( userProps.getProperty( NODE_NAME_PROP ),
-                userProps.getProperty( NODE_TYPE_PROP ), versionProps.getProperty( 
-                SOFT_VERSION_PROP ), userProps.getProperty( COM_SCHEME_PROP ), 
-                userProps.getProperty( HOST_ADDRESS_PROP ), Integer.parseInt( userProps.getProperty( 
-                PORT_NUMBER_PROP ) ), userProps.getProperty( APP_CTX_PROP ), userProps.getProperty( 
-                ENTRY_ADDRESS_PROP ), Integer.parseInt( userProps.getProperty( SO_TIMEOUT_PROP ) ),
-                Integer.parseInt( userProps.getProperty( CONN_TIMEOUT_PROP ) ),
-                userProps.getProperty( WORK_DIR_PROP ), userProps.getProperty( IMAGES_DIR_PROP ),
-                userProps.getProperty( THUMBNAILS_DIR_PROP ), userProps.getProperty( ORG_NAME_PROP),
-                userProps.getProperty( ORG_ADDRESS_PROP ), userProps.getProperty( TIME_ZONE_PROP ),
-                userProps.getProperty( EMAIL_PROP ), userProps.getProperty( KEYSTORE_PASS_PROP ),
-                userProps.getProperty( KEY_ALIAS_PROP ), userProps.getProperty( CERTS_DIR_PROP ),
+            AppConfiguration conf = new AppConfiguration(userProps.getProperty(NODE_NAME_PROP),
+                userProps.getProperty(NODE_ADDRESS_PROP), userProps.getProperty(NODE_TYPE_PROP), 
+                versionProps.getProperty(SOFT_VERSION_PROP), Integer.parseInt(userProps.getProperty(
+                SO_TIMEOUT_PROP)), Integer.parseInt(userProps.getProperty(CONN_TIMEOUT_PROP)),
+                userProps.getProperty(WORK_DIR_PROP), userProps.getProperty(IMAGES_DIR_PROP),
+                userProps.getProperty(THUMBNAILS_DIR_PROP), userProps.getProperty(ORG_NAME_PROP),
+                userProps.getProperty(ORG_ADDRESS_PROP), userProps.getProperty(TIME_ZONE_PROP),
+                userProps.getProperty(EMAIL_PROP), userProps.getProperty(KEYSTORE_PASS_PROP),
+                userProps.getProperty(KEY_ALIAS_PROP), userProps.getProperty(CERTS_DIR_PROP),
                 userProps.getProperty(KEYSTORE_DIR_PROP));
             return conf;
         } catch( Exception e ) {
@@ -217,25 +206,21 @@ public class ConfigurationManager {
             HashMap<String, Properties> props = loadProperties();
             Properties userProps = props.get( USER_PROPS_KEY );
             //
-            userProps.setProperty( NODE_NAME_PROP, appConf.getNodeName() );
-            userProps.setProperty( NODE_TYPE_PROP, appConf.getNodeType() );
-            userProps.setProperty( COM_SCHEME_PROP, appConf.getScheme() );
-            userProps.setProperty( HOST_ADDRESS_PROP, appConf.getHostAddress() );
-            userProps.setProperty( PORT_NUMBER_PROP, Integer.toString( appConf.getPort() ) );
-            userProps.setProperty( APP_CTX_PROP, appConf.getAppCtx() );
-            userProps.setProperty( ENTRY_ADDRESS_PROP, appConf.getEntryAddress() );
-            userProps.setProperty( SO_TIMEOUT_PROP, Integer.toString( appConf.getSoTimeout() ) );
-            userProps.setProperty( CONN_TIMEOUT_PROP, Integer.toString( appConf.getConnTimeout()) );
-            userProps.setProperty( WORK_DIR_PROP, appConf.getWorkDir() );
-            userProps.setProperty( IMAGES_DIR_PROP, appConf.getImagesDir() );
-            userProps.setProperty( THUMBNAILS_DIR_PROP, appConf.getThumbsDir() );
-            userProps.setProperty( ORG_NAME_PROP, appConf.getOrganization() );
-            userProps.setProperty( ORG_ADDRESS_PROP, appConf.getAddress() );
-            userProps.setProperty( TIME_ZONE_PROP, appConf.getTimeZone() );
-            userProps.setProperty( EMAIL_PROP, appConf.getEmail() );
-            userProps.setProperty( KEYSTORE_PASS_PROP, appConf.getKeystorePass() );
-            userProps.setProperty( KEY_ALIAS_PROP, appConf.getCertAlias() );
-            userProps.setProperty( CERTS_DIR_PROP, appConf.getCertsDir() );
+            userProps.setProperty(NODE_NAME_PROP, appConf.getNodeName());
+            userProps.setProperty(NODE_ADDRESS_PROP, appConf.getNodeAddress());
+            userProps.setProperty(NODE_TYPE_PROP, appConf.getNodeType());
+            userProps.setProperty(SO_TIMEOUT_PROP, Integer.toString(appConf.getSoTimeout()));
+            userProps.setProperty(CONN_TIMEOUT_PROP, Integer.toString(appConf.getConnTimeout()));
+            userProps.setProperty(WORK_DIR_PROP, appConf.getWorkDir());
+            userProps.setProperty(IMAGES_DIR_PROP, appConf.getImagesDir());
+            userProps.setProperty(THUMBNAILS_DIR_PROP, appConf.getThumbsDir());
+            userProps.setProperty(ORG_NAME_PROP, appConf.getOrganization());
+            userProps.setProperty(ORG_ADDRESS_PROP, appConf.getAddress());
+            userProps.setProperty(TIME_ZONE_PROP, appConf.getTimeZone());
+            userProps.setProperty(EMAIL_PROP, appConf.getEmail());
+            userProps.setProperty(KEYSTORE_PASS_PROP, appConf.getKeystorePass());
+            userProps.setProperty(KEY_ALIAS_PROP, appConf.getCertAlias());
+            userProps.setProperty(CERTS_DIR_PROP, appConf.getCertsDir());
             userProps.setProperty(KEYSTORE_DIR_PROP, appConf.getKeystoreDir());
             //
             FileOutputStream out = new FileOutputStream( ServletContextUtil.getServletContextPath()

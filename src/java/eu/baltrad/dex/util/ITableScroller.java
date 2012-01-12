@@ -40,7 +40,7 @@ public interface ITableScroller {
      *
      * @param page Current page number to set
      */
-    public void setCurrentPage( int page );
+    public void setCurrentPage(int page);
     /**
      * Sets current page number to the next page.
      */

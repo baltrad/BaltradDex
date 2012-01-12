@@ -101,23 +101,14 @@ Author     : szewczenko
                                             <form:errors path="command.nodeType" cssClass="error"/>
                                         </div>
                                         <div class="row">
-                                            <div class="protocol-prefix">http://</div>
-                                            <div class="shortaddress">
-                                                <form:input path="command.hostAddress"
-                                                    title="Enter host address"/>
+                                            <div class="fulladdress">
+                                                <form:input path="command.nodeAddress"
+                                                    title="Enter fully qualified node address"/>
                                                 <div class="hint">
-                                                    Server host address, e.g. baltrad.org
+                                                    Node address, e.g. http://baltrad.eu:8084/BaltradDex/dispatch.htm
                                                 </div>
                                             </div>
-                                            <div class="port-separator">:</div>
-                                            <div class="portnumber">
-                                                <form:input path="command.port"
-                                                    title="Enter port number"/>
-                                                <div class="hint">
-                                                    Port number
-                                                </div>
-                                            </div>
-                                            <form:errors path="command.hostAddress" cssClass="error"/>
+                                            <form:errors path="command.nodeAddress" cssClass="error"/>
                                         </div>
                                         <div class="row">
                                             <div class="orgname">

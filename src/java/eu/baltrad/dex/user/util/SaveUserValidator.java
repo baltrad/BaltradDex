@@ -27,6 +27,7 @@ import org.springframework.validation.ValidationUtils;
 
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
+import eu.baltrad.dex.util.WebValidator;
 
 /**
  * Validator class used to validate input from add user form.
@@ -41,6 +42,7 @@ public class SaveUserValidator implements Validator {
     private static final int COUNTRY_CODE_LENGTH = 2;
 //---------------------------------------------------------------------------------------- Variables
     private UserManager userManager;
+    private WebValidator webValidator;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Declares classes supported by this validator.
@@ -76,8 +78,10 @@ public class SaveUserValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "stateName", "error.missing.state_name");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "countryCode", 
                 "error.missing.country_code");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nodeAddress", 
-                "error.missing.node_address");
+        // validate node address
+        if (!webValidator.validateUrl(user.getNodeAddress())) {
+            errors.rejectValue("nodeAddress","error.address.invalid");
+        }
         // Password is only validated for new accounts
         if( user.getId() == 0 ) {
             if( !errors.hasFieldErrors("password") && !errors.hasFieldErrors("confirmPassword")) {
@@ -107,5 +111,18 @@ public class SaveUserValidator implements Validator {
      * @param userManager Reference to user manager object
      */
     public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
+    /**
+     * @return the webValidator
+     */
+    public WebValidator getWebValidator() {
+        return webValidator;
+    }
+
+    /**
+     * @param webValidator the webValidator to set
+     */
+    public void setWebValidator(WebValidator webValidator) {
+        this.webValidator = webValidator;
+    }
 }
 //--------------------------------------------------------------------------------------------------

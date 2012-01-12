@@ -87,11 +87,10 @@ public class SaveConfigurationController extends SimpleFormController {
     protected Object formBackingObject( HttpServletRequest request ) {
         AppConfiguration conf = configurationManager.loadAppConf();
         if( conf == null ) {
-            conf = new AppConfiguration("Node name", PRIMARY_NODE, "0.7.3", "https", "localhost",
-                    8443, "BaltradDex", "dispatch.htm", 60000, 60000, "work", "images",
-                    "thumbs", "My Organization", "Organization's address", "Time zone",
-                    "Node admin's email", "passwd", "alias", "certs", 
-                    "/opt/baltrad/etc/bltnode-keys");
+            conf = new AppConfiguration("Node name", "http://localhost:8084/BaltradDex/dispatch.htm",
+                PRIMARY_NODE, "0.7.3", 60000, 60000, "work", "images", "thumbs", "My Organization", 
+                    "Organization's address", "Time zone", "Node admin's email", "passwd", "alias", 
+                    "certs", "/opt/baltrad/etc/bltnode-keys");
         }
         return conf;
     }

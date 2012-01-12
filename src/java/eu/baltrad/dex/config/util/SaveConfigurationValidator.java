@@ -22,7 +22,7 @@
 package eu.baltrad.dex.config.util;
 
 import eu.baltrad.dex.config.model.AppConfiguration;
-import eu.baltrad.dex.util.WebUtil;
+import eu.baltrad.dex.util.WebValidator;
 
 import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
@@ -38,6 +38,8 @@ import org.springframework.validation.ValidationUtils;
 public class SaveConfigurationValidator implements Validator {
 //---------------------------------------------------------------------------------------- Constants
     private static final int MIN_FIELD_LENGTH = 6;
+
+    private WebValidator webValidator;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Declares classes supported by this validator.
@@ -62,29 +64,34 @@ public class SaveConfigurationValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "address", "error.missing.address" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "timeZone", "error.missing.timezone" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "workDir", "error.missing.workdir" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", "error.missing.email" );
+        //ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", "error.missing.email" );
         // validate node name
-        if( conf.getNodeName().trim().length() > 0 && conf.getNodeName().trim().length()
-                < MIN_FIELD_LENGTH ) {
+        if (conf.getNodeName().trim().length() > 0 && conf.getNodeName().trim().length()
+                < MIN_FIELD_LENGTH) {
             errors.rejectValue( "nodeName", "error.short.nodename" );
         }
-        // validate host address
-        if( conf.getHostAddress().isEmpty() ) {
-            ValidationUtils.rejectIfEmptyOrWhitespace( errors, "hostAddress",
-                "error.address.invalid" );
-        }
-        // Validate port number
-        if( errors.hasFieldErrors( "port") ) {
-            errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
-        }
-        if( conf.getPort() <= 0 ) {
-            errors.rejectValue( "hostAddress", "error.portnumber.invalid" );
+        // validate node address
+        if (!webValidator.validateUrl(conf.getNodeAddress())) {
+            errors.rejectValue("nodeAddress","error.address.invalid");
         }
         // validate email address
-        if( conf.getEmail().trim().length() > 0 && !WebUtil.validateEmailAddress(
-                conf.getEmail() ) ) {
-            errors.rejectValue( "email", "error.address.invalid" );
+        if (!webValidator.validateEmail(conf.getEmail())) {
+            errors.rejectValue("email", "error.address.invalid" );
         }
+    }
+
+    /**
+     * @return the webValidator
+     */
+    public WebValidator getWebValidator() {
+        return webValidator;
+    }
+
+    /**
+     * @param webValidator the webValidator to set
+     */
+    public void setWebValidator(WebValidator webValidator) {
+        this.webValidator = webValidator;
     }
 }
 //--------------------------------------------------------------------------------------------------

@@ -540,12 +540,6 @@ input:focus, textarea:focus {
     background-color:#A0CB6F;
 }
 /* Node settings page ----------------------------------------------------------------------------*/
-.protocol-prefix, .port-separator {
-    float:left;
-    color:#444444;
-    font-size:14px;
-    font-weight:normal;
-}
 .props .row {
     height:32px;
 }
@@ -561,11 +555,11 @@ input:focus, textarea:focus {
 .nodetype select {
     width:200px;
 }
-.shortaddress {
+.fulladdress {
     float:left;
 }
-.shortaddress input {
-    width:200px;
+.fulladdress input {
+    width:360px;
 }
 .portnumber {
     float:left;
