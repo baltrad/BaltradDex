@@ -148,117 +148,35 @@ public class RemoteDataSourceController extends MultiActionController {
         String nodeName = request.getParameter(SEL_ADDR_PARAM);
         String connAddress = request.getParameter(ENTER_ADDR_PARAM);
         NodeConnection nodeConn = null;
-        logger.debug("dsConnect: nodeName="+nodeName+", address="+connAddress);
-        if (!validate(nodeName) && !webValidator.validateUrl(connAddress)) {
-          logger.debug("dsConnect: not valid: nodeName="+nodeName+", address="+connAddress);
-            // Address was not specified
-            modelAndView.addObject(SEL_ADDR_ERROR_KEY, SEL_ADDR_ERROR_MSG);
-            modelAndView.addObject(ENTER_ADDR_ERROR_KEY, ENTER_ADDR_ERROR_MSG);
-            modelAndView.addObject(CONNECTIONS_KEY, connMgr.get());
-            modelAndView.setViewName(CONNECT_TO_NODE_VIEW);
-        } else {
-            if (validate(nodeName) && webValidator.validateUrl(connAddress)) {
-                // use new address
-              logger.debug("dsConnect: Using address="+connAddress+", but name is valid as well: " + nodeName);
-                nodeConn = new NodeConnection(connAddress);
-            }
-            if (validate(nodeName) && !webValidator.validateUrl(connAddress)) {
-                // use connection selected from the list
-              logger.debug("dsConnect: Using name="+nodeName);
-                nodeConn = connMgr.get(nodeName);
-            }
-            if (!validate(nodeName) && webValidator.validateUrl(connAddress)) {
-                // use new address
-              logger.debug("dsConnect: Using address="+connAddress);
-
-                nodeConn = new NodeConnection(connAddress);
-            }
-            HttpResponse res = postDSListRequest(nodeConn);
-            // Get remote node name from response header
-            setRemoteNodeName(getHeader(res, HDR_NODE_NAME));
-            setRemoteNodeAddress(nodeConn.getNodeAddress());
-            int code = res.getStatusLine().getStatusCode();
-            if (code == HttpServletResponse.SC_UNAUTHORIZED) {
-                modelAndView.addObject(ERROR_MSG_KEY, CONN_UNAUTHORIZED_MSG); 
-            }
-            if (code == HttpServletResponse.SC_OK) {
-              logger.debug("dsConnect: Response ok. Reading frame");
-                SerialFrame serialFrame = readFrameFromStream(res);
-                if (authenticate(/*ServletContextUtil.getServletContextPath() 
-                        + InitAppUtil.KS_FILE_PATH,*/
-                        InitAppUtil.getConf().getKeystoreDir(), serialFrame.getNodeName(), 
-                        serialFrame.getSignature(), serialFrame.getTimestamp())) {                        
-                  logger.debug("dsConnect: Authenticated. Validating data sources");
-
-                  List<DataSource> dsList = (List<DataSource>) serialFrame.getItemList();
-                    if (validate(dsList)) {
-                        modelAndView.addObject(DATA_SOURCES_KEY, dsList);
-                        // make the list available to other methods
-                        setRemoteDataSources(dsList);
-                    } else {
-                        modelAndView.addObject(ERROR_MSG_KEY, DS_LIST_EMPTY_MSG);
-                    }
-                } else {
-                  logger.debug("dsConnect: Not authorized");
-
-                  modelAndView.addObject(ERROR_MSG_KEY, DS_LIST_UNAUTHORIZED_MSG);
-                }
-            }
-            modelAndView.addObject(REMOTE_NODE_NAME_KEY, getRemoteNodeName()); 
-            modelAndView.setViewName(DATA_SOURCES_VIEW);
-            
-            logger.debug("dsConnect: Remote name: " + getRemoteNodeName());
-            
-            if (connMgr.get(getRemoteNodeName()) == null) {
-              logger.debug("dsConnect: Saving or updating node connection with name: " + getRemoteNodeName());
-                try {
-                    nodeConn.setNodeName(getRemoteNodeName());
-                    connMgr.saveOrUpdate(nodeConn);
-                } catch(Exception e) {
-                  logger.debug("Failed to save node connection", e);
-                    log.error("Failed to save node connection", e);
-                }
+        
+        try {
+        
+        
+            logger.debug("dsConnect: nodeName="+nodeName+", address="+connAddress);
+            if (!validate(nodeName) && !webValidator.validateUrl(connAddress)) {
+              logger.debug("dsConnect: not valid: nodeName="+nodeName+", address="+connAddress);
+                // Address was not specified
+                modelAndView.addObject(SEL_ADDR_ERROR_KEY, SEL_ADDR_ERROR_MSG);
+                modelAndView.addObject(ENTER_ADDR_ERROR_KEY, ENTER_ADDR_ERROR_MSG);
+                modelAndView.addObject(CONNECTIONS_KEY, connMgr.get());
+                modelAndView.setViewName(CONNECT_TO_NODE_VIEW);
             } else {
-              logger.debug("dsConnect: No connection with name name: " + getRemoteNodeName());
-            }
-            
-            /*
-            if (validate(connAddress)) {
-                // User defined new connection
-                nodeConn = new NodeConnection(connAddress);
-                try {
-                    HttpResponse res = postCertRequest(nodeConn);
-                    // Get remote node name & address from response header
-                    setRemoteNodeName(getHeader(res, HDR_NODE_NAME));
-                    setRemoteNodeAddress(nodeConn.getNodeAddress());
-                    // Store connection in the db
-                    if (validate(getRemoteNodeName())) {
-                        // Store connection in the db
-                        if (connMgr.get(getRemoteNodeName()) == null) {
-                            try {
-                                nodeConn.setNodeName(getRemoteNodeName());
-                                connMgr.saveOrUpdate(nodeConn);
-                            } catch(Exception e) {
-                                log.error("Failed to save node connection", e);
-                            }
-                        }
-                    }
-                    // Proceed depending upon return code
-                    int code = res.getStatusLine().getStatusCode();
-                    if (code == HttpServletResponse.SC_UNAUTHORIZED) {
-                        modelAndView.addObject(ERROR_MSG_KEY, CONN_UNAUTHORIZED_MSG); 
-                    }
-                    if (code == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
-                        modelAndView.addObject(ERROR_MSG_KEY, INTERNAL_SERVER_ERROR_MSG);     
-                    }
-                } catch(Exception e) {
-                    modelAndView.addObject(ERROR_MSG_KEY, CONN_FAILURE_MSG); 
-                    log.error("Failed to post certificate", e);
-                }       
-            }
-            if (validate(nodeName) && !validate(connAddress)) {
-                // User selected existing connection from the list
-                nodeConn = connMgr.get(nodeName);
+                if (validate(nodeName) && webValidator.validateUrl(connAddress)) {
+                    // use new address
+                  logger.debug("dsConnect: Using address="+connAddress+", but name is valid as well: " + nodeName);
+                    nodeConn = new NodeConnection(connAddress);
+                }
+                if (validate(nodeName) && !webValidator.validateUrl(connAddress)) {
+                    // use connection selected from the list
+                  logger.debug("dsConnect: Using name="+nodeName);
+                    nodeConn = connMgr.get(nodeName);
+                }
+                if (!validate(nodeName) && webValidator.validateUrl(connAddress)) {
+                    // use new address
+                  logger.debug("dsConnect: Using address="+connAddress);
+
+                    nodeConn = new NodeConnection(connAddress);
+                }
                 HttpResponse res = postDSListRequest(nodeConn);
                 // Get remote node name from response header
                 setRemoteNodeName(getHeader(res, HDR_NODE_NAME));
@@ -268,11 +186,13 @@ public class RemoteDataSourceController extends MultiActionController {
                     modelAndView.addObject(ERROR_MSG_KEY, CONN_UNAUTHORIZED_MSG); 
                 }
                 if (code == HttpServletResponse.SC_OK) {
+                  logger.debug("dsConnect: Response ok. Reading frame");
                     SerialFrame serialFrame = readFrameFromStream(res);
-                    if (authenticate(ServletContextUtil.getServletContextPath() 
-                            + InitAppUtil.KS_FILE_PATH, serialFrame.getNodeName(), 
+                    if (authenticate(InitAppUtil.getConf().getKeystoreDir(), serialFrame.getNodeName(), 
                             serialFrame.getSignature(), serialFrame.getTimestamp())) {                        
-                        List<DataSource> dsList = (List<DataSource>) serialFrame.getItemList();
+                      logger.debug("dsConnect: Authenticated. Validating data sources");
+
+                      List<DataSource> dsList = (List<DataSource>) serialFrame.getItemList();
                         if (validate(dsList)) {
                             modelAndView.addObject(DATA_SOURCES_KEY, dsList);
                             // make the list available to other methods
@@ -281,14 +201,35 @@ public class RemoteDataSourceController extends MultiActionController {
                             modelAndView.addObject(ERROR_MSG_KEY, DS_LIST_EMPTY_MSG);
                         }
                     } else {
-                        modelAndView.addObject(ERROR_MSG_KEY, DS_LIST_UNAUTHORIZED_MSG);
+                      logger.debug("dsConnect: Not authorized");
+
+                      modelAndView.addObject(ERROR_MSG_KEY, DS_LIST_UNAUTHORIZED_MSG);
                     }
                 }
+                modelAndView.addObject(REMOTE_NODE_NAME_KEY, getRemoteNodeName()); 
+                modelAndView.setViewName(DATA_SOURCES_VIEW);
+
+                logger.debug("dsConnect: Remote name: " + getRemoteNodeName());
+
+                if (connMgr.get(getRemoteNodeName()) == null) {
+                  logger.debug("dsConnect: Saving or updating node connection with name: " 
+                          + getRemoteNodeName());
+                    try {
+                        nodeConn.setNodeName(getRemoteNodeName());
+                        connMgr.saveOrUpdate(nodeConn);
+                    } catch(Exception e) {
+                      logger.debug("Failed to save node connection", e);
+                        log.error("Failed to save node connection", e);
+                    }
+                } else {
+                  logger.debug("dsConnect: No connection with name name: " + getRemoteNodeName());
+                }
             }
-            modelAndView.addObject(REMOTE_NODE_NAME_KEY, getRemoteNodeName()); 
+        } catch (Exception e) {
+            modelAndView.addObject(ERROR_MSG_KEY, CONN_FAILURE_MSG); 
             modelAndView.setViewName(DATA_SOURCES_VIEW);
-        }*/
-        }    
+            log.error(CONN_FAILURE_MSG);
+        }        
         return modelAndView;
     }
     /**

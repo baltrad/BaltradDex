@@ -64,7 +64,6 @@ public class SaveConfigurationValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "address", "error.missing.address" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "timeZone", "error.missing.timezone" );
         ValidationUtils.rejectIfEmptyOrWhitespace( errors, "workDir", "error.missing.workdir" );
-        //ValidationUtils.rejectIfEmptyOrWhitespace( errors, "email", "error.missing.email" );
         // validate node name
         if (conf.getNodeName().trim().length() > 0 && conf.getNodeName().trim().length()
                 < MIN_FIELD_LENGTH) {

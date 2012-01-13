@@ -149,20 +149,7 @@ public class SaveConfigurationController extends SimpleFormController {
             Object command, BindException errors ) {
         AppConfiguration appConf = ( AppConfiguration )command;
         try {
-            //AppConfiguration oldConf = configurationManager.loadAppConf();
             configurationManager.saveAppConf( appConf );
-            // Update certificate configuration / alias if node name has been changed  
-            /*Certificate cert = loadCert(ServletContextUtil.getServletContextPath() + 
-                    InitAppUtil.KS_FILE_PATH, oldConf.getNodeName(),
-                    InitAppUtil.getConf().getKeystorePass());
-            certManager.storePrivateEntry(ServletContextUtil.getServletContextPath() +
-                    InitAppUtil.KS_FILE_PATH, InitAppUtil.getConf().getKeystorePass(), cert, 
-                    appConf.getNodeName());
-            // Delete obsolete certificate  
-            certManager.deleteFromKS(ServletContextUtil.getServletContextPath() +
-                    InitAppUtil.KS_FILE_PATH, InitAppUtil.getConf().getKeystorePass(), 
-                    oldConf.getNodeName());
-            */
             InitAppUtil.saveAppConf( appConf );
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveconf.savesuccess" ) );

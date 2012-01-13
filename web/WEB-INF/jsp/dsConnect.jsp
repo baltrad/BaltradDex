@@ -33,8 +33,16 @@ Author     : szewczenko
         </div>
         <div class="right">
             <div class="blttitle">
-                <img src="includes/images/icons/connection.png" alt="">
-                Connected to <c:out value="${remoteNodeName}"/>
+                <c:choose>
+                    <c:when test="${not empty remoteNodeName}">
+                        <img src="includes/images/icons/connection.png" alt="">
+                        Connected to <c:out value="${remoteNodeName}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <img src="includes/images/icons/failure.png" alt="">
+                        Connection failure
+                    </c:otherwise>
+                </c:choose>
             </div>
             <c:choose>
                 <c:when test="${not empty errorMsg}">
