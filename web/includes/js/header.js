@@ -23,7 +23,7 @@
  * BaltradDex header template.
  */
 document.write( "<div class=\"help\"> " );
-document.write( "<a href=\"help.htm\">Help</a>" );
+document.write( "<a href=\"help/index.html\" target=\"_blank\">Help</a>" );
 document.write( " | " );
 document.write( "<a href=\"logout.htm\">Log out</a>" );
 document.write( "</div>" );
