@@ -342,7 +342,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </copy>
     <copy todir="${build.test.dir}">
       <fileset dir="${test.data.dir}"/>
-      <fileset dir="${etc.dir}/${keystore.dir}"/>    
+      <fileset dir="${etc.dir}/${keystore.dir}"/>
     </copy>
     
 	<!-- Seems a bit odd, but there is no real conditions in ant so we call both

@@ -21,9 +21,11 @@
 
 package eu.baltrad.dex.util;
 
+
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
+import eu.baltrad.frame.model.Handler;
 
 import org.apache.log4j.Logger;
 
@@ -61,6 +63,8 @@ public class InitAppUtil {
     private static String thumbsDir;
     /** Certificates directory */
     private static String certsDir;
+    /** Reference to frame handler object */
+    private static Handler handler;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Load application settings.
@@ -69,6 +73,7 @@ public class InitAppUtil {
         if( appConf == null ) {
             ConfigurationManager cm = new ConfigurationManager();
             appConf = cm.loadAppConf();
+            initHandler(appConf);
             createDirs();
             log.info( "Application successfully initialized" );
         }
@@ -97,6 +102,14 @@ public class InitAppUtil {
                 appConf.getThumbsDir(), "New thumbs storage directory created" );
         certsDir = createDir( appConf.getWorkDir() + File.separator + 
                 appConf.getCertsDir(), "New certificate storage directory created" );
+    }
+    /**
+     * Initializes frame handler.
+     * 
+     * @param appConf Application configuration object
+     */
+    private static void initHandler(AppConfiguration appConf) {
+        handler = new Handler(appConf.getConnTimeout(), appConf.getSoTimeout());
     }
     /**
      * Gets configuration object.
@@ -128,6 +141,12 @@ public class InitAppUtil {
      * @return Certificates directory
      */
     public static String getCertsDir() { return certsDir; }
+    /**
+     * Gets reference to frame handler
+     * 
+     * @return Reference to frame handler
+     */
+    public static Handler getHandler() { return handler; }
     /**
      * Method extracts relative file name from absolute file path string.
      *
