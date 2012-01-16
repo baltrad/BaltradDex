@@ -290,6 +290,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="includes/**/*.gif" />
         <include name="includes/**/*.jpg" />
         <include name="includes/**/*.txt" />
+      	<include name="help/**/*.html" />
       </fileset>
       <fileset dir="${etc.dir}">
         <include name="db.properties" />
