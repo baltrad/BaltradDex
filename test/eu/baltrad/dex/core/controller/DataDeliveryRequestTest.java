@@ -99,18 +99,18 @@ public class DataDeliveryRequestTest extends TestCase {
         assertEquals(10, senders.size());
     }
     
-    @Test
     /*
      * Uncomment to test data delivery against operational node
-     * 
-     * public void testPostDataDeliveryRequest() throws Exception {
-        for (int i = 0; i < 10; i++) {
+     */
+    @Test
+    public void testPostDataDeliveryRequest() throws Exception {
+        /*for (int i = 0; i < 10; i++) {
             senders.get(i).start();
             Thread.sleep(2000);
             
             assertEquals(200, senders.get(i).getStatus());            
-        }
-    }*/
+        }*/
+    }
     
     private void registerHttpScheme(SchemeRegistry schemeReg) {
         Scheme http = new Scheme("http", 80, new PlainSocketFactory());
