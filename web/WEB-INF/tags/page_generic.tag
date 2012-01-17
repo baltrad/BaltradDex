@@ -17,7 +17,7 @@
   <jsp:invoke fragment="extraHeader"/>
   <!-- favicon -->
   <link rel="icon" type="image/png" href="includes/images/favicon.png"/>
-  <title>Baltrad | ${pageTitle}</title>
+  <title>BALTRAD | ${pageTitle}</title>
 </head>
 <body>
    <div id="bltcontainer">

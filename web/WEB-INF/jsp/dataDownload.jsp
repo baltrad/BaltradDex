@@ -35,7 +35,7 @@ Author     : szewczenko
         </noscript>
         <script type="text/javascript" language="javascript" src="includes/js/expandable.js"></script>
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Data download</title>
+        <title>BALTRAD | Data download</title>
     </head>
     <body>
         <div id="bltcontainer">

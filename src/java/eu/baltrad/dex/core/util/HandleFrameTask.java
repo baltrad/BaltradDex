@@ -62,16 +62,15 @@ public class HandleFrameTask implements Runnable {
      * @param entry File entry
      * @param frame Data delivery frame 
      */
-    public HandleFrameTask(DeliveryRegisterManager drManager, Logger log, User user, 
-            FileEntry entry, Frame frame) 
+    public HandleFrameTask(DeliveryRegisterManager drManager, Logger log, 
+            User user, FileEntry entry, Frame frame) 
     {
         this.drManager = drManager;
         this.log = log;
         this.user = user;
         this.entry = entry;
         this.frame = frame;
-        this.handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
-                InitAppUtil.getConf().getSoTimeout());
+        this.handler = InitAppUtil.getHandler();
     }
     /**
      * Implements Runnable interface. Runs frame delivery task in a separate thread.

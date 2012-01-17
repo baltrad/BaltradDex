@@ -49,7 +49,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Log in</title>
+        <title>BALTRAD | Log in</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -75,7 +75,7 @@ Author     : szewczenko
                                 </div>
                                 <div class="right">
                                     <div class="prompt">
-                                        | Log on to Baltrad system.
+                                        | Log on to BALTRAD
                                     </div>
                                     <div class="username">
                                         <form:input path="command.name"/>

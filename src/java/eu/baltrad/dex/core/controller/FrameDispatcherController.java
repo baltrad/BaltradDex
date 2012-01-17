@@ -39,8 +39,6 @@ import eu.baltrad.dex.core.util.HandleFrameTask;
 import eu.baltrad.dex.core.util.IncomingFileNamer;
 import eu.baltrad.dex.registry.model.*;
 import eu.baltrad.dex.bltdata.model.BltFileManager;
-import eu.baltrad.dex.util.ServletContextUtil;
-import eu.baltrad.dex.core.model.Cert;
 import eu.baltrad.dex.core.model.CertManager;
 
 import eu.baltrad.bdb.FileCatalog;
@@ -242,7 +240,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
                 response.setStatus(HttpServletResponse.SC_OK);
                 // Send data source listing to the client
-                //User user = userManager.getByName(Frame.getNodeName(parms));
                 List<Integer> dataSourceIds = dataSourceManager.getDataSourceIds(user.getId());
                 List<DataSource> dsList = new ArrayList<DataSource>();
                 for (int i = 0; i < dataSourceIds.size(); i++) {
@@ -250,9 +247,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 }
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(
-                    InitAppUtil.getConf().getKeystoreDir(),
-                    /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/ 
-                    InitAppUtil.getConf().getCertAlias(), timestamp);
+                    InitAppUtil.getConf().getKeystoreDir(), InitAppUtil.getConf().getCertAlias(), 
+                        timestamp);
                 SerialFrame serialFrame = SerialFrame.postDSListResponse(user.getNodeAddress(), 
                         InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
                         timestamp, signature, dsList);
@@ -275,9 +271,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response 
      */
     private void handleSubscriptionRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(/*ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH,*/InitAppUtil.getConf().getKeystoreDir(),
-                Frame.getNodeName(parms), 
+        if (authenticate(InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
                 Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             try {
                 log.info(Frame.getNodeName(parms) + " requested data source subscription");
@@ -312,9 +306,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 response.setStatus(HttpServletResponse.SC_OK);
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
-                String signature = getSignatureString(
-                    /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH*/
-                    InitAppUtil.getConf().getKeystoreDir(), 
+                String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(), 
                     InitAppUtil.getConf().getCertAlias(), timestamp); 
                 SerialFrame serialFrame = SerialFrame.postSubscriptionResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
@@ -338,9 +330,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response 
      */
     private void handleSubscriptionSyncRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(/*ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH,*/
-                InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
+        if (authenticate(InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
                 Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             try {
                 Subscription sub = (Subscription) readObjectFromFile(Frame.getPayloadFile(parms));
@@ -359,9 +349,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 response.setStatus(HttpServletResponse.SC_OK);
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
-                String signature = getSignatureString(
-                    /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/
-                    InitAppUtil.getConf().getKeystoreDir(),    
+                String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(),    
                     InitAppUtil.getConf().getCertAlias(), timestamp); 
                 SerialFrame serialFrame = SerialFrame.postSubscriptionSyncResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
@@ -386,9 +374,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response 
      */
     private void handleSubscriptionUpdateRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(/*ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH,*/
-                InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
+        if (authenticate(InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
                 Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             try {
                 log.info(Frame.getNodeName(parms) + " updated subscription status");
@@ -429,9 +415,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 response.setStatus(HttpServletResponse.SC_OK);
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
-                String signature = getSignatureString(
-                    /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/
-                    InitAppUtil.getConf().getKeystoreDir(),    
+                String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(),    
                     InitAppUtil.getConf().getCertAlias(), timestamp); 
                 SerialFrame serialFrame = SerialFrame.postSubscriptionUpdateResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
@@ -453,9 +437,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response 
      */
     private void handleDataDeliveryRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(/*ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH,*/
-                InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
+        if (authenticate(InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
                 Frame.getSignature(parms), Frame.getTimestamp(parms))) {
             FileInputStream fis = null;
             try {
@@ -486,9 +468,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             receiver.getId(), fileEntry.getUuid().toString());
                     if (matches && dre == null) {
                         long timestamp = System.currentTimeMillis();
-                        String signature = getSignatureString(
-                            /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/
-                            InitAppUtil.getConf().getKeystoreDir(),    
+                        String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(),    
                             InitAppUtil.getConf().getCertAlias(), timestamp);
                         Frame frame = Frame.postDataDeliveryRequest(receiver.getNodeAddress(), 
                             InitAppUtil.getConf().getNodeAddress(),
@@ -502,7 +482,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     }
                 }
                 // delete temporary files here
-                
                 
                 
                 response.setStatus(HttpServletResponse.SC_OK);

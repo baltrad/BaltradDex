@@ -323,6 +323,14 @@ BEGIN
     EXCEPTION
         WHEN OTHERS THEN RAISE NOTICE 'Failed to drop table dex_node_address';
     END;
+    BEGIN
+        ALTER TABLE dex_delivery_register DROP CONSTRAINT dex_delivery_register_user_id_fkey;
+        ALTER TABLE dex_delivery_register ADD CONSTRAINT dex_delivery_register_user_id_fkey 
+            FOREIGN KEY (user_id) REFERENCES dex_users (id) MATCH SIMPLE 
+            ON UPDATE NO ACTION ON DELETE CASCADE;
+    EXCEPTION 
+        WHEN OTHERS THEN RAISE NOTICE 'Failed to alter table dex_delivery_register';
+    END;
 END;
 $$ LANGUAGE plpgsql;
 

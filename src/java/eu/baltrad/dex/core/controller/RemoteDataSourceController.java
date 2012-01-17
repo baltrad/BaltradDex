@@ -90,7 +90,7 @@ public class RemoteDataSourceController extends MultiActionController {
     private static final String INTERNAL_SERVER_ERROR_MSG = "Failed to access remote node due to " +
         "internal server error. In case the problem persists, contact remote node's administrator.";
     private static final String CONN_FAILURE_MSG = "Failed to connect to the remote node. " +
-        " Check node's address or contact remote node's administrator";
+        " Check node address or contact remote node administrator";
     private static final String SUB_REQUEST_OK = "Subscription request was successfully completed";
     private static final String REMOTE_NODE_NAME_KEY = "remoteNodeName";    
     private static final String DATA_SOURCES_KEY = "remoteDataSources";

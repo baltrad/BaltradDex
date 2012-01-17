@@ -41,7 +41,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Edit user account</title>
+        <title>BALTRAD | Edit user account</title>
     </head>
     <body>
         <div id="bltcontainer">
