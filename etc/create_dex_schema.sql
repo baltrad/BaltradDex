@@ -103,9 +103,9 @@ CREATE TABLE dex_messages
 -- dex_messages_timestamp_idx ----------------------------------------------------------------------
 CREATE UNIQUE INDEX dex_messages_timestamp_idx ON dex_messages (timestamp);
 
--- channel_id_seq ----------------------------------------------------------------------------------
+-- radar_id_seq ------------------------------------------------------------------------------------
 CREATE SEQUENCE radar_id_seq;
--- dex_channels ------------------------------------------------------------------------------------
+-- dex_radars --------------------------------------------------------------------------------------
 CREATE TABLE dex_radars
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('radar_id_seq'),
@@ -147,7 +147,7 @@ CREATE SEQUENCE delivery_register_id_seq;
 CREATE TABLE dex_delivery_register
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('delivery_register_id_seq'),
-    user_id INT NOT NULL REFERENCES dex_users (id),
+    user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE,
     uuid VARCHAR(128) NOT NULL,
     user_name VARCHAR(32) NOT NULL,
     timestamp TIMESTAMP NOT NULL,

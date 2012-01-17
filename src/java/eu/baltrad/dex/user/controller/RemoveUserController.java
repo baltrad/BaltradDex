@@ -25,10 +25,6 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.core.model.CertManager;
-import eu.baltrad.dex.util.ApplicationSecurityManager;
-import eu.baltrad.dex.util.ServletContextUtil;
-import eu.baltrad.dex.util.InitAppUtil;
-import eu.baltrad.dex.core.model.Cert;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -144,32 +140,22 @@ public class RemoveUserController extends MultiActionController {
     public ModelAndView removeAccountStatus( HttpServletRequest request,
             HttpServletResponse response ) {
         String[] userIds = request.getParameterValues( REMOVED_USERS_KEY );
-        String userName = "";
-        for( int i = 0; i < userIds.length; i++ ) {
-            try {
-                User user = userManager.get( Integer.parseInt( userIds[ i ] ) );
-                userName = user.getName();
-                userManager.deleteUser( Integer.parseInt( userIds[ i ] ) );
-                /* Remove user certificate if user is peer
-                if (user.getRoleName().equals(User.ROLE_PEER)) {
-                    String ksFileName = ServletContextUtil.getServletContextPath() + 
-                        InitAppUtil.KS_FILE_PATH;
-                    String ksPasswd = InitAppUtil.getConf().getKeystorePass();
-                    certManager.deleteFromKS(ksFileName, ksPasswd, user.getName());
-                    Cert cert = certManager.get(user.getName());
-                    cert.setTrusted(false);
-                    certManager.saveOrUpdate(cert);
-                }*/
-                log.warn( "User account removed from the system: " + userName );
-            } catch( Exception e ) {
-                String msg = "Failed to remove user account";
-                request.getSession().removeAttribute(OK_MSG_KEY);
-                request.getSession().setAttribute(ERROR_MSG_KEY, msg);
-                log.error(msg, e);
+        try {
+            for (int i = 0; i < userIds.length; i++) {
+                User user = userManager.get(Integer.parseInt(userIds[i]));
+                userManager.deleteUser(Integer.parseInt(userIds[i]));
+                log.warn("User account" + user.getName() + " successfully removed");
             }
+            String msg = "User account(s) successfully removed.";
+            request.getSession().setAttribute(OK_MSG_KEY, msg);
+            log.warn(msg);
+        } catch (Exception e) {
+            String msg = "Failed to remove user account(s).";
+            request.getSession().removeAttribute(OK_MSG_KEY);
+            request.getSession().setAttribute(ERROR_MSG_KEY, msg);
+            log.error(msg, e);
         }
-        String msg = "Selected user account successfully removed.";
-        return new ModelAndView(REMOVED_ACCOUNT_VIEW, OK_MSG_KEY, msg);
+        return new ModelAndView(REMOVED_ACCOUNT_VIEW);
     }
     /**
      * Method gets reference to user manager object.
