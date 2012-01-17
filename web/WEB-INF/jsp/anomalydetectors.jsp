@@ -40,7 +40,7 @@ List of anomaly detectors
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Quality controls</title>
+        <title>BALTRAD | Quality controls</title>
     </head>
     <body>
         <div id="bltcontainer">

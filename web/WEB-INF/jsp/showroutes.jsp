@@ -42,7 +42,7 @@ List of routes
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Routes</title>
+        <title>BALTRAD | Routes</title>
     </head>
     <body>
         <div id="bltcontainer">

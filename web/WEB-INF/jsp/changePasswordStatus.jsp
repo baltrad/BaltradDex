@@ -30,7 +30,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Change password</title>
+        <title>BALTRAD | Change password</title>
     </head>
     <body>
         <div id="bltcontainer">

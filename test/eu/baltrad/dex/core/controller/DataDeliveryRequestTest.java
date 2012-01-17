@@ -109,7 +109,8 @@ public class DataDeliveryRequestTest extends TestCase {
             Thread.sleep(2000);
             
             assertEquals(200, senders.get(i).getStatus());            
-        }*/
+        }
+        */
     }
     
     private void registerHttpScheme(SchemeRegistry schemeReg) {

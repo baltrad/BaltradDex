@@ -30,7 +30,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>Baltrad | Remove user account</title>
+        <title>BALTRAD | Remove user account</title>
     </head>
     <body>
         <div id="bltcontainer">

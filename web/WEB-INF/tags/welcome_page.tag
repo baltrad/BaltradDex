@@ -1,10 +1,10 @@
 <div class="blttitle">
-    Welcome to Baltrad Radar Data Exchange and Processing System!
+    Welcome to BALTRAD!
 </div>
 <div class="blttext">
-    <p>Baltrad is running on ${nodeName} operated by ${operator}.</p>
+    <p>BALTRAD is running on ${nodeName} operated by ${operator}.</p>
     <p>You have signed in as user ${userName}.</p>
-    <p>Following is the information about local Baltrad node.</p>
+    <p>Information on this BALTRAD node:</p>
 </div>
 <div class="bltseparator"></div>
 <div class="table">

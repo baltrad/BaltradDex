@@ -41,7 +41,7 @@ Author     : szewczenko
 
 <html>
     <head>
-        <title>Baltrad | Data preview</title>
+        <title>BALTRAD | Data preview</title>
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
         <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
         <script type="text/javascript" src="includes/js/slider.js"></script>
