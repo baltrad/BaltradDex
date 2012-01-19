@@ -48,11 +48,15 @@ import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.bdb.db.DatabaseError;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
+import eu.baltrad.beast.message.IBltXmlMessage;
 import eu.baltrad.beast.message.mo.BltDataMessage;
+import eu.baltrad.beast.parser.IXmlMessageParser;
 import eu.baltrad.beast.db.IFilter;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -76,7 +80,7 @@ import java.io.IOException;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class FrameDispatcherController extends HttpServlet implements Controller {
+public class FrameDispatcherController extends HttpServlet implements Controller, InitializingBean {
 //---------------------------------------------------------------------------------------- Constants
     // path to HDF5 dataset used to generate image thumb
     /*private static final String H5_THUMB_DATASET_PATH = "/dataset1/data1/data";
@@ -100,9 +104,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private DataSourceManager dataSourceManager;
     private SubscriptionManager subscriptionManager;
     private Logger log;
+    
+    private static Logger logger = LogManager.getLogger(FrameDispatcherController.class);
+    
     private BltDataProcessorController bltDataProcessorController;
     // Reference to file catalog object
     private FileCatalog fileCatalog;
+    
+    // Beast xml message parser
+    private IXmlMessageParser xmlMessageParser;
     // Beast message manager
     private IBltMessageManager bltMessageManager;
     // Frame publisher manager
@@ -120,8 +130,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * Constructor.
      */
     public FrameDispatcherController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        InitAppUtil.loadAppConf();
+        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     /**
      * Required by the Spring's Controller interface, wraps actual doGet method used to
@@ -507,15 +516,53 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             log.error("Failed to authenticate frame");
         }
     }
+    
+    /**
+     * Authenticates a message from the parameters
+     * @param parms the parameters. Should contain Node name, signature and timestamp
+     * @return true if authenticated
+     */
+    boolean isAuthenticated(HashMap parms) {
+      return authenticate(InitAppUtil.getConf().getKeystoreDir(),
+                          Frame.getNodeName(parms),
+                          Frame.getSignature(parms),
+                          Frame.getTimestamp(parms));
+    }
+    
+    /**
+     * Returns this nodes name. This method exists just for making testing
+     * simpler.
+     * @return this nodes name.
+     */
+    String getConfigNodeName() {
+      return InitAppUtil.getConf().getNodeName();
+    }
+    
     /**
      * Handles message delivery request.
      * 
      * @param parms Request parameters
      * @param response HTTP response 
      */
-    private void handleMessageDeliveryRequest(HashMap parms, HttpServletRequest request) {
-        // to be implemented
+    void handleMessageDeliveryRequest(HashMap parms, HttpServletRequest request) {
+      if (isAuthenticated(parms)) {
+        String nodeName = getConfigNodeName();
+        String frameNodeName = Frame.getNodeName(parms);
+        if (nodeName != null && nodeName.equals(frameNodeName)) {
+          String msg = Frame.getMessage(parms);
+          logger.debug("Got a message delivery: '"+msg+"'");
+          try {
+            IBltXmlMessage message = xmlMessageParser.parse(msg);
+            bltMessageManager.manage(message);
+          } catch (Exception e) {
+            // pass
+          }
+        } else {
+          logger.debug("message from unknown node, ignoring");
+        }
+      }
     }
+    
     /**
      * Method gets reference to user manager object.
      *
@@ -619,6 +666,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     public void setBltMessageManager( IBltMessageManager bltMessageManager ) {
         this.bltMessageManager = bltMessageManager;
     }
+    
+    /**
+     * Dependency injected xml parser for identifying beast messages.
+     * @param parser the beast xml message parser
+     */
+    public void setXmlMessageParser(IXmlMessageParser parser) {
+      this.xmlMessageParser = parser;
+    }
+    
     /**
      * Gets reference to delivery register manager object.
      *
@@ -670,5 +726,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param certificateManager the certificateManager to set
      */
     public void setCertManager(CertManager certManager) { this.certManager = certManager; }
+    
+
+    /**
+     * Called by spring fwk after the object initialization is completed.
+     * @throws Exception upon error
+     */
+    @Override
+    public void afterPropertiesSet() throws Exception {
+      InitAppUtil.loadAppConf();
+    }
 }
 //--------------------------------------------------------------------------------------------------

@@ -21,6 +21,10 @@
 
 package eu.baltrad.dex.core.controller;
 
+import eu.baltrad.beast.manager.IBltMessageManager;
+import eu.baltrad.beast.message.IBltMessage;
+import eu.baltrad.beast.message.IBltXmlMessage;
+import eu.baltrad.beast.parser.IXmlMessageParser;
 import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.EasyX509TrustManager;
 
@@ -47,6 +51,8 @@ import org.apache.http.HttpVersion;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.entity.mime.content.FileBody;
+import org.dom4j.Document;
+import org.easymock.MockControl;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.net.ssl.SSLContext;
@@ -96,6 +102,20 @@ public class FrameDispatcherControllerTest extends TestCase {
     private static byte[] publicKeyStub;
     private static Certificate cert;
     private static PrivateKey privateKey;
+    
+// Mocking stuff
+    interface MethodMock {
+      boolean isAuthenticated(HashMap parms);
+      String getConfigNodeName();
+    };
+    
+    MockControl methodControl = null;
+    MethodMock methods = null;
+    MockControl parserControl = null;
+    IXmlMessageParser parser = null;
+    MockControl managerControl = null;
+    IBltMessageManager manager = null;
+      
 //------------------------------------------------------------------------------------------ Methods    
     @Override
     public void setUp() throws Exception {
@@ -123,8 +143,39 @@ public class FrameDispatcherControllerTest extends TestCase {
         HttpConnectionParams.setConnectionTimeout( httpParams, 60000 );
         HttpConnectionParams.setSoTimeout( httpParams, 60000 );
         HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
+        
+        methodControl = MockControl.createControl(MethodMock.class);
+        methods = (MethodMock)methodControl.getMock();
+        parserControl = MockControl.createControl(IXmlMessageParser.class);
+        parser = (IXmlMessageParser)parserControl.getMock();
+        managerControl = MockControl.createControl(IBltMessageManager.class);
+        manager = (IBltMessageManager)managerControl.getMock();
     }
     
+    @Override
+    public void tearDown() throws Exception {
+        client.getConnectionManager().shutdown();
+        tester.stop();
+        methodControl = null;
+        methods = null;
+        parserControl = null;
+        parser = null;
+        managerControl = null;
+        manager = null;
+    }
+    
+    protected void replay() throws Exception {
+      methodControl.replay();
+      parserControl.replay();
+      managerControl.replay();
+    }
+
+    protected void verify() throws Exception {
+      methodControl.verify();
+      parserControl.verify();
+      managerControl.verify();
+    }
+
     public void testHttpGetMethod() throws IOException {
         HttpGet httpGet = new HttpGet( context + SERVLET_PATH );
         HttpResponse response = client.execute( httpGet );
@@ -403,10 +454,106 @@ public class FrameDispatcherControllerTest extends TestCase {
         assertEquals( HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode() );
     }
     
-    @Override
-    public void tearDown() throws Exception {
-        client.getConnectionManager().shutdown();
-        tester.stop();
+    public void testHandleMessageDeliveryRequest_success() throws Exception {
+      IBltXmlMessage bltmsg = new IBltXmlMessage() {
+        public Document toDocument() {return null;}
+        public void fromDocument(Document arg0) {}
+      };
+      
+      HashMap<String,String> parms = new HashMap<String,String>();
+      parms.put("BF_NodeName", "se.smhi.main");
+      parms.put("BF_MessageField", "<bltalert>..</bltalert>");
+      
+      methods.isAuthenticated(parms);
+      methodControl.setReturnValue(true);
+      methods.getConfigNodeName();
+      methodControl.setReturnValue("se.smhi.main");
+      parser.parse("<bltalert>..</bltalert>");
+      parserControl.setReturnValue(bltmsg);
+      manager.manage(bltmsg);
+      
+      FrameDispatcherController classUnderTest = new FrameDispatcherController() {
+        boolean isAuthenticated(HashMap parms) {
+          return methods.isAuthenticated(parms);
+        }
+        String getConfigNodeName() {
+          return methods.getConfigNodeName();
+        }
+      };
+      classUnderTest.setBltMessageManager(manager);
+      classUnderTest.setXmlMessageParser(parser);
+      
+      replay();
+      
+      classUnderTest.handleMessageDeliveryRequest(parms, null);
+
+      verify();
+    }
+
+    public void testHandleMessageDeliveryRequest_illegalSender() throws Exception {
+      IBltXmlMessage bltmsg = new IBltXmlMessage() {
+        public Document toDocument() {return null;}
+        public void fromDocument(Document arg0) {}
+      };
+      
+      HashMap<String,String> parms = new HashMap<String,String>();
+      parms.put("BF_NodeName", "bad.one");
+      parms.put("BF_MessageField", "<bltalert>..</bltalert>");
+      
+      methods.isAuthenticated(parms);
+      methodControl.setReturnValue(false);
+      
+      FrameDispatcherController classUnderTest = new FrameDispatcherController() {
+        boolean isAuthenticated(HashMap parms) {
+          return methods.isAuthenticated(parms);
+        }
+        String getConfigNodeName() {
+          return methods.getConfigNodeName();
+        }
+      };
+      classUnderTest.setBltMessageManager(manager);
+      classUnderTest.setXmlMessageParser(parser);
+      
+      replay();
+      
+      classUnderTest.handleMessageDeliveryRequest(parms, null);
+
+      verify();
+    }
+
+    public void testHandleMessageDeliveryRequest_notBeastMessage() throws Exception {
+      IBltXmlMessage bltmsg = new IBltXmlMessage() {
+        public Document toDocument() {return null;}
+        public void fromDocument(Document arg0) {}
+      };
+      
+      HashMap<String,String> parms = new HashMap<String,String>();
+      parms.put("BF_NodeName", "se.smhi.main");
+      parms.put("BF_MessageField", "my message");
+      
+      methods.isAuthenticated(parms);
+      methodControl.setReturnValue(true);
+      methods.getConfigNodeName();
+      methodControl.setReturnValue("se.smhi.main");
+      parser.parse("my message");
+      parserControl.setThrowable(new RuntimeException());
+      
+      FrameDispatcherController classUnderTest = new FrameDispatcherController() {
+        boolean isAuthenticated(HashMap parms) {
+          return methods.isAuthenticated(parms);
+        }
+        String getConfigNodeName() {
+          return methods.getConfigNodeName();
+        }
+      };
+      classUnderTest.setBltMessageManager(manager);
+      classUnderTest.setXmlMessageParser(parser);
+      
+      replay();
+      
+      classUnderTest.handleMessageDeliveryRequest(parms, null);
+
+      verify();
     }
     
     /**

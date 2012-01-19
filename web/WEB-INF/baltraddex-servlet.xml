@@ -446,6 +446,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
         </property>
+        <property name="xmlMessageParser">
+            <ref bean="xmlmsgParser"/>
+        </property>        
         <property name="bltMessageManager">
             <ref bean="bltmanager"/>
         </property>
@@ -1112,4 +1115,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
     </bean>
 
+  <bean id="xmlmsgFactory" class="eu.baltrad.beast.parser.impl.XmlMessageFactory">
+    <property name="registry">
+      <map>
+        <entry key="bltalert" value="eu.baltrad.beast.message.mo.BltAlertMessage"/>
+        <entry key="bltcommand" value="eu.baltrad.beast.message.mo.BltCommandMessage"/>
+        <entry key="bltgenerate" value="eu.baltrad.beast.message.mo.BltGenerateMessage"/>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="xmlmsgParser" class="eu.baltrad.beast.parser.impl.XmlMessageParser" autowire="byType"/>
 </beans>
