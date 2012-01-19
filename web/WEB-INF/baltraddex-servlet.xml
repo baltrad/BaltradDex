@@ -1121,6 +1121,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <entry key="bltalert" value="eu.baltrad.beast.message.mo.BltAlertMessage"/>
         <entry key="bltcommand" value="eu.baltrad.beast.message.mo.BltCommandMessage"/>
         <entry key="bltgenerate" value="eu.baltrad.beast.message.mo.BltGenerateMessage"/>
+        <entry key="blttriggerjob" value="eu.baltrad.beast.message.mo.BltTriggerJobMessage"/>
       </map>
     </property>
   </bean>
