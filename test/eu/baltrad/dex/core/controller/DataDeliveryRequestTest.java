@@ -111,6 +111,11 @@ public class DataDeliveryRequestTest extends TestCase {
             assertEquals(200, senders.get(i).getStatus());            
         }
         */
+        /*long timestamp = System.currentTimeMillis();
+        String signature = Protocol.getSignatureString(KEYCZAR_KEYSTORE, NODE_NAME, timestamp);
+        FrameSender sender = new FrameSender(client, Frame.postDataDeliveryRequest(ADDRESS, 
+                    ADDRESS, NODE_NAME, timestamp, signature, new File("belarus.h5")));
+        sender.start();*/
     }
     
     private void registerHttpScheme(SchemeRegistry schemeReg) {

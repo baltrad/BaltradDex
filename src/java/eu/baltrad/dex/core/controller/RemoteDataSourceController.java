@@ -373,7 +373,6 @@ public class RemoteDataSourceController extends MultiActionController {
         long timestamp = System.currentTimeMillis();
         String signature = getSignatureString(
                 InitAppUtil.getConf().getKeystoreDir(),
-                /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/ 
                 InitAppUtil.getConf().getCertAlias(), timestamp);
         Frame frame = Frame.postSubscriptionRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
