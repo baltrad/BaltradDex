@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+    <bean id="bdb_db" class="eu.baltrad.bdb.db.rest.RestfulDatabase" >
+        <constructor-arg value="${database.uri}" />
+    </bean>
+    <bean id="bdb_storage" class="eu.baltrad.bdb.storage.CacheDirStorage">
+        <constructor-arg index="0" value="${data.storage.folder}" />
+        <constructor-arg index="1" value="1000" /> <!-- cache size -->
+    </bean>
+    <bean id="bdb_file_catalog" class="eu.baltrad.bdb.BasicFileCatalog">
+        <constructor-arg ref="bdb_db" />
+        <constructor-arg ref="bdb_storage" />
+    </bean>
+</beans>
