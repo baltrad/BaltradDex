@@ -226,7 +226,6 @@ public class InitAppUtil {
      *
      * @param directory Directory where temporary files are stored
      * @param maxAge Maximum age of temporary file
-     * @deprecated Use deleteFile() instead
      */
     public static void cleanUpTempFiles( String directory ) {
         File dir = new File( directory );

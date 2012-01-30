@@ -25,6 +25,7 @@ import eu.baltrad.frame.model.*;
 import static eu.baltrad.frame.model.Protocol.*;
 import static eu.baltrad.dex.util.InitAppUtil.validate;
 import static eu.baltrad.dex.util.InitAppUtil.deleteFile;
+import static eu.baltrad.dex.util.InitAppUtil.cleanUpTempFiles;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.datasource.model.DataSource;
@@ -489,11 +490,10 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         framePublisherManager.getFramePublisher(
                                 receiver.getName()).addTask(task);
                     }
-                }
-                // delete temporary files here
-                
-                
+                } 
                 response.setStatus(HttpServletResponse.SC_OK);
+                 // Delete temporary files
+                cleanUpTempFiles(InitAppUtil.getWorkDir());
             } catch (DuplicateEntry e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("Duplicate entry error", e);

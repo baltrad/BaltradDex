@@ -217,7 +217,7 @@ public class BltFileBrowserController extends SimpleFormController implements IT
             /* Set current page number */
             setCurrentPage( 1 );
             /* Count selected files */
-            String countQuery = bltFileManager.buildQuery( false, getRadarStation(), 
+            String countQuery = bltFileManager.buildQuery( false, getRadarStation().trim(), 
                 getFileObject(), getStartDate(), startTime, getEndDate(), endTime, null, null,
                 getSortByDateAsc(), getSortByDateDesc(), getSortByTimeAsc(), getSortByTimeDesc(),
                 getSortBySourceAsc(), getSortBySourceDesc(), getSortByTypeAsc(),
@@ -225,7 +225,7 @@ public class BltFileBrowserController extends SimpleFormController implements IT
             /* Set number of selected files */
             setNumEntries( bltFileManager.countSelectedFileEntries( countQuery ) );
             /* Select files */
-            String selectQuery = bltFileManager.buildQuery( true, getRadarStation(), 
+            String selectQuery = bltFileManager.buildQuery( true, getRadarStation().trim(), 
                 getFileObject(), getStartDate(), startTime, getEndDate(), endTime,
                 Integer.toString( 0 ), Integer.toString( BltFileManager.ENTRIES_PER_PAGE),
                 getSortByDateAsc(), getSortByDateDesc(), getSortByTimeAsc(), getSortByTimeDesc(),
