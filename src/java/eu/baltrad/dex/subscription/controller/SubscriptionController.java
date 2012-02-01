@@ -469,8 +469,7 @@ public class SubscriptionController extends MultiActionController {
         Frame frame = Frame.postSubscriptionSyncRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
                 timestamp, signature, payloadFile);
-        Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
-                InitAppUtil.getConf().getSoTimeout());
+        Handler handler = InitAppUtil.getHandler();
         response = handler.post(frame);
         deleteFile(payloadFile);
         return response;
@@ -492,8 +491,7 @@ public class SubscriptionController extends MultiActionController {
         Frame frame = Frame.postSubscriptionUpdateRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
                 timestamp, signature, payloadFile);
-        Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
-                InitAppUtil.getConf().getSoTimeout());
+        Handler handler = InitAppUtil.getHandler();
         response = handler.post(frame);
         deleteFile(payloadFile);
         return response;

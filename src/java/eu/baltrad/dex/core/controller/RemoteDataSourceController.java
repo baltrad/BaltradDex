@@ -148,10 +148,7 @@ public class RemoteDataSourceController extends MultiActionController {
         String nodeName = request.getParameter(SEL_ADDR_PARAM);
         String connAddress = request.getParameter(ENTER_ADDR_PARAM);
         NodeConnection nodeConn = null;
-        
         try {
-        
-        
             logger.debug("dsConnect: nodeName="+nodeName+", address="+connAddress);
             if (!validate(nodeName) && !webValidator.validateUrl(connAddress)) {
               logger.debug("dsConnect: not valid: nodeName="+nodeName+", address="+connAddress);
@@ -350,14 +347,12 @@ public class RemoteDataSourceController extends MultiActionController {
         HttpResponse response = null;
         long timestamp = System.currentTimeMillis();
         String signature = getSignatureString(
-                InitAppUtil.getConf().getKeystoreDir(),
-                /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/ 
-                InitAppUtil.getConf().getCertAlias(), timestamp);
+                InitAppUtil.getConf().getKeystoreDir(), InitAppUtil.getConf().getCertAlias(), 
+                timestamp);
         Frame frame = Frame.postDSListRequest(nodeConn.getNodeAddress(), 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
                 timestamp, signature);
-        Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
-                InitAppUtil.getConf().getSoTimeout());
+        Handler handler = InitAppUtil.getHandler();
         response = handler.post(frame);
         return response;
     }
@@ -377,8 +372,7 @@ public class RemoteDataSourceController extends MultiActionController {
         Frame frame = Frame.postSubscriptionRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
                 timestamp, signature, payloadFile);
-        Handler handler = new Handler(InitAppUtil.getConf().getConnTimeout(), 
-                InitAppUtil.getConf().getSoTimeout());
+        Handler handler = InitAppUtil.getHandler();
         response = handler.post(frame);
         deleteFile(payloadFile);
         return response;

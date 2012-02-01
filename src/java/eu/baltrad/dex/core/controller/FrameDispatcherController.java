@@ -100,7 +100,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     // image file extension
     private static final String IMAGE_FILE_EXT = ".png";*/
 //---------------------------------------------------------------------------------------- Variables
-    //private BaltradFrameHandler bfHandler;
     private UserManager userManager;
     private DataSourceManager dataSourceManager;
     private SubscriptionManager subscriptionManager;
