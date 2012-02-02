@@ -146,7 +146,10 @@ public class InitAppUtil {
      * 
      * @return Reference to frame handler
      */
-    public static Handler getHandler() { return handler; }
+    public static Handler getHandler() { 
+        //return handler; 
+        return new Handler(appConf.getConnTimeout(), appConf.getSoTimeout());
+    }
     /**
      * Method extracts relative file name from absolute file path string.
      *

@@ -179,6 +179,7 @@ public class RemoteDataSourceController extends MultiActionController {
                 setRemoteNodeName(getHeader(res, HDR_NODE_NAME));
                 setRemoteNodeAddress(nodeConn.getNodeAddress());
                 int code = res.getStatusLine().getStatusCode();
+                
                 if (code == HttpServletResponse.SC_UNAUTHORIZED) {
                     modelAndView.addObject(ERROR_MSG_KEY, CONN_UNAUTHORIZED_MSG); 
                 }
@@ -222,6 +223,7 @@ public class RemoteDataSourceController extends MultiActionController {
                   logger.debug("dsConnect: No connection with name name: " + getRemoteNodeName());
                 }
             }
+            
         } catch (Exception e) {
             modelAndView.addObject(ERROR_MSG_KEY, CONN_FAILURE_MSG); 
             modelAndView.setViewName(DATA_SOURCES_VIEW);
