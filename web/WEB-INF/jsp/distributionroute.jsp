@@ -92,6 +92,7 @@ Creates a distribution route
                                       formAction="distributionroute.htm">
                      <jsp:attribute name="extraLeft">
                          <div class="row">Destination</div>
+                         <div class="row">Name template</div>
                          <div class="bdbFilterrow">Filter</div>
                      </jsp:attribute>
                      <jsp:attribute name="extraRight">
@@ -99,6 +100,12 @@ Creates a distribution route
                              <input type="text" name="destination" value="${destination}"/>
                              <div class="hint">
                                  url of the destination to send files to
+                             </div>
+                         </div>
+                         <div class="row">
+                             <input type="text" name="namingTemplate" value="${namingTemplate}"/>
+                             <div class="hint">
+                               template to use when naming files (if empty, use UUID)
                              </div>
                          </div>
                          <div class="bdbFilterrow">

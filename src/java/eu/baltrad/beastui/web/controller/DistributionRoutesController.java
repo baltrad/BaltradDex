@@ -65,6 +65,7 @@ public class DistributionRoutesController {
       @RequestParam(value="active", required=false) Boolean active,
       @RequestParam(value="description", required=false) String description,
       @RequestParam(value="destination", required=false) String destination,
+      @RequestParam(value="namingTemplate", required=false) String namingTemplate,
       @RequestParam(value="filterJson", required=false) String filterJson,
       @RequestParam(value="submitButton", required=false) String opString) {
     
@@ -80,6 +81,7 @@ public class DistributionRoutesController {
       routeDef = manager.getDefinition(name);
       DistributionRule rule = (DistributionRule)routeDef.getRule();
       destination = rule.getDestination().toString();
+      namingTemplate = rule.getMetadataNamingTemplate();
       try {
         filterJson = jsonMapper.writeValueAsString(rule.getFilter());
       } catch (IOException e) {
@@ -97,13 +99,13 @@ public class DistributionRoutesController {
 
     switch (op) {
       case Add:
-        return addRoute(model, routeDef, destination, filterJson);
+        return addRoute(model, routeDef, destination, namingTemplate, filterJson);
       case Modify:
-        return modifyRoute(model, routeDef, destination, filterJson);
+        return modifyRoute(model, routeDef, destination, namingTemplate, filterJson);
       case Delete:
         return deleteRoute(model, name);
       default:
-        return viewShowRoute(model, routeDef, destination, filterJson, null);
+        return viewShowRoute(model, routeDef, destination, namingTemplate, filterJson, null);
     }
   }
 
@@ -111,11 +113,12 @@ public class DistributionRoutesController {
       Model model,
       RouteDefinition routeDef,
       String destination,
+      String namingTemplate,
       String filterJson) {
     String emessage = null;
     try {
       validateDefinition(routeDef);
-      DistributionRule rule = createRule(destination, filterJson);
+      DistributionRule rule = createRule(destination, namingTemplate, filterJson);
       routeDef.setRule(rule);
       manager.storeDefinition(routeDef);
       return "redirect:showroutes.htm";
@@ -123,7 +126,7 @@ public class DistributionRoutesController {
       logger.error("Failed to create definition", e);
       emessage = "Failed to create definition: " + e.getMessage();
     }
-    return viewShowRoute(model, routeDef, destination, filterJson, emessage);
+    return viewShowRoute(model, routeDef, destination, namingTemplate, filterJson, emessage);
   }
 
   protected String deleteRoute(Model model, String name) {
@@ -147,12 +150,13 @@ public class DistributionRoutesController {
       Model model,
       RouteDefinition routeDef,
       String destination,
+      String namingTemplate,
       String filterJson) {
     String emessage = null;
 
     try {
       validateDefinition(routeDef);
-      DistributionRule rule = createRule(destination, filterJson);
+      DistributionRule rule = createRule(destination, namingTemplate, filterJson);
       routeDef.setRule(rule);
       manager.updateDefinition(routeDef);
       return "redirect:showroutes.htm";
@@ -160,7 +164,7 @@ public class DistributionRoutesController {
       logger.error("Failed to update definition", e);
       emessage = "Failed to update definition: " + e.getMessage();
     }
-    return viewShowRoute(model, routeDef, destination, filterJson, emessage);
+    return viewShowRoute(model, routeDef, destination, namingTemplate, filterJson, emessage);
   }
   
   /**
@@ -170,10 +174,12 @@ public class DistributionRoutesController {
       Model model,
       RouteDefinition route,
       String destination,
+      String namingTemplate,
       String filterJson,
       String emessage) {
     model.addAttribute("route", route);
     model.addAttribute("destination", destination);
+    model.addAttribute("namingTemplate", namingTemplate);
     model.addAttribute("filterJson", filterJson);
     model.addAttribute("emessage", emessage);
     return "distributionroute";
@@ -222,6 +228,7 @@ public class DistributionRoutesController {
    */
   protected DistributionRule createRule(
       String destination,
+      String namingTemplate,
       String filterJson) {
     DistributionRule rule =
       (DistributionRule)manager.createRule(DistributionRule.TYPE);
@@ -229,6 +236,11 @@ public class DistributionRoutesController {
       rule.setDestination(destination);
     } catch (IllegalArgumentException e) {
       throw new RuleException("invalid destination: " + e.getCause().getMessage());
+    }
+    if (namingTemplate != null && !namingTemplate.isEmpty()) {
+      rule.setMetadataNamingTemplate(namingTemplate);
+    } else {
+      rule.setUuidNamer();
     }
     if (filterJson == null || filterJson.equals(""))
       throw new RuleException("filter must be specified");
