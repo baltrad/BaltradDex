@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.Date;
 import java.util.Collections;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import junit.framework.TestCase;
 
@@ -50,7 +51,6 @@ import eu.baltrad.beast.db.*;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.itest.DexJDBCITestHelper;
 import eu.baltrad.dex.itest.DexDBITestHelper;
-import java.text.SimpleDateFormat;
 
 /**
  * Integration test for baltrad-db and Beast.
@@ -156,6 +156,14 @@ public class BltFileManagerITest extends TestCase {
         fltrBrzId = combinedFilter.getId();
         assertTrue(fltrBrzId > 0);
         jdbcHelper.saveCombinedFilter(dsBrzId, combinedFilter.getId());
+    }
+    
+    @Override
+    public void tearDown() {
+        bdb.close();
+        jdbcHelper = null;
+        bdbHelper = null;
+        context.close();
     }
     
     public void testGetFilter() throws Exception {

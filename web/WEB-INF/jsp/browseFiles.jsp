@@ -251,7 +251,7 @@ Author     : szewczenko
                                             </a>
                                         </div>
                                         <div id="cell" class="download">
-                                            <a href="download.htm?path=${entry.path}">
+                                            <a href="download.htm?uuid=${entry.uuid}">
                                                 <c:out value="Download"/>
                                             </a>
                                         </div>
