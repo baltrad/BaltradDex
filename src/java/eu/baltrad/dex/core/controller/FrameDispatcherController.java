@@ -39,7 +39,7 @@ import eu.baltrad.dex.core.util.FramePublisher;
 import eu.baltrad.dex.core.util.HandleFrameTask;
 import eu.baltrad.dex.core.util.IncomingFileNamer;
 import eu.baltrad.dex.registry.model.*;
-import eu.baltrad.dex.bltdata.model.BltFileManager;
+import eu.baltrad.dex.db.model.BltFileManager;
 import eu.baltrad.dex.core.model.CertManager;
 
 import eu.baltrad.bdb.FileCatalog;

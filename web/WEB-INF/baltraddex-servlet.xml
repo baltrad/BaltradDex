@@ -31,14 +31,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
        http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
     <!--
-      bdb.xml provides the following beans:
-        bdb_db: a eu.baltrad.bdb.db.Database implementation
-        bdb_storage: a eu.baltrad.bdb.storage.LocalStorage implementetation
-        bdb_file_catalog: a eu.baltrad.bdb.FileCatalog implementation
-    -->
-    <import resource="bdb.xml"/>
-
-    <!--
         URLs controlled by the role based USER level http request interceptor.
     -->
     <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
@@ -310,7 +302,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         File details controller.
     -->
     <bean name="bltFileDetailsController"
-        class="eu.baltrad.dex.bltdata.controller.BltFileDetailsController">
+        class="eu.baltrad.dex.db.controller.BltFileDetailsController">
         <property name="bltDataProcessor">
             <ref bean="bltDataProcessor"/>
         </property>
@@ -324,7 +316,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="bltDataProcessorController"/>
         </property>
 	<property name="fileCatalog">
-	    <ref bean="bdb_file_catalog" />
+	    <ref bean="fileCatalog" />
 	</property>
         <property name="successView">
             <value>fileDetails</value>
@@ -334,7 +326,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         File browser controller
     -->
     <bean name="bltFileBrowserController"
-            class="eu.baltrad.dex.bltdata.controller.BltFileBrowserController">
+            class="eu.baltrad.dex.db.controller.BltFileBrowserController">
         <property name="successView">
             <value>browseFiles</value>
         </property>
@@ -395,7 +387,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         Data download controller.
     -->
     <bean name="bltFileDownloadController"
-            class="eu.baltrad.dex.bltdata.controller.BltFileDownloadController">
+            class="eu.baltrad.dex.db.controller.BltFileDownloadController">
         <property name="successView">
             <value>radarData</value>
         </property>
@@ -414,7 +406,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Data source files manager
     -->
-    <bean id="bltFileManager" class="eu.baltrad.dex.bltdata.model.BltFileManager">
+    <bean id="bltFileManager" class="eu.baltrad.dex.db.model.BltFileManager">
         <property name="dataSourceManager">
             <ref bean="dataSourceManager"/>
         </property>
@@ -422,7 +414,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="coreFilterManager"/>
         </property>
 	<property name="fileCatalog">
-	    <ref bean="bdb_file_catalog" />
+	    <ref bean="fileCatalog" />
 	</property>
     </bean>
 
@@ -476,7 +468,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="bltFileManager" />
         </property>
         <property name="fileCatalog">
-            <ref bean="bdb_file_catalog" />
+            <ref bean="fileCatalog" />
         </property>
         <property name="certManager">
             <ref bean="certManager"/>
@@ -857,7 +849,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="bltDataProcessorController"/>
         </property>
 	<property name="fileCatalog">
-	    <ref bean="bdb_file_catalog" />
+	    <ref bean="fileCatalog" />
 	</property>
     </bean>
 
@@ -1059,6 +1051,19 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
     <!-- Nice to have a cron-like scheduler -->
     <bean id="beastscheduler" class="eu.baltrad.beast.scheduler.BeastScheduler" autowire="byType"/>
+
+    <!-- and the file catalog -->
+    <bean id="bdb_db" class="eu.baltrad.bdb.db.rest.RestfulDatabase" >
+        <constructor-arg value="${database.uri}" />
+    </bean>
+    <bean id="bdb_storage" class="eu.baltrad.bdb.storage.CacheDirStorage">
+        <constructor-arg index="0" value="${data.storage.folder}" />
+        <constructor-arg index="1" value="1000" /> <!-- cache size -->
+    </bean>
+    <bean id="fileCatalog" class="eu.baltrad.bdb.BasicFileCatalog">
+        <constructor-arg ref="bdb_db" />
+        <constructor-arg ref="bdb_storage" />
+    </bean>
     
     <!-- and the abstraction of the catalog -->
     <bean id="catalog" class="eu.baltrad.beast.db.Catalog" autowire="byType" />

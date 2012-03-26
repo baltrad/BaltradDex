@@ -19,7 +19,7 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.bltdata.controller;
+package eu.baltrad.dex.db.controller;
 
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.user.model.User;

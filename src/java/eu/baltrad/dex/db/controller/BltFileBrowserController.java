@@ -1,6 +1,6 @@
 /***************************************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -19,10 +19,10 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.bltdata.controller;
+package eu.baltrad.dex.db.controller;
 
-import eu.baltrad.dex.bltdata.model.BltFileManager;
-import eu.baltrad.dex.bltdata.model.BltFile;
+import eu.baltrad.dex.db.model.BltFileManager;
+import eu.baltrad.dex.db.model.BltFile;
 import eu.baltrad.dex.datasource.model.FileObjectManager;
 import eu.baltrad.dex.util.ITableScroller;
 
@@ -40,7 +40,7 @@ import java.util.List;
  * File browser controller implements fileset selection and browsing functionality.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 0.7.2
+ * @version 1.1.0
  * @since 0.7.2
  */
 public class BltFileBrowserController extends SimpleFormController implements ITableScroller {
@@ -197,7 +197,7 @@ public class BltFileBrowserController extends SimpleFormController implements IT
         setSortByTime( request );
         setSortBySource( request );
         setSortByType( request );
-        List<BltFile> fileEntries = null;
+        List<BltFile> fileEntries;
         /* File selection option */
         if( pageNum == null ) {
             setRadarStation(request.getParameter(RADARS_LIST_PARAM) );
@@ -217,32 +217,33 @@ public class BltFileBrowserController extends SimpleFormController implements IT
             /* Set current page number */
             setCurrentPage( 1 );
             /* Count selected files */
-            String countQuery = bltFileManager.buildQuery( false, getRadarStation().trim(), 
-                getFileObject(), getStartDate(), startTime, getEndDate(), endTime, null, null,
-                getSortByDateAsc(), getSortByDateDesc(), getSortByTimeAsc(), getSortByTimeDesc(),
-                getSortBySourceAsc(), getSortBySourceDesc(), getSortByTypeAsc(),
-                getSortByTypeDesc() );
-            /* Set number of selected files */
-            setNumEntries( bltFileManager.countSelectedFileEntries( countQuery ) );
+            setNumEntries(bltFileManager.countFileEntries(
+                getRadarStation().trim(), getFileObject(), getStartDate(), 
+                startTime, getEndDate(), endTime));
+            
             /* Select files */
-            String selectQuery = bltFileManager.buildQuery( true, getRadarStation().trim(), 
-                getFileObject(), getStartDate(), startTime, getEndDate(), endTime,
-                Integer.toString( 0 ), Integer.toString( BltFileManager.ENTRIES_PER_PAGE),
-                getSortByDateAsc(), getSortByDateDesc(), getSortByTimeAsc(), getSortByTimeDesc(),
-                getSortBySourceAsc(), getSortBySourceDesc(), getSortByTypeAsc(),
-                getSortByTypeDesc() );
-            fileEntries = bltFileManager.getFileEntries( selectQuery );
+            fileEntries = bltFileManager.getFileEntries(
+                getRadarStation().trim(), getFileObject(), getStartDate(), 
+                startTime, getEndDate(), endTime, Integer.toString(0), 
+                Integer.toString(BltFileManager.ENTRIES_PER_PAGE), 
+                getSortByDateAsc(), getSortByDateDesc(), getSortByTimeAsc(), 
+                getSortByTimeDesc(), getSortBySourceAsc(), 
+                getSortBySourceDesc(), getSortByTypeAsc(), getSortByTypeDesc());
+            
+            
         } else {
             /* Page scrolling option */
             if( pageNum.matches( "<<" ) ) {
-                firstPage();
-                String selectQuery = bltFileManager.buildQuery( true, getRadarStation(), 
-                    getFileObject(), getStartDate(), startTime, getEndDate(), endTime,
-                    Integer.toString( 0 ), Integer.toString( BltFileManager.ENTRIES_PER_PAGE),
-                    getSortByDateAsc(), getSortByDateDesc(), getSortByTimeAsc(), getSortByTimeDesc(),
-                    getSortBySourceAsc(), getSortBySourceDesc(), getSortByTypeAsc(),
-                    getSortByTypeDesc() );
-                fileEntries = bltFileManager.getFileEntries( selectQuery );
+                firstPage(); 
+                fileEntries = bltFileManager.getFileEntries(getRadarStation(), 
+                    getFileObject(), getStartDate(), startTime, getEndDate(), 
+                    endTime, Integer.toString(0), Integer.toString( 
+                    BltFileManager.ENTRIES_PER_PAGE), getSortByDateAsc(), 
+                    getSortByDateDesc(), getSortByTimeAsc(), 
+                    getSortByTimeDesc(), getSortBySourceAsc(), 
+                    getSortBySourceDesc(), getSortByTypeAsc(), 
+                    getSortByTypeDesc());
+                
             } else {
                 if( pageNum.matches( ">>" ) ) {
                     lastPage();
@@ -256,13 +257,14 @@ public class BltFileBrowserController extends SimpleFormController implements IT
                 }
                 int offset = ( getCurrentPage() * BltFileManager.ENTRIES_PER_PAGE )
                         - BltFileManager.ENTRIES_PER_PAGE;
-                String selectQuery = bltFileManager.buildQuery( true, getRadarStation(), 
-                    getFileObject(), getStartDate(), startTime, getEndDate(), endTime,
-                    Integer.toString( offset ), Integer.toString(
-                    BltFileManager.ENTRIES_PER_PAGE ), getSortByDateAsc(), getSortByDateDesc(),
-                    getSortByTimeAsc(), getSortByTimeDesc(), getSortBySourceAsc(),
-                    getSortBySourceDesc(), getSortByTypeAsc(), getSortByTypeDesc() );
-                fileEntries = bltFileManager.getFileEntries( selectQuery );
+                fileEntries = bltFileManager.getFileEntries(getRadarStation(), 
+                    getFileObject(), getStartDate(), startTime, getEndDate(), 
+                    endTime, Integer.toString(offset), Integer.toString(
+                    BltFileManager.ENTRIES_PER_PAGE ), getSortByDateAsc(), 
+                    getSortByDateDesc(), getSortByTimeAsc(), 
+                    getSortByTimeDesc(), getSortBySourceAsc(),
+                    getSortBySourceDesc(), getSortByTypeAsc(), 
+                    getSortByTypeDesc());
             }
         }
         /*

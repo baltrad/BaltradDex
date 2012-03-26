@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.bltdata.controller;
 
-import eu.baltrad.dex.bltdata.model.BltFileManager;
-import eu.baltrad.dex.bltdata.model.BltFile;
+import eu.baltrad.dex.db.model.BltFileManager;
+import eu.baltrad.dex.db.model.BltFile;
 import eu.baltrad.dex.util.ITableScroller;
 
 import javax.servlet.http.HttpServletRequest;

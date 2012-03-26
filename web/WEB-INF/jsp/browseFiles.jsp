@@ -24,9 +24,9 @@ Author     : szewczenko
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
 <%@page import="java.util.List" %>
-<%@page import="eu.baltrad.dex.bltdata.model.BltFile" %>
-<%@page import="eu.baltrad.dex.bltdata.model.BltFileManager" %>
-<%@page import="eu.baltrad.dex.bltdata.controller.BltFileBrowserController" %>
+<%@page import="eu.baltrad.dex.db.model.BltFile" %>
+<%@page import="eu.baltrad.dex.db.model.BltFileManager" %>
+<%@page import="eu.baltrad.dex.db.controller.BltFileBrowserController" %>
 
 <%
     // Check if file's list is not empty
