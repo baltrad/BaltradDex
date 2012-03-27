@@ -470,11 +470,13 @@ public class SaveDataSourceController extends MultiActionController {
             setDSFileObjectsModel( modelAndView );
         }
         // At least one user has to be selected
-        if( selectedUsers.size() == 0 ) {
+        // #819: Allow data sources with no users
+        
+        /*if( selectedUsers.size() == 0 ) {
             modelAndView.setViewName( DS_SAVE_USERS_VIEW );
             modelAndView.addObject( DS_SELECT_USERS_ERROR_KEY, DS_SELECT_USERS_ERROR_MSG );
             setDSUsersModel( modelAndView );
-        }
+        }*/
         return modelAndView;
     }
     /**

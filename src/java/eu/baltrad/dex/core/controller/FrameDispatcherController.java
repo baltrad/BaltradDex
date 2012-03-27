@@ -227,10 +227,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response
      */
     private void handleDSListRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(/*ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH,*/
-                InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
-                Frame.getSignature(parms), Frame.getTimestamp(parms))) {
+        if (authenticate(InitAppUtil.getConf().getKeystoreDir(), 
+                Frame.getNodeName(parms), Frame.getSignature(parms), 
+                Frame.getTimestamp(parms))) {
             try {
                 log.info(Frame.getNodeName(parms) + " requested data source listing");
                 // create user account

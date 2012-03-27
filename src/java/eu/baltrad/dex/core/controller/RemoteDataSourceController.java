@@ -220,7 +220,7 @@ public class RemoteDataSourceController extends MultiActionController {
                         log.error("Failed to save node connection", e);
                     }
                 } else {
-                  logger.debug("dsConnect: No connection with name name: " + getRemoteNodeName());
+                  logger.debug("dsConnect: No connection with name: " + getRemoteNodeName());
                 }
             }
             
@@ -279,10 +279,9 @@ public class RemoteDataSourceController extends MultiActionController {
         }
         if (code == HttpServletResponse.SC_OK) {
             SerialFrame serialFrame = readFrameFromStream(res);
-            if (authenticate(/*ServletContextUtil.getServletContextPath() 
-                    + InitAppUtil.KS_FILE_PATH,*/
-                    InitAppUtil.getConf().getKeystoreDir(), serialFrame.getNodeName(), 
-                    serialFrame.getSignature(), serialFrame.getTimestamp())) {
+            if (authenticate(InitAppUtil.getConf().getKeystoreDir(), 
+                    serialFrame.getNodeName(), serialFrame.getSignature(), 
+                    serialFrame.getTimestamp())) {
                 List<DataSource> dsConfirm = (List<DataSource>) serialFrame.getItemList();
                 if (validate(dsConfirm)) {
                     try {
