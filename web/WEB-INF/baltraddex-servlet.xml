@@ -163,9 +163,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="removeNodeConnections.htm">nodeConnectionController</prop>
                 <prop key="nodeConnectionsToRemove.htm">nodeConnectionController</prop>
                 <prop key="nodeConnectionsRemovalStatus.htm">nodeConnectionController</prop>
-                
-                <prop key="showCertificates.htm">certificateController</prop>
-                <prop key="showCertificateDetails.htm">certificateDetailsController</prop>
             </props>
         </property>
     </bean>
@@ -473,9 +470,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="fileCatalog">
             <ref bean="fileCatalog" />
         </property>
-        <property name="certManager">
-            <ref bean="certManager"/>
-        </property>
     </bean>
 
     <!--
@@ -668,9 +662,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="userManager">
             <ref bean="userManager" />
         </property>
-        <property name="certManager">
-            <ref bean="certManager"/>
-        </property>
     </bean>
 
     <!--
@@ -800,9 +791,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="formView">
             <value>nodeProperties</value>
         </property>
-        <property name="certManager">
-            <ref bean="certManager"/>
-        </property>
     </bean>
 
     <!--
@@ -899,40 +887,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="dataSourceManager"/>
         </property>
     </bean>
-    
-    <!-- Certificate manager -->
-    <bean name="certManager" class="eu.baltrad.dex.core.model.CertManager"/>
-    
-    <!-- Certificate controller -->
-    <bean name="certificateController" class="eu.baltrad.dex.core.controller.CertificateController">
-        <property name="certManager">
-            <ref bean="certManager"/>
-        </property>
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-        <property name="formView">
-            <value>showCertificates</value>
-        </property>
-        <property name="successView">
-            <value>redirect:showCertificates.htm</value>
-        </property>
-        <property name="commandClass">
-            <value>eu.baltrad.dex.core.model.Cert</value>
-        </property>
-    </bean>
-    
-    <!-- Certificate details controller -->
-    <bean name="certificateDetailsController" 
-          class="eu.baltrad.dex.core.controller.CertificateDetailsController">
-        <property name="certManager">
-            <ref bean="certManager"/>
-        </property>
-        <property name="successView">
-            <value>showCertificateDetails</value>
-        </property>
-    </bean>
-    
+  
     <!--
         Message resources.
     -->

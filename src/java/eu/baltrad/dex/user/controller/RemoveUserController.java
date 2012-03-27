@@ -24,7 +24,6 @@ package eu.baltrad.dex.user.controller;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.log.model.MessageLogger;
-import eu.baltrad.dex.core.model.CertManager;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -60,8 +59,6 @@ public class RemoveUserController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Variables
     // User manager
     private UserManager userManager;
-    /** Certificate manager */
-    private CertManager certManager;
     // Logger object
     private Logger log;
     /** List of user accounts to be removed */
@@ -169,17 +166,5 @@ public class RemoveUserController extends MultiActionController {
      * @param userManager Reference to user manager object
      */
     public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
-    /**
-     * Certificate manager getter.
-     * 
-     * @return Reference to certificate manager
-     */
-    public CertManager getCertManager() { return certManager; }
-    /**
-     * Certificate manager setter.
-     * 
-     * @param certManager Reference to certificate manager to set
-     */
-    public void setCertManager(CertManager certManager) { this.certManager = certManager; }
 }
 //--------------------------------------------------------------------------------------------------

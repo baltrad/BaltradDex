@@ -40,7 +40,6 @@ import eu.baltrad.dex.core.util.HandleFrameTask;
 import eu.baltrad.dex.core.util.IncomingFileNamer;
 import eu.baltrad.dex.registry.model.*;
 import eu.baltrad.dex.db.model.BltFileManager;
-import eu.baltrad.dex.core.model.CertManager;
 
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.bdb.db.FileEntry;
@@ -123,8 +122,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private DeliveryRegisterManager deliveryRegisterManager;
     /** Reference to BltFileManager */
     private BltFileManager bltFileManager;
-    /** Certificate manager */
-    private CertManager certManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
@@ -716,15 +713,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param fileCatalog 
      */
     public void setFileCatalog(FileCatalog fileCatalog) { this.fileCatalog = fileCatalog; }
-    /**
-     * @return the certificateManager
-     */
-    public CertManager getCertManager() { return certManager; }
-
-    /**
-     * @param certificateManager the certificateManager to set
-     */
-    public void setCertManager(CertManager certManager) { this.certManager = certManager; }
     
 
     /**
