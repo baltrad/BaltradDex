@@ -44,6 +44,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="dsShow.htm">showDataSourcesController</prop>
                 <prop key="dsFiles.htm">bltDataSourceController</prop>
                 <prop key="fileDetails.htm">bltFileDetailsController</prop>
+                <prop key="download.htm">bltFileDownloadController</prop>
                 <prop key="imagePreview.htm">bltImagePreviewController</prop>
                 <prop key="dataDownload.htm">downloadStatusController</prop>
                 <prop key="dataUpload.htm">uploadStatusController</prop>
@@ -96,7 +97,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="dsConnect.htm">remoteDataSourceController</prop>
                 <prop key="dsToConnect.htm">remoteDataSourceController</prop>
                 <prop key="dsSubscribed.htm">remoteDataSourceController</prop>
-                <prop key="download.htm">bltFileDownloadController</prop>
                 <prop key="showSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSelectedSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSubscriptionStatus.htm">subscriptionController</prop>
