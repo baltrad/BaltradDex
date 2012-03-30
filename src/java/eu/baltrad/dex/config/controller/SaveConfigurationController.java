@@ -26,7 +26,6 @@ import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.util.ServletContextUtil;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.log.model.MessageLogger;
-import eu.baltrad.dex.core.model.CertManager;
 
 import org.apache.log4j.Logger;
 
@@ -68,8 +67,6 @@ public class SaveConfigurationController extends SimpleFormController {
 //---------------------------------------------------------------------------------------- Variables
     private ConfigurationManager configurationManager;
     private Logger log;
-     /** Certificate manager */
-    private CertManager certManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
@@ -177,17 +174,5 @@ public class SaveConfigurationController extends SimpleFormController {
     public void setConfigurationManager( ConfigurationManager configurationManager ) {
         this.configurationManager = configurationManager;
     }
-    /**
-     * Certificate manager getter.
-     * 
-     * @return Reference to certificate manager
-     */
-    public CertManager getCertManager() { return certManager; }
-    /**
-     * Certificate manager setter.
-     * 
-     * @param certManager Reference to certificate manager to set
-     */
-    public void setCertManager(CertManager certManager) { this.certManager = certManager; }
 }
 //--------------------------------------------------------------------------------------------------

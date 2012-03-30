@@ -19,17 +19,18 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.bltdata.controller;
+package eu.baltrad.dex.db.controller;
 
 import eu.baltrad.dex.bltdata.model.BltDataProcessor;
-import eu.baltrad.dex.bltdata.model.BltFileManager;
-import eu.baltrad.dex.bltdata.model.BltFile;
+import eu.baltrad.dex.db.model.BltFileManager;
+import eu.baltrad.dex.db.model.BltFile;
 import eu.baltrad.dex.bltdata.model.BltDataset;
 import eu.baltrad.dex.bltdata.model.BltDataProjector;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.bdb.FileCatalog;
+import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.Group;

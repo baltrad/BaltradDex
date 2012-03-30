@@ -23,7 +23,7 @@ package eu.baltrad.dex.registry.controller;
 
 import eu.baltrad.dex.registry.model.DeliveryRegisterEntry;
 import eu.baltrad.dex.registry.model.DeliveryRegisterManager;
-import eu.baltrad.dex.bltdata.model.BltFileManager;
+import eu.baltrad.dex.db.model.BltFileManager;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.util.ITableScroller;
 import eu.baltrad.dex.log.model.MessageLogger;

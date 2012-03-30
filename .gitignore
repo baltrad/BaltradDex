@@ -3,3 +3,6 @@
 develop.properties
 *~
 .*.swp
+/nbproject/private/
+/dist/
+/build/

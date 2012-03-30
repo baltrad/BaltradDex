@@ -81,7 +81,11 @@ public class DistributionRoutesController {
       routeDef = manager.getDefinition(name);
       DistributionRule rule = (DistributionRule)routeDef.getRule();
       destination = rule.getDestination().toString();
-      namingTemplate = rule.getMetadataNamingTemplate();
+      
+      //@@@ uncomment before submitting
+      //namingTemplate = rule.getMetadataNamingTemplate();
+      
+      
       try {
         filterJson = jsonMapper.writeValueAsString(rule.getFilter());
       } catch (IOException e) {
@@ -237,11 +241,18 @@ public class DistributionRoutesController {
     } catch (IllegalArgumentException e) {
       throw new RuleException("invalid destination: " + e.getCause().getMessage());
     }
-    if (namingTemplate != null && !namingTemplate.isEmpty()) {
+    
+    
+    //@@@ uncomment before submitting
+    /*if (namingTemplate != null && !namingTemplate.isEmpty()) {
       rule.setMetadataNamingTemplate(namingTemplate);
     } else {
       rule.setUuidNamer();
-    }
+    }*/
+    
+    
+    
+    
     if (filterJson == null || filterJson.equals(""))
       throw new RuleException("filter must be specified");
     try {

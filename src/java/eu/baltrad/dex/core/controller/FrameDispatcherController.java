@@ -39,8 +39,7 @@ import eu.baltrad.dex.core.util.FramePublisher;
 import eu.baltrad.dex.core.util.HandleFrameTask;
 import eu.baltrad.dex.core.util.IncomingFileNamer;
 import eu.baltrad.dex.registry.model.*;
-import eu.baltrad.dex.bltdata.model.BltFileManager;
-import eu.baltrad.dex.core.model.CertManager;
+import eu.baltrad.dex.db.model.BltFileManager;
 
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.bdb.db.FileEntry;
@@ -123,8 +122,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     private DeliveryRegisterManager deliveryRegisterManager;
     /** Reference to BltFileManager */
     private BltFileManager bltFileManager;
-    /** Certificate manager */
-    private CertManager certManager;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor.
@@ -230,10 +227,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param response HTTP response
      */
     private void handleDSListRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(/*ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH,*/
-                InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
-                Frame.getSignature(parms), Frame.getTimestamp(parms))) {
+        if (authenticate(InitAppUtil.getConf().getKeystoreDir(), 
+                Frame.getNodeName(parms), Frame.getSignature(parms), 
+                Frame.getTimestamp(parms))) {
             try {
                 log.info(Frame.getNodeName(parms) + " requested data source listing");
                 // create user account
@@ -716,15 +712,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param fileCatalog 
      */
     public void setFileCatalog(FileCatalog fileCatalog) { this.fileCatalog = fileCatalog; }
-    /**
-     * @return the certificateManager
-     */
-    public CertManager getCertManager() { return certManager; }
-
-    /**
-     * @param certificateManager the certificateManager to set
-     */
-    public void setCertManager(CertManager certManager) { this.certManager = certManager; }
     
 
     /**

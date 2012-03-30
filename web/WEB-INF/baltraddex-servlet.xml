@@ -31,14 +31,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
        http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 
     <!--
-      bdb.xml provides the following beans:
-        bdb_db: a eu.baltrad.bdb.db.Database implementation
-        bdb_storage: a eu.baltrad.bdb.storage.LocalStorage implementetation
-        bdb_file_catalog: a eu.baltrad.bdb.FileCatalog implementation
-    -->
-    <import resource="bdb.xml"/>
-
-    <!--
         URLs controlled by the role based USER level http request interceptor.
     -->
     <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
@@ -52,6 +44,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="dsShow.htm">showDataSourcesController</prop>
                 <prop key="dsFiles.htm">bltDataSourceController</prop>
                 <prop key="fileDetails.htm">bltFileDetailsController</prop>
+                <prop key="download.htm">bltFileDownloadController</prop>
                 <prop key="imagePreview.htm">bltImagePreviewController</prop>
                 <prop key="dataDownload.htm">downloadStatusController</prop>
                 <prop key="dataUpload.htm">uploadStatusController</prop>
@@ -104,7 +97,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="dsConnect.htm">remoteDataSourceController</prop>
                 <prop key="dsToConnect.htm">remoteDataSourceController</prop>
                 <prop key="dsSubscribed.htm">remoteDataSourceController</prop>
-                <prop key="download.htm">bltFileDownloadController</prop>
                 <prop key="showSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSelectedSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSubscriptionStatus.htm">subscriptionController</prop>
@@ -171,9 +163,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="removeNodeConnections.htm">nodeConnectionController</prop>
                 <prop key="nodeConnectionsToRemove.htm">nodeConnectionController</prop>
                 <prop key="nodeConnectionsRemovalStatus.htm">nodeConnectionController</prop>
-                
-                <prop key="showCertificates.htm">certificateController</prop>
-                <prop key="showCertificateDetails.htm">certificateDetailsController</prop>
             </props>
         </property>
     </bean>
@@ -310,7 +299,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         File details controller.
     -->
     <bean name="bltFileDetailsController"
-        class="eu.baltrad.dex.bltdata.controller.BltFileDetailsController">
+        class="eu.baltrad.dex.db.controller.BltFileDetailsController">
         <property name="bltDataProcessor">
             <ref bean="bltDataProcessor"/>
         </property>
@@ -324,7 +313,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="bltDataProcessorController"/>
         </property>
 	<property name="fileCatalog">
-	    <ref bean="bdb_file_catalog" />
+	    <ref bean="fileCatalog" />
 	</property>
         <property name="successView">
             <value>fileDetails</value>
@@ -334,7 +323,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         File browser controller
     -->
     <bean name="bltFileBrowserController"
-            class="eu.baltrad.dex.bltdata.controller.BltFileBrowserController">
+            class="eu.baltrad.dex.db.controller.BltFileBrowserController">
         <property name="successView">
             <value>browseFiles</value>
         </property>
@@ -395,10 +384,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         Data download controller.
     -->
     <bean name="bltFileDownloadController"
-            class="eu.baltrad.dex.bltdata.controller.BltFileDownloadController">
+            class="eu.baltrad.dex.db.controller.BltFileDownloadController">
         <property name="successView">
             <value>radarData</value>
         </property>
+        <property name="fileCatalog">
+	    <ref bean="fileCatalog" />
+	</property>
     </bean>
 
     <!--
@@ -414,7 +406,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Data source files manager
     -->
-    <bean id="bltFileManager" class="eu.baltrad.dex.bltdata.model.BltFileManager">
+    <bean id="bltFileManager" class="eu.baltrad.dex.db.model.BltFileManager">
         <property name="dataSourceManager">
             <ref bean="dataSourceManager"/>
         </property>
@@ -422,7 +414,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="coreFilterManager"/>
         </property>
 	<property name="fileCatalog">
-	    <ref bean="bdb_file_catalog" />
+	    <ref bean="fileCatalog" />
 	</property>
     </bean>
 
@@ -476,10 +468,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="bltFileManager" />
         </property>
         <property name="fileCatalog">
-            <ref bean="bdb_file_catalog" />
-        </property>
-        <property name="certManager">
-            <ref bean="certManager"/>
+            <ref bean="fileCatalog" />
         </property>
     </bean>
 
@@ -673,9 +662,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="userManager">
             <ref bean="userManager" />
         </property>
-        <property name="certManager">
-            <ref bean="certManager"/>
-        </property>
     </bean>
 
     <!--
@@ -805,9 +791,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="formView">
             <value>nodeProperties</value>
         </property>
-        <property name="certManager">
-            <ref bean="certManager"/>
-        </property>
     </bean>
 
     <!--
@@ -857,7 +840,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="bltDataProcessorController"/>
         </property>
 	<property name="fileCatalog">
-	    <ref bean="bdb_file_catalog" />
+	    <ref bean="fileCatalog" />
 	</property>
     </bean>
 
@@ -904,40 +887,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="dataSourceManager"/>
         </property>
     </bean>
-    
-    <!-- Certificate manager -->
-    <bean name="certManager" class="eu.baltrad.dex.core.model.CertManager"/>
-    
-    <!-- Certificate controller -->
-    <bean name="certificateController" class="eu.baltrad.dex.core.controller.CertificateController">
-        <property name="certManager">
-            <ref bean="certManager"/>
-        </property>
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-        <property name="formView">
-            <value>showCertificates</value>
-        </property>
-        <property name="successView">
-            <value>redirect:showCertificates.htm</value>
-        </property>
-        <property name="commandClass">
-            <value>eu.baltrad.dex.core.model.Cert</value>
-        </property>
-    </bean>
-    
-    <!-- Certificate details controller -->
-    <bean name="certificateDetailsController" 
-          class="eu.baltrad.dex.core.controller.CertificateDetailsController">
-        <property name="certManager">
-            <ref bean="certManager"/>
-        </property>
-        <property name="successView">
-            <value>showCertificateDetails</value>
-        </property>
-    </bean>
-    
+  
     <!--
         Message resources.
     -->
@@ -1061,6 +1011,19 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
     <!-- Nice to have a cron-like scheduler -->
     <bean id="beastscheduler" class="eu.baltrad.beast.scheduler.BeastScheduler" autowire="byType"/>
+
+    <!-- and the file catalog -->
+    <bean id="bdb_db" class="eu.baltrad.bdb.db.rest.RestfulDatabase" >
+        <constructor-arg value="${database.uri}" />
+    </bean>
+    <bean id="bdb_storage" class="eu.baltrad.bdb.storage.CacheDirStorage">
+        <constructor-arg index="0" value="${data.storage.folder}" />
+        <constructor-arg index="1" value="1000" /> <!-- cache size -->
+    </bean>
+    <bean id="fileCatalog" class="eu.baltrad.bdb.BasicFileCatalog">
+        <constructor-arg ref="bdb_db" />
+        <constructor-arg ref="bdb_storage" />
+    </bean>
     
     <!-- and the abstraction of the catalog -->
     <bean id="catalog" class="eu.baltrad.beast.db.Catalog" autowire="byType" />

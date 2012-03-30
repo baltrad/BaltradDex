@@ -645,10 +645,8 @@ input:focus, textarea:focus {
 .dssave .dsname input {
     width:200px; 
 }
-.dssave .dsdescription {
+.dsdescription textarea {
     float:left;
-}
-.dssave .dsdescription textarea {
     width:200px;
     height:64px;
 }

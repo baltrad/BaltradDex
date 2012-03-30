@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,13 +17,15 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
-package eu.baltrad.dex.bltdata.controller;
+package eu.baltrad.dex.db.controller;
 
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.ApplicationSecurityManager;
+
+import eu.baltrad.bdb.FileCatalog;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,8 +40,8 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * Download controller class implementing data download functionality.
@@ -49,12 +51,13 @@ import java.io.IOException;
  * @since 1.0
  */
 public class BltFileDownloadController implements Controller {
-//---------------------------------------------------------------------------------------- Constants
-    public static final String FILE_PATH = "path";
-//---------------------------------------------------------------------------------------- Variables
+//-------------------------------------------------------------------- Constants
+    public static final String ENTRY_UUID = "uuid";
+//-------------------------------------------------------------------- Variables
     private Logger log;
+    private FileCatalog fileCatalog;
     private String successView;
-//------------------------------------------------------------------------------------------ Methods
+//---------------------------------------------------------------------- Methods
     /**
      * Controller.
      */
@@ -68,37 +71,39 @@ public class BltFileDownloadController implements Controller {
      * @param response Http response
      * @return Model and view
      */
-    public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response ) {
-
-        User user = ( User )ApplicationSecurityManager.getUser( request );
+    public ModelAndView handleRequest(HttpServletRequest request, 
+            HttpServletResponse response) {
+        User user = (User) ApplicationSecurityManager.getUser(request);
         ServletContext servletContext = request.getSession().getServletContext();
-        String filePath = request.getParameter( FILE_PATH );
-        String fileName = filePath.substring( filePath.lastIndexOf( File.separator ) + 1 );
-        File file = new File( filePath );
-        int fileSize = ( int )file.length();
-        BufferedInputStream in = null;
+        String entryUuid = request.getParameter(ENTRY_UUID);
+        File fi = fileCatalog.getLocalPathForUuid(UUID.fromString(entryUuid));
+        String filePath = fi.getAbsolutePath();
+        String fileName = fi.getName();
+        int fileSize = (int) fi.length();
+        BufferedInputStream bis = null;
         if( fileSize > 0 ) {
             try {
-                in = new BufferedInputStream( new FileInputStream( file ) );
-            } catch( FileNotFoundException e ) {
-                log.warn( "File not found", e );
-            }
-            String mimeType = servletContext.getMimeType( filePath );
-            response.setBufferSize( fileSize );
-            response.setContentType( mimeType );
-            response.setHeader( "Content-Disposition", "attachement; filename=\"" + fileName + "\"" );
-            response.setContentLength( fileSize );
-            try {
-                FileCopyUtils.copy( in, response.getOutputStream() );
-                in.close();
-                response.getOutputStream().flush();
-                response.getOutputStream().close();
-            } catch( IOException e ) {
-                log.error( "Error downloading file" + e );
-            }
-            log.info( "User " + user.getName() + " downloading file: " + file.getName() );
+                try {
+                    bis = new BufferedInputStream(new FileInputStream(fi));
+                    String mimeType = servletContext.getMimeType(filePath);
+                    response.setBufferSize(fileSize);
+                    response.setContentType(mimeType);
+                    response.setHeader("Content-Disposition", "attachement; " +
+                            "filename=\"" + fileName + "\"" );
+                    response.setContentLength(fileSize);
+                    FileCopyUtils.copy(bis, response. getOutputStream());
+                    log.info("User " + user.getName() + " downloading file: " + 
+                                                                      fileName);
+                } finally {
+                    response.getOutputStream().flush();
+                    response.getOutputStream().close();
+                    bis.close();
+                }
+            } catch (IOException e) {
+                log.error("Failed to download file", e);
+            } 
         } else {
-            log.error( "Invalid file size: " + fileSize );
+            log.error("Invalid file size: " + fileSize);
         }
         return null;
     }
@@ -117,6 +122,11 @@ public class BltFileDownloadController implements Controller {
      */
     public void setSuccessView( String successView ) {
         this.successView = successView;
+    }
+    public FileCatalog getFileCatalog() { return fileCatalog; }
+
+    public void setFileCatalog(FileCatalog fileCatalog) {
+        this.fileCatalog = fileCatalog;
     }
 }
 //--------------------------------------------------------------------------------------------------

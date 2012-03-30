@@ -24,12 +24,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
 <project name="BaltradDex" basedir="." default="dist">
   <description>Builds and deploys BaltradDex application</description>
-  <property file="develop.properties" />
   <property name="app.name" value="Baltrad Data Exchange System: BaltradDex"/>
   <property name="root.dir" value="${basedir}"/>
   <property name="script.dir" value="${root.dir}/script"/>
-  <!-- !!! do not override this property -->
-  
   <property name="lib.dir" value="lib"/>
   <property name="extralib.dir" value="extralib"/>
   <property name="src.dir" value="src"/>
@@ -49,16 +46,20 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="build.classes.dir" value="${build.webinf.dir}/classes"/>
   <property name="build.lib.dir" value="${build.webinf.dir}/lib"/>
   <property name="build.test.dir" value="${build.dir}/test" />
+  <property name="build.itest.dir" value="${build.dir}/itest"/>  
   <property name="test.conf.dir" value="${build.test.dir}/conf" />
   <property name="test.data.dir" value="test-data" />
   <property name="compile.debug" value="true"/>
   <property name="compile.includeAntRuntime" value="no"/>
   <property name="compile.optimize" value="true"/>
-  <property name="javahdf.path" value="/opt/hdf-java"/>
+  <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java"/>
   
-  <!-- You can override properties in this file -->
+  <!-- You can override properties in these files -->
+  <property file="${etc.dir}/develop.properties" />
   <property file="${etc.dir}/db.properties"/>
   <property file="${etc.dir}/appserver.properties"/>
+  
+  <property file="${etc.dir}/testdb.properties" />
 
   <property environment="env"/>
 
@@ -204,7 +205,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="*.jar"/>
       </fileset>
       <fileset dir="lib">
-        <include name="postgresql-8.4-701.jdbc4.jar"/>
+        <include name="postgresql-8.4-701.jdbc4.jar"/> 
         <include name="apache-mime4j-0.6.jar"/>
       </fileset>
       <!-- Also, include neccesary libs from beast-lib -->
@@ -288,9 +289,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="**/*.properties"/>
       </fileset>
     </copy>
-    <!-- Copy test data -->
 
-  	<!-- First copy the dex version of the beast-log messages.xml into the classpath -->
+    <!-- First copy the dex version of the beast-log messages.xml into the classpath -->
     <copy todir="${build.classes.dir}">
       <fileset dir="${etc.dir}">
         <include name="beast-log-messages.xml"/>
@@ -299,10 +299,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   	
     <!-- But since the beast version might contain changes, we preferrably use that one instead -->
     <copy todir="${build.classes.dir}" overwrite="true">
-      <fileset dir="${beast.path}/etc">
+      <fileset dir="${beast.path}/etc"> 
     	<include name="beast-log-messages.xml"/>
       </fileset>
     </copy>
+    <!-- Copy test data -->
     <copy todir="${build.test.dir}">
       <fileset dir="${test.data.dir}"/>
     </copy>
@@ -391,7 +392,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
   <target name="execute.test" depends="compile.test">
 	<mkdir dir="${dist.dir}/junit-reports" />
-	<junit dir="${build.test.dir}" showoutput="true" forkmode="perBatch" printsummary="no" >
+	<junit dir="${build.test.dir}" showoutput="true" forkmode="perBatch" 
+               printsummary="no" >
 	  <jvmarg line="-Djava.awt.headless=true -Xmx512m -XX:MaxPermSize=512m"/>
 	  <formatter type="xml"/> 
 	  <formatter type="brief" usefile="false" if="test.format.brief" />
@@ -406,7 +408,91 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   </target>
   
   <target name="test" depends="compile,execute.test"/>
-
+  
+  <!-- 
+      INTEGRATION TEST PART 
+  -->
+  <!-- Compile source files -->
+  <target name="compile.itest">
+    <mkdir dir="${build.itest.dir}"/>
+    <javac srcdir="${root.dir}/itest" encoding="UTF-8" deprecation="on"
+           debug="${compile.debug}" 
+           includeAntRuntime="${compile.includeAntRuntime}"    	
+           optimize="${compile.optimize}" destdir="${build.itest.dir}">
+      <classpath location="${build.classes.dir}"/>
+      <classpath refid="lib.path"/>
+      <classpath refid="test.lib.path"/>
+    </javac>
+    <!-- copy any resources -->
+    <copy todir="${build.itest.dir}">
+      <fileset dir="${root.dir}/itest">
+        <include name="**/testdata/**"/>
+        <include name="**/*.xml"/>
+        <include name="**/*.h5"/>
+      </fileset>
+    </copy>
+  </target>
+  <!-- Setup integration tests -->
+  <target name="init.itest">
+	<mkdir dir="${dist.dir}/junit-reports" />
+	<copy file="${etc.dir}/testdb.properties" todir="${build.classes.dir}"/>
+  </target>
+  <!-- Create test database -->
+  <target name="create.testdb">
+    <sql classpath="${lib.dir}/${itest.bdb.jar}"
+         driver="${itest.bdb.driver}"
+         url="${itest.bdb.uri}"
+         userid="${itest.bdb.user}" 
+         password="${itest.bdb.pwd}"
+         escapeprocessing="false"
+         expandproperties="false"
+         delimitertype="row">
+      <transaction src="${etc.dir}/drop_dex_schema.sql"/>
+      <transaction src="${etc.dir}/create_dex_schema.sql"/>
+      <transaction src="${etc.dir}/drop_beast_schema.sql"/>
+      <transaction src="${etc.dir}/create_beast_schema.sql"/>
+    </sql>
+  </target>
+  <!-- Start baltrad-bdb server -->
+  <target name="start-bdb-server">
+    <chmod file="${script.dir}/start-bdb-server.sh" perm="755"/>
+    <exec executable="${script.dir}/start-bdb-server.sh">
+      <arg value="${bltnode.install.prefix}"/>  
+      <arg value="${basedir}/${etc.dir}/testdb.properties"/>
+      <arg value="${basedir}/${build.itest.dir}/baltrad-bdb-server.pid"/>
+      <arg value="${basedir}/${build.itest.dir}/baltrad-bdb-server.log"/>
+      <arg value="${baltrad.bdb.server.uri}"/>
+      <arg value="${basedir}/${etc.dir}/odim_source.xml"/>
+    </exec> 
+  </target>
+  <!-- Stop baltrad-bdb server -->
+  <target name="stop-bdb-server">
+    <chmod file="${script.dir}/stop-bdb-server.sh" perm="755"/>
+    <exec executable="${script.dir}/stop-bdb-server.sh">
+      <arg value="${basedir}/${build.itest.dir}/baltrad-bdb-server.pid"/>
+    </exec> 
+  </target>   
+  <!-- Execute integration tests -->
+  <target name="execute.itest" depends="compile.itest,init.itest,
+                                        start-bdb-server">
+    <mkdir dir="${dist.dir}/junit-reports" />
+    <junit dir="${build.itest.dir}" showoutput="true" forkmode="perBatch" 
+           printsummary="no" >
+      <jvmarg line="-Djava.awt.headless=true -Xmx512m -XX:MaxPermSize=512m"/>
+      <formatter type="xml"/> 
+      <formatter type="brief" usefile="false" if="test.format.brief" />
+      <classpath refid="test.lib.path"/>
+      <classpath location="${build.classes.dir}"/>
+      <classpath refid="lib.path"/>
+      <classpath location="${build.itest.dir}" />
+      <batchtest fork="yes" todir="${dist.dir}/junit-reports">
+        <fileset dir="${build.itest.dir}" includes="**/*Test.class"/>
+      </batchtest>
+    </junit>
+    <!-- Stop bdb server once the tests are finished -->
+    <antcall target="stop-bdb-server"/>
+  </target>
+    
   <!-- delete build and dist directories -->
   <target name="clean">
     <delete dir="build"/>
@@ -426,8 +512,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
   <!-- create database and users -->
   <target name="create-db">
-    <sql classpath="${lib.dir}/${db.jar}" driver="${db.driver}" url="${db.url}" userid="${db.user}"
-        password="${db.pwd}">
+    <sql classpath="${lib.dir}/${db.jar}" driver="${db.driver}" url="${db.url}"
+         userid="${db.user}" password="${db.pwd}">
       <transaction src="${etc.dir}/create_db.sql"/>
     </sql>
   </target>
@@ -478,7 +564,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   </target>
   
   <!-- deploy on tomcat -->
-
   <target name="deploy" depends="dist, context-status, insert-data"
     	if="context.deployable">
     <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
@@ -489,18 +574,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             update="${mgr.update}"
             war="file:${dist.dir}/BaltradDex.war"/>
   </target>
-
-  <!--target name="deploy" depends="dist, context-status"
-    	if="context.deployable">
-    <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
-    <deploy url="${mgr.url}"
-            username="${mgr.username}"
-            password="${mgr.password}"
-            path="${mgr.path}"
-            update="${mgr.update}"
-            war="file:${dist.dir}/BaltradDex.war"/>
-  </target-->
-
 
   <target name="hudson" depends="compile,prepare-testdb,execute.test"/>
 
@@ -574,6 +647,5 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             </fileset> 
          </javadoc>
     </target>
-
 </project>
 

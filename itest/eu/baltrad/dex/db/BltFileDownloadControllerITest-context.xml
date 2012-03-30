@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+  <!-- Property placeholder configurer for expanding ${} into values -->
+  <bean id="propertyConfigurer" 
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>testdb.properties</value>
+      </list>
+    </property>
+  </bean>
+  
+  <!-- Dex DB test helper -->
+  <bean id="bdbHelper" class="eu.baltrad.dex.itest.DexDBITestHelper" 
+        autowire="byType">
+    <constructor-arg index="0" value="${itest.bdb.server.uri}" />
+    <constructor-arg index="1" value="${itest.bdb.storage.path}" />
+  </bean>
+  
+  <bean id="bdb" class="eu.baltrad.bdb.db.rest.RestfulDatabase" >
+    <constructor-arg value="${itest.bdb.server.uri}" />
+  </bean>
+  
+  <bean id="storage" class="eu.baltrad.bdb.storage.CacheDirStorage">
+    <constructor-arg index="0" value="${itest.bdb.storage.path}" />
+    <constructor-arg index="1" value="1000" />
+  </bean>
+  
+  <bean id="catalog" class="eu.baltrad.bdb.BasicFileCatalog">
+    <constructor-arg ref="bdb" />
+    <constructor-arg ref="storage" />
+  </bean>
+  
+</beans>

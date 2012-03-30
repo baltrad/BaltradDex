@@ -59,11 +59,20 @@ public class SaveConfigurationValidator implements Validator {
     public void validate( Object command, Errors errors ) {
         AppConfiguration conf = ( AppConfiguration )command;
         if( conf == null ) return;
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "nodeName", "error.missing.nodename" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "organization", "error.missing.orgname" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "address", "error.missing.address" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "timeZone", "error.missing.timezone" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "workDir", "error.missing.workdir" );
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nodeName", 
+                                                      "error.missing.nodename");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nodeAddress", 
+                                                   "error.missing.nodeaddress");
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "organization", 
+                                                      "error.missing.orgname" );
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "address", 
+                                                    "error.missing.orgaddress");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "timeZone", 
+                                                      "error.missing.timezone");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "workDir", 
+                                                       "error.missing.workdir");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", 
+                                                    "error.missing.adminemail");
         // validate node name
         if (conf.getNodeName().trim().length() > 0 && conf.getNodeName().trim().length()
                 < MIN_FIELD_LENGTH) {

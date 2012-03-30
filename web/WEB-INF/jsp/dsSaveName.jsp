@@ -83,12 +83,9 @@ Author     : szewczenko
                                         </div>
                                         <div class="rightcol">
                                             <div class="dsdescription">
-                                                <textarea name="dsDescription" rows="64" cols="200"
-                                                    title="Enter data source description">
-                                                    <c:out value="${dsDescription}"/>
-                                                </textarea>
+                                                <textarea name="dsDescription">${dsDescription}</textarea>
                                                 <div class="hint">
-                                                    Verbose description of the data source
+                                                    Data source description
                                                 </div>
                                             </div>
                                             <c:if test="${not empty dsDescriptionError}">
