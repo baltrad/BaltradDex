@@ -15,6 +15,7 @@
                 <li><a href="showroutes.htm">Show</a></li>
                 <li><a href="groovyroute_create.htm">Create script</a></li>
                 <li><a href="compositeroute_create.htm">Create composite</a></li>
+                <li><a href="googlemaproute_create.htm">Create google map</a></li>
                 <li><a href="volumeroute_create.htm">Create volume</a></li>
                 <li><a href="distributionroute.htm">Create distribution</a></li>
                 <li><a href="bdbtrimcountroute_create.htm">Create DB trim count</a></li>

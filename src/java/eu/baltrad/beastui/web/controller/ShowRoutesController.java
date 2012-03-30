@@ -87,6 +87,8 @@ public class ShowRoutesController {
       return "redirect:bdbtrimageroute_create.htm";
     } else if (operation != null && operation.equals("BdbTrimCount")) {
       return "redirect:bdbtrimcountroute_create.htm";
+    } else if (operation != null && operation.equals("GoogleMap")) {
+      return "redirect:googlemaproute_create.htm";
     }
     model.addAttribute("emessage", "Unknown operation: '"+operation+"'");
     return "redirect:showroutes.htm";
@@ -112,6 +114,8 @@ public class ShowRoutesController {
         result = "redirect:bdbtrimageroute_show.htm";
       } else if (type.equals("bdb_trim_count")) {
         result = "redirect:bdbtrimcountroute_show.htm";
+      } else if (type.equals("blt_gmap")) {
+        result = "redirect:googlemaproute_show.htm";
       }
 
       if (result != null) {

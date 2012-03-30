@@ -126,6 +126,9 @@ List of routes
                                                             <c:when test="${route.ruleType == 'bdb_trim_count'}">
                                                                 <c:out value="BdbTrimCount"/>
                                                             </c:when>
+                                                            <c:when test="${route.ruleType == 'bdb_gmap'}">
+                                                                <c:out value="GoogleMap"/>
+                                                            </c:when>
                                                             <c:otherwise>
                                                                 <c:out value="${route.ruleType}"/>
                                                             </c:otherwise>
