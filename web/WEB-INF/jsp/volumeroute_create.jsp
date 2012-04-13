@@ -187,7 +187,7 @@ Creates a volume route
                                         <div class="row">
                                             <input type="text" name="timeout" value="<%=timeout%>"/>
                                             <div class="hint">
-                                               Timeout in milliseconds
+                                               Timeout in seconds
                                             </div>
                                         </div>
                                         <div class="row6">
