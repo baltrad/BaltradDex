@@ -254,7 +254,7 @@ public class UserManager {
             if (user.getId() == 0) {
                 sql = "INSERT INTO dex_users (name, name_hash, role_name, password, org_name, " +
                     "org_unit, locality, state, country_code, node_address) VALUES ('" +
-                    user.getName() + "', '" + MessageDigestUtil.createHash(user.getName()) + 
+                    user.getName() + "', '" + MessageDigestUtil.createHash("MD5", 16, user.getName()) + 
                     "', '" + user.getRoleName() + "', '" + user.getPassword() + "', '" + 
                     user.getOrganizationName() + "', '" + user.getOrganizationUnit() + "', '" + 
                     user.getLocalityName() + "', '" + user.getStateName() + "', '" + 
@@ -263,7 +263,7 @@ public class UserManager {
             } else {
                 // record exists, do update
                 sql = "UPDATE dex_users SET name = '" + user.getName() + "', name_hash = '" +
-                    MessageDigestUtil.createHash(user.getName()) + "', role_name = '" + 
+                    MessageDigestUtil.createHash("MD5", 16, user.getName()) + "', role_name = '" + 
                     user.getRoleName() + "', " + "password = '" + user.getPassword() + 
                     "', org_name = '" + user.getOrganizationName() + "', org_unit = '" + 
                     user.getOrganizationUnit() + "', locality = '" + user.getLocalityName() + 

@@ -21,10 +21,6 @@
 
 package eu.baltrad.dex.util;
 
-import eu.baltrad.dex.log.model.MessageLogger;
-
-import org.apache.log4j.Logger;
-
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -37,37 +33,26 @@ import java.security.NoSuchAlgorithmException;
  * @since 1.0
  */
 public class MessageDigestUtil {
-//---------------------------------------------------------------------------------------- Constants
-    // Algorithm type identifier
-    private static final String ALGORITHM = "MD5";
-    // Hash length constant
-    private static final int HASH_LEN = 16;
-    /** Logger */
-    private static Logger log;
-//------------------------------------------------------------------------------------------ Methods
-    /**
-     * Constructor.
-     */
-    public MessageDigestUtil() {
-        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-    }
+//---------------------------------------------------------------------- Methods
     /**
      * Method returns hash for a given message.
      * 
      * @param message Message string
      * @return Hash
      */
-    public static String createHash( String message ) {
+    public static String createHash(String algorithm, int hashLen, 
+            String message) {
         String hashString = "";
         try {
-            MessageDigest md = MessageDigest.getInstance( ALGORITHM );
-            byte[] messageDigest = md.digest( message.getBytes() );
-                BigInteger number = new BigInteger( 1, messageDigest );
-                hashString = number.toString( HASH_LEN );
-        } catch( NoSuchAlgorithmException e ) {
-            log.error( "Error while initializing hash function", e );
+            MessageDigest md = MessageDigest.getInstance(algorithm);
+            byte[] messageDigest = md.digest(message.getBytes());
+            BigInteger number = new BigInteger(1, messageDigest);
+            hashString = number.toString(hashLen);
+        } catch(NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error while initializing hash function", 
+                    e);
         }
         return hashString;
     }
 }
-//--------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------

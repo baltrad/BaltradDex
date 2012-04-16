@@ -24,7 +24,7 @@ package eu.baltrad.dex.subscription.controller;
 import eu.baltrad.dex.subscription.model.Subscription;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.subscription.model.SubscriptionManager;
-import eu.baltrad.dex.core.controller.FrameDispatcherController;
+import eu.baltrad.dex.net.controller.FrameDispatcherController;
 import eu.baltrad.frame.model.*;
 import static eu.baltrad.frame.model.Protocol.*;
 

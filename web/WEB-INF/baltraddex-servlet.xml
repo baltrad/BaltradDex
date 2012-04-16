@@ -260,7 +260,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="validator">
             <ref bean="loginValidator"/>
-        </property>
+        </property>        
     </bean>
 
     <!--

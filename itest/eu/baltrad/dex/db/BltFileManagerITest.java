@@ -339,7 +339,7 @@ public class BltFileManagerITest extends TestCase {
         AttributeResult r = bdb.execute(q);
         r.next();
         long count = r.getLong("entryCount");
-        assertEquals(count, 4);
+        assertEquals(4, count);
         r.close();
         
         // fetch entries with FileQuery
@@ -371,6 +371,47 @@ public class BltFileManagerITest extends TestCase {
             time = t;
         }
         fr.close();
+    }
+    
+    public void testBdbOperators() {
+        ExpressionFactory xpr = new ExpressionFactory();
+        List<Expression> xprs = new ArrayList<Expression>();
+        Expression e1 = xpr.eq(xpr.attribute("what/source:PLC"), 
+                                             xpr.literal("Brzuchania"));
+        xprs.add(e1);
+        eu.baltrad.bdb.util.Date startDate = 
+                    new eu.baltrad.bdb.util.Date(2012, 3, 22);
+        Expression e2 = xpr.ge(xpr.attribute("what/date"), 
+                                                        xpr.literal(startDate));
+        xprs.add(e2);
+        
+        eu.baltrad.bdb.util.Date stopDate = 
+                    new eu.baltrad.bdb.util.Date(2012, 3, 22);
+        Expression e3 = xpr.le(xpr.attribute("what/date"), 
+                                                        xpr.literal(stopDate));
+        xprs.add(e3);
+        
+        eu.baltrad.bdb.util.Time startTime = 
+                    new eu.baltrad.bdb.util.Time(7, 40, 0); 
+        Expression e4 = xpr.ge(xpr.attribute("what/time"), 
+                                                        xpr.literal(startTime));
+        xprs.add(e4);
+        
+        eu.baltrad.bdb.util.Time stopTime = 
+                    new eu.baltrad.bdb.util.Time(8, 10, 59); 
+        Expression e5 = xpr.le(xpr.attribute("what/time"), 
+                                                        xpr.literal(stopTime));
+        xprs.add(e5);
+        
+        Expression ex = xpr.and(xprs);
+        AttributeQuery q = new AttributeQuery();
+        q.setFilter(ex);
+        q.fetch("entryCount", xpr.count(xpr.attribute("file:uuid")));
+        AttributeResult r = bdb.execute(q);
+        r.next();
+        long count = r.getLong("entryCount");
+        assertEquals(4, count);
+        r.close();
     }
     
 }

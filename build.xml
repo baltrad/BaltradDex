@@ -53,12 +53,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="compile.includeAntRuntime" value="no"/>
   <property name="compile.optimize" value="true"/>
   <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java"/>
+  <property name="keystore.dir" value="keystore"/>
+  <property name="hostname" value="dev.baltrad.eu"/>
   
   <!-- You can override properties in these files -->
   <property file="${etc.dir}/develop.properties" />
   <property file="${etc.dir}/db.properties"/>
   <property file="${etc.dir}/appserver.properties"/>
-  
   <property file="${etc.dir}/testdb.properties" />
 
   <property environment="env"/>
@@ -202,6 +203,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="*.jar"/>
       </fileset>
       <fileset dir="lib/proj4">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/commons-validator">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/commons-codec">
+        <include name="*.jar"/>
+      </fileset>
+      <fileset dir="lib/commons-lang">
         <include name="*.jar"/>
       </fileset>
       <fileset dir="lib">
@@ -358,9 +368,18 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   </target>
 
   <!-- UNIT TEST PART -->
-  <target name="compile.test">
+  
+  <target name="init.test">
     <mkdir dir="${build.test.dir}"/>
     <mkdir dir="${test.conf.dir}"/>
+    <chmod file="${script.dir}/init-keyczar-keystore.sh" perm="755"/>
+    <exec executable="${script.dir}/init-keyczar-keystore.sh">
+        <arg value="${build.test.dir}/${keystore.dir}"/>
+        <arg value="${hostname}"/>    
+    </exec>
+  </target>
+  
+  <target name="compile.test" depends="init.test">
     <javac srcdir="${root.dir}/test"
            encoding="8859_1"
            deprecation="on"
@@ -449,8 +468,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
          delimitertype="row">
       <transaction src="${etc.dir}/drop_dex_schema.sql"/>
       <transaction src="${etc.dir}/create_dex_schema.sql"/>
-      <transaction src="${etc.dir}/drop_beast_schema.sql"/>
-      <transaction src="${etc.dir}/create_beast_schema.sql"/>
+      <transaction src="${beast.path}/sql/drop_db.sql"/>
+      <transaction src="${beast.path}/sql/create_db.sql"/>
     </sql>
   </target>
   <!-- Start baltrad-bdb server -->

@@ -212,7 +212,7 @@ public class User {
      * @param name User name
      */
     public void setNameHash( String name ) {
-        this.nameHash = MessageDigestUtil.createHash( name );
+        this.nameHash = MessageDigestUtil.createHash("MD5", 16, name);
     }
     /**
      * Gets password.
@@ -226,7 +226,7 @@ public class User {
      * @param password Password to set
      */
     public void setPassword( String password ) {
-        this.password = MessageDigestUtil.createHash( password );
+        this.password = MessageDigestUtil.createHash("MD5", 16, password);
     }
     /**
      * Gets confirmed password.
@@ -240,7 +240,8 @@ public class User {
      * @param confirmPassword Confirmed password to set
      */
     public void setConfirmPassword( String confirmPassword ) {
-        this.confirmPassword = MessageDigestUtil.createHash( confirmPassword );
+        this.confirmPassword = MessageDigestUtil.createHash("MD5", 16,
+                confirmPassword);
     }
     /**
      * @return the checked
