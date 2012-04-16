@@ -50,8 +50,8 @@ import java.util.ArrayList;
  */
 public class DataDeliveryRequestTest extends TestCase {
 //---------------------------------------------------------------------------------------- Constants   
-    private final static String KEYCZAR_KEYSTORE = "bltnode-keys";
-    private final static String NODE_NAME = "test.baltrad.eu";
+    private final static String KEYCZAR_KEYSTORE = "keystore";
+    private final static String NODE_NAME = "dev.baltrad.eu";
     private static final String ADDRESS = "http://localhost:8084/BaltradDex/dispatch.htm";
 //---------------------------------------------------------------------------------------- Variables
     private HttpClient client;
