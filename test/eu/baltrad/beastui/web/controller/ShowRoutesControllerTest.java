@@ -115,6 +115,15 @@ public class ShowRoutesControllerTest extends TestCase {
     assertEquals("redirect:bdbtrimcountroute_create.htm", result);
   }
   
+  public void testCreateRoute_GoogleMap() {
+    replay();
+    
+    String result = classUnderTest.createRoute(model, "GoogleMap");
+    
+    verify();
+    assertEquals("redirect:googlemaproute_create.htm", result);
+  }
+  
   public void testCreateRoute_Unknown() {
     model.addAttribute("emessage", "Unknown operation: 'Unknown'");
     modelControl.setReturnValue(null);
@@ -219,4 +228,26 @@ public class ShowRoutesControllerTest extends TestCase {
     assertEquals("redirect:bdbtrimcountroute_show.htm", result);
   }
 
+  public void testShowRoute_GoogleMap() {
+    MockControl defControl = MockClassControl.createControl(RouteDefinition.class);
+    RouteDefinition def = (RouteDefinition)defControl.getMock();
+    
+    manager.getDefinition("Nisse");
+    managerControl.setReturnValue(def);
+    def.getRuleType();
+    defControl.setReturnValue("blt_gmap");
+    
+    model.addAttribute("name", "Nisse");
+    modelControl.setReturnValue(null);
+
+    replay();
+    defControl.replay();
+    
+    String result = classUnderTest.showRoute(model, "Nisse");
+    
+    verify();
+    defControl.verify();
+    
+    assertEquals("redirect:googlemaproute_show.htm", result);
+  }
 }
