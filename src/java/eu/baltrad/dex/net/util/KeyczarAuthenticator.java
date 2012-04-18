@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
+import org.keyczar.exceptions.KeyczarException;
 
 /**
  * Implements Keyczar authenticator.
@@ -104,7 +105,14 @@ public class KeyczarAuthenticator implements Authenticator {
      * @return True upon success, false otherwise
      */
     public boolean authenticate(String message, String signature) {
-        return verifier.verify(message, signature);
+        boolean result = false;
+        try {
+            result = verifier.verify(message, signature);
+        } catch (KeyczarException e) {
+            System.out.println("Failed to authenticate message: " 
+                    + e.getMessage());
+        }
+        return result;
     }
     
     /**

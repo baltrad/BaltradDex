@@ -37,12 +37,12 @@ public class KeyczarVerifier implements Verifier {
     }
   }
   
-  @Override
-  public boolean verify(String message, String signature) {
+  public boolean verify(String message, String signature) 
+          throws KeyczarException {
     try {
       return verifier.verify(message, signature);
     } catch (KeyczarException e) {
-      throw new RuntimeException("verification failed", e);
+      throw new KeyczarException("verification failed", e);
     }
   }
 }

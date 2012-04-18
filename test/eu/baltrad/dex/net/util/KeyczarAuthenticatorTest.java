@@ -63,6 +63,13 @@ public class KeyczarAuthenticatorTest {
         format = new SimpleDateFormat(DATE_FORMAT);
     }
     
+    private void setAttributes(HttpServletRequest request) {
+        request.setAttribute("Content-Type", "text/html");
+        request.setAttribute("Content-MD5", Base64.encodeBase64String(
+                request.getRequestURI().getBytes()));
+        request.setAttribute("Date", format.format(new Date()));
+    }
+    
     @Test
     public void getMessage() {
         HttpUriRequest request = requestFactory
@@ -130,13 +137,6 @@ public class KeyczarAuthenticatorTest {
         request.setAttribute("Date", "");
         assertFalse(classUnderTest.authenticate(classUnderTest.getMessage(
                 request), classUnderTest.getSignature(request)));
-    }
-    
-    private void setAttributes(HttpServletRequest request) {
-        request.setAttribute("Content-Type", "text/html");
-        request.setAttribute("Content-MD5", Base64.encodeBase64String(
-                request.getRequestURI().getBytes()));
-        request.setAttribute("Date", format.format(new Date()));
     }
     
 }

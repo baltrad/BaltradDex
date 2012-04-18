@@ -19,6 +19,8 @@ along with BaltradFrame. If not, see <http://www.gnu.org/licenses/>.
 
 package eu.baltrad.dex.auth.util;
 
+import org.keyczar.exceptions.KeyczarException;
+
 public interface Verifier {
   /**
    * Verify a signature
@@ -28,5 +30,5 @@ public interface Verifier {
    *
    * @return True if the signature is valid
    */
-  boolean verify(String message, String signature);
+  boolean verify(String message, String signature) throws KeyczarException;
 }

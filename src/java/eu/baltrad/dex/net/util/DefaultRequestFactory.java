@@ -22,7 +22,6 @@
 package eu.baltrad.dex.net.util;
 
 import eu.baltrad.dex.net.util.UrlValidatorUtil;
-import eu.baltrad.dex.datasource.model.DataSource;
 
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpGet;
@@ -33,7 +32,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.codec.binary.Base64;
 
 import java.net.URI;
-import java.util.Set;
 import java.util.Date;
 import java.io.InputStream;
 import java.io.IOException;
@@ -58,8 +56,6 @@ public class DefaultRequestFactory implements RequestFactory {
     private UrlValidatorUtil urlValidator;
     /** Server URI */ 
     private URI serverUri;
-    /** JSON utility */
-    private JsonUtil jsonUtil;
     /** Common date format */
     private SimpleDateFormat dateFormat;
         
@@ -76,7 +72,6 @@ public class DefaultRequestFactory implements RequestFactory {
             throw new IllegalArgumentException("Invalid server URI: " 
                     + serverUri);
         }
-        this.jsonUtil = new JsonUtil();
         this.dateFormat = new SimpleDateFormat(DATE_FORMAT);
     }
     
@@ -174,28 +169,28 @@ public class DefaultRequestFactory implements RequestFactory {
     
     /**
      * Creates post subscription request.
+     * @param jsonSources String representation of data sources 
      * @return Http POST request 
      */
-    public HttpPost createPostSubscriptionRequest(Set<DataSource> dataSources) {
+    public HttpPost createPostSubscriptionRequest(String jsonSources) {
         HttpPost httpPost = new HttpPost(getRequestUri("postsubscription.htm"));
-        String jsonString = null;
         StringEntity entity = null;
         try {
-            jsonString = jsonUtil.dataSourcesToJsonString(dataSources);
-            entity = new StringEntity(jsonString);
+            entity = new StringEntity(jsonSources);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         httpPost.setEntity(entity);
         httpPost.addHeader("Content-Type", "application/json");
         httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
-                jsonString.getBytes()));
+                jsonSources.getBytes()));
         httpPost.addHeader("Date", dateFormat.format(new Date()));
         return httpPost;
     }
     
     /**
      * Creates post data file request.
+     * @param fileContent File content as stream
      * @return Http POST request 
      */
     public HttpPost createPostFileRequest(InputStream fileContent) {

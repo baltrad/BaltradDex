@@ -38,6 +38,7 @@ import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
 
+import java.util.Set;
 import java.util.HashSet;
 
 /**
@@ -59,13 +60,12 @@ public class DataSourceListControllerTest {
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
     
-    
     @Before
     public void setUp() throws Exception {
         tester = new ServletTester();
         tester.setContextPath("/");
         
-        tester.addServlet (DataSourceListServlet.class, 
+        tester.addServlet(DataSourceListServlet.class, 
                 "/DataSourceListServlet/getdatasourcelisting.htm");
         context = tester.createSocketConnector(true);
         tester.start();
@@ -96,7 +96,7 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void handleRequest_WrongAddress() throws Exception {
+    public void handleRequest_InvalidURL() throws Exception {
         request.addParameter("url_input", "http://invalid");
         classUnderTest.setAuthenticator(keyczarAuthenticator);
         ModelAndView modelAndView = classUnderTest.handleRequest(request, 
@@ -106,7 +106,7 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void handleRequest_NewAddress() throws Exception {
+    public void handleRequest_NewURL() throws Exception {
         request.addParameter("url_input", context + "/DataSourceListServlet");
         classUnderTest.setAuthenticator(keyczarAuthenticator);
         ModelAndView modelAndView = classUnderTest.handleRequest(request, 
@@ -115,7 +115,7 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void handleRequest_ExistingAddress() throws Exception {
+    public void handleRequest_ExistingURL() throws Exception {
         request.addParameter("url_select", context + "/DataSourceListServlet");
         classUnderTest.setAuthenticator(keyczarAuthenticator);
         ModelAndView modelAndView = classUnderTest.handleRequest(request, 
@@ -124,7 +124,7 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void handleRequest_BothAddresses() throws Exception {
+    public void handleRequest_BothURLs() throws Exception {
         request.addParameter("url_input", context + "/DataSourceListServlet");
         request.addParameter("url_select", context + "/DataSourceListServlet");
         classUnderTest.setAuthenticator(keyczarAuthenticator);
@@ -155,6 +155,22 @@ public class DataSourceListControllerTest {
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 response.getStatus());
         assertEquals("connect", modelAndView.getViewName());
+        assertTrue(modelAndView.getModel().containsKey(
+                "datasource.server.error"));
+    }
+    
+    @Test
+    public void handleRequest_Unauthorized() throws Exception {
+        request.addParameter("url_input", context + "/DataSourceListServlet");
+        classUnderTest.setAuthenticator(new KeyczarAuthenticator(
+                "./fake_keystore", "dev.baltrad.eu"));
+        ModelAndView modelAndView = classUnderTest.handleRequest(request, 
+                response);
+        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, 
+                response.getStatus());
+        assertEquals("connect", modelAndView.getViewName());
+        assertTrue(modelAndView.getModel().containsKey(
+                "datasource.server.error"));
     }
     
     @Test
@@ -168,7 +184,7 @@ public class DataSourceListControllerTest {
         assertEquals("datasources", modelAndView.getViewName());
         assertNotNull(modelAndView.getModel());
         assertTrue(modelAndView.getModel().containsKey("data_sources_key"));
-        HashSet<DataSource> dataSources = (HashSet<DataSource>) 
+        Set<DataSource> dataSources = (HashSet<DataSource>) 
                 modelAndView.getModel().get("data_sources_key");
         assertNotNull(dataSources);
         assertEquals(3, dataSources.size()); 

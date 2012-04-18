@@ -54,6 +54,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="compile.optimize" value="true"/>
   <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java"/>
   <property name="keystore.dir" value="keystore"/>
+  <property name="fake.keystore.dir" value="fake_keystore"/>
   <property name="hostname" value="dev.baltrad.eu"/>
   
   <!-- You can override properties in these files -->
@@ -377,8 +378,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <arg value="${build.test.dir}/${keystore.dir}"/>
         <arg value="${hostname}"/>    
     </exec>
+    <exec executable="${script.dir}/init-keyczar-keystore.sh">
+        <arg value="${build.test.dir}/${fake.keystore.dir}"/>
+        <arg value="${hostname}"/>    
+    </exec>
   </target>
-  
   <target name="compile.test" depends="init.test">
     <javac srcdir="${root.dir}/test"
            encoding="8859_1"

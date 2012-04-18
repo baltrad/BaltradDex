@@ -21,8 +21,6 @@
 
 package eu.baltrad.dex.net.util;
 
-import eu.baltrad.dex.datasource.model.DataSource;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.Header;
@@ -35,7 +33,6 @@ import org.junit.Test;
 import java.net.URI;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
-import java.util.HashSet;
 
 /**
  * Request factory test.
@@ -102,7 +99,7 @@ public class DefaultRequestFactoryTest {
     @Test
     public void createPostSubscriptionRequest() {
         HttpUriRequest request = classUnderTest.createPostSubscriptionRequest(
-                                                     new HashSet<DataSource>());
+                "json string will be passed here");
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/postsubscription.htm"), 

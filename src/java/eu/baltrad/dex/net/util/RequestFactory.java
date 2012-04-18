@@ -21,12 +21,9 @@
 
 package eu.baltrad.dex.net.util;
 
-import eu.baltrad.dex.datasource.model.DataSource;
-
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.io.InputStream;
-import java.util.Set;
 
 /**
  * Request factory.
@@ -40,8 +37,7 @@ public interface RequestFactory {
     
     public HttpUriRequest createGetSubscriptionRequest();
     
-    public HttpUriRequest createPostSubscriptionRequest(
-           Set<DataSource> dataSources);
+    public HttpUriRequest createPostSubscriptionRequest(String jsonSources);
     
     public HttpUriRequest createPostFileRequest(InputStream fileContent);
     
