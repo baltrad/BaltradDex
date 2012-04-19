@@ -23,12 +23,9 @@ package eu.baltrad.dex.net.controller;
 
 import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.datasource.model.DataSource;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.HttpResponse;
-
-import org.apache.commons.io.IOUtils;
 
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;
@@ -37,42 +34,35 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
-import java.util.Set;
-import java.io.StringWriter;
 import java.io.InputStream;
-import java.io.IOException;
 
 /**
- * Post subscription status requests on the server.
+ * Posts file on the server.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.1.0
  * @since 1.1.0
  */
-public class GetSubscriptionController implements Controller {
+public class PostFileController implements Controller {
     
-    /** Current view */
-    private static final String GET_SUBSCRIPTION_VIEW = "getsubscription";
-    /** Show subscription view */
-    private static final String SHOW_SUBSCRIPTION_VIEW = "showsubscription";
-    
-    /** Data sources selected for subscription */
-    private static final String SUBSCRIPTIONS_KEY = "subscriptions_key";
     /** URL of the target node */
     private static final String TARGET_NODE_URL = "target_node_url";
 
     /** Message keys */
     private static final String INVALID_URL_MSG = "node.url.invalid";
-    private static final String SUBSCRIPTION_READ_ERROR_MSG = 
-            "datasource.read.error";
-    private static final String SUBSCRIPTION_SERVER_ERROR_MSG = 
-            "subscription.server.error";
+    private static final String POSTFILE_SERVER_ERROR_MSG = 
+            "postfile.server.error";
+    private static final String POSTFILE_NULLCONTENT_ERROR_MSG = 
+            "postfile.nullcontent.error";
+    private static final String POSTFILE_SUCCESS_MSG = "postfile.success.msg";
+    
     
     private UrlValidatorUtil urlValidator;
     private MessageResourceUtil messages;
     private Authenticator authenticator;
     private RequestFactory requestFactory;
     private HttpClientUtil httpClient;
-    private JsonUtil jsonUtil;
+    
+    private InputStream fileContent;
     
     public ModelAndView handleRequest(HttpServletRequest request, 
             HttpServletResponse response) throws Exception {
@@ -81,51 +71,32 @@ public class GetSubscriptionController implements Controller {
         // validate target node URL
         String url = request.getParameter(TARGET_NODE_URL);
         if (!urlValidator.validate(url)) {
-            modelAndView.addObject(INVALID_URL_MSG, messages.getMessage(
+            modelAndView.addObject(INVALID_URL_MSG, getMessages().getMessage(
                     INVALID_URL_MSG));
-            modelAndView.setViewName(GET_SUBSCRIPTION_VIEW);
         } else {
-            
             requestFactory = new DefaultRequestFactory(URI.create(url));
-            HttpUriRequest req = requestFactory.createGetSubscriptionRequest();
-            authenticator.addCredentials(req);
-            
             try {
-                HttpResponse res = httpClient.post(req);
-                response.setStatus(res.getStatusLine().getStatusCode()); 
-                if (res.getStatusLine().getStatusCode() == 
-                        HttpServletResponse.SC_OK) {
-                    String jsonSources = "";
-                    try {
-                        StringWriter writer = new StringWriter();
-                        InputStream is = null;
-                        try {
-                            is = res.getEntity().getContent();
-                            IOUtils.copy(is, writer);
-                            jsonSources = writer.toString();
-                        } finally {
-                            writer.close();
-                            is.close();
-                        }
-                        Set<DataSource> sources = jsonUtil
-                                .jsonStringToDataSources(jsonSources);
-                        modelAndView.setViewName(SHOW_SUBSCRIPTION_VIEW);
-                        modelAndView.addObject(SUBSCRIPTIONS_KEY, sources);
-                        
-                    } catch (IOException e) {
-                        modelAndView.setViewName(GET_SUBSCRIPTION_VIEW);
-                        modelAndView.addObject(SUBSCRIPTION_READ_ERROR_MSG, 
-                            messages.getMessage(SUBSCRIPTION_READ_ERROR_MSG));
+                HttpUriRequest req = requestFactory.createPostFileRequest(
+                    getFileContent());
+                try {
+                    getAuthenticator().addCredentials(req);
+                    HttpResponse res = httpClient.post(req);
+                    response.setStatus(res.getStatusLine().getStatusCode());
+                    if (res.getStatusLine().getStatusCode() == 
+                            HttpServletResponse.SC_OK) {
+                        modelAndView.addObject(POSTFILE_SUCCESS_MSG, 
+                            messages.getMessage(POSTFILE_SUCCESS_MSG));
+                    } else {
+                        modelAndView.addObject(POSTFILE_SERVER_ERROR_MSG, 
+                            messages.getMessage(POSTFILE_SERVER_ERROR_MSG));
                     }
-                } else {
-                    modelAndView.setViewName(GET_SUBSCRIPTION_VIEW);
-                    modelAndView.addObject(SUBSCRIPTION_SERVER_ERROR_MSG, 
-                        messages.getMessage(SUBSCRIPTION_SERVER_ERROR_MSG));
+                } catch (Exception e) {
+                    modelAndView.addObject(POSTFILE_SERVER_ERROR_MSG, 
+                        messages.getMessage(POSTFILE_SERVER_ERROR_MSG));
                 }
             } catch (Exception e) {
-                modelAndView.setViewName(GET_SUBSCRIPTION_VIEW);
-                modelAndView.addObject(SUBSCRIPTION_SERVER_ERROR_MSG, 
-                    messages.getMessage(SUBSCRIPTION_SERVER_ERROR_MSG));
+                modelAndView.addObject(POSTFILE_NULLCONTENT_ERROR_MSG, 
+                        messages.getMessage(POSTFILE_NULLCONTENT_ERROR_MSG));
             }
         }
         return modelAndView;
@@ -188,17 +159,17 @@ public class GetSubscriptionController implements Controller {
     }
 
     /**
-     * @return the jsonUtil
+     * @return the fileContent
      */
-    public JsonUtil getJsonUtil() {
-        return jsonUtil;
+    public InputStream getFileContent() {
+        return fileContent;
     }
 
     /**
-     * @param jsonUtil the jsonUtil to set
+     * @param fileContent the fileContent to set
      */
-    public void setJsonUtil(JsonUtil jsonUtil) {
-        this.jsonUtil = jsonUtil;
+    public void setFileContent(InputStream fileContent) {
+        this.fileContent = fileContent;
     }
     
 }

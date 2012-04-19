@@ -23,7 +23,6 @@ package eu.baltrad.dex.net.controller;
 
 import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.datasource.model.DataSource;
 
 import org.mortbay.jetty.testing.ServletTester;
 
@@ -38,25 +37,20 @@ import org.junit.Test;
 
 import javax.servlet.http.HttpServletResponse;
 
-import java.util.Set;
-import java.util.HashSet;
+import java.io.ByteArrayInputStream;
 
 /**
- * Get subscription controller test.
- * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.1.0
- * @since 1.1.0
+ *
+ * @author szewczenko
  */
-public class GetSubscriptionControllerTest {
+public class PostFileControllerTest {
     
     private ServletTester tester;
     private String context;
-    private GetSubscriptionController classUnderTest;
-    private UrlValidatorUtil urlValidator;
+    private PostFileController classUnderTest;
     private Authenticator authenticator;
-    private JsonUtil jsonUtil;
+    private UrlValidatorUtil urlValidator;
     private HttpClientUtil httpClient;
-    
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
     
@@ -64,12 +58,12 @@ public class GetSubscriptionControllerTest {
     public void setUp() throws Exception {
         tester = new ServletTester();
         tester.setContextPath("/");
-        tester.addServlet(GetSubscriptionServlet.class, 
-                "/GetSubscriptionServlet/getsubscription.htm");
+        tester.addServlet(PostFileServlet.class, 
+                "/PostFileServlet/postfile.htm");
         context = tester.createSocketConnector(true);
         tester.start();
         
-        classUnderTest = new GetSubscriptionController();
+        classUnderTest = new PostFileController();
         urlValidator = new UrlValidatorUtil();
         classUnderTest.setUrlValidator(urlValidator);
         authenticator = new KeyczarAuthenticator("./keystore", 
@@ -77,12 +71,10 @@ public class GetSubscriptionControllerTest {
         classUnderTest.setAuthenticator(authenticator); 
         httpClient = new HttpClientUtil(60000, 60000);
         classUnderTest.setHttpClient(httpClient);
-        jsonUtil = new JsonUtil();
-        classUnderTest.setJsonUtil(jsonUtil);
         classUnderTest.setMessages(new MessageResourceUtil(
                 "resources/messages"));
         
-        request = new MockHttpServletRequest("POST", "/postsubscription.htm");
+        request = new MockHttpServletRequest("POST", "/postfile.htm");
         response = new MockHttpServletResponse();
     }
     
@@ -97,39 +89,49 @@ public class GetSubscriptionControllerTest {
         request.addParameter("target_node_url", "http://invalid");
         ModelAndView modelAndView = classUnderTest.handleRequest(request, 
                 response);
-        assertEquals("getsubscription", modelAndView.getViewName());
+        assertNotNull(modelAndView);
         assertTrue(modelAndView.getModel().containsKey("node.url.invalid"));
     }
     
     @Test
     public void handleRequest_Unauthorized() throws Exception {
         request.addParameter("target_node_url", context + 
-                "/GetSubscriptionServlet");
+                "/PostFileServlet");
         classUnderTest.setAuthenticator(new KeyczarAuthenticator(
                 "./fake_keystore", "dev.baltrad.eu"));
+        classUnderTest.setFileContent(new ByteArrayInputStream(
+                "testfilecontent".getBytes()));
         ModelAndView modelAndView = classUnderTest.handleRequest(request, 
                 response);
-        assertEquals("getsubscription", modelAndView.getViewName());
+        assertNotNull(modelAndView);
         assertTrue(modelAndView.getModel().containsKey(
-                "subscription.server.error"));
+                "postfile.server.error"));
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());  
+    }
+    
+    @Test
+    public void handleRequest_NullContent() throws Exception {
+        request.addParameter("target_node_url", context + 
+                "/PostFileServlet");
+        classUnderTest.setFileContent(null);
+        ModelAndView modelAndView = classUnderTest.handleRequest(request,
+                response);
+        assertNotNull(modelAndView);
+        assertTrue(modelAndView.getModel().containsKey(
+                "postfile.nullcontent.error"));
     }
     
     @Test
     public void handleRequest_OK() throws Exception {
         request.addParameter("target_node_url", context + 
-                "/GetSubscriptionServlet");
+                "/PostFileServlet");
+        classUnderTest.setFileContent(new ByteArrayInputStream(
+                "testfilecontent".getBytes()));
         ModelAndView modelAndView = classUnderTest.handleRequest(request,
                 response);
-        // validate model and view
-        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-        assertEquals("showsubscription", modelAndView.getViewName());
-        assertNotNull(modelAndView.getModel());
-        assertTrue(modelAndView.getModel().containsKey("subscriptions_key"));
-        Set<DataSource> subscriptions = (HashSet<DataSource>) 
-                modelAndView.getModel().get("subscriptions_key");
-        assertNotNull(subscriptions);
-        assertEquals(3, subscriptions.size()); 
+        assertNotNull(modelAndView);
+        assertTrue(modelAndView.getModel().containsKey("postfile.success.msg"));
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());        
     }
     
 }
