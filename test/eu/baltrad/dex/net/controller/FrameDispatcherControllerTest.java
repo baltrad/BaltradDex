@@ -94,16 +94,16 @@ public class FrameDispatcherControllerTest extends TestCase {
     private static final String PK_FILE_STUB = "pkfilestub";
     private static final String MSG_TO_SIGN = "Sample message body to be signed";
 //---------------------------------------------------------------------------------------- Variables    
-    private static ServletTester tester;
-    private static HttpClient client;
-    private static String context;
-    private static KeyPair pair;
-    private static Signature dsa;
-    private static byte[] signature;
-    private static byte[] publicKey;
-    private static byte[] publicKeyStub;
-    private static Certificate cert;
-    private static PrivateKey privateKey;
+    //private static ServletTester tester;
+    //private static HttpClient client;
+    //private static String context;
+    //private static KeyPair pair;
+    //private static Signature dsa;
+    //private static byte[] signature;
+    //private static byte[] publicKey;
+    //private static byte[] publicKeyStub;
+    //private static Certificate cert;
+    //private static PrivateKey privateKey;
     
 // Mocking stuff
     interface MethodMock {
@@ -121,7 +121,7 @@ public class FrameDispatcherControllerTest extends TestCase {
 //------------------------------------------------------------------------------------------ Methods    
     @Override
     public void setUp() throws Exception {
-        tester = new ServletTester();
+        /*tester = new ServletTester();
         
         assertNotNull( tester );
         
@@ -148,7 +148,7 @@ public class FrameDispatcherControllerTest extends TestCase {
         HttpConnectionParams.setConnectionTimeout( httpParams, 60000 );
         HttpConnectionParams.setSoTimeout( httpParams, 60000 );
         HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
-        
+        */
         methodControl = MockControl.createControl(MethodMock.class);
         methods = (MethodMock)methodControl.getMock();
         parserControl = MockControl.createControl(IXmlMessageParser.class);
@@ -159,8 +159,8 @@ public class FrameDispatcherControllerTest extends TestCase {
     
     @Override
     public void tearDown() throws Exception {
-        client.getConnectionManager().shutdown();
-        tester.stop();
+        //client.getConnectionManager().shutdown();
+        //tester.stop();
         methodControl = null;
         methods = null;
         parserControl = null;
@@ -181,7 +181,7 @@ public class FrameDispatcherControllerTest extends TestCase {
       managerControl.verify();
     }
 
-    public void testHttpGetMethod() throws IOException {
+    /*public void testHttpGetMethod() throws IOException {
         HttpGet httpGet = new HttpGet( context + SERVLET_PATH );
         HttpResponse response = client.execute( httpGet );
         
@@ -363,13 +363,13 @@ public class FrameDispatcherControllerTest extends TestCase {
                 new char[]{ 's', '3', 'c', 'r', 'e', 't' } );
         
         assertNotNull( privateKey );
-    }
+    }*/
     
     /**
      * Certificate authentication request. Certificate is attached to the message body. 
      * Server will verify the certificate (e.g. by comparing its fingerprints) and store 
      * it in the trusted keystore.  
-     */
+     *
     public void testPostCertRequest() throws IOException {
         HttpPost post = new HttpPost( context + SERVLET_PATH );
         MultipartEntity me = new MultipartEntity();
@@ -394,7 +394,7 @@ public class FrameDispatcherControllerTest extends TestCase {
      * Authenticate using certificate existing in server's trusted keystore. We send only message
      * and a signature. The certificate and its public key is extracted from the keystore 
      * based on alias (in production code user name will be used as alias).
-     */
+     *
     public void testCertAuthFail() throws IOException, Exception {
         HttpPost post = new HttpPost( context + SERVLET_PATH );
         MultipartEntity me = new MultipartEntity();
@@ -429,7 +429,7 @@ public class FrameDispatcherControllerTest extends TestCase {
      * Authenticate using certificate existing in server's trusted keystore. We send only message
      * and a signature. The certificate and its public key is extracted from the keystore 
      * based on alias (in production code user name will be used as alias).
-     */
+     *
     public void testCertAuthSuccess() throws IOException, Exception {
         HttpPost post = new HttpPost( context + SERVLET_PATH );
         MultipartEntity me = new MultipartEntity();
@@ -457,7 +457,7 @@ public class FrameDispatcherControllerTest extends TestCase {
         HttpResponse response = client.execute( post );
         
         assertEquals( HttpServletResponse.SC_OK, response.getStatusLine().getStatusCode() );
-    }
+    }*/
     
     public void testHandleMessageDeliveryRequest_success() throws Exception {
       IBltXmlMessage bltmsg = new IBltXmlMessage() {
@@ -565,7 +565,7 @@ public class FrameDispatcherControllerTest extends TestCase {
      * 
      * @param response
      * @return 
-     */
+     *
     private String readMessageFromStream( HttpResponse response ) {
         StringBuilder sb = new StringBuilder();
         try {
@@ -589,7 +589,7 @@ public class FrameDispatcherControllerTest extends TestCase {
      * 
      * @param response
      * @return 
-     */
+     *
     private Object readObjectFromStream( HttpResponse response ) {
         Object obj = null;
         try {
@@ -613,7 +613,7 @@ public class FrameDispatcherControllerTest extends TestCase {
     /**
      * 
      * @param schemeReg 
-     */
+     *
     private void registerHttpScheme( SchemeRegistry schemeReg ) {
         Scheme http = new Scheme("http", 80, new PlainSocketFactory() );
         schemeReg.register(http);
@@ -621,7 +621,7 @@ public class FrameDispatcherControllerTest extends TestCase {
     /**
      * 
      * @param schemeReg 
-     */
+     *
     private void registerHttpsScheme( SchemeRegistry schemeReg ) {
         try {
             SSLContext sslContext = SSLContext.getInstance( "SSL" );
@@ -639,7 +639,7 @@ public class FrameDispatcherControllerTest extends TestCase {
      * @return
      * @throws NoSuchAlgorithmException
      * @throws NoSuchProviderException 
-     */
+     *
     public KeyPair generateKeys() {
         KeyPairGenerator keyGen = null;
         try {
@@ -658,7 +658,7 @@ public class FrameDispatcherControllerTest extends TestCase {
      * @param sig
      * @param message
      * @return 
-     */
+     *
     public byte[] signMessage( Signature sig, String message ) {
         byte[] sigBytes = null;
         try {
@@ -682,7 +682,7 @@ public class FrameDispatcherControllerTest extends TestCase {
      * 
      * @param byteArray
      * @param filePath 
-     */
+     *
     public void writeByteArrayToFile( byte[] byteArray, String filePath ) {
         try {
             FileOutputStream fos = null;
@@ -703,7 +703,7 @@ public class FrameDispatcherControllerTest extends TestCase {
      * @param passwd
      * @param alias
      * @return 
-     */
+     *
     public Certificate loadCertFromKS( String ksFileName, String certAlias, char[] passwd ) {
         Certificate cer = null;
         try {
@@ -721,7 +721,7 @@ public class FrameDispatcherControllerTest extends TestCase {
      * 
      * @param cert
      * @param certFileName 
-     */
+     *
     public void saveCertToFile( Certificate cert, String certFileName ) {
         try {
             FileOutputStream fos = new FileOutputStream( new File( certFileName ) );
@@ -740,8 +740,8 @@ public class FrameDispatcherControllerTest extends TestCase {
      * @param keyAlias
      * @param passwd
      * @return 
-     */
-    public PrivateKey loadPrivateKeyFromKS( String ksFileName, String keyAlias, char[] passwd ) {
+     *
+    publicPrivateKey loadPrivateKeyFromKS( String ksFileName, String keyAlias, char[] passwd ) {
         PrivateKey priv = null;
         try {
             KeyStore ks = KeyStore.getInstance( "JKS" );
@@ -753,6 +753,6 @@ public class FrameDispatcherControllerTest extends TestCase {
             System.out.println( "failed to load private key from keystore " + e.getMessage() );
         }
         return priv;
-    }
+    }*/
 }
 //--------------------------------------------------------------------------------------------------

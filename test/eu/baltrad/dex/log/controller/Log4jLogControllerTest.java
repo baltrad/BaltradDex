@@ -49,8 +49,8 @@ public class Log4jLogControllerTest extends TestCase {
         public boolean requiresLayout() { return true; }
         public void close() {}
         public void append( LoggingEvent event ) {
-            System.out.println( "____________________msg: " + event.getRenderedMessage() +
-                    " level: " + event.getLevel().toString() + " logger name " + getName() );
+            //System.out.println( "____________________msg: " + event.getRenderedMessage() +
+            //        " level: " + event.getLevel().toString() + " logger name " + getName() );
         }
 
     }

@@ -89,7 +89,7 @@ public class SubscriptionManager {
             jdbcConnectionManager.returnConnection(conn);
         }
         return subscriptions;
-    }
+    } 
     /**
      * Gets subsciptions by type.
      *

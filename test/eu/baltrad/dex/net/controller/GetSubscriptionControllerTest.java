@@ -41,24 +41,21 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Set;
 import java.util.HashSet;
 
-
 /**
- * Post subscription controller test.
+ * Get subscription controller test.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.1.0
  * @since 1.1.0
  */
-public class PostSubscriptionControllerTest {
+public class GetSubscriptionControllerTest {
     
     private ServletTester tester;
     private String context;
-    private PostSubscriptionController classUnderTest;
+    private GetSubscriptionController classUnderTest;
     private UrlValidatorUtil urlValidator;
     private Authenticator authenticator;
     private JsonUtil jsonUtil;
     private HttpClientUtil httpClient;
-    
-    private Set<DataSource> sources;
     
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
@@ -67,12 +64,12 @@ public class PostSubscriptionControllerTest {
     public void setUp() throws Exception {
         tester = new ServletTester();
         tester.setContextPath("/");
-        tester.addServlet(PostSubscriptionServlet.class, 
-                "/PostSubscriptionServlet/postsubscription.htm");
+        tester.addServlet(GetSubscriptionServlet.class, 
+                "/GetSubscriptionServlet/getsubscription.htm");
         context = tester.createSocketConnector(true);
         tester.start();
         
-        classUnderTest = new PostSubscriptionController();
+        classUnderTest = new GetSubscriptionController();
         urlValidator = new UrlValidatorUtil();
         classUnderTest.setUrlValidator(urlValidator);
         authenticator = new KeyczarAuthenticator("./keystore", 
@@ -84,15 +81,6 @@ public class PostSubscriptionControllerTest {
         classUnderTest.setJsonUtil(jsonUtil);
         classUnderTest.setMessages(new MessageResourceUtil(
                 "resources/messages"));
-        
-        sources = new HashSet<DataSource>();
-        DataSource ds1 = new DataSource(1, "DS1", "A test data source");
-        DataSource ds2 = new DataSource(2, "DS2", "One more test data source");
-        DataSource ds3 = new DataSource(3, "DS3", "Yet another test data " +
-                                                                     "source");
-        sources.add(ds1);
-        sources.add(ds2);
-        sources.add(ds3);
         
         request = new MockHttpServletRequest("POST", "/postsubscription.htm");
         response = new MockHttpServletResponse();
@@ -109,58 +97,19 @@ public class PostSubscriptionControllerTest {
         request.addParameter("target_node_url", "http://invalid");
         ModelAndView modelAndView = classUnderTest.handleRequest(request, 
                 response);
-        assertEquals("selectsubscription", modelAndView.getViewName());
+        assertEquals("getsubscription", modelAndView.getViewName());
         assertTrue(modelAndView.getModel().containsKey("node.url.invalid"));
-    }
-    
-    @Test
-    public void handleRequest_MissingParameter() throws Exception {
-        request.addParameter("target_node_url", context + 
-                "/PostSubscriptionServlet");
-        ModelAndView modelAndView = classUnderTest.handleRequest(request, 
-                response);
-        assertEquals("selectsubscription", modelAndView.getViewName());
-        assertTrue(modelAndView.getModel().containsKey(
-                "datasource.selection.invalid"));
-    }
-    
-    @Test
-    public void handleRequest_InvalidSelection() throws Exception {
-        request.addParameter("target_node_url", context + 
-                "/PostSubscriptionServlet");
-        request.addParameter("data_sources_key", "");
-        ModelAndView modelAndView = classUnderTest.handleRequest(request, 
-                response);
-        assertEquals("selectsubscription", modelAndView.getViewName());
-        assertTrue(modelAndView.getModel().containsKey(
-                "datasource.selection.invalid"));
-    }
-    
-    @Test
-    public void handleRequest_InternalServerError() throws Exception {
-        request.addParameter("target_node_url", context + 
-                "/PostSubscriptionServlet");
-        request.addParameter("data_sources_key", "invalid json string");
-        ModelAndView modelAndView = classUnderTest.handleRequest(request, 
-                response);
-        assertEquals("selectsubscription", modelAndView.getViewName());
-        assertTrue(modelAndView.getModel().containsKey(
-                "subscription.server.error"));
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                response.getStatus());
     }
     
     @Test
     public void handleRequest_Unauthorized() throws Exception {
         request.addParameter("target_node_url", context + 
-                "/PostSubscriptionServlet");
-        request.addParameter("data_sources_key", jsonUtil
-                .dataSourcesToJsonString(sources));
+                "/GetSubscriptionServlet");
         classUnderTest.setAuthenticator(new KeyczarAuthenticator(
                 "./fake_keystore", "dev.baltrad.eu"));
         ModelAndView modelAndView = classUnderTest.handleRequest(request, 
                 response);
-        assertEquals("selectsubscription", modelAndView.getViewName());
+        assertEquals("getsubscription", modelAndView.getViewName());
         assertTrue(modelAndView.getModel().containsKey(
                 "subscription.server.error"));
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());  
@@ -169,13 +118,19 @@ public class PostSubscriptionControllerTest {
     @Test
     public void handleRequest_OK() throws Exception {
         request.addParameter("target_node_url", context + 
-                "/PostSubscriptionServlet");
-        request.addParameter("data_sources_key", jsonUtil
-                .dataSourcesToJsonString(sources));
-        ModelAndView modelAndView = classUnderTest.handleRequest(request, 
-                response);    
-        assertEquals("postsubscription", modelAndView.getViewName());
-        assertEquals(HttpServletResponse.SC_OK, response.getStatus());   
+                "/GetSubscriptionServlet");
+        ModelAndView modelAndView = classUnderTest.handleRequest(request,
+                response);
+        // validate model and view
+        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        assertEquals("showsubscription", modelAndView.getViewName());
+        assertNotNull(modelAndView.getModel());
+        assertTrue(modelAndView.getModel().containsKey("subscriptions_key"));
+        Set<DataSource> subscriptions = (HashSet<DataSource>) 
+                modelAndView.getModel().get("subscriptions_key");
+        assertNotNull(subscriptions);
+        assertEquals(3, subscriptions.size()); 
     }
+   
     
 }

@@ -69,8 +69,8 @@ public class JDBCConnectionTest extends TestCase {
             while( resultSet.next() ) {
                 String name = resultSet.getString( "name" );
                 String wmoNumber = resultSet.getString( "wmo_number" );
-                System.out.println( "Radar name: " + name );
-                System.out.println( "WMO number: " + wmoNumber );
+                //System.out.println( "Radar name: " + name );
+                //System.out.println( "WMO number: " + wmoNumber );
             }
             stmt.close();
             conn.close();
