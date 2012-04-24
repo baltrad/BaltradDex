@@ -23,6 +23,9 @@ package eu.baltrad.dex.subscription.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.user.model.User;
+
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import org.apache.log4j.Logger;
 
@@ -33,6 +36,8 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Subscription manager inplementing subscription handling functionality.
@@ -45,8 +50,11 @@ public class SubscriptionManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** JDBC template */
+    private JdbcTemplate jdbcTemplate;
     /** Logger */
     private Logger log;
+    
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
@@ -55,6 +63,19 @@ public class SubscriptionManager {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
+    
+    
+    public Set<Subscription> get(User user) {
+        
+        return null;
+    }
+    
+    public void set(Set<Subscription> s) {
+        
+    }
+    
+    
+    
     /**
      * Gets all existing subscriptions.
      *
@@ -414,6 +435,20 @@ public class SubscriptionManager {
             log.error("Failed to compare subscriptions", e);
         }
         return res;
+    }
+
+    /**
+     * @return the jdbcTemplate
+     */
+    public JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
+
+    /**
+     * @param jdbcTemplate the jdbcTemplate to set
+     */
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 }
 //--------------------------------------------------------------------------------------------------

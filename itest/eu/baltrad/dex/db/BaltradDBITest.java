@@ -42,7 +42,7 @@ import eu.baltrad.bdb.expr.Expression;
 import eu.baltrad.bdb.expr.ExpressionFactory;
 import eu.baltrad.bdb.oh5.Metadata;
 
-import eu.baltrad.dex.itest.DexDBITestHelper; 
+import eu.baltrad.dex.itest.DexDBITestHelper;
 
 
 /**
@@ -75,8 +75,8 @@ public class BaltradDBITest extends TestCase {
     public void testSelectLegionowo() throws Exception {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
-        q.fetch("uuid", xpr.attribute("file:uuid"));
-        q.setFilter(xpr.eq(xpr.attribute("what/source:PLC"), 
+        q.fetch("uuid", xpr.attribute("_bdb/uuid"));
+        q.setFilter(xpr.eq(xpr.attribute("_bdb/source:PLC"), 
                                                     xpr.literal("Legionowo")));
         AttributeResult rs = bdb.execute(q);
         assertEquals(1, rs.size());
@@ -91,7 +91,7 @@ public class BaltradDBITest extends TestCase {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
         Set<String> result = new HashSet<String>();
-        q.fetch("source", xpr.attribute("what/source:PLC"));
+        q.fetch("source", xpr.attribute("_bdb/source:PLC"));
         AttributeResult rs = bdb.execute(q);
         assertEquals(31, rs.size());
         while (rs.next()) {
@@ -118,13 +118,13 @@ public class BaltradDBITest extends TestCase {
         assertTrue(result.contains("Örnsköldsvik"));
         assertTrue(result.contains("Vara"));
         assertTrue(result.contains("Vilebo"));
-    }    
+    }
     
     public void testSelectByObject() {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
         Set<String> result = new HashSet<String>();
-        q.fetch("source", xpr.attribute("what/source:PLC"));
+        q.fetch("source", xpr.attribute("_bdb/source:PLC"));
         Expression e1 = xpr.eq(xpr.attribute("what/object"), 
                                                            xpr.literal("PVOL"));
         q.setFilter(e1);
@@ -170,7 +170,7 @@ public class BaltradDBITest extends TestCase {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
         Set<String> result = new HashSet<String>();
-        q.fetch("source", xpr.attribute("what/source:PLC"));
+        q.fetch("source", xpr.attribute("_bdb/source:PLC"));
         Expression e1 = xpr.eq(xpr.attribute("what/date"), 
                                                        xpr.literal("20120315"));
         q.setFilter(e1);
@@ -194,7 +194,7 @@ public class BaltradDBITest extends TestCase {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
         Set<String> result = new HashSet<String>();
-        q.fetch("source", xpr.attribute("what/source:PLC"));
+        q.fetch("source", xpr.attribute("_bdb/source:PLC"));
         Expression e1 = xpr.eq(xpr.attribute("what/date"), 
                                                        xpr.literal("20120315"));
         Expression e2 = xpr.ge(xpr.attribute("what/time"), 
@@ -219,7 +219,7 @@ public class BaltradDBITest extends TestCase {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
         Set<String> result = new HashSet<String>();
-        q.fetch("source", xpr.attribute("what/source:PLC"));
+        q.fetch("source", xpr.attribute("_bdb/source:PLC"));
         List<Expression> xprs = new ArrayList<Expression>();
         Expression e1 = xpr.eq(xpr.attribute("what/object"), 
                                                            xpr.literal("PVOL"));
@@ -249,8 +249,8 @@ public class BaltradDBITest extends TestCase {
     public void testFetchFileByUuid() {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
-        q.fetch("uuid", xpr.attribute("file:uuid"));
-        q.setFilter(xpr.eq(xpr.attribute("what/source:PLC"), 
+        q.fetch("uuid", xpr.attribute("_bdb/uuid"));
+        q.setFilter(xpr.eq(xpr.attribute("_bdb/source:PLC"), 
                                                     xpr.literal("Legionowo")));
         AttributeResult rs = bdb.execute(q);
         assertEquals(1, rs.size());
@@ -259,7 +259,7 @@ public class BaltradDBITest extends TestCase {
         rs.close();
         
         FileQuery fq = new FileQuery();
-        Expression e = xpr.eq(xpr.attribute("file:uuid"), xpr.literal(legUuid));
+        Expression e = xpr.eq(xpr.attribute("_bdb/uuid"), xpr.literal(legUuid));
         fq.setFilter(e);
         FileResult fr = bdb.execute(fq);
         assertEquals(1, fr.size());
@@ -277,8 +277,8 @@ public class BaltradDBITest extends TestCase {
     public void testFileDownload() throws Exception {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
-        q.fetch("uuid", xpr.attribute("file:uuid"));
-        q.setFilter(xpr.eq(xpr.attribute("what/source:PLC"), 
+        q.fetch("uuid", xpr.attribute("_bdb/uuid"));
+        q.setFilter(xpr.eq(xpr.attribute("_bdb/source:PLC"), 
                                                     xpr.literal("Legionowo")));
         AttributeResult rs = bdb.execute(q);
         assertEquals(1, rs.size());
@@ -287,7 +287,7 @@ public class BaltradDBITest extends TestCase {
         rs.close();
         
         FileQuery fq = new FileQuery();
-        Expression e = xpr.eq(xpr.attribute("file:uuid"), xpr.literal(legUuid));
+        Expression e = xpr.eq(xpr.attribute("_bdb/uuid"), xpr.literal(legUuid));
         fq.setFilter(e);
         FileResult fr = bdb.execute(fq);
         assertEquals(1, fr.size());
@@ -304,4 +304,5 @@ public class BaltradDBITest extends TestCase {
         assertEquals(entry.getContentSize(), f.length());
         assertTrue(f.delete());
     }
+    
 }

@@ -78,6 +78,9 @@ else
    echo "Failed to start baltrad-bdb server." 
 fi
 
+# give the server some time to come up
+sleep 1
+
 "$bdb_bin_path"/baltrad-bdb-client import_sources --url="$bdb_url" \
         "$bdb_sources_file"
 if [ "$?" -eq 0 ];

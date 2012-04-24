@@ -68,8 +68,8 @@ public class BltFileDownloadControllerITest extends TestCase {
     public void testFileDownload() throws Exception {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
-        q.fetch("uuid", xpr.attribute("file:uuid"));
-        q.setFilter(xpr.eq(xpr.attribute("what/source:PLC"), 
+        q.fetch("uuid", xpr.attribute("_bdb/uuid"));
+        q.setFilter(xpr.eq(xpr.attribute("_bdb/source:PLC"), 
                                                     xpr.literal("Legionowo")));
         AttributeResult r = catalog.getDatabase().execute(q);
         assertEquals(1, r.size());

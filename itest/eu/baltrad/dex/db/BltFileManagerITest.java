@@ -25,10 +25,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Date;
-import java.util.Collections;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -111,7 +108,7 @@ public class BltFileManagerITest extends TestCase {
         assertNotNull(combinedFilter);
         combinedFilter.setMatchType(CombinedFilter.MatchType.ALL);
         AttributeFilter sourceFilter = new AttributeFilter();
-        sourceFilter.setAttribute("what/source:WMO");
+        sourceFilter.setAttribute("_bdb/source:WMO");
         sourceFilter.setValueType(AttributeFilter.ValueType.STRING);
         sourceFilter.setOperator(AttributeFilter.Operator.IN);
         sourceFilter.setValue("12374");
@@ -140,7 +137,7 @@ public class BltFileManagerITest extends TestCase {
         assertNotNull(combinedFilter);
         combinedFilter.setMatchType(CombinedFilter.MatchType.ALL);
         sourceFilter = new AttributeFilter();
-        sourceFilter.setAttribute("what/source:WMO");
+        sourceFilter.setAttribute("_bdb/source:WMO");
         sourceFilter.setValueType(AttributeFilter.ValueType.STRING);
         sourceFilter.setOperator(AttributeFilter.Operator.IN);
         sourceFilter.setValue("12568");
@@ -181,7 +178,7 @@ public class BltFileManagerITest extends TestCase {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
         q.setFilter(comboFilter.getExpression());
-        q.fetch("fileCount", xpr.count(xpr.attribute("file:uuid")));
+        q.fetch("fileCount", xpr.count(xpr.attribute("_bdb/uuid")));
         AttributeResult r = bdb.execute(q);
         r.next();
         long count = r.getLong("fileCount");
@@ -194,7 +191,7 @@ public class BltFileManagerITest extends TestCase {
         q = new AttributeQuery();
         xpr = new ExpressionFactory();
         q.setFilter(comboFilter.getExpression());
-        q.fetch("fileCount", xpr.count(xpr.attribute("file:uuid")));
+        q.fetch("fileCount", xpr.count(xpr.attribute("_bdb/uuid")));
         r = bdb.execute(q);
         r.next();
         count = r.getLong("fileCount");
@@ -243,23 +240,22 @@ public class BltFileManagerITest extends TestCase {
     }
     
     public void testGetDistinctRadarStations() {
-        Set<String> result = new HashSet<String>();
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
-        q.fetch("plc", xpr.attribute("what/source:PLC"));
+        q.fetch("plc", xpr.attribute("_bdb/source:PLC"));
         // Workaround for #56: bdb doesn't seem to handle diacritics properly,
-        // so we fetch WMO identifier to be used with file queries  
-        q.fetch("wmo", xpr.attribute("what/source:WMO"));
+        // so we fetch WMO identifier to be used with file queries
+        q.fetch("wmo", xpr.attribute("_bdb/source:WMO"));
+        q.setDistinct(true);
         AttributeResult r = bdb.execute(q);
+        assertEquals(20, r.size());
+        List<String> result = new ArrayList<String>();
         while (r.next()) {
             String identifier = r.getString("wmo") + " " + r.getString("plc");
             result.add(identifier);
         }
-        r.close();
-        List<String> radarStations = Collections.synchronizedList(
-                                                         new ArrayList(result));
-        Collections.sort(radarStations);
-        assertEquals(20, radarStations.size());
+        assertNotNull(result);
+        assertEquals(20, result.size());
     }
     
     public void testQueryBdb() {
@@ -277,7 +273,7 @@ public class BltFileManagerITest extends TestCase {
         ExpressionFactory xpr = new ExpressionFactory();
         List<Expression> xprs = new ArrayList<Expression>();
         if (!parms1.get("source").isEmpty()) {
-            Expression e = xpr.eq(xpr.attribute("what/source:PLC"), 
+            Expression e = xpr.eq(xpr.attribute("_bdb/source:PLC"), 
                                              xpr.literal(parms1.get("source")));
             xprs.add(e);
         }
@@ -335,7 +331,7 @@ public class BltFileManagerITest extends TestCase {
         Expression ex = xpr.and(xprs);
         AttributeQuery q = new AttributeQuery();
         q.setFilter(ex);
-        q.fetch("entryCount", xpr.count(xpr.attribute("file:uuid")));
+        q.fetch("entryCount", xpr.count(xpr.attribute("_bdb/uuid")));
         AttributeResult r = bdb.execute(q);
         r.next();
         long count = r.getLong("entryCount");
@@ -376,7 +372,7 @@ public class BltFileManagerITest extends TestCase {
     public void testBdbOperators() {
         ExpressionFactory xpr = new ExpressionFactory();
         List<Expression> xprs = new ArrayList<Expression>();
-        Expression e1 = xpr.eq(xpr.attribute("what/source:PLC"), 
+        Expression e1 = xpr.eq(xpr.attribute("_bdb/source:PLC"), 
                                              xpr.literal("Brzuchania"));
         xprs.add(e1);
         eu.baltrad.bdb.util.Date startDate = 
@@ -406,7 +402,7 @@ public class BltFileManagerITest extends TestCase {
         Expression ex = xpr.and(xprs);
         AttributeQuery q = new AttributeQuery();
         q.setFilter(ex);
-        q.fetch("entryCount", xpr.count(xpr.attribute("file:uuid")));
+        q.fetch("entryCount", xpr.count(xpr.attribute("_bdb/uuid")));
         AttributeResult r = bdb.execute(q);
         r.next();
         long count = r.getLong("entryCount");

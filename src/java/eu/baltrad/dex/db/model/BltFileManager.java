@@ -45,8 +45,6 @@ import eu.baltrad.bdb.db.FileResult;
 import eu.baltrad.bdb.expr.ExpressionFactory;
 import eu.baltrad.bdb.expr.Expression;
 import eu.baltrad.bdb.oh5.Metadata;
-//import eu.baltrad.bdb.util.Date;
-//import eu.baltrad.bdb.util.Time;
 
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
@@ -63,12 +61,6 @@ import eu.baltrad.dex.log.model.MessageLogger;
  */
 public class BltFileManager {
 //-------------------------------------------------------------------- Constants
-    /** File catalog date attribute */
-    private static final String FC_DATE_ATTR = "what/date";
-    /** File catalog time attribute */
-    private static final String FC_TIME_ATTR = "what/time";
-    /** File UUID key */
-    private static final String FC_FILE_UUID = "file:uuid";
     /** Date format string */
     private static final String FC_DATE_STR = "yyyyMMdd";
     /** Time format string */
@@ -129,7 +121,7 @@ public class BltFileManager {
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
         q.setFilter(attributeFilter.getExpression());
-        q.fetch("fileCount", xpr.count( xpr.attribute("file:uuid")));
+        q.fetch("fileCount", xpr.count( xpr.attribute("_bdb/uuid")));
         AttributeResult r = fileCatalog.getDatabase().execute(q);
         long count;
         try {
@@ -177,8 +169,8 @@ public class BltFileManager {
         IFilter attributeFilter = getFilter(dsName);
         q.setLimit(limit);
         q.setSkip(offset);
-        q.appendOrderClause(xpr.desc(xpr.combinedDateTime(FC_DATE_ATTR, 
-                                                                FC_TIME_ATTR)));
+        q.appendOrderClause(xpr.desc(xpr.combinedDateTime("what/date", 
+                                                                "what/time")));
         q.setFilter(attributeFilter.getExpression());
         FileResult r = fileCatalog.getDatabase().execute(q);
         List<BltFile> bltFiles = new ArrayList<BltFile>();
@@ -205,7 +197,7 @@ public class BltFileManager {
         ExpressionFactory xpr = new ExpressionFactory();
         FileQuery q = new FileQuery();
         // filter the query with a given file identity string
-        q.setFilter(xpr.eq(xpr.attribute(FC_FILE_UUID), xpr.literal(uuid)));
+        q.setFilter(xpr.eq(xpr.attribute("_bdb/uuid"), xpr.literal(uuid)));
         FileResult r = fileCatalog.getDatabase().execute(q);
         BltFile bltFile = null;
         try {
@@ -228,23 +220,21 @@ public class BltFileManager {
      * @return List containing distinct radar stations names.
      */
     public List<String> getDistinctRadarStations() {
-        Set<String> result = new HashSet<String>();
         AttributeQuery q = new AttributeQuery();
         ExpressionFactory xpr = new ExpressionFactory();
-        q.fetch("plc", xpr.attribute("what/source:PLC"));
+        q.fetch("plc", xpr.attribute("_bdb/source:PLC"));
         // Workaround for #56: bdb doesn't seem to handle diacritics properly,
-        // so we fetch WMO identifier to be used with file queries  
-        q.fetch("wmo", xpr.attribute("what/source:WMO"));
+        // so we fetch WMO identifier to be used with file queries
+        q.fetch("wmo", xpr.attribute("_bdb/source:WMO"));
+        q.setDistinct(true);
         AttributeResult r = fileCatalog.getDatabase().execute(q);
+        List<String> result = new ArrayList<String>();
         while (r.next()) {
-            String identifier = r.getString("wmo") + " : " + r.getString("plc");
+            String identifier = r.getString("wmo") + " " + r.getString("plc");
             result.add(identifier);
         }
-        r.close();
-        List<String> radarStations = Collections.synchronizedList(
-                                                         new ArrayList(result));
-        Collections.sort(radarStations);
-        return radarStations;
+        Collections.sort(result);
+        return result;
     }
     /**
      * Counts file entries matching criteria given by parameters. 
@@ -267,7 +257,7 @@ public class BltFileManager {
         if (ex != null) {
             q.setFilter(ex);
         }
-        q.fetch("entryCount", xpr.count(xpr.attribute("file:uuid")));
+        q.fetch("entryCount", xpr.count(xpr.attribute("_bdb/uuid")));
         AttributeResult r = fileCatalog.getDatabase().execute(q);
         long count = 0;
         try {
@@ -340,10 +330,10 @@ public class BltFileManager {
                                                                 "what/time")));
         }
         if (sortBySourceAsc) {
-            q.appendOrderClause(xpr.asc(xpr.attribute("what/source:PLC")));
+            q.appendOrderClause(xpr.asc(xpr.attribute("_bdb/source:PLC")));
         }
         if (sortBySourceDesc) {
-            q.appendOrderClause(xpr.desc(xpr.attribute("what/source:PLC")));
+            q.appendOrderClause(xpr.desc(xpr.attribute("_bdb/source:PLC")));
         }
         if (sortByObjectAsc) {
             q.appendOrderClause(xpr.asc(xpr.attribute("what/object")));
@@ -386,7 +376,7 @@ public class BltFileManager {
             if (InitAppUtil.validate(radarStation)) {
                 String wmoNumber = radarStation.substring(0, 
                                                      radarStation.indexOf(" "));
-                Expression e = xpr.eq(xpr.attribute("what/source:WMO"), 
+                Expression e = xpr.eq(xpr.attribute("_bdb/source:WMO"), 
                                                         xpr.literal(wmoNumber));
                 xprs.add(e);
             }

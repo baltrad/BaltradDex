@@ -86,7 +86,7 @@ public class DexDBITestHelper extends TestCase {
     
     public DexDBITestHelper(String bdbServerUri, String bdbStoragePath) {
         this.bdbServerUri = bdbServerUri;
-        this.bdbStoragePath = bdbStoragePath;
+        this.bdbStoragePath = bdbStoragePath; 
         // we don't want to insert and purge with each test method
         if (uuidMap == null) {
             try {
@@ -98,6 +98,7 @@ public class DexDBITestHelper extends TestCase {
             }
         }
     }
+    
     
     public static String getClassName(Class clazz) {
         String name = clazz.getName();

@@ -40,10 +40,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 public class DexJDBCITestHelper {
     
     private JdbcTemplate jdbcTemplate = null;
-    private DataSource dataSource = null;
     private SimpleJdbcInsert insertDs = null;
     private SimpleJdbcInsert insertFilter = null;
-    private SimpleJdbcCall getFilter = null;
     
     /**
      * @param dataSource the dataSource to set
