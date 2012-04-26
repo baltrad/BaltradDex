@@ -14,7 +14,7 @@
   </bean>
   
   <!-- Dex DB test helper -->
-  <bean id="bdbHelper" class="eu.baltrad.dex.itest.DexDBITestHelper" 
+  <bean id="bdbHelper" class="eu.baltrad.dex.db.itest.DexDBITestHelper" 
         autowire="byType">
     <constructor-arg index="0" value="${itest.bdb.server.uri}" />
     <constructor-arg index="1" value="${itest.bdb.storage.path}" />

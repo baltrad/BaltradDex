@@ -42,7 +42,7 @@ import eu.baltrad.bdb.expr.Expression;
 import eu.baltrad.bdb.expr.ExpressionFactory;
 import eu.baltrad.bdb.oh5.Metadata;
 
-import eu.baltrad.dex.itest.DexDBITestHelper;
+import eu.baltrad.dex.db.itest.DexDBITestHelper;
 
 
 /**

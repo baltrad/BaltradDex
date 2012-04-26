@@ -19,7 +19,7 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.itest;
+package eu.baltrad.dex.db.itest;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -27,14 +27,30 @@ import java.io.FileInputStream;
 import java.util.Map;
 import java.util.HashMap;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+
 import junit.framework.TestCase;
 
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
+
+import org.dbunit.database.DatabaseConfig;
+import org.dbunit.database.DatabaseConnection;
+import org.dbunit.database.IDatabaseConnection;
+import org.dbunit.dataset.datatype.IDataTypeFactory;
+import org.dbunit.dataset.IDataSet;
+import org.dbunit.dataset.ITable;
+import org.dbunit.dataset.xml.FlatXmlDataSet;
+import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+import org.dbunit.operation.DatabaseOperation;
 
 import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.db.Database;
 import eu.baltrad.bdb.db.rest.RestfulDatabase;
+
 
 /**
  * Baltrad-db integration test helper.
@@ -45,6 +61,8 @@ import eu.baltrad.bdb.db.rest.RestfulDatabase;
  */
 public class DexDBITestHelper extends TestCase {
     
+    private DataSource dataSource = null;
+    private IDataTypeFactory factory = null;
     private String bdbServerUri = null;
     private String bdbStoragePath = null;
     private static Map<String, String> uuidMap;
@@ -84,6 +102,10 @@ public class DexDBITestHelper extends TestCase {
         "fixtures/Z_SCAN_C_ESWI_20101023180000_sevil_000000.h5"
     };
     
+    public DexDBITestHelper() {
+        
+    }
+    
     public DexDBITestHelper(String bdbServerUri, String bdbStoragePath) {
         this.bdbServerUri = bdbServerUri;
         this.bdbStoragePath = bdbStoragePath; 
@@ -98,7 +120,6 @@ public class DexDBITestHelper extends TestCase {
             }
         }
     }
-    
     
     public static String getClassName(Class clazz) {
         String name = clazz.getName();
@@ -165,7 +186,6 @@ public class DexDBITestHelper extends TestCase {
     
     /**
      * Inserts file entries into baltrad-db.
-     * 
      * @throws Exception 
      */
     private void insertIntoBaltradDB() throws Exception {
@@ -180,6 +200,95 @@ public class DexDBITestHelper extends TestCase {
         }
         System.out.println("Stored " + FIXTURES.length + " files in " + 
                 (System.currentTimeMillis() - startTime) + "ms");
+    }
+    
+    /**
+     * Gets database connection.
+     * @param conn
+     * @return
+     * @throws Exception 
+     */
+    private IDatabaseConnection getConnection(Connection conn) throws Exception 
+    {
+        IDatabaseConnection connection = new DatabaseConnection(conn);
+        connection.getConfig().setProperty(
+                DatabaseConfig.PROPERTY_DATATYPE_FACTORY, getFactory());    
+        return connection;
+    }
+    
+    /**
+     * Delete test data from database.
+     */
+    private void deleteFromDB() {
+        SimpleJdbcTemplate template = new SimpleJdbcTemplate(dataSource);
+        template.update("DELETE FROM dex_subscriptions");
+    }
+    
+    /**
+     * Inserts test dataset for a given test case.
+     * @param tc
+     * @throws Exception 
+     */
+    public void cleanInsert(Object tc) throws Exception {
+        Connection conn = dataSource.getConnection();
+        try {
+            deleteFromDB();
+            IDatabaseConnection connection = getConnection(conn);
+            DatabaseOperation.CLEAN_INSERT.execute(connection, 
+                    getXMLDataset(tc, null));
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            DataSourceUtils.releaseConnection(conn, dataSource);
+        }
+    }
+    
+    /**
+     * Gets test dataset from XML file.
+     * @param tc
+     * @param suffix
+     * @return
+     * @throws Exception 
+     */
+    private FlatXmlDataSet getXMLDataset(Object tc, String suffix) throws Exception {
+        String className = getClassName(tc.getClass());
+        String resourceName = className;
+        if (suffix != null) {
+            resourceName += "-" + suffix;
+        }
+        resourceName += ".xml";
+        File f = new File(tc.getClass().getResource(resourceName).getFile());
+        FlatXmlDataSetBuilder builder = new FlatXmlDataSetBuilder();
+        return builder.build(f);
+    }
+    
+    /**
+     * Gets database table.
+     * @param name
+     * @return
+     * @throws Exception 
+     */
+    public ITable getDBTable(String name) throws Exception {
+        Connection conn = dataSource.getConnection();
+        try {
+            IDatabaseConnection connection = getConnection(conn);
+            IDataSet dataset = connection.createDataSet();
+            return dataset.getTable(name);
+        } finally {
+            DataSourceUtils.releaseConnection(conn, dataSource);
+        }
+    }
+    
+    /**
+     * Gets XML table.
+     * @param tc
+     * @param name
+     * @return
+     * @throws Exception 
+     */
+    public ITable getXMLTable(Object tc, String suffix, String name) throws Exception {
+        IDataSet dataset = getXMLDataset(tc, suffix);
+        return dataset.getTable(name);
     }
 
     /**
@@ -222,5 +331,33 @@ public class DexDBITestHelper extends TestCase {
      */
     public void setUuidMap(Map<String, String> _uuidMap) {
         uuidMap = _uuidMap;
+    }
+
+    /**
+     * @return the dataSource
+     */
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    /**
+     * @param dataSource the dataSource to set
+     */
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    /**
+     * @return the factory
+     */
+    public IDataTypeFactory getFactory() {
+        return factory;
+    }
+
+    /**
+     * @param factory the factory to set
+     */
+    public void setFactory(IDataTypeFactory factory) {
+        this.factory = factory;
     }
 }

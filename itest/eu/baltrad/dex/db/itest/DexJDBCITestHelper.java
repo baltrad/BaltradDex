@@ -19,7 +19,7 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.itest;
+package eu.baltrad.dex.db.itest;
 
 import java.util.Map;
 import java.util.HashMap;

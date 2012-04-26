@@ -19,7 +19,7 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.db;
+package eu.baltrad.dex.db.model;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -46,8 +46,8 @@ import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.beast.db.*;
 
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.itest.DexJDBCITestHelper;
-import eu.baltrad.dex.itest.DexDBITestHelper;
+import eu.baltrad.dex.db.itest.DexJDBCITestHelper;
+import eu.baltrad.dex.db.itest.DexDBITestHelper;
 
 /**
  * Integration test for baltrad-db and Beast.

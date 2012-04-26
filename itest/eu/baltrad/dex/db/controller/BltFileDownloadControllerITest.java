@@ -19,7 +19,7 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.db;
+package eu.baltrad.dex.db.controller;
 
 import java.util.UUID;
 import java.io.File;
@@ -36,7 +36,7 @@ import eu.baltrad.bdb.db.AttributeQuery;
 import eu.baltrad.bdb.db.AttributeResult;
 import eu.baltrad.bdb.expr.ExpressionFactory;
 
-import eu.baltrad.dex.itest.DexDBITestHelper;
+import eu.baltrad.dex.db.itest.DexDBITestHelper;
 
 /**
  * Integration test for baltrad-db.
@@ -48,20 +48,18 @@ import eu.baltrad.dex.itest.DexDBITestHelper;
 public class BltFileDownloadControllerITest extends TestCase {
     
     private AbstractApplicationContext context = null;
-    private DexDBITestHelper bdbHelper = null;
     private FileCatalog catalog;
     
     @Override
     public void setUp() {
         context = DexDBITestHelper.loadContext(this);
-        bdbHelper = (DexDBITestHelper) context.getBean("bdbHelper");
         catalog = (BasicFileCatalog) context.getBean("catalog");
         assertNotNull(catalog);
     }
     
     @Override
     public void tearDown() {
-        bdbHelper = null;
+        catalog = null;
         context.close();
     } 
     

@@ -24,23 +24,19 @@ package eu.baltrad.dex.subscription.model;
 import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.user.model.User;
+import java.sql.*;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import org.apache.log4j.Logger;
 
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.ResultSet;
-
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
+import javax.swing.tree.RowMapper;
 
 /**
- * Subscription manager inplementing subscription handling functionality.
+ * Subscription manager implementing subscription handling functionality.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.0
@@ -51,9 +47,11 @@ public class SubscriptionManager {
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
     /** JDBC template */
-    private JdbcTemplate jdbcTemplate;
+    private SimpleJdbcOperations jdbcTemplate;
     /** Logger */
     private Logger log;
+    
+    private Mapper mapper;
     
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -62,18 +60,105 @@ public class SubscriptionManager {
     public SubscriptionManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.mapper = new Mapper();
     }
     
-    
-    public Set<Subscription> get(User user) {
-        
-        return null;
+    /**
+     * Loads subscription from database.
+     * @param id Record id
+     * @return Subscription with a given id
+     */
+    public Subscription load(int id) {
+        String sql = "SELECT * FROM dex_subscriptions WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, mapper, id);
     }
     
-    public void set(Set<Subscription> s) {
-        
+    /**
+     * Loads subscriptions from a database.
+     * @param type Subscription type
+     * @return List of subscriptions matching a given type
+     */
+    public List<Subscription> load(String type) {
+        String sql = "SELECT * FROM dex_subscriptions WHERE type = ?";
+        return jdbcTemplate.query(sql, mapper, type);
     }
     
+    /**
+     * Stores subscription in a database.
+     * @param s Subscription to store
+     */
+    public void store(Subscription s) {
+        jdbcTemplate.update("INSERT INTO dex_subscriptions " +
+            "(id, timestamp, user_name, data_source_name, operator_name, " + 
+            "type, active, synkronized, node_address) " +
+            "VALUES (?,?,?,?,?,?,?,?,?)",
+            s.getId(),
+            s.getTimeStamp(),
+            s.getUserName(),
+            s.getDataSourceName(),
+            s.getOperatorName(),
+            s.getType(),
+            s.getActive(),
+            s.getSynkronized(),
+            s.getNodeAddress());
+    }
+    
+    /**
+     * Updates subscription.
+     * @param s Subscription object
+     */
+    public void update(Subscription s) {
+        jdbcTemplate.update("UPDATE dex_subscriptions SET timestamp = ?, " +
+            "user_name = ?, data_source_name = ?, operator_name = ?, " + 
+            "type = ?, active = ?, synkronized = ?, node_address = ? " +
+            "WHERE id = ?",
+            s.getTimeStamp(),
+            s.getUserName(),
+            s.getDataSourceName(),
+            s.getOperatorName(),
+            s.getType(),
+            s.getActive(),
+            s.getSynkronized(),
+            s.getNodeAddress(),
+            s.getId());
+    }
+    
+    /**
+     * Removes subscription from the database.
+     * @param s Subscription to remove
+     */
+    public void delete(Subscription s) {
+        jdbcTemplate.update("DELETE FROM dex_subscriptions WHERE id = ?", 
+                s.getId());
+    }
+     
+    /**
+     * Row mapper.
+     */
+    private static final class Mapper implements 
+                                        ParameterizedRowMapper<Subscription> {
+        /**
+         * Maps records to result set. 
+         * @param rs Result set 
+         * @param rowNum Row number
+         * @return Subscription object
+         * @throws SQLException 
+         */
+        public Subscription mapRow(ResultSet rs, int rowNum) 
+                throws SQLException {
+            Subscription s = new Subscription();
+            s.setId(rs.getInt("id"));
+            s.setTimeStamp(rs.getTimestamp("timestamp"));
+            s.setUserName(rs.getString("user_name"));
+            s.setDataSourceName(rs.getString("data_source_name"));
+            s.setOperatorName(rs.getString("operator_name"));
+            s.setType(rs.getString("type"));
+            s.setActive(rs.getBoolean("active"));
+            s.setSynkronized(rs.getBoolean("synkronized"));
+            s.setNodeAddress(rs.getString("node_address"));
+            return s;
+        }
+    }
     
     
     /**
@@ -440,14 +525,14 @@ public class SubscriptionManager {
     /**
      * @return the jdbcTemplate
      */
-    public JdbcTemplate getJdbcTemplate() {
+    public SimpleJdbcOperations getJdbcTemplate() {
         return jdbcTemplate;
     }
 
     /**
      * @param jdbcTemplate the jdbcTemplate to set
      */
-    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 }
