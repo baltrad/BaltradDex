@@ -82,9 +82,7 @@ public class DistributionRoutesController {
       DistributionRule rule = (DistributionRule)routeDef.getRule();
       destination = rule.getDestination().toString();
       
-      //@@@ uncomment before submitting
-      //namingTemplate = rule.getMetadataNamingTemplate();
-      
+      namingTemplate = rule.getMetadataNamingTemplate();
       
       try {
         filterJson = jsonMapper.writeValueAsString(rule.getFilter());
@@ -243,15 +241,11 @@ public class DistributionRoutesController {
     }
     
     
-    //@@@ uncomment before submitting
-    /*if (namingTemplate != null && !namingTemplate.isEmpty()) {
+    if (namingTemplate != null && !namingTemplate.isEmpty()) {
       rule.setMetadataNamingTemplate(namingTemplate);
     } else {
       rule.setUuidNamer();
-    }*/
-    
-    
-    
+    }
     
     if (filterJson == null || filterJson.equals(""))
       throw new RuleException("filter must be specified");
