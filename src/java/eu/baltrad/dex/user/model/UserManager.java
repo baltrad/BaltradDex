@@ -43,7 +43,7 @@ import java.util.ArrayList;
  * @version 1.0
  * @since 1.0
  */
-public class UserManager {
+public class UserManager implements IUserManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;

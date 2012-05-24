@@ -21,9 +21,9 @@
 
 package eu.baltrad.dex.subscription.controller;
 
-import eu.baltrad.dex.subscription.model.Subscription;
+import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
-import eu.baltrad.dex.subscription.model.SubscriptionManager;
+import eu.baltrad.dex.net.model.SubscriptionManager;
 import eu.baltrad.dex.net.controller.FrameDispatcherController;
 import eu.baltrad.frame.model.*;
 import static eu.baltrad.frame.model.Protocol.*;
@@ -54,7 +54,7 @@ import java.util.Collections;
  * @version 1.0
  * @since 1.0
  */
-public class SubscriptionController extends MultiActionController {
+public class SubscriptionController_deprecated extends MultiActionController {
 //---------------------------------------------------------------------------------------- Constants
     // model keys
     private static final String SHOW_SUBSCRIPTIONS_KEY = "subscriptions";
@@ -97,9 +97,9 @@ public class SubscriptionController extends MultiActionController {
     /**
      * Constructor.
      */
-    public SubscriptionController() {
+    public SubscriptionController_deprecated() {
         log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-    }
+    } 
     /**
      * Shows list of all subscriptions.
      *
@@ -115,7 +115,7 @@ public class SubscriptionController extends MultiActionController {
         for (int i = 0; i < subscriptions.size(); i++) {
             File subFile = writeObjectToFile(subscriptions.get(i), 
                     InitAppUtil.getWorkDir());
-            HttpResponse res = postSubsciptionSyncRequest(subscriptions.get(i).getNodeAddress(), 
+            HttpResponse res = postSubsciptionSyncRequest(subscriptions.get(i).getNodeAddress(),
                     subFile);
             int code = res.getStatusLine().getStatusCode();
             if (code == HttpServletResponse.SC_UNAUTHORIZED) {
@@ -126,7 +126,7 @@ public class SubscriptionController extends MultiActionController {
                 log.error("Failed to access remote node due to internal server error"); 
             }
             if (code == HttpServletResponse.SC_OK) {
-                    SerialFrame serialFrame = readFrameFromStream(res);
+                SerialFrame serialFrame = readFrameFromStream(res);    
                 if (authenticate(/*ServletContextUtil.getServletContextPath() 
                         + InitAppUtil.KS_FILE_PATH,*/
                         InitAppUtil.getConf().getKeystoreDir(), serialFrame.getNodeName(), 
@@ -459,6 +459,11 @@ public class SubscriptionController extends MultiActionController {
      * @return HTTP response 
      */
     private HttpResponse postSubsciptionSyncRequest(String remoteNodeAddress, File payloadFile) {
+        // to remain compatibility with versions using BaltradFrame
+        if (!remoteNodeAddress.endsWith("/BaltradDex/dispatch.htm")) {
+            remoteNodeAddress += "/BaltradDex/dispatch.htm";
+        }
+        
         HttpResponse response = null;
         long timestamp = System.currentTimeMillis();
 
@@ -482,6 +487,11 @@ public class SubscriptionController extends MultiActionController {
      * @return HTTP response 
      */
     private HttpResponse postSubscriptionUpdateRequest(String remoteNodeAddress, File payloadFile) {
+        // to remain compatibility with versions using BaltradFrame
+        if (!remoteNodeAddress.endsWith("/BaltradDex/dispatch.htm")) {
+            remoteNodeAddress += "/BaltradDex/dispatch.htm";
+        }
+        
         HttpResponse response = null;
         long timestamp = System.currentTimeMillis();
         String signature = getSignatureString(

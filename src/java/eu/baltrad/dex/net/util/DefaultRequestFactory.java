@@ -142,12 +142,17 @@ public class DefaultRequestFactory implements RequestFactory {
     
     /**
      * Creates get data source listing request.
+     * @param nodeName Name of the node making a request
+     * @param nodeAddress Address of the node making a request
      * @return Http GET request 
      */
-    public HttpGet createGetDataSourceListingRequest() {
+    public HttpGet createGetDataSourceListingRequest(String nodeName, 
+            String nodeAddress) {
         HttpGet httpGet = new HttpGet(
                 getRequestUri("getdatasourcelisting.htm"));
-        httpGet.addHeader("Content-Type", "text/html");
+        httpGet.addHeader("Node-Name", nodeName);
+        httpGet.addHeader("Node-Address", nodeAddress);
+        httpGet.addHeader("Content-Type", "text/html");  
         httpGet.addHeader("Content-MD5", Base64.encodeBase64String(
                 httpGet.getURI().toString().getBytes()));
         httpGet.addHeader("Date", dateFormat.format(new Date()));
@@ -169,10 +174,13 @@ public class DefaultRequestFactory implements RequestFactory {
     
     /**
      * Creates post subscription request.
+     * @param nodeName Name of the node making a request
+     * @param nodeAddress Address of the node making a request
      * @param jsonSources String representation of data sources 
      * @return Http POST request 
      */
-    public HttpPost createPostSubscriptionRequest(String jsonSources) {
+    public HttpPost createPostSubscriptionRequest(String nodeName, 
+            String nodeAddress, String jsonSources) {
         HttpPost httpPost = new HttpPost(getRequestUri("postsubscription.htm"));
         StringEntity entity = null;
         try {
@@ -181,6 +189,8 @@ public class DefaultRequestFactory implements RequestFactory {
             throw new RuntimeException(e);
         }
         httpPost.setEntity(entity);
+        httpPost.addHeader("Node-Name", nodeName);
+        httpPost.addHeader("Node-Address", nodeAddress);
         httpPost.addHeader("Content-Type", "application/json");
         httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
                 jsonSources.getBytes()));

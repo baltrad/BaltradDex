@@ -73,11 +73,14 @@ public class DefaultRequestFactoryTest {
     @Test
     public void createGetDataSourceListingRequest() {
         HttpUriRequest request = classUnderTest
-                                           .createGetDataSourceListingRequest();
+                .createGetDataSourceListingRequest("localnode", 
+                    "http://localhost");
         assertEquals("GET", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/getdatasourcelisting.htm"), 
             request.getURI());
+        assertEquals("localnode", getHeader(request, "Node-Name"));
+        assertEquals("http://localhost", getHeader(request, "Node-Address"));
         assertEquals("text/html", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));
         assertNotNull(getHeader(request, "Date"));
@@ -99,11 +102,14 @@ public class DefaultRequestFactoryTest {
     @Test
     public void createPostSubscriptionRequest() {
         HttpUriRequest request = classUnderTest.createPostSubscriptionRequest(
+                "localnode", "http://localhost",
                 "json string will be passed here");
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/postsubscription.htm"), 
             request.getURI());
+        assertEquals("localnode", getHeader(request, "Node-Name"));
+        assertEquals("http://localhost", getHeader(request, "Node-Address"));
         assertEquals("application/json", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));
         assertNotNull(getHeader(request, "Date"));

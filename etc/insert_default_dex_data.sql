@@ -29,7 +29,7 @@ INSERT INTO dex_roles (id, role) VALUES (1, 'admin'), (2, 'operator'),
 INSERT INTO dex_users (name, name_hash, role_name, password, org_name, org_unit, locality, 
                         state, country_code, node_address)
     VALUES ('admin', MD5('admin'), 'admin', MD5('baltrad'), 'Company', 'Unit', 'City', 'Country',
-            'XX', 'http://localhost:8080/BaltradDex.dispatch.htm');
+            'XX', 'http://localhost:8080');
 
 -- dex_data_quantity -------------------------------------------------------------------------------
 INSERT INTO dex_data_quantities (data_quantity, unit, description) VALUES

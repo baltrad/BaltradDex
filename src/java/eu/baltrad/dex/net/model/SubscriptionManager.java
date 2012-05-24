@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,23 +17,26 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
-package eu.baltrad.dex.subscription.model;
+package eu.baltrad.dex.net.model;
 
+import eu.baltrad.dex.net.model.Subscription;
+import eu.baltrad.dex.net.model.ISubscriptionManager;
 import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.user.model.User;
 import java.sql.*;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.dao.EmptyResultDataAccessException;
 
 import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.ArrayList;
-import javax.swing.tree.RowMapper;
 
 /**
  * Subscription manager implementing subscription handling functionality.
@@ -42,18 +45,18 @@ import javax.swing.tree.RowMapper;
  * @version 1.0
  * @since 1.0
  */
-public class SubscriptionManager {
-//---------------------------------------------------------------------------------------- Variables
+public class SubscriptionManager implements ISubscriptionManager {
+//-------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
     /** JDBC template */
     private SimpleJdbcOperations jdbcTemplate;
     /** Logger */
     private Logger log;
-    
+    /** Row mapper */
     private Mapper mapper;
     
-//------------------------------------------------------------------------------------------ Methods
+//---------------------------------------------------------------------- Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
@@ -64,13 +67,44 @@ public class SubscriptionManager {
     }
     
     /**
+     * @param jdbcTemplate the jdbcTemplate to set
+     */
+    @Autowired
+    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+    
+    /**
      * Loads subscription from database.
      * @param id Record id
      * @return Subscription with a given id
      */
     public Subscription load(int id) {
         String sql = "SELECT * FROM dex_subscriptions WHERE id = ?";
-        return jdbcTemplate.queryForObject(sql, mapper, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, mapper, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Loads subscriptions from database.
+     * @param userName User name
+     * @param dataSourceName Data source name
+     * @param type Subscription type
+     * @return Subscription object matching given criteria
+     */
+    public Subscription load(String userName, String dataSourceName, 
+            String type) {
+        String sql = "SELECT * FROM dex_subscriptions WHERE user_name = ? " + 
+                "AND data_source_name = ? AND type = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, mapper, userName, 
+                dataSourceName, type); 
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
     
     /**
@@ -80,15 +114,20 @@ public class SubscriptionManager {
      */
     public List<Subscription> load(String type) {
         String sql = "SELECT * FROM dex_subscriptions WHERE type = ?";
-        return jdbcTemplate.query(sql, mapper, type);
+        try {
+            return jdbcTemplate.query(sql, mapper, type);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
     
     /**
      * Stores subscription in a database.
      * @param s Subscription to store
+     * @return Number of affected records
      */
-    public void store(Subscription s) {
-        jdbcTemplate.update("INSERT INTO dex_subscriptions " +
+    public int store(Subscription s) {
+        return jdbcTemplate.update("INSERT INTO dex_subscriptions " +
             "(id, timestamp, user_name, data_source_name, operator_name, " + 
             "type, active, synkronized, node_address) " +
             "VALUES (?,?,?,?,?,?,?,?,?)",
@@ -104,12 +143,33 @@ public class SubscriptionManager {
     }
     
     /**
+     * Stores subscription record without ID
+     * @param s Subscription to store
+     * @return Number of affected records
+     */
+    public int storeNoId(Subscription s) {
+        return jdbcTemplate.update("INSERT INTO dex_subscriptions " +
+            "(timestamp, user_name, data_source_name, operator_name, " + 
+            "type, active, synkronized, node_address) " +
+            "VALUES (?,?,?,?,?,?,?,?)",
+            s.getTimeStamp(),
+            s.getUserName(),
+            s.getDataSourceName(),
+            s.getOperatorName(),
+            s.getType(),
+            s.getActive(),
+            s.getSynkronized(),
+            s.getNodeAddress());
+    }
+    
+    /**
      * Updates subscription.
      * @param s Subscription object
+     * @return Number of affected records
      */
-    public void update(Subscription s) {
-        jdbcTemplate.update("UPDATE dex_subscriptions SET timestamp = ?, " +
-            "user_name = ?, data_source_name = ?, operator_name = ?, " + 
+    public int update(Subscription s) {
+        return jdbcTemplate.update("UPDATE dex_subscriptions SET timestamp = ?,"
+            + " user_name = ?, data_source_name = ?, operator_name = ?, " + 
             "type = ?, active = ?, synkronized = ?, node_address = ? " +
             "WHERE id = ?",
             s.getTimeStamp(),
@@ -126,9 +186,10 @@ public class SubscriptionManager {
     /**
      * Removes subscription from the database.
      * @param s Subscription to remove
+     * @return Number of affected records
      */
-    public void delete(Subscription s) {
-        jdbcTemplate.update("DELETE FROM dex_subscriptions WHERE id = ?", 
+    public int delete(Subscription s) {
+        return jdbcTemplate.update("DELETE FROM dex_subscriptions WHERE id = ?", 
                 s.getId());
     }
      
@@ -161,11 +222,18 @@ public class SubscriptionManager {
     }
     
     
+    
+    
+    
+    
+    
+    
     /**
      * Gets all existing subscriptions.
      *
      * @return List of all existing subscriptions
      */
+    @Deprecated
     public List<Subscription> get() {
         Connection conn = null;
         List<Subscription> subscriptions = new ArrayList<Subscription>();
@@ -202,6 +270,7 @@ public class SubscriptionManager {
      * @param type Subscription type
      * @return List of subscriptions of a given type
      */
+    @Deprecated
     public List<Subscription> get(String type) {
         Connection conn = null;
         List<Subscription> subscriptions = new ArrayList<Subscription>();
@@ -239,6 +308,7 @@ public class SubscriptionManager {
      * @param type Subscription type
      * @return Subscription object
      */
+    @Deprecated
     public Subscription get(String dsName, String type) {
         Connection conn = null;
         Subscription subscription = null;
@@ -277,6 +347,7 @@ public class SubscriptionManager {
      * @param type Subscription type
      * @return Subscription object
      */
+    @Deprecated
     public Subscription get(String usrName, String dsName, String type) {
         Connection conn = null;
         Subscription subscription = null;
@@ -314,6 +385,7 @@ public class SubscriptionManager {
      * @param subscriptionType Subscription type
      * @return List of strings representing field values
      */
+    @Deprecated
     public List<String> getDistinct(String fieldName, String type) {
         Connection conn = null;
         List<String> fieldValues = new ArrayList<String>();
@@ -341,6 +413,7 @@ public class SubscriptionManager {
      * @return Number of inserted records
      * @throws Exception
      */
+    @Deprecated
     public int save(Subscription sub) throws Exception {
         Connection conn = null;
         int insert = 0;
@@ -372,6 +445,7 @@ public class SubscriptionManager {
      * @return Number of inserted records
      * @throws Exception
      */
+    @Deprecated
     public int update(String dataSourceName, String subscriptionType, boolean active) 
             throws Exception {
         Connection conn = null;
@@ -400,6 +474,7 @@ public class SubscriptionManager {
      * @throws SQLException
      * @throws Exception
      */
+    @Deprecated
     public int delete(int id) {
         Connection conn = null;
         int delete = 0;
@@ -424,6 +499,7 @@ public class SubscriptionManager {
      * @return Number of deleted records
      * @throws Exception
      */
+    @Deprecated
     public int delete(String dataSourceName, String subscriptionType)
             throws Exception {
         Connection conn = null;
@@ -452,6 +528,7 @@ public class SubscriptionManager {
      * @return Number of deleted records
      * @throws Exception
      */
+    @Deprecated
     public int delete(String userName, String dataSourceName, String subscriptionType) 
             throws Exception {
         Connection conn = null;
@@ -520,20 +597,6 @@ public class SubscriptionManager {
             log.error("Failed to compare subscriptions", e);
         }
         return res;
-    }
-
-    /**
-     * @return the jdbcTemplate
-     */
-    public SimpleJdbcOperations getJdbcTemplate() {
-        return jdbcTemplate;
-    }
-
-    /**
-     * @param jdbcTemplate the jdbcTemplate to set
-     */
-    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
     }
 }
 //--------------------------------------------------------------------------------------------------

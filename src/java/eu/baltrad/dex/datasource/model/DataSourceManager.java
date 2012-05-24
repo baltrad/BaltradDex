@@ -24,11 +24,15 @@ package eu.baltrad.dex.datasource.model;
 import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.dex.log.model.MessageLogger;
 
+import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -40,12 +44,16 @@ import java.util.ArrayList;
  * @version 0.6.4
  * @since 0.6.4
  */
-public class DataSourceManager {
+public class DataSourceManager implements IDataSourceManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
+    /** JDBC template */
+    private SimpleJdbcOperations jdbcTemplate;
     /** Logger */
     private Logger log;
+    /** Row mapper */
+    private Mapper mapper;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
@@ -53,12 +61,51 @@ public class DataSourceManager {
     public DataSourceManager() {
         this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.mapper = new Mapper();
     }
+    
+    /**
+     * Load data sources by user.
+     * @param id User id
+     * @return List of data sources for a given user.
+     */
+    public List<DataSource> load(int id) {
+        String sql = "SELECT * FROM dex_data_sources WHERE id IN (SELECT " +
+                "data_source_id FROM dex_data_source_users WHERE user_id = ?)";
+        return jdbcTemplate.query(sql, mapper, id);
+    }
+    
+    /**
+     * Row mapper.
+     */
+    private static final class Mapper implements 
+                                        ParameterizedRowMapper<DataSource> {
+        /**
+         * Maps records to result set. 
+         * @param rs Result set 
+         * @param rowNum Row number
+         * @return Subscription object
+         * @throws SQLException 
+         */
+        public DataSource mapRow(ResultSet rs, int rowNum) 
+                throws SQLException {
+            DataSource ds = new DataSource();
+            ds.setId(rs.getInt("id"));
+            ds.setName(rs.getString("name"));
+            ds.setDescription(rs.getString("description"));
+            return ds;
+        }
+    }
+    
+    
+    
+    
     /**
      * Gets all data sources.
      *
      * @return List of all available data sources.
      */
+    @Deprecated
     public List<DataSource> getDataSources() {
         Connection conn = null;
         List<DataSource> dataSources = new ArrayList<DataSource>();
@@ -88,6 +135,7 @@ public class DataSourceManager {
      * @return Data source with a given ID
      * @throws Exception
      */
+    @Deprecated
     public DataSource getDataSource( int id ) throws Exception {
         Connection conn = null;
         DataSource dataSource = null;
@@ -118,6 +166,7 @@ public class DataSourceManager {
      * @return Data source matching a given identifier
      * @throws Exception
      */
+    @Deprecated
     public DataSource getDataSource( String identifier ) throws Exception {
         Connection conn = null;
         DataSource dataSource = null;
@@ -148,6 +197,7 @@ public class DataSourceManager {
      * @return Number of saved or updated records
      * @throws Exception
      */
+    @Deprecated
     public int saveOrUpdate( DataSource dataSource ) throws Exception {
         Connection conn = null;
         long count = 0;
@@ -188,6 +238,7 @@ public class DataSourceManager {
      * @return Number of deleted records
      * @throws Exception
      */
+    @Deprecated
     public int deleteDataSource( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
@@ -213,6 +264,7 @@ public class DataSourceManager {
      * @return Number of saved or updated records
      * @throws Exception
      */
+    @Deprecated
     public int saveRadar( int dataSourceId, int radarId ) throws Exception {
         Connection conn = null;
         int update = 0;
@@ -239,6 +291,7 @@ public class DataSourceManager {
      * @return Number of deleted records
      * @throws Exception
      */
+    @Deprecated
     public int deleteRadars( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
@@ -264,6 +317,7 @@ public class DataSourceManager {
      * @return Radar IDs for a given data source
      * @throws Exception
      */
+    @Deprecated
     public List<Integer> getRadarIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> radarIds = new ArrayList<Integer>();
@@ -292,6 +346,7 @@ public class DataSourceManager {
      * @return Number of saved or updated records
      * @throws Exception
      */
+    @Deprecated
     public int saveFileObject( int dataSourceId, int fileObjectId ) throws Exception {
         Connection conn = null;
         int update = 0;
@@ -318,6 +373,7 @@ public class DataSourceManager {
      * @return Number of deleted records
      * @throws Exception
      */
+    @Deprecated
     public int deleteFileObjects( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
@@ -343,6 +399,7 @@ public class DataSourceManager {
      * @return File object IDs for a given data source
      * @throws Exception
      */
+    @Deprecated
     public List<Integer> getFileObjectIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> fileObjectIds = new ArrayList<Integer>();
@@ -371,6 +428,7 @@ public class DataSourceManager {
      * @return Number of saved or updated records
      * @throws Exception
      */
+    @Deprecated
     public int saveDataQuantity( int dataSourceId, int dataQuantityId ) throws Exception {
         Connection conn = null;
         int update = 0;
@@ -397,6 +455,7 @@ public class DataSourceManager {
      * @return Number of deleted records
      * @throws Exception
      */
+    @Deprecated
     public int deleteDataQuantities( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
@@ -422,6 +481,7 @@ public class DataSourceManager {
      * @return Data quantity IDs for a given data source
      * @throws Exception
      */
+    @Deprecated
     public List<Integer> getDataQuantityIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> dataQuantityIds = new ArrayList<Integer>();
@@ -450,6 +510,7 @@ public class DataSourceManager {
      * @return Number of saved or updated records
      * @throws Exception
      */
+    @Deprecated
     public int saveProduct( int dataSourceId, int productId ) throws Exception {
         Connection conn = null;
         int update = 0;
@@ -476,6 +537,7 @@ public class DataSourceManager {
      * @return Number of deleted records
      * @throws Exception
      */
+    @Deprecated
     public int deleteProducts( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
@@ -501,6 +563,7 @@ public class DataSourceManager {
      * @return Product IDs for a given data source
      * @throws Exception
      */
+    @Deprecated
     public List<Integer> getProductIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> productIds = new ArrayList<Integer>();
@@ -530,6 +593,7 @@ public class DataSourceManager {
      * @return Number of saved or updated records
      * @throws Exception
      */
+    @Deprecated
     public int saveProductParameter( int dataSourceId, int parameterId, String parameterValue ) 
             throws Exception {
         Connection conn = null;
@@ -558,6 +622,7 @@ public class DataSourceManager {
      * @return Number of deleted records
      * @throws Exception
      */
+    @Deprecated
     public int deleteProductParameters( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
@@ -584,6 +649,7 @@ public class DataSourceManager {
      * @return Product parameter IDs for a given data source
      * @throws Exception
      */
+    @Deprecated
     public List<Integer> getProductParameterIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> productParameterIds = new ArrayList<Integer>();
@@ -613,6 +679,7 @@ public class DataSourceManager {
      * @return Number of saved or updated records
      * @throws Exception
      */
+    @Deprecated
     public int saveUser( int dataSourceId, int userId ) throws Exception {
         Connection conn = null;
         int update = 0;
@@ -639,6 +706,7 @@ public class DataSourceManager {
      * @return Number of deleted records
      * @throws Exception
      */
+    @Deprecated
     public int deleteUsers( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
@@ -664,6 +732,7 @@ public class DataSourceManager {
      * @return User IDs for a given data source
      * @throws Exception
      */
+    @Deprecated
     public List<Integer> getUserIds( int dataSourceId ) throws Exception {
         Connection conn = null;
         List<Integer> userIds = new ArrayList<Integer>();
@@ -691,6 +760,7 @@ public class DataSourceManager {
      * @return Data source IDs for a given user
      * @throws Exception
      */
+    @Deprecated
     public List<Integer> getDataSourceIds( int userId ) throws Exception {
         Connection conn = null;
         List<Integer> dataSourceIds = new ArrayList<Integer>();
@@ -719,6 +789,7 @@ public class DataSourceManager {
      * @return Number of saved or updated records
      * @throws Exception
      */
+    @Deprecated
     public int saveFilter( int dataSourceId, int filterId ) throws Exception {
         Connection conn = null;
         int update = 0;
@@ -745,6 +816,7 @@ public class DataSourceManager {
      * @return Filter ID
      * @throws Exception
      */
+    @Deprecated
     public int getFilterId( int dataSourceId ) throws Exception {
         Connection conn = null;
         int filterId = 0;
@@ -771,6 +843,7 @@ public class DataSourceManager {
      * @return Number of deleted records
      * @throws Exception
      */
+    @Deprecated
     public int deleteFilters( int dataSourceId ) throws Exception {
         Connection conn = null;
         int delete = 0;
@@ -788,6 +861,20 @@ public class DataSourceManager {
             jdbcConnectionManager.returnConnection( conn );
         }
         return delete;
+    }
+
+    /**
+     * @return the jdbcTemplate
+     */
+    public SimpleJdbcOperations getJdbcTemplate() {
+        return jdbcTemplate;
+    }
+
+    /**
+     * @param jdbcTemplate the jdbcTemplate to set
+     */
+    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
 }
 //--------------------------------------------------------------------------------------------------

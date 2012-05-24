@@ -93,4 +93,32 @@ public interface Authenticator {
      */
     public String getUser(HttpServletRequest request);
     
+    /**
+     * Retrieves node name from request.
+     * @param request Http URI request
+     * @return Name of the requesting node
+     */
+    public String getNodeName(HttpUriRequest request);
+    
+    /**
+     * Retrieves node name from request.
+     * @param request Http servlet request
+     * @return Name of the requesting node
+     */
+    public String getNodeName(HttpServletRequest request);
+    
+    /**
+     * Retrieves node address from request.
+     * @param request Http URI request
+     * @return Address of the requesting node
+     */
+    public String getNodeAddress(HttpUriRequest request);
+    
+    /**
+     * Retrieves node address from request.
+     * @param request Http servlet request
+     * @return Address of the requesting node
+     */
+    public String getNodeAddress(HttpServletRequest request);
+    
 }

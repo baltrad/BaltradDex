@@ -32,8 +32,6 @@ import eu.baltrad.dex.util.EasyX509TrustManager;
 
 import junit.framework.TestCase;
 
-import org.mortbay.jetty.testing.ServletTester;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;

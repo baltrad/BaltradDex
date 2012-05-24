@@ -17,16 +17,19 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 
 import java.security.SecureRandom;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 
+import java.io.IOException;
+
 /**
  *
  * @author szewczenko
  */
-public class HttpClientUtil {
+public class HttpClientUtil implements IHttpClientUtil {
     
     /** Maximum number of connections */
     private static final int MAX_TOTAL_CONNS = 200;
@@ -51,12 +54,15 @@ public class HttpClientUtil {
     }
     
     
-    public HttpResponse post(HttpUriRequest request) {
+    public HttpResponse post(HttpUriRequest request) throws IOException, 
+            Exception {
         HttpResponse response = null;
         try {
             response = client.execute(request);
+        } catch (IOException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to post request", e);
+            throw e;
         }
         return response;
     }

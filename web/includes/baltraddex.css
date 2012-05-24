@@ -870,6 +870,7 @@ input:focus, textarea:focus {
     float:right;
     text-align:center;
 }
+
 /* Subscription management page ------------------------------------------------------------------*/
 .subscriptions .name {
     width:35%;
@@ -1223,6 +1224,26 @@ input:focus, textarea:focus {
     float:left;
     width:60%;
 }
+
+/* Alerts and messages -------------------------------------------------------*/ 
+.alert {
+    width:100%;
+    padding:4px;
+}
+.alert .icon {
+    float:left;
+    padding:4px;
+    width:10%;
+}
+.alert .text {
+    float:left;
+    padding-top:18px;
+    width:86%;
+    text-align:justify;
+}
+
+
+
 /* Certificate management page--------------------------------------------------------------------*/
 .certs .alias {
     width:40%;
@@ -1267,4 +1288,13 @@ input:focus, textarea:focus {
   float: left;
   clear: left;
 }
-/*------------------------------------------------------------------------------------------------*/
+/* Expandable section --------------------------------------------------------*/
+.expand_head {
+    cursor:pointer;
+    text-decoration:underline;
+    padding:8px 0px 4px 0px;
+}
+.expand_body {}
+
+
+/*----------------------------------------------------------------------------*/

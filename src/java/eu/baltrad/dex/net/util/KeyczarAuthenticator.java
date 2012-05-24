@@ -48,6 +48,8 @@ public class KeyczarAuthenticator implements Authenticator {
     
     private static final String[] HEADERS = {"Content-Type", "Content-MD5",
         "Date"};
+    private static final String NODE_NAME_HDR = "Node-Name";
+    private static final String NODE_ADDR_HDR = "Node-Address";
     private static final String AUTH_HDR = "Authorization";
     private static final String HDR_SEPARATOR = ":";
     
@@ -219,5 +221,50 @@ public class KeyczarAuthenticator implements Authenticator {
         return parts[0];
     }
     
+    /**
+     * Retrieves node name from request.
+     * @param request Http URI request
+     * @return Name of the requesting node
+     */
+    public String getNodeName(HttpUriRequest request) {
+        Header header = request.getFirstHeader(NODE_NAME_HDR);
+        return header.getValue();
+    }
+    
+    /**
+     * Retrieves node name from request.
+     * @param request Http servlet request
+     * @return Name of the requesting node
+     */
+    public String getNodeName(HttpServletRequest request) {
+        String headerValue = 
+            ((String) request.getAttribute(NODE_NAME_HDR) != null) ?
+            (String) request.getAttribute(NODE_NAME_HDR) : 
+            request.getHeader(NODE_NAME_HDR);
+        return headerValue;
+    }
+    
+    /**
+     * Retrieves node address from request.
+     * @param request Http URI request
+     * @return Address of the requesting node
+     */
+    public String getNodeAddress(HttpUriRequest request) {
+        Header header = request.getFirstHeader(NODE_ADDR_HDR);
+        return header.getValue();
+    }
+    
+    /**
+     * Retrieves node address from request.
+     * @param request Http servlet request
+     * @return Address of the requesting node
+     */
+    public String getNodeAddress(HttpServletRequest request) {
+        String headerValue = 
+            ((String) request.getAttribute(NODE_ADDR_HDR) != null) ?
+            (String) request.getAttribute(NODE_ADDR_HDR) : 
+            request.getHeader(NODE_ADDR_HDR);
+        return headerValue;
+    }
 }
             

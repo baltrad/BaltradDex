@@ -19,7 +19,7 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.subscription.model;
+package eu.baltrad.dex.net.model;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;

@@ -236,7 +236,7 @@ Author     : szewczenko
                                                 </c:choose>
                                                 <div class="hint">
                                                     Node address, 
-                                                    e.g. http://baltrad.eu:8084/BaltradDex/dispatch.htm
+                                                    e.g. http://baltrad.eu:8084
                                                 </div>
                                             </div>
                                             <form:errors path="command.nodeAddress" cssClass="error"/>

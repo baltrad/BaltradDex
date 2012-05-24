@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.net.controller;
 
+import eu.baltrad.dex.net.model.SubscriptionManager;
+import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.frame.model.*;
 import static eu.baltrad.frame.model.Protocol.*;
 import static eu.baltrad.dex.util.InitAppUtil.validate;
@@ -32,7 +34,6 @@ import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
-import eu.baltrad.dex.subscription.model.*;
 import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 import eu.baltrad.dex.net.util.FramePublisherManager;
 import eu.baltrad.dex.net.util.FramePublisher;
@@ -127,6 +128,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * Constructor.
      */
     public FrameDispatcherController() {
+        System.out.println("_________ FDC constructor ");
+        
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     /**
@@ -138,6 +141,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @return ModelAndView object
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response ) {
+        
+        System.out.println("_________ FDC handle request ");
+        
         doGet( request, response );
         return new ModelAndView();
     }
@@ -149,6 +155,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     @Override
     public void doGet( HttpServletRequest request, HttpServletResponse response ) {
+        
+        System.out.println("_________ FDC request received ");
+        
         // Create new session to avoid comitting response too early 
         HttpSession session = request.getSession(true);
         // Parse incoming baltrad frame
@@ -168,6 +177,9 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         }
         // Handle subscription synchronization request
         if (Frame.getRequestType(parms).equals(BF_POST_SUBSCRIPTION_SYNC_REQUEST)) {
+            
+            System.out.println("_________ FDC subscription sync request received ");
+            
             handleSubscriptionSyncRequest(parms, response);
         }
         // Handle subscription update request

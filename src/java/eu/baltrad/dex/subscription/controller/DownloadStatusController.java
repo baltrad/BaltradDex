@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.subscription.controller;
 
-import eu.baltrad.dex.subscription.model.SubscriptionManager;
-import eu.baltrad.dex.subscription.model.Subscription;
+import eu.baltrad.dex.net.model.SubscriptionManager;
+import eu.baltrad.dex.net.model.Subscription;
 
 import org.springframework.web.servlet.mvc.Controller;
 import org.springframework.web.servlet.ModelAndView;

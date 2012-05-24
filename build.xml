@@ -457,7 +457,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </copy>
   </target>
   <!-- Setup integration tests -->
-  <target name="init.itest">
+  <target name="init.itest" depends="create.testdb">
 	<mkdir dir="${dist.dir}/junit-reports" />
 	<copy file="${etc.dir}/testdb.properties" todir="${build.classes.dir}"/>
   </target>
@@ -587,8 +587,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </sql>
   </target>
   
-  <!-- deploy on tomcat -->
-  <target name="deploy" depends="dist, context-status, insert-data"
+  <!-- deploy on tomcat ::::::::::;;;; insert-data   -->
+  <target name="deploy" depends="dist, context-status"
     	if="context.deployable">
     <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
     <deploy url="${mgr.url}"

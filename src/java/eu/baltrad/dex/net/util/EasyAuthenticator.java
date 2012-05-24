@@ -113,4 +113,40 @@ public class EasyAuthenticator implements Authenticator {
         return null;
     }
     
+    /**
+     * Method stub.
+     * @param request Http URI request
+     * @return null
+     */
+    public String getNodeName(HttpUriRequest request) {
+        return null;
+    }
+    
+    /**
+     * Method stub.
+     * @param request Http servlet request
+     * @return null
+     */
+    public String getNodeName(HttpServletRequest request) {
+        return null;
+    }
+    
+    /**
+     * Method stub.
+     * @param request Http URI request
+     * @return null
+     */
+    public String getNodeAddress(HttpUriRequest request) {
+        return null;
+    }
+    
+    /**
+     * Method stub.
+     * @param request Http servlet request
+     * @return null
+     */
+    public String getNodeAddress(HttpServletRequest request) {
+        return null;
+    }
+    
 }

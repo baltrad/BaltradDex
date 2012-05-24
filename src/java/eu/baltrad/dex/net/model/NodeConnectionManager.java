@@ -1,4 +1,4 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
 * Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+********************************************************************************/
 
 package eu.baltrad.dex.net.model;
 
@@ -33,6 +33,8 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.ArrayList;
 
+import java.io.IOException;
+
 /**
  * Node manager class implementing node connection object handling functionality.
  *
@@ -40,7 +42,7 @@ import java.util.ArrayList;
  * @version 1.0
  * @since 1.0
  */
-public class NodeConnectionManager {
+public class NodeConnectionManager implements INodeConnectionManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
     private JDBCConnectionManager jdbcConnectionManager;
@@ -145,7 +147,7 @@ public class NodeConnectionManager {
      * @return Number of saved or updated records
      * @throws Exception
      */
-    public int saveOrUpdate(NodeConnection nodeConn) throws Exception {
+    public int saveOrUpdate(NodeConnection nodeConn) {
         Connection conn = null;
         int update = 0;
         try {
@@ -170,7 +172,6 @@ public class NodeConnectionManager {
             }
         } catch(Exception e) {
             log.error("Failed to save node connection", e);
-            throw e;
         } finally {
             jdbcConnectionManager.returnConnection(conn);
         }

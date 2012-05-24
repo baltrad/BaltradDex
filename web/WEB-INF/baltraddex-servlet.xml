@@ -68,9 +68,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
         <property name="mappings">
             <props>
-                <!--<prop key="dsConnect.htm">remoteDataSourceController</prop>
-                <prop key="dsToConnect.htm">remoteDataSourceController</prop>
-                <prop key="dsSubscribed.htm">remoteDataSourceController</prop>
+               <!--
                 <prop key="download.htm">bltFileDownloadController</prop>
                 <prop key="showSubscriptions.htm">subscriptionController</prop>
                 <prop key="showSelectedSubscriptions.htm">subscriptionController</prop>
@@ -93,13 +91,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <props>
                 <prop key="exchange.htm">urlFilenameController</prop>
                 <prop key="processing.htm">urlFilenameController</prop>
-                <prop key="connectToNode.htm">remoteDataSourceController</prop>
-                <prop key="dsConnect.htm">remoteDataSourceController</prop>
-                <prop key="dsToConnect.htm">remoteDataSourceController</prop>
-                <prop key="dsSubscribed.htm">remoteDataSourceController</prop>
-                <prop key="showSubscriptions.htm">subscriptionController</prop>
-                <prop key="showSelectedSubscriptions.htm">subscriptionController</prop>
-                <prop key="showSubscriptionStatus.htm">subscriptionController</prop>
+                <prop key="showSubscriptions.htm">subscriptionController_deprecated</prop>
+                <prop key="showSelectedSubscriptions.htm">subscriptionController_deprecated</prop>
+                <prop key="showSubscriptionStatus.htm">subscriptionController_deprecated</prop>
                 <prop key="showRegister.htm">registerController</prop>
             </props>
         </property>
@@ -153,12 +147,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="dsRemove.htm">removeDataSourceController</prop>
                 <prop key="dsSelectEdit.htm">editDataSourceController</prop>
 
-                <prop key="removeDownloadSubscriptions.htm">subscriptionController</prop>
-                <prop key="downloadSubscriptionsToRemove.htm">subscriptionController</prop>
-                <prop key="downloadSubscriptionsRemovalStatus.htm">subscriptionController</prop>
-                <prop key="removeUploadSubscriptions.htm">subscriptionController</prop>
-                <prop key="uploadSubscriptionsToRemove.htm">subscriptionController</prop>
-                <prop key="uploadSubscriptionsRemovalStatus.htm">subscriptionController</prop>
+                <prop key="removeDownloadSubscriptions.htm">subscriptionController_deprecated</prop>
+                <prop key="downloadSubscriptionsToRemove.htm">subscriptionController_deprecated</prop>
+                <prop key="downloadSubscriptionsRemovalStatus.htm">subscriptionController_deprecated</prop>
+                <prop key="removeUploadSubscriptions.htm">subscriptionController_deprecated</prop>
+                <prop key="uploadSubscriptionsToRemove.htm">subscriptionController_deprecated</prop>
+                <prop key="uploadSubscriptionsRemovalStatus.htm">subscriptionController_deprecated</prop>
 
                 <prop key="removeNodeConnections.htm">nodeConnectionController</prop>
                 <prop key="nodeConnectionsToRemove.htm">nodeConnectionController</prop>
@@ -176,6 +170,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="login.htm">loginController</prop>
                 <prop key="logout.htm">logoutController</prop>
                 <prop key="dispatch.htm">frameDispatcherController</prop>
+                <prop key="getdatasourcelisting.htm">dataSourceListServlet</prop>
+                <prop key="postsubscription.htm">postSubscriptionServlet</prop>
             </props>
         </property>
     </bean>
@@ -349,8 +345,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Subscription controller
     -->
-    <bean name="subscriptionController"
-        class="eu.baltrad.dex.subscription.controller.SubscriptionController">
+    <bean name="subscriptionController_deprecated"
+        class="eu.baltrad.dex.subscription.controller.SubscriptionController_deprecated">
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
         </property>
@@ -417,11 +413,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 	    <ref bean="fileCatalog" />
 	</property>
     </bean>
-
-    <!--
-        Subscription manager.
-    -->
-    <bean name="subscriptionManager" class="eu.baltrad.dex.subscription.model.SubscriptionManager"/>
 
     <!--
         Message logger
@@ -719,28 +710,46 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
     </bean>
 
-    <!--
-        Remote data source controller
-    -->
-    <bean id="remoteDataSourceController"
-            class="eu.baltrad.dex.net.controller.RemoteDataSourceController">
-        <property name="dispatcher">
-            <ref bean="frameDispatcherController"/>
-        </property>
-        <property name="subscriptionManager">
-            <ref bean="subscriptionManager"/>
-        </property>
-        <property name="connMgr">
-            <ref bean="nodeConnectionManager" />
-        </property>
-        <property name="webValidator">
-            <ref bean="webValidator"/>
-        </property>
+
+    <!-- Data source list controller -->
+    <bean id="dataSourceListController" 
+          class="eu.baltrad.dex.net.controller.DataSourceListController"
+          autowire="byType"/>
+    <!-- Data source list servlet -->
+    <bean id="dataSourceListServlet" 
+          class="eu.baltrad.dex.net.servlet.DataSourceListServlet"
+          autowire="byType"/>
+          
+    <!-- Node connection manager -->
+    <bean id="nodeConnectionManager" 
+          class="eu.baltrad.dex.net.model.NodeConnectionManager"/>
+    <!-- URL address validator -->
+    <bean id="urlValidator" class="eu.baltrad.dex.net.util.UrlValidatorUtil"/>
+    <!-- Message source utility -->
+    <bean id="messages" class="eu.baltrad.dex.util.MessageResourceUtil">
+        <constructor-arg value="resources/messages"/>
     </bean>
+    <!-- JSON format utility -->
+    <bean id="jsonUtil" class="eu.baltrad.dex.net.util.JsonUtil"/>
+    
+    <!-- Subscription controller -->
+    <bean id="postSubscriptionController" 
+          class="eu.baltrad.dex.net.controller.PostSubscriptionController"
+          autowire="byType"/>
+    <!-- Post subscription servlet -->
+    <bean id="postSubscriptionServlet" 
+          class="eu.baltrad.dex.net.servlet.PostSubscriptionServlet"
+          autowire="byType"/>
+    <!-- Subscription manager -->
+    <bean name="subscriptionManager" 
+          class="eu.baltrad.dex.net.model.SubscriptionManager" 
+          autowire="byType"/>
+    
 
-    <!-- Node manager -->
 
-    <bean name="nodeConnectionManager" class="eu.baltrad.dex.net.model.NodeConnectionManager"/>
+    
+
+    
 
     <!--
         Message digest utility.
@@ -845,7 +854,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!-- DataSourceManager -->
-    <bean name="dataSourceManager" class="eu.baltrad.dex.datasource.model.DataSourceManager"/>
+    <bean name="dataSourceManager" 
+          class="eu.baltrad.dex.datasource.model.DataSourceManager"
+          autowire="byType"/>
 
     <!-- SaveDataSourceController -->
     <bean name="saveDataSourceController"
@@ -888,9 +899,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
     </bean>
   
-    <!--
-        Message resources.
-    -->
+    <!-- Message source -->
     <bean id="messageSource"
         class="org.springframework.context.support.ResourceBundleMessageSource">
 	<property name="basenames">

@@ -222,6 +222,10 @@ public class DexDBITestHelper extends TestCase {
     private void deleteFromDB() {
         SimpleJdbcTemplate template = new SimpleJdbcTemplate(dataSource);
         template.update("DELETE FROM dex_subscriptions");
+        template.update("DELETE FROM dex_data_sources");
+        template.update("DELETE FROM dex_data_source_users");
+        template.update("DELETE FROM dex_users");
+        template.update("DELETE FROM dex_roles");
     }
     
     /**

@@ -33,11 +33,13 @@ import java.io.InputStream;
  */
 public interface RequestFactory {
     
-    public HttpUriRequest createGetDataSourceListingRequest();
+    public HttpUriRequest createGetDataSourceListingRequest(String nodeName, 
+            String nodeAddress);
     
     public HttpUriRequest createGetSubscriptionRequest();
     
-    public HttpUriRequest createPostSubscriptionRequest(String jsonSources);
+    public HttpUriRequest createPostSubscriptionRequest(String nodeName,
+            String nodeAddress, String jsonSources);
     
     public HttpUriRequest createPostFileRequest(InputStream fileContent);
     

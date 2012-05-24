@@ -92,15 +92,15 @@ public class JsonUtilTest {
     
     @Test
     public void dataSourcesToJsonString() {
-        String s = classUnderTest.dataSourcesToJsonString(toJson);
+        String s = classUnderTest.dataSourcesToJson(toJson);
         assertNotNull(s);
         assertEquals(jsonString, s);
     }
     
     @Test
-    public void jsonStringToDataSources() {
+    public void jsonStringToDataSources() throws Exception  {
         HashSet<DataSource> dataSources = (HashSet<DataSource>)
-                             classUnderTest.jsonStringToDataSources(jsonString);
+                             classUnderTest.jsonToDataSources(jsonString);
         assertNotNull(dataSources);
         assertEquals(3, dataSources.size());
         for (DataSource ds : dataSources) {

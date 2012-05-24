@@ -2,7 +2,7 @@
     <ul>
         <li>
             <img src="includes/images/icons/connect.png" alt="">
-            <a href="connectToNode.htm">Connect</a>
+            <a href="dsconnect.htm">Connect</a>
         </li>
         <li>
             <img src="includes/images/icons/subscription.png" alt="">

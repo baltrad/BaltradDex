@@ -29,13 +29,13 @@ INSERT INTO dex_roles (id, role) VALUES (1, 'admin'), (2, 'operator'),
 INSERT INTO dex_users (name, name_hash, role_name, password, org_name, org_unit, locality, 
                         state, country_code, node_address)
     VALUES ('admin', MD5('admin'), 'admin', MD5('7GIg7Y@K!Yi'), 'IMGW', 'OTN', 'Warsaw',
-            'Poland', 'PL', 'http://localhost:8084/BaltradDex/dispatch.htm'),
+            'Poland', 'PL', 'http://127.0.0.1:8084'),
 
         ('operator', MD5('operator'), 'operator', MD5('Baltrad2008'), 'IMGW', 'OTN', 'Warsaw',
-        'Poland', 'PL', 'http://localhost:8084/BaltradDex/dispatch.htm'),
+        'Poland', 'PL', 'http://127.0.0.1:8084'),
 
         ('user', MD5('user'), 'user', MD5('Baltrad2008'), 'IMGW', 'OTN', 'Warsaw', 'Poland',
-        'PL', 'http://localhost:8084/BaltradDex/dispatch.htm');
+        'PL', 'http://127.0.0.1:8084');
 
 -- dex_radars --------------------------------------------------------------------------------------
 INSERT INTO dex_radars (name, wmo_number) VALUES ('Legionowo', '12374'),

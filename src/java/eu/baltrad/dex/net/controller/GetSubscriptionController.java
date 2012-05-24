@@ -108,7 +108,7 @@ public class GetSubscriptionController implements Controller {
                             is.close();
                         }
                         Set<DataSource> sources = jsonUtil
-                                .jsonStringToDataSources(jsonSources);
+                                .jsonToDataSources(jsonSources);
                         modelAndView.setViewName(SHOW_SUBSCRIPTION_VIEW);
                         modelAndView.addObject(SUBSCRIPTIONS_KEY, sources);
                         

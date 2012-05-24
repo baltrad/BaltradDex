@@ -51,4 +51,14 @@ public class MessageResourceUtil {
         return messages.getMessage(messageCode, null, null);
     }
     
+    /**
+     * Gets message from resource file
+     * @param messageCode Message key
+     * @param args Message arguments
+     * @return Message body filled with arguments
+     */
+    public String getMessage(String messageCode, Object[] args) {
+        return messages.getMessage(messageCode, args, null);
+    }
+    
 }

@@ -73,7 +73,8 @@ public class KeyczarAuthenticatorTest {
     @Test
     public void getMessage() {
         HttpUriRequest request = requestFactory
-                .createGetDataSourceListingRequest();
+                .createGetDataSourceListingRequest("localnode", 
+                    "http://localhost");
         String message = classUnderTest.getMessage(request);
         assertNotNull(message);
         assertTrue(message.length() > 0);
@@ -116,6 +117,26 @@ public class KeyczarAuthenticatorTest {
         String userName = classUnderTest.getUser(request);
         assertNotNull(userName);
         assertTrue(userName.length() > 0);
+    }
+    
+    @Test
+    public void getNodeName() {
+        HttpUriRequest request = requestFactory
+                .createGetDataSourceListingRequest("localnode", 
+                    "http://localhost");
+        String nodeName = classUnderTest.getNodeName(request);
+        assertNotNull(nodeName);
+        assertEquals("localnode", nodeName);
+    }
+    
+    @Test
+    public void getNodeAddress() {
+        HttpUriRequest request = requestFactory
+                .createGetDataSourceListingRequest("localnode", 
+                    "http://localhost");
+        String nodeAddress = classUnderTest.getNodeAddress(request);
+        assertNotNull(nodeAddress);
+        assertEquals("http://localhost", nodeAddress);
     }
     
     @Test 

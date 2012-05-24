@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.subscription.model;
 
+import eu.baltrad.dex.net.model.SubscriptionManager;
+import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.db.itest.DexDBITestHelper;
 
 import org.springframework.context.support.AbstractApplicationContext;
@@ -93,6 +95,26 @@ public class SubscriptionManagerTest extends TestCase {
         assertTrue(classUnderTest.compare(expected, actual));
     }
     
+    public void testLoadByNameAndType() throws Exception {
+        Subscription expected = new Subscription();
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
+        Date date = format.parse("2012-04-24 14:00:00.00");
+        expected.setTimeStamp(new Timestamp(date.getTime()));
+        expected.setUserName("User3");
+        expected.setDataSourceName("DataSource3");
+        expected.setOperatorName("Operator3");
+        expected.setType("download");
+        expected.setActive(true);
+        expected.setSynkronized(false);
+        expected.setNodeAddress("http://baltrad.com");
+        
+        verifyDBTables(null);
+        Subscription actual = classUnderTest.load("User3", "DataSource3", 
+                "download");
+        assertNotNull(actual);
+        assertTrue(classUnderTest.compare(expected, actual));
+    }
+    
     public void testLoadByType() throws Exception {
         List<Subscription> subs = classUnderTest.load("download");
         verifyDBTables(null);
@@ -114,7 +136,7 @@ public class SubscriptionManagerTest extends TestCase {
         s.setSynkronized(false);
         s.setNodeAddress("http://test.baltrad.eu");
         
-        classUnderTest.store(s);
+        assertEquals(1, classUnderTest.store(s));
         verifyDBTables("store");
     }
     
@@ -132,7 +154,7 @@ public class SubscriptionManagerTest extends TestCase {
         s.setSynkronized(false);
         s.setNodeAddress("http://baltrad.org");
         
-        classUnderTest.update(s);
+        assertEquals(1, classUnderTest.update(s));
         verifyDBTables("update");
     }
     
@@ -140,7 +162,8 @@ public class SubscriptionManagerTest extends TestCase {
         Subscription s = new Subscription();
         s.setId(2);
         
-        classUnderTest.delete(s);
+        assertEquals(1, classUnderTest.delete(s));
         verifyDBTables("delete");   
     }
+    
 }

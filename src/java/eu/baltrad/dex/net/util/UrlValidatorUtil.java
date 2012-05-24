@@ -48,7 +48,7 @@ public class UrlValidatorUtil {
      * @param url URL address to validate.
      * @return True upon successful validation, false otherwise
      */
-    public boolean validate(String url) {
+    public boolean validate(String url) { 
         return urlValidator.isValid(url);
     }
 }

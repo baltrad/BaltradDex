@@ -1,7 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+/*******************************************************************************
+*
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+*
+* This file is part of the BaltradDex software.
+*
+* BaltradDex is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* BaltradDex is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
+*
+*******************************************************************************/
+
 package eu.baltrad.dex.net.util;
 
 import eu.baltrad.dex.datasource.model.DataSource;
@@ -21,7 +38,7 @@ import java.io.IOException;
  * @version 1.1.0
  * @since 1.1.0
  */
-public class JsonUtil {
+public class JsonUtil implements IJsonUtil {
     
     /** JSON object mapper */
     private ObjectMapper mapper;
@@ -38,7 +55,8 @@ public class JsonUtil {
      * @param dataSources Hash set containing data source objects
      * @return JSON string
      */
-    public String dataSourcesToJsonString(Set<DataSource> dataSources) {
+    public String dataSourcesToJson(Set<DataSource> dataSources) 
+            throws RuntimeException {
         StringWriter writer = new StringWriter();
         String jsonString = null;
         try {
@@ -57,7 +75,8 @@ public class JsonUtil {
      * @param jsonString JSON string
      * @return Hash set containing data source objects
      */
-    public Set<DataSource> jsonStringToDataSources(String jsonString) {
+    public Set<DataSource> jsonToDataSources(String jsonString) 
+            throws RuntimeException {
         HashSet<DataSource> dataSources = null;
         try {
             dataSources = mapper.readValue(jsonString, 

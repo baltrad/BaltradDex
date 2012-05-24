@@ -22,160 +22,291 @@
 package eu.baltrad.dex.net.controller;
 
 import eu.baltrad.dex.net.util.*;
+import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.net.model.INodeConnectionManager;
+import eu.baltrad.dex.net.model.ISubscriptionManager;
+import eu.baltrad.dex.net.model.Subscription;
+import eu.baltrad.dex.net.model.NodeConnection;
+import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.HttpResponse;
+import org.apache.commons.io.IOUtils;
 
-import org.springframework.web.servlet.mvc.Controller;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
 
+import java.util.Set;
+import java.util.HashSet;
+
+import java.io.InputStream;
+import java.io.IOException;
+
 /**
- * Post subscription requests on the server.
+ * Controls data source subscription process.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.1.0
  * @since 1.1.0
  */
-public class PostSubscriptionController implements Controller {
+@Controller
+public class PostSubscriptionController implements MessageSetter {
     
-    /** Current view */
-    private static final String SELECT_SUBSCRIPTION_VIEW = "selectsubscription";
-    /** Post subscription view */
-    private static final String POST_SUBSCRIPTION_VIEW = "postsubscription";
+    /** Initial view */
+    private static final String SUBSCRIBE_VIEW = "subscribe";
     
-    /** Data sources selected for subscription */
-    private static final String DATA_SOURCES_KEY = "data_sources_key";
-    /** URL of the target node */
-    private static final String TARGET_NODE_URL = "target_node_url";
-
-    /** Message keys */
-    private static final String INVALID_URL_MSG = "node.url.invalid";
-    private static final String INVALID_SELECTION_MSG = 
-            "datasource.selection.invalid";
-    private static final String SUBSCRIPTION_SERVER_ERROR_MSG = 
-            "subscription.server.error";
+    /** Subscription connection error key */
+    private final static String PS_HTTP_CONN_ERROR_KEY = 
+            "postsubscription.controller.http_connection_error";        
+    /** General connection error */
+    private static final String PS_GENERIC_CONN_ERROR_KEY = 
+            "postsubscription.controller.generic_connection_error"; 
+    /** Internal controller error key */
+    private static final String PS_INTERNAL_CONTROLLER_ERROR_KEY = 
+            "postsubscription.controller.internal_controller_error";
+    /** Subscription server - error message */
+    private static final String PS_SERVER_ERROR_KEY = 
+            "postsubscription.controller.subscription_server_error";
+    /** Subscription server - success message */
+    private static final String PS_SERVER_SUCCESS_MESSAGE_KEY = 
+            "postsubscription.controller.subscription_server_success";
+    /** Subscription server - partial subscription message */
+    private static final String PS_SERVER_PARTIAL_SUBSCRIPTION = 
+            "postsubscription.controller.subscription_server_partial";
+    /** Peer node name key */
+    private static final String PEER_NAME_KEY = "peer_name";
     
-    private UrlValidatorUtil urlValidator;
-    private MessageResourceUtil messages;
     private Authenticator authenticator;
+    private IHttpClientUtil httpClient;
+    private IJsonUtil jsonUtil;
+    private INodeConnectionManager nodeConnectionManager;
+    private ISubscriptionManager subscriptionManager;    
     private RequestFactory requestFactory;
-    private HttpClientUtil httpClient;
-    private JsonUtil jsonUtil;
+    private MessageResourceUtil messages;
+    private String nodeName;
+    private String nodeAddress; 
     
+    /**
+     * Default constructor.
+     */
+    public PostSubscriptionController() {
+        this.authenticator = new KeyczarAuthenticator(
+                InitAppUtil.getConf().getKeystoreDir(),
+                InitAppUtil.getConf().getNodeName());
+        this.httpClient = new HttpClientUtil(
+                InitAppUtil.getConf().getConnTimeout(), 
+                InitAppUtil.getConf().getSoTimeout());
+        this.nodeName = InitAppUtil.getConf().getNodeName();
+        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+    }
     
-    public ModelAndView handleRequest(HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        
-        ModelAndView modelAndView = new ModelAndView();
-        // validate target node URL
-        String url = request.getParameter(TARGET_NODE_URL);
-        if (!urlValidator.validate(url)) {
-            modelAndView.addObject(INVALID_URL_MSG, messages.getMessage(
-                    INVALID_URL_MSG));
-            modelAndView.setViewName(SELECT_SUBSCRIPTION_VIEW);
-        } else {
-            // Post request
-            String jsonSources = request.getParameter(DATA_SOURCES_KEY);
-            if (jsonSources != null && !jsonSources.isEmpty()) {
-                requestFactory = new DefaultRequestFactory(URI.create(url));
-                HttpUriRequest req = requestFactory
-                        .createPostSubscriptionRequest(jsonSources);
-                this.authenticator.addCredentials(req);
-
-                try {
-                    HttpResponse res = httpClient.post(req);
-                    response.setStatus(res.getStatusLine().getStatusCode()); 
-                    if (res.getStatusLine().getStatusCode() == 
-                            HttpServletResponse.SC_OK) {
-                        modelAndView.setViewName(POST_SUBSCRIPTION_VIEW);
-                    } else {
-                        modelAndView.setViewName(SELECT_SUBSCRIPTION_VIEW);
-                        modelAndView.addObject(SUBSCRIPTION_SERVER_ERROR_MSG, 
-                            messages.getMessage(SUBSCRIPTION_SERVER_ERROR_MSG));
-                    }
-                } catch (Exception e) {
-                    modelAndView.setViewName(SELECT_SUBSCRIPTION_VIEW);
-                    modelAndView.addObject(SUBSCRIPTION_SERVER_ERROR_MSG, 
-                        messages.getMessage(SUBSCRIPTION_SERVER_ERROR_MSG));
-                }
-
-            } else {
-                modelAndView.addObject(INVALID_SELECTION_MSG, 
-                        messages.getMessage(INVALID_SELECTION_MSG));
-                modelAndView.setViewName(SELECT_SUBSCRIPTION_VIEW);
-            }
-            
+    /**
+     * Constructor.
+     * @param nodeName Node name
+     * @param nodeAdress Node address
+     */
+    public PostSubscriptionController(String nodeName, String nodeAddress) {
+        this.nodeName = nodeName;
+        this.nodeAddress = nodeAddress;
+    }
+    
+    /**
+     * Sets message.
+     * @param model Model
+     * @param messageKey Message key 
+     * @param message Message 
+     */
+    public void setMessage(Model model, String messageKey, String message) {
+        model.addAttribute(messageKey, message);
+    }
+    
+    /**
+     * Sets detailed message.
+     * @param model Model
+     * @param messageKey Message key
+     * @param detailsKey Details key
+     * @param message Message
+     * @param details Detailed message
+     */
+    public void setMessage(Model model, String messageKey, String detailsKey,
+            String message, String details) 
+    {
+        model.addAttribute(messageKey, message);
+        model.addAttribute(detailsKey, details);
+    }
+    
+    /**
+     * Reads data sources from http response.
+     * @param response Http response
+     * @return Data source string
+     * @throws IOException 
+     */
+    private String readDataSources(HttpResponse response) 
+            throws InternalControllerException {
+        try {
+        InputStream is = null;
+        try {
+            is = response.getEntity().getContent();
+            return IOUtils.toString(is);
+        } finally {
+            is.close();
         }
-        return modelAndView;
+        }catch(IOException e) {
+            throw new InternalControllerException("Failed to read data " +
+                    "sources from server response");
+        }
+    }
+    
+    /**
+     * Stores local subscriptions.
+     * @param res Http response
+     * @param dataSourceString Data sources Json string
+     * @return True if subscriptions are successfully saved 
+     */
+    private boolean storeLocalSubscriptions(HttpResponse response, 
+            String dataSourceString) throws InternalControllerException{
+        try {
+            Set<DataSource> dataSources = jsonUtil
+                    .jsonToDataSources(dataSourceString);
+            boolean result = true;
+            for (DataSource ds : dataSources) {
+                Subscription requested = new Subscription(
+                    System.currentTimeMillis(), nodeName,
+                    ds.getName(), 
+                    response.getFirstHeader("Node-Name").getValue(),
+                    Subscription.SUBSCRIPTION_DOWNLOAD, true, true,
+                    response.getFirstHeader("Node-Address").getValue());
+                Subscription existing = subscriptionManager.load(
+                    nodeName, ds.getName(), Subscription.SUBSCRIPTION_DOWNLOAD);
+                if (existing == null) {
+                    if (subscriptionManager.storeNoId(requested) != 1) {
+                        result = false;
+                    }
+                } else {       
+                    requested.setId(existing.getId());
+                    if (subscriptionManager.update(requested) != 1) {
+                        result = false;
+                    }
+                }
+            }
+            return result;
+        } catch (Exception e) {
+            throw new InternalControllerException("Failed to store " 
+                    + "local subscriptions");
+        }
+    }
+    
+    /**
+     * Sends subscription request to the server.
+     * @param model Model
+     * @param peerName Peer node name
+     * @param selectedDataSources Data sources selected for subscription
+     * @return View name
+     */
+    @RequestMapping("/subscribe.htm")
+    public String subscribe(Model model,
+            @RequestParam(value="peer_name", required=true) String peerName,
+            @RequestParam(value="selected_data_sources", required=true) 
+            String[] selectedDataSources) {
         
-    }
-
-    /**
-     * @return the urlValidator
-     */
-    public UrlValidatorUtil getUrlValidator() {
-        return urlValidator;
-    }
-
-    /**
-     * @param urlValidator the urlValidator to set
-     */
-    public void setUrlValidator(UrlValidatorUtil urlValidator) {
-        this.urlValidator = urlValidator;
-    }
-
-    /**
-     * @return the messages
-     */
-    public MessageResourceUtil getMessages() {
-        return messages;
-    }
-
-    /**
-     * @param messages the messages to set
-     */
-    public void setMessages(MessageResourceUtil messages) {
-        this.messages = messages;
-    }
-
-    /**
-     * @return the jsonUtil
-     */
-    public JsonUtil getJsonUtil() {
-        return jsonUtil;
+        Set<DataSource> selectedPeerDataSources = new HashSet<DataSource>();
+        for (int i = 0; i < selectedDataSources.length; i++) {
+            String[] parms = selectedDataSources[i].split("_");
+            selectedPeerDataSources.add(new DataSource(
+                    Integer.parseInt(parms[0]), parms[1], parms[2]));
+        }
+        String dataSourceString = jsonUtil
+                .dataSourcesToJson(selectedPeerDataSources);
+        NodeConnection conn = nodeConnectionManager.get(peerName);
+        requestFactory = new DefaultRequestFactory(
+                URI.create(conn.getNodeAddress()));
+        HttpUriRequest req = requestFactory
+                .createPostSubscriptionRequest(nodeName, nodeAddress,
+                    dataSourceString);
+        authenticator.addCredentials(req);
+        try {
+            HttpResponse res = httpClient.post(req);
+            if (res.getStatusLine().getStatusCode() == 
+                    HttpServletResponse.SC_OK) {
+                storeLocalSubscriptions(res, readDataSources(res));
+                setMessage(model, SUCCESS_MSG_KEY, 
+                        messages.getMessage(PS_SERVER_SUCCESS_MESSAGE_KEY));
+            } else if (res.getStatusLine().getStatusCode() == 
+                    HttpServletResponse.SC_PARTIAL_CONTENT) {
+                storeLocalSubscriptions(res, readDataSources(res));
+                setMessage(model, ERROR_MSG_KEY, 
+                        messages.getMessage(PS_SERVER_PARTIAL_SUBSCRIPTION));
+            } else if (res.getStatusLine().getStatusCode() == 
+                    HttpServletResponse.SC_NOT_FOUND) {
+                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, 
+                        messages.getMessage(PS_SERVER_ERROR_KEY),
+                        res.getStatusLine().getReasonPhrase());
+            } else {       
+                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                    messages.getMessage(PS_SERVER_ERROR_KEY), 
+                    res.getStatusLine().getReasonPhrase());
+            }  
+        } catch (InternalControllerException e) {
+            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                messages.getMessage(PS_INTERNAL_CONTROLLER_ERROR_KEY), 
+                e.getMessage());
+        } catch (IOException e) {
+            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                messages.getMessage(PS_HTTP_CONN_ERROR_KEY), e.getMessage());
+        } catch (Exception e) {
+            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                messages.getMessage(PS_GENERIC_CONN_ERROR_KEY), e.getMessage());
+        }
+        model.addAttribute(PEER_NAME_KEY, peerName);
+        return SUBSCRIBE_VIEW;
     }
 
     /**
      * @param jsonUtil the jsonUtil to set
      */
-    public void setJsonUtil(JsonUtil jsonUtil) {
+    @Autowired
+    public void setJsonUtil(IJsonUtil jsonUtil) {
         this.jsonUtil = jsonUtil;
     }
 
     /**
-     * @return the httpClient
+     * @param nodeConnectionManager the nodeConnectionManager to set
      */
-    public HttpClientUtil getHttpClient() {
-        return httpClient;
+    @Autowired
+    public void setNodeConnectionManager(
+            INodeConnectionManager nodeConnectionManager) {
+        this.nodeConnectionManager = nodeConnectionManager;
+    }
+
+    /**
+     * @param messages the messages to set
+     */
+    @Autowired
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
+    }
+
+    /**
+     * @param subscriptionManager the subscriptionManager to set
+     */
+    @Autowired
+    public void setSubscriptionManager(ISubscriptionManager subscriptionManager) 
+    {
+        this.subscriptionManager = subscriptionManager;
     }
 
     /**
      * @param httpClient the httpClient to set
      */
-    public void setHttpClient(HttpClientUtil httpClient) {
+    public void setHttpClient(IHttpClientUtil httpClient) {
         this.httpClient = httpClient;
-    }
-
-    /**
-     * @return the authenticator
-     */
-    public Authenticator getAuthenticator() {
-        return authenticator;
     }
 
     /**
