@@ -128,8 +128,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * Constructor.
      */
     public FrameDispatcherController() {
-        System.out.println("_________ FDC constructor ");
-        
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     /**
@@ -141,9 +139,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @return ModelAndView object
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response ) {
-        
-        System.out.println("_________ FDC handle request ");
-        
         doGet( request, response );
         return new ModelAndView();
     }
@@ -155,9 +150,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      */
     @Override
     public void doGet( HttpServletRequest request, HttpServletResponse response ) {
-        
-        System.out.println("_________ FDC request received ");
-        
         // Create new session to avoid comitting response too early 
         HttpSession session = request.getSession(true);
         // Parse incoming baltrad frame
@@ -177,9 +169,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         }
         // Handle subscription synchronization request
         if (Frame.getRequestType(parms).equals(BF_POST_SUBSCRIPTION_SYNC_REQUEST)) {
-            
-            System.out.println("_________ FDC subscription sync request received ");
-            
             handleSubscriptionSyncRequest(parms, response);
         }
         // Handle subscription update request
@@ -195,43 +184,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
             handleMessageDeliveryRequest(parms, request);
         }
     }
-    /**
-     * Handles certificate post request.
-     * 
-     * @param parms Request parameters
-     * @param response HTTP response
-     *
-    private void handleCertRequest(HashMap parms, HttpServletResponse response) {
-        if (authenticate(ServletContextUtil.getServletContextPath() 
-                + InitAppUtil.KS_FILE_PATH,
-                InitAppUtil.getConf().getKeystoreDir(), Frame.getNodeName(parms), 
-                Frame.getSignature(parms), Frame.getTimestamp(parms))) {
-            try {
-                String msg = "";
-                msg = "New certificate received from " + Frame.getNodeName(parms);
-                log.info(msg);
-                // create user account
-                User user = null;
-                if ((user = userManager.getByName(Frame.getNodeName(parms))) == null) {
-                    // Create user with just a name and address 
-                    user = new User(Frame.getNodeName(parms), User.ROLE_PEER,
-                            Frame.getLocalUri(parms));
-                    userManager.saveOrUpdatePeer(user);
-                    log.warn("New peer account created: " + user.getName());
-                }
-                // Set node name as response header
-                addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
-            } catch(Exception e) {
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                log.error("Failed to save certificate configuration", e);
-            }
-        } else { 
-            log.error("Failed to authenticate frame");
-            // Set node name as response header
-            addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        }
-    }
+    
     /**
      * Handles data source listing request
      * 
