@@ -25,6 +25,7 @@ import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.net.model.*;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.log.model.MessageLogger;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -42,6 +43,7 @@ import org.apache.http.ProtocolVersion;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -83,6 +85,7 @@ public class PostSubscriptionControllerTest {
     private INodeConnectionManager nodeConnectionManagerMock;
     private ISubscriptionManager subscriptionManagerMock;
     private MessageResourceUtil messages;
+    private Logger log;
     private JsonUtil jsonUtil;
     
     @Before
@@ -94,6 +97,8 @@ public class PostSubscriptionControllerTest {
         classUnderTest.setAuthenticator(new EasyAuthenticator());
         messages = new MessageResourceUtil("resources/messages");
         classUnderTest.setMessages(messages);
+        log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        classUnderTest.setLog(log);
         
         httpClientMock = createMock(IHttpClientUtil.class);
         nodeConnectionManagerMock = createMock(INodeConnectionManager.class);
@@ -146,7 +151,8 @@ public class PostSubscriptionControllerTest {
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
-                "postsubscription.controller.http_connection_error"),
+                "postsubscription.controller.http_connection_error",
+                new String[] {"test.baltrad.eu"}),
                 model.asMap().get("error_message"));
         assertTrue(model.containsAttribute("error_details"));
         assertEquals("Http connection error", 
@@ -172,7 +178,8 @@ public class PostSubscriptionControllerTest {
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
-                "postsubscription.controller.generic_connection_error"),
+                "postsubscription.controller.generic_connection_error",
+                new String[] {"test.baltrad.eu"}),
                 model.asMap().get("error_message"));
         assertTrue(model.containsAttribute("error_details"));
         assertEquals("Generic connection error", 
@@ -201,7 +208,8 @@ public class PostSubscriptionControllerTest {
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
-                "postsubscription.controller.subscription_server_error"),
+                "postsubscription.controller.subscription_server_error",
+                new String[] {"test.baltrad.eu"}),
                 model.asMap().get("error_message"));
         assertTrue(model.containsAttribute("error_details"));
         assertEquals("Internal server error", 
@@ -229,10 +237,11 @@ public class PostSubscriptionControllerTest {
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
-                "postsubscription.controller.internal_controller_error"), 
+                "postsubscription.controller.internal_controller_error",
+                new String[] {"test.baltrad.eu"}), 
                 model.asMap().get("error_message"));
         assertTrue(model.containsAttribute("error_details"));
-        assertEquals("Failed to store local subscriptions",
+        assertEquals("Failed to convert JSON string to data sources",
                 model.asMap().get("error_details"));
         
         verify(httpClientMock);
@@ -257,7 +266,8 @@ public class PostSubscriptionControllerTest {
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
-                "postsubscription.controller.subscription_server_error"),
+                "postsubscription.controller.subscription_server_error",
+                new String[] {"test.baltrad.eu"}),
                 model.asMap().get("error_message"));
         assertTrue(model.containsAttribute("error_details"));
         assertEquals("Subscription error", model.asMap().get("error_details"));
@@ -289,7 +299,8 @@ public class PostSubscriptionControllerTest {
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
-                "postsubscription.controller.subscription_server_partial"), 
+                "postsubscription.controller.subscription_server_partial",
+                new String[] {"test.baltrad.eu"}), 
                 model.asMap().get("error_message"));
         assertNotNull(getResponseBody(response));
         assertEquals(JSON_SOURCES_PARTIAL, getResponseBody(response));
@@ -327,7 +338,8 @@ public class PostSubscriptionControllerTest {
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("success_message"));
         assertEquals(messages.getMessage(
-                "postsubscription.controller.subscription_server_success"), 
+                "postsubscription.controller.subscription_server_success",
+                new String[] {"test.baltrad.eu"}), 
                 model.asMap().get("success_message"));
         assertNotNull(getResponseBody(response));
         assertEquals(JSON_SOURCES_OK, getResponseBody(response));

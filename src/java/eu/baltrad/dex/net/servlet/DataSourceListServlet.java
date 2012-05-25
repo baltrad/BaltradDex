@@ -53,9 +53,10 @@ import java.util.HashSet;
  * @since 1.1.0
  */
 public class DataSourceListServlet extends HttpServlet implements Controller {
-    
+    /** Unauthorized request error key */
     private static final String DS_UNAUTHORIZED_REQUEST_KEY = 
             "datasource.server.unauthorized_request";
+    /** Internal server error key */
     private static final String DS_INTERNAL_SERVER_ERROR_KEY = 
             "datasource.server.internal_server_error";
     
@@ -141,11 +142,12 @@ public class DataSourceListServlet extends HttpServlet implements Controller {
                 }
             } else {
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
-                    messages.getMessage(DS_UNAUTHORIZED_REQUEST_KEY));
+                        messages.getMessage(DS_UNAUTHORIZED_REQUEST_KEY));
             }
         } catch (Exception e) {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    messages.getMessage(DS_INTERNAL_SERVER_ERROR_KEY));
+                    messages.getMessage(DS_INTERNAL_SERVER_ERROR_KEY,
+                        new String[] {e.getMessage()}));
         }
     }
 

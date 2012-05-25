@@ -123,7 +123,7 @@ public class DataSourceListServletTest {
         expect(userManagerMock.getByName("test.baltrad.eu")).andReturn(null)
                 .anyTimes();
         expect(userManagerMock.saveOrUpdatePeer(isA(User.class)))
-                .andThrow(new Exception()).anyTimes();
+                .andThrow(new Exception("Internal server error")).anyTimes();
         replay(userManagerMock);
         
         classUnderTest.setAuthenticator(authMock);
@@ -135,7 +135,8 @@ public class DataSourceListServletTest {
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 response.getStatus());
         assertEquals(
-                messages.getMessage("datasource.server.internal_server_error"), 
+                messages.getMessage("datasource.server.internal_server_error",
+                    new String[] {"Internal server error"}), 
                 response.getErrorMessage());
         reset(authMock);
         reset(userManagerMock);

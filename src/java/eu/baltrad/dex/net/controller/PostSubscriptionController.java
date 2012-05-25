@@ -29,6 +29,7 @@ import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.net.model.NodeConnection;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.log.model.MessageLogger;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,7 @@ import org.springframework.ui.Model;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.HttpResponse;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -75,7 +77,7 @@ public class PostSubscriptionController implements MessageSetter {
     private static final String PS_SERVER_ERROR_KEY = 
             "postsubscription.controller.subscription_server_error";
     /** Subscription server - success message */
-    private static final String PS_SERVER_SUCCESS_MESSAGE_KEY = 
+    private static final String PS_SERVER_SUCCESS_KEY = 
             "postsubscription.controller.subscription_server_success";
     /** Subscription server - partial subscription message */
     private static final String PS_SERVER_PARTIAL_SUBSCRIPTION = 
@@ -90,6 +92,8 @@ public class PostSubscriptionController implements MessageSetter {
     private ISubscriptionManager subscriptionManager;    
     private RequestFactory requestFactory;
     private MessageResourceUtil messages;
+    private Logger log;
+    
     private String nodeName;
     private String nodeAddress; 
     
@@ -105,6 +109,7 @@ public class PostSubscriptionController implements MessageSetter {
                 InitAppUtil.getConf().getSoTimeout());
         this.nodeName = InitAppUtil.getConf().getNodeName();
         this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
     /**
@@ -159,8 +164,7 @@ public class PostSubscriptionController implements MessageSetter {
             is.close();
         }
         }catch(IOException e) {
-            throw new InternalControllerException("Failed to read data " +
-                    "sources from server response");
+            throw new InternalControllerException(e.getMessage());
         }
     }
     
@@ -198,8 +202,7 @@ public class PostSubscriptionController implements MessageSetter {
             }
             return result;
         } catch (Exception e) {
-            throw new InternalControllerException("Failed to store " 
-                    + "local subscriptions");
+            throw new InternalControllerException(e.getMessage());
         }
     }
     
@@ -235,34 +238,55 @@ public class PostSubscriptionController implements MessageSetter {
             HttpResponse res = httpClient.post(req);
             if (res.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_OK) {
+                String okMsg = messages.getMessage(PS_SERVER_SUCCESS_KEY,
+                        new String[] {peerName});        
                 storeLocalSubscriptions(res, readDataSources(res));
-                setMessage(model, SUCCESS_MSG_KEY, 
-                        messages.getMessage(PS_SERVER_SUCCESS_MESSAGE_KEY));
+                setMessage(model, SUCCESS_MSG_KEY, okMsg);
+                log.warn(okMsg);
             } else if (res.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_PARTIAL_CONTENT) {
+                String errorMsg = messages.getMessage(
+                    PS_SERVER_PARTIAL_SUBSCRIPTION, new String[] {peerName});    
                 storeLocalSubscriptions(res, readDataSources(res));
-                setMessage(model, ERROR_MSG_KEY, 
-                        messages.getMessage(PS_SERVER_PARTIAL_SUBSCRIPTION));
+                setMessage(model, ERROR_MSG_KEY, errorMsg);
+                log.error(errorMsg);
             } else if (res.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_NOT_FOUND) {
-                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, 
-                        messages.getMessage(PS_SERVER_ERROR_KEY),
-                        res.getStatusLine().getReasonPhrase());
-            } else {       
-                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                    messages.getMessage(PS_SERVER_ERROR_KEY), 
-                    res.getStatusLine().getReasonPhrase());
+                String errorMsg = messages.getMessage(PS_SERVER_ERROR_KEY,
+                        new String[] {peerName});
+                String errorDetails = res.getStatusLine().getReasonPhrase();
+                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                        errorDetails);      
+                log.error(errorMsg + ": " + errorDetails);
+            } else {
+                String errorMsg = messages.getMessage(PS_SERVER_ERROR_KEY,
+                        new String[] {peerName});
+                String errorDetails = res.getStatusLine().getReasonPhrase();
+                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                        errorDetails);
+                log.error(errorMsg + ": " + errorDetails);
             }  
         } catch (InternalControllerException e) {
-            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                messages.getMessage(PS_INTERNAL_CONTROLLER_ERROR_KEY), 
-                e.getMessage());
+            String errorMsg = messages.getMessage(
+                    PS_INTERNAL_CONTROLLER_ERROR_KEY, new String[] {peerName}); 
+            String errorDetails = e.getMessage();
+            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                    errorDetails);
+            log.error(errorMsg + ": " + errorDetails);
         } catch (IOException e) {
-            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                messages.getMessage(PS_HTTP_CONN_ERROR_KEY), e.getMessage());
+            String errorMsg = messages.getMessage(
+                    PS_HTTP_CONN_ERROR_KEY, new String[] {peerName});
+            String errorDetails = e.getMessage();
+            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                    errorDetails);
+            log.error(errorMsg + ": " + errorDetails);
         } catch (Exception e) {
-            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                messages.getMessage(PS_GENERIC_CONN_ERROR_KEY), e.getMessage());
+            String errorMsg = messages.getMessage(
+                    PS_GENERIC_CONN_ERROR_KEY, new String[] {peerName});
+            String errorDetails = e.getMessage();
+            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                    errorDetails);
+            log.error(errorMsg + ": " + errorDetails);
         }
         model.addAttribute(PEER_NAME_KEY, peerName);
         return SUBSCRIBE_VIEW;
@@ -314,6 +338,13 @@ public class PostSubscriptionController implements MessageSetter {
      */
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
+    }
+
+    /**
+     * @param log the log to set
+     */
+    public void setLog(Logger log) {
+        this.log = log;
     }
     
 }

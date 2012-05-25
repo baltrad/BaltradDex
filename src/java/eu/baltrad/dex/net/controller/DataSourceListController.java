@@ -26,6 +26,7 @@ import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.net.model.*;
+import eu.baltrad.dex.log.model.MessageLogger;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +37,12 @@ import org.springframework.ui.Model;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.HttpResponse;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
@@ -70,14 +71,14 @@ public class DataSourceListController implements MessageSetter {
     private static final String PEER_NAME_KEY = "peer_name";
     
     /** Invalid URL address message key */
-    private static final String INVALID_URL_MSG_KEY = 
+    private static final String DS_INVALID_NODE_URL_KEY = 
             "datasource.controller.invalid_node_url";
-    /** Data source read error message key */
-    private static final String DS_READ_ERROR_KEY = 
-            "datasource.controller.datasource_read_error";
+    /** Internal controller error message key */
+    private static final String DS_INTERNAL_CONTROLLER_ERROR_KEY = 
+            "datasource.controller.internal_controller_error";
     /** Data source server error key */
-    private static final String DS_SERVER_ERROR_KEY = 
-            "datasource.controller.datasource_server_error";
+    private static final String DS_INTERNAL_SERVER_ERROR_KEY = 
+            "datasource.controller.internal_server_error";
     /** Data source connection error key */
     private final static String DS_HTTP_CONN_ERROR_KEY = 
             "datasource.controller.http_connection_error";        
@@ -92,11 +93,13 @@ public class DataSourceListController implements MessageSetter {
     private IHttpClientUtil httpClient;
     private IJsonUtil jsonUtil;
     private MessageResourceUtil messages;
+    private Logger log;
     private String nodeName;
     private String nodeAddress;
     
     /** These variables are shared between methods */
     private String peerNodeName;
+    private String peerNodeAddress;
     private Set<DataSource> peerDataSources;
     
     /**
@@ -121,6 +124,7 @@ public class DataSourceListController implements MessageSetter {
                 InitAppUtil.getConf().getSoTimeout());
         this.nodeName = InitAppUtil.getConf().getNodeName();
         this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
     /**
@@ -146,6 +150,29 @@ public class DataSourceListController implements MessageSetter {
     {
         model.addAttribute(messageKey, message);
         model.addAttribute(detailsKey, details);
+    }
+    
+    /**
+     * Reads data sources from http response.
+     * @param response Http response
+     * @return Data source string
+     * @throws IOException 
+     */
+    private Set<DataSource> readDataSources(HttpResponse response) 
+            throws InternalControllerException {
+        try {
+            InputStream is = null;
+            try {
+                is = response.getEntity().getContent();
+                return jsonUtil.jsonToDataSources(IOUtils.toString(is));
+            } finally {
+                is.close();
+            }
+        } catch (IOException e) {
+            throw new InternalControllerException(e.getMessage());
+        } catch (RuntimeException e) {
+            throw new InternalControllerException(e.getMessage());
+        }
     }
     
     /**
@@ -181,7 +208,7 @@ public class DataSourceListController implements MessageSetter {
         String url = urlValidator.validate(urlInput) ? urlInput : urlSelect;
         if (!urlValidator.validate(url)) {
             setMessage(model, ERROR_MSG_KEY,
-                       messages.getMessage(INVALID_URL_MSG_KEY));
+                       messages.getMessage(DS_INVALID_NODE_URL_KEY));
             viewName = DS_CONNECT_VIEW;
         } else {
             // Post request if URL was successfully validated 
@@ -196,7 +223,7 @@ public class DataSourceListController implements MessageSetter {
                         HttpServletResponse.SC_OK) {
                     // Make peer node name available for other methods
                     peerNodeName = res.getFirstHeader("Node-Name").getValue();
-                    String peerNodeAddress = 
+                    peerNodeAddress = 
                             res.getFirstHeader("Node-Address").getValue();
                     model.addAttribute(PEER_NAME_KEY, peerNodeName);
                     // Add connection to the list
@@ -205,50 +232,45 @@ public class DataSourceListController implements MessageSetter {
                                 peerNodeAddress);
                         nodeConnectionManager.saveOrUpdate(conn);
                     }
-                    String jsonSources = "";
-                    // Read data sources list from string
-                    try {
-                        StringWriter writer = new StringWriter();
-                        InputStream is = null;
-                        try {
-                            is = res.getEntity().getContent();
-                            IOUtils.copy(is, writer);
-                            jsonSources = writer.toString();
-                        } finally {
-                            writer.close();
-                            is.close();
-                        }
-                        Set<DataSource> sources = jsonUtil
-                                .jsonToDataSources(jsonSources); 
-                        viewName = DS_CONNECTED_VIEW;
-                        model.addAttribute(DATA_SOURCES_KEY, sources);
-                        // Make data sources available for other methods
-                        peerDataSources = sources;
-                    // Handle data source read errors    
-                    } catch (Exception e) {
-                        viewName = DS_CONNECT_VIEW;
-                        setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                                messages.getMessage(DS_READ_ERROR_KEY),
-                                e.getMessage());
-                    }
+                    // Make data sources available for other methods
+                    peerDataSources = readDataSources(res);
+                    viewName = DS_CONNECTED_VIEW;
+                    model.addAttribute(DATA_SOURCES_KEY, peerDataSources);
                 // Server failed to respond, retrieve error message      
                 } else {
                     viewName = DS_CONNECT_VIEW;
+                    String errorMsg = messages.getMessage(
+                        DS_INTERNAL_SERVER_ERROR_KEY);
+                    String errorDetails = res.getStatusLine().getReasonPhrase(); 
                     setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                            messages.getMessage(DS_SERVER_ERROR_KEY), 
-                            res.getStatusLine().getReasonPhrase());
+                            errorMsg, errorDetails);
+                    log.error(errorMsg + ": " + errorDetails);
                 }
-            // Handle httpclient exceptions
+            } catch (InternalControllerException e) {
+                 viewName = DS_CONNECT_VIEW;
+                 String errorMsg = messages.getMessage(
+                     DS_INTERNAL_CONTROLLER_ERROR_KEY, 
+                     new String[] {peerNodeName});
+                 String errorDetails = e.getMessage();
+                 setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                        errorMsg, errorDetails);
+                 log.error(errorMsg + ": " + errorDetails);
             } catch (IOException e) {
                 viewName = DS_CONNECT_VIEW;
+                String errorMsg = messages.getMessage(DS_HTTP_CONN_ERROR_KEY,
+                        new String[] {url});
+                String errorDetails = e.getMessage();
                 setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                    messages.getMessage(DS_HTTP_CONN_ERROR_KEY), 
-                    e.getMessage());
+                        errorMsg, errorDetails);
+                log.error(errorMsg + ": " + errorDetails);
             } catch (Exception e) {
                 viewName = DS_CONNECT_VIEW;
+                String errorMsg = messages.getMessage(DS_GENERIC_CONN_ERROR_KEY,
+                        new String[] {url});
+                String errorDetails = e.getMessage();
                 setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                    messages.getMessage(DS_GENERIC_CONN_ERROR_KEY), 
-                    e.getMessage());
+                        errorMsg, errorDetails);
+                log.error(errorMsg + ": " + errorDetails);
             }
         }
         model.addAttribute(CONNECTIONS_KEY, nodeConnectionManager.get());
@@ -328,6 +350,13 @@ public class DataSourceListController implements MessageSetter {
      */
     public void setHttpClient(IHttpClientUtil httpClient) {
         this.httpClient = httpClient;
+    }
+
+    /**
+     * @param log the log to set
+     */
+    public void setLog(Logger log) {
+        this.log = log;
     }
     
 }

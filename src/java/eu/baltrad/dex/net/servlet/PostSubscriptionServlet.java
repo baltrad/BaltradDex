@@ -67,7 +67,7 @@ public class PostSubscriptionServlet extends HttpServlet implements Controller {
             "postsubscription.server.subscription_success";
     private static final String PS_SUBSCRIPTION_FAILURE_KEY = 
             "postsubscription.server.subscription_failure";
-    private static final String PS_SUBSCRIPTION_GENERIC_ERROR = 
+    private static final String PS_GENERIC_SUBSCRIPTION_ERROR = 
             "postsubscription.server.generic_subscription_error";
     
     private Authenticator authenticator;
@@ -141,7 +141,7 @@ public class PostSubscriptionServlet extends HttpServlet implements Controller {
     }
     
     /**
-     * Stores subscriptions requested by peers.
+     * Stores subscriptions requested by peer.
      * @param request Http request
      * @param requestedDataSources Requested data sources
      * @return Subscribed data sources
@@ -229,7 +229,7 @@ public class PostSubscriptionServlet extends HttpServlet implements Controller {
                     res.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
                 } else {
                     res.setStatus(HttpServletResponse.SC_NOT_FOUND,
-                        messages.getMessage(PS_SUBSCRIPTION_GENERIC_ERROR));
+                        messages.getMessage(PS_GENERIC_SUBSCRIPTION_ERROR));
                 }
             } else {
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 

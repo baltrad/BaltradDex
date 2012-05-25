@@ -25,6 +25,7 @@ import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.net.model.*;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.log.model.MessageLogger;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,6 +41,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.log4j.Logger;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -72,6 +74,7 @@ public class DataSourceListControllerTest {
     private DataSourceListController classUnderTest;
     private INodeConnectionManager connectionManagerMock;
     private IHttpClientUtil httpClientMock;
+    private Logger log;
     
     @Before
     public void setUp() throws Exception {
@@ -83,6 +86,8 @@ public class DataSourceListControllerTest {
         jsonUtil = new JsonUtil(); 
         messages = new MessageResourceUtil("resources/messages");
         classUnderTest.setMessages(messages);
+        log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        classUnderTest.setLog(log);
         
         connectionManagerMock = createMock(INodeConnectionManager.class);
         expect(connectionManagerMock.get("test.baltrad.eu"))
@@ -131,7 +136,7 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void dsConnected_ServerError() throws Exception {
+    public void dsConnected_InternalServerError() throws Exception {
         HttpResponse res = createResponse(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 "Internal server error");
@@ -149,7 +154,8 @@ public class DataSourceListControllerTest {
         assertEquals("dsconnect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
-            messages.getMessage("datasource.controller.datasource_server_error"), 
+            messages.getMessage(
+                "datasource.controller.internal_server_error"), 
             model.asMap().get("error_message"));
         assertTrue(model.containsAttribute("error_details"));
         assertEquals("Internal server error", model.asMap()
@@ -172,7 +178,8 @@ public class DataSourceListControllerTest {
         assertEquals("dsconnect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
-            messages.getMessage("datasource.controller.http_connection_error"), 
+            messages.getMessage("datasource.controller.http_connection_error",
+                new String[] {"http://test.baltrad.eu"}), 
             model.asMap().get("error_message"));
         assertTrue(model.containsAttribute("error_details"));
         assertEquals("Http connection exception", model.asMap()
@@ -196,8 +203,9 @@ public class DataSourceListControllerTest {
         assertEquals("dsconnect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
-                "datasource.controller.generic_connection_error"), 
-                model.asMap().get("error_message"));
+                "datasource.controller.generic_connection_error",
+                new String[] {"http://test.baltrad.eu"}), 
+            model.asMap().get("error_message"));
         assertTrue(model.containsAttribute("error_details"));
         assertEquals("Generic connection exception", model.asMap()
                 .get("error_details"));
@@ -205,7 +213,7 @@ public class DataSourceListControllerTest {
     }
 
     @Test
-    public void dsConnected_DataSourceReadError() throws Exception {
+    public void dsConnected_InternalControllerError() throws Exception {
         HttpResponse res = createResponse(HttpServletResponse.SC_OK, "OK");
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andReturn(res).anyTimes();
@@ -226,8 +234,10 @@ public class DataSourceListControllerTest {
         assertEquals("dsconnect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
-                messages.getMessage("datasource.controller.datasource_read_error"), 
-                model.asMap().get("error_message"));
+                messages.getMessage(
+                    "datasource.controller.internal_controller_error", 
+                    new String[] {"test.baltrad.eu"}), 
+            model.asMap().get("error_message"));
         assertTrue(model.containsAttribute("error_details"));
         assertEquals("Data source read error", model.asMap()
                 .get("error_details"));
