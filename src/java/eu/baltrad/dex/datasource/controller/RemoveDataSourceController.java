@@ -51,11 +51,11 @@ import java.util.Collections;
 public class RemoveDataSourceController extends MultiActionController {
 //---------------------------------------------------------------------------------------- Constants
     /** Select remove data source view */
-    private static final String DS_SELECT_REMOVE_VIEW = "dsSelectRemove";
+    private static final String DS_SELECT_REMOVE_VIEW = "remove_datasource";
     /** Data source selection view */
-    private static final String DS_TO_REMOVE_VIEW = "dsToRemove";
+    private static final String DS_TO_REMOVE_VIEW = "remove_selected_datasource";
     /** Remove data source view */
-    private static final String DS_REMOVE_VIEW = "dsRemove";
+    private static final String DS_REMOVE_VIEW = "remove_datasource_status";
     /** Data sources list model key */
     private static final String DS_SELECT_REMOVE_KEY = "dataSources";
     /** Submit button key */
@@ -87,7 +87,8 @@ public class RemoveDataSourceController extends MultiActionController {
      * @param response Current HTTP response
      * @return The prepared model and view
      */
-    public ModelAndView dsSelectRemove( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView remove_datasource( HttpServletRequest request, 
+            HttpServletResponse response ) {
         List<DataSource> dataSources = dataSourceManager.getDataSources();
         Collections.sort( dataSources );
         return new ModelAndView( DS_SELECT_REMOVE_VIEW, DS_SELECT_REMOVE_KEY, dataSources );
@@ -99,7 +100,8 @@ public class RemoveDataSourceController extends MultiActionController {
      * @param response Current HTTP response
      * @return The prepared model and view
      */
-    public ModelAndView dsToRemove( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView remove_selected_datasource( HttpServletRequest request, 
+            HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         Map parameterMap = request.getParameterMap();
         String[] parameterValues = null;
@@ -133,7 +135,8 @@ public class RemoveDataSourceController extends MultiActionController {
      * @param response Current HTTP response
      * @return The prepared model and view
      */
-    public ModelAndView dsRemove( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView remove_datasource_status( HttpServletRequest request, 
+            HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         Map parameterMap = request.getParameterMap();
         String[] parameterValues = null;

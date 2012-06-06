@@ -23,7 +23,7 @@ package eu.baltrad.dex.db.controller;
 
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.util.ApplicationSecurityManager;
+import eu.baltrad.dex.auth.util.SecurityManager;
 
 import eu.baltrad.bdb.FileCatalog;
 
@@ -73,7 +73,8 @@ public class BltFileDownloadController implements Controller {
      */
     public ModelAndView handleRequest(HttpServletRequest request, 
             HttpServletResponse response) {
-        User user = (User) ApplicationSecurityManager.getUser(request);
+        User user = (User) SecurityManager.getSessionUser(
+                request.getSession());
         ServletContext servletContext = request.getSession().getServletContext();
         String entryUuid = request.getParameter(ENTRY_UUID);
         File fi = fileCatalog.getLocalPathForUuid(UUID.fromString(entryUuid));

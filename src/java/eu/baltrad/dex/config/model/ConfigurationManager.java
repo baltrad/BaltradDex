@@ -137,7 +137,7 @@ public class ConfigurationManager {
      * Constructor
      */
     public ConfigurationManager() {
-        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );   
     }
     /**
      * Loads properties from files into hash map object.

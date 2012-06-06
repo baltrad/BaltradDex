@@ -49,7 +49,7 @@ Author     : szewczenko
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>BALTRAD | Log in</title>
+        <title>BALTRAD | Login</title>
     </head>
     <body>
         <div id="bltcontainer">
@@ -60,8 +60,29 @@ Author     : szewczenko
                 <div class="login">
                     <c:choose>
                         <c:when test="${ init_status == 0 }">
-                            <form method="post">
-                                <%@include file="/WEB-INF/jsp/formMessages.jsp"%>
+                            <form method="post" action="<c:url value='j_spring_security_check' />">
+                                <c:if test="${not empty login_error}">
+                                    <div class="systemerror">
+                                        <div class="header">
+                                            Login failed.
+                                        </div>
+                                        <div class="message">
+                                            Invalid user credentials.
+                                        </div>
+                                    </div>
+                                    <c:set var="login_error" value="" scope="session" />
+                                </c:if>
+                                <c:if test="${not empty logout_message}">
+                                    <div class="systemmessage">
+                                        <div class="header">
+                                            Logout successful.
+                                        </div>
+                                        <div class="message">
+                                            User successfully logged out.
+                                        </div>
+                                    </div>
+                                    <c:set var="logout_message" value="" scope="session" />
+                                </c:if>  
                                 <div class="left">
                                     <div class="date">
                                         <%= dateAndTime %>
@@ -78,25 +99,23 @@ Author     : szewczenko
                                         | Log on to BALTRAD
                                     </div>
                                     <div class="username">
-                                        <form:input path="command.name"/>
+                                        <input type="text" name="j_username"/>
                                         <div class="hint">
                                             Valid account name
                                         </div>
-                                        <form:errors path="command.name" cssClass="error"/>
                                     </div>
                                     <div class="password">
-                                        <form:password path="command.password"/>
+                                        <input type="password" name="j_password"/>
                                         <div class="hint">
                                             Case-sensitive
                                         </div>
-                                        <form:errors path="command.password" cssClass="error"/>
                                     </div>
                                     <div class="buttons">
-                                        <button class="rounded" type="submit">
-                                            <span>Sign in</span>
-                                        </button>
                                         <button class="rounded" type="reset">
                                             <span>Clear</span>
+                                        </button>
+                                        <button class="rounded" type="submit">
+                                            <span>Sign in</span>
                                         </button>
                                     </div>
                                 </div>

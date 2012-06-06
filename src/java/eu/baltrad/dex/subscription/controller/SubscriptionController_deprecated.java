@@ -68,19 +68,16 @@ public class SubscriptionController_deprecated extends MultiActionController {
     private static final String ERROR_MSG = "Failed to complete subscription update. See system " +
             "log for details.";
     // view names
-    private static final String SHOW_SUBSCRIPTIONS_VIEW = "showSubscriptions";
-    private static final String SELECTED_SUBSCRIPTIONS_VIEW = "showSelectedSubscriptions";
-    private static final String SUBSCRIPTION_STATUS_VIEW = "showSubscriptionStatus";
-    private static final String REMOVE_SUBSCRIPTIONS_VIEW = "removeDownloadSubscriptions";
-    private static final String SELECT_REMOVE_SUBSCRIPTION_VIEW = "downloadSubscriptionsToRemove";
-    private static final String SUBSCRIPTION_REMOVAL_STATUS_VIEW = 
-            "downloadSubscriptionsRemovalStatus";
-    private static final String REDIRECT_VIEW = "removeDownloadSubscriptions.htm";
-    private static final String SHOW_PEERS_SUBSCRIPTIONS_VIEW = "removeUploadSubscriptions";
-    private static final String SHOW_SELECTED_PEERS_SUBSCRIPTIONS_VIEW =
-                                                                "uploadSubscriptionsToRemove";
-    private static final String SHOW_REMOVED_PEERS_SUBSCRIPTIONS_VIEW =
-                                                                "uploadSubscriptionsRemovalStatus";
+    private static final String SHOW_SUBSCRIPTIONS_VIEW = "subscription";
+    private static final String SELECTED_SUBSCRIPTIONS_VIEW = "selected_subscription";
+    private static final String SUBSCRIPTION_STATUS_VIEW = "subscription_status";
+    private static final String REMOVE_SUBSCRIPTIONS_VIEW = "remove_download";
+    private static final String SELECT_REMOVE_SUBSCRIPTION_VIEW = "remove_selected_download";
+    private static final String SUBSCRIPTION_REMOVAL_STATUS_VIEW = "remove_download_status";
+    private static final String REDIRECT_VIEW = "remove_download.htm";
+    private static final String SHOW_PEERS_SUBSCRIPTIONS_VIEW = "remove_upload";
+    private static final String SHOW_SELECTED_PEERS_SUBSCRIPTIONS_VIEW = "remove_selected_upload";
+    private static final String SHOW_REMOVED_PEERS_SUBSCRIPTIONS_VIEW = "remove_upload_status";
 //---------------------------------------------------------------------------------------- Variables
     //private ChannelManager channelManager;
     private DataSourceManager dataSourceManager;
@@ -107,7 +104,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
      * @param response Http response
      * @return Model and view containing list of all subscriptions
      */
-    public ModelAndView showSubscriptions(HttpServletRequest request, 
+    public ModelAndView subscription(HttpServletRequest request, 
             HttpServletResponse response) {
         ModelAndView modelAndView = new ModelAndView();
         List <Subscription> subscriptions = subscriptionManager.get(
@@ -155,7 +152,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
      * @param response Http response
      * @return Model and view containing list of data channels selected for subscription
      */
-    public ModelAndView showSelectedSubscriptions( HttpServletRequest request,
+    public ModelAndView selected_subscription( HttpServletRequest request,
             HttpServletResponse response ) {
         // get the list of data sources selected for subscription by the user
         String[] selDataSources = request.getParameterValues( SELECTED_DATA_SOURCES_KEY );
@@ -215,7 +212,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
      * @param response Http response
      * @return Model and view containing list of subscribed data channels
      */
-    public ModelAndView showSubscriptionStatus(HttpServletRequest request,
+    public ModelAndView subscription_status(HttpServletRequest request,
             HttpServletResponse response) {
         ModelAndView modelAndView = new ModelAndView();
         boolean result = false;
@@ -285,7 +282,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView holding list of all available channels
      */
-    public ModelAndView removeDownloadSubscriptions( HttpServletRequest request,
+    public ModelAndView remove_download( HttpServletRequest request,
             HttpServletResponse response ) {
         List subscriptions = subscriptionManager.get(
                 Subscription.SUBSCRIPTION_DOWNLOAD);
@@ -298,7 +295,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView holding list of channels selected for removal
      */
-    public ModelAndView downloadSubscriptionsToRemove( HttpServletRequest request,
+    public ModelAndView remove_selected_download( HttpServletRequest request,
             HttpServletResponse response ) {
         // get the list of channels selected for subscription by the user
         String[] selDataSources = request.getParameterValues( SELECTED_DATA_SOURCES_KEY );
@@ -354,7 +351,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView holding list of removed subscriptions
      */
-    public ModelAndView downloadSubscriptionsRemovalStatus( HttpServletRequest request,
+    public ModelAndView remove_download_status( HttpServletRequest request,
             HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         try {
@@ -381,7 +378,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView holding list peers subscriptions
      */
-    public ModelAndView removeUploadSubscriptions( HttpServletRequest request,
+    public ModelAndView remove_upload( HttpServletRequest request,
             HttpServletResponse response ) {
         List subscriptions = subscriptionManager.get(
                 Subscription.SUBSCRIPTION_UPLOAD);
@@ -395,7 +392,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView holding list of peers subscriptions selected for removal
      */
-    public ModelAndView uploadSubscriptionsToRemove( HttpServletRequest request,
+    public ModelAndView remove_selected_upload( HttpServletRequest request,
             HttpServletResponse response ) {
         // get the list of channels selected for subscription by the user
         //String[] selChannels = request.getParameterValues( SELECTED_CHANNELS_KEY );
@@ -431,7 +428,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
      * @param response HTTP response
      * @return ModelAndView
      */
-    public ModelAndView uploadSubscriptionsRemovalStatus( HttpServletRequest request,
+    public ModelAndView remove_upload_status( HttpServletRequest request,
             HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         try {

@@ -138,14 +138,14 @@ public class PostSubscriptionControllerTest {
     }
     
     @Test
-    public void subscribe_HttpConnectionError() throws Exception {
+    public void postSubscription_HttpConnectionError() throws Exception {
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andThrow(new IOException("Http connection error"));
         replay(httpClientMock);
         
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.subscribe(model, "test.baltrad.eu",
+        String viewName = classUnderTest.postSubscription(model, "test.baltrad.eu",
                 SELECTED_DATA_SOURCES);
         
         assertEquals("subscribe", viewName);
@@ -165,14 +165,14 @@ public class PostSubscriptionControllerTest {
     }
     
     @Test
-    public void subscribe_GenericConnectionError() throws Exception {
+    public void postSubscription_GenericConnectionError() throws Exception {
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andThrow(new Exception("Generic connection error"));
         replay(httpClientMock);
         
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.subscribe(model, "test.baltrad.eu",
+        String viewName = classUnderTest.postSubscription(model, "test.baltrad.eu",
                 SELECTED_DATA_SOURCES);
         
         assertEquals("subscribe", viewName);
@@ -192,7 +192,7 @@ public class PostSubscriptionControllerTest {
     }
     
     @Test
-    public void subscribe_InternalServerError() throws Exception {
+    public void postSubscription_InternalServerError() throws Exception {
         HttpResponse response = createResponse(
             HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
             "Internal server error", "");
@@ -202,7 +202,7 @@ public class PostSubscriptionControllerTest {
         
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.subscribe(model, "test.baltrad.eu",
+        String viewName = classUnderTest.postSubscription(model, "test.baltrad.eu",
                 SELECTED_DATA_SOURCES);
         
         assertEquals("subscribe", viewName);
@@ -222,7 +222,7 @@ public class PostSubscriptionControllerTest {
     }
     
     @Test
-    public void subscribe_InternalControllerError() throws Exception {
+    public void postSubscription_InternalControllerError() throws Exception {
         HttpResponse response = createResponse(HttpServletResponse.SC_OK, 
                 null, "");
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
@@ -232,7 +232,7 @@ public class PostSubscriptionControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.subscribe(model, "test.baltrad.eu",
+        String viewName = classUnderTest.postSubscription(model, "test.baltrad.eu",
                 SELECTED_DATA_SOURCES);
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("error_message"));
@@ -251,7 +251,7 @@ public class PostSubscriptionControllerTest {
     }
     
     @Test
-    public void subscribe_SubscriptionFailedError() throws Exception {
+    public void postSubscription_SubscriptionFailedError() throws Exception {
         HttpResponse response = createResponse(
             HttpServletResponse.SC_NOT_FOUND, "Subscription error", "");
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
@@ -260,7 +260,7 @@ public class PostSubscriptionControllerTest {
         
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.subscribe(model, "test.baltrad.eu",
+        String viewName = classUnderTest.postSubscription(model, "test.baltrad.eu",
                 SELECTED_DATA_SOURCES);
         
         assertEquals("subscribe", viewName);
@@ -279,7 +279,7 @@ public class PostSubscriptionControllerTest {
     }
     
     @Test
-    public void subscribe_PartialSubscriptionError() throws Exception {
+    public void postSubscription_PartialSubscriptionError() throws Exception {
         HttpResponse response = createResponse(
             HttpServletResponse.SC_PARTIAL_CONTENT, null, JSON_SOURCES_PARTIAL);
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
@@ -294,7 +294,7 @@ public class PostSubscriptionControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.subscribe(model, "test.baltrad.eu",
+        String viewName = classUnderTest.postSubscription(model, "test.baltrad.eu",
                 SELECTED_DATA_SOURCES);
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("error_message"));
@@ -318,7 +318,7 @@ public class PostSubscriptionControllerTest {
     }
     
     @Test
-    public void subscribe_OK() throws Exception {
+    public void postSubscription_OK() throws Exception {
         HttpResponse response = createResponse(HttpServletResponse.SC_OK, 
                 null, JSON_SOURCES_OK);
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
@@ -333,7 +333,7 @@ public class PostSubscriptionControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.subscribe(model, "test.baltrad.eu",
+        String viewName = classUnderTest.postSubscription(model, "test.baltrad.eu",
                 SELECTED_DATA_SOURCES);
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("success_message"));

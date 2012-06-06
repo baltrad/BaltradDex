@@ -49,11 +49,11 @@ List of adaptors
             </div>
             <div id="bltmain">
                 <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/processingTab.jsp"%>
+                    <%@include file="/WEB-INF/jsp/processing_tab.jsp"%>
                 </div>
                 <div id="tabcontent">
                     <div class="left">
-                        <%@include file="/WEB-INF/jsp/processingMenu.jsp"%>
+                        <%@include file="/WEB-INF/jsp/processing_menu.jsp"%>
                     </div>
                     <div class="right">
                         <div class="blttitle">

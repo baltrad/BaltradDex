@@ -33,10 +33,12 @@ public interface ISubscriptionManager {
     
     public Subscription load(int id);
     
-    public Subscription load(String userName, String dataSourceName, 
+    public Subscription load(String user, String dataSource, 
             String type);
     
     public List<Subscription> load(String type);
+    
+    public List<Subscription> loadOperators(String type);
     
     public int store(Subscription s);
     

@@ -40,7 +40,6 @@ public class User {
 //---------------------------------------------------------------------------------------- Variables
     private int id;
     private String name;
-    private String nameHash;
     private String roleName;
     private String password;
     private String confirmPassword;
@@ -82,7 +81,6 @@ public class User {
      * 
      * @param id
      * @param name
-     * @param nameHash
      * @param roleName
      * @param password
      * @param confirmPassword
@@ -93,12 +91,11 @@ public class User {
      * @param countryCode
      * @param nodeAddress 
      */
-    public User(int id, String name, String nameHash, String roleName, String password,
+    public User(int id, String name, String roleName, String password,
             String confirmPassword, String organizationName, String organizationUnit, 
             String localityName, String stateName, String countryCode, String nodeAddress) {
         this.id = id;
         this.name = name;
-        this.nameHash = nameHash;
         this.roleName = roleName;
         this.password = password;
         this.confirmPassword = confirmPassword;
@@ -123,12 +120,11 @@ public class User {
      * @param countryCode
      * @param nodeAddress 
      */
-    public User(int id, String name, String nameHash, String roleName, String password, 
+    public User(int id, String name, String roleName, String password, 
             String organizationName, String organizationUnit, String localityName, String stateName, 
             String countryCode, String nodeAddress ) {
         this.id = id;
         this.name = name;
-        this.nameHash = nameHash;
         this.roleName = roleName;
         this.password = password;
         this.organizationName = organizationName;
@@ -142,7 +138,6 @@ public class User {
      * 
      * 
      * @param name
-     * @param nameHash
      * @param roleName
      * @param organizationName
      * @param organizationUnit
@@ -151,11 +146,10 @@ public class User {
      * @param countryCode
      * @param nodeAddress 
      */
-    public User(String name, String nameHash, String roleName, String organizationName, 
+    public User(String name, String roleName, String organizationName, 
             String organizationUnit, String localityName, String stateName, String countryCode, 
             String nodeAddress ) {
         this.name = name;
-        this.nameHash = nameHash;
         this.roleName = roleName;
         this.organizationName = organizationName;
         this.organizationUnit = organizationUnit;
@@ -201,20 +195,6 @@ public class User {
      */
     public void setName( String name ) { this.name = name; }
     /**
-     * Gets user name as hash.
-     * 
-     * @return nameHash User name as hash
-     */
-    public String getNameHash() { return nameHash; }
-    /**
-     * Sets user name as hash.
-     * 
-     * @param name User name
-     */
-    public void setNameHash( String name ) {
-        this.nameHash = MessageDigestUtil.createHash("MD5", 16, name);
-    }
-    /**
      * Gets password.
      * 
      * @return Password
@@ -226,7 +206,7 @@ public class User {
      * @param password Password to set
      */
     public void setPassword( String password ) {
-        this.password = MessageDigestUtil.createHash("MD5", 16, password);
+        this.password = password;
     }
     /**
      * Gets confirmed password.
@@ -240,8 +220,7 @@ public class User {
      * @param confirmPassword Confirmed password to set
      */
     public void setConfirmPassword( String confirmPassword ) {
-        this.confirmPassword = MessageDigestUtil.createHash("MD5", 16,
-                confirmPassword);
+        this.confirmPassword = confirmPassword;
     }
     /**
      * @return the checked

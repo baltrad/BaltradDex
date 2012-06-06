@@ -30,11 +30,11 @@ Author     : szewczenko
 <%@page import="eu.baltrad.dex.user.model.User" %>
 
 <jsp:useBean id="securityManager" scope="session"
-             class="eu.baltrad.dex.util.ApplicationSecurityManager">
+             class="eu.baltrad.dex.auth.util.SecurityManager">
 </jsp:useBean>
 
 <%
-    User user = (User)securityManager.getUser(request);
+    User user = (User) securityManager.getSessionUser(session);
     HttpSession sess = request.getSession();
     String userName = user.getName();
     sess.setAttribute("userName", userName);

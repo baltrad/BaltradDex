@@ -149,7 +149,7 @@ public class DefaultRequestFactory implements RequestFactory {
     public HttpGet createGetDataSourceListingRequest(String nodeName, 
             String nodeAddress) {
         HttpGet httpGet = new HttpGet(
-                getRequestUri("getdatasourcelisting.htm"));
+                getRequestUri("get_datasource_listing.htm"));
         httpGet.addHeader("Node-Name", nodeName);
         httpGet.addHeader("Node-Address", nodeAddress);
         httpGet.addHeader("Content-Type", "text/html");  
@@ -164,7 +164,7 @@ public class DefaultRequestFactory implements RequestFactory {
      * @return Http GET request 
      */
     public HttpGet createGetSubscriptionRequest() {
-        HttpGet httpGet = new HttpGet(getRequestUri("getsubscription.htm"));
+        HttpGet httpGet = new HttpGet(getRequestUri("get_subscription.htm"));
         httpGet.addHeader("Content-Type", "text/html");
         httpGet.addHeader("Content-MD5", Base64.encodeBase64String(
                 httpGet.getURI().toString().getBytes()));
@@ -181,7 +181,7 @@ public class DefaultRequestFactory implements RequestFactory {
      */
     public HttpPost createPostSubscriptionRequest(String nodeName, 
             String nodeAddress, String jsonSources) {
-        HttpPost httpPost = new HttpPost(getRequestUri("postsubscription.htm"));
+        HttpPost httpPost = new HttpPost(getRequestUri("post_subscription.htm"));
         StringEntity entity = null;
         try {
             entity = new StringEntity(jsonSources);
@@ -204,7 +204,7 @@ public class DefaultRequestFactory implements RequestFactory {
      * @return Http POST request 
      */
     public HttpPost createPostFileRequest(InputStream fileContent) {
-        HttpPost httpPost = new HttpPost(getRequestUri("postfile.htm"));
+        HttpPost httpPost = new HttpPost(getRequestUri("post_file.htm"));
         byte[] bytes = null; 
         ByteArrayEntity entity = null;
         try {

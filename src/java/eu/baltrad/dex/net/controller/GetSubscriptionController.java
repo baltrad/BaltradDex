@@ -25,19 +25,25 @@ import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 
+import eu.baltrad.dex.net.model.ISubscriptionManager;
+import eu.baltrad.dex.net.model.Subscription;
+
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.HttpResponse;
 
 import org.apache.commons.io.IOUtils;
 
-import org.springframework.web.servlet.mvc.Controller;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
-import java.util.Set;
+import java.util.List;
 import java.io.StringWriter;
 import java.io.InputStream;
 import java.io.IOException;
@@ -48,24 +54,33 @@ import java.io.IOException;
  * @version 1.1.0
  * @since 1.1.0
  */
-public class GetSubscriptionController implements Controller {
+@Controller
+public class GetSubscriptionController implements MessageSetter {
     
     /** Current view */
-    private static final String GET_SUBSCRIPTION_VIEW = "getsubscription";
+    //private static final String GET_SUBSCRIPTION_VIEW = "getsubscription";
     /** Show subscription view */
-    private static final String SHOW_SUBSCRIPTION_VIEW = "showsubscription";
+    //private static final String SHOW_SUBSCRIPTION_VIEW = "showsubscription";
     
     /** Data sources selected for subscription */
-    private static final String SUBSCRIPTIONS_KEY = "subscriptions_key";
+    //private static final String SUBSCRIPTIONS_KEY = "subscriptions_key";
     /** URL of the target node */
-    private static final String TARGET_NODE_URL = "target_node_url";
+    //private static final String TARGET_NODE_URL = "target_node_url";
 
     /** Message keys */
-    private static final String INVALID_URL_MSG = "node.url.invalid";
-    private static final String SUBSCRIPTION_READ_ERROR_MSG = 
-            "datasource.read.error";
-    private static final String SUBSCRIPTION_SERVER_ERROR_MSG = 
-            "subscription.server.error";
+    //private static final String INVALID_URL_MSG = "node.url.invalid";
+    //private static final String SUBSCRIPTION_READ_ERROR_MSG = 
+    //        "datasource.read.error";
+    //private static final String SUBSCRIPTION_SERVER_ERROR_MSG = 
+    //        "subscription.server.error";
+    
+    private static final String SUBSCRIBED_PEERS_VIEW = "subscribedpeers";
+    
+    private static final String SUBSCRIPTION_BY_PEER_VIEW = "subscriptionbypeer";
+    
+    private static final String SUBSCRIBED_PEERS_KEY = "subscribed_peers";
+    
+    private ISubscriptionManager subscriptionManager;
     
     private UrlValidatorUtil urlValidator;
     private MessageResourceUtil messages;
@@ -74,7 +89,53 @@ public class GetSubscriptionController implements Controller {
     private HttpClientUtil httpClient;
     private JsonUtil jsonUtil;
     
-    public ModelAndView handleRequest(HttpServletRequest request, 
+    
+    
+    /**
+     * Sets message.
+     * @param model Model
+     * @param messageKey Message key 
+     * @param message Message 
+     */
+    public void setMessage(Model model, String messageKey, String message) {
+        model.addAttribute(messageKey, message);
+    }
+    
+    /**
+     * Sets detailed message.
+     * @param model Model
+     * @param messageKey Message key
+     * @param detailsKey Details key
+     * @param message Message
+     * @param details Detailed message
+     */
+    public void setMessage(Model model, String messageKey, String detailsKey,
+            String message, String details) 
+    {
+        model.addAttribute(messageKey, message);
+        model.addAttribute(detailsKey, details);
+    }
+    
+    
+    @RequestMapping("/subscribedpeers.htm")
+    public String subscribedPeers(Model model) {
+        List<Subscription> downloads = subscriptionManager.loadOperators(
+                Subscription.SUBSCRIPTION_DOWNLOAD);
+        model.addAttribute(SUBSCRIBED_PEERS_KEY, downloads);
+        return SUBSCRIBED_PEERS_VIEW;
+        
+    }
+    
+    @RequestMapping("/subscriptionbypeer.htm")
+    public String subscriptionByPeer(
+            @RequestParam(value="peer_name", required=true) String peerName) {
+        
+        
+        return SUBSCRIPTION_BY_PEER_VIEW;
+    }
+    
+    
+    /*public ModelAndView handleRequest(HttpServletRequest request, 
             HttpServletResponse response) throws Exception {
         
         ModelAndView modelAndView = new ModelAndView();
@@ -129,7 +190,7 @@ public class GetSubscriptionController implements Controller {
             }
         }
         return modelAndView;
-    }
+    }*/
 
     /**
      * @return the urlValidator
@@ -199,6 +260,15 @@ public class GetSubscriptionController implements Controller {
      */
     public void setJsonUtil(JsonUtil jsonUtil) {
         this.jsonUtil = jsonUtil;
+    }
+
+    /**
+     * @param subscriptionManager the subscriptionManager to set
+     */
+    @Autowired
+    public void setSubscriptionManager(ISubscriptionManager subscriptionManager) 
+    {
+        this.subscriptionManager = subscriptionManager;
     }
     
 }

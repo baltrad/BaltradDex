@@ -31,7 +31,8 @@ import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
-import org.springframework.web.servlet.mvc.Controller;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -52,7 +53,8 @@ import java.util.HashSet;
  * @version 1.1.0
  * @since 1.1.0
  */
-public class DataSourceListServlet extends HttpServlet implements Controller {
+@Controller
+public class DataSourceListServlet extends HttpServlet {
     /** Unauthorized request error key */
     private static final String DS_UNAUTHORIZED_REQUEST_KEY = 
             "datasource.server.unauthorized_request";
@@ -98,6 +100,7 @@ public class DataSourceListServlet extends HttpServlet implements Controller {
      * @param response Http servlet response
      * @return Model and view
      */
+    @RequestMapping("/get_datasource_listing.htm")
     public ModelAndView handleRequest(HttpServletRequest request, 
             HttpServletResponse response) {
         HttpSession session = request.getSession(true);

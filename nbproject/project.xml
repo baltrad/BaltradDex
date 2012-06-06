@@ -108,6 +108,18 @@
                     <file>${file.reference.easymockclassextension-2.3.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
+                <library dirs="200">
+                    <file>${file.reference.spring-security-core-2.0.7.RELEASE.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.spring-security-acl-2.0.7.RELEASE.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.spring-security-cas-client-2.0.7.RELEASE.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
             </web-module-libraries>
             <web-module-additional-libraries/>
             <source-roots>
@@ -121,12 +133,13 @@
         <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
             <config-files>
                 <config-file>web/WEB-INF/applicationContext.xml</config-file>
-                <config-file>web/WEB-INF/dispatcher-servlet.xml</config-file>
+                <config-file>web/WEB-INF/baltraddex-servlet.xml</config-file>
+                <config-file>web/WEB-INF/bdb.xml</config-file>
+                <config-file>web/WEB-INF/test.xml</config-file>
             </config-files>
             <config-file-groups>
                 <config-file-group name="Default Group">
                     <config-file>web/WEB-INF/applicationContext.xml</config-file>
-                    <config-file>web/WEB-INF/dispatcher-servlet.xml</config-file>
                 </config-file-group>
             </config-file-groups>
         </spring-data>

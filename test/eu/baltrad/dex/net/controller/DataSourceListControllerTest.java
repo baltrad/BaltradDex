@@ -117,18 +117,18 @@ public class DataSourceListControllerTest {
     } 
     
     @Test
-    public void dsConnect() {
+    public void connect2Node() {
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.dsConnect(model);
-        assertEquals("dsconnect", viewName);
+        String viewName = classUnderTest.connect2Node(model);
+        assertEquals("connect_to_node", viewName);
     }
     
     @Test
-    public void dsConnected_InvalidURL() throws Exception {
+    public void nodeConnected_InvalidURL() throws Exception {
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.dsConnected(model, null, 
+        String viewName = classUnderTest.nodeConnected(model, null, 
                 "http://invalid");
-        assertEquals("dsconnect", viewName);
+        assertEquals("connect_to_node", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
                 messages.getMessage("datasource.controller.invalid_node_url"), 
@@ -136,7 +136,7 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void dsConnected_InternalServerError() throws Exception {
+    public void nodeConnected_InternalServerError() throws Exception {
         HttpResponse res = createResponse(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 "Internal server error");
@@ -147,11 +147,11 @@ public class DataSourceListControllerTest {
         
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.dsConnected(model, null, 
+        String viewName = classUnderTest.nodeConnected(model, null, 
                 "http://test.baltrad.eu");
         
         verify(httpClientMock);
-        assertEquals("dsconnect", viewName);
+        assertEquals("connect_to_node", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
             messages.getMessage(
@@ -164,18 +164,18 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void dsConnected_HttpConnectionError() throws Exception {
+    public void nodeConnected_HttpConnectionError() throws Exception {
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
             .andThrow(new IOException("Http connection exception")).anyTimes();
         replay(httpClientMock);
         
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.dsConnected(model, null, 
+        String viewName = classUnderTest.nodeConnected(model, null, 
                 "http://test.baltrad.eu");
         
         verify(httpClientMock);
-        assertEquals("dsconnect", viewName);
+        assertEquals("connect_to_node", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
             messages.getMessage("datasource.controller.http_connection_error",
@@ -188,7 +188,7 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void dsConnected_GenericConnectionError() throws Exception {
+    public void nodeConnected_GenericConnectionError() throws Exception {
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andThrow(new Exception("Generic connection exception"))
                 .anyTimes();
@@ -196,11 +196,11 @@ public class DataSourceListControllerTest {
         
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.dsConnected(model, null, 
+        String viewName = classUnderTest.nodeConnected(model, null, 
                 "http://test.baltrad.eu");
         
         verify(httpClientMock);
-        assertEquals("dsconnect", viewName);
+        assertEquals("connect_to_node", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
                 "datasource.controller.generic_connection_error",
@@ -213,7 +213,7 @@ public class DataSourceListControllerTest {
     }
 
     @Test
-    public void dsConnected_InternalControllerError() throws Exception {
+    public void nodeConnected_InternalControllerError() throws Exception {
         HttpResponse res = createResponse(HttpServletResponse.SC_OK, "OK");
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andReturn(res).anyTimes();
@@ -226,12 +226,12 @@ public class DataSourceListControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.dsConnected(model, null,
+        String viewName = classUnderTest.nodeConnected(model, null,
                 "http://test.baltrad.eu");
         
         verify(httpClientMock);
         verify(jsonUtilMock);
-        assertEquals("dsconnect", viewName);
+        assertEquals("connect_to_node", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
                 messages.getMessage(
@@ -246,7 +246,7 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void dsConnected_URLInput() throws Exception {
+    public void nodeConnected_URLInput() throws Exception {
         HttpResponse res = createResponse(HttpServletResponse.SC_OK, "OK");
         Set<DataSource> sources = jsonUtil.jsonToDataSources(JSON_SOURCES);
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
@@ -259,12 +259,12 @@ public class DataSourceListControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.dsConnected(model, null,
+        String viewName = classUnderTest.nodeConnected(model, null,
                 "http://test.baltrad.eu");
         
         verify(httpClientMock);
         verify(jsonUtilMock);
-        assertEquals("dsconnected", viewName);
+        assertEquals("node_connected", viewName);
         assertTrue(model.containsAttribute("data_sources"));
         Set<DataSource> dataSources = (HashSet<DataSource>) 
                 model.asMap().get("data_sources");
@@ -275,7 +275,7 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void dsConnected_NodeSelect() throws Exception {
+    public void nodeConnected_NodeSelect() throws Exception {
         HttpResponse res = createResponse(HttpServletResponse.SC_OK, "OK");
         Set<DataSource> sources = jsonUtil.jsonToDataSources(JSON_SOURCES);
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
@@ -288,13 +288,13 @@ public class DataSourceListControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.dsConnected(model,
+        String viewName = classUnderTest.nodeConnected(model,
                 "test.baltrad.eu", null);
         
         verify(httpClientMock);
         verify(jsonUtilMock);
         verify(connectionManagerMock);
-        assertEquals("dsconnected", viewName);
+        assertEquals("node_connected", viewName);
         assertTrue(model.containsAttribute("data_sources"));
         Set<DataSource> dataSources = (HashSet<DataSource>) 
                 model.asMap().get("data_sources");
@@ -306,7 +306,7 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void dsConnected_URLInputAndNodeSelect() throws Exception {
+    public void nodeConnected_URLInputAndNodeSelect() throws Exception {
         HttpResponse res = createResponse(HttpServletResponse.SC_OK, "OK");
         Set<DataSource> sources = jsonUtil.jsonToDataSources(JSON_SOURCES);
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
@@ -319,13 +319,13 @@ public class DataSourceListControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.dsConnected(model,
+        String viewName = classUnderTest.nodeConnected(model,
                 "test.baltrad.eu", "http://test.baltrad.eu");
         
         verify(httpClientMock);
         verify(jsonUtilMock);
         verify(connectionManagerMock);
-        assertEquals("dsconnected", viewName);
+        assertEquals("node_connected", viewName);
         assertTrue(model.containsAttribute("data_sources"));
         Set<DataSource> dataSources = (HashSet<DataSource>) 
                 model.asMap().get("data_sources");

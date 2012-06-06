@@ -77,7 +77,6 @@ CREATE TABLE dex_users
 (
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('user_id_seq'),
     name VARCHAR(64) NOT NULL UNIQUE,
-    name_hash VARCHAR(32) UNIQUE,
     role_name VARCHAR(32) NOT NULL REFERENCES dex_roles (role),
     password VARCHAR(32),
     org_name VARCHAR(256),

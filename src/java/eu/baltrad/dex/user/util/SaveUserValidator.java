@@ -70,14 +70,14 @@ public class SaveUserValidator implements Validator {
                 "error.missing.confirmpassword" );
         }
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "organizationName", 
-                "error.missing.organization_name");
+                "error.missing.orgname");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "organizationUnit", 
-                "error.missing.organization_unit");
+                "error.missing.orgunit");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "localityName", 
-                "error.missing.locality_name");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "stateName", "error.missing.state_name");
+                "error.missing.locality");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "stateName", "error.missing.state");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "countryCode", 
-                "error.missing.country_code");
+                "error.missing.code");
         // validate node address
         if (!webValidator.validateUrl(user.getNodeAddress())) {
             errors.rejectValue("nodeAddress","error.address.invalid");
@@ -96,7 +96,7 @@ public class SaveUserValidator implements Validator {
         }
         if (user.getCountryCode().trim().length() > 0 && 
                 user.getCountryCode().trim().length() != COUNTRY_CODE_LENGTH) {
-            errors.rejectValue("countryCode", "error.field.countrycode.invalid");
+            errors.rejectValue("countryCode", "error.missing.code");
         }
     }
     /**

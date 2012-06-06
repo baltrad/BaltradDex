@@ -30,7 +30,8 @@ import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.net.model.ISubscriptionManager;
 
-import org.springframework.web.servlet.mvc.Controller;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -57,7 +58,8 @@ import java.io.IOException;
  * @version 1.1.0
  * @since 1.1.0
  */
-public class PostSubscriptionServlet extends HttpServlet implements Controller {
+@Controller
+public class PostSubscriptionServlet extends HttpServlet {
  
     private static final String PS_UNAUTHORIZED_REQUEST_KEY =
             "postsubscription.server.unauthorized_request";
@@ -195,6 +197,7 @@ public class PostSubscriptionServlet extends HttpServlet implements Controller {
      * @param response Http servlet response
      * @return Model and view
      */
+    @RequestMapping("/post_subscription.htm")
     public ModelAndView handleRequest(HttpServletRequest request, 
             HttpServletResponse response) {
         HttpSession session = request.getSession(true);

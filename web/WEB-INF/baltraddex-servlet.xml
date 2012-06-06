@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -29,173 +29,86 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
        http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
        http://www.springframework.org/schema/tx
        http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-
-    <!--
-        URLs controlled by the role based USER level http request interceptor.
-    -->
+    <!-- 
+        All non-annotated controllers should be mapped here. 
+    --> 
     <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-        <property name="interceptors">
-            <list>
-                <ref bean="userHttpRequestInterceptor"/>
-            </list>
-        </property>
         <property name="mappings">
             <props>
-                <prop key="dsShow.htm">showDataSourcesController</prop>
-                <prop key="dsFiles.htm">bltDataSourceController</prop>
-                <prop key="fileDetails.htm">bltFileDetailsController</prop>
-                <prop key="download.htm">bltFileDownloadController</prop>
-                <prop key="imagePreview.htm">bltImagePreviewController</prop>
-                <prop key="dataDownload.htm">downloadStatusController</prop>
-                <prop key="dataUpload.htm">uploadStatusController</prop>
-                <prop key="home.htm">urlFilenameController</prop>
-                <prop key="latestMessages.htm">urlFilenameController</prop>
+                <!-- User pages-->
+                <!-- @@@ deprecated, to be removed soon -->
+                <prop key="dispatch.htm">frameDispatcherController</prop>
+                <!-- @@@-->
+                <prop key="latest_messages.htm">urlFilenameController</prop>
+                <prop key="all_messages.htm">journalController</prop>
                 <prop key="logtable.htm">logTableController</prop>
-                <prop key="allMessages.htm">journalController</prop>
-                <prop key="browseFiles.htm">bltFileBrowserController</prop>
-            </props>
-        </property>
-    </bean>
-
-    <!--
-        URLs controlled by the role based PEER level http request interceptor.
-    -->
-    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-        <property name="interceptors">
-            <list>
-                <ref bean="peerHttpRequestInterceptor"/>
-            </list>
-        </property>
-        <property name="mappings">
-            <props>
-               <!--
+                <prop key="data_download.htm">downloadStatusController</prop>
+                <prop key="data_upload.htm">uploadStatusController</prop>
+                <prop key="datasources.htm">showDataSourcesController</prop>
+                <prop key="datasource_files.htm">bltDataSourceController</prop>
+                <prop key="browse_files.htm">bltFileBrowserController</prop>
+                <prop key="file_details.htm">bltFileDetailsController</prop>
                 <prop key="download.htm">bltFileDownloadController</prop>
-                <prop key="showSubscriptions.htm">subscriptionController</prop>
-                <prop key="showSelectedSubscriptions.htm">subscriptionController</prop>
-                <prop key="showSubscriptionStatus.htm">subscriptionController</prop>
-                <prop key="showRegister.htm">registerController</prop-->
-            </props>
-        </property>
-    </bean>
-
-    <!--
-        URLs controlled by the role based OPERATOR level http request interceptor.
-    -->
-    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-        <property name="interceptors">
-            <list>
-                <ref bean="operatorHttpRequestInterceptor"/>
-            </list>
-        </property>
-        <property name="mappings">
-            <props>
+                <prop key="data_preview.htm">bltImagePreviewController</prop>
+                <!-- Operator pages -->
                 <prop key="exchange.htm">urlFilenameController</prop>
                 <prop key="processing.htm">urlFilenameController</prop>
-                <prop key="showSubscriptions.htm">subscriptionController_deprecated</prop>
-                <prop key="showSelectedSubscriptions.htm">subscriptionController_deprecated</prop>
-                <prop key="showSubscriptionStatus.htm">subscriptionController_deprecated</prop>
-                <prop key="showRegister.htm">registerController</prop>
-            </props>
-        </property>
-    </bean>
-
-    <!--
-        URLs controlled by the role based ADMIN level http request interceptor.
-    -->
-    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-        <property name="interceptors">
-            <list>
-                <ref bean="adminHttpRequestInterceptor"/>
-            </list>
-        </property>
-        <property name="mappings">
-            <props>
+                <prop key="subscription.htm">subscriptionController_deprecated</prop>
+                <prop key="selected_subscription.htm">subscriptionController_deprecated</prop>
+                <prop key="subscription_status.htm">subscriptionController_deprecated</prop>
+                <prop key="registry.htm">registerController</prop>
+                <!-- Admin pages -->
                 <prop key="settings.htm">urlFilenameController</prop>
-                <prop key="nodeProperties.htm">saveConfigurationController</prop>
-                <prop key="removeMessages.htm">urlFilenameController</prop>
-                <prop key="configureMessages.htm">saveMessagesConfigurationController</prop>
-                <prop key="messagesRemovalStatus.htm">removeMessagesController</prop>
-
-                <prop key="configureRegistry.htm">saveRegistryConfigurationController</prop>
-                <prop key="removeRegisterEntries.htm">registerController</prop>
-                <prop key="registerEntriesRemovalStatus.htm">registerController</prop>
-
-                <prop key="saveAccount.htm">saveUserController</prop>
-                <prop key="editAccount.htm">editUserController</prop>
-                <prop key="saveAccountStatus">urlFilenameController</prop>
-                <prop key="removeAccount.htm">removeUserController</prop>
-                <prop key="accountToRemove.htm">removeUserController</prop>
-                <prop key="removeAccountStatus.htm">removeUserController</prop>
-                <prop key="changePassword.htm">changePasswordController</prop>
-                <prop key="changePasswordStatus">urlFilenameController</prop>
-
-                <prop key="saveRadar.htm">saveRadarController</prop>
-                <prop key="editRadar.htm">editRadarController</prop>
-                <prop key="saveRadarStatus">urlFilenameController</prop>
-                <prop key="removeRadar.htm">removeRadarController</prop>
-                <prop key="radarToRemove.htm">removeRadarController</prop>
-                <prop key="removeRadarStatus.htm">removeRadarController</prop>
-
-                <prop key="dsSaveName.htm">saveDataSourceController</prop>
-                <prop key="dsSaveRadars.htm">saveDataSourceController</prop>
-                <prop key="dsSaveFileObjects.htm">saveDataSourceController</prop>
-                <prop key="dsSaveUsers.htm">saveDataSourceController</prop>
-                <prop key="dsSaveSummary.htm">saveDataSourceController</prop>
-                <prop key="dsSave.htm">saveDataSourceController</prop>
-                <prop key="dsSelectRemove.htm">removeDataSourceController</prop>
-                <prop key="dsToRemove.htm">removeDataSourceController</prop>
-                <prop key="dsRemove.htm">removeDataSourceController</prop>
-                <prop key="dsSelectEdit.htm">editDataSourceController</prop>
-
-                <prop key="removeDownloadSubscriptions.htm">subscriptionController_deprecated</prop>
-                <prop key="downloadSubscriptionsToRemove.htm">subscriptionController_deprecated</prop>
-                <prop key="downloadSubscriptionsRemovalStatus.htm">subscriptionController_deprecated</prop>
-                <prop key="removeUploadSubscriptions.htm">subscriptionController_deprecated</prop>
-                <prop key="uploadSubscriptionsToRemove.htm">subscriptionController_deprecated</prop>
-                <prop key="uploadSubscriptionsRemovalStatus.htm">subscriptionController_deprecated</prop>
-
-                <prop key="removeNodeConnections.htm">nodeConnectionController</prop>
-                <prop key="nodeConnectionsToRemove.htm">nodeConnectionController</prop>
-                <prop key="nodeConnectionsRemovalStatus.htm">nodeConnectionController</prop>
+                <prop key="save_radar.htm">saveRadarController</prop>
+                <prop key="edit_radar.htm">editRadarController</prop>
+                <prop key="save_radar_status">urlFilenameController</prop>
+                <prop key="remove_radar.htm">removeRadarController</prop>
+                <prop key="radar_to_remove.htm">removeRadarController</prop>
+                <prop key="remove_radar_status.htm">removeRadarController</prop>
+                
+                <prop key="save_datasource.htm">saveDataSourceController</prop>
+                <prop key="save_datasource_radar.htm">saveDataSourceController</prop>
+                <prop key="save_datasource_file_object.htm">saveDataSourceController</prop>
+                <prop key="save_datasource_user.htm">saveDataSourceController</prop>
+                <prop key="save_datasource_summary.htm">saveDataSourceController</prop>
+                <prop key="save_datasource_config.htm">saveDataSourceController</prop>
+                <prop key="edit_datasource.htm">editDataSourceController</prop>
+                <prop key="remove_datasource.htm">removeDataSourceController</prop>
+                <prop key="remove_selected_datasource.htm">removeDataSourceController</prop>
+                <prop key="remove_datasource_status.htm">removeDataSourceController</prop>
+                
+                <prop key="remove_download.htm">subscriptionController_deprecated</prop>
+                <prop key="remove_upload.htm">subscriptionController_deprecated</prop>
+                <prop key="remove_selected_download.htm">subscriptionController_deprecated</prop>
+                <prop key="remove_selected_upload.htm">subscriptionController_deprecated</prop>
+                <prop key="remove_download_status.htm">subscriptionController_deprecated</prop>
+                <prop key="remove_upload_status.htm">subscriptionController_deprecated</prop>
+                
+                <prop key="configure_registry.htm">saveRegistryConfigurationController</prop>
+                <prop key="clear_registry.htm">registerController</prop>
+                <prop key="clear_registry_status.htm">registerController</prop>
+                
+                <prop key="remove_connection.htm">nodeConnectionController</prop>
+                <prop key="remove_selected_connection.htm">nodeConnectionController</prop>
+                <prop key="remove_connection_status.htm">nodeConnectionController</prop>
+                
+                <prop key="configure_messages.htm">saveMessagesConfigurationController</prop>
+                <prop key="clear_messages.htm">urlFilenameController</prop>
+                <prop key="clear_messages_status.htm">removeMessagesController</prop>
+                
+                <prop key="save_user_account.htm">saveUserController</prop>
+                <prop key="save_user_account_status.htm">urlFilenameController</prop>
+                <prop key="edit_user_account.htm">editUserController</prop>
+                <prop key="remove_user_account.htm">removeUserController</prop>
+                <prop key="remove_selected_user_account.htm">removeUserController</prop>
+                <prop key="remove_user_account_status.htm">removeUserController</prop>
+                <prop key="change_user_password.htm">changePasswordController</prop>
+                <prop key="change_user_password_status.htm">urlFilenameController</prop>
+                
+                <prop key="node_settings.htm">saveConfigurationController</prop>
             </props>
         </property>
     </bean>
-
-    <!--
-        The following URLs are not intercepted by any of the http request interceptors.
-    -->
-    <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
-        <property name="mappings">
-            <props>
-                <prop key="login.htm">loginController</prop>
-                <prop key="logout.htm">logoutController</prop>
-                <prop key="dispatch.htm">frameDispatcherController</prop>
-                <prop key="getdatasourcelisting.htm">dataSourceListServlet</prop>
-                <prop key="postsubscription.htm">postSubscriptionServlet</prop>
-            </props>
-        </property>
-    </bean>
-
-    <!--
-        USER level role based http request interceptor.
-    -->
-    <bean id="userHttpRequestInterceptor" class="eu.baltrad.dex.util.UserHttpRequestInterceptor"/>
-
-    <!--
-        PEER level role based http request interceptor.
-    -->
-    <bean id="peerHttpRequestInterceptor" class="eu.baltrad.dex.util.PeerHttpRequestInterceptor"/>
-
-    <!--
-        OPERATOR level role based http request interceptor.
-    -->
-    <bean id="operatorHttpRequestInterceptor" 
-            class="eu.baltrad.dex.util.OperatorHttpRequestInterceptor"/>
-
-    <!--
-        ADMIN level role based http request interceptor.
-    -->
-    <bean id="adminHttpRequestInterceptor" class="eu.baltrad.dex.util.AdminHttpRequestInterceptor"/>
 
     <!--
         View resolver.
@@ -219,7 +132,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="subscriptionManager"/>
         </property>
         <property name="successView">
-            <value>dataDownload</value>
+            <value>data_download</value>
         </property>
     </bean>
     <!--
@@ -231,52 +144,16 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="subscriptionManager"/>
         </property>
         <property name="successView">
-            <value>dataUpload</value>
+            <value>data_upload</value>
         </property>
     </bean>
 
     <!--
-        The signin controller.
+        Login/logout controller.
     -->
-    <bean name="loginController" class="eu.baltrad.dex.auth.controller.LoginController">
-        <property name="sessionForm">
-            <value>true</value>
-	</property>
-	<property name="formView">
-            <value>login</value>
-        </property>
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-        <property name="successView">
-            <value>redirect:home.htm</value>
-        </property>
-        <property name="commandClass">
-            <value>eu.baltrad.dex.user.model.User</value>
-        </property>
-        <property name="validator">
-            <ref bean="loginValidator"/>
-        </property>        
-    </bean>
-
-    <!--
-        Logout controller.
-    -->
-    <bean name="logoutController" class="eu.baltrad.dex.auth.controller.LogoutController">
-        <property name="successView">
-            <value>redirect:login.htm</value>
-        </property>
-     </bean>
-
-    <!--
-    The index controller.
-    -->
-    <!--bean name="indexController"
-        class="org.springframework.web.servlet.mvc.ParameterizableViewController">
-        <property name="viewName">
-            <value>hello</value>
-        </property>
-    </bean -->
+    <bean name="loginController" 
+          class="eu.baltrad.dex.auth.controller.LoginController"
+          autowire="byType"/>      
 
     <!--
         Data from data source controller.
@@ -287,7 +164,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="bltFileManager" />
         </property>
         <property name="successView">
-            <value>dsFiles</value>
+            <value>datasource_files</value>
         </property>
     </bean>
 
@@ -312,7 +189,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 	    <ref bean="fileCatalog" />
 	</property>
         <property name="successView">
-            <value>fileDetails</value>
+            <value>file_details</value>
         </property>
     </bean>
     <!--
@@ -321,10 +198,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="bltFileBrowserController"
             class="eu.baltrad.dex.db.controller.BltFileBrowserController">
         <property name="successView">
-            <value>browseFiles</value>
+            <value>browse_files</value>
         </property>
         <property name="formView">
-            <value>browseFiles</value>
+            <value>browse_files</value>
         </property>
         <property name="sessionForm">
             <value>false</value>
@@ -345,6 +222,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Subscription controller
     -->
+    <!-- @@@ deprecated, to be removed-->
     <bean name="subscriptionController_deprecated"
         class="eu.baltrad.dex.subscription.controller.SubscriptionController_deprecated">
         <property name="subscriptionManager">
@@ -372,7 +250,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="journalController" class="eu.baltrad.dex.log.controller.JournalController">
         <property name="successView">
-            <value>allMessages</value>
+            <value>all_messages</value>
         </property>
     </bean>
 
@@ -426,6 +304,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="framePublisher" class="eu.baltrad.dex.net.util.FramePublisher"/>
 
     <!-- Frame dispatcher controller -->
+    <!-- @@@ deprecated, to be removed-->
     <bean name="frameDispatcherController"
         class="eu.baltrad.dex.net.controller.FrameDispatcherController">
         <property name="userManager">
@@ -464,11 +343,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!--
-        Sign in validator.
-    -->
-    <bean name="loginValidator" class="eu.baltrad.dex.auth.util.LoginValidator"/>
-
-    <!--
         User manager.
     -->
     <bean name="userManager" class="eu.baltrad.dex.user.model.UserManager"/>
@@ -485,7 +359,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="removeMessagesController"
             class="eu.baltrad.dex.log.controller.RemoveMessagesController">
         <property name="successView">
-            <value>messagesRemovalStatus</value>
+            <value>clear_messages_status</value>
         </property>
     </bean>
     <!--
@@ -494,10 +368,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="saveMessagesConfigurationController"
             class="eu.baltrad.dex.config.controller.SaveMessagesConfigurationController">
         <property name="successView">
-            <value>redirect:configureMessages.htm</value>
+            <value>redirect:configure_messages.htm</value>
         </property>
         <property name="formView">
-            <value>configureMessages</value>
+            <value>configure_messages</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.config.model.LogConfiguration</value>
@@ -544,10 +418,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="saveRegistryConfigurationController"
             class="eu.baltrad.dex.config.controller.SaveRegistryConfigurationController">
         <property name="successView">
-            <value>redirect:configureRegistry.htm</value>
+            <value>redirect:configure_registry.htm</value>
         </property>
         <property name="formView">
-            <value>configureRegistry</value>
+            <value>configure_registry</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.config.model.LogConfiguration</value>
@@ -572,7 +446,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="editUserController" class="eu.baltrad.dex.user.controller.EditUserController">
         <property name="successView">
-            <value>editAccount</value>
+            <value>edit_user_account</value>
         </property>
         <property name="userManager">
             <ref bean="userManager"/>
@@ -584,13 +458,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="saveUserController" class="eu.baltrad.dex.user.controller.SaveUserController">
         <property name="successView">
-            <value>saveAccountStatus</value>
+            <value>save_user_account_status</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.user.model.User</value>
         </property>
         <property name="formView">
-            <value>saveAccount</value>
+            <value>save_user_account</value>
         </property>
         <property name="validator">
             <ref bean="saveUserValidator"/>
@@ -621,13 +495,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="changePasswordController"
             class="eu.baltrad.dex.user.controller.ChangePasswordController">
         <property name="successView">
-            <value>changePasswordStatus</value>
+            <value>change_user_password_status</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.user.model.Password</value>
         </property>
         <property name="formView">
-            <value>changePassword</value>
+            <value>change_user_password</value>
         </property>
         <property name="validator">
             <ref bean="changePasswordValidator"/>
@@ -661,10 +535,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="saveRadarController"
         class="eu.baltrad.dex.radar.controller.SaveRadarController">
         <property name="formView">
-            <value>saveRadar</value>
+            <value>save_radar</value>
         </property>
         <property name="successView">
-            <value>saveRadarStatus</value>
+            <value>save_radar_status</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.radar.model.Radar</value>
@@ -690,7 +564,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean name="editRadarController" class="eu.baltrad.dex.radar.controller.EditRadarController">
         <property name="successView">
-            <value>editRadar</value>
+            <value>edit_radar</value>
         </property>
         <property name="radarManager">
             <ref bean="radarManager"/>
@@ -702,14 +576,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     <bean id="removeRadarController"
         class="eu.baltrad.dex.radar.controller.RemoveRadarController">
-        <!--property name="nameResolver">
-            <ref local="nameResolver"/>
-        </property-->
         <property name="radarManager">
             <ref bean="radarManager" />
         </property>
     </bean>
-
 
     <!-- Data source list controller -->
     <bean id="dataSourceListController" 
@@ -732,14 +602,23 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- JSON format utility -->
     <bean id="jsonUtil" class="eu.baltrad.dex.net.util.JsonUtil"/>
     
-    <!-- Subscription controller -->
+    <!-- Post subscription controller -->
     <bean id="postSubscriptionController" 
           class="eu.baltrad.dex.net.controller.PostSubscriptionController"
           autowire="byType"/>
     <!-- Post subscription servlet -->
     <bean id="postSubscriptionServlet" 
           class="eu.baltrad.dex.net.servlet.PostSubscriptionServlet"
+          autowire="byType"/>   
+    <!-- Get subscription controller -->
+    <bean id="getSubscriptionController" 
+          class="eu.baltrad.dex.net.controller.GetSubscriptionController" 
           autowire="byType"/>
+    <!-- Get subscription servlet -->
+    <bean id="getSubscriptionServlet" 
+          class="eu.baltrad.dex.net.servlet.GetSubscriptionServlet"
+          autowire="byType"/>
+          
     <!-- Subscription manager -->
     <bean name="subscriptionManager" 
           class="eu.baltrad.dex.net.model.SubscriptionManager" 
@@ -759,7 +638,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Application security manager.
     -->
-    <bean name="applicationSecurityManager" class="eu.baltrad.dex.util.ApplicationSecurityManager"/>
+    <bean name="applicationSecurityManager" class="eu.baltrad.dex.auth.util.SecurityManager"/>
     
     <!-- Configuration manager -->
 
@@ -786,7 +665,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="configurationManager"/>
         </property>
         <property name="successView">
-            <value>redirect:nodeProperties.htm</value>
+            <value>redirect:node_settings.htm</value>
         </property>
         <property name="commandClass">
             <value>eu.baltrad.dex.config.model.AppConfiguration</value>
@@ -798,7 +677,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <value>false</value>
         </property>
         <property name="formView">
-            <value>nodeProperties</value>
+            <value>node_settings</value>
         </property>
     </bean>
 
@@ -870,7 +749,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="showDataSourcesController"
             class="eu.baltrad.dex.datasource.controller.ShowDataSourcesController">
         <property name="successView">
-            <value>dsShow</value>
+            <value>datasources</value>
         </property>
         <property name="dataSourceManager">
             <ref bean="dataSourceManager"/>
@@ -888,11 +767,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
     </bean>
 
-    <!-- EditDataSourcesController -->
+    <!-- EditDataSourceController -->
     <bean name="editDataSourceController"
             class="eu.baltrad.dex.datasource.controller.EditDataSourceController">
         <property name="successView">
-            <value>dsSelectEdit</value>
+            <value>edit_datasource</value>
         </property>
         <property name="dataSourceManager">
             <ref bean="dataSourceManager"/>
@@ -1005,11 +884,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     
     <!-- beastui uses Controller annotations -->
     <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-        <property name="interceptors">
+        <!--property name="interceptors">
             <list>
                 <ref bean="operatorHttpRequestInterceptor"/>
             </list>
-        </property>
+        </property-->
     </bean>
 
     <!-- We need to have a timeout manager so that we can initiate timeout requests from anywhere -->

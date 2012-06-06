@@ -55,9 +55,9 @@ public class RegisterController extends MultiActionController implements ITableS
     private static final String OK_MSG_KEY = "message";
     private static final String ERROR_MSG_KEY = "error";
     // view names
-    private static final String SHOW_REGISTER_VIEW = "showRegister";
-    private static final String CLEAR_REGISTER_VIEW = "removeRegisterEntries";
-    private static final String SHOW_CLEAR_REGISTER_STATUS_VIEW = "registerEntriesRemovalStatus";
+    private static final String SHOW_REGISTER_VIEW = "registry";
+    private static final String CLEAR_REGISTER_VIEW = "clear_registry";
+    private static final String SHOW_CLEAR_REGISTER_STATUS_VIEW = "clear_registry_status";
     /** Page number map key */
     private static final String PAGE_NUMBER = "pagenum";
 //---------------------------------------------------------------------------------------- Variables
@@ -85,7 +85,7 @@ public class RegisterController extends MultiActionController implements ITableS
      * @throws ServletException
      * @throws IOException
      */
-    public ModelAndView showRegister( HttpServletRequest request, HttpServletResponse response )
+    public ModelAndView registry( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
         String pageNum = request.getParameter( PAGE_NUMBER );
         List<DeliveryRegisterEntry> entries = null;
@@ -126,7 +126,7 @@ public class RegisterController extends MultiActionController implements ITableS
      * @throws ServletException
      * @throws IOException
      */
-    public ModelAndView removeRegisterEntries( HttpServletRequest request,
+    public ModelAndView clear_registry( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
         return new ModelAndView( CLEAR_REGISTER_VIEW, CLEAR_REGISTER_KEY,
                 deliveryRegisterManager.countEntries() );
@@ -140,7 +140,7 @@ public class RegisterController extends MultiActionController implements ITableS
      * @throws ServletException
      * @throws IOException
      */
-    public ModelAndView registerEntriesRemovalStatus( HttpServletRequest request,
+    public ModelAndView clear_registry_status( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
         try {
             int deletedEntries = deliveryRegisterManager.deleteEntries();

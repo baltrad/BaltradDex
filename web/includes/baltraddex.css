@@ -1214,6 +1214,7 @@ input:focus, textarea:focus {
 .logconf .col {
     float:left;
     padding-right:8px;
+    padding-left:16px; 
 }
 .logconf .inner-leftcol {
     float:left;

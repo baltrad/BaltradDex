@@ -1,5 +1,5 @@
-/***************************************************************************************************
-Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+/*******************************************************************************
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,7 +15,10 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software. If not, see http://www.gnu.org/licenses.
-****************************************************************************************************
+********************************************************************************
 Document : SQL script upgrading existing BaltradDex schema
 Created on : Jan 14, 2011, 9:09 AM
-***************************************************************************************************/
+*******************************************************************************/
+
+ALTER TABLE dex_users DROP COLUMN name_hash;
+-- reset passwords to user names 

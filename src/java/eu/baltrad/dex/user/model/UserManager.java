@@ -75,7 +75,6 @@ public class UserManager implements IUserManager {
             while (resultSet.next()) {
                 int userId = resultSet.getInt("id");
                 String name = resultSet.getString("name");
-                String nameHash = resultSet.getString("name_hash" );
                 String role = resultSet.getString("role_name");
                 String passwd = resultSet.getString("password");
                 String orgName = resultSet.getString("org_name");
@@ -84,7 +83,7 @@ public class UserManager implements IUserManager {
                 String state = resultSet.getString("state");
                 String countryCode = resultSet.getString("country_code");
                 String nodeAddress = resultSet.getString("node_address");
-                User user = new User(userId, name, nameHash, role, passwd, orgName, orgUnit, 
+                User user = new User(userId, name, role, passwd, orgName, orgUnit, 
                         locality, state, countryCode, nodeAddress);
                 users.add(user);
             }
@@ -113,7 +112,6 @@ public class UserManager implements IUserManager {
             while (resultSet.next()) {
                 int userId = resultSet.getInt("id");
                 String name = resultSet.getString("name");
-                String nameHash = resultSet.getString("name_hash" );
                 String role = resultSet.getString("role_name");
                 String passwd = resultSet.getString("password");
                 String orgName = resultSet.getString("org_name");
@@ -122,7 +120,7 @@ public class UserManager implements IUserManager {
                 String state = resultSet.getString("state");
                 String countryCode = resultSet.getString("country_code");
                 String nodeAddress = resultSet.getString("node_address");
-                user = new User(userId, name, nameHash, role, passwd, orgName, orgUnit, locality, 
+                user = new User(userId, name, role, passwd, orgName, orgUnit, locality, 
                         state, countryCode, nodeAddress);
             }
             stmt.close();
@@ -150,7 +148,6 @@ public class UserManager implements IUserManager {
             while (resultSet.next()) {
                 int id = resultSet.getInt("id");
                 String userName = resultSet.getString("name");
-                String nameHash = resultSet.getString("name_hash" );
                 String role = resultSet.getString("role_name");
                 String passwd = resultSet.getString("password");
                 String orgName = resultSet.getString("org_name");
@@ -159,44 +156,7 @@ public class UserManager implements IUserManager {
                 String state = resultSet.getString("state");
                 String countryCode = resultSet.getString("country_code");
                 String nodeAddress = resultSet.getString("node_address");
-                user = new User(id, userName, nameHash, role, passwd, orgName, orgUnit, locality, 
-                        state, countryCode, nodeAddress);
-            }
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to select user", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return user;
-    }
-    /**
-     * Gets user with a given name hash.
-     *
-     * @param hash User name hash
-     * @return User with a given name hash
-     */
-    public User getByHash(String hash) {
-        Connection conn = null;
-        User user = null;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_users WHERE name_hash = '" + hash + "';";
-            ResultSet resultSet = stmt.executeQuery( sql );
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-                String nameHash = resultSet.getString("name_hash" );
-                String role = resultSet.getString("role_name");
-                String passwd = resultSet.getString("password");
-                String orgName = resultSet.getString("org_name");
-                String orgUnit = resultSet.getString("org_unit");
-                String locality = resultSet.getString("locality");
-                String state = resultSet.getString("state");
-                String countryCode = resultSet.getString("country_code");
-                String nodeAddress = resultSet.getString("node_address");
-                user = new User(id, name, nameHash, role, passwd, orgName, orgUnit, locality, 
+                user = new User(id, userName, role, passwd, orgName, orgUnit, locality, 
                         state, countryCode, nodeAddress);
             }
             stmt.close();
@@ -252,19 +212,19 @@ public class UserManager implements IUserManager {
             String sql = "";
             // record does not exists, do insert
             if (user.getId() == 0) {
-                sql = "INSERT INTO dex_users (name, name_hash, role_name, password, org_name, " +
+                sql = "INSERT INTO dex_users (name, role_name, password, org_name, " +
                     "org_unit, locality, state, country_code, node_address) VALUES ('" +
-                    user.getName() + "', '" + MessageDigestUtil.createHash("MD5", 16, user.getName()) + 
-                    "', '" + user.getRoleName() + "', '" + user.getPassword() + "', '" + 
+                    user.getName() + "', '" + user.getRoleName() + "', '" + 
+                    user.getPassword() + "', '" + 
                     user.getOrganizationName() + "', '" + user.getOrganizationUnit() + "', '" + 
                     user.getLocalityName() + "', '" + user.getStateName() + "', '" + 
                     user.getCountryCode() + "', '" + user.getNodeAddress() + "');";
                 update = stmt.executeUpdate(sql);
             } else {
                 // record exists, do update
-                sql = "UPDATE dex_users SET name = '" + user.getName() + "', name_hash = '" +
-                    MessageDigestUtil.createHash("MD5", 16, user.getName()) + "', role_name = '" + 
-                    user.getRoleName() + "', " + "password = '" + user.getPassword() + 
+                sql = "UPDATE dex_users SET name = '" + user.getName() + 
+                    "', role_name = '" + user.getRoleName() + "', " 
+                    + "password = '" + user.getPassword() + 
                     "', org_name = '" + user.getOrganizationName() + "', org_unit = '" + 
                     user.getOrganizationUnit() + "', locality = '" + user.getLocalityName() + 
                     "', state = '" + user.getStateName() + "', country_code = '" + 

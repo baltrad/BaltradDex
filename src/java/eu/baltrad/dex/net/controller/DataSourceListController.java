@@ -32,6 +32,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import org.springframework.ui.Model;
 
 import org.apache.http.client.methods.HttpUriRequest;
@@ -57,11 +58,11 @@ import java.util.Set;
 public class DataSourceListController implements MessageSetter {
     
     /** Initial view - connect to data source*/
-    private static final String DS_CONNECT_VIEW = "dsconnect";
+    private static final String DS_CONNECT_VIEW = "connect_to_node";
     /** Successful connection view */
-    private static final String DS_CONNECTED_VIEW = "dsconnected";
+    private static final String DS_CONNECTED_VIEW = "node_connected";
     /** Presents list of data sources selected for subscription */
-    private static final String DS_SELECTED_VIEW = "dsselected";
+    private static final String DS_SELECTED_VIEW = "selected_datasource";
     
     /** List of available connections */
     private final static String CONNECTIONS_KEY = "connections";
@@ -180,8 +181,8 @@ public class DataSourceListController implements MessageSetter {
      * @param model Model
      * @return View name
      */
-    @RequestMapping("/dsconnect.htm")
-    public String dsConnect(Model model) { 
+    @RequestMapping("/connect_to_node.htm")
+    public String connect2Node(Model model) { 
         model.addAttribute(CONNECTIONS_KEY, nodeConnectionManager.get());
         return DS_CONNECT_VIEW;
     }
@@ -193,8 +194,8 @@ public class DataSourceListController implements MessageSetter {
      * @param urlInput URL typed in the text box
      * @return View name
      */
-    @RequestMapping("/dsconnected.htm")
-    public String dsConnected(Model model, 
+    @RequestMapping("/node_connected.htm")
+    public String nodeConnected(Model model, 
             @RequestParam(value="node_select", required=false) String nodeSelect,
             @RequestParam(value="url_input", required=false) String urlInput) 
     {
@@ -283,8 +284,8 @@ public class DataSourceListController implements MessageSetter {
      * @param selectedDataSources Data sources selected for subscription 
      * @return View name
      */
-    @RequestMapping("/dsselected.htm")
-    public String dsSelected(Model model, 
+    @RequestMapping("/selected_datasource.htm")
+    public String selectedDataSources(Model model, 
                 @RequestParam(value="selected_data_sources", required=false) 
                 String[] selectedDataSources) {
         String viewName = null;

@@ -214,7 +214,7 @@ public class PostSubscriptionController implements MessageSetter {
      * @return View name
      */
     @RequestMapping("/subscribe.htm")
-    public String subscribe(Model model,
+    public String postSubscription(Model model,
             @RequestParam(value="peer_name", required=true) String peerName,
             @RequestParam(value="selected_data_sources", required=true) 
             String[] selectedDataSources) {

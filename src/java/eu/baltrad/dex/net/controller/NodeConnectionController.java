@@ -51,9 +51,9 @@ public class NodeConnectionController extends MultiActionController {
     private static final String OK_MSG_KEY = "message";
     private static final String ERROR_MSG_KEY = "error";
     // view names
-    private static final String SHOW_CONN_VIEW = "removeNodeConnections";
-    private static final String SHOW_SEL_CONN_VIEW = "nodeConnectionsToRemove";
-    private static final String SHOW_REM_CONN_VIEW = "nodeConnectionsRemovalStatus";
+    private static final String SHOW_CONN_VIEW = "remove_connection";
+    private static final String SHOW_SEL_CONN_VIEW = "remove_selected_connection";
+    private static final String SHOW_REM_CONN_VIEW = "remove_connection_status";
 //---------------------------------------------------------------------------------------- Variables
     private NodeConnectionManager nodeConnectionManager;
     private Logger log;
@@ -73,7 +73,7 @@ public class NodeConnectionController extends MultiActionController {
      * @param response Http response
      * @return ModelAndView object containing list of all registered node connections
      */
-    public ModelAndView removeNodeConnections( HttpServletRequest request,
+    public ModelAndView remove_connection( HttpServletRequest request,
             HttpServletResponse response ) {
         List nodeConnections = nodeConnectionManager.get();
         return new ModelAndView( SHOW_CONN_VIEW, SHOW_CONN_MODEL, nodeConnections );
@@ -85,7 +85,7 @@ public class NodeConnectionController extends MultiActionController {
      * @param response Http response
      * @return ModelAndView object containing list of node connections selected for removal
      */
-    public ModelAndView nodeConnectionsToRemove( HttpServletRequest request,
+    public ModelAndView remove_selected_connection( HttpServletRequest request,
             HttpServletResponse response ) {
         ModelAndView modelAndView = null;
         String[] connectionIds = request.getParameterValues( SHOW_SEL_CONN_MODEL );
@@ -110,7 +110,7 @@ public class NodeConnectionController extends MultiActionController {
      * @param response Http response
      * @return ModelAndView object containing error messages.
      */
-    public ModelAndView nodeConnectionsRemovalStatus( HttpServletRequest request,
+    public ModelAndView remove_connection_status( HttpServletRequest request,
             HttpServletResponse response ) {
         try {
             for( int i = 0; i < getSelectedConns().size(); i++ ) {

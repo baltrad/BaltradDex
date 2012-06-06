@@ -119,17 +119,17 @@ public class SaveDataSourceController extends MultiActionController {
     /** Default option on the list */
     private static final String DEFAULT_LIST_OPTION_KEY = "select";
     /** Save data source name view */
-    private static final String DS_SAVE_NAME_VIEW = "dsSaveName";
+    private static final String DS_SAVE_NAME_VIEW = "save_datasource";
     /** Save data source radars view */
-    private static final String DS_SAVE_RADARS_VIEW = "dsSaveRadars";
+    private static final String DS_SAVE_RADARS_VIEW = "save_datasource_radar";
     /** Save data source file objects view */
-    private static final String DS_SAVE_FILE_OBJECTS_VIEW = "dsSaveFileObjects";
+    private static final String DS_SAVE_FILE_OBJECTS_VIEW = "save_datasource_file_object";
     /** Save data source users view */
-    private static final String DS_SAVE_USERS_VIEW = "dsSaveUsers";
+    private static final String DS_SAVE_USERS_VIEW = "save_datasource_user";
     /** Save data source summary view */
-    private static final String DS_SAVE_SUMMARY_VIEW = "dsSaveSummary";
+    private static final String DS_SAVE_SUMMARY_VIEW = "save_datasource_summary";
     /** Save data source view */
-    private static final String DS_SAVE_VIEW = "dsSave";
+    private static final String DS_SAVE_VIEW = "save_datasource_config";
 
     /** Data source name parameter key */
     private static final String DS_NAME_KEY = "dsName";
@@ -271,7 +271,8 @@ public class SaveDataSourceController extends MultiActionController {
      * @param response Current HTTP response
      * @return The prepared model and view
      */
-    public ModelAndView dsSaveName( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView save_datasource( HttpServletRequest request, 
+            HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         
         // Check if data source name is given as a request parameter
@@ -324,7 +325,8 @@ public class SaveDataSourceController extends MultiActionController {
      * @param response Current HTTP response
      * @return The prepared model and view
      */
-    public ModelAndView dsSaveRadars( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView save_datasource_radar( HttpServletRequest request, 
+            HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         if( request.getParameter( DS_NAME_KEY ) != null &&
                 !request.getParameter( DS_NAME_KEY ).isEmpty() ) {
@@ -357,7 +359,7 @@ public class SaveDataSourceController extends MultiActionController {
      * @param response Current HTTP response
      * @return The prepared model and view
      */
-    public ModelAndView dsSaveFileObjects( HttpServletRequest request,
+    public ModelAndView save_datasource_file_object( HttpServletRequest request,
             HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         // Get parameter map
@@ -401,7 +403,8 @@ public class SaveDataSourceController extends MultiActionController {
      * @param response Current HTTP response
      * @return The prepared model and view
      */
-    public ModelAndView dsSaveUsers( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView save_datasource_user( HttpServletRequest request, 
+            HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         // Get parameter map
         Map parameterMap = request.getParameterMap();
@@ -438,7 +441,8 @@ public class SaveDataSourceController extends MultiActionController {
      * @param response Current HTTP response
      * @return The prepared model and view
      */
-    public ModelAndView dsSaveSummary( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView save_datasource_summary( HttpServletRequest request, 
+            HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         // Get parameter map
         Map parameterMap = request.getParameterMap();
@@ -486,7 +490,8 @@ public class SaveDataSourceController extends MultiActionController {
      * @param response Current HTTP response
      * @return The prepared model and view
      */
-    public ModelAndView dsSave( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView save_datasource_config( HttpServletRequest request, 
+            HttpServletResponse response ) {
         ModelAndView modelAndView = new ModelAndView();
         // Get parameter map
         Map parameterMap = request.getParameterMap();

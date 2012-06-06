@@ -77,7 +77,7 @@ public class DefaultRequestFactoryTest {
                     "http://localhost");
         assertEquals("GET", request.getMethod());
         assertEquals(URI.create(
-            "http://example.com/BaltradDex/getdatasourcelisting.htm"), 
+            "http://example.com/BaltradDex/get_datasource_listing.htm"), 
             request.getURI());
         assertEquals("localnode", getHeader(request, "Node-Name"));
         assertEquals("http://localhost", getHeader(request, "Node-Address"));
@@ -92,7 +92,7 @@ public class DefaultRequestFactoryTest {
                                            .createGetSubscriptionRequest();
         assertEquals("GET", request.getMethod());
         assertEquals(URI.create(
-            "http://example.com/BaltradDex/getsubscription.htm"), 
+            "http://example.com/BaltradDex/get_subscription.htm"), 
             request.getURI());
         assertEquals("text/html", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));
@@ -106,7 +106,7 @@ public class DefaultRequestFactoryTest {
                 "json string will be passed here");
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
-            "http://example.com/BaltradDex/postsubscription.htm"), 
+            "http://example.com/BaltradDex/post_subscription.htm"), 
             request.getURI());
         assertEquals("localnode", getHeader(request, "Node-Name"));
         assertEquals("http://localhost", getHeader(request, "Node-Address"));
@@ -121,7 +121,7 @@ public class DefaultRequestFactoryTest {
         HttpUriRequest request = classUnderTest.createPostFileRequest(is);
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
-            "http://example.com/BaltradDex/postfile.htm"), request.getURI());
+            "http://example.com/BaltradDex/post_file.htm"), request.getURI());
         assertEquals("application/x-hdf5", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));
         assertNotNull(getHeader(request, "Date"));

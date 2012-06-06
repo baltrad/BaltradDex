@@ -22,9 +22,9 @@
 /*
  * BaltradDex header template.
  */
-document.write( "<div class=\"help\"> " );
-document.write( "<a href=\"help/index.html\" target=\"_blank\">Help</a>" );
-document.write( " | " );
-document.write( "<a href=\"logout.htm\">Log out</a>" );
-document.write( "</div>" );
+document.write("<div class=\"help\"> ");
+document.write("<a href=\"help/index.html\" target=\"_blank\">Help</a>");
+document.write(" | " );
+document.write("<a href=\"j_spring_security_logout\">Logout</a>");
+document.write("</div>");
 

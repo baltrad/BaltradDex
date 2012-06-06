@@ -55,7 +55,6 @@ public class SubscriptionManager implements ISubscriptionManager {
     private Logger log;
     /** Row mapper */
     private Mapper mapper;
-    
 //---------------------------------------------------------------------- Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
@@ -95,13 +94,13 @@ public class SubscriptionManager implements ISubscriptionManager {
      * @param type Subscription type
      * @return Subscription object matching given criteria
      */
-    public Subscription load(String userName, String dataSourceName, 
+    public Subscription load(String user, String dataSource, 
             String type) {
         String sql = "SELECT * FROM dex_subscriptions WHERE user_name = ? " + 
                 "AND data_source_name = ? AND type = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, mapper, userName, 
-                dataSourceName, type); 
+            return jdbcTemplate.queryForObject(sql, mapper, user, 
+                dataSource, type); 
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -114,6 +113,21 @@ public class SubscriptionManager implements ISubscriptionManager {
      */
     public List<Subscription> load(String type) {
         String sql = "SELECT * FROM dex_subscriptions WHERE type = ?";
+        try {
+            return jdbcTemplate.query(sql, mapper, type);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Loads distinct operators.
+     * @param type Subscription type 
+     * @return List of distinct operators 
+     */
+    public List<Subscription> loadOperators(String type) {
+        String sql = "SELECT DISTINCT ON (operator_name) * FROM " +
+                "dex_subscriptions WHERE type = ?";
         try {
             return jdbcTemplate.query(sql, mapper, type);
         } catch (EmptyResultDataAccessException e) {
@@ -224,6 +238,8 @@ public class SubscriptionManager implements ISubscriptionManager {
     
     
     
+    
+    //------------------------------------------------------------ to be removed
     
     
     

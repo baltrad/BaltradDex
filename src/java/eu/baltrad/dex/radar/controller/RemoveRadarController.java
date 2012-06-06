@@ -52,9 +52,9 @@ public class RemoveRadarController extends MultiActionController {
     private static final String OK_MSG_KEY = "message";
     private static final String ERROR_MSG_KEY = "error";
     // view names
-    private static final String SHOW_CHANNELS_VIEW = "removeRadar";
-    private static final String SELECTED_CHANNELS_VIEW = "radarToRemove";
-    private static final String REMOVED_CHANNELS_VIEW = "removeRadarStatus";
+    private static final String SHOW_CHANNELS_VIEW = "remove_radar";
+    private static final String SELECTED_CHANNELS_VIEW = "radar_to_remove";
+    private static final String REMOVED_CHANNELS_VIEW = "remove_radar_status";
 //---------------------------------------------------------------------------------------- Variables
     // Radar manager
     private RadarManager radarManager;
@@ -74,7 +74,7 @@ public class RemoveRadarController extends MultiActionController {
      * @param response Http response
      * @return Models and view containing list of all available channels
      */
-    public ModelAndView removeRadar( HttpServletRequest request,
+    public ModelAndView remove_radar( HttpServletRequest request,
             HttpServletResponse response ) {
         List channels = radarManager.getChannels();
         return new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
@@ -86,7 +86,7 @@ public class RemoveRadarController extends MultiActionController {
      * @param response Http response
      * @return Model and view containing list of channels selected for removal
      */
-    public ModelAndView radarToRemove( HttpServletRequest request,
+    public ModelAndView radar_to_remove( HttpServletRequest request,
             HttpServletResponse response ) {
         ModelAndView modelAndView = null;
         String[] channelIds = request.getParameterValues( SELECTED_CHANNELS_KEY );
@@ -109,7 +109,7 @@ public class RemoveRadarController extends MultiActionController {
      * @param response Http response
      * @return Model and view containing data access exception errors if occured.
      */
-    public ModelAndView removeRadarStatus( HttpServletRequest request,
+    public ModelAndView remove_radar_status( HttpServletRequest request,
             HttpServletResponse response ) {
         String[] channelIds = request.getParameterValues( REMOVED_CHANNELS_KEY );
         String channelName = "";

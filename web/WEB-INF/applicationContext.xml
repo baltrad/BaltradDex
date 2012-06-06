@@ -1,24 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:aop="http://www.springframework.org/schema/aop"
-       xmlns:tx="http://www.springframework.org/schema/tx"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
-       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-    
-    <!--bean id="propertyConfigurer"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"
-          p:location="/WEB-INF/jdbc.properties" />
-    
-    <bean id="dataSource"
-          class="org.springframework.jdbc.datasource.DriverManagerDataSource"
-          p:driverClassName="${jdbc.driverClassName}"
-          p:url="${jdbc.url}"
-          p:username="${jdbc.username}"
-          p:password="${jdbc.password}" /-->
-    
-    <!-- ADD PERSISTENCE SUPPORT HERE (jpa, hibernate, etc) -->
-    
-</beans>
+<beans:beans xmlns:security="http://www.springframework.org/schema/security"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+        http://www.springframework.org/schema/security
+        http://www.springframework.org/schema/security/spring-security-2.0.1.xsd" 
+        xmlns:aop="http://www.springframework.org/schema/aop">  
+       
+    <security:http auto-config="true" access-denied-page="/login.htm">
+        <security:form-login login-page="/login.htm" 
+                             default-target-url="/home.htm" 
+                             authentication-failure-url="/login_failed.htm" 
+                             always-use-default-target="true"/>
+        <security:logout logout-success-url="/logout.htm"/>
+        <!-- 
+            User pages 
+        -->
+        <security:intercept-url pattern="/home.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/latest_messages.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/all_messages.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/logtable.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/data_download.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/data_upload.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/datasources.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/browse_files.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/datasource_files.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/file_details.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/data_preview.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/download.htm" access="ROLE_USER" />
+        <!-- 
+            Operator pages 
+        -->
+        <security:intercept-url pattern="/exchange.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/processing.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/connect_to_node.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/node_connected.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/selected_datasource.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/subscription.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/selected_subscription.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/subscription_status.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/registry.htm" access="ROLE_OPERATOR" />
+        
+        <security:intercept-url pattern="/adaptors.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/anomalydetector_create.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/anomalydetector_show.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/anomalydetectors.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/bdbtrimageroute_create.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/bdbtrimageroute_show.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/bdbtrimcountroute_create.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/bdbtrimcountroute_show.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/compositeroute_create.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/compositeroute_show.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/createadaptor.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/createscheduledjob.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/distributionroute.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/googlemaproute_create.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/googlemaproute_show.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/groovyroute_create.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/groovyroute_show.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/showadaptor.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/showroutes.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/showschedule.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/showscheduledjob.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/volumeroute_create.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/volumeroute_show.htm" access="ROLE_OPERATOR" />
+        <!-- 
+            Admin pages 
+        -->
+        <security:intercept-url pattern="/settings.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/save_radar.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/edit_radar.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/save_radar_status" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_radar.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/radar_to_remove.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_radar_status.htm" access="ROLE_ADMIN" />
+        
+        <security:intercept-url pattern="/save_datasource.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/save_datasource_radar.htm" access="ROLE_ADMIN" /> 
+        <security:intercept-url pattern="/save_datasource_file_object.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/save_datasource_user.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/save_datasource_summary.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/save_datasource_config.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/edit_datasource.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_datasource.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_selected_datasource.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_datasource_status.htm" access="ROLE_ADMIN" />
+        
+        <security:intercept-url pattern="/remove_download.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_upload.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_selected_download.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_selected_upload.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_download_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_upload_status.htm" access="ROLE_ADMIN" />
+        
+        <security:intercept-url pattern="/configure_registry.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/clear_registry.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/clear_registry_status.htm" access="ROLE_ADMIN" />
+        
+        <security:intercept-url pattern="/remove_connection.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_selected_connection.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_connection_status.htm" access="ROLE_ADMIN" />
+        
+        <security:intercept-url pattern="/configure_messages.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/clear_messages.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/clear_messages_status.htm" access="ROLE_ADMIN" />
+        
+        <security:intercept-url pattern="/save_user_account.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/save_user_account_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/edit_user_account.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_user_account.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_selected_user_account.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_user_account_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/change_user_password.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/change_user_password_status.htm" access="ROLE_ADMIN" />
+
+        <security:intercept-url pattern="/node_settings.htm" access="ROLE_ADMIN" />
+    </security:http>
+
+    <security:authentication-provider 
+                user-service-ref="simpleUserDetailsService"/>
+    <beans:bean id="simpleUserDetailsService" 
+                class="eu.baltrad.dex.auth.util.SimpleUserDetailsService"/>        
+            
+</beans:beans>

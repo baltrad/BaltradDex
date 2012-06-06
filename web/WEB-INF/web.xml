@@ -28,14 +28,14 @@
         <url-pattern>*.json</url-pattern>
     </servlet-mapping>
     <session-config>
-        <session-timeout>
-    30
-    </session-timeout>
+        <session-timeout>30</session-timeout>
     </session-config>
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.htm</welcome-file>
+        <welcome-file>index.html</welcome-file>
     </welcome-file-list>
-    <!-- encoding filter -->
+    <!-- Encoding filter -->
     <filter>
         <filter-name>encodingFilter</filter-name>
         <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -48,9 +48,17 @@
             <param-value>true</param-value>
         </init-param>
     </filter>
+    <!-- Security filter -->
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
     <filter-mapping>
         <filter-name>encodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping> 
-
+    </filter-mapping>
 </web-app>

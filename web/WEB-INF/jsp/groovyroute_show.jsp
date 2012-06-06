@@ -25,7 +25,7 @@ Modifies a groovy route
 
 <t:page_tabbed pageTitle="Create Groovy route" activeTab="processing">
     <div class="left">
-        <%@include file="/WEB-INF/jsp/processingMenu.jsp"%>
+        <%@include file="/WEB-INF/jsp/processing_menu.jsp"%>
     </div>
     <div class="right">
         <div class="blttitle">

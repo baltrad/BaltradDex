@@ -53,9 +53,9 @@ public class RemoveUserController extends MultiActionController {
     private static final String ERROR_MSG_KEY = "error";
 
     // view names
-    private static final String REMOVE_ACCOUNT_VIEW = "removeAccount";
-    private static final String ACCOUNT_TO_REMOVE_VIEW = "accountToRemove";
-    private static final String REMOVED_ACCOUNT_VIEW = "removeAccountStatus";
+    private static final String REMOVE_ACCOUNT_VIEW = "remove_user_account";
+    private static final String ACCOUNT_TO_REMOVE_VIEW = "remove_selected_user_account";
+    private static final String REMOVED_ACCOUNT_VIEW = "remove_user_account_status";
 //---------------------------------------------------------------------------------------- Variables
     // User manager
     private UserManager userManager;
@@ -79,7 +79,7 @@ public class RemoveUserController extends MultiActionController {
      * @param response HttpServletResponse
      * @return Model and view containing list of all user accounts registered in the system
      */
-    public ModelAndView removeAccount( HttpServletRequest request, HttpServletResponse response ) {
+    public ModelAndView remove_user_account( HttpServletRequest request, HttpServletResponse response ) {
         List<User> allUsers = userManager.get();
         removeUsers.clear();
         for (int i = 0; i < allUsers.size(); i++) {
@@ -103,8 +103,8 @@ public class RemoveUserController extends MultiActionController {
      * @param response HttpServletResponse
      * @return Model and view containing list of user accounts selected for removal
      */
-    public ModelAndView accountToRemove( HttpServletRequest request,
-            HttpServletResponse response ) {
+    public ModelAndView remove_selected_user_account(HttpServletRequest request,
+            HttpServletResponse response) {
         ModelAndView modelAndView = null;
         String[] userIds = request.getParameterValues( ACCOUNT_TO_REMOVE_KEY );
         if( userIds != null ) {
@@ -134,8 +134,8 @@ public class RemoveUserController extends MultiActionController {
      * @param response HttpServletResponse
      * @return Model and view containing data access exception errors if occured
      */
-    public ModelAndView removeAccountStatus( HttpServletRequest request,
-            HttpServletResponse response ) {
+    public ModelAndView remove_user_account_status(HttpServletRequest request,
+            HttpServletResponse response) {
         String[] userIds = request.getParameterValues( REMOVED_USERS_KEY );
         try {
             for (int i = 0; i < userIds.length; i++) {

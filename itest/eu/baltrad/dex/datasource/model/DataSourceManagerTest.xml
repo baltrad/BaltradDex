@@ -11,11 +11,11 @@
           
     <dex_roles id="1" role="peer"/>     
         
-    <dex_users id="1" name="User1" name_hash="111" role_name="peer" password=""
+    <dex_users id="1" name="User1" role_name="peer" password=""
                org_name="" org_unit="" locality="" state="" country_code="" 
                node_address="http://localhost"/>
                
-    <dex_users id="2" name="User2" name_hash="222" role_name="peer" password=""
+    <dex_users id="2" name="User2" role_name="peer" password=""
                org_name="" org_unit="" locality="" state="" country_code="" 
                node_address="http://localhost"/>
         
