@@ -8,12 +8,13 @@
         http://www.springframework.org/schema/security/spring-security-2.0.1.xsd" 
         xmlns:aop="http://www.springframework.org/schema/aop">  
        
-    <security:http auto-config="true" access-denied-page="/login.htm">
+    <security:http auto-config="true" access-denied-page="/login.htm"> 
         <security:form-login login-page="/login.htm" 
                              default-target-url="/home.htm" 
                              authentication-failure-url="/login_failed.htm" 
                              always-use-default-target="true"/>
         <security:logout logout-success-url="/logout.htm"/>
+        
         <!-- 
             User pages 
         -->
@@ -119,7 +120,10 @@
     </security:http>
 
     <security:authentication-provider 
-                user-service-ref="simpleUserDetailsService"/>
+                user-service-ref="simpleUserDetailsService">
+        <security:password-encoder hash="md5"/>
+    </security:authentication-provider>
+    
     <beans:bean id="simpleUserDetailsService" 
                 class="eu.baltrad.dex.auth.util.SimpleUserDetailsService"/>        
             

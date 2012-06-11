@@ -215,7 +215,7 @@ public class UserManager implements IUserManager {
                 sql = "INSERT INTO dex_users (name, role_name, password, org_name, " +
                     "org_unit, locality, state, country_code, node_address) VALUES ('" +
                     user.getName() + "', '" + user.getRoleName() + "', '" + 
-                    user.getPassword() + "', '" + 
+                    MessageDigestUtil.createHash("MD5", 16, user.getPassword()) + "', '" + 
                     user.getOrganizationName() + "', '" + user.getOrganizationUnit() + "', '" + 
                     user.getLocalityName() + "', '" + user.getStateName() + "', '" + 
                     user.getCountryCode() + "', '" + user.getNodeAddress() + "');";
@@ -224,7 +224,7 @@ public class UserManager implements IUserManager {
                 // record exists, do update
                 sql = "UPDATE dex_users SET name = '" + user.getName() + 
                     "', role_name = '" + user.getRoleName() + "', " 
-                    + "password = '" + user.getPassword() + 
+                    + "password = '" + MessageDigestUtil.createHash("MD5", 16, user.getPassword()) + 
                     "', org_name = '" + user.getOrganizationName() + "', org_unit = '" + 
                     user.getOrganizationUnit() + "', locality = '" + user.getLocalityName() + 
                     "', state = '" + user.getStateName() + "', country_code = '" + 

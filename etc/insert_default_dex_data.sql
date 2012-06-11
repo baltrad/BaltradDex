@@ -28,7 +28,7 @@ INSERT INTO dex_roles (id, role) VALUES (1, 'admin'), (2, 'operator'),
 -- insert default user admin into dex_users table --------------------------------------------------
 INSERT INTO dex_users (name, role_name, password, org_name, org_unit, locality, 
                         state, country_code, node_address)
-    VALUES ('admin', 'admin', 'admin', 'Company', 'Unit', 'City', 'Country',
+    VALUES ('admin', 'admin', MD5('admin'), 'Company', 'Unit', 'City', 'Country',
             'XX', 'http://localhost:8080');
 
 -- dex_data_quantity -------------------------------------------------------------------------------
