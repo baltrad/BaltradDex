@@ -719,7 +719,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="bltImagePreviewController"
             class="eu.baltrad.dex.bltdata.controller.BltImagePreviewController">
         <property name="successView">
-            <value>imagePreview</value>
+            <value>data_preview</value>
         </property>
         <property name="bltDataProcessor">
             <ref bean="bltDataProcessor"/>

@@ -26,8 +26,8 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@ page import="eu.baltrad.dex.bltdata.model.BltFile" %>
-<%@ page import="eu.baltrad.dex.bltdata.model.BltDataset" %>
+<%@ page import="eu.baltrad.dex.db.model.BltFile" %>
+<%@ page import="eu.baltrad.dex.db.model.BltDataset" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>

@@ -19,7 +19,7 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.bltdata.model;
+package eu.baltrad.dex.db.model;
 
 /**
  * Class implements functionality allowing to store dataset specific metadata.

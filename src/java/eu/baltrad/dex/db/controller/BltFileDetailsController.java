@@ -24,7 +24,7 @@ package eu.baltrad.dex.db.controller;
 import eu.baltrad.dex.bltdata.model.BltDataProcessor;
 import eu.baltrad.dex.db.model.BltFileManager;
 import eu.baltrad.dex.db.model.BltFile;
-import eu.baltrad.dex.bltdata.model.BltDataset;
+import eu.baltrad.dex.db.model.BltDataset;
 import eu.baltrad.dex.bltdata.model.BltDataProjector;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;

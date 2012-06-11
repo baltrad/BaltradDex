@@ -22,3 +22,4 @@ Created on : Jan 14, 2011, 9:09 AM
 
 ALTER TABLE dex_users DROP COLUMN name_hash;
 -- reset passwords to user names 
+
