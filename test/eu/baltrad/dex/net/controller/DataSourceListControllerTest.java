@@ -123,6 +123,7 @@ public class DataSourceListControllerTest {
         assertEquals("connect_to_node", viewName);
     }
     
+/*
     @Test
     public void nodeConnected_InvalidURL() throws Exception {
         Model model = new ExtendedModelMap();
@@ -334,6 +335,6 @@ public class DataSourceListControllerTest {
         reset(httpClientMock);
         reset(jsonUtilMock);
         reset(connectionManagerMock); 
-    }
+    }*/
     
 }

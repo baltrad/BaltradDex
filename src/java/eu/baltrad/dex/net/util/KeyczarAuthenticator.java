@@ -63,11 +63,12 @@ public class KeyczarAuthenticator implements Authenticator {
      * @param keystoreRoot Keystore root directory
      * @param keyName Name of the key to use for authentication
      */
-    public KeyczarAuthenticator(String keystoreRoot, String keyName) {
+    public KeyczarAuthenticator(String keystoreRoot, String signerKeyName,
+            String verifierKeyName) {
         this.cryptoFactory = new KeyczarCryptoFactory(new File(keystoreRoot));
-        this.keyName = keyName;
-        this.signer = cryptoFactory.createSigner(keyName);
-        this.verifier = cryptoFactory.createVerifier(keyName);
+        this.keyName = /*keyName*/signerKeyName;
+        this.signer = cryptoFactory.createSigner(signerKeyName);
+        this.verifier = cryptoFactory.createVerifier(verifierKeyName);
     }
     
     /**

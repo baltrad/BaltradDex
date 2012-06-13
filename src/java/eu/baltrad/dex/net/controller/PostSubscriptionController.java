@@ -101,14 +101,14 @@ public class PostSubscriptionController implements MessageSetter {
      * Default constructor.
      */
     public PostSubscriptionController() {
-        this.authenticator = new KeyczarAuthenticator(
+        /*this.authenticator = new KeyczarAuthenticator(
                 InitAppUtil.getConf().getKeystoreDir(),
                 InitAppUtil.getConf().getNodeName());
         this.httpClient = new HttpClientUtil(
                 InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
         this.nodeName = InitAppUtil.getConf().getNodeName();
-        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();*/
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
@@ -218,6 +218,16 @@ public class PostSubscriptionController implements MessageSetter {
             @RequestParam(value="peer_name", required=true) String peerName,
             @RequestParam(value="selected_data_sources", required=true) 
             String[] selectedDataSources) {
+        
+        authenticator = new KeyczarAuthenticator(
+                InitAppUtil.getConf().getKeystoreDir(),
+                InitAppUtil.getConf().getNodeName(),
+                InitAppUtil.getConf().getNodeName());
+        httpClient = new HttpClientUtil(
+                InitAppUtil.getConf().getConnTimeout(), 
+                InitAppUtil.getConf().getSoTimeout());
+        nodeName = InitAppUtil.getConf().getNodeName();
+        nodeAddress = InitAppUtil.getConf().getNodeAddress();
         
         Set<DataSource> selectedPeerDataSources = new HashSet<DataSource>();
         for (int i = 0; i < selectedDataSources.length; i++) {

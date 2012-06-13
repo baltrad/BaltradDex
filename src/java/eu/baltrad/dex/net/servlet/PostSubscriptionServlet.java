@@ -85,11 +85,11 @@ public class PostSubscriptionServlet extends HttpServlet {
      * Default constructor.
      */
     public PostSubscriptionServlet() {
-        this.authenticator = new KeyczarAuthenticator(
+        /**this.authenticator = new KeyczarAuthenticator(
             InitAppUtil.getConf().getKeystoreDir(),
             InitAppUtil.getConf().getNodeName());
         this.nodeName = InitAppUtil.getConf().getNodeName();
-        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();*/
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
@@ -163,17 +163,17 @@ public class PostSubscriptionServlet extends HttpServlet {
                 subscriptionManager.load(
                     authenticator.getNodeName(request), ds.getName(), 
                     Subscription.SUBSCRIPTION_UPLOAD);
-            String[] mesageArgs = {ds.getName(), nodeName, 
+            String[] messageArgs = {ds.getName(), nodeName, 
                     authenticator.getNodeName(request)};
             if (existing == null) {
                 if (subscriptionManager.storeNoId(requested) == 1) {
                     subscribedDataSources.add(new DataSource(
                             ds.getName(), ds.getDescription()));
                     log.warn(messages.getMessage(
-                            PS_SUBSCRIPTION_SUCCESS_KEY, mesageArgs));
+                            PS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
                 } else {
                     log.error(messages.getMessage(
-                            PS_SUBSCRIPTION_FAILURE_KEY, mesageArgs));
+                            PS_SUBSCRIPTION_FAILURE_KEY, messageArgs));
                 }
             } else {
                 requested.setId(existing.getId());
@@ -181,10 +181,10 @@ public class PostSubscriptionServlet extends HttpServlet {
                     subscribedDataSources.add(new DataSource(
                             ds.getName(), ds.getDescription()));
                     log.warn(messages.getMessage(
-                            PS_SUBSCRIPTION_SUCCESS_KEY, mesageArgs));
+                            PS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
                 } else {
                     log.error(messages.getMessage(
-                            PS_SUBSCRIPTION_FAILURE_KEY, mesageArgs));
+                            PS_SUBSCRIPTION_FAILURE_KEY, messageArgs));
                 }
             }            
         }
@@ -215,6 +215,13 @@ public class PostSubscriptionServlet extends HttpServlet {
     {
         NodeResponse res = new NodeResponse(response);
         try {
+            authenticator = new KeyczarAuthenticator(
+                InitAppUtil.getConf().getKeystoreDir(),
+                InitAppUtil.getConf().getNodeName(),
+                    request.getHeader("Node-Name"));
+            nodeName = InitAppUtil.getConf().getNodeName();
+            nodeAddress = InitAppUtil.getConf().getNodeAddress();
+            
             if (authenticator.authenticate(authenticator.getMessage(
                     request), authenticator.getSignature(request))) {
                 String jsonRequested = readDataSources(request);

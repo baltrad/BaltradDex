@@ -58,7 +58,7 @@ public class KeyczarAuthenticatorTest {
         requestFactory = new DefaultRequestFactory(
                 URI.create("http://example.com"));
         classUnderTest = new KeyczarAuthenticator("./keystore", 
-                "dev.baltrad.eu");
+                "dev.baltrad.eu", "dev.baltrad.eu");
         assertNotNull(classUnderTest);
         format = new SimpleDateFormat(DATE_FORMAT);
     }
