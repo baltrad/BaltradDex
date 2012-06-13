@@ -137,7 +137,7 @@ public class PostSubscriptionControllerTest {
         }
     }
     
-   
+    @Test
     public void foo() {}
     
     /*@Test
