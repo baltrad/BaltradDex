@@ -116,14 +116,14 @@ public class DataSourceListController implements MessageSetter {
      * Default constructor.
      */
     public DataSourceListController() {
-        this.authenticator = new KeyczarAuthenticator(
+        /*this.authenticator = new KeyczarAuthenticator(
                 InitAppUtil.getConf().getKeystoreDir(),
                 InitAppUtil.getConf().getNodeName());
         this.httpClient = new HttpClientUtil(
                 InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
         this.nodeName = InitAppUtil.getConf().getNodeName();
-        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();*/
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
@@ -198,6 +198,17 @@ public class DataSourceListController implements MessageSetter {
             @RequestParam(value="node_select", required=false) String nodeSelect,
             @RequestParam(value="url_input", required=false) String urlInput) 
     {
+        authenticator = new KeyczarAuthenticator(
+                InitAppUtil.getConf().getKeystoreDir(),
+                InitAppUtil.getConf().getNodeName(),
+                InitAppUtil.getConf().getNodeName());
+        httpClient = new HttpClientUtil(
+                InitAppUtil.getConf().getConnTimeout(), 
+                InitAppUtil.getConf().getSoTimeout());
+        nodeName = InitAppUtil.getConf().getNodeName();
+        nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        
+        
         String viewName = null;
         // Validate node's URL address 
         String urlSelect = null;
@@ -215,7 +226,7 @@ public class DataSourceListController implements MessageSetter {
             requestFactory = new DefaultRequestFactory(URI.create(url));
             HttpUriRequest req = requestFactory
                 .createGetDataSourceListingRequest(nodeName, nodeAddress);
-            authenticator.addCredentials(req);
+            authenticator.addCredentials(req); 
             try {
                 HttpResponse res = httpClient.post(req);
                 // Server reponse is OK, process data source list 

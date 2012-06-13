@@ -74,11 +74,11 @@ public class DataSourceListServlet extends HttpServlet implements Controller {
      * Default constructor.
      */
     public DataSourceListServlet() {
-        this.authenticator = new KeyczarAuthenticator(
+        /*this.authenticator = new KeyczarAuthenticator(
             InitAppUtil.getConf().getKeystoreDir(),
             InitAppUtil.getConf().getNodeName());
         this.nodeName = InitAppUtil.getConf().getNodeName();
-        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();*/
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
@@ -115,6 +115,14 @@ public class DataSourceListServlet extends HttpServlet implements Controller {
     {
         NodeResponse res = new NodeResponse(response);
         try {
+            authenticator = new KeyczarAuthenticator(
+                InitAppUtil.getConf().getKeystoreDir(),
+                InitAppUtil.getConf().getNodeName(),
+                    request.getHeader("Node-Name"));
+            
+            nodeName = InitAppUtil.getConf().getNodeName();
+            nodeAddress = InitAppUtil.getConf().getNodeAddress();
+            
             if (authenticator.authenticate(authenticator.getMessage(
                     request), authenticator.getSignature(request))) {
                 // TODO User account will be created when 
