@@ -89,7 +89,7 @@ Author     : szewczenko
                                                                 Data source
                                                             </div>
                                                             <div id="cell" class="timestamp">
-                                                                Started on
+                                                                Started at
                                                             </div>
                                                         </div>
                                                         <c:forEach var="sub" items="${remote}">
@@ -99,8 +99,8 @@ Author     : szewczenko
                                                                         <c:out value="${sub.dataSourceName}"/>
                                                                     </div>
                                                                     <div id="cell" class="timestamp">
-                                                                        <c:out value="${sub.dateStr}"/>,
-                                                                        <c:out value="${sub.timeStr}"/>
+                                                                        <fmt:formatDate value="${sub.timeStamp}" 
+                                                                                        pattern="yyyy/dd/MM HH:mm:ss"/>
                                                                     </div>
                                                                 </div>
                                                             </c:if>

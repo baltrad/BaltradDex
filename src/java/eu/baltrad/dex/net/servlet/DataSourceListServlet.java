@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.net.servlet;
 
+import eu.baltrad.dex.net.model.NodeRequest;
 import eu.baltrad.dex.net.model.NodeResponse;
 import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.user.model.User;
@@ -77,8 +78,7 @@ public class DataSourceListServlet extends HttpServlet {
      */
     public DataSourceListServlet() {
         this.authenticator = new KeyczarAuthenticator(
-            InitAppUtil.getConf().getKeystoreDir(),
-            InitAppUtil.getConf().getNodeName());
+            InitAppUtil.getConf().getKeystoreDir());
         this.nodeName = InitAppUtil.getConf().getNodeName();
         this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
@@ -95,6 +95,16 @@ public class DataSourceListServlet extends HttpServlet {
     }
     
     /**
+     * Initializes servlet with current configuration.
+     */
+    private void initConfiguration() {
+        this.authenticator = new KeyczarAuthenticator(
+                InitAppUtil.getConf().getKeystoreDir());
+        this.nodeName = InitAppUtil.getConf().getNodeName();
+        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+    }
+    
+    /**
      * Implements Controller interface.
      * @param request Http servlet request
      * @param response Http servlet response
@@ -103,6 +113,7 @@ public class DataSourceListServlet extends HttpServlet {
     @RequestMapping("/get_datasource_listing.htm")
     public ModelAndView handleRequest(HttpServletRequest request, 
             HttpServletResponse response) {
+        initConfiguration();
         HttpSession session = request.getSession(true);
         doGet(request, response);
         return new ModelAndView();
@@ -116,17 +127,17 @@ public class DataSourceListServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
     {
+        NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
         try {
-            if (authenticator.authenticate(authenticator.getMessage(
-                    request), authenticator.getSignature(request))) {
+            if (authenticator.authenticate(req.getMessage(), req.getSignature(),
+                    req.getNodeName())) {
                 // TODO User account will be created when 
                 // keys are exchanged
-                User user = userManager.getByName(authenticator
-                        .getNodeName(request));
+                User user = userManager.getByName(req.getNodeName());
                 if (user == null) {
-                    user = new User(authenticator.getNodeName(request), 
-                        User.ROLE_PEER, authenticator.getNodeAddress(request));       
+                    user = new User(req.getNodeName(), 
+                        User.ROLE_PEER, req.getNodeAddress());       
                     userManager.saveOrUpdatePeer(user);
                     log.warn("New peer account created: " + user.getName());
                 }

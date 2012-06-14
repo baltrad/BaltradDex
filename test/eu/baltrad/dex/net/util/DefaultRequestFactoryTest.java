@@ -88,13 +88,16 @@ public class DefaultRequestFactoryTest {
     
     @Test
     public void createGetSubscriptionRequest() {
-        HttpUriRequest request = classUnderTest
-                                           .createGetSubscriptionRequest();
-        assertEquals("GET", request.getMethod());
+        HttpUriRequest request = classUnderTest.createGetSubscriptionRequest(
+                "localnode", "http://localhost",
+                "json string will be passed here");
+        assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/get_subscription.htm"), 
             request.getURI());
-        assertEquals("text/html", getHeader(request, "Content-Type"));
+        assertEquals("localnode", getHeader(request, "Node-Name"));
+        assertEquals("http://localhost", getHeader(request, "Node-Address"));
+        assertEquals("application/json", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));
         assertNotNull(getHeader(request, "Date"));
     }

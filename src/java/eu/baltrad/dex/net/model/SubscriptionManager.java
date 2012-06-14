@@ -74,7 +74,7 @@ public class SubscriptionManager implements ISubscriptionManager {
     }
     
     /**
-     * Loads subscription from database.
+     * Loads subscription by id.
      * @param id Record id
      * @return Subscription with a given id
      */
@@ -88,7 +88,37 @@ public class SubscriptionManager implements ISubscriptionManager {
     }
     
     /**
-     * Loads subscriptions from database.
+     * Loads subscriptions by type.
+     * @param type Subscription type
+     * @return List of subscriptions matching a given type
+     */
+    public List<Subscription> load(String type) {
+        String sql = "SELECT * FROM dex_subscriptions WHERE type = ?";
+        try {
+            return jdbcTemplate.query(sql, mapper, type);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Loads subscriptions by operator name and type.
+     * @param operator
+     * @param type
+     * @return List of subscriptions matching given parameters
+     */
+    public List<Subscription> load(String operator, String type) {
+        String sql = "SELECT * FROM dex_subscriptions WHERE operator_name = ?" +
+                " AND type = ?";
+        try {
+            return jdbcTemplate.query(sql, mapper, operator, type);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Loads subscriptions by user name, data source name and type.
      * @param userName User name
      * @param dataSourceName Data source name
      * @param type Subscription type
@@ -101,20 +131,6 @@ public class SubscriptionManager implements ISubscriptionManager {
         try {
             return jdbcTemplate.queryForObject(sql, mapper, user, 
                 dataSource, type); 
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-    
-    /**
-     * Loads subscriptions from a database.
-     * @param type Subscription type
-     * @return List of subscriptions matching a given type
-     */
-    public List<Subscription> load(String type) {
-        String sql = "SELECT * FROM dex_subscriptions WHERE type = ?";
-        try {
-            return jdbcTemplate.query(sql, mapper, type);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }

@@ -163,13 +163,23 @@ public class DefaultRequestFactory implements RequestFactory {
      * Creates get subscription request.
      * @return Http GET request 
      */
-    public HttpGet createGetSubscriptionRequest() {
-        HttpGet httpGet = new HttpGet(getRequestUri("get_subscription.htm"));
-        httpGet.addHeader("Content-Type", "text/html");
-        httpGet.addHeader("Content-MD5", Base64.encodeBase64String(
-                httpGet.getURI().toString().getBytes()));
-        httpGet.addHeader("Date", dateFormat.format(new Date()));
-        return httpGet;
+    public HttpPost createGetSubscriptionRequest(String nodeName, 
+            String nodeAddress, String jsonSources) {
+        HttpPost httpPost = new HttpPost(getRequestUri("get_subscription.htm"));
+        StringEntity entity = null;
+        try {
+            entity = new StringEntity(jsonSources);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        httpPost.setEntity(entity);
+        httpPost.addHeader("Node-Name", nodeName);
+        httpPost.addHeader("Node-Address", nodeAddress);
+        httpPost.addHeader("Content-Type", "application/json");
+        httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
+                jsonSources.getBytes()));
+        httpPost.addHeader("Date", dateFormat.format(new Date()));
+        return httpPost;
     }
     
     /**

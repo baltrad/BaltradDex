@@ -22,7 +22,6 @@
 package eu.baltrad.dex.net.model;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 
 import java.sql.Timestamp;
 
@@ -39,19 +38,11 @@ public class Subscription implements Serializable, Comparable<Subscription> {
     public static final String SUBSCRIPTION_DOWNLOAD = "download";
     /** Data upload - subscribed local data sources */
     public static final String SUBSCRIPTION_UPLOAD = "upload";
-    /** Date format string */
-    private final static String DATE_FORMAT = "yyyy/MM/dd";
-    /** Time format string */
-    private final static String TIME_FORMAT = "HH:mm:ss";
 //---------------------------------------------------------------------------------------- Variables
     /** Subscription ID */
     private int id;
     /** Timestamp */
     private Timestamp timeStamp;
-    /** Auxiliary variable storing date as string */
-    private String dateStr;
-    /** Auxiliary variable storing time as string */
-    private String timeStr;
     /** Subscriber's name */
     private String userName;
     /** Data source name */
@@ -92,10 +83,6 @@ public class Subscription implements Serializable, Comparable<Subscription> {
         this.type = type;
         this.active = active;
         this.synkronized = synkronized;
-        SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
-        SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
-        this.dateStr = dateFormat.format( timeStamp );
-        this.timeStr = timeFormat.format( timeStamp );
         this.nodeAddress = nodeAddress;
     }
     /**
@@ -122,10 +109,6 @@ public class Subscription implements Serializable, Comparable<Subscription> {
         this.type = type;
         this.active = active;
         this.synkronized = synkronized;
-        SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
-        SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
-        this.dateStr = dateFormat.format( timeStamp );
-        this.timeStr = timeFormat.format( timeStamp );
         this.nodeAddress = nodeAddress;
     }
     /**
@@ -152,10 +135,6 @@ public class Subscription implements Serializable, Comparable<Subscription> {
         this.type = type;
         this.active = active;
         this.synkronized = synkronized;
-        SimpleDateFormat dateFormat = new SimpleDateFormat( DATE_FORMAT );
-        SimpleDateFormat timeFormat = new SimpleDateFormat( TIME_FORMAT );
-        this.dateStr = dateFormat.format( timeStamp );
-        this.timeStr = timeFormat.format( timeStamp );
         this.nodeAddress = nodeAddress;
     }
     /**
@@ -182,30 +161,6 @@ public class Subscription implements Serializable, Comparable<Subscription> {
      * @param Subscription's timestamp.
      */
     public void setTimeStamp(Timestamp timeStamp) { this.timeStamp = timeStamp; }
-    /**
-     * Gets date string.
-     *
-     * @return Date string
-     */
-    public String getDateStr() { return dateStr; }
-    /**
-     * Sets date string.
-     *
-     * @param dateStr Date string to set
-     */
-    public void setDateStr(String dateStr) { this.dateStr = dateStr; }
-    /**
-     * Gets time string.
-     *
-     * @return Time string
-     */
-    public String getTimeStr() { return timeStr; }
-    /**
-     * Sets time string.
-     *
-     * @param timeStr Time string to set
-     */
-    public void setTimeStr(String timeStr) { this.timeStr = timeStr; }
     /**
      * Method gets user name.
      *

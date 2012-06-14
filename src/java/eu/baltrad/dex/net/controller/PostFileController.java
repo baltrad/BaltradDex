@@ -79,7 +79,7 @@ public class PostFileController implements Controller {
                 HttpUriRequest req = requestFactory.createPostFileRequest(
                     getFileContent());
                 try {
-                    getAuthenticator().addCredentials(req);
+                    //getAuthenticator().addCredentials(req);
                     HttpResponse res = httpClient.post(req);
                     response.setStatus(res.getStatusLine().getStatusCode());
                     if (res.getStatusLine().getStatusCode() == 

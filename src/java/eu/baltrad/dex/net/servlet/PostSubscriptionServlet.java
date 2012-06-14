@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.net.servlet;
 
+import eu.baltrad.dex.net.model.NodeRequest;
 import eu.baltrad.dex.net.model.NodeResponse;
 import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.util.InitAppUtil;
@@ -53,7 +54,7 @@ import java.util.HashSet;
 import java.io.IOException;
 
 /**
- * Receives and handles post subscription requests.
+ * Receives and handles subscription requests.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.1.0
  * @since 1.1.0
@@ -85,11 +86,6 @@ public class PostSubscriptionServlet extends HttpServlet {
      * Default constructor.
      */
     public PostSubscriptionServlet() {
-        this.authenticator = new KeyczarAuthenticator(
-            InitAppUtil.getConf().getKeystoreDir(),
-            InitAppUtil.getConf().getNodeName());
-        this.nodeName = InitAppUtil.getConf().getNodeName();
-        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
@@ -101,6 +97,16 @@ public class PostSubscriptionServlet extends HttpServlet {
     public PostSubscriptionServlet(String nodeName, String nodeAddress) {
         this.nodeName = nodeName;
         this.nodeAddress = nodeAddress;
+    }
+    
+    /**
+     * Initializes servlet with current configuration.
+     */
+    private void initConfiguration() {
+        this.authenticator = new KeyczarAuthenticator(
+                InitAppUtil.getConf().getKeystoreDir());
+        this.nodeName = InitAppUtil.getConf().getNodeName();
+        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
     }
     
     /**
@@ -144,27 +150,26 @@ public class PostSubscriptionServlet extends HttpServlet {
     
     /**
      * Stores subscriptions requested by peer.
-     * @param request Http request
+     * @param req Node request
      * @param requestedDataSources Requested data sources
      * @return Subscribed data sources
      */
-    private Set<DataSource> storePeerSubscriptions(HttpServletRequest request,
+    private Set<DataSource> storePeerSubscriptions(NodeRequest req,
             Set<DataSource> requestedDataSources) {
         Set<DataSource> subscribedDataSources = new HashSet<DataSource>();
         for (DataSource ds : requestedDataSources) {
             // Save or update depending on whether subscription exists
             Subscription requested = new Subscription(
                 System.currentTimeMillis(), 
-                authenticator.getNodeName(request),
+                req.getNodeName(),
                 ds.getName(), nodeName, 
                 Subscription.SUBSCRIPTION_UPLOAD, 
                 false, false, nodeAddress);
             Subscription existing = 
                 subscriptionManager.load(
-                    authenticator.getNodeName(request), ds.getName(), 
+                    req.getNodeName(), ds.getName(), 
                     Subscription.SUBSCRIPTION_UPLOAD);
-            String[] mesageArgs = {ds.getName(), nodeName, 
-                    authenticator.getNodeName(request)};
+            String[] mesageArgs = {ds.getName(), nodeName, req.getNodeName()};
             if (existing == null) {
                 if (subscriptionManager.storeNoId(requested) == 1) {
                     subscribedDataSources.add(new DataSource(
@@ -200,6 +205,7 @@ public class PostSubscriptionServlet extends HttpServlet {
     @RequestMapping("/post_subscription.htm")
     public ModelAndView handleRequest(HttpServletRequest request, 
             HttpServletResponse response) {
+        initConfiguration();
         HttpSession session = request.getSession(true);
         doPost(request, response);
         return new ModelAndView();
@@ -213,15 +219,16 @@ public class PostSubscriptionServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) 
     {
+        NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
         try {
-            if (authenticator.authenticate(authenticator.getMessage(
-                    request), authenticator.getSignature(request))) {
+            if (authenticator.authenticate(req.getMessage(), 
+                    req.getSignature(), req.getNodeName())) {
                 String jsonRequested = readDataSources(request);
                 Set<DataSource> requestedDataSources = jsonUtil
                             .jsonToDataSources(jsonRequested);
                 Set<DataSource> subscribedDataSources = 
-                        storePeerSubscriptions(request, requestedDataSources);
+                        storePeerSubscriptions(req, requestedDataSources);
                 String jsonSubscribed = jsonUtil.dataSourcesToJson(
                         subscribedDataSources);
                 if (subscribedDataSources.equals(requestedDataSources)) {

@@ -21,33 +21,49 @@
 
 package eu.baltrad.dex.net.model;
 
-import java.util.List;
-
 /**
- * Subscription manager interface.
+ * Http servlet request wrapper.
+ * 
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.1.1
  * @since 1.1.1
  */
-public interface ISubscriptionManager {
+public interface INodeRequest {
+
+    static final String[] HEADERS = {"Content-Type", "Content-MD5", "Date"};
+    static final String NODE_NAME_HDR = "Node-Name";
+    static final String NODE_ADDR_HDR = "Node-Address";
+    static final String AUTH_HDR = "Authorization";
+    static final String HDR_SEPARATOR = ":";
     
-    public Subscription load(int id);
+    /**
+     * Retrieves message for authentication.
+     * @return Message to be signed
+     */
+    public String getMessage();
     
-    public List<Subscription> load(String type);
+    /**
+     * Extracts signature from request header. 
+     * @return Signature string
+     */
+    public String getSignature();
     
-    public List<Subscription> load(String operator, String type);
+    /**
+     * Extracts user name from request header. 
+     * @return User identity string
+     */
+    public String getUser();
     
-    public Subscription load(String user, String dataSource, 
-            String type);
+    /**
+     * Retrieves node name from request.
+     * @return Name of the requesting node
+     */
+    public String getNodeName();
     
-    public List<Subscription> loadOperators(String type);
-    
-    public int store(Subscription s);
-    
-    public int storeNoId(Subscription s);
-    
-    public int update(Subscription s);
-    
-    public int delete(Subscription s);
+    /**
+     * Retrieves node address from request.
+     * @return Address of the requesting node
+     */
+    public String getNodeAddress();
     
 }

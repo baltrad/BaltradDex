@@ -22,16 +22,14 @@
 package eu.baltrad.dex.net.controller;
 
 import eu.baltrad.dex.net.util.*;
-import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.datasource.model.DataSource;
-
 import eu.baltrad.dex.net.model.ISubscriptionManager;
 import eu.baltrad.dex.net.model.Subscription;
-
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.HttpResponse;
-
-import org.apache.commons.io.IOUtils;
+import eu.baltrad.dex.net.model.INodeConnectionManager;
+import eu.baltrad.dex.net.model.NodeConnection;
+import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.util.InitAppUtil;
+import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.log.model.MessageLogger;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,17 +37,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
 
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.HttpResponse;
+
+import org.apache.commons.io.IOUtils;
+
+import org.apache.log4j.Logger;
+
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import java.io.StringWriter;
 import java.io.InputStream;
 import java.io.IOException;
 
 /**
- * Post subscription status requests on the server.
+ * 
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.1.0
  * @since 1.1.0
@@ -74,21 +82,53 @@ public class GetSubscriptionController implements MessageSetter {
     //private static final String SUBSCRIPTION_SERVER_ERROR_MSG = 
     //        "subscription.server.error";
     
-    private static final String SUBSCRIBED_PEERS_VIEW = "subscribedpeers";
+    private static final String SUBSCRIBED_PEERS_VIEW = "subscribed_peers";
     
-    private static final String SUBSCRIPTION_BY_PEER_VIEW = "subscriptionbypeer";
+    private static final String SUBSCRIPTION_BY_PEER_VIEW = "subscription_by_peer";
+    private static final String SELECTED_SUBSCRIPTION_VIEW = "selected_subscription";
+    
     
     private static final String SUBSCRIBED_PEERS_KEY = "subscribed_peers";
+    private static final String SUBSCRIPTION_BY_PEER_KEY = "subscription_by_peer"; 
+    private static final String PEER_NAME_KEY = "peer_name";
     
     private ISubscriptionManager subscriptionManager;
+    private INodeConnectionManager nodeConnectionManager;
     
     private UrlValidatorUtil urlValidator;
     private MessageResourceUtil messages;
     private Authenticator authenticator;
     private RequestFactory requestFactory;
     private HttpClientUtil httpClient;
-    private JsonUtil jsonUtil;
+    private IJsonUtil jsonUtil;
+    private Logger log;
     
+    private String nodeName;
+    private String nodeAddress;
+    
+    /**
+     * Default constructor.
+     */
+    public GetSubscriptionController() {
+        this.authenticator = new KeyczarAuthenticator(
+                InitAppUtil.getConf().getKeystoreDir());
+        this.httpClient = new HttpClientUtil(
+                InitAppUtil.getConf().getConnTimeout(), 
+                InitAppUtil.getConf().getSoTimeout());
+        this.nodeName = InitAppUtil.getConf().getNodeName();
+        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);        
+    }
+    
+    /**
+     * Constructor.
+     * @param nodeName Node name
+     * @param nodeAdress Node address
+     */
+    public GetSubscriptionController(String nodeName, String nodeAddress) {
+        this.nodeName = nodeName;
+        this.nodeAddress = nodeAddress;
+    }
     
     
     /**
@@ -117,150 +157,156 @@ public class GetSubscriptionController implements MessageSetter {
     }
     
     
-    @RequestMapping("/subscribedpeers.htm")
+    @RequestMapping("/subscribed_peers.htm")
     public String subscribedPeers(Model model) {
-        List<Subscription> downloads = subscriptionManager.loadOperators(
+        List<Subscription> subscribedPeers = subscriptionManager.loadOperators(
                 Subscription.SUBSCRIPTION_DOWNLOAD);
-        model.addAttribute(SUBSCRIBED_PEERS_KEY, downloads);
+        model.addAttribute(SUBSCRIBED_PEERS_KEY, subscribedPeers);
         return SUBSCRIBED_PEERS_VIEW;
         
     }
     
-    @RequestMapping("/subscriptionbypeer.htm")
-    public String subscriptionByPeer(
+    @RequestMapping("/subscription_by_peer.htm")
+    public String subscriptionByPeer(Model model,
             @RequestParam(value="peer_name", required=true) String peerName) {
-        
-        
+        List<Subscription> subscriptionByPeer = subscriptionManager.load(
+                peerName, Subscription.SUBSCRIPTION_DOWNLOAD);
+        model.addAttribute(SUBSCRIPTION_BY_PEER_KEY, subscriptionByPeer);
+        model.addAttribute(PEER_NAME_KEY, peerName);
         return SUBSCRIPTION_BY_PEER_VIEW;
     }
     
-    
-    /*public ModelAndView handleRequest(HttpServletRequest request, 
-            HttpServletResponse response) throws Exception {
+    @RequestMapping("/selected_subscription.htm")
+    public String getSubscription(Model model,
+            @RequestParam(value="peer_name", required=true) String peerName,
+            @RequestParam(value="selected_data_sources", required=false)
+                String[] selectedDataSources) {
         
-        ModelAndView modelAndView = new ModelAndView();
-        // validate target node URL
-        String url = request.getParameter(TARGET_NODE_URL);
-        if (!urlValidator.validate(url)) {
-            modelAndView.addObject(INVALID_URL_MSG, messages.getMessage(
-                    INVALID_URL_MSG));
-            modelAndView.setViewName(GET_SUBSCRIPTION_VIEW);
-        } else {
-            
-            requestFactory = new DefaultRequestFactory(URI.create(url));
-            HttpUriRequest req = requestFactory.createGetSubscriptionRequest();
-            authenticator.addCredentials(req);
-            
-            try {
-                HttpResponse res = httpClient.post(req);
-                response.setStatus(res.getStatusLine().getStatusCode()); 
-                if (res.getStatusLine().getStatusCode() == 
-                        HttpServletResponse.SC_OK) {
-                    String jsonSources = "";
-                    try {
-                        StringWriter writer = new StringWriter();
-                        InputStream is = null;
-                        try {
-                            is = res.getEntity().getContent();
-                            IOUtils.copy(is, writer);
-                            jsonSources = writer.toString();
-                        } finally {
-                            writer.close();
-                            is.close();
-                        }
-                        Set<DataSource> sources = jsonUtil
-                                .jsonToDataSources(jsonSources);
-                        modelAndView.setViewName(SHOW_SUBSCRIPTION_VIEW);
-                        modelAndView.addObject(SUBSCRIPTIONS_KEY, sources);
-                        
-                    } catch (IOException e) {
-                        modelAndView.setViewName(GET_SUBSCRIPTION_VIEW);
-                        modelAndView.addObject(SUBSCRIPTION_READ_ERROR_MSG, 
-                            messages.getMessage(SUBSCRIPTION_READ_ERROR_MSG));
-                    }
-                } else {
-                    modelAndView.setViewName(GET_SUBSCRIPTION_VIEW);
-                    modelAndView.addObject(SUBSCRIPTION_SERVER_ERROR_MSG, 
-                        messages.getMessage(SUBSCRIPTION_SERVER_ERROR_MSG));
-                }
-            } catch (Exception e) {
-                modelAndView.setViewName(GET_SUBSCRIPTION_VIEW);
-                modelAndView.addObject(SUBSCRIPTION_SERVER_ERROR_MSG, 
-                    messages.getMessage(SUBSCRIPTION_SERVER_ERROR_MSG));
+        Set<DataSource> selectedPeerDataSources = new HashSet<DataSource>();
+        if (selectedDataSources != null) {
+            for (int i = 0; i < selectedDataSources.length; i++) {
+                selectedPeerDataSources.add(
+                        new DataSource(0, selectedDataSources[i], ""));
             }
+        } 
+        String dataSourceString = jsonUtil
+                .dataSourcesToJson(selectedPeerDataSources);
+        NodeConnection conn = nodeConnectionManager.get(peerName);
+        requestFactory = new DefaultRequestFactory(
+                URI.create(conn.getNodeAddress()));
+        HttpUriRequest req = requestFactory
+                .createGetSubscriptionRequest(nodeName, nodeAddress, 
+                    dataSourceString);
+        authenticator.addCredentials(req, nodeName);
+        try {
+            HttpResponse res = httpClient.post(req);
+            if (res.getStatusLine().getStatusCode() == 
+                    HttpServletResponse.SC_OK) {
+                
+            } else {
+                
+            }
+            
+        } catch (IOException e) {
+            
+        } catch (Exception e) {
+            
         }
-        return modelAndView;
-    }*/
+        
+        
+        
+        
+        System.out.println("_________________________ds string = " + dataSourceString);
+        
+       
+        
+        return SELECTED_SUBSCRIPTION_VIEW;
+    }
+    
+    
+    /**
+     * @param jsonUtil the jsonUtil to set
+     */
+    @Autowired
+    public void setJsonUtil(IJsonUtil jsonUtil) {
+        this.jsonUtil = jsonUtil;
+    }
+    
+    /**
+     * @param nodeConnectionManager the nodeConnectionManager to set
+     */
+    @Autowired
+    public void setNodeConnectionManager(
+            INodeConnectionManager nodeConnectionManager) {
+        this.nodeConnectionManager = nodeConnectionManager;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
 
     /**
      * @return the urlValidator
-     */
+     *
     public UrlValidatorUtil getUrlValidator() {
         return urlValidator;
     }
 
     /**
      * @param urlValidator the urlValidator to set
-     */
-    public void setUrlValidator(UrlValidatorUtil urlValidator) {
+     * void setUrlValidator(UrlValidatorUtil urlValidator) {
         this.urlValidator = urlValidator;
     }
 
     /**
      * @return the messages
-     */
+     *
     public MessageResourceUtil getMessages() {
         return messages;
     }
 
     /**
      * @param messages the messages to set
-     */
+     *
     public void setMessages(MessageResourceUtil messages) {
         this.messages = messages;
     }
 
     /**
      * @return the authenticator
-     */
+     *
     public Authenticator getAuthenticator() {
         return authenticator;
     }
 
     /**
      * @param authenticator the authenticator to set
-     */
+     *
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
     }
 
     /**
      * @return the httpClient
-     */
+     *
     public HttpClientUtil getHttpClient() {
         return httpClient;
     }
 
     /**
      * @param httpClient the httpClient to set
-     */
+     *
     public void setHttpClient(HttpClientUtil httpClient) {
         this.httpClient = httpClient;
-    }
+    }*/
 
-    /**
-     * @return the jsonUtil
-     */
-    public JsonUtil getJsonUtil() {
-        return jsonUtil;
-    }
+   
 
-    /**
-     * @param jsonUtil the jsonUtil to set
-     */
-    public void setJsonUtil(JsonUtil jsonUtil) {
-        this.jsonUtil = jsonUtil;
-    }
+    
 
     /**
      * @param subscriptionManager the subscriptionManager to set

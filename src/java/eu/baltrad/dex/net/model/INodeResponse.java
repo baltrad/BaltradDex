@@ -19,31 +19,30 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.net.util;
-
-import org.apache.http.client.methods.HttpUriRequest;
+package eu.baltrad.dex.net.model;
 
 /**
- *
- * @author szewczenko
+ * Http servlet response wrapper.
+ * 
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
+ * @version 1.1.1
+ * @since 1.1.1
  */
-public interface Authenticator {
+public interface INodeResponse {
+
+    static final String NODE_NAME_HDR = "Node-Name";
+    static final String NODE_ADDR_HDR = "Node-Address";
     
     /**
-     * Add credentials to outgoing request.
-     * @param request Http URI request to add credentials to
-     * @param keyName Private key used to sign a message 
+     * Sets node name.
+     * @param nodeName Node name to set
      */
-    public void addCredentials(HttpUriRequest request, String keyName);
+    public void setNodeName(String nodeName);
     
     /**
-     * Authenticates request at servlet side.
-     * @param message Message to authenticate
-     * @param signature Signature to authenticate with
-     * @param keyName Public key used to verify a message 
-     * @return True upon successful authentication, false otherwise
+     * Sets node address.
+     * @param nodeAddress Node address to set 
      */
-    public boolean authenticate(String message, String signture, 
-            String keyName);
+    public void setNodeAddress(String nodeAddress);
     
 }

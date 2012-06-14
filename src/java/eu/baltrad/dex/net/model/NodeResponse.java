@@ -31,11 +31,8 @@ import javax.servlet.http.HttpServletResponseWrapper;
  * @version 1.1.1
  * @since 1.1.1
  */
-public class NodeResponse extends HttpServletResponseWrapper {
-    
-    private static final String NODE_NAME_HDR = "Node-Name";
-    private static final String NODE_ADDR_HDR = "Node-Address";
-    
+public class NodeResponse extends HttpServletResponseWrapper 
+                                                    implements INodeResponse {
     /**
      * Constructor.
      * @param response Http servlet response 

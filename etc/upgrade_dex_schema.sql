@@ -21,14 +21,17 @@ Created on : Jan 14, 2011, 9:09 AM
 *******************************************************************************/
 
 ALTER TABLE dex_users DROP COLUMN name_hash;
--- reset passwords to user names 
+/*
+    It may be necessary to reset users' passwords since we're now using
+    spring-security package.
+*/  
 CREATE OR REPLACE FUNCTION update_user_passwords() RETURNS void AS $$
 DECLARE 
 	user_name TEXT;
 BEGIN
 	FOR user_name IN SELECT NAME FROM dex_users
 	LOOP
-		UPDATE dex_users SET password = user_name WHERE name = user_name; 
+		UPDATE dex_users SET password = MD5(user_name) WHERE name = user_name; 
 	END LOOP;
 	RETURN;	
 EXCEPTION WHEN OTHERS THEN 
@@ -36,5 +39,5 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $$ LANGUAGE plpgsql;
 
--- SELECT update_user_passwords();
+SELECT update_user_passwords();
 

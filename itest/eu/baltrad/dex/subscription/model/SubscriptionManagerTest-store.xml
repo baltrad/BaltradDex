@@ -14,8 +14,14 @@
         user_name="User3" data_source_name="DataSource3" 
         operator_name="Operator3" type="download" active="true" 
         synkronized="false" node_address="http://baltrad.com"/>
-    <dex_subscriptions id="4" timestamp="2012-04-25 15:00:00.00" 
+        
+    <dex_subscriptions id="4" timestamp="2012-04-24 18:00:00.00" 
         user_name="User4" data_source_name="DataSource4" 
-        operator_name="Operator4" type="upload" active="true" 
+        operator_name="Operator1" type="download" active="true" 
+        synkronized="false" node_address="http://baltrad.com"/>        
+        
+    <dex_subscriptions id="5" timestamp="2012-04-25 15:00:00.00" 
+        user_name="User5" data_source_name="DataSource5" 
+        operator_name="Operator5" type="upload" active="true" 
         synkronized="false" node_address="http://test.baltrad.eu"/>    
 </dataset>

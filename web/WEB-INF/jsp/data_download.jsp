@@ -90,7 +90,7 @@ Author     : szewczenko
                                                             Data source
                                                         </div>
                                                         <div id="cell" class="timestamp">
-                                                            Started on
+                                                            Started at
                                                         </div>
                                                         <div id="cell" class="active">
                                                             Status
@@ -103,7 +103,8 @@ Author     : szewczenko
                                                                     <c:out value="${sub.dataSourceName}"/>
                                                                 </div>
                                                                 <div id="cell" class="timestamp">
-                                                                    <c:out value="${sub.dateStr}"/>, <c:out value="${sub.timeStr}"/>
+                                                                    <fmt:formatDate value="${sub.timeStamp}" 
+                                                                                    pattern="yyyy/dd/MM HH:mm:ss"/>
                                                                 </div>
                                                                 <div id="cell" class="active">
                                                                 <c:choose>

@@ -101,14 +101,6 @@ public class PostSubscriptionController implements MessageSetter {
      * Default constructor.
      */
     public PostSubscriptionController() {
-        this.authenticator = new KeyczarAuthenticator(
-                InitAppUtil.getConf().getKeystoreDir(),
-                InitAppUtil.getConf().getNodeName());
-        this.httpClient = new HttpClientUtil(
-                InitAppUtil.getConf().getConnTimeout(), 
-                InitAppUtil.getConf().getSoTimeout());
-        this.nodeName = InitAppUtil.getConf().getNodeName();
-        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
@@ -120,6 +112,19 @@ public class PostSubscriptionController implements MessageSetter {
     public PostSubscriptionController(String nodeName, String nodeAddress) {
         this.nodeName = nodeName;
         this.nodeAddress = nodeAddress;
+    }
+    
+    /**
+     * Initializes controller with current configuration
+     */
+    private void initConfiguration() {
+        this.authenticator = new KeyczarAuthenticator(
+                InitAppUtil.getConf().getKeystoreDir());
+        this.httpClient = new HttpClientUtil(
+                InitAppUtil.getConf().getConnTimeout(), 
+                InitAppUtil.getConf().getSoTimeout());
+        this.nodeName = InitAppUtil.getConf().getNodeName();
+        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
     }
     
     /**
@@ -156,7 +161,7 @@ public class PostSubscriptionController implements MessageSetter {
     private String readDataSources(HttpResponse response) 
             throws InternalControllerException {
         try {
-        InputStream is = null;
+            InputStream is = null;
         try {
             is = response.getEntity().getContent();
             return IOUtils.toString(is);
@@ -218,7 +223,7 @@ public class PostSubscriptionController implements MessageSetter {
             @RequestParam(value="peer_name", required=true) String peerName,
             @RequestParam(value="selected_data_sources", required=true) 
             String[] selectedDataSources) {
-        
+        initConfiguration();
         Set<DataSource> selectedPeerDataSources = new HashSet<DataSource>();
         for (int i = 0; i < selectedDataSources.length; i++) {
             String[] parms = selectedDataSources[i].split("_");
@@ -233,7 +238,7 @@ public class PostSubscriptionController implements MessageSetter {
         HttpUriRequest req = requestFactory
                 .createPostSubscriptionRequest(nodeName, nodeAddress,
                     dataSourceString);
-        authenticator.addCredentials(req);
+        authenticator.addCredentials(req, nodeName);
         try {
             HttpResponse res = httpClient.post(req);
             if (res.getStatusLine().getStatusCode() == 

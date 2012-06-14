@@ -53,10 +53,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <!-- Operator pages -->
                 <prop key="exchange.htm">urlFilenameController</prop>
                 <prop key="processing.htm">urlFilenameController</prop>
+                <prop key="registry.htm">registerController</prop>
+                
                 <prop key="subscription.htm">subscriptionController_deprecated</prop>
                 <prop key="selected_subscription.htm">subscriptionController_deprecated</prop>
                 <prop key="subscription_status.htm">subscriptionController_deprecated</prop>
-                <prop key="registry.htm">registerController</prop>
+                
+                
                 <!-- Admin pages -->
                 <prop key="settings.htm">urlFilenameController</prop>
                 <prop key="save_radar.htm">saveRadarController</prop>

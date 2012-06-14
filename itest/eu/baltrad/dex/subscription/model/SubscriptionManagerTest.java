@@ -95,6 +95,13 @@ public class SubscriptionManagerTest extends TestCase {
         assertTrue(classUnderTest.compare(expected, actual));
     }
     
+    public void testLoadByType() throws Exception {
+        List<Subscription> subs = classUnderTest.load("download");
+        verifyDBTables(null);
+        assertNotNull(subs);
+        assertEquals(3, subs.size());
+    }
+    
     public void testLoadByNameAndType() throws Exception {
         Subscription expected = new Subscription();
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
@@ -115,8 +122,9 @@ public class SubscriptionManagerTest extends TestCase {
         assertTrue(classUnderTest.compare(expected, actual));
     }
     
-    public void testLoadByType() throws Exception {
-        List<Subscription> subs = classUnderTest.load("download");
+    public void testLoadByOperatorAndType() throws Exception {
+        List<Subscription> subs = classUnderTest.load("Operator1", 
+                Subscription.SUBSCRIPTION_DOWNLOAD);
         verifyDBTables(null);
         assertNotNull(subs);
         assertEquals(2, subs.size());
@@ -124,13 +132,13 @@ public class SubscriptionManagerTest extends TestCase {
     
     public void testStore() throws Exception {
         Subscription s = new Subscription();
-        s.setId(4);
+        s.setId(5);
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
         Date date = format.parse("2012-04-25 15:00:00.00");
         s.setTimeStamp(new Timestamp(date.getTime()));
-        s.setUserName("User4");
-        s.setDataSourceName("DataSource4");
-        s.setOperatorName("Operator4");
+        s.setUserName("User5");
+        s.setDataSourceName("DataSource5");
+        s.setOperatorName("Operator5");
         s.setType("upload");
         s.setActive(true);
         s.setSynkronized(false);

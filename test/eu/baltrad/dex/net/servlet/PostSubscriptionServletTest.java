@@ -35,12 +35,17 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
 
+import org.apache.commons.codec.binary.Base64;
+
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * Post subscription servlet test.
@@ -61,12 +66,15 @@ public class PostSubscriptionServletTest {
             + "data source\"},{\"name\":\"DS2\",\"id\":0,\"description\":\"One "
             + "more test data source\"}]";
     
+     private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
+    
     private PostSubscriptionServlet classUnderTest;
     private JsonUtil jsonUtil;
     private MessageResourceUtil messages;
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
     private ISubscriptionManager subscriptionManagerMock;
+    private DateFormat format;
     
     @Before
     public void setUp() {
@@ -79,6 +87,7 @@ public class PostSubscriptionServletTest {
         classUnderTest.setJsonUtil(jsonUtil);
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
+        format = new SimpleDateFormat(DATE_FORMAT);
         subscriptionManagerMock = createMock(ISubscriptionManager.class);
     }
     
@@ -87,15 +96,24 @@ public class PostSubscriptionServletTest {
         classUnderTest = null;
     }
     
+    private void setAttributes(MockHttpServletRequest request) {
+        request.setAttribute("Content-Type", "text/html");  
+        request.setAttribute("Content-MD5", Base64.encodeBase64String(
+                request.getRequestURI().getBytes()));
+        request.setAttribute("Date", format.format(new Date()));
+        request.addHeader("Authorization", "test.baltrad.eu" + ":" + 
+            "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_");   
+        request.addHeader("Node-Name", "test.baltrad.eu");
+        request.addHeader("Node-Address", "http://test.baltrad.eu");
+    }
+    
+    
     @Test
     public void handleRequest_Unauthorized() throws Exception {
         Authenticator authMock = createMock(Authenticator.class);
-        expect(authMock.authenticate(null, null)).andReturn(Boolean.FALSE)
-                .anyTimes();
-        expect(authMock.getMessage(isA(MockHttpServletRequest.class)))
-                .andReturn(null);
-        expect(authMock.getSignature(isA(MockHttpServletRequest.class)))
-                .andReturn(null);
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.FALSE).anyTimes();
+        setAttributes(request);
         replay(authMock);
         
         classUnderTest.setAuthenticator(authMock);
@@ -112,12 +130,9 @@ public class PostSubscriptionServletTest {
     @Test 
     public void handleRequest_InternalServerError() throws Exception {
         Authenticator authMock = createMock(Authenticator.class);
-        expect(authMock.authenticate(null, null)).andReturn(Boolean.TRUE)
-                .anyTimes();
-        expect(authMock.getMessage(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
-        expect(authMock.getSignature(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
+        setAttributes(request);
         replay(authMock);
         
         IJsonUtil jsonUtilMock = createMock(IJsonUtil.class);
@@ -144,14 +159,9 @@ public class PostSubscriptionServletTest {
     @Test
     public void handleRequest_SubscriptionFailedError() throws Exception {
         Authenticator authMock = createMock(Authenticator.class);
-        expect(authMock.authenticate(null, null)).andReturn(Boolean.TRUE)
-                .anyTimes();
-        expect(authMock.getMessage(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
-        expect(authMock.getSignature(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
-        expect(authMock.getNodeName(isA(MockHttpServletRequest.class)))
-                .andReturn("test.baltrad.eu").anyTimes();
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
+        setAttributes(request);
         replay(authMock);
         expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
                 isA(String.class))).andReturn(null).anyTimes();
@@ -179,14 +189,9 @@ public class PostSubscriptionServletTest {
     @Test
     public void handleRequest_PartialSubscriptionError() throws Exception {
         Authenticator authMock = createMock(Authenticator.class);
-        expect(authMock.authenticate(null, null)).andReturn(Boolean.TRUE)
-                .anyTimes();
-        expect(authMock.getMessage(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
-        expect(authMock.getSignature(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
-        expect(authMock.getNodeName(isA(MockHttpServletRequest.class)))
-                .andReturn("test.baltrad.eu").anyTimes();
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
+        setAttributes(request);
         replay(authMock);
         expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
                 isA(String.class))).andReturn(null).anyTimes();
@@ -215,14 +220,9 @@ public class PostSubscriptionServletTest {
     @Test 
     public void handleRequest_OK() throws Exception {
         Authenticator authMock = createMock(Authenticator.class);
-        expect(authMock.authenticate(null, null)).andReturn(Boolean.TRUE)
-                .anyTimes();
-        expect(authMock.getMessage(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
-        expect(authMock.getSignature(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
-        expect(authMock.getNodeName(isA(MockHttpServletRequest.class)))
-                .andReturn("test.baltrad.eu").anyTimes();
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
+        setAttributes(request);
         replay(authMock);
         expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
                 isA(String.class))).andReturn(null).anyTimes();

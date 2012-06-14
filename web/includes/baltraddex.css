@@ -886,6 +886,9 @@ input:focus, textarea:focus {
     width:10%;
     text-align:center;
 }
+.subscriptions .timestamp {
+    width:30%;
+}
 .removesubscriptions .name {
     width:30%;
 }
