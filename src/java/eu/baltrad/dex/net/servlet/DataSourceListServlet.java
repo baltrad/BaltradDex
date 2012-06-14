@@ -77,10 +77,6 @@ public class DataSourceListServlet extends HttpServlet {
      * Default constructor.
      */
     public DataSourceListServlet() {
-        this.authenticator = new KeyczarAuthenticator(
-            InitAppUtil.getConf().getKeystoreDir());
-        this.nodeName = InitAppUtil.getConf().getNodeName();
-        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
