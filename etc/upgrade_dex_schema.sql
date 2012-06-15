@@ -20,12 +20,40 @@ Document : SQL script upgrading existing BaltradDex schema
 Created on : Jan 14, 2011, 9:09 AM
 *******************************************************************************/
 
-ALTER TABLE dex_users DROP COLUMN name_hash;
+CREATE OR REPLACE FUNCTION make_plpgsql()
+RETURNS VOID
+  LANGUAGE SQL
+AS $$
+  CREATE LANGUAGE plpgsql;
+$$;
+
+SELECT
+  CASE
+    WHEN EXISTS (
+      SELECT 1 from pg_catalog.pg_language where lanname='plpgsql'
+    ) THEN
+      NULL
+    ELSE make_plpgsql()
+  END;
+
+CREATE OR REPLACE FUNCTION remove_name_hash_from_dex_users() RETURNS VOID AS $$
+BEGIN
+    PERFORM true FROM information_schema.columns
+        WHERE table_name = 'dex_users' AND column_name = 'name_hash';
+    IF FOUND THEN
+        RAISE NOTICE 'removing name_hash from dex_users';
+        ALTER TABLE dex_users DROP COLUMN name_hash;
+    ELSE
+        RAISE NOTICE 'column "name_hash" already removed';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
 /*
     It may be necessary to reset users' passwords since we're now using
     spring-security package.
 */  
-CREATE OR REPLACE FUNCTION update_user_passwords() RETURNS void AS $$
+CREATE OR REPLACE FUNCTION reset_user_passwords() RETURNS void AS $$
 DECLARE 
 	user_name TEXT;
 BEGIN
@@ -39,5 +67,9 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT update_user_passwords();
+SELECT remove_name_hash_from_dex_users();
+SELECT reset_user_passwords();
 
+DROP FUNCTION make_plpgsql(); 
+DROP FUNCTION remove_name_hash_from_dex_users();
+DROP FUNCTION reset_user_passwords();
