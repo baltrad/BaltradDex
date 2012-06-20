@@ -58,8 +58,6 @@ public class AppConfiguration {
     private String email;
     /** Keystore password */
     private String keystorePass;
-    /** Certificate alias */
-    private String certAlias;
     /** Certificates directory */
     private String certsDir;
     /** Keystore directory */
@@ -82,13 +80,12 @@ public class AppConfiguration {
      * @param timeZone Time zone
      * @param email Node admin's email
      * @param keystorePass Keystore password  
-     * @param certAlias Certificate alias
      * @param keystoreDir Keystore directory
      */
     public AppConfiguration( String nodeName, String nodeAddress, String nodeType, String version, 
             int soTimeout, int connTimeout, String workDir, String imagesDir, String thumbsDir, 
             String organization, String address, String timeZone, String email, String keystorePass,
-            String certAlias, String certsDir, String keystoreDir) {
+            String certsDir, String keystoreDir) {
         this.nodeName = nodeName;
         this.nodeAddress = nodeAddress;
         this.nodeType = nodeType;
@@ -103,7 +100,6 @@ public class AppConfiguration {
         this.timeZone = timeZone;
         this.email = email;
         this.keystorePass = keystorePass;
-        this.certAlias = certAlias;
         this.certsDir = certsDir;
         this.keystoreDir = keystoreDir;
     }
@@ -132,7 +128,6 @@ public class AppConfiguration {
                 appConf.getTimeZone().equals( this.getTimeZone() ) &&
                 appConf.getEmail().equals( this.getEmail() ) &&
                 appConf.getKeystorePass().equals( this.getKeystorePass() ) &&
-                appConf.getCertAlias().equals( this.getCertAlias() ) &&
                 appConf.getCertsDir().equals( this.getCertsDir() ) &&
                 appConf.getKeystoreDir().equals(this.getKeystoreDir());
         } else {
@@ -307,18 +302,6 @@ public class AppConfiguration {
      * @param Keystore password to set
      */
     public void setKeystorePass( String keystorePass ) { this.keystorePass = keystorePass; }
-    /**
-     * Gets certificate alias. 
-     * 
-     * @return Certificate alias
-     */
-    public String getCertAlias() { return certAlias; }
-    /**
-     * Sets certificate alias. 
-     * 
-     * @param certAlias Certificate alias to set
-     */
-    public void setCertAlias( String certAlias ) { this.certAlias = certAlias; }
     /**
      * Gets certificates directory.
      * 
