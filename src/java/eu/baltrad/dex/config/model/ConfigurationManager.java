@@ -121,8 +121,6 @@ public class ConfigurationManager {
     
     /** Keystore password */
     private static final String KEYSTORE_PASS_PROP = "keystore.pass";
-    /** Certificate alias */ 
-    private static final String KEY_ALIAS_PROP = "key.alias";
     /** Certificates directory */
     private static final String CERTS_DIR_PROP = "certificates.directory";
     
@@ -187,8 +185,7 @@ public class ConfigurationManager {
                 userProps.getProperty(THUMBNAILS_DIR_PROP), userProps.getProperty(ORG_NAME_PROP),
                 userProps.getProperty(ORG_ADDRESS_PROP), userProps.getProperty(TIME_ZONE_PROP),
                 userProps.getProperty(EMAIL_PROP), userProps.getProperty(KEYSTORE_PASS_PROP),
-                userProps.getProperty(KEY_ALIAS_PROP), userProps.getProperty(CERTS_DIR_PROP),
-                userProps.getProperty(KEYSTORE_DIR_PROP));
+                userProps.getProperty(CERTS_DIR_PROP), userProps.getProperty(KEYSTORE_DIR_PROP));
             return conf;
         } catch( Exception e ) {
             log.error( "Failed to load properties", e );
@@ -219,7 +216,6 @@ public class ConfigurationManager {
             userProps.setProperty(TIME_ZONE_PROP, appConf.getTimeZone());
             userProps.setProperty(EMAIL_PROP, appConf.getEmail());
             userProps.setProperty(KEYSTORE_PASS_PROP, appConf.getKeystorePass());
-            userProps.setProperty(KEY_ALIAS_PROP, appConf.getCertAlias());
             userProps.setProperty(CERTS_DIR_PROP, appConf.getCertsDir());
             userProps.setProperty(KEYSTORE_DIR_PROP, appConf.getKeystoreDir());
             //

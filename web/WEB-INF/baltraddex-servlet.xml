@@ -50,10 +50,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="file_details.htm">bltFileDetailsController</prop>
                 <prop key="download.htm">bltFileDownloadController</prop>
                 <prop key="data_preview.htm">bltImagePreviewController</prop>
+                
                 <!-- Operator pages -->
                 <prop key="exchange.htm">urlFilenameController</prop>
                 <prop key="processing.htm">urlFilenameController</prop>
                 <prop key="registry.htm">registerController</prop>
+                
                 <!-- Admin pages -->
                 <prop key="settings.htm">urlFilenameController</prop>
                 <prop key="save_radar.htm">saveRadarController</prop>

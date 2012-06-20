@@ -159,16 +159,16 @@ public class PostSubscriptionServlet extends HttpServlet {
                 subscriptionManager.load(
                     req.getNodeName(), ds.getName(), 
                     Subscription.SUBSCRIPTION_UPLOAD);
-            String[] mesageArgs = {ds.getName(), nodeName, req.getNodeName()};
+            String[] messageArgs = {ds.getName(), nodeName, req.getNodeName()};
             if (existing == null) {
                 if (subscriptionManager.storeNoId(requested) == 1) {
                     subscribedDataSources.add(new DataSource(
                             ds.getName(), ds.getDescription()));
                     log.warn(messages.getMessage(
-                            PS_SUBSCRIPTION_SUCCESS_KEY, mesageArgs));
+                            PS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
                 } else {
                     log.error(messages.getMessage(
-                            PS_SUBSCRIPTION_FAILURE_KEY, mesageArgs));
+                            PS_SUBSCRIPTION_FAILURE_KEY, messageArgs));
                 }
             } else {
                 requested.setId(existing.getId());
@@ -176,10 +176,10 @@ public class PostSubscriptionServlet extends HttpServlet {
                     subscribedDataSources.add(new DataSource(
                             ds.getName(), ds.getDescription()));
                     log.warn(messages.getMessage(
-                            PS_SUBSCRIPTION_SUCCESS_KEY, mesageArgs));
+                            PS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
                 } else {
                     log.error(messages.getMessage(
-                            PS_SUBSCRIPTION_FAILURE_KEY, mesageArgs));
+                            PS_SUBSCRIPTION_FAILURE_KEY, messageArgs));
                 }
             }            
         }

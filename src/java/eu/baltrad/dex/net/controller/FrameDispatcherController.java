@@ -217,8 +217,14 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 }
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(
-                    InitAppUtil.getConf().getKeystoreDir(), InitAppUtil.getConf().getCertAlias(), 
+                    InitAppUtil.getConf().getKeystoreDir(), InitAppUtil.getConf().getNodeName(), 
                         timestamp);
+                
+                // to remain compatibility with versions using BaltradFrame
+                if (!user.getNodeAddress().endsWith("/BaltradDex/dispatch.htm")) {
+                    user.setNodeAddress(user.getNodeAddress() + "/BaltradDex/dispatch.htm");
+                }
+                
                 SerialFrame serialFrame = SerialFrame.postDSListResponse(user.getNodeAddress(), 
                         InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
                         timestamp, signature, dsList);
@@ -277,7 +283,13 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(), 
-                    InitAppUtil.getConf().getCertAlias(), timestamp); 
+                    InitAppUtil.getConf().getNodeName(), timestamp);
+                
+                // to remain compatibility with versions using BaltradFrame
+                if (!user.getNodeAddress().endsWith("/BaltradDex/dispatch.htm")) {
+                    user.setNodeAddress(user.getNodeAddress() + "/BaltradDex/dispatch.htm");
+                }
+                
                 SerialFrame serialFrame = SerialFrame.postSubscriptionResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
                         InitAppUtil.getConf().getNodeName(), timestamp, signature, subConfirm);
@@ -320,7 +332,13 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(),    
-                    InitAppUtil.getConf().getCertAlias(), timestamp); 
+                    InitAppUtil.getConf().getNodeName(), timestamp); 
+                
+                // to remain compatibility with versions using BaltradFrame
+                if (!user.getNodeAddress().endsWith("/BaltradDex/dispatch.htm")) {
+                    user.setNodeAddress(user.getNodeAddress() + "/BaltradDex/dispatch.htm");
+                }
+                
                 SerialFrame serialFrame = SerialFrame.postSubscriptionSyncResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
                         InitAppUtil.getConf().getNodeName(), timestamp, signature, sub);
@@ -386,7 +404,13 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 User user = userManager.getByName(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(),    
-                    InitAppUtil.getConf().getCertAlias(), timestamp); 
+                    InitAppUtil.getConf().getNodeName(), timestamp); 
+                
+                // to remain compatibility with versions using BaltradFrame
+                if (!user.getNodeAddress().endsWith("/BaltradDex/dispatch.htm")) {
+                    user.setNodeAddress(user.getNodeAddress() + "/BaltradDex/dispatch.htm");
+                }
+                
                 SerialFrame serialFrame = SerialFrame.postSubscriptionUpdateResponse(
                         user.getNodeAddress(), InitAppUtil.getConf().getNodeAddress(), 
                         InitAppUtil.getConf().getNodeName(), timestamp, signature, confirmedSub);
@@ -433,13 +457,20 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     boolean matches = metadataMatcher.match(fileEntry.getMetadata(), 
                             filter.getExpression());
                     // Make sure that user exists locally
+
                     User receiver = userManager.getByName(sub.getUserName());
                     DeliveryRegisterEntry dre = deliveryRegisterManager.getEntry(
                             receiver.getId(), fileEntry.getUuid().toString());
                     if (matches && dre == null) {
                         long timestamp = System.currentTimeMillis();
                         String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(),    
-                            InitAppUtil.getConf().getCertAlias(), timestamp);
+                            InitAppUtil.getConf().getNodeName(), timestamp);
+                        
+                        // to remain compatibility with versions using BaltradFrame
+                        if (!receiver.getNodeAddress().endsWith("/BaltradDex/dispatch.htm")) {
+                            receiver.setNodeAddress(receiver.getNodeAddress() + "/BaltradDex/dispatch.htm");
+                        }                        
+                        
                         Frame frame = Frame.postDataDeliveryRequest(receiver.getNodeAddress(), 
                             InitAppUtil.getConf().getNodeAddress(),
                             InitAppUtil.getConf().getNodeName(), timestamp, signature, payloadFile);

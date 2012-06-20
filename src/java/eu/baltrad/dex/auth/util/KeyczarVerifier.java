@@ -40,9 +40,9 @@ public class KeyczarVerifier implements Verifier {
   public boolean verify(String message, String signature) 
           throws KeyczarException {
     try {
-      return verifier.verify(message, signature);
+      return verifier.verify(message, signature);      
     } catch (KeyczarException e) {
-      throw new KeyczarException("verification failed", e);
+        throw new KeyczarException("verification failed", e);
     }
   }
 }

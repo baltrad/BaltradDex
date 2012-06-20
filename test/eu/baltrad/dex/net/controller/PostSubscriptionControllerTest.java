@@ -146,7 +146,8 @@ public class PostSubscriptionControllerTest {
     }
     
     @Test
-    public void postSubscription_HttpConnectionError() throws Exception {
+    public void subscribe_HttpConnectionError() throws Exception {
+
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andThrow(new IOException("Http connection error"));
         replay(httpClientMock);

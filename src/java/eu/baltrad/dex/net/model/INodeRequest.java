@@ -31,10 +31,10 @@ package eu.baltrad.dex.net.model;
 public interface INodeRequest {
 
     static final String[] HEADERS = {"Content-Type", "Content-MD5", "Date"};
-    static final String AUTH_HDR = "Authorization";
-    static final String HDR_SEPARATOR = ":";
     static final String NODE_NAME_HDR = "Node-Name";
     static final String NODE_ADDR_HDR = "Node-Address";
+    static final String AUTH_HDR = "Authorization";
+    static final String HDR_SEPARATOR = ":";
     
     /**
      * Retrieves message for authentication.

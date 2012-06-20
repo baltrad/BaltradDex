@@ -466,7 +466,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
         String signature = getSignatureString(
                 /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/
                 InitAppUtil.getConf().getKeystoreDir(),
-                InitAppUtil.getConf().getCertAlias(), timestamp);
+                InitAppUtil.getConf().getNodeName(), timestamp);
         Frame frame = Frame.postSubscriptionSyncRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
                 timestamp, signature, payloadFile);
@@ -493,7 +493,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
         String signature = getSignatureString(
                 /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/
                 InitAppUtil.getConf().getKeystoreDir(),
-                InitAppUtil.getConf().getCertAlias(), timestamp);
+                InitAppUtil.getConf().getNodeName(), timestamp);
         Frame frame = Frame.postSubscriptionUpdateRequest(remoteNodeAddress, 
                 InitAppUtil.getConf().getNodeAddress(), InitAppUtil.getConf().getNodeName(), 
                 timestamp, signature, payloadFile);

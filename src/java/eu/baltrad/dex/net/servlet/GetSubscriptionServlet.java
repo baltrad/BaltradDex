@@ -60,6 +60,7 @@ import java.io.IOException;
  * @since 1.1.0
  */
 @Controller
+
 public class GetSubscriptionServlet extends HttpServlet {
     
     private static final String GS_INTERNAL_SERVER_ERROR_KEY = 
@@ -127,6 +128,9 @@ public class GetSubscriptionServlet extends HttpServlet {
     
     
     
+
+
+
     /**
      * Implements Controller interface.
      * @param request Http servlet request
@@ -151,6 +155,7 @@ public class GetSubscriptionServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) 
     {
         
+
         System.out.println("______________________get subscription request received");
         
         NodeRequest req = new NodeRequest(request);
@@ -190,6 +195,7 @@ public class GetSubscriptionServlet extends HttpServlet {
     @Autowired
     public void setJsonUtil(IJsonUtil jsonUtil) {
         this.jsonUtil = jsonUtil;
+
     }
     
     

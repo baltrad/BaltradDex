@@ -68,7 +68,11 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT remove_name_hash_from_dex_users();
+<<<<<<< HEAD
 --SELECT reset_user_passwords();
+=======
+SELECT reset_user_passwords();
+>>>>>>> 2c6e9f2789d17d4633eb1528979cb9fa27983219
 
 DROP FUNCTION make_plpgsql(); 
 DROP FUNCTION remove_name_hash_from_dex_users();

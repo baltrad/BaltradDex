@@ -85,7 +85,6 @@ public class DataSourceListControllerTest {
         protected void initConfiguration() {}
     }
     
-    
     @Before
     public void setUp() throws Exception {
         classUnderTest = new DSLController();

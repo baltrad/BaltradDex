@@ -66,7 +66,7 @@ public class PostSubscriptionServletTest {
             + "data source\"},{\"name\":\"DS2\",\"id\":0,\"description\":\"One "
             + "more test data source\"}]";
     
-     private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
+    private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
     
     private PSServlet classUnderTest;
     private JsonUtil jsonUtil;
@@ -75,6 +75,7 @@ public class PostSubscriptionServletTest {
     private MockHttpServletResponse response;
     private ISubscriptionManager subscriptionManagerMock;
     private DateFormat format;
+
     
     class PSServlet extends PostSubscriptionServlet {
         public PSServlet() {
@@ -114,7 +115,6 @@ public class PostSubscriptionServletTest {
         request.addHeader("Node-Name", "test.baltrad.eu");
         request.addHeader("Node-Address", "http://test.baltrad.eu");
     }
-    
     
     @Test
     public void handleRequest_Unauthorized() throws Exception {

@@ -96,18 +96,47 @@ public class GetSubscriptionController implements MessageSetter {
     private static final String SELECTED_SUBSCRIPION_KEY = "selected_subscription";
     private static final String PEER_NAME_KEY = "peer_name";
     private static final String STATUS_NOT_CHANGED_KEY = "status_not_changed";
-    
-    
     private static final String SELECTED_DATA_SOURCES_KEY = "selected_data_sources";
     
     private ISubscriptionManager subscriptionManager;
+    private INodeConnectionManager nodeConnectionManager;
     
     private IDataSourceManager dataSourceManager;
     
     private MessageResourceUtil messages;
-    
+
+    private Authenticator authenticator;
+    private RequestFactory requestFactory;
+    private HttpClientUtil httpClient;
+    private IJsonUtil jsonUtil;
     private Logger log;
     
+    private String nodeName;
+    private String nodeAddress;
+    
+    /**
+     * Default constructor.
+     **
+    public GetSubscriptionController() {
+        this.authenticator = new KeyczarAuthenticator(
+                InitAppUtil.getConf().getKeystoreDir());
+        this.httpClient = new HttpClientUtil(
+                InitAppUtil.getConf().getConnTimeout(), 
+                InitAppUtil.getConf().getSoTimeout());
+        this.nodeName = InitAppUtil.getConf().getNodeName();
+        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);        
+    }*/
+    
+    /**
+     * Constructor.
+     * @param nodeName Node name
+     * @param nodeAdress Node address
+     */
+    public GetSubscriptionController(String nodeName, String nodeAddress) {
+        this.nodeName = nodeName;
+        this.nodeAddress = nodeAddress;
+    }
     
     
     /**
@@ -142,6 +171,7 @@ public class GetSubscriptionController implements MessageSetter {
         model.addAttribute(detailsKey, details);
     }
     
+
     /**
      * 
      * @param model
@@ -172,6 +202,7 @@ public class GetSubscriptionController implements MessageSetter {
         return SUBSCRIPTION_BY_PEER_VIEW;
     }
     
+
     /**
      * 
      * @param model
@@ -230,9 +261,89 @@ public class GetSubscriptionController implements MessageSetter {
     }
     
     
+    /**
+     * @param jsonUtil the jsonUtil to set
+     */
+    @Autowired
+    public void setJsonUtil(IJsonUtil jsonUtil) {
+        this.jsonUtil = jsonUtil;
+    }
+    
+    /**
+     * @param nodeConnectionManager the nodeConnectionManager to set
+     */
+    @Autowired
+    public void setNodeConnectionManager(
+            INodeConnectionManager nodeConnectionManager) {
+        this.nodeConnectionManager = nodeConnectionManager;
+    }
     
     
-     
+    
+    
+    
+    
+    
+    
+
+    /**
+     * @return the urlValidator
+     *
+    public UrlValidatorUtil getUrlValidator() {
+        return urlValidator;
+    }
+
+    /**
+     * @param urlValidator the urlValidator to set
+     * void setUrlValidator(UrlValidatorUtil urlValidator) {
+        this.urlValidator = urlValidator;
+    }
+
+    /**
+     * @return the messages
+     *
+    public MessageResourceUtil getMessages() {
+        return messages;
+    }
+
+    /**
+     * @param messages the messages to set
+     *
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
+    }
+
+    /**
+     * @return the authenticator
+     *
+    public Authenticator getAuthenticator() {
+        return authenticator;
+    }
+
+    /**
+     * @param authenticator the authenticator to set
+     *
+    public void setAuthenticator(Authenticator authenticator) {
+        this.authenticator = authenticator;
+    }
+
+    /**
+     * @return the httpClient
+     *
+    public HttpClientUtil getHttpClient() {
+        return httpClient;
+    }
+
+    /**
+     * @param httpClient the httpClient to set
+     *
+    public void setHttpClient(HttpClientUtil httpClient) {
+        this.httpClient = httpClient;
+    }*/
+
+   
+
+    
 
     /**
      * @param subscriptionManager the subscriptionManager to set

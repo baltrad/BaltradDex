@@ -582,6 +582,54 @@ public class SubscriptionManager implements ISubscriptionManager {
         }
         return delete;
     }
-    
+    /**
+     * Compares two subscription lists based on chosen subscription field values.
+     *
+     * @param s1 First subscription list
+     * @param s2 Second subscription list
+     * @return True if field values are equal
+     */
+    public boolean compare(List<Subscription> s1, List<Subscription> s2) {
+        boolean res = true;
+        try {
+            if (s1.size() != s2.size()) {
+                res = false;
+            } else {
+                for (int i = 0; i < s1.size(); i++) {
+                    if(!s1.get(i).getDataSourceName().equals(s2.get(i).getDataSourceName()) ||
+                            !s1.get(i).getNodeAddress().equals(s2.get(i).getNodeAddress()) ||
+                            !s1.get(i).getOperatorName().equals(s2.get(i).getOperatorName()) ||
+                            !s1.get(i).getType().equals(s2.get(i).getType()) ||
+                            s1.get(i).getActive() != s2.get(i).getActive()) {
+                        res = false;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to compare subscriptions lists", e);
+        }
+        return res;
+    }
+    /**
+     * Compares two subscription objects based on chosen field values.
+     *
+     * @param s1 First subscription object
+     * @param s2 Second subscription object
+     * @return True if field values are equal
+     */
+    public boolean compare(Subscription s1, Subscription s2) {
+        boolean res = true;
+        try {
+            if (!s1.getDataSourceName().equals(s2.getDataSourceName()) ||
+                    !s1.getNodeAddress().equals(s2.getNodeAddress()) ||
+                    !s1.getOperatorName().equals(s2.getOperatorName()) ||
+                    !s1.getType().equals( s2.getType()) || s1.getActive() != s2.getActive()) {
+                res = false;
+            }
+        } catch(Exception e) {
+            log.error("Failed to compare subscriptions", e);
+        }
+        return res;
+    }
 }
 //--------------------------------------------------------------------------------------------------
