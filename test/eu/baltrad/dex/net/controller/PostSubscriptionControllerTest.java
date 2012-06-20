@@ -80,7 +80,7 @@ public class PostSubscriptionControllerTest {
             + "data source\"},{\"name\":\"DS2\",\"id\":2,\"description\":\"One "
             + "more test data source\"}]";
     
-    private PostSubscriptionController classUnderTest;
+    private PSController classUnderTest;
     private IHttpClientUtil httpClientMock;
     private INodeConnectionManager nodeConnectionManagerMock;
     private ISubscriptionManager subscriptionManagerMock;
@@ -88,10 +88,18 @@ public class PostSubscriptionControllerTest {
     private Logger log;
     private JsonUtil jsonUtil;
     
+    class PSController extends PostSubscriptionController {
+        public PSController() {
+            this.nodeName = "test.baltrad.eu";
+            this.nodeAddress = "http://test.baltrad.eu";
+        }
+        @Override
+        public void initConfiguration() {}
+    }
+    
     @Before
     public void setUp() throws Exception {
-        classUnderTest = new PostSubscriptionController("test.baltrad.eu", 
-                "http://test.baltrad.eu");
+        classUnderTest = new PSController();
         jsonUtil = new JsonUtil();
         classUnderTest.setJsonUtil(jsonUtil);
         classUnderTest.setAuthenticator(new EasyAuthenticator());

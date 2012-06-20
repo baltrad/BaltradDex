@@ -103,7 +103,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
      * @param request Http request
      * @param response Http response
      * @return Model and view containing list of all subscriptions
-     */
+     *
     public ModelAndView subscription(HttpServletRequest request, 
             HttpServletResponse response) {
         ModelAndView modelAndView = new ModelAndView();
@@ -124,8 +124,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
             }
             if (code == HttpServletResponse.SC_OK) {
                 SerialFrame serialFrame = readFrameFromStream(res);    
-                if (authenticate(/*ServletContextUtil.getServletContextPath() 
-                        + InitAppUtil.KS_FILE_PATH,*/
+                if (authenticate(
                         InitAppUtil.getConf().getKeystoreDir(), serialFrame.getNodeName(), 
                         serialFrame.getSignature(), serialFrame.getTimestamp())) {
                     Subscription sub = (Subscription) serialFrame.getItem();
@@ -144,14 +143,14 @@ public class SubscriptionController_deprecated extends MultiActionController {
         modelAndView.setViewName(SHOW_SUBSCRIPTIONS_VIEW);
         modelAndView.addObject(SHOW_SUBSCRIPTIONS_KEY, subscriptions);
         return modelAndView;
-    }
+    }*/
     /**
      * Shows list of data channels selected for subscription.
      *
      * @param request Http request
      * @param response Http response
      * @return Model and view containing list of data channels selected for subscription
-     */
+     *
     public ModelAndView selected_subscription( HttpServletRequest request,
             HttpServletResponse response ) {
         // get the list of data sources selected for subscription by the user
@@ -204,7 +203,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
         setChangedSubscriptions( changedSubs );
         return new ModelAndView( SELECTED_SUBSCRIPTIONS_VIEW, SELECTED_SUBSCRIPTIONS_KEY,
                 changedSubs );
-    }
+    }*/
     /**
      * Shows list of subscribed data channels.
      *

@@ -1,5 +1,5 @@
 <%-- 
-    Document   : getsubscription
+    Document   : get_subscription.htm
     Created on : May 25, 2012, 1:54:26 PM
     Author     : szewczenko
 --%>

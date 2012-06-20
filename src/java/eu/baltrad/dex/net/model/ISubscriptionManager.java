@@ -33,10 +33,12 @@ public interface ISubscriptionManager {
     
     public Subscription load(int id);
     
+    public List<Subscription> load(String type);
+    
+    public List<Subscription> load(String operator, String type);
+    
     public Subscription load(String user, String dataSource, 
             String type);
-    
-    public List<Subscription> load(String type);
     
     public List<Subscription> loadOperators(String type);
     
@@ -47,5 +49,4 @@ public interface ISubscriptionManager {
     public int update(Subscription s);
     
     public int delete(Subscription s);
-    
 }

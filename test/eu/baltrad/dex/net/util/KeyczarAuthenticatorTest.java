@@ -21,6 +21,10 @@
 
 package eu.baltrad.dex.net.util;
 
+import eu.baltrad.dex.net.model.NodeRequest;
+import eu.baltrad.dex.auth.util.Signer;
+import eu.baltrad.dex.auth.util.KeyczarCryptoFactory;
+
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.Header;
 
@@ -34,6 +38,7 @@ import org.junit.Test;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Date;
 import java.text.DateFormat;
@@ -49,115 +54,65 @@ public class KeyczarAuthenticatorTest {
     
     private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
     
+    private KeyczarCryptoFactory cryptoFactory;
     private RequestFactory requestFactory;
     private KeyczarAuthenticator classUnderTest;
     private DateFormat format;
     
     @Before
     public void setUp() {
+        cryptoFactory = new KeyczarCryptoFactory(new File("./keystore"));
         requestFactory = new DefaultRequestFactory(
                 URI.create("http://example.com"));
-        classUnderTest = new KeyczarAuthenticator("./keystore", 
-                "dev.baltrad.eu");
+        classUnderTest = new KeyczarAuthenticator("./keystore");
         assertNotNull(classUnderTest);
         format = new SimpleDateFormat(DATE_FORMAT);
     }
     
     private void setAttributes(HttpServletRequest request) {
-        request.setAttribute("Content-Type", "text/html");
+        request.setAttribute("Content-Type", "text/html");  
         request.setAttribute("Content-MD5", Base64.encodeBase64String(
                 request.getRequestURI().getBytes()));
         request.setAttribute("Date", format.format(new Date()));
     }
     
     @Test
-    public void getMessage() {
-        HttpUriRequest request = requestFactory
-                .createGetDataSourceListingRequest("localnode", 
-                    "http://localhost");
-        String message = classUnderTest.getMessage(request);
-        assertNotNull(message);
-        assertTrue(message.length() > 0);
-    }
-    
-    @Test
-    public void sign() {
-        HttpUriRequest request = requestFactory.createGetSubscriptionRequest();
-        String signature = classUnderTest.sign(request);
-        assertNotNull(signature);
-        assertTrue(signature.length() > 0);   
-    }
-    
-    @Test
     public void addCredentials() {
-        HttpUriRequest request = requestFactory.createGetSubscriptionRequest();
-        classUnderTest.addCredentials(request);
+        HttpUriRequest request = requestFactory.createGetSubscriptionRequest(
+            "localnode", "http://localhost",
+                "json string will be passed here");
+        classUnderTest.addCredentials(request, "dev.baltrad.eu");
         Header header = request.getFirstHeader("Authorization");
         assertNotNull(header);
         assertNotNull(header.getValue());
     }
     
-    @Test
-    public void getSignature() {
-        HttpServletRequest request = new MockHttpServletRequest("GET", 
-                "/getdatasourcelisting.htm");
-        setAttributes(request);
-        classUnderTest.addCredentials(request);
-        String signature = classUnderTest.getSignature(request);
-        assertNotNull(signature);
-        assertTrue(signature.length() > 0);
-    }
-    
-    @Test
-    public void getUser() {
-        HttpServletRequest request = new MockHttpServletRequest("GET", 
-                "/getdatasourcelisting.htm");
-        setAttributes(request);
-        classUnderTest.addCredentials(request);
-        String userName = classUnderTest.getUser(request);
-        assertNotNull(userName);
-        assertTrue(userName.length() > 0);
-    }
-    
-    @Test
-    public void getNodeName() {
-        HttpUriRequest request = requestFactory
-                .createGetDataSourceListingRequest("localnode", 
-                    "http://localhost");
-        String nodeName = classUnderTest.getNodeName(request);
-        assertNotNull(nodeName);
-        assertEquals("localnode", nodeName);
-    }
-    
-    @Test
-    public void getNodeAddress() {
-        HttpUriRequest request = requestFactory
-                .createGetDataSourceListingRequest("localnode", 
-                    "http://localhost");
-        String nodeAddress = classUnderTest.getNodeAddress(request);
-        assertNotNull(nodeAddress);
-        assertEquals("http://localhost", nodeAddress);
-    }
-    
     @Test 
     public void authenticate_Success() {
         HttpServletRequest request = new MockHttpServletRequest("GET", 
-                "/getdatasourcelisting.htm");
+                "/get_datasource_listing.htm");
         setAttributes(request);
-        classUnderTest.addCredentials(request);
-        assertTrue(classUnderTest.authenticate(classUnderTest.getMessage(
-                request), classUnderTest.getSignature(request)));
+        NodeRequest req = new NodeRequest(request);
+        Signer signer = cryptoFactory.createSigner("dev.baltrad.eu");
+        String signature = signer.sign(req.getMessage());
+        req.setAttribute("Authorization", "dev.baltrad.eu" + ":" + signature);
+        
+        assertTrue(classUnderTest.authenticate(req.getMessage(), 
+                req.getSignature(), "dev.baltrad.eu"));
     }
     
     @Test
     public void authenticate_Failure() {
         HttpServletRequest request = new MockHttpServletRequest("GET", 
-                "/getdatasourcelisting.htm");
+                "/get_datasource_listing.htm");
         setAttributes(request);
-        classUnderTest.addCredentials(request);
+        NodeRequest req = new NodeRequest(request);
+        Signer signer = cryptoFactory.createSigner("dev.baltrad.eu");
+        String signature = signer.sign(req.getMessage());
+        req.setAttribute("Authorization", "dev.baltrad.eu" + ":" + signature);
         request.setAttribute("Date", "");
-        assertFalse(classUnderTest.authenticate(classUnderTest.getMessage(
-                request), classUnderTest.getSignature(request)));
+        assertFalse(classUnderTest.authenticate(req.getMessage(), 
+                req.getSignature(), "dev.baltrad.eu"));
     }
     
 }

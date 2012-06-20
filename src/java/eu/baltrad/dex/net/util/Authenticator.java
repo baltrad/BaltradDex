@@ -23,8 +23,6 @@ package eu.baltrad.dex.net.util;
 
 import org.apache.http.client.methods.HttpUriRequest;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  *
  * @author szewczenko
@@ -34,91 +32,18 @@ public interface Authenticator {
     /**
      * Add credentials to outgoing request.
      * @param request Http URI request to add credentials to
+     * @param keyName Private key used to sign a message 
      */
-    public void addCredentials(HttpUriRequest request);
-    
-    /**
-     * Add credentials to outgoing request.
-     * @param request Http servlet equest to add credentials to
-     */
-    public void addCredentials(HttpServletRequest request);
+    public void addCredentials(HttpUriRequest request, String keyName);
     
     /**
      * Authenticates request at servlet side.
      * @param message Message to authenticate
      * @param signature Signature to authenticate with
+     * @param keyName Public key used to verify a message 
      * @return True upon successful authentication, false otherwise
      */
-    public boolean authenticate(String message, String signture);
-    
-    /**
-     * Creates authentication input.  
-     * @param request Http URI request
-     * @return Message to be authenticated
-     */
-    public String getMessage(HttpUriRequest request);
-    
-    /**
-     * Creates authentication input.  
-     * @param request Http servlet request
-     * @return Message to be authenticated
-     */
-    public String getMessage(HttpServletRequest request);
-    
-    /**
-     * Retrieves signature from request.
-     * @param request Http URI request
-     * @return Signature string
-     */
-    public String getSignature(HttpUriRequest request);
-    
-    /**
-     * Retrieves signature from request.
-     * @param request Http servlet request
-     * @return Signature string
-     */
-    public String getSignature(HttpServletRequest request);
-    
-    /**
-     * Retrieves user name from request.
-     * @param request Http URI request
-     * @return User identity string
-     */
-    public String getUser(HttpUriRequest request);
-    
-    /**
-     * Retrieves user name from request.
-     * @param request Http servlet request
-     * @return User identity string
-     */
-    public String getUser(HttpServletRequest request);
-    
-    /**
-     * Retrieves node name from request.
-     * @param request Http URI request
-     * @return Name of the requesting node
-     */
-    public String getNodeName(HttpUriRequest request);
-    
-    /**
-     * Retrieves node name from request.
-     * @param request Http servlet request
-     * @return Name of the requesting node
-     */
-    public String getNodeName(HttpServletRequest request);
-    
-    /**
-     * Retrieves node address from request.
-     * @param request Http URI request
-     * @return Address of the requesting node
-     */
-    public String getNodeAddress(HttpUriRequest request);
-    
-    /**
-     * Retrieves node address from request.
-     * @param request Http servlet request
-     * @return Address of the requesting node
-     */
-    public String getNodeAddress(HttpServletRequest request);
+    public boolean authenticate(String message, String signture, 
+            String keyName);
     
 }

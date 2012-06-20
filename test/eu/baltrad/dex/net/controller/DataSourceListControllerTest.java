@@ -71,15 +71,24 @@ public class DataSourceListControllerTest {
     private JsonUtil jsonUtil;
     private IJsonUtil jsonUtilMock;
     private MessageResourceUtil messages;
-    private DataSourceListController classUnderTest;
+    private DSLController classUnderTest;
     private INodeConnectionManager connectionManagerMock;
     private IHttpClientUtil httpClientMock;
     private Logger log;
     
+    class DSLController extends DataSourceListController {
+        public DSLController() {
+            this.nodeName = "test.baltrad.eu";
+            this.nodeAddress = "http://test.baltrad.eu";
+        }
+        @Override
+        protected void initConfiguration() {}
+    }
+    
+    
     @Before
     public void setUp() throws Exception {
-        classUnderTest = new DataSourceListController("test.baltrad.eu", 
-                "http://test.baltrad.eu");
+        classUnderTest = new DSLController();
         classUnderTest.setAuthenticator(new EasyAuthenticator());
         urlValidator = new UrlValidatorUtil();
         classUnderTest.setUrlValidator(urlValidator);

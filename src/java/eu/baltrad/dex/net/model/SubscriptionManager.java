@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Subscription manager implementing subscription handling functionality.
@@ -74,7 +75,7 @@ public class SubscriptionManager implements ISubscriptionManager {
     }
     
     /**
-     * Loads subscription from database.
+     * Loads subscription by id.
      * @param id Record id
      * @return Subscription with a given id
      */
@@ -88,7 +89,37 @@ public class SubscriptionManager implements ISubscriptionManager {
     }
     
     /**
-     * Loads subscriptions from database.
+     * Loads subscriptions by type.
+     * @param type Subscription type
+     * @return List of subscriptions matching a given type
+     */
+    public List<Subscription> load(String type) {
+        String sql = "SELECT * FROM dex_subscriptions WHERE type = ?";
+        try {
+            return jdbcTemplate.query(sql, mapper, type);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Loads subscriptions by operator name and type.
+     * @param operator
+     * @param type
+     * @return List of subscriptions matching given parameters
+     */
+    public List<Subscription> load(String operator, String type) {
+        String sql = "SELECT * FROM dex_subscriptions WHERE operator_name = ?" +
+                " AND type = ?";
+        try {
+            return jdbcTemplate.query(sql, mapper, operator, type);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Loads subscriptions by user name, data source name and type.
      * @param userName User name
      * @param dataSourceName Data source name
      * @param type Subscription type
@@ -101,20 +132,6 @@ public class SubscriptionManager implements ISubscriptionManager {
         try {
             return jdbcTemplate.queryForObject(sql, mapper, user, 
                 dataSource, type); 
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
-    }
-    
-    /**
-     * Loads subscriptions from a database.
-     * @param type Subscription type
-     * @return List of subscriptions matching a given type
-     */
-    public List<Subscription> load(String type) {
-        String sql = "SELECT * FROM dex_subscriptions WHERE type = ?";
-        try {
-            return jdbcTemplate.query(sql, mapper, type);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -565,54 +582,6 @@ public class SubscriptionManager implements ISubscriptionManager {
         }
         return delete;
     }
-    /**
-     * Compares two subscription lists based on chosen subscription field values.
-     *
-     * @param s1 First subscription list
-     * @param s2 Second subscription list
-     * @return True if field values are equal
-     */
-    public boolean compare(List<Subscription> s1, List<Subscription> s2) {
-        boolean res = true;
-        try {
-            if (s1.size() != s2.size()) {
-                res = false;
-            } else {
-                for (int i = 0; i < s1.size(); i++) {
-                    if(!s1.get(i).getDataSourceName().equals(s2.get(i).getDataSourceName()) ||
-                            !s1.get(i).getNodeAddress().equals(s2.get(i).getNodeAddress()) ||
-                            !s1.get(i).getOperatorName().equals(s2.get(i).getOperatorName()) ||
-                            !s1.get(i).getType().equals(s2.get(i).getType()) ||
-                            s1.get(i).getActive() != s2.get(i).getActive()) {
-                        res = false;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.error("Failed to compare subscriptions lists", e);
-        }
-        return res;
-    }
-    /**
-     * Compares two subscription objects based on chosen field values.
-     *
-     * @param s1 First subscription object
-     * @param s2 Second subscription object
-     * @return True if field values are equal
-     */
-    public boolean compare(Subscription s1, Subscription s2) {
-        boolean res = true;
-        try {
-            if (!s1.getDataSourceName().equals(s2.getDataSourceName()) ||
-                    !s1.getNodeAddress().equals(s2.getNodeAddress()) ||
-                    !s1.getOperatorName().equals(s2.getOperatorName()) ||
-                    !s1.getType().equals( s2.getType()) || s1.getActive() != s2.getActive()) {
-                res = false;
-            }
-        } catch(Exception e) {
-            log.error("Failed to compare subscriptions", e);
-        }
-        return res;
-    }
+    
 }
 //--------------------------------------------------------------------------------------------------

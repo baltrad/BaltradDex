@@ -25,7 +25,6 @@ Author     : szewczenko
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@ page import="java.util.List" %>
 
 <t:page_tabbed pageTitle="Subscriptions" activeTab="exchange">
     <jsp:body>
@@ -34,70 +33,57 @@ Author     : szewczenko
         </div>
         <div class="right">
             <div class="blttitle">
-                Subscription management
+                Subscribed peer nodes
             </div>
             <c:choose>
-                <c:when test="${not empty downloads}">
+                <c:when test="${not empty subscribed_peers}">
                     <div class="blttext">
-                        Click on peer node's name to view list of subscribed
+                        Click on peer node's name to access list of subscribed
                         data sources.
                     </div>
                     <div class="table">
                         <div class="subscriptions">
-                            <form action="subscriptions.htm" method="post">
-                                <div class="tableheader">
-                                    <div id="cell" class="count">&nbsp;</div>
-                                    <div id="cell" class="name">
-                                        Data source
+                            <div class="tableheader">
+                                <div id="cell" class="count">&nbsp;</div>
+                                <div id="cell" class="name">
+                                    Peer name
+                                </div>
+                                <div id="cell" class="timestamp">
+                                    Node address
+                                </div>
+                            </div>
+                            <c:set var="count" scope="page" value="1"/>
+                            <c:forEach items="${subscribed_peers}" var="sub">
+                                <div class="entry">
+                                    <div id="cell" class="count">
+                                        <c:out value="${count}"/>
+                                        <c:set var="count" value="${count + 1}"/>
                                     </div>
                                     <div id="cell" class="operator">
-                                        Operator
+                                        <a href="subscription_by_peer.htm?peer_name=${sub.operatorName}" 
+                                            title="Click to access subscribed data sources">
+                                            <c:out value="${sub.operatorName}" />
+                                        </a>
                                     </div>
-                                    <div id="cell" class="active">
-                                        Status
-                                    </div>
-                                </div>
-                                <c:set var="count" scope="page" value="1"/>
-                                <c:forEach items="${downloads}" var="sub">
-                                    <div class="entry">
-                                        <div id="cell" class="count">
-                                            <c:out value="${count}"/>
-                                            <c:set var="count" value="${count + 1}"/>
-                                        </div>
-                                        <div id="cell" class="name">
-                                            <c:out value="${sub.dataSourceName}"/>
-                                        </div>
-                                        <div id="cell" class="operator">
-                                            <c:out value="${sub.operatorName}"/>
-                                        </div>
-                                        <div id="cell" class="active">
-                                            <c:choose>
-                                                <c:when test="${sub.active == true}">
-                                                    <input type="checkbox" name="selectedDataSources"
-                                                        value="${sub.dataSourceName}" checked/>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <input type="checkbox" name="selectedDataSources"
-                                                        value="${sub.dataSourceName}"/>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </div>
-                                    </div>
-                                </c:forEach>
-                                <div class="tablefooter">
-                                    <div class="buttons">
-                                        <button class="rounded" type="submit">
-                                            <span>OK</span>
-                                        </button>
+                                    <div id="cell" class="nodeaddress">
+                                        <c:out value="${sub.nodeAddress}"/>
                                     </div>
                                 </div>
-                            </form>
+                            </c:forEach>
+                            <div class="tablefooter">
+                                <div class="buttons">
+                                    <button class="rounded" type="button"
+                                            onclick="window.location.href='exchange.htm'">
+                                        <span>Back</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </c:when>
                 <c:otherwise>
                     <div class="blttext">
-                        No active subscriptions found. Use node connection 
+                        No subscribed peers found. Use node connection 
                         functionality to connect to peer nodes and subscribe 
                         data sources.
                     </div>
@@ -105,7 +91,7 @@ Author     : szewczenko
                         <div class="tablefooter">
                             <div class="buttons">
                                 <button class="rounded" type="button"
-                                    onclick="window.location.href='dsconnect.htm'">
+                                    onclick="window.location.href='connect_to_node.htm'">
                                     <span>OK</span>
                                 </button>
                             </div>

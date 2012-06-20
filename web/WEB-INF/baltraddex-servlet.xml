@@ -53,9 +53,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <!-- Operator pages -->
                 <prop key="exchange.htm">urlFilenameController</prop>
                 <prop key="processing.htm">urlFilenameController</prop>
-                <prop key="subscription.htm">subscriptionController_deprecated</prop>
-                <prop key="selected_subscription.htm">subscriptionController_deprecated</prop>
-                <prop key="subscription_status.htm">subscriptionController_deprecated</prop>
                 <prop key="registry.htm">registerController</prop>
                 <!-- Admin pages -->
                 <prop key="settings.htm">urlFilenameController</prop>
@@ -585,6 +582,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="dataSourceListController" 
           class="eu.baltrad.dex.net.controller.DataSourceListController"
           autowire="byType"/>
+          
     <!-- Data source list servlet -->
     <bean id="dataSourceListServlet" 
           class="eu.baltrad.dex.net.servlet.DataSourceListServlet"
@@ -593,12 +591,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- Node connection manager -->
     <bean id="nodeConnectionManager" 
           class="eu.baltrad.dex.net.model.NodeConnectionManager"/>
+          
     <!-- URL address validator -->
     <bean id="urlValidator" class="eu.baltrad.dex.net.util.UrlValidatorUtil"/>
+    
     <!-- Message source utility -->
     <bean id="messages" class="eu.baltrad.dex.util.MessageResourceUtil">
         <constructor-arg value="resources/messages"/>
     </bean>
+    
     <!-- JSON format utility -->
     <bean id="jsonUtil" class="eu.baltrad.dex.net.util.JsonUtil"/>
     
@@ -606,14 +607,17 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="postSubscriptionController" 
           class="eu.baltrad.dex.net.controller.PostSubscriptionController"
           autowire="byType"/>
+          
     <!-- Post subscription servlet -->
     <bean id="postSubscriptionServlet" 
           class="eu.baltrad.dex.net.servlet.PostSubscriptionServlet"
-          autowire="byType"/>   
+          autowire="byType"/>
+          
     <!-- Get subscription controller -->
     <bean id="getSubscriptionController" 
           class="eu.baltrad.dex.net.controller.GetSubscriptionController" 
           autowire="byType"/>
+          
     <!-- Get subscription servlet -->
     <bean id="getSubscriptionServlet" 
           class="eu.baltrad.dex.net.servlet.GetSubscriptionServlet"

@@ -1,5 +1,5 @@
 <%-- 
-    Document   : postsubscription
+    Document   : post_subscription.htm
     Created on : May 23, 2012, 9:49:33 AM
     Author     : szewczenko
 --%>

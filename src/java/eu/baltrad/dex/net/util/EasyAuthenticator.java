@@ -23,8 +23,6 @@ package eu.baltrad.dex.net.util;
 
 import org.apache.http.client.methods.HttpUriRequest;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * Implements easy authenticator.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
@@ -36,16 +34,9 @@ public class EasyAuthenticator implements Authenticator {
     /**
      * Method stub.
      * @param request Http URI request 
+     * @param keyName Private key used to sign a message 
      */
-    public void addCredentials(HttpUriRequest request) {
-        
-    }
-    
-    /**
-     * Method stub.
-     * @param request Http servlet request 
-     */
-    public void addCredentials(HttpServletRequest request) {
+    public void addCredentials(HttpUriRequest request, String keyName) {
         
     }
     
@@ -53,100 +44,12 @@ public class EasyAuthenticator implements Authenticator {
      * Lets all the requests through.
      * @param message Message to authenticate
      * @param signature Signature to use for message verification
+     * @param keyName Public key used to verify a message 
      * @return True upon successful authentication, false otherwise
      */ 
-    public boolean authenticate(String message, String signature) {
+    public boolean authenticate(String message, String signature, 
+            String keyName) {
         return true;
-    }
-    
-    /**
-     * Method stub.
-     * @param request Http URI request
-     * @return null
-     */
-    public String getMessage(HttpUriRequest request) {
-        return null;
-    }
-    
-    /**
-     * Method stub.
-     * @param request Http servlet request
-     * @return null
-     */
-    public String getMessage(HttpServletRequest request) {
-        return null;
-    }
-    
-    /**
-     * Method stub.
-     * @param request Http URI request
-     * @return 
-     */
-    public String getSignature(HttpUriRequest request) {
-        return null;
-    }
-    
-    /**
-     * Method stub.
-     * @param request Http servlet request
-     * @return null
-     */
-    public String getSignature(HttpServletRequest request) {
-        return null;
-    }
-    
-    /**
-     * Method stub.
-     * @param request Http URI request
-     * @return 
-     */
-    public String getUser(HttpUriRequest request) {
-        return null;
-    }
-    
-    /**
-     * Method stub.
-     * @param request Http servlet request
-     * @return null
-     */
-    public String getUser(HttpServletRequest request) {
-        return null;
-    }
-    
-    /**
-     * Method stub.
-     * @param request Http URI request
-     * @return null
-     */
-    public String getNodeName(HttpUriRequest request) {
-        return null;
-    }
-    
-    /**
-     * Method stub.
-     * @param request Http servlet request
-     * @return null
-     */
-    public String getNodeName(HttpServletRequest request) {
-        return null;
-    }
-    
-    /**
-     * Method stub.
-     * @param request Http URI request
-     * @return null
-     */
-    public String getNodeAddress(HttpUriRequest request) {
-        return null;
-    }
-    
-    /**
-     * Method stub.
-     * @param request Http servlet request
-     * @return null
-     */
-    public String getNodeAddress(HttpServletRequest request) {
-        return null;
     }
     
 }

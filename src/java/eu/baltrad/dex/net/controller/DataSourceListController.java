@@ -95,8 +95,8 @@ public class DataSourceListController implements MessageSetter {
     private IJsonUtil jsonUtil;
     private MessageResourceUtil messages;
     private Logger log;
-    private String nodeName;
-    private String nodeAddress;
+    protected String nodeName;
+    protected String nodeAddress;
     
     /** These variables are shared between methods */
     private String peerNodeName;
@@ -104,28 +104,23 @@ public class DataSourceListController implements MessageSetter {
     private Set<DataSource> peerDataSources;
     
     /**
-     * Constructor.
-     * @param nodeName Local node name
-     * @param nodeAddress Local node address
-     */
-    public DataSourceListController(String nodeName, String nodeAddress) {
-        this.nodeName = nodeName;
-        this.nodeAddress = nodeAddress;
-    }
-    
-    /**
      * Default constructor.
      */
     public DataSourceListController() {
+        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+    }
+    
+    /**
+     * Initializes controller with current configuration
+     */
+    protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
-                InitAppUtil.getConf().getKeystoreDir(),
-                InitAppUtil.getConf().getNodeName());
+                InitAppUtil.getConf().getKeystoreDir());
         this.httpClient = new HttpClientUtil(
                 InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
         this.nodeName = InitAppUtil.getConf().getNodeName();
         this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
     /**
@@ -199,6 +194,7 @@ public class DataSourceListController implements MessageSetter {
             @RequestParam(value="node_select", required=false) String nodeSelect,
             @RequestParam(value="url_input", required=false) String urlInput) 
     {
+        initConfiguration();
         String viewName = null;
         // Validate node's URL address 
         String urlSelect = null;
@@ -216,7 +212,7 @@ public class DataSourceListController implements MessageSetter {
             requestFactory = new DefaultRequestFactory(URI.create(url));
             HttpUriRequest req = requestFactory
                 .createGetDataSourceListingRequest(nodeName, nodeAddress);
-            authenticator.addCredentials(req);
+            authenticator.addCredentials(req, nodeName);
             try {
                 HttpResponse res = httpClient.post(req);
                 // Server reponse is OK, process data source list 
@@ -232,7 +228,7 @@ public class DataSourceListController implements MessageSetter {
                         NodeConnection conn = new NodeConnection(peerNodeName, 
                                 peerNodeAddress);
                         nodeConnectionManager.saveOrUpdate(conn);
-                    }
+                    }    
                     // Make data sources available for other methods
                     peerDataSources = readDataSources(res);
                     viewName = DS_CONNECTED_VIEW;

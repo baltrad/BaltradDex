@@ -45,7 +45,7 @@ Author     : szewczenko
                     <div class="tablefooter">
                        <div class="buttons">
                            <button class="rounded" type="button"
-                                onclick="window.location.href='subscription.htm'">
+                                onclick="window.location.href='subscribed_peers.htm'">
                                 <span>OK</span>
                            </button>
                        </div>

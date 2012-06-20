@@ -6,7 +6,7 @@
         </li>
         <li>
             <img src="includes/images/icons/subscription.png" alt="">
-            <a href="subscription.htm">Subscriptions</a>
+            <a href="subscribed_peers.htm">Subscriptions</a>
         </li>
         <li>
             <img src="includes/images/icons/register.png" alt="">

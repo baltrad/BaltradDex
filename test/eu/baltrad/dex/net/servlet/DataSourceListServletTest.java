@@ -37,6 +37,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
 
+import org.apache.commons.codec.binary.Base64;
+
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.*;
@@ -47,6 +49,9 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  * Data source list servlet test.
@@ -61,36 +66,57 @@ public class DataSourceListServletTest {
             + "more test data source\"},{\"name\":\"DS3\",\"id\":3,\"" 
             + "description\":\"Yet another test data source\"}]";
     
-    private DataSourceListServlet classUnderTest;
+    private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
+    
+    private DateFormat format;
+    private DSLServlet classUnderTest;
     private MessageResourceUtil messages;
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
     
+    class DSLServlet extends DataSourceListServlet {
+        public DSLServlet() {
+            this.nodeName = "test.baltrad.eu";
+            this.nodeAddress = "http://test.baltrad.eu";
+        }
+        @Override
+        public void initConfiguration() {}
+    }
+    
+    
     @Before
     public void setUp() throws Exception {
-        classUnderTest = new DataSourceListServlet("test.baltrad.eu", 
-                "http://test.baltrad.eu");
+        classUnderTest = new DSLServlet();
         classUnderTest.setLog(MessageLogger.getLogger(MessageLogger.SYS_DEX));
         messages = new MessageResourceUtil("resources/messages");
         classUnderTest.setMessages(messages);
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
+        format = new SimpleDateFormat(DATE_FORMAT);
     }
     
     @After
     public void tearDown() {
         classUnderTest = null;
-    }   
+    }
+    
+    private void setAttributes(MockHttpServletRequest request) {
+        request.setAttribute("Content-Type", "text/html");  
+        request.setAttribute("Content-MD5", Base64.encodeBase64String(
+                request.getRequestURI().getBytes()));
+        request.setAttribute("Date", format.format(new Date()));
+        request.addHeader("Authorization", "test.baltrad.eu" + ":" + 
+            "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_");   
+        request.addHeader("Node-Name", "test.baltrad.eu");
+        request.addHeader("Node-Address", "http://test.baltrad.eu");
+    }
     
     @Test
     public void handleRequest_Unauthorized() throws Exception {
         Authenticator authMock = createMock(Authenticator.class);
-        expect(authMock.authenticate(null, null)).andReturn(Boolean.FALSE)
-                .anyTimes();
-        expect(authMock.getMessage(isA(MockHttpServletRequest.class)))
-                .andReturn(null);
-        expect(authMock.getSignature(isA(MockHttpServletRequest.class)))
-                .andReturn(null);
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.FALSE).anyTimes();
+        setAttributes(request);
         replay(authMock);
         
         classUnderTest.setAuthenticator(authMock);
@@ -107,18 +133,10 @@ public class DataSourceListServletTest {
     @Test 
     public void handleRequest_InternalServerError() throws Exception {
         Authenticator authMock = createMock(Authenticator.class);
-        expect(authMock.authenticate(null, null)).andReturn(Boolean.TRUE)
-                .anyTimes();
-        expect(authMock.getMessage(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
-        expect(authMock.getSignature(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
-        expect(authMock.getNodeName(isA(MockHttpServletRequest.class)))
-                .andReturn("test.baltrad.eu").anyTimes();
-        expect(authMock.getNodeAddress(isA(MockHttpServletRequest.class)))
-                .andReturn("http://test.baltrad.eu").anyTimes();
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
+        setAttributes(request);
         replay(authMock);
-        
         IUserManager userManagerMock = createMock(IUserManager.class);
         expect(userManagerMock.getByName("test.baltrad.eu")).andReturn(null)
                 .anyTimes();
@@ -145,16 +163,9 @@ public class DataSourceListServletTest {
     @Test 
     public void handleRequest_OK() throws Exception {
         Authenticator authMock = createMock(Authenticator.class);
-        expect(authMock.authenticate(null, null)).andReturn(Boolean.TRUE)
-                .anyTimes();
-        expect(authMock.getMessage(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
-        expect(authMock.getSignature(isA(MockHttpServletRequest.class)))
-                .andReturn(null).anyTimes();
-        expect(authMock.getNodeName(isA(MockHttpServletRequest.class)))
-                .andReturn("test.baltrad.eu").anyTimes();
-        expect(authMock.getNodeAddress(isA(MockHttpServletRequest.class)))
-                .andReturn("http://test.baltrad.eu").anyTimes();
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
+        setAttributes(request);
         replay(authMock);
         
         IUserManager userManagerMock = createMock(IUserManager.class);
