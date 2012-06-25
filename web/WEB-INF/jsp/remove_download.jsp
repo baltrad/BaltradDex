@@ -96,8 +96,8 @@ Author     : szewczenko
                                             </c:choose>
                                         </div>
                                         <div id="cell" class="check">
-                                            <input type="checkbox" name="selectedDataSources"
-                                                value="${sub.dataSourceName}"/>
+                                            <input type="checkbox" name="downloadIds"
+                                                value="${sub.id}"/>
                                         </div>
                                     </div>
                                 </c:forEach>

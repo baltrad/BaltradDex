@@ -33,6 +33,7 @@ import javax.servlet.ServletException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Controller renders data upload status page. 
@@ -66,11 +67,15 @@ public class UploadStatusController implements Controller {
         throws ServletException, IOException {
         ModelAndView modelAndView = new ModelAndView( getSuccessView() );
         // get users
-        List<String> users = subscriptionManager.getDistinct(USER_NAME_FIELD,
-                Subscription.SUBSCRIPTION_UPLOAD);
+        List<Subscription> subscription = subscriptionManager
+                .loadOperators(Subscription.SUBSCRIPTION_UPLOAD);
+        List<String> users = new ArrayList<String>();
+        for (Subscription s : subscription) {
+            users.add(s.getOperatorName());
+        }
         modelAndView.addObject( USERS, users );
         // get remote subscriptions
-        List<Subscription> remoteSubscriptions = subscriptionManager.get(
+        List<Subscription> remoteSubscriptions = subscriptionManager.load(
                 Subscription.SUBSCRIPTION_UPLOAD);
         modelAndView.addObject( REMOTE_SUBSCRIPTION, remoteSubscriptions );
         return modelAndView;

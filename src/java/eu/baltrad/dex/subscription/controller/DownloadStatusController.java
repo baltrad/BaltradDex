@@ -33,6 +33,7 @@ import javax.servlet.ServletException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Controller renders data download status page presented to te user upon successfull login.
@@ -66,11 +67,15 @@ public class DownloadStatusController implements Controller {
         throws ServletException, IOException {
         ModelAndView modelAndView = new ModelAndView( getSuccessView() );
         // get operators
-        List<String> operators = subscriptionManager.getDistinct( OPERATOR_NAME_FIELD,
-                Subscription.SUBSCRIPTION_DOWNLOAD);
+        List<Subscription> subscription = subscriptionManager
+                .loadOperators(Subscription.SUBSCRIPTION_DOWNLOAD);
+        List<String> operators = new ArrayList<String>();
+        for (Subscription s : subscription) {
+            operators.add(s.getOperatorName());
+        }
         modelAndView.addObject( OPERATORS, operators );
         // get local subscriptions
-        List<Subscription> localSubscriptions = subscriptionManager.get(
+        List<Subscription> localSubscriptions = subscriptionManager.load(
                 Subscription.SUBSCRIPTION_DOWNLOAD);
         modelAndView.addObject( LOCAL_SUBSCRIPTION, localSubscriptions );
         return modelAndView;

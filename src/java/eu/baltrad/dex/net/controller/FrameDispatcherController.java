@@ -260,7 +260,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                         DataSource dsLocal = dataSourceManager.getDataSource(dsRequest.getName());
                         User user = userManager.getByName(Frame.getNodeName(parms));
                         // make sure user hasn't already subscribed the selected data sources
-                        if (subscriptionManager.get(user.getName(), dsLocal.getName(),
+                        if (subscriptionManager.load(user.getName(), dsLocal.getName(),
                                 Subscription.SUBSCRIPTION_UPLOAD) != null) {
                             log.warn("User " + user.getName() + " has already subscribed " + 
                                     dsLocal.getName() );
@@ -271,7 +271,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                                 InitAppUtil.getConf().getNodeName(),
                                 Subscription.SUBSCRIPTION_UPLOAD, false, false,
                                 InitAppUtil.getConf().getNodeAddress());
-                            subscriptionManager.save(sub);
+                            subscriptionManager.storeNoId(sub);
                             subConfirm.add(dsRequest);
                             log.info("User " + user.getName() + " subscribed " + 
                                     dsLocal.getName());
@@ -376,25 +376,37 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 // This subscription object serves asa confirrmation
                 Subscription confirmedSub = new Subscription();
                 if (sub.getActive()) {
-                    if (subscriptionManager.get(s.getUserName(), s.getDataSourceName(), 
+                    if (subscriptionManager.load(s.getUserName(), s.getDataSourceName(), 
                             Subscription.SUBSCRIPTION_UPLOAD) == null) {
                         // Subscription doesn't exist in the database - add as new subscription
-                        subscriptionManager.save(s);
+                        subscriptionManager.storeNoId(s);
                         confirmedSub = s;
                         confirmedSub.setActive(true);
                         log.info("User " + s.getUserName() + " subscribed " + s.getDataSourceName());
                     } else {
                         // Subscription exists in the database - update subscription
 
-                        subscriptionManager.update(s.getDataSourceName(), 
-                                Subscription.SUBSCRIPTION_UPLOAD, true);
+                        //subscriptionManager.update(s.getDataSourceName(), 
+                        //        Subscription.SUBSCRIPTION_UPLOAD, true);
+                        Subscription subs = subscriptionManager.load(
+                                s.getUserName(), s.getDataSourceName(),
+                                    Subscription.SUBSCRIPTION_UPLOAD);
+                        subs.setActive(true);
+                        subscriptionManager.update(subs);
+                        
                         confirmedSub = s;
                         confirmedSub.setActive(true);
                         log.info("User " + s.getUserName() + " subscribed " + s.getDataSourceName());
                     }                    
                 } else {
                     // Delete remote subscription
-                    int ii = subscriptionManager.delete(s.getUserName(), s.getDataSourceName(), s.getType());
+                    //int ii = subscriptionManager.delete(s.getUserName(), s.getDataSourceName(), s.getType());
+                    
+                    Subscription subs = subscriptionManager
+                            .load(s.getUserName(), s.getDataSourceName(), 
+                                s.getType());
+                    int ii = subscriptionManager.delete(subs);
+                    
                     confirmedSub = s;
                     log.info("User " + s.getUserName() + " cancelled subscription of "
                             + s.getDataSourceName());
@@ -449,7 +461,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 bltMessageManager.manage(message);
                 MetadataMatcher metadataMatcher = new MetadataMatcher();
                 // Iterate through subscriptions list to send data to the users
-                List<Subscription> subs = subscriptionManager.get(Subscription.SUBSCRIPTION_UPLOAD);
+                List<Subscription> subs = subscriptionManager.load(
+                        Subscription.SUBSCRIPTION_UPLOAD);
                 for (Subscription sub : subs) {
                     // Check if file entry matches the subscribed data source's filter
                     String dataSourceName = sub.getDataSourceName();

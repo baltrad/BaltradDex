@@ -82,8 +82,8 @@ Author     : szewczenko
                                             <c:out value="${sub.userName}"/>
                                         </div>
                                         <div id="cell" class="check">
-                                            <input type="checkbox" name="selectedDataSources"
-                                                value="${sub.dataSourceName}"/>
+                                            <input type="checkbox" name="uploadIds"
+                                                value="${sub.id}"/>
                                         </div>
                                     </div>
                                 </c:forEach>

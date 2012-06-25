@@ -21,12 +21,7 @@
 
 package eu.baltrad.dex.net.model;
 
-import eu.baltrad.dex.net.model.Subscription;
-import eu.baltrad.dex.net.model.ISubscriptionManager;
-import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.dex.log.model.MessageLogger;
-import eu.baltrad.dex.user.model.User;
-import java.sql.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
@@ -35,8 +30,10 @@ import org.springframework.dao.EmptyResultDataAccessException;
 
 import org.apache.log4j.Logger;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Subscription manager implementing subscription handling functionality.
@@ -47,8 +44,6 @@ import java.util.ArrayList;
  */
 public class SubscriptionManager implements ISubscriptionManager {
 //-------------------------------------------------------------------- Variables
-    /** Reference to JDBCConnector class object */
-    private JDBCConnectionManager jdbcConnectionManager;
     /** JDBC template */
     private SimpleJdbcOperations jdbcTemplate;
     /** Logger */
@@ -57,11 +52,10 @@ public class SubscriptionManager implements ISubscriptionManager {
     private Mapper mapper;
 //---------------------------------------------------------------------- Methods
     /**
-     * Constructor gets reference to JDBCConnectionManager instance.
+     * Constructor.
      */
     public SubscriptionManager() {
-        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
         this.mapper = new Mapper();
     }
     
@@ -251,336 +245,6 @@ public class SubscriptionManager implements ISubscriptionManager {
         }
     }
     
-    
-    
-    
-    
-    //------------------------------------------------------------ to be removed
-    
-    
-    
-    
-    /**
-     * Gets all existing subscriptions.
-     *
-     * @return List of all existing subscriptions
-     */
-    @Deprecated
-    public List<Subscription> get() {
-        Connection conn = null;
-        List<Subscription> subscriptions = new ArrayList<Subscription>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_subscriptions;";
-            ResultSet resultSet = stmt.executeQuery(sql);
-            while (resultSet.next()) {
-                int subId = resultSet.getInt("id");
-                Timestamp timeStamp = resultSet.getTimestamp("timestamp");
-                String userName = resultSet.getString("user_name");
-                String dataSourceName = resultSet.getString("data_source_name");
-                String operator = resultSet.getString("operator_name");
-                String type = resultSet.getString("type");
-                boolean active = resultSet.getBoolean("active");
-                boolean synkronized = resultSet.getBoolean("synkronized");
-                String nodeAddress = resultSet.getString("node_address");
-                Subscription sub = new Subscription(subId, timeStamp, userName, dataSourceName,
-                        operator, type, active, synkronized, nodeAddress);
-                subscriptions.add(sub);
-            }
-            stmt.close();
-        } catch (Exception e) {
-            log.error("Failed to select subscriptions", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return subscriptions;
-    } 
-    /**
-     * Gets subsciptions by type.
-     *
-     * @param type Subscription type
-     * @return List of subscriptions of a given type
-     */
-    @Deprecated
-    public List<Subscription> get(String type) {
-        Connection conn = null;
-        List<Subscription> subscriptions = new ArrayList<Subscription>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_subscriptions WHERE type = '" + type + "';";
-            ResultSet resultSet = stmt.executeQuery(sql );
-            while (resultSet.next()) {
-                int subId = resultSet.getInt("id");
-                Timestamp timeStamp = resultSet.getTimestamp("timestamp");
-                String userName = resultSet.getString("user_name");
-                String dataSourceName = resultSet.getString("data_source_name");
-                String operator = resultSet.getString("operator_name");
-                String subType = resultSet.getString("type");
-                boolean active = resultSet.getBoolean("active");
-                boolean synkronized = resultSet.getBoolean("synkronized");
-                String nodeAddress = resultSet.getString("node_address");
-                Subscription sub = new Subscription(subId, timeStamp, userName, dataSourceName,
-                        operator, subType, active, synkronized, nodeAddress);
-                subscriptions.add(sub);
-            }
-            stmt.close();
-        } catch (Exception e) {
-            log.error("Failed to select subscriptions", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return subscriptions;
-    }
-    /**
-     * Gets unique subsciption identified by data source name and subscription type.
-     *
-     * @param dsName Data source name
-     * @param type Subscription type
-     * @return Subscription object
-     */
-    @Deprecated
-    public Subscription get(String dsName, String type) {
-        Connection conn = null;
-        Subscription subscription = null;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_subscriptions WHERE data_source_name = '" + dsName +
-                    "' AND type = '" + type + "';";
-            ResultSet resultSet = stmt.executeQuery(sql);
-            while (resultSet.next()) {
-                int subId = resultSet.getInt("id");
-                Timestamp timeStamp = resultSet.getTimestamp("timestamp");
-                String userName = resultSet.getString("user_name");
-                String dataSourceName = resultSet.getString("data_source_name");
-                String operator = resultSet.getString("operator_name");
-                String subType = resultSet.getString("type");
-                boolean active = resultSet.getBoolean("active");
-                boolean synkronized = resultSet.getBoolean("synkronized");
-                String nodeAddress = resultSet.getString("node_address");
-                subscription = new Subscription( subId, timeStamp, userName, dataSourceName,
-                        operator, subType, active, synkronized, nodeAddress);
-            }
-            stmt.close();
-        } catch (Exception e) {
-            log.error("Failed to select subscriptions", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return subscription;
-    }
-    /**
-     * Gets unique subsciption identified by user name, data source name and subscription type.
-     *
-     * @param usrName User name
-     * @param dsName Data source name
-     * @param type Subscription type
-     * @return Subscription object
-     */
-    @Deprecated
-    public Subscription get(String usrName, String dsName, String type) {
-        Connection conn = null;
-        Subscription subscription = null;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_subscriptions WHERE user_name = '" + usrName +
-                    "' AND data_source_name = '" + dsName + "' AND type = '" + type + "';";
-            ResultSet resultSet = stmt.executeQuery(sql);
-            while (resultSet.next()) {
-                int subId = resultSet.getInt("id");
-                Timestamp timeStamp = resultSet.getTimestamp("timestamp");
-                String user = resultSet.getString("user_name");
-                String dataSourceName = resultSet.getString("data_source_name");
-                String operator = resultSet.getString("operator_name");
-                String subType = resultSet.getString("type");
-                boolean active = resultSet.getBoolean("active");
-                boolean synkronized = resultSet.getBoolean("synkronized");
-                String nodeAddress = resultSet.getString("node_address");
-                subscription = new Subscription(subId, timeStamp, user, dataSourceName, operator,
-                        subType, active, synkronized, nodeAddress);
-            }
-            stmt.close();
-        } catch (Exception e) {
-            log.error("Failed to select subscriptions", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return subscription;
-    }
-    /**
-     * Gets distinct field values.
-     *
-     * @param fieldName Name of the field the value of which will be selected
-     * @param subscriptionType Subscription type
-     * @return List of strings representing field values
-     */
-    @Deprecated
-    public List<String> getDistinct(String fieldName, String type) {
-        Connection conn = null;
-        List<String> fieldValues = new ArrayList<String>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery("SELECT DISTINCT " + fieldName +
-                    " FROM dex_subscriptions WHERE type = '" + type + "';");
-            while (resultSet.next()) {
-                String fieldValue = resultSet.getString(fieldName);
-                fieldValues.add(fieldValue);
-            }
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to select subscriptions", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return fieldValues;
-    }
-    /**
-     * Saves subscription object.
-     *
-     * @param sub Subscription to be saved
-     * @return Number of inserted records
-     * @throws Exception
-     */
-    @Deprecated
-    public int save(Subscription sub) throws Exception {
-        Connection conn = null;
-        int insert = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "INSERT INTO dex_subscriptions (timestamp, user_name, data_source_name, " +
-                    "operator_name, type, active, synkronized, node_address) VALUES ('" + 
-                    sub.getTimeStamp() + "', '" + sub.getUserName() + "', '" + 
-                    sub.getDataSourceName() + "', '" + sub.getOperatorName() + "', '" + 
-                    sub.getType() + "', " + sub.getActive() + ", " + sub.getSynkronized() + ", '" +
-                    sub.getNodeAddress() + "');";
-            insert = stmt.executeUpdate(sql);
-            stmt.close();
-        } catch (Exception e) {
-            log.error("Failed to save subscription", e);
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return insert;
-    }
-    /**
-     * Updates subscription object.
-     *
-     * @param dataSourceName Data source name
-     * @param subscriptionType Subscription type
-     * @param active Active toggle
-     * @return Number of inserted records
-     * @throws Exception
-     */
-    @Deprecated
-    public int update(String dataSourceName, String subscriptionType, boolean active) 
-            throws Exception {
-        Connection conn = null;
-        int update = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "UPDATE dex_subscriptions SET active = " + active  + " WHERE " +
-                    "data_source_name = '" + dataSourceName + "' AND type = '" + subscriptionType +
-                    "';";
-            update = stmt.executeUpdate(sql) ;
-            stmt.close();
-        } catch (Exception e) {
-            log.error("Failed to update subscription", e);
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return update;
-    }
-    /**
-     * Deletes subscription with a given ID.
-     *
-     * @param id Subscription ID
-     * @return Number of deleted records
-     * @throws SQLException
-     * @throws Exception
-     */
-    @Deprecated
-    public int delete(int id) {
-        Connection conn = null;
-        int delete = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DELETE FROM dex_subscriptions WHERE id = " + id + ";";
-            delete = stmt.executeUpdate(sql);
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to delete subscription", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return delete;
-    }
-    /**
-     * Deletes subscription identified by a given data source name and type.
-     *
-     * @param dataSourceName Name of subscribed data source
-     * @param subscriptionType Subscription type
-     * @return Number of deleted records
-     * @throws Exception
-     */
-    @Deprecated
-    public int delete(String dataSourceName, String subscriptionType)
-            throws Exception {
-        Connection conn = null;
-        int delete = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DELETE FROM dex_subscriptions WHERE data_source_name = '" +
-                    dataSourceName + "' AND type = '" + subscriptionType + "';";
-            delete = stmt.executeUpdate(sql);
-            stmt.close();
-        } catch (Exception e) {
-            log.error("Failed to delete subscription", e);
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return delete;
-    }
-    /**
-     * Deletes subscription identified by a given user name, channel name and type.
-     *
-     * @param userName Name of the subscriber
-     * @param dataSourceName Name of subscribed data source
-     * @param subscriptionType Subscription type
-     * @return Number of deleted records
-     * @throws Exception
-     */
-    @Deprecated
-    public int delete(String userName, String dataSourceName, String subscriptionType) 
-            throws Exception {
-        Connection conn = null;
-        int delete = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DELETE FROM dex_subscriptions WHERE user_name = '" + userName + 
-                    "' AND data_source_name = '" + dataSourceName + "' AND type = '" +
-                    subscriptionType + "';";
-            delete = stmt.executeUpdate(sql);
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to delete subscription", e);
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return delete;
-    }
     /**
      * Compares two subscription lists based on chosen subscription field values.
      *

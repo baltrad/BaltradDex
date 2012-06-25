@@ -583,7 +583,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   </target>
   
   <!-- deploy on tomcat @@@ insert-data -->
-  <target name="deploy" depends="dist, insert-data, context-status"
+  <target name="deploy" depends="dist, context-status"
     	if="context.deployable">
     <echo message="Deploying ${mgr.path} to ${mgr.url}"/>
     <deploy url="${mgr.url}"

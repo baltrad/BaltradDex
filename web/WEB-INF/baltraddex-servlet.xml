@@ -76,12 +76,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="remove_selected_datasource.htm">removeDataSourceController</prop>
                 <prop key="remove_datasource_status.htm">removeDataSourceController</prop>
                 
-                <prop key="remove_download.htm">subscriptionController_deprecated</prop>
-                <prop key="remove_upload.htm">subscriptionController_deprecated</prop>
-                <prop key="remove_selected_download.htm">subscriptionController_deprecated</prop>
-                <prop key="remove_selected_upload.htm">subscriptionController_deprecated</prop>
-                <prop key="remove_download_status.htm">subscriptionController_deprecated</prop>
-                <prop key="remove_upload_status.htm">subscriptionController_deprecated</prop>
+                <prop key="remove_download.htm">subscriptionController</prop>
+                <prop key="remove_upload.htm">subscriptionController</prop>
+                <prop key="remove_selected_download.htm">subscriptionController</prop>
+                <prop key="remove_selected_upload.htm">subscriptionController</prop>
+                <prop key="remove_download_status.htm">subscriptionController</prop>
+                <prop key="remove_upload_status.htm">subscriptionController</prop>
                 
                 <prop key="configure_registry.htm">saveRegistryConfigurationController</prop>
                 <prop key="clear_registry.htm">registerController</prop>
@@ -221,17 +221,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Subscription controller
     -->
-    <!-- @@@ deprecated, to be removed-->
-    <bean name="subscriptionController_deprecated"
-        class="eu.baltrad.dex.subscription.controller.SubscriptionController_deprecated">
+    <bean name="subscriptionController"
+        class="eu.baltrad.dex.subscription.controller.SubscriptionController">
         <property name="subscriptionManager">
             <ref bean="subscriptionManager"/>
-        </property>
-        <property name="dataSourceManager">
-            <ref bean="dataSourceManager" />
-        </property>
-        <property name="frameDispatcherController">
-            <ref bean="frameDispatcherController"/>
         </property>
     </bean>
 
