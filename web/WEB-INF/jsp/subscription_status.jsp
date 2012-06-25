@@ -33,18 +33,19 @@ Author     : szewczenko
         </div>
         <div class="right">
             <div class="blttitle">
-                Subscription management
+                <img src="includes/images/icons/connection.png" alt="">
+                Connected to <c:out value="${peer_name}"/>
             </div>
             <div class="blttext">
                 Data source subscription status.
             </div>
             <div class="table">
+                <%@include file="/WEB-INF/jsp/messages.jsp"%>
                 <div class="addradar">
-                    <%@include file="/WEB-INF/jsp/generic_messages.jsp"%>
                     <div class="tablefooter">
                        <div class="buttons">
                            <button class="rounded" type="button"
-                                onclick="window.location.href='subscription.htm'">
+                                onclick="window.location.href='subscription_by_peer.htm?peer_name=${peer_name}'">
                                 <span>OK</span>
                            </button>
                        </div>

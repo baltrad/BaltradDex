@@ -42,12 +42,7 @@
         <security:intercept-url pattern="/subscribed_peers.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/subscription_by_peer.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/selected_subscription.htm" access="ROLE_OPERATOR" />
-        
-        
-        
         <security:intercept-url pattern="/subscription_status.htm" access="ROLE_OPERATOR" />
-        
-        
         
         <security:intercept-url pattern="/registry.htm" access="ROLE_OPERATOR" />
         

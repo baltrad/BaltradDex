@@ -67,7 +67,7 @@ public class PostSubscriptionController implements MessageSetter {
     /** Subscription connection error key */
     private final static String PS_HTTP_CONN_ERROR_KEY = 
             "postsubscription.controller.http_connection_error";        
-    /** General connection error */
+    /** Generic connection error */
     private static final String PS_GENERIC_CONN_ERROR_KEY = 
             "postsubscription.controller.generic_connection_error"; 
     /** Internal controller error key */

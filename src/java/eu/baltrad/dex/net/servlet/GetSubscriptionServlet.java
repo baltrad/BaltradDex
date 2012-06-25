@@ -27,7 +27,6 @@ import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.net.model.ISubscriptionManager;
 
@@ -49,8 +48,8 @@ import org.apache.log4j.Logger;
 import java.io.StringWriter;
 import java.io.PrintWriter;
 
-import java.util.Set;
-import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 import java.io.IOException;
 
 /**
@@ -67,6 +66,12 @@ public class GetSubscriptionServlet extends HttpServlet {
             "getsubscription.server.internal_server_error";
     private static final String GS_UNAUTHORIZED_REQUEST_KEY =
             "getsubscription.server.unauthorized_request";
+    private static final String GS_SUBSCRIPTION_SUCCESS_KEY = 
+            "getsubscription.server.subscription_success";
+    private static final String GS_SUBSCRIPTION_FAILURE_KEY = 
+            "getsubscription.server.subscription_failure";
+    private static final String GS_GENERIC_SUBSCRIPTION_ERROR = 
+            "getsubscription.server.generic_subscription_error";
     
     private Authenticator authenticator;
     private IJsonUtil jsonUtil;
@@ -74,9 +79,8 @@ public class GetSubscriptionServlet extends HttpServlet {
     private MessageResourceUtil messages;
     private Logger log;
     
-    private String nodeName;
-    private String nodeAddress;
-    
+    protected String nodeName;
+    protected String nodeAddress;
     
     /**
      * Default constructor.
@@ -98,7 +102,7 @@ public class GetSubscriptionServlet extends HttpServlet {
     /**
      * Initializes servlet with current configuration.
      */
-    private void initConfiguration() {
+    protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
                 InitAppUtil.getConf().getKeystoreDir());
         this.nodeName = InitAppUtil.getConf().getNodeName();
@@ -106,30 +110,104 @@ public class GetSubscriptionServlet extends HttpServlet {
     }
     
     /**
-     * Reads data source string from http request.
+     * Reads subscripion string from http request.
      * @param request Http request
-     * @return Data source string
+     * @return Subscription string
      * @throws IOException 
      */
-    private String readDataSources(HttpServletRequest request) 
+    private String readSubscriptions(HttpServletRequest request) 
             throws IOException {
         ServletInputStream sis = request.getInputStream();
         StringWriter writer = new StringWriter();
-        String dataSources = "";
+        String subscriptions = "";
         try {
             IOUtils.copy(sis, writer);
-            dataSources = writer.toString();
+            subscriptions = writer.toString();
         } finally {
             writer.close();
             sis.close();
         }
-        return dataSources;
+        return subscriptions;
     }
     
+    /**
+     * Writes subscription string to http response. 
+     * @param response Http response
+     * @param subscriptions Subscriptions string
+     * @throws IOException 
+     */
+    private void writeSubscriptions(NodeResponse response, String subscriptions) 
+            throws IOException {
+        PrintWriter writer = new PrintWriter(response.getOutputStream());
+        try {
+            response.setNodeName(nodeName);
+            response.setNodeAddress(nodeAddress);
+            writer.print(subscriptions);
+        } finally {
+            writer.close();
+        }    
+    }
     
-    
-
-
+    /**
+     * Stores subscriptions requested by peer. 
+     * @param req Node request
+     * @param requestedSubscription Requested subscriptions
+     * @return Updated peer subscriptions
+     */
+    private List<Subscription> storePeerSubscriptions(NodeRequest req,
+                List<Subscription> requestedSubscription) {
+        List<Subscription> subscriptions = new ArrayList<Subscription>();
+        for (Subscription requested : requestedSubscription) {
+            Subscription current = subscriptionManager.load(
+                    requested.getUserName(), requested.getDataSourceName(), 
+                    Subscription.SUBSCRIPTION_UPLOAD);
+            if (current != null) {
+                String[] messageArgs = {current.getDataSourceName(), 
+                        nodeName, current.getUserName()};
+                if (requested.getActive()) {
+                    current.setActive(requested.getActive());
+                    current.setSynkronized(true);
+                    if (subscriptionManager.update(current) == 1) {    
+                        subscriptions.add(current);
+                        log.warn(messages.getMessage(
+                                GS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));   
+                    } else {
+                        log.error(messages.getMessage(
+                                GS_SUBSCRIPTION_FAILURE_KEY, messageArgs));
+                    }
+                } else {
+                    current.setActive(requested.getActive());
+                    current.setSynkronized(true);
+                    if (subscriptionManager.delete(current) == 1) {    
+                        subscriptions.add(current);
+                        log.warn(messages.getMessage(
+                                GS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));   
+                    } else {
+                        log.error(messages.getMessage(
+                                GS_SUBSCRIPTION_FAILURE_KEY, messageArgs));
+                    }
+                }
+            } else {
+                if (requested.getActive()) {
+                    current = new Subscription(System.currentTimeMillis(), 
+                        requested.getUserName(), requested.getDataSourceName(),
+                        nodeName, Subscription.SUBSCRIPTION_UPLOAD, 
+                        requested.getActive(), true, nodeAddress);
+                    String[] messageArgs = {current.getDataSourceName(), 
+                                            nodeName, current.getUserName()};
+                    if (subscriptionManager.storeNoId(current) == 1) {
+                        subscriptions.add(current);
+                        log.warn(messages.getMessage(
+                                GS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
+                    } else {
+                        log.error(messages.getMessage(
+                                GS_SUBSCRIPTION_FAILURE_KEY, messageArgs));
+                    }
+                }
+            }
+        }
+        return subscriptions;
+    }
 
     /**
      * Implements Controller interface.
@@ -154,22 +232,28 @@ public class GetSubscriptionServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) 
     {
-        
-
-        System.out.println("______________________get subscription request received");
-        
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
         try {
             if (authenticator.authenticate(req.getMessage(), req.getSignature(),
                     req.getNodeName())) {
-                String jsonRequested = readDataSources(request);
-                Set<DataSource> requestedDataSources = jsonUtil
-                            .jsonToDataSources(jsonRequested);
-                
-                
-                
-                
+                String jsonRequested = readSubscriptions(request);
+                List<Subscription> requestedSubscription = jsonUtil
+                        .jsonToSubscriptions(jsonRequested); 
+                List<Subscription> subscriptions = storePeerSubscriptions(req, 
+                        requestedSubscription);
+                String jsonSubscribed = jsonUtil.subscriptionsToJson(
+                        subscriptions);
+                if (subscriptions.size() == requestedSubscription.size()) {
+                    writeSubscriptions(res, jsonSubscribed);
+                    res.setStatus(HttpServletResponse.SC_OK);
+                } else if (subscriptions.size() > 0) {
+                    writeSubscriptions(res, jsonSubscribed);
+                    res.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+                } else {
+                    res.setStatus(HttpServletResponse.SC_NOT_FOUND,
+                        messages.getMessage(GS_GENERIC_SUBSCRIPTION_ERROR));
+                }
             } else {
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
                     messages.getMessage(GS_UNAUTHORIZED_REQUEST_KEY));
@@ -179,7 +263,6 @@ public class GetSubscriptionServlet extends HttpServlet {
                     messages.getMessage(GS_INTERNAL_SERVER_ERROR_KEY));
         }
     }
-    
     
     /**
      * @param messages the messages to set
@@ -197,6 +280,28 @@ public class GetSubscriptionServlet extends HttpServlet {
         this.jsonUtil = jsonUtil;
 
     }
+
+    /**
+     * @param subscriptionManager the subscriptionManager to set
+     */
+    @Autowired
+    public void setSubscriptionManager(ISubscriptionManager subscriptionManager) 
+    {
+        this.subscriptionManager = subscriptionManager;
+    }
     
+    /**
+     * @param log the log to set
+     */
+    public void setLog(Logger log) {
+        this.log = log;
+    }
+    
+    /**
+     * @param authenticator the authenticator to set
+     */
+    public void setAuthenticator(Authenticator authenticator) {
+        this.authenticator = authenticator;
+    }
     
 }

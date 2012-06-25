@@ -98,11 +98,10 @@ Author     : szewczenko
                                                 </c:otherwise>
                                             </c:choose>
                                         </div>
-                                        <div id="cell" class="hidden">
-                                            <input type="checkbox" 
+                                        <div>        
+                                            <input type="checkbox" class="hidden"
                                                    name="current_subscription_ids"
-                                                   value="${sub.id}"
-                                                   checked/>
+                                                   value="${sub.id}" checked/>
                                         </div>
                                     </div>
                                 </c:forEach>

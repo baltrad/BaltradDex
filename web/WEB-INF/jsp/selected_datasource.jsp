@@ -42,9 +42,8 @@ Author     : szewczenko
             </div>
             <div class="table">
                 <div class="dsconnect">
-                    <form action="subscribe.htm" method="post">
-                        <input type="text" class="hidden" name="peer_name"
-                               value="${peer_name}"/>
+                    <form action="subscribe.htm?peer_name=${peer_name}" 
+                          method="post">
                         <div class="tableheader">
                             <div id="cell" class="count">&nbsp;</div>
                             <div id="cell" class="name">

@@ -6,17 +6,4 @@
             <line>30</line>
         </file>
     </editor-bookmarks>
-    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/1">
-        <file>file:/home/szewczenko/Projects/Baltrad/BaltradDex/build.xml</file>
-        <file>file:/home/szewczenko/Projects/Baltrad/BaltradDex/web/WEB-INF/baltraddex-servlet.xml</file>
-        <file>file:/home/szewczenko/Projects/Baltrad/BaltradDex/web/WEB-INF/applicationContext.xml</file>
-        <file>file:/home/szewczenko/Projects/Baltrad/BaltradDex/src/java/eu/baltrad/dex/net/controller/GetSubscriptionController.java</file>
-        <file>file:/home/szewczenko/Projects/Baltrad/BaltradDex/web/WEB-INF/jsp/selected_subscription.jsp</file>
-        <file>file:/home/szewczenko/Projects/Baltrad/BaltradDex/src/java/eu/baltrad/dex/net/controller/PostSubscriptionController.java</file>
-        <file>file:/home/szewczenko/Projects/Baltrad/BaltradDex/src/java/eu/baltrad/dex/net/servlet/GetSubscriptionServlet.java</file>
-        <file>file:/home/szewczenko/Projects/Baltrad/BaltradDex/src/java/eu/baltrad/dex/net/servlet/PostSubscriptionServlet.java</file>
-        <file>file:/home/szewczenko/Projects/Baltrad/BaltradDex/src/java/resources/messages.properties</file>
-        <file>file:/home/szewczenko/Projects/Baltrad/BaltradDex/web/WEB-INF/jsp/post_subscription.jsp</file>
-        <file>file:/home/szewczenko/Projects/Baltrad/BaltradDex/src/java/eu/baltrad/dex/net/controller/FrameDispatcherController.java</file>
-    </open-files>
 </project-private>

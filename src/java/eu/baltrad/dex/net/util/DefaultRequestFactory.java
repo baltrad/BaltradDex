@@ -161,14 +161,17 @@ public class DefaultRequestFactory implements RequestFactory {
     
     /**
      * Creates get subscription request.
-     * @return Http GET request 
+     * @param nodeName Name of the node making a request
+     * @param nodeAddress Address of the node making a request
+     * @param jsonSubscriptions String representation of subscriptions
+     * @return Http POST request
      */
     public HttpPost createGetSubscriptionRequest(String nodeName, 
-            String nodeAddress, String jsonSources) {
+            String nodeAddress, String jsonSubscriptions) {
         HttpPost httpPost = new HttpPost(getRequestUri("get_subscription.htm"));
         StringEntity entity = null;
         try {
-            entity = new StringEntity(jsonSources);
+            entity = new StringEntity(jsonSubscriptions);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -177,7 +180,7 @@ public class DefaultRequestFactory implements RequestFactory {
         httpPost.addHeader("Node-Address", nodeAddress);
         httpPost.addHeader("Content-Type", "application/json");
         httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
-                jsonSources.getBytes()));
+                jsonSubscriptions.getBytes()));
         httpPost.addHeader("Date", dateFormat.format(new Date()));
         return httpPost;
     }

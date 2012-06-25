@@ -26,8 +26,6 @@ import eu.baltrad.dex.net.model.ISubscriptionManager;
 import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.net.model.INodeConnectionManager;
 import eu.baltrad.dex.net.model.NodeConnection;
-import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.datasource.model.IDataSourceManager;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.log.model.MessageLogger;
@@ -40,30 +38,26 @@ import org.springframework.ui.Model;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.HttpResponse;
-
 import org.apache.commons.io.IOUtils;
-
 import org.apache.log4j.Logger;
 
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
+
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
-import java.io.StringWriter;
-import java.io.InputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import java.io.InputStream;
+import java.io.IOException;
+import java.util.Arrays;
+
 /**
- * 
+ * Controls subscription process.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.1.0
  * @since 1.1.0
@@ -71,79 +65,81 @@ import java.util.Iterator;
 @Controller
 public class GetSubscriptionController implements MessageSetter {
     
-    /** Current view */
-    //private static final String GET_SUBSCRIPTION_VIEW = "getsubscription";
-    /** Show subscription view */
-    //private static final String SHOW_SUBSCRIPTION_VIEW = "showsubscription";
-    
-    /** Data sources selected for subscription */
-    //private static final String SUBSCRIPTIONS_KEY = "subscriptions_key";
-    /** URL of the target node */
-    //private static final String TARGET_NODE_URL = "target_node_url";
-
-    /** Message keys */
-    //private static final String INVALID_URL_MSG = "node.url.invalid";
-    //private static final String SUBSCRIPTION_READ_ERROR_MSG = 
-    //        "datasource.read.error";
-    //private static final String SUBSCRIPTION_SERVER_ERROR_MSG = 
-    //        "subscription.server.error";
-    
+    /** Subscribed peers view */
     private static final String SUBSCRIBED_PEERS_VIEW = "subscribed_peers";
-    private static final String SUBSCRIPTION_BY_PEER_VIEW = "subscription_by_peer";
-    private static final String SELECTED_SUBSCRIPTION_VIEW = "selected_subscription";
+    /** Subscription by peer view */
+    private static final String SUBSCRIPTION_BY_PEER_VIEW = 
+                                                        "subscription_by_peer";
+    /** Selected subscription view */
+    private static final String SELECTED_SUBSCRIPTION_VIEW = 
+                                                        "selected_subscription";
+    /** Subscription status view */
+    private static final String SUBSCRIPTION_STATUS_VIEW = 
+                                                        "subscription_status";
+    
+    /** Subscribed peers key */
     private static final String SUBSCRIBED_PEERS_KEY = "subscribed_peers";
-    private static final String SUBSCRIPTION_BY_PEER_KEY = "subscription_by_peer"; 
-    private static final String SELECTED_SUBSCRIPION_KEY = "selected_subscription";
+    /** Subscription by peer key */
+    private static final String SUBSCRIPTION_BY_PEER_KEY = 
+                                                        "subscription_by_peer"; 
+    /** Selected subscription key */
+    private static final String SELECTED_SUBSCRIPION_KEY = 
+                                                        "selected_subscription";
+    /** Peer node name key */
     private static final String PEER_NAME_KEY = "peer_name";
+    /** Subscription modification status key */
     private static final String STATUS_NOT_CHANGED_KEY = "status_not_changed";
-    private static final String SELECTED_DATA_SOURCES_KEY = "selected_data_sources";
+    
+    /** Subscription server - success message */
+    private static final String GS_SERVER_SUCCESS_KEY = 
+            "getsubscription.controller.subscription_server_success";
+    /** Subscription server - error message */
+    private static final String GS_SERVER_ERROR_KEY = 
+            "getsubscription.controller.subscription_server_error";
+     /** Subscription server - partial subscription message */
+    private static final String GS_SERVER_PARTIAL_SUBSCRIPTION = 
+            "getsubscription.controller.subscription_server_partial";
+    /** Internal controller error key */
+    private static final String GS_INTERNAL_CONTROLLER_ERROR_KEY = 
+            "getsubscription.controller.internal_controller_error";
+    /** Subscription connection error key */
+    private final static String GS_HTTP_CONN_ERROR_KEY = 
+            "getsubscription.controller.http_connection_error";  
+    /** Generic connection error */
+    private static final String GS_GENERIC_CONN_ERROR_KEY = 
+            "getsubscription.controller.generic_connection_error";
     
     private ISubscriptionManager subscriptionManager;
     private INodeConnectionManager nodeConnectionManager;
-    
-    private IDataSourceManager dataSourceManager;
-    
     private MessageResourceUtil messages;
-
     private Authenticator authenticator;
     private RequestFactory requestFactory;
-    private HttpClientUtil httpClient;
+    private IHttpClientUtil httpClient;
     private IJsonUtil jsonUtil;
     private Logger log;
     
-    private String nodeName;
-    private String nodeAddress;
+    protected String nodeName;
+    protected String nodeAddress;
     
     /**
      * Default constructor.
-     **
+     */
     public GetSubscriptionController() {
-        this.authenticator = new KeyczarAuthenticator(
-                InitAppUtil.getConf().getKeystoreDir());
+        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);        
+    }
+    
+    /**
+     * Initializes controller with current configuration
+     */
+    protected void initConfiguration() {
+        this.setAuthenticator(new KeyczarAuthenticator(
+                 InitAppUtil.getConf().getKeystoreDir()));
         this.httpClient = new HttpClientUtil(
                 InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
         this.nodeName = InitAppUtil.getConf().getNodeName();
         this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);        
-    }*/
-    
-    /**
-     * Constructor.
-     * @param nodeName Node name
-     * @param nodeAdress Node address
-     */
-    public GetSubscriptionController(String nodeName, String nodeAddress) {
-        this.nodeName = nodeName;
-        this.nodeAddress = nodeAddress;
-    }
-    
-    
-    /**
-     * Default constructor.
-     */
-    public GetSubscriptionController() {
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);        
+        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
     /**
@@ -171,11 +167,134 @@ public class GetSubscriptionController implements MessageSetter {
         model.addAttribute(detailsKey, details);
     }
     
-
     /**
-     * 
-     * @param model
-     * @return 
+     * Creates subscription request list.
+     * @param activeSubscriptionIds Active subscription ids
+     * @param inactiveSubscriptionIds Inactive subscription ids
+     * @return List of requested subscriptions
+     */
+    private List<Subscription> createSubscriptionRequest(
+            String[] activeSubscriptionIds, String[] inactiveSubscriptionIds) {
+        List<Subscription> subscriptions = new ArrayList<Subscription>();
+        if (activeSubscriptionIds != null) {
+            for (int i = 0; i < activeSubscriptionIds.length; i++) {
+                Subscription s = subscriptionManager.load(Integer.parseInt(
+                        activeSubscriptionIds[i]));
+                s.setActive(true);
+                subscriptions.add(s);
+            }
+        }
+        if (inactiveSubscriptionIds != null) {
+            for (int i = 0; i < inactiveSubscriptionIds.length; i++) {
+                Subscription s = subscriptionManager.load(Integer.parseInt(
+                        inactiveSubscriptionIds[i]));
+                s.setActive(false);
+                subscriptions.add(s);
+            }
+        }
+        return subscriptions; 
+    }
+    
+    
+    /**
+     * Checks if subscription status was modified. 
+     * @param currentSubscriptionIds Current subscription ids
+     * @param selectedSubscriptionIds Selected subscription ids
+     * @return True if subscription status was modified 
+     */
+    private boolean statusModified(String[] currentSubscriptionIds, 
+            String[] selectedSubscriptionIds) {
+        List<String> current = Arrays.asList(currentSubscriptionIds);
+        List<String> selected = new ArrayList<String>();
+        if (selectedSubscriptionIds != null) {
+            selected = Arrays.asList(selectedSubscriptionIds);
+        }
+        List<String> unselected = new ArrayList<String>();
+        boolean result = false;
+        for (String id : current) {
+            if (!selected.contains(id)) {
+                unselected.add(id);
+            }
+        }
+        for (String id : selected) {
+            if (subscriptionManager.load(Integer.parseInt(id)).getActive() 
+                    != true ) {
+                result = true;
+            }
+        }
+        for (String id : unselected) {
+            if (subscriptionManager.load(Integer.parseInt(id)).getActive() 
+                    == true ) {
+                result = true;
+            }
+        }
+        return result;
+    }
+    
+    /**
+     * Reads subscriptions from http response.
+     * @param response Http response
+     * @return Subscriptions string
+     * @throws IOException 
+     */
+    private String readSubscriptions(HttpResponse response) 
+            throws InternalControllerException {
+        try {
+            InputStream is = null;
+        try {
+            is = response.getEntity().getContent();
+            return IOUtils.toString(is);
+        } finally {
+            is.close();
+        }
+        }catch(IOException e) {
+            throw new InternalControllerException(e.getMessage());
+        }
+    }
+    
+    /**
+     * Stores local subscriptions.
+     * @param res Http response
+     * @param subscriptionString Subscriptions Json string
+     * @return True if subscriptions are successfully saved 
+     */
+    private boolean storeLocalSubscriptions(HttpResponse response,
+            String subscriptionString) throws InternalControllerException {
+        try {
+            List<Subscription> subscriptions = jsonUtil
+                    .jsonToSubscriptions(subscriptionString);
+            boolean result = true;
+            for (Subscription s : subscriptions) {
+                Subscription requested = new Subscription(
+                    System.currentTimeMillis(), nodeName, s.getDataSourceName(), 
+                    response.getFirstHeader("Node-Name").getValue(), 
+                    Subscription.SUBSCRIPTION_DOWNLOAD, s.getActive(),
+                    s.getSynkronized(), 
+                    response.getFirstHeader("Node-Address").getValue());
+                Subscription existing = subscriptionManager.load(
+                    nodeName, s.getDataSourceName(), 
+                    Subscription.SUBSCRIPTION_DOWNLOAD);
+                if (existing == null) {
+                    if (subscriptionManager.storeNoId(requested) != 1) {
+                        result = false;
+                    }
+                } else {       
+                    requested.setId(existing.getId());
+                    if (subscriptionManager.update(requested) != 1) {
+                        result = false;
+                    }
+                }        
+            }
+            return result;
+        } catch (Exception e) {
+            throw new InternalControllerException(e.getMessage());
+        }
+    }
+    
+    /**
+     * Shows lists of subscribed peer nodes.
+     * @param model Model
+     * @return Subscribed peers view
      */
     @RequestMapping("/subscribed_peers.htm")
     public String subscribedPeers(Model model) {
@@ -187,10 +306,10 @@ public class GetSubscriptionController implements MessageSetter {
     }
     
     /**
-     * 
-     * @param model
-     * @param peerName
-     * @return 
+     * Shows list of subscriptions for a given peer node. 
+     * @param model Model
+     * @param peerName Peer node name
+     * @return Subscriptions by peer view
      */
     @RequestMapping("/subscription_by_peer.htm")
     public String subscriptionByPeer(Model model,
@@ -201,18 +320,18 @@ public class GetSubscriptionController implements MessageSetter {
         model.addAttribute(PEER_NAME_KEY, peerName);
         return SUBSCRIPTION_BY_PEER_VIEW;
     }
-    
 
     /**
-     * 
-     * @param model
-     * @param peerName
-     * @param currentSubscriptionIds
-     * @param selectedSubscriptionIds
-     * @return 
+     * Shows list of selected subscriptions. The list is posted on the remote 
+     * node and subscription status is modified accordingly.
+     * @param model Model
+     * @param peerName Peer node name
+     * @param currentSubscriptionIds IDs of current subscriptions
+     * @param selectedSubscriptionIds IDs of selected subscriptions  
+     * @return Selected subscriptions view
      */
     @RequestMapping("/selected_subscription.htm")
-    public String getSubscription(Model model,
+    public String selectedSubscription(Model model,
             @RequestParam(value="peer_name", required=true) String peerName,
             @RequestParam(value="current_subscription_ids", required=true) 
                 String[] currentSubscriptionIds,
@@ -245,21 +364,104 @@ public class GetSubscriptionController implements MessageSetter {
             }
         }
         model.addAttribute(PEER_NAME_KEY, peerName);
-        
-        if (currentSubscriptionIds.length == selectedSubscriptionIds.length) {
+        if (statusModified(currentSubscriptionIds, selectedSubscriptionIds)) {
+            List<Subscription> selectedSubscription = 
+                new ArrayList<Subscription>(selectedSubscriptionMap.values());
+            model.addAttribute(SELECTED_SUBSCRIPION_KEY, selectedSubscription);
+            return SELECTED_SUBSCRIPTION_VIEW;
+        } else {
             List<Subscription> subscriptionByPeer = subscriptionManager.load(
                 peerName, Subscription.SUBSCRIPTION_DOWNLOAD);
             model.addAttribute(SUBSCRIPTION_BY_PEER_KEY, subscriptionByPeer);
             model.addAttribute(STATUS_NOT_CHANGED_KEY, "unchanged");
             return SUBSCRIPTION_BY_PEER_VIEW;
-        } else {
-            List<Subscription> selectedSubscription = 
-                new ArrayList<Subscription>(selectedSubscriptionMap.values());
-            model.addAttribute(SELECTED_SUBSCRIPION_KEY, selectedSubscription);
-            return SELECTED_SUBSCRIPTION_VIEW;
         }
     }
     
+    /**
+     * Post subscription request on the peer node.
+     * @param model Model
+     * @param peerName Peer node name
+     * @param activeSubscriptionIds List contains IDs of active subscriptions 
+     * @param inactiveSubscriptionIds List contains IDs of inactive 
+     *                                subscriptions 
+     * @return Subscription status view
+     */
+    @RequestMapping("/subscription_status.htm")
+    public String getSubscription(Model model,
+            @RequestParam(value="peer_name", required=true) String peerName,
+            @RequestParam(value="active_subscription_ids", required=false) 
+                String[] activeSubscriptionIds,
+            @RequestParam(value="inactive_subscription_ids", required=false)
+                String[] inactiveSubscriptionIds) {
+        initConfiguration();
+        String subscriptionString = jsonUtil.subscriptionsToJson(
+                createSubscriptionRequest(activeSubscriptionIds, 
+                    inactiveSubscriptionIds));
+        NodeConnection conn = nodeConnectionManager.get(peerName);
+        requestFactory = new DefaultRequestFactory(
+                                            URI.create(conn.getNodeAddress()));
+        HttpUriRequest req = requestFactory.createGetSubscriptionRequest(
+                nodeName, nodeAddress, subscriptionString);
+        authenticator.addCredentials(req, nodeName);
+        try {
+            HttpResponse res = httpClient.post(req);
+            if (res.getStatusLine().getStatusCode() 
+                    == HttpServletResponse.SC_OK) {
+                String okMsg = messages.getMessage(GS_SERVER_SUCCESS_KEY,
+                        new String[] {peerName});        
+                storeLocalSubscriptions(res, readSubscriptions(res));
+                setMessage(model, SUCCESS_MSG_KEY, okMsg);
+                log.warn(okMsg);
+            } else if (res.getStatusLine().getStatusCode() 
+                    == HttpServletResponse.SC_PARTIAL_CONTENT) {
+                String errorMsg = messages.getMessage(
+                    GS_SERVER_PARTIAL_SUBSCRIPTION, new String[] {peerName});    
+                storeLocalSubscriptions(res, readSubscriptions(res));
+                setMessage(model, ERROR_MSG_KEY, errorMsg);
+                log.error(errorMsg);
+            } else if (res.getStatusLine().getStatusCode() 
+                    == HttpServletResponse.SC_NOT_FOUND) {
+                
+                String errorMsg = messages.getMessage(GS_SERVER_ERROR_KEY,
+                        new String[] {peerName});
+                String errorDetails = res.getStatusLine().getReasonPhrase();
+                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                        errorDetails);      
+                log.error(errorMsg + ": " + errorDetails);
+            } else {
+                String errorMsg = messages.getMessage(GS_SERVER_ERROR_KEY,
+                        new String[] {peerName});
+                String errorDetails = res.getStatusLine().getReasonPhrase();
+                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                        errorDetails);
+                log.error(errorMsg + ": " + errorDetails);   
+            }
+        } catch (InternalControllerException e) {
+            String errorMsg = messages.getMessage(
+                    GS_INTERNAL_CONTROLLER_ERROR_KEY, new String[] {peerName}); 
+            String errorDetails = e.getMessage();
+            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                    errorDetails);
+            log.error(errorMsg + ": " + errorDetails);
+        } catch (IOException e)  {
+            String errorMsg = messages.getMessage(
+                    GS_HTTP_CONN_ERROR_KEY, new String[] {peerName});
+            String errorDetails = e.getMessage();
+            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                    errorDetails);
+            log.error(errorMsg + ": " + errorDetails);
+        } catch (Exception e) {
+            String errorMsg = messages.getMessage(
+                    GS_GENERIC_CONN_ERROR_KEY, new String[] {peerName});
+            String errorDetails = e.getMessage();
+            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                    errorDetails);
+            log.error(errorMsg + ": " + errorDetails);
+        }
+        model.addAttribute(PEER_NAME_KEY, peerName);
+        return SUBSCRIPTION_STATUS_VIEW;
+    }
     
     /**
      * @param jsonUtil the jsonUtil to set
@@ -277,73 +479,6 @@ public class GetSubscriptionController implements MessageSetter {
             INodeConnectionManager nodeConnectionManager) {
         this.nodeConnectionManager = nodeConnectionManager;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-
-    /**
-     * @return the urlValidator
-     *
-    public UrlValidatorUtil getUrlValidator() {
-        return urlValidator;
-    }
-
-    /**
-     * @param urlValidator the urlValidator to set
-     * void setUrlValidator(UrlValidatorUtil urlValidator) {
-        this.urlValidator = urlValidator;
-    }
-
-    /**
-     * @return the messages
-     *
-    public MessageResourceUtil getMessages() {
-        return messages;
-    }
-
-    /**
-     * @param messages the messages to set
-     *
-    public void setMessages(MessageResourceUtil messages) {
-        this.messages = messages;
-    }
-
-    /**
-     * @return the authenticator
-     *
-    public Authenticator getAuthenticator() {
-        return authenticator;
-    }
-
-    /**
-     * @param authenticator the authenticator to set
-     *
-    public void setAuthenticator(Authenticator authenticator) {
-        this.authenticator = authenticator;
-    }
-
-    /**
-     * @return the httpClient
-     *
-    public HttpClientUtil getHttpClient() {
-        return httpClient;
-    }
-
-    /**
-     * @param httpClient the httpClient to set
-     *
-    public void setHttpClient(HttpClientUtil httpClient) {
-        this.httpClient = httpClient;
-    }*/
-
-   
-
-    
 
     /**
      * @param subscriptionManager the subscriptionManager to set
@@ -353,13 +488,34 @@ public class GetSubscriptionController implements MessageSetter {
     {
         this.subscriptionManager = subscriptionManager;
     }
-
+    
     /**
-     * @param dataSourceManager the dataSourceManager to set
+     * @param httpClient the httpClient to set
+     */
+    public void setHttpClient(IHttpClientUtil httpClient) {
+        this.httpClient = httpClient;
+    }
+    
+    /**
+     * @param messages the messages to set
      */
     @Autowired
-    public void setDataSourceManager(IDataSourceManager dataSourceManager) {
-        this.dataSourceManager = dataSourceManager;
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
+    }
+    
+    /**
+     * @param log the log to set
+     */
+    public void setLog(Logger log) {
+        this.log = log;
+    }
+
+    /**
+     * @param authenticator the authenticator to set
+     */
+    public void setAuthenticator(Authenticator authenticator) {
+        this.authenticator = authenticator;
     }
     
 }

@@ -22,8 +22,10 @@
 package eu.baltrad.dex.net.util;
 
 import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.net.model.Subscription;
 
 import java.util.Set;
+import java.util.List;
 
 /**
  * Json utility interface.
@@ -38,6 +40,12 @@ public interface IJsonUtil {
              throws RuntimeException;
      
      public Set<DataSource> jsonToDataSources(String jsonString) 
+             throws RuntimeException;
+     
+     public String subscriptionsToJson(List<Subscription> subscriptions)
+             throws RuntimeException;
+     
+     public List<Subscription> jsonToSubscriptions(String jsonString) 
              throws RuntimeException;
      
 }

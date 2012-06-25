@@ -22,9 +22,7 @@
 package eu.baltrad.dex.net.util;
 
 import eu.baltrad.dex.datasource.model.DataSource;
-
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.type.TypeReference;
+import eu.baltrad.dex.net.model.Subscription;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -32,7 +30,8 @@ import org.junit.Test;
 
 import java.util.Set;
 import java.util.HashSet;
-import java.io.StringWriter;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Json utility test.
@@ -43,72 +42,103 @@ import java.io.StringWriter;
 public class JsonUtilTest {
     
     private JsonUtil classUnderTest;
-    private ObjectMapper mapper;
-    private Set<DataSource> toJson;
-    private String jsonString;
+    private Set<DataSource> dataSources;
+    private List<Subscription> subscriptions;
+    private String jsonSources;
+    private String jsonSubscriptions;
     
     @Before
     public void setUp() {
-        jsonString = "[{\"name\":\"DS1\",\"id\":1,\"description\":\"A test "
+        jsonSources = "[{\"name\":\"DS1\",\"id\":1,\"description\":\"A test "
             + "data source\"},{\"name\":\"DS2\",\"id\":2,\"description\":\"One "
             + "more test data source\"},{\"name\":\"DS3\",\"id\":3,\"" 
             + "description\":\"Yet another test data source\"}]";
         
+        jsonSubscriptions = "[{\"id\":1,\"type\":\"download\",\"timeStamp\"" 
+            + ":1340189763867,\"userName\":\"User1\",\"nodeAddress\":" 
+            + "\"http://test.baltrad.eu\",\"dataSourceName\":\"DS1\"," 
+            + "\"operatorName\":\"Operator1\",\"active\":true,\"synkronized\""
+            + ":true},{\"id\":2,\"type\":\"download\",\"timeStamp\"" 
+            + ":1340189763867,\"userName\":\"User2\",\"nodeAddress\":"
+            + "\"http://baltrad.eu\",\"dataSourceName\":\"DS2\","
+            + "\"operatorName\":\"Operator2\",\"active\":true,\"synkronized\":"
+            + "false},{\"id\":3,\"type\":\"upload\",\"timeStamp\":"
+            + "1340189763867,\"userName\":\"User3\",\"nodeAddress\":"
+            + "\"http://baltrad.imgw.pl\",\"dataSourceName\":\"DS3\","
+            + "\"operatorName\":\"Operator3\",\"active\":false,\"synkronized\""
+            + ":true}]";
+        
         classUnderTest = new JsonUtil();
-        mapper = new ObjectMapper();
-        toJson = new HashSet<DataSource>();
+        dataSources = new HashSet<DataSource>();
         DataSource ds1 = new DataSource(1, "DS1", "A test data source");
-        toJson.add(ds1);
+        dataSources.add(ds1);
         DataSource ds2 = new DataSource(2, "DS2", "One more test data source");
-        toJson.add(ds2);
+        dataSources.add(ds2);
         DataSource ds3 = new DataSource(3, "DS3", 
                                                 "Yet another test data source");
-        toJson.add(ds3);
-        assertEquals(3, toJson.size());
-    }
-    
-    @Test
-    public void hashSetToJsonString() throws Exception {
-        StringWriter writer = new StringWriter();
-        mapper.writeValue(writer, toJson);
-        assertNotNull(writer.toString());
-        assertEquals(jsonString, writer.toString());
-    }
-    
-    @Test
-    public void jsonStringToHashSet() throws Exception {
-        HashSet<DataSource> fromJson = mapper.readValue(jsonString, 
-                                    new TypeReference<HashSet<DataSource>>(){});
-        assertNotNull(fromJson);
-        assertEquals(3, fromJson.size());
-        for (DataSource ds : fromJson) {
-            assertNotNull(ds);
-            assertNotNull(ds.getId());
-            assertNotNull(ds.getName());
-            assertNotNull(ds.getDescription());
-        }
+        dataSources.add(ds3);
+        assertEquals(3, dataSources.size());
         
+        long time = 1340189763867L;
+        subscriptions = new ArrayList<Subscription>();
+        Subscription s1 = new Subscription(1, time, "User1", "DS1", "Operator1",
+                "download", true, true, "http://test.baltrad.eu");
+        subscriptions.add(s1);
+        Subscription s2 = new Subscription(2, time, "User2", "DS2", "Operator2",
+                "download", true, false, "http://baltrad.eu");
+        subscriptions.add(s2);
+        Subscription s3 = new Subscription(3, time, "User3", "DS3", "Operator3",
+                "upload", false, true, "http://baltrad.imgw.pl");
+        subscriptions.add(s3);
+        assertEquals(3, subscriptions.size());
     }
     
     @Test
     public void dataSourcesToJsonString() {
-        String s = classUnderTest.dataSourcesToJson(toJson);
+        String s = classUnderTest.dataSourcesToJson(dataSources);
         assertNotNull(s);
-        assertEquals(jsonString, s);
+        assertEquals(jsonSources, s);
     }
     
     @Test
     public void jsonStringToDataSources() throws Exception  {
-        HashSet<DataSource> dataSources = (HashSet<DataSource>)
-                             classUnderTest.jsonToDataSources(jsonString);
-        assertNotNull(dataSources);
-        assertEquals(3, dataSources.size());
-        for (DataSource ds : dataSources) {
+        HashSet<DataSource> sources = (HashSet<DataSource>)
+                             classUnderTest.jsonToDataSources(jsonSources);
+        assertNotNull(sources);
+        assertEquals(3, sources.size());
+        for (DataSource ds : sources) {
             assertNotNull(ds);
             assertNotNull(ds.getId());
             assertNotNull(ds.getName());
             assertNotNull(ds.getDescription());
         }
-        
     }
+    
+    @Test
+    public void subscriptionsToJsonString() {
+        String s = classUnderTest.subscriptionsToJson(subscriptions);
+        assertNotNull(s);
+        assertEquals(jsonSubscriptions, s);
+    }
+    
+    @Test
+    public void jsonStringToSubscriptions() throws Exception  {
+        ArrayList<Subscription> subs = (ArrayList<Subscription>)
+                         classUnderTest.jsonToSubscriptions(jsonSubscriptions);
+        assertNotNull(subs);
+        assertEquals(3, subs.size());
+        for (Subscription s : subs) {
+            assertNotNull(s);
+            assertNotNull(s.getId());
+            assertNotNull(s.getTimeStamp());
+            assertNotNull(s.getUserName());
+            assertNotNull(s.getDataSourceName());
+            assertNotNull(s.getOperatorName());
+            assertNotNull(s.getType());
+            assertNotNull(s.getActive());
+            assertNotNull(s.getSynkronized());
+            assertNotNull(s.getNodeAddress());
+        }
+    }
+    
 }

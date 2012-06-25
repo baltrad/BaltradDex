@@ -37,7 +37,7 @@ public interface RequestFactory {
             String nodeAddress);
     
     public HttpUriRequest createGetSubscriptionRequest(String nodeName,
-            String nodeAddress, String jsonSources);
+            String nodeAddress, String jsonSubscriptions);
     
     public HttpUriRequest createPostSubscriptionRequest(String nodeName,
             String nodeAddress, String jsonSources);

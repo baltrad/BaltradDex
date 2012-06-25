@@ -210,7 +210,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
      * @param request Http request
      * @param response Http response
      * @return Model and view containing list of subscribed data channels
-     */
+     *
     public ModelAndView subscription_status(HttpServletRequest request,
             HttpServletResponse response) {
         ModelAndView modelAndView = new ModelAndView();
@@ -230,8 +230,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
                 }
                 if (code == HttpServletResponse.SC_OK) {
                     SerialFrame serialFrame = readFrameFromStream(res);
-                    if (authenticate(/*ServletContextUtil.getServletContextPath() 
-                            + InitAppUtil.KS_FILE_PATH,*/
+                    if (authenticate(
                             InitAppUtil.getConf().getKeystoreDir(), serialFrame.getNodeName(), 
                             serialFrame.getSignature(), serialFrame.getTimestamp())) {
                         Subscription sub = (Subscription) serialFrame.getItem();
@@ -272,7 +271,7 @@ public class SubscriptionController_deprecated extends MultiActionController {
         }
         modelAndView.setViewName(SUBSCRIPTION_STATUS_VIEW);
         return modelAndView;
-    }
+    }*/
     /**
      * Shows list of all subscribed channels with check-boxes allowing user to select channels
      * for removal.
@@ -491,7 +490,6 @@ public class SubscriptionController_deprecated extends MultiActionController {
         HttpResponse response = null;
         long timestamp = System.currentTimeMillis();
         String signature = getSignatureString(
-                /*ServletContextUtil.getServletContextPath() + InitAppUtil.KS_FILE_PATH,*/
                 InitAppUtil.getConf().getKeystoreDir(),
                 InitAppUtil.getConf().getNodeName(), timestamp);
         Frame frame = Frame.postSubscriptionUpdateRequest(remoteNodeAddress, 

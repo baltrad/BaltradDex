@@ -40,7 +40,8 @@ Author     : szewczenko
             </div>
             <div class="table">
                 <div class="subscriptions">
-                    <form action="subscribe.htm" method="post">
+                    <form action="subscription_status.htm?peer_name=${peer_name}" 
+                          method="post">
                         <div class="tableheader">
                             <div id="cell" class="count">&nbsp;</div>
                             <div id="cell" class="name">
@@ -71,10 +72,20 @@ Author     : szewczenko
                                         <c:when test="${sub.active == true}">
                                             <img src="includes/images/icons/download.png" 
                                                     alt="Start" title="Start subscription">
+                                            <div id="cell" class="hidden">
+                                                <input type="checkbox" 
+                                                       name="active_subscription_ids"
+                                                       value="${sub.id}" checked/>
+                                            </div>
                                         </c:when>
                                         <c:otherwise>
                                             <img src="includes/images/icons/stop.png" 
                                                     alt="Stop" title="Stop subscription">
+                                            <div id="cell" class="hidden">
+                                                <input type="checkbox" 
+                                                       name="inactive_subscription_ids"
+                                                       value="${sub.id}" checked/>
+                                            </div>    
                                         </c:otherwise>
                                     </c:choose>
                                 </div>

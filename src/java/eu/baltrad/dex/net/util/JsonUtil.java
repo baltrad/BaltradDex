@@ -22,12 +22,15 @@
 package eu.baltrad.dex.net.util;
 
 import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.net.model.Subscription;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 
 import java.io.StringWriter;
 import java.io.IOException;
@@ -86,6 +89,44 @@ public class JsonUtil implements IJsonUtil {
                     + " sources", e);
         }
         return dataSources;
+    }
+    
+    /**
+     * Converts list containing subscription objects into JSON string.
+     * @param subscriptions List containing subscription objects
+     * @return JSON string
+     */
+    public String subscriptionsToJson(List<Subscription> subscriptions) 
+            throws RuntimeException {
+        StringWriter writer = new StringWriter();
+        String jsonString = null;
+        try {
+            mapper.writeValue(writer, subscriptions);
+            jsonString = writer.toString();
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to convert subscriptions to JSON"
+                    + " string", e);
+        }
+        return jsonString;
+    }
+    
+    /**
+     * Converts JSON string to array list containing subscription objects.
+     * @param jsonString JSON string
+     * @return Array list containing subscription objects
+     */
+    public List<Subscription> jsonToSubscriptions(String jsonString) 
+            throws RuntimeException {
+        ArrayList<Subscription> subscriptions = null;
+        try {
+            subscriptions = mapper.readValue(jsonString, 
+                                new TypeReference<ArrayList<Subscription>>(){});
+        } catch(IOException e) {
+            throw new RuntimeException("Failed to convert JSON string to data"
+                    + " sources", e);
+        }
+        return subscriptions;
     }
     
 }
