@@ -619,10 +619,22 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           autowire="byType"/>
           
     <!-- Subscription manager -->
-    <bean name="subscriptionManager" 
+    <bean id="subscriptionManager" 
           class="eu.baltrad.dex.net.model.SubscriptionManager" 
           autowire="byType"/>
+          
+    <!-- Post file servlet -->
+    <bean id="postFileServlet" 
+          class="eu.baltrad.dex.net.servlet.PostFileServlet" 
+          autowire="byType"/>
+          
+    <!-- Incoming file namer -->      
+    <bean id="incomingFileNamer" 
+          class="eu.baltrad.dex.net.util.IncomingFileNamer"/>
     
+    <!-- Metadata matcher -->
+    <bean id="metadataMatcher" 
+          class="eu.baltrad.bdb.oh5.MetadataMatcher"/>
 
 
     

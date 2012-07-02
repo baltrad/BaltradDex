@@ -46,8 +46,6 @@ public class UploadStatusController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
      /** Users key */
     private final static String USERS = "users";
-    /** References "user_name" field in dex_subscriptions table */
-    private final static String USER_NAME_FIELD = "user_name";
     /** Remote subscription key */
     private static final String REMOTE_SUBSCRIPTION = "remote";
 //---------------------------------------------------------------------------------------- Variables
@@ -71,7 +69,7 @@ public class UploadStatusController implements Controller {
                 .loadOperators(Subscription.SUBSCRIPTION_UPLOAD);
         List<String> users = new ArrayList<String>();
         for (Subscription s : subscription) {
-            users.add(s.getOperatorName());
+            users.add(s.getUserName());
         }
         modelAndView.addObject( USERS, users );
         // get remote subscriptions

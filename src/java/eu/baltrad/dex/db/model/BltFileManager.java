@@ -59,7 +59,7 @@ import eu.baltrad.dex.log.model.MessageLogger;
  * @version 1.1.0
  * @since 0.1.6
  */
-public class BltFileManager {
+public class BltFileManager implements IBltFileManager {
 //-------------------------------------------------------------------- Constants
     /** Date format string */
     private static final String FC_DATE_STR = "yyyyMMdd";

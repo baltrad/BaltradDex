@@ -121,10 +121,13 @@ public class DefaultRequestFactoryTest {
     @Test
     public void createPostFileRequest() {
         InputStream is = new ByteArrayInputStream("datafilecontent".getBytes());
-        HttpUriRequest request = classUnderTest.createPostFileRequest(is);
+        HttpUriRequest request = classUnderTest.createPostFileRequest(
+                "localnode", "http://localhost", is);
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/post_file.htm"), request.getURI());
+        assertEquals("localnode", getHeader(request, "Node-Name"));
+        assertEquals("http://localhost", getHeader(request, "Node-Address"));
         assertEquals("application/x-hdf5", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));
         assertNotNull(getHeader(request, "Date"));

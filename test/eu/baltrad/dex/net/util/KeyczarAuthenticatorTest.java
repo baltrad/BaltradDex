@@ -81,7 +81,7 @@ public class KeyczarAuthenticatorTest {
         HttpUriRequest request = requestFactory.createGetSubscriptionRequest(
             "localnode", "http://localhost",
                 "json string will be passed here");
-        classUnderTest.addCredentials(request, "dev.baltrad.eu");
+        classUnderTest.addCredentials(request, "test.baltrad.eu");
         Header header = request.getFirstHeader("Authorization");
         assertNotNull(header);
         assertNotNull(header.getValue());
@@ -93,12 +93,11 @@ public class KeyczarAuthenticatorTest {
                 "/get_datasource_listing.htm");
         setAttributes(request);
         NodeRequest req = new NodeRequest(request);
-        Signer signer = cryptoFactory.createSigner("dev.baltrad.eu");
+        Signer signer = cryptoFactory.createSigner("test.baltrad.eu");
         String signature = signer.sign(req.getMessage());
-        req.setAttribute("Authorization", "dev.baltrad.eu" + ":" + signature);
-        
+        req.setAttribute("Authorization", "test.baltrad.eu" + ":" + signature);
         assertTrue(classUnderTest.authenticate(req.getMessage(), 
-                req.getSignature(), "dev.baltrad.eu"));
+                req.getSignature(), "test.baltrad.eu"));
     }
     
     @Test
@@ -107,12 +106,12 @@ public class KeyczarAuthenticatorTest {
                 "/get_datasource_listing.htm");
         setAttributes(request);
         NodeRequest req = new NodeRequest(request);
-        Signer signer = cryptoFactory.createSigner("dev.baltrad.eu");
+        Signer signer = cryptoFactory.createSigner("test.baltrad.eu");
         String signature = signer.sign(req.getMessage());
-        req.setAttribute("Authorization", "dev.baltrad.eu" + ":" + signature);
+        req.setAttribute("Authorization", "test.baltrad.eu" + ":" + signature);
         request.setAttribute("Date", "");
         assertFalse(classUnderTest.authenticate(req.getMessage(), 
-                req.getSignature(), "dev.baltrad.eu"));
+                req.getSignature(), "test.baltrad.eu"));
     }
     
 }

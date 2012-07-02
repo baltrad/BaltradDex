@@ -19,30 +19,19 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.net.util;
+package eu.baltrad.dex.db.model;
 
-import org.apache.http.client.methods.HttpUriRequest;
-
-import java.io.InputStream;
+import eu.baltrad.beast.db.IFilter;
 
 /**
- * Request factory.
+ * File manager interface.
+ * 
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.1.0
- * @since 1.1.0
+ * @version 1.1.1
+ * @since 1.1.1
  */
-public interface RequestFactory {
+public interface IBltFileManager {
     
-    public HttpUriRequest createGetDataSourceListingRequest(String nodeName, 
-            String nodeAddress);
-    
-    public HttpUriRequest createGetSubscriptionRequest(String nodeName,
-            String nodeAddress, String jsonSubscriptions);
-    
-    public HttpUriRequest createPostSubscriptionRequest(String nodeName,
-            String nodeAddress, String jsonSources);
-    
-    public HttpUriRequest createPostFileRequest(String nodeName,
-            String nodeAddress, InputStream fileContent);
+    public IFilter getFilter(String name);
     
 }

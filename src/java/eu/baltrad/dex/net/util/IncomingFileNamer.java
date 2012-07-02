@@ -28,9 +28,10 @@ import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.oh5.Attribute;
 import eu.baltrad.bdb.oh5.Metadata;
 import eu.baltrad.bdb.oh5.Source;
-import eu.baltrad.bdb.util.FileNamer;
+//import eu.baltrad.bdb.util.FileNamer;
+import eu.baltrad.bdb.util.FileEntryNamer;
 
-public class IncomingFileNamer implements FileNamer {
+public class IncomingFileNamer implements FileEntryNamer {
   private List<String> sourceKeyPriorities;
 
   public IncomingFileNamer() {

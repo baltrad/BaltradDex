@@ -213,22 +213,26 @@ public class DefaultRequestFactory implements RequestFactory {
     
     /**
      * Creates post data file request.
+     * @param nodeName Name of the node making a request
+     * @param nodeAddress Address of the node making a request
      * @param fileContent File content as stream
      * @return Http POST request 
      */
-    public HttpPost createPostFileRequest(InputStream fileContent) {
+    public HttpPost createPostFileRequest(String nodeName, 
+            String nodeAddress, InputStream fileContent) {
         HttpPost httpPost = new HttpPost(getRequestUri("post_file.htm"));
-        byte[] bytes = null; 
         ByteArrayEntity entity = null;
         try {
-            bytes = IOUtils.toByteArray(fileContent);
-            entity = new ByteArrayEntity(bytes);
+            entity = new ByteArrayEntity(IOUtils.toByteArray(fileContent));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         httpPost.setEntity(entity);
+        httpPost.addHeader("Node-Name", nodeName);
+        httpPost.addHeader("Node-Address", nodeAddress);
         httpPost.addHeader("Content-Type", "application/x-hdf5");
-        httpPost.addHeader("Content-MD5", Base64.encodeBase64String(bytes));
+        httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
+                httpPost.getURI().toString().getBytes()));
         httpPost.addHeader("Date", dateFormat.format(new Date()));
         return httpPost;
     }

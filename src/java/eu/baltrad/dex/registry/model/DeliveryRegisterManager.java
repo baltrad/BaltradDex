@@ -41,7 +41,7 @@ import java.util.Date;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class DeliveryRegisterManager {
+public class DeliveryRegisterManager implements IDeliveryRegistryManager {
 //---------------------------------------------------------------------------------------- Constants
     /** Number of file entries per page */
     public final static int ENTRIES_PER_PAGE = 12;
@@ -88,6 +88,36 @@ public class DeliveryRegisterManager {
         }
         return count;
     }
+    
+    /**
+     * Check if entry exists.
+     * @param userId User id
+     * @param uuid File identity string
+     * @return True if entry exists
+     */
+    public boolean entryExists(int userId, String uuid) {
+        Connection conn = null;
+        boolean result = false;
+        try {
+            conn = jdbcConnectionManager.getConnection();
+            Statement stmt = conn.createStatement();
+            ResultSet resultSet = stmt.executeQuery("SELECT COUNT(*) FROM " +
+                "dex_delivery_register WHERE user_id = " + userId + 
+                " AND uuid = '" + uuid + "';");
+            resultSet.next();
+            if (resultSet.getInt(1) > 0) {
+                result = true;
+            }
+            stmt.close();
+        } catch(Exception e) {
+            log.error("Failed to select delivery register entry", e);
+        } finally {
+            jdbcConnectionManager.returnConnection( conn );
+        }
+        return result;
+    }
+    
+    
     /**
      * Gets unique delivery register entry identified by user's ID and file's UUID.
      *

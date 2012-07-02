@@ -54,7 +54,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="compile.optimize" value="true"/>
   <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java"/>
   <property name="keystore.dir" value="keystore"/>
-  <property name="hostname" value="dev.baltrad.eu"/>
+  <property name="hostname" value="test.baltrad.eu"/>
   
   <!-- You can override properties in these files -->
   <property file="${etc.dir}/develop.properties" />

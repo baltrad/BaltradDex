@@ -46,8 +46,6 @@ public class DownloadStatusController implements Controller {
 //---------------------------------------------------------------------------------------- Constants
     /** Operators key */
     private final static String OPERATORS = "operators";
-    /** References "operator_name" field in dex_subscriptions table */
-    private final static String OPERATOR_NAME_FIELD = "operator_name";
     /** Local subscriprions key */
     private static final String LOCAL_SUBSCRIPTION = "local";
 //---------------------------------------------------------------------------------------- Variables
