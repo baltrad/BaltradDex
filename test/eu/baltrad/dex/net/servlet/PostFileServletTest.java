@@ -52,6 +52,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
 
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.StatusLine;
 import org.apache.http.message.BasicStatusLine;
@@ -67,13 +68,13 @@ import org.junit.After;
 import org.junit.Test;
 
 import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
-import org.apache.http.client.methods.HttpUriRequest;
 
 /**
  * Post file servlet test.
@@ -291,6 +292,9 @@ public class PostFileServletTest {
         expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
                 .anyTimes();
         expect(entryMock.getMetadata()).andReturn(null).anyTimes();
+        expect(entryMock.getContentStream())
+            .andReturn(new ByteArrayInputStream("content stream".getBytes()))
+            .anyTimes();
         
         FileCatalog fileCatalogMock = 
                 (FileCatalog) createMock(FileCatalog.class);
