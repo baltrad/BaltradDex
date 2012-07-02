@@ -56,10 +56,6 @@ public class AppConfiguration {
     private String thumbsDir;
     /** Node administrator's email */
     private String email;
-    /** Keystore password */
-    private String keystorePass;
-    /** Certificates directory */
-    private String certsDir;
     /** Keystore directory */
     private String keystoreDir;
 //------------------------------------------------------------------------------------------ Methods
@@ -84,8 +80,8 @@ public class AppConfiguration {
      */
     public AppConfiguration( String nodeName, String nodeAddress, String nodeType, String version, 
             int soTimeout, int connTimeout, String workDir, String imagesDir, String thumbsDir, 
-            String organization, String address, String timeZone, String email, String keystorePass,
-            String certsDir, String keystoreDir) {
+            String organization, String address, String timeZone, String email, 
+            String keystoreDir) {
         this.nodeName = nodeName;
         this.nodeAddress = nodeAddress;
         this.nodeType = nodeType;
@@ -99,8 +95,6 @@ public class AppConfiguration {
         this.address= address;
         this.timeZone = timeZone;
         this.email = email;
-        this.keystorePass = keystorePass;
-        this.certsDir = certsDir;
         this.keystoreDir = keystoreDir;
     }
     /**
@@ -127,8 +121,6 @@ public class AppConfiguration {
                 appConf.getAddress().equals( this.getAddress() ) &&
                 appConf.getTimeZone().equals( this.getTimeZone() ) &&
                 appConf.getEmail().equals( this.getEmail() ) &&
-                appConf.getKeystorePass().equals( this.getKeystorePass() ) &&
-                appConf.getCertsDir().equals( this.getCertsDir() ) &&
                 appConf.getKeystoreDir().equals(this.getKeystoreDir());
         } else {
             return false;
@@ -290,31 +282,6 @@ public class AppConfiguration {
      * @param email Node administrator's email
      */
     public void setEmail( String email ) { this.email = email; }
-    /**
-     * Gets keystore password.
-     * 
-     * @return Keystore password
-     */
-    public String getKeystorePass() { return keystorePass; }
-    /**
-     * Sets keystore password.
-     * 
-     * @param Keystore password to set
-     */
-    public void setKeystorePass( String keystorePass ) { this.keystorePass = keystorePass; }
-    /**
-     * Gets certificates directory.
-     * 
-     * @return Certificates directory
-     */
-    public String getCertsDir() { return certsDir; }
-    /**
-     * Sets certificates directory.
-     * 
-     * @param certsDir Certificates directory to set
-     */
-    public void setCertsDir( String certsDir ) { this.certsDir = certsDir; }
-
     /**
      * @return the keystoreDir
      */

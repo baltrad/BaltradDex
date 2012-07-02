@@ -154,7 +154,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
         HttpSession session = request.getSession(true);
         // Parse incoming baltrad frame
         HashMap parms = parse(request, InitAppUtil.getWorkDir(), InitAppUtil.getWorkDir(), 
-                InitAppUtil.getCertsDir());
+                /*InitAppUtil.getCertsDir()*/new File(".").getAbsolutePath());
         // Handle post certificate request
         /*if (Frame.getRequestType(parms).equals(BF_POST_CERT)) {
             handleCertRequest(parms, response);

@@ -42,18 +42,14 @@ import java.util.HashMap;
 public class ConfigurationManager {
 //---------------------------------------------------------------------------------------- Constants
     /** Default properties file name */
-    private static final String DEX_DEFAULT_PROPS = "WEB-INF/conf/dex.default.properties";
+    private static final String DEX_DEFAULT_PROPS = "dex.default.properties";
     /** User-defined properties file name */
-    private static final String DEX_USER_PROPS = "WEB-INF/conf/dex.user.properties";
-    /** Version properties file name */
-    private static final String DEX_VERSION_PROPS = "WEB-INF/conf/dex.version.properties";
+    private static final String DEX_USER_PROPS = "dex.user.properties";
     
     /** Default properties key */
     private static String DEFAULT_PROPS_KEY = "default_props";
     /** User properties key */
     private static String USER_PROPS_KEY = "user_props";
-    /** Version properties key  */
-    private static String VERSION_PROPS_KEY = "version_props";
     
     /** Properties file comment */
     private static final String DEX_PROPS_FILE_COMMENT = "BaltradDex configuration file";
@@ -117,13 +113,6 @@ public class ConfigurationManager {
     /** Age limit - minutes */
     private static final String REG_MAX_AGE_MINUTES = "registry.max_age_minutes";
     
-    // Keystore configuration
-    
-    /** Keystore password */
-    private static final String KEYSTORE_PASS_PROP = "keystore.pass";
-    /** Certificates directory */
-    private static final String CERTS_DIR_PROP = "certificates.directory";
-    
     /** Keystore directory */
     private static final String KEYSTORE_DIR_PROP = "keystore.directory";
     
@@ -158,12 +147,12 @@ public class ConfigurationManager {
         in.close();
         props.put( USER_PROPS_KEY, userProps );
         //
-        in = new FileInputStream( ServletContextUtil.getServletContextPath() + DEX_VERSION_PROPS );
+        /*in = new FileInputStream( ServletContextUtil.getServletContextPath() + DEX_VERSION_PROPS );
         Properties versionProps = new Properties();
         versionProps.load( in );
         in.close();
         props.put( VERSION_PROPS_KEY, versionProps );
-        //
+        /*/
         return props;
     }
     /**
@@ -175,17 +164,17 @@ public class ConfigurationManager {
         try {
             HashMap<String, Properties> props = loadProperties();
             Properties userProps = props.get( USER_PROPS_KEY );
-            Properties versionProps = props.get( VERSION_PROPS_KEY );
+            //Properties versionProps = props.get( VERSION_PROPS_KEY );
             //
             AppConfiguration conf = new AppConfiguration(userProps.getProperty(NODE_NAME_PROP),
                 userProps.getProperty(NODE_ADDRESS_PROP), userProps.getProperty(NODE_TYPE_PROP), 
-                versionProps.getProperty(SOFT_VERSION_PROP), Integer.parseInt(userProps.getProperty(
+                userProps.getProperty(SOFT_VERSION_PROP), Integer.parseInt(userProps.getProperty(
                 SO_TIMEOUT_PROP)), Integer.parseInt(userProps.getProperty(CONN_TIMEOUT_PROP)),
                 userProps.getProperty(WORK_DIR_PROP), userProps.getProperty(IMAGES_DIR_PROP),
                 userProps.getProperty(THUMBNAILS_DIR_PROP), userProps.getProperty(ORG_NAME_PROP),
                 userProps.getProperty(ORG_ADDRESS_PROP), userProps.getProperty(TIME_ZONE_PROP),
-                userProps.getProperty(EMAIL_PROP), userProps.getProperty(KEYSTORE_PASS_PROP),
-                userProps.getProperty(CERTS_DIR_PROP), userProps.getProperty(KEYSTORE_DIR_PROP));
+                userProps.getProperty(EMAIL_PROP), 
+                userProps.getProperty(KEYSTORE_DIR_PROP));
             return conf;
         } catch( Exception e ) {
             log.error( "Failed to load properties", e );
@@ -215,8 +204,6 @@ public class ConfigurationManager {
             userProps.setProperty(ORG_ADDRESS_PROP, appConf.getAddress());
             userProps.setProperty(TIME_ZONE_PROP, appConf.getTimeZone());
             userProps.setProperty(EMAIL_PROP, appConf.getEmail());
-            userProps.setProperty(KEYSTORE_PASS_PROP, appConf.getKeystorePass());
-            userProps.setProperty(CERTS_DIR_PROP, appConf.getCertsDir());
             userProps.setProperty(KEYSTORE_DIR_PROP, appConf.getKeystoreDir());
             //
             FileOutputStream out = new FileOutputStream( ServletContextUtil.getServletContextPath()

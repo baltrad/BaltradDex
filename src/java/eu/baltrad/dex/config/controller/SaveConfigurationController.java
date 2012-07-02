@@ -86,8 +86,8 @@ public class SaveConfigurationController extends SimpleFormController {
         if( conf == null ) {
             conf = new AppConfiguration("Node name", "http://localhost:8084/BaltradDex/dispatch.htm",
                 PRIMARY_NODE, "0.7.3", 60000, 60000, "work", "images", "thumbs", "My Organization", 
-                    "Organization's address", "Time zone", "Node admin's email", "passwd", 
-                    "certs", "/opt/baltrad/etc/bltnode-keys");
+                    "Organization's address", "Time zone", "Node admin's email", 
+                    "/opt/baltrad/etc/bltnode-keys");
         }
         return conf;
     }

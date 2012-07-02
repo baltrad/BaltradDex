@@ -41,7 +41,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="build.web.dir" value="${build.dir}/web"/>
   <property name="build.metainf.dir" value="${build.web.dir}/META-INF"/>
   <property name="build.webinf.dir" value="${build.web.dir}/WEB-INF"/>
-  <property name="build.conf.dir" value="${build.webinf.dir}/conf"/>
   <property name="build.jsp.dir" value="${build.webinf.dir}/jsp"/>
   <property name="build.classes.dir" value="${build.webinf.dir}/classes"/>
   <property name="build.lib.dir" value="${build.webinf.dir}/lib"/>
@@ -151,7 +150,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <mkdir dir="${build.web.dir}"/>
     <mkdir dir="${build.metainf.dir}"/>
     <mkdir dir="${build.webinf.dir}"/>
-    <mkdir dir="${build.conf.dir}"/>
     <mkdir dir="${build.jsp.dir}"/>
     <mkdir dir="${build.classes.dir}"/>
     <mkdir dir="${build.lib.dir}"/>
@@ -267,6 +265,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="${etc.dir}">
         <include name="db.properties" />
         <include name="log4j.properties" />
+        <include name="dex.user.properties" />
+        <include name="dex.default.properties" />
       </fileset>
     </copy>
 
@@ -316,15 +316,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- Copy test data -->
     <copy todir="${build.test.dir}">
       <fileset dir="${test.data.dir}"/>
-    </copy>
-    
-    <!-- copy application properties files -->
-    <copy todir="${build.conf.dir}">
-      <fileset dir="${etc.dir}">
-        <include name="dex.default.properties"/>
-        <include name="dex.user.properties"/>
-        <include name="dex.version.properties"/>
-      </fileset>
     </copy>
 
 </target>

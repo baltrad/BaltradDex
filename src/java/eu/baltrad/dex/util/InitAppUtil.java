@@ -48,8 +48,6 @@ public class InitAppUtil {
     private final static String TEMP_FILE_SUFFIX = ".dat";
     /** Maximum age of temporary files in miliseconds, set to 3 minutes */
     private static final long TEMP_FILE_MAX_AGE = 180000;
-    /** Keystore file path */
-    public static final String KS_FILE_PATH = "WEB-INF/conf/.dex_keystore.jks";
 //---------------------------------------------------------------------------------------- Variables
     /** References logger object */
     private static Logger log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
@@ -61,8 +59,6 @@ public class InitAppUtil {
     private static String imagesDir;
     /** Thumbnails directory */
     private static String thumbsDir;
-    /** Certificates directory */
-    private static String certsDir;
     /** Reference to frame handler object */
     private static Handler handler;
 //------------------------------------------------------------------------------------------ Methods
@@ -100,8 +96,6 @@ public class InitAppUtil {
                 appConf.getImagesDir(), "New image storage directory created" );
         thumbsDir = createDir( appConf.getWorkDir() + File.separator + 
                 appConf.getThumbsDir(), "New thumbs storage directory created" );
-        certsDir = createDir( appConf.getWorkDir() + File.separator + 
-                appConf.getCertsDir(), "New certificate storage directory created" );
     }
     /**
      * Initializes frame handler.
@@ -135,12 +129,6 @@ public class InitAppUtil {
      * @return Thumbnails directory
      */
     public static String getThumbsDir() { return thumbsDir; }
-    /**
-     * Gets certificates directory.
-     * 
-     * @return Certificates directory
-     */
-    public static String getCertsDir() { return certsDir; }
     /**
      * Gets reference to frame handler
      * 
