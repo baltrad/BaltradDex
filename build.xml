@@ -377,14 +377,21 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <mkdir dir="${test.conf.dir}"/>
     
     
-    <echo message="______ current dir = ${basedir}"/>
-    <echo message="______ creating keystore in ${build.test.dir}/${keystore.dir}"/>
+    
     
     
     <copy file="${etc.dir}/testdb.properties" todir="${build.classes.dir}"/>
+    <copy file="${etc.dir}/develop.properties" todir="${build.classes.dir}"/>
+    
+    <echo message="______ current dir = ${basedir}"/>
+    <echo message="______ keystore dir = ${keystore.dir}"/>
+    <echo message="______ host name = ${hostname}"/>
+    
+    
+    
     <chmod file="${script.dir}/init-keyczar-keystore.sh" perm="755"/>
     <exec executable="${script.dir}/init-keyczar-keystore.sh">
-        <arg value="${basedir}/${build.test.dir}/${keystore.dir}"/>
+        <arg value="${build.test.dir}/${keystore.dir}"/>
         <arg value="${hostname}"/>    
     </exec>
   </target>
