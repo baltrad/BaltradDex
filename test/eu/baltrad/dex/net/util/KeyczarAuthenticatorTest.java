@@ -61,10 +61,10 @@ public class KeyczarAuthenticatorTest {
     
     @Before
     public void setUp() {
-        cryptoFactory = new KeyczarCryptoFactory(new File("keystore"));
+        cryptoFactory = new KeyczarCryptoFactory(new File("./keystore"));
         requestFactory = new DefaultRequestFactory(
                 URI.create("http://example.com"));
-        classUnderTest = new KeyczarAuthenticator("keystore");
+        classUnderTest = new KeyczarAuthenticator("./keystore");
         assertNotNull(classUnderTest);
         format = new SimpleDateFormat(DATE_FORMAT);
     }
