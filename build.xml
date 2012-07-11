@@ -376,7 +376,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <mkdir dir="${build.test.dir}"/>
     <mkdir dir="${test.conf.dir}"/>
     <copy file="${etc.dir}/testdb.properties" todir="${build.classes.dir}"/>
-    <copy file="${etc.dir}/develop.properties" todir="${build.classes.dir}"/>
     <chmod file="${script.dir}/init-keyczar-keystore.sh" perm="755"/>
     <exec executable="${script.dir}/init-keyczar-keystore.sh">
         <arg value="${build.test.dir}/${keystore.dir}"/>
