@@ -61,10 +61,10 @@ public class KeyczarAuthenticatorTest {
     
     @Before
     public void setUp() {
-        cryptoFactory = new KeyczarCryptoFactory(new File("./keystore"));
+        cryptoFactory = new KeyczarCryptoFactory(new File("keystore"));
         requestFactory = new DefaultRequestFactory(
                 URI.create("http://example.com"));
-        classUnderTest = new KeyczarAuthenticator("./keystore");
+        classUnderTest = new KeyczarAuthenticator("keystore");
         assertNotNull(classUnderTest);
         format = new SimpleDateFormat(DATE_FORMAT);
     }
@@ -81,7 +81,7 @@ public class KeyczarAuthenticatorTest {
         HttpUriRequest request = requestFactory.createGetSubscriptionRequest(
             "localnode", "http://localhost",
                 "json string will be passed here");
-        classUnderTest.addCredentials(request, "test.baltrad.eu");
+        classUnderTest.addCredentials(request, "localhost");
         Header header = request.getFirstHeader("Authorization");
         assertNotNull(header);
         assertNotNull(header.getValue());
@@ -93,11 +93,11 @@ public class KeyczarAuthenticatorTest {
                 "/get_datasource_listing.htm");
         setAttributes(request);
         NodeRequest req = new NodeRequest(request);
-        Signer signer = cryptoFactory.createSigner("test.baltrad.eu");
+        Signer signer = cryptoFactory.createSigner("localhost");
         String signature = signer.sign(req.getMessage());
-        req.setAttribute("Authorization", "test.baltrad.eu" + ":" + signature);
+        req.setAttribute("Authorization", "localhost" + ":" + signature);
         assertTrue(classUnderTest.authenticate(req.getMessage(), 
-                req.getSignature(), "test.baltrad.eu"));
+                req.getSignature(), "localhost"));
     }
     
     @Test
@@ -106,12 +106,12 @@ public class KeyczarAuthenticatorTest {
                 "/get_datasource_listing.htm");
         setAttributes(request);
         NodeRequest req = new NodeRequest(request);
-        Signer signer = cryptoFactory.createSigner("test.baltrad.eu");
+        Signer signer = cryptoFactory.createSigner("localhost");
         String signature = signer.sign(req.getMessage());
-        req.setAttribute("Authorization", "test.baltrad.eu" + ":" + signature);
+        req.setAttribute("Authorization", "localhost" + ":" + signature);
         request.setAttribute("Date", "");
         assertFalse(classUnderTest.authenticate(req.getMessage(), 
-                req.getSignature(), "test.baltrad.eu"));
+                req.getSignature(), "localhost"));
     }
     
 }
