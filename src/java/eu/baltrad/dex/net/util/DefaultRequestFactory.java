@@ -171,7 +171,7 @@ public class DefaultRequestFactory implements RequestFactory {
         HttpPost httpPost = new HttpPost(getRequestUri("get_subscription.htm"));
         StringEntity entity = null;
         try {
-            entity = new StringEntity(jsonSubscriptions);
+            entity = new StringEntity(jsonSubscriptions, "UTF-8");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -197,7 +197,7 @@ public class DefaultRequestFactory implements RequestFactory {
         HttpPost httpPost = new HttpPost(getRequestUri("post_subscription.htm"));
         StringEntity entity = null;
         try {
-            entity = new StringEntity(jsonSources);
+            entity = new StringEntity(jsonSources, "UTF-8");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

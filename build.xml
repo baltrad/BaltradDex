@@ -24,14 +24,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
 <project name="BaltradDex" basedir="." default="dist">
   <description>Builds and deploys BaltradDex application</description>
-  <property name="app.name" value="Baltrad Data Exchange System: BaltradDex"/>
+  <property name="app.name" value="BaltradDex | Data Exchange System"/>
   <property name="root.dir" value="${basedir}"/>
   <property name="script.dir" value="${root.dir}/script"/>
   <property name="lib.dir" value="lib"/>
   <property name="extralib.dir" value="extralib"/>
   <property name="src.dir" value="src"/>
-  <property name="javadocs.dir" value="docs"/>
-  <property name="javadocs.src.dir" value="${src.dir}/java/eu/baltrad/dex"/>
   <property name="web.dir" value="web"/>
   <property name="webinf.dir" value="${web.dir}/WEB-INF"/>
   <property name="webinf.dir" value="${web.dir}/WEB-INF"/>
@@ -47,19 +45,20 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="build.test.dir" value="${build.dir}/test" />
   <property name="build.itest.dir" value="${build.dir}/itest"/>  
   <property name="test.conf.dir" value="${build.test.dir}/conf" />
-  <property name="test.data.dir" value="test-data" />
   <property name="compile.debug" value="true"/>
   <property name="compile.includeAntRuntime" value="no"/>
   <property name="compile.optimize" value="true"/>
   <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java"/>
-  <property name="keystore.dir" value="keystore"/>
-  <property name="hostname" value="test.baltrad.eu"/>
-  
+  <property name="doc.dir" value="${root.dir}/doc"/>
+  <property name="doc.build.dir" value="${doc.dir}/build"/>
+  <property name="javadoc.dir" value="${doc.build.dir}/javadoc"/>
+  <property name="doxygen.dir" value="${doc.build.dir}/doxygen"/>
   <!-- You can override properties in these files -->
   <property file="${etc.dir}/develop.properties" />
   <property file="${etc.dir}/db.properties"/>
   <property file="${etc.dir}/appserver.properties"/>
   <property file="${etc.dir}/testdb.properties" />
+  <property file="${etc.dir}/dex.user.properties" />
 
   <property environment="env"/>
 
@@ -142,7 +141,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <include name="xmlrpc-common-3.1.2.jar"/>
       <include name="xmlrpc-server-3.1.2.jar"/>
     </fileset>
-  </path>  
+  </path>
+  
+  <!-- Doxygen path -->
+  <path id="doxygen.classpath">
+    <fileset dir="${lib.dir}/doxygen">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
 	
 <target name="init">
     <!-- create directory structure -->
@@ -313,10 +319,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     	<include name="beast-log-messages.xml"/>
       </fileset>
     </copy>
-    <!-- Copy test data -->
-    <copy todir="${build.test.dir}">
-      <fileset dir="${test.data.dir}"/>
-    </copy>
 
 </target>
 
@@ -357,6 +359,16 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </fileset>
     </war>
   </target>
+  
+  <!-- Create keystore. Additional task used mainly for development -->
+  <target name="init-keystore">
+    <chmod file="${script.dir}/init-keyczar-keystore.sh" perm="755"/>
+    <exec executable="${script.dir}/init-keyczar-keystore.sh">
+        <arg value="${keystore.directory}"/>
+        <arg value="${node.name}"/>    
+    </exec>
+  </target>
+
 
   <!-- UNIT TEST PART -->
   
@@ -483,7 +495,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </exec> 
   </target>   
   <!-- Execute integration tests -->
-  <target name="execute.itest" depends="compile.itest,init.itest,
+  <target name="execute-itest" depends="compile.itest,init.itest,
                                         start-bdb-server">
     <mkdir dir="${dist.dir}/junit-reports" />
     <junit dir="${build.itest.dir}" showoutput="true" forkmode="perBatch" 
@@ -518,6 +530,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="**/*.war" />
       </fileset>
     </delete>
+    <delete dir="${doc.build.dir}"/>
   </target>
 
   <!-- create database and users -->
@@ -644,18 +657,32 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </or>
     </condition>
   </target>
-
-    <!-- Generate BaltradDex source code documentation using javadoc -->
-    <target name="javadocs">
-        <mkdir dir="${javadocs.dir}"/>
-        <javadoc sourcepath="${src.dir}" destdir="${javadocs.dir}"
-            classpath="${src.dir}" author="true" version="true"
-            use="true" windowtitle="${app.name} API"
-            doctitle="&lt;h1&gt;${app.name}&lt;/h1&gt;">
-            <fileset dir="${javadocs.src.dir}">
+    
+    <!-- Generate source code documentation -->
+    <target name="doc" description="Generates source code documentation">
+        <taskdef name="doxygen"  classname="org.doxygen.tools.DoxygenTask" 
+                 classpathref="doxygen.classpath"/>
+        <mkdir dir="${doxygen.dir}"/>
+        <mkdir dir="${javadoc.dir}"/>
+        <doxygen configFilename="${basedir}/doxygen/dex_doxygen.cfg"/>
+        <!--javadoc packagenames="eu.baltrad.*" 
+                 sourcepath="${src.dir}"
+                 destdir="${javadoc.dir}"
+                 author="true"
+                 version="true"
+                 use="true"
+                 windowtitle="${app.name} API">
+            <fileset dir="${src.dir}">
                 <include name="**/*.java"/>
-            </fileset> 
-         </javadoc>
+            </fileset>          
+            <doctitle><![CDATA[<h1>${app.name} API</h1>]]></doctitle>
+            <bottom><![CDATA[<i>Copyright 2009 - 2012 Institute of Meteorology 
+                    and Water Management</i>]]></bottom>
+            <classpath refid="lib.path"/>         
+        </javadoc-->
+        <echo message="Doxygen documentation created in ${doxygen.dir}"/>
+        <echo message="Javadoc documentation created in ${javadoc.dir}"/>
     </target>
+    
 </project>
 

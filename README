@@ -1,6 +1,6 @@
 ################################################################################
 #                                                                              #  
-# Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW  # 
+# Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW  # 
 #                                                                              #
 # This file is part of the BaltradDex software.                                #
 #                                                                              #
@@ -35,5 +35,21 @@ Although the above configuration may work, the functionality it provides will
 be limited and the system operation may be unstable. Therefore it should not
 be used for operational work. It is strongly recommended to perform full
 installation procedure using baltrad-node software package.
+
+The first step before installation is generating user manual, installation
+instructions and source code documentation.  
+
+NOTE: The following software packages are required to build documentation: 
+- Java Development Kit (JDK) - version 1.6.0_20 or later.
+- Apache Ant build tool - version 1.7.1 or later. 
+
+To generate source code documentation and user manual:
+
+$ cd BaltradDex
+$ ant doc 
+
+User manual and source code documentation will be stored in 
+doc/build/doxygen/html folder and Javadoc source code documentation in
+doc/build/javadoc  
 
 

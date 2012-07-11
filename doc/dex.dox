@@ -1,0 +1,798 @@
+/**
+\mainpage BaltradDex documentation
+
+\date July 4, 2012 
+\author Maciej Szewczykowski | maciej@baltrad.eu
+\version 1.2
+\par Copyright
+2012 &copy; Institute of Meteorology and Water Management, Warsaw, Poland
+
+- \subpage intro
+
+	-# \ref legal
+	-# \ref about
+	-# \ref structure
+	-# \ref gendocs
+
+- \subpage install
+
+	-# \ref prereq
+	-# \ref prep
+		-# \ref prep_db
+		-# \ref prep_tomcat
+	-# \ref build_dex
+	-# \ref test_dex
+	-# \ref tomcat_ssl
+		-# \ref prep_keystore
+		-# \ref tomcat_ssl_conf
+
+- \subpage running
+
+	-# \ref start
+	-# \ref login 
+	-# \ref quick_setup 
+		-# \ref quick_node_props
+ 		-# \ref quick_data_sources 	
+
+- \subpage trouble
+
+- \subpage exchange_format
+
+	-# \ref exchange_general
+	-# \ref exchange_auth 
+		-# \ref exchange_hdr
+		-# \ref exchange_sign
+	-# \ref exchange_get_datasource
+	-# \ref exchange_post_subscription
+	-# \ref exchange_get_subscription
+	-# \ref exchange_post_file
+
+- \subpage support 
+
+
+
+\page intro Introduction
+
+
+
+\section legal Legal notice
+\par
+BALTRAD Data Exchange System (BaltradDex) is free software: you can redistribute 
+it and/or modify it under the terms of the GNU Lesser General Public License 
+as published by the Free Software Foundation, either version 3 of the License, 
+or (at your option) any later version.
+
+\par
+BaltradDex is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+\par
+You should have received a copy of the GNU Lesser General Public License
+along with BaltradDex.  If not, see http://www.gnu.org/licenses/.
+By obtaining, using, and/or copying this software and/or its associated 
+documentation, you agree that you have read, understood, and will comply
+with the following terms and conditions:
+
+\section about About
+\par
+BaltradDex is a part of the BALTRAD project, allowing to establish connections 
+between BALTRAD nodes, access and subscribe data sources available on a given 
+node as well as to receive and send radar data. BaltradDex also provides 
+a web interface allowing for integrated access to other system components.    
+
+\section structure Project structure
+\par
+Project directory tree consists of the following:
+
+- \b doc contains project documentation
+- \b doxygen contains Doxygen configuration file
+- \b etc contains configuration files
+- \b extralib contains additional libraries
+- \b itest contains integration tests
+- \b lib contains libraries  
+- \b script contains executable shell scripts
+- \b src contains source code files
+- \b test contains tests
+- \b tools contains additional executables
+- \b web contains web interface files
+
+\section gendocs Generating documentation
+
+In order to generate documentation, call the following at task from 
+build.xml script:
+
+\code
+$ cd BaltradDex
+$ ant doc
+\endcode
+
+Documentation will be stored in dox/build directory. This manual will be 
+available under \p doxygen directory, whereas javadoc source code documentation 
+will be available in \p javadoc folder.  
+
+
+
+\page install Installation
+
+
+
+\attention 
+\n
+Baltrad Data Exchange System (BaltradDex) constitutes an integral part of 
+baltrad node software package. As such, it provides full functionality only
+if installed with node-installer utility. However it is possible to deploy 
+BaltradDex provided that the following BALTRAD software components are 
+installed in the system:
+\attention
+\n
+- \b baltrad-db - Baltrad database management system
+- \b beast - Baltrad message management and data processing interface
+\attention 
+\n
+Please refer to the documentation of the above packages for installation and
+usage instructions.
+\attention
+\n 
+Although the above configuration may work, the functionality it provides will
+be limited and the system operation may be unstable. Therefore it should not
+be used for operational work. It is strongly recommended to perform full
+installation procedure using node-installer utility.
+
+\section prereq Prerequisites
+
+BaltradDex depends on the following software packages:
+- <b>Java Development Kit (JDK)</b> - version 1.6.0_20 or later.
+- <b>Apache Tomcat</b> - version 6.0.26 or later. BaltradDex is implemented as
+Java Web Application. As such, it requires Apache Tomcat JSP and servlet
+container to run.
+- <b>Apache Ant build tool</b> - version 1.7.1 or later. Build, deployment 
+and other tasks are executed and controlled by Apache Ant build tool. 
+- <b>PostgreSQL database server</b> - version 8.4 or later. BaltradDex uses 
+PostgreSQL database server to store its configuration and runtime parameters.
+- <b>HDF Java</b> - HDF5 libraries for Java, version 2.7 or later. HDF Java 
+can be either build from sources or installed as precompiled binaries. 
+For detailed information and download go to:
+http://www.hdfgroup.org/hdf-java-html/ 
+
+\attention
+\n
+BaltradDex makes reference to libraries provided by baltrad-db and beast
+components. Make sure the above software packages are installed on your system 
+and that suitable libraries are available before installing BaltradDex.
+
+\section prep Preparation
+
+\subsection prep_db Create database 
+Before installing the software, you have to create a dedicated database and 
+user in the PostgreSQL server. It can be achieved using psql client 
+or pgAdmin administrative tool as well.
+
+With psql client, use the following commands:
+
+\code
+$ su - postgres
+$ psql
+> CREATE USER baltrad with PASSWORD 'baltrad';
+> CREATE DATABASE baltrad with OWNER baltrad;
+\endcode
+
+\subsection prep_tomcat Configure Tomcat
+
+Once Tomcat servlet container is installed, remember to configure
+administrative account to be used at the deployment stage. Edit 
+\p tomcat-users.xml file located in \p TOMCAT_DIR/conf so it looks 
+like the following:
+
+\code
+<?xml version='1.0' encoding='utf-8'?>
+<tomcat-users>
+    <role rolename="tomcat"/>
+    <role rolename="manager"/>
+    <user password="tomcat" roles="tomcat" username="tomcat"/>
+    <user password="tomcat" roles="role1" username="role1"/>
+    <user password="s3cret" roles="manager,admin" username="manager"/>
+</tomcat-users>
+\endcode
+
+\section build_dex Build & install BaltradDex 
+
+The first step of installation is creating necessary database schema. 
+This is achieved by executing the following build script task:
+
+\code
+$ cd BaltradDex
+$ ant create-full-schema
+\endcode
+
+Next step is preparing a keystore to be used with application. In order to do
+this, edit some properties in \p etc/dex.user.properties file:
+
+- \p node.name - the name of your BALTRAD node, e.g. test.baltrad.eu
+- \p keystore.directory - the directory where keystore will be created
+
+Next, call the following build script task:
+
+\code
+$ cd BaltradDex
+$ ant init-keystore
+\endcode
+
+To build and deploy BaltradDex application on Tomcat server:
+
+\code
+$ cd BaltradDex
+$ ant deploy
+\endcode
+
+\attention
+\n
+At this stage it may be necessary to modify appserver.properties file located in
+BaltradDex/etc folder. Note that user's name and password for Tomcat user have
+to match your setup in tomcat-users.xml.
+
+\section test_dex Testing
+
+To run unit tests, execute the following ant task:
+
+\code
+$ cd BaltradDex
+$ ant test
+\endcode
+
+To run integration tests, execute the following ant task:
+
+\code
+$ cd BaltradDex
+$ ant execute-itest
+\endcode
+
+\attention
+\n
+Integration tests require that baltrad-db and beast software packages are 
+installed in your system.
+
+\section tomcat_ssl Configuring Tomcat with SSL
+
+\note
+The following is a detailed instruction on how to configure your Apache 
+Tomcat servlet container to enable secure communication with SSL. Please 
+refer to <a href="http://tomcat.apache.org/tomcat-4.0-doc/ssl-howto.html">
+Apache Tomcat documentation</a> for more information about how to configure 
+SSL on Tomcat.
+\endnote
+
+\subsection prep_keystore Prepare certificate keystore
+
+To create a new keystore from scratch, containing a single self-signed 
+Certificate, execute the following from a terminal command line:
+
+\code
+$ %JAVA_HOME%/bin/keytool -genkey -alias tomcat -keyalg RSA 
+		-keystore /path/to/my/keystore
+\endcode
+
+where \p JAVA_HOME points at your \p JDK installation.
+
+After executing this command, you will first be prompted for the keystore 
+password. The default password used by Tomcat is \p changeit (all lower case), 
+although you can specify a custom password if you like. 
+
+Next, you will be prompted for general information about this Certificate, 
+such as company, contact name, and so on. This information will be displayed 
+to users who attempt to access a secure page in your application, so make sure 
+that the information provided here matches what they will expect.
+
+Finally, you will be prompted for the key password, which is the password 
+specifically for this Certificate (as opposed to any other Certificates stored 
+in the same keystore file). You MUST use the same password here as was used for 
+the keystore password itself.
+
+\subsection tomcat_ssl_conf Edit Tomcat configuration file
+
+The next step is to configure your secure socket in the server.xml configuration 
+file located in the following directory:
+
+\code
+%CATALINA_HOME%/conf/server.xml
+\endcode  
+
+where \p CATALINA_HOME represents the directory into which you installed Tomcat. 
+
+First, configure SSL connector: 
+
+\code
+<Connector port="8084" protocol="HTTP/1.1" SSLEnabled="true"
+           maxThreads="200" scheme="https" secure="true"
+           clientAuth="false" sslProtocol="TLS" URIEncoding="UTF-8"
+	   keystoreFile="/path/to/my/keystore/keystore.jks" 
+	   keystorePass="changeit" keystoreAlias="tomcat"/>
+\endcode
+
+The \p port attribute (default value is 8443) is the TCP/IP port number on which 
+Tomcat will listen for secure connections. You can change this to any port 
+number you wish. Assuming that you are upgrading your baltrad-node installation,
+you will probably prefer to use the same port number as you have been using for
+standard, non-secure communication up to now. Make sure that \p keystoreFile
+points at your certificate keystore created in the first step, and that
+\p keystorePass matches the password set for the keystore.  
+
+Next, configure the non-SSL connector. Please note that the \p redirectPort 
+attribute must match the port number configured in SSL connector. Also, make 
+sure that different port numbers are configured for standard and SSL connectors.
+ 
+\code
+<Connector port="8080" protocol="HTTP/1.1" connectionTimeout="20000"
+           redirectPort="8084" URIEncoding="UTF-8" />
+\endcode
+
+After completing these configuration changes, you must restart Tomcat. 
+From now on you should be able to access BaltradDex web application via SSL. 
+Go to the address bar of your browser and type the following: 	
+
+\code
+https://localhost:8084/BaltradDex
+\endcode
+
+Because we are using self-signed certificates, your browser will warn you about
+untrusted connection and ask you if you want to add a security exception. 
+Confirm security exception to access BaltradDex login page. 
+
+\attention
+BaltradDex configuration involving SSL haven't been tested in production 
+environment so far.
+
+
+
+\page running Running the software
+
+
+
+\section start Starting BaltradDex
+Assuming that your Tomcat server is installed on local machine and listening 
+on port 8084, in order to run the application, open a web browser and type 
+the following in the address bar:
+
+\code
+http://localhost:8084/
+\endcode
+
+Default user name is \p admin with password \p admin. It strongly recommended 
+to change the standard password immediately.
+
+\section login Login/Logout
+
+Sign in typing your user name and password in the textbox available on the 
+login screen. In order to sign out, use \p Logout link available in the upper 
+right corner of each page.  
+
+\note 
+For security reasons, it is important that user signs out each time after 
+work session is over. The following message on the login page confirms that user
+credentials have been successfully removed from HTTP session.      
+\n
+\n
+\image html logout.png
+\endnote
+
+\section quick_setup Quick setup
+
+In order to configure a fully functional system ready to exchange data, several 
+things have to be done.
+
+\subsection quick_node_props Node properties
+
+First thing to do is to configure node properties. Since setting node properties
+require administrative privileges, it is necessary to sign in as user \p admin.
+Once signed in, go to \p Settings tab and select <tt>Node settings</tt> 
+option from the main menu in the left column. 
+
+\image html node_properties.png
+
+The most important settings are <tt>Node name</tt> and <tt>Node address</tt>. 
+Make sure that these settings are correct before configuring data exchange.
+
+\attention
+Make sure that <tt>Node name</tt> setting always matches the name of
+localhosts's key entry in the keystore. If you have installed BaltradDex 
+software  with node-installer package, your node name was specified on 
+installation stage and it should remain unchanged. In case of installing 
+BaltradDex as standalone module, proceed according to the instructions given 
+in \ref build_dex.
+
+\subsection quick_data_sources Data sources  
+
+
+<!-- \section conf Configuration
+\subsection radars Setting radar stations
+\subsection data_sources Setting data sources
+\subsection accounts User accounts
+\section conn Connecting to peer node
+\section subscribe Managing subscriptions -->	
+
+
+
+\page trouble Troubleshooting
+
+
+
+dealing with different server response error codes 
+
+\page exchange_format Data exchange format
+
+\section exchange_general General information
+
+BaltradDex uses standard HTTP message structure for communication. 
+Request and response parameters are passed as HTTP message headers. However, 
+for passing additional information between BALTRAD nodes, the following 
+custom header fields are introduced:
+
+\code
+Node-Name: <name of requesting node>
+Node-Address: <address of requesting node>
+\endcode
+
+This information is essential for correct node identification within BALTRAD
+network, as well as for message authentication
+
+\section exchange_auth Authentication   
+For safety reasons, all messages passed within BALTRAD network are 
+authenticated. Authentication is based on private/public keys using 
+<a href="http://www.keyczar.org">KeyCzar</a> toolkit.
+
+\subsection exchange_hdr Authentication header 
+For the purpose of authentication, a standard HTTP \p Authorization header 
+is used. The header value consists of user name name and user-specific 
+credentials in the following format:
+
+\code
+Authorization: <user name>:<credentials>
+\endcode
+
+\attention 
+User name is used to locate and access keys in the keystore. By default, 
+BaltradDex uses node name property for this purpose. Therefore node name 
+provided at the stage of installation (or initialization of the keystore) 
+should not be modified without a justified reason.
+
+\subsection exchange_sign Signing a request
+In order to sign a request, first an input message should be prepared. This 
+message will be next used to generate a signature. Input message is assembled 
+from the following request elements:
+
+	- Request method 
+	- Request URI
+	- Content-Type request header
+	- Content-MD5 request header
+  
+Typical input message will look like the following:
+\code
+GET
+http://example.baltrad.eu:8084/BaltradDex/get_datasource_listing.htm
+text/html
+aHR0cDovLzE ...
+\endcode
+
+\attention
+The value of Content-MD5 request differs depending on the type of request. 
+Refer to the documentation of particular request types for details.
+
+Input message is signed with KeyCzar \p sign() method available in
+\p org.keyczar.Signer class, resulting in Base64 encoded signature string. 
+Exemplary authorization header will take the following form:
+
+\code
+Authorization: example.baltrad.eu:APa7608wLQI ...
+\endcode
+  
+Once signed, the request is ready to submit. In case of a failure to 
+authenticate the request on server side, the server will response with 
+<tt>HTTP 401 Unauthorized</tt> status code. In case the server is unable 
+to find a public key matching user name provided in \p Authorization header, 
+<tt>HTTP 500 Internal Server Error</tt> response is returned.
+
+\section exchange_get_datasource Get data source listing request
+
+\par
+\b Description
+\n 
+\n Request for data source listing. Reponse contains list of data sources 
+available for a given user to subscribe.
+
+\par 
+\b Request
+
+\par
+- Request URI: <tt>get_datasource_listing.htm</tt>
+- Method: <tt>GET</tt>
+- Headers: <tt>Node-Name, Node-Address, Content-Type, Content-MD5, Date, 
+				Authorization</tt>
+- Body: <tt>No content</tt>
+\n
+\n <b>Example:</b>
+\code
+GET http://example.baltrad.eu:8084/BaltradDex/get_datasource_listing.htm HTTP/1.1
+Node-Name: test.baltrad.eu
+Node-Address: http://test.baltrad.eu
+Content-Type: text/html
+Content-MD5: aHR0cDovLzE ...
+Date: Fri, 6 Jul 2012 13:00:26 CEST
+Authorization: test.baltrad.eu:APa7608wLQI ...
+\endcode
+\par
+\note
+Content-MD5 header value consists of Base64-encoded request URI.
+
+\par 
+\b Response
+
+\par
+- Headers: <tt>Node-Name, Node-Address</tt>
+- Status: 
+     - <tt>200 OK</tt> : Success
+     - <tt>401 Unauthorized</tt> : Server failed to authenticate request
+     - <tt>500 Internal server error</tt> : Server error			
+- Body: <tt>List of data sources</tt>
+\n
+\n <b>Example:</b>
+\code
+Node-Name: example.baltrad.eu
+Node-Address: http://example.baltrad.eu
+[
+  {
+    "name":"PastewnikPVOL",
+    "id":2,
+    "description":"Polar volumes from Pastewnik"
+  },			               
+  {
+    "name":"LegionowoPVOL",
+    "id":1,
+    "description":"Polar volumes from Legionowo"
+  }
+]
+\endcode
+
+\section exchange_post_subscription Post subscription request
+
+\par
+\b Description
+\n 
+\n Request for data source subscription. Reponse contains list of successfully 
+subscribed data sources. 
+
+\par 
+\b Request
+
+\par
+- Request URI: <tt>post_subscription.htm</tt>
+- Method: <tt>POST</tt>
+- Headers: <tt>Node-Name, Node-Address, Content-Type, Content-MD5, Date, 
+				Authorization</tt>
+- Body: <tt>List of data sources selected for subscription</tt>
+\n
+\n <b>Example:</b>
+\code
+GET http://example.baltrad.eu:8084/BaltradDex/post_subscription.htm HTTP/1.1
+Node-Name: test.baltrad.eu
+Node-Address: http://test.baltrad.eu
+Content-Type: application/json
+Content-MD5: aHR0cDovLzE ...
+Date: Fri, 6 Jul 2012 13:00:26 CEST
+Authorization: test.baltrad.eu:APa7608wLQI ...
+[
+  {
+    "name":"PastewnikPVOL",
+    "id":2,
+    "description":"Polar volumes from Pastewnik"
+  },
+  {
+    "name":"LegionowoPVOL",
+    "id":1,
+    "description":"Polar volumes from Legionowo"
+  }
+]
+
+
+\endcode
+\par
+\note
+Content-MD5 header value consists of Base64-encoded list of data sources 
+selected for subscription.
+
+\par 
+\b Response
+
+\par
+- Headers: <tt>Node-Name, Node-Address</tt>
+- Status: 
+     - <tt>200 OK</tt> : Success
+     - <tt>206 Partial Content</tt> : Subscription request was completed partially
+     - <tt>401 Unauthorized</tt> : Server failed to authenticate request
+     - <tt>404 Not Found</tt> : Generic subscription error
+     - <tt>500 Internal server error</tt> : Server error 					
+- Body: <tt>List of successfully subscribed data sources</tt>
+\n
+\n <b>Example:</b>
+\code
+Node-Name: example.baltrad.eu
+Node-Address: http://example.baltrad.eu
+[
+  {
+    "name":"PastewnikPVOL",
+    "id":0,
+    "description":"Polar volumes from Pastewnik"
+  },			               
+  {
+    "name":"LegionowoPVOL",
+    "id":0,
+    "description":"Polar volumes from Legionowo"
+  }
+]
+\endcode
+
+\section exchange_get_subscription Get subscription request
+
+\par
+\b Description
+\n 
+\n Request for subscription update. Reponse contains list of updated 
+subscriptions. 
+
+\par 
+\b Request
+
+\par
+- Request URI: <tt>get_subscription.htm</tt>
+- Method: <tt>POST</tt>
+- Headers: <tt>Node-Name, Node-Address, Content-Type, Content-MD5, Date, 
+				Authorization</tt>
+- Body: <tt>List of subscriptions</tt>
+\n
+\n <b>Example:</b>
+\code
+GET http://example.baltrad.eu:8084/BaltradDex/get_subscription.htm HTTP/1.1
+Node-Name: test.baltrad.eu
+Node-Address: http://test.baltrad.eu
+Content-Type: application/json
+Content-MD5: aHR0cDovLzE ...
+Date: Fri, 6 Jul 2012 13:00:26 CEST
+Authorization: test.baltrad.eu:APa7608wLQI ...
+[
+  { 
+    "id":11,
+    "type":"download",
+    "timeStamp":1341836838130,
+    "userName":"test.baltrad.eu",
+    "operatorName":"example.baltrad.eu",
+    "active":true,
+    "nodeAddress":"http://test.baltrad.eu:8084",
+    "dataSourceName":"PastewnikPVOL",
+    "synkronized":true
+  },
+  {
+    "id":12,
+    "type":"download",
+    "timeStamp":1341836838162,
+    "userName":"test.baltrad.eu",
+    "operatorName":"example.baltrad.eu",
+    "active":false,
+    "nodeAddress":"http://test.baltrad.eu:8084",
+    "dataSourceName":"LegionowoPVOL",
+    "synkronized":true
+  }
+]
+\endcode
+\par
+\note
+Content-MD5 header value consists of Base64-encoded list of subscriptions.
+
+\par 
+\b Response
+
+\par
+- Headers: <tt>Node-Name, Node-Address</tt>
+- Status: 
+     - <tt>200 OK</tt> : Success
+     - <tt>206 Partial Content</tt> : Subscription request was completed partially 
+     - <tt>401 Unauthorized</tt> : Server failed to authenticate request 
+     - <tt>404 Not Found</tt> : Generic subscription error 
+     - <tt>500 Internal server error</tt> : Server error 
+- Body: <tt>List of successfully updated subscriptions</tt>
+\n
+\n <b>Example:</b>
+\code
+Node-Name: example.baltrad.eu
+Node-Address: http://example.baltrad.eu
+[
+  {
+    "id":9,
+    "type":"upload",
+    "timeStamp":1341836838078,
+    "userName":"test.baltrad.eu",
+    "operatorName":"example.baltrad.eu",
+    "active":true,
+    "nodeAddress":"http://example.baltrad.eu:8084",
+    "dataSourceName":"PastewnikPVOL",
+    "synkronized":true
+  },
+  {
+    "id":10,
+    "type":"upload",
+    "timeStamp":1341836838112,
+    "userName":"test.baltrad.eu",
+    "operatorName":"example.baltrad.eu",
+    "active":false,
+    "nodeAddress":"http://example.baltrad.eu:8084",
+    "dataSourceName":"LegionowoPVOL",
+    "synkronized":true
+  }
+]
+\endcode
+
+
+
+
+\section exchange_post_file Post file request
+\par
+\b Description
+\n 
+\n Post file request. Reponse indicates post file operation result. 
+
+\par 
+\b Request
+
+\par
+- Request URI: <tt>post_file.htm</tt>
+- Method: <tt>POST</tt>
+- Headers: <tt>Node-Name, Node-Address, Content-Type, Content-MD5, Date, 
+				Authorization</tt>
+- Body: <tt>File content</tt>
+\n
+\n <b>Example:</b>
+\code
+GET http://example.baltrad.eu:8084/BaltradDex/post_file.htm HTTP/1.1
+Node-Name: test.baltrad.eu
+Node-Address: http://test.baltrad.eu
+Content-Type: application/x-hdf5
+Content-MD5: aHR0cDovLzE ...
+Date: Fri, 6 Jul 2012 13:00:26 CEST
+Authorization: test.baltrad.eu:APa7608wLQI ...
+<file content>
+\endcode
+\par
+\note
+Content-MD5 header value consists of Base64-encoded request URI.
+
+\par 
+\b Response
+
+\par
+- Headers: <tt>Node-Name, Node-Address</tt>
+- Status: 
+     - <tt>200 OK</tt> : Success
+     - <tt>401 Unauthorized</tt> : Server failed to authenticate request
+     - <tt>404 Not Found</tt> : Generic post file error
+     - <tt>409 Conflict</tt> : File already stored in the database
+     - <tt>500 Internal server error</tt> : Server error 		
+- Body: <tt>No content</tt>
+\n
+\n <b>Example:</b>
+\code
+Node-Name: example.baltrad.eu
+Node-Address: http://example.baltrad.eu
+\endcode
+
+
+
+\page support Support & feedback 
+
+
+
+Ask for support and send your feedback to: 
+\n\n
+\p maciej@baltrad.eu
+\n
+\n
+\p support@baltrad.eu
+*/

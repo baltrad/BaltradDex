@@ -234,14 +234,14 @@ public class PostSubscriptionController implements MessageSetter {
             if (res.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_OK) {
                 String okMsg = messages.getMessage(PS_SERVER_SUCCESS_KEY,
-                        new String[] {peerName});        
+                        new String[] {peerName});
                 storeLocalSubscriptions(res, readDataSources(res));
                 setMessage(model, SUCCESS_MSG_KEY, okMsg);
                 log.warn(okMsg);
             } else if (res.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_PARTIAL_CONTENT) {
                 String errorMsg = messages.getMessage(
-                    PS_SERVER_PARTIAL_SUBSCRIPTION, new String[] {peerName});    
+                    PS_SERVER_PARTIAL_SUBSCRIPTION, new String[] {peerName});
                 storeLocalSubscriptions(res, readDataSources(res));
                 setMessage(model, ERROR_MSG_KEY, errorMsg);
                 log.error(errorMsg);

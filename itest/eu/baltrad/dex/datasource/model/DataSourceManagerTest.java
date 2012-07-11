@@ -22,7 +22,6 @@
 package eu.baltrad.dex.datasource.model;
 
 import eu.baltrad.dex.db.itest.DexDBITestHelper;
-import eu.baltrad.dex.net.model.Subscription;
 
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;

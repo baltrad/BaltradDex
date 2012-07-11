@@ -409,7 +409,7 @@ public class GetSubscriptionController implements MessageSetter {
             if (res.getStatusLine().getStatusCode() 
                     == HttpServletResponse.SC_OK) {
                 String okMsg = messages.getMessage(GS_SERVER_SUCCESS_KEY,
-                        new String[] {peerName});        
+                        new String[] {peerName});
                 storeLocalSubscriptions(res, readSubscriptions(res));
                 setMessage(model, SUCCESS_MSG_KEY, okMsg);
                 log.warn(okMsg);

@@ -111,7 +111,7 @@ public class KeyczarAuthenticator implements Authenticator {
                 headerValue = StringUtils.strip(headerValue);
                 result.add(headerValue);
             }
-        }
+        } 
         return StringUtils.join(result, '\n');
     }
 }
