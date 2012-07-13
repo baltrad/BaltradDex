@@ -32,7 +32,21 @@
 	-# \ref login 
 	-# \ref quick_setup 
 		-# \ref quick_node_props
- 		-# \ref quick_data_sources 	
+		-# \ref quick_radars
+ 		-# \ref quick_data_sources 
+		-# \ref quick_keys
+	-# \ref conn
+	-# \ref subscribe
+	-# \ref subscription_status
+	-# \ref registry
+	-# \ref log
+	-# \ref more_data_sources
+	-# \ref data_browse
+	-# \ref admin
+		-# \ref accounts
+		-# \ref registry_admin
+		-# \ref messages_admin	
+	
 
 - \subpage trouble
 
@@ -345,7 +359,7 @@ environment so far.
 
 
 
-\page running Running the software
+\page running Running BaltradDex
 
 
 
@@ -401,15 +415,323 @@ installation stage and it should remain unchanged. In case of installing
 BaltradDex as standalone module, proceed according to the instructions given 
 in \ref build_dex.
 
+\subsection quick_radars Radars
+
+BaltradDex provides radar interface which allows to access data from  a given
+radar station. Radar interface is not used directly - it is selected as a 
+basic parameter of data source (see the next section). In order to configure 
+radar, go to \p Settings tab and click <tt>Radars</tt> and \p Add.
+In the text boxes type radar station name and WMO identification number. Make
+sure that radar parameters are correct and Click \p Save button to save 
+configuration. 
+
+\image html save_radar.png
+
+\note
+Use \p Edit and \p Remove options available in <tt>Radars</tt> menu in 
+order to modify radar parameters or delete radar from the system.
+Note that in case when name of existing radar is modified, it will
+be saved as a new radar.      
+\endnote
+
 \subsection quick_data_sources Data sources  
+
+Next step is configuration of data sources. Data source is an interface
+allowing to access data injected into baltrad node from local production 
+system. Go to \p Settings tab and click <tt>Data Sources</tt> and \p Add.
+Provide a significant data source name and description like in the 
+example given below.
+
+\image html data_source_name.png
+
+Click \p Next and move on to radar selection page. Select one or more radar 
+station for a data source. Remember that data files coming from these radars 
+will be available with this data source.  
+\note
+Each time after selecting radar from the drop-down list, confirm your selection 
+using \p + button. In order to remove previously selected radar station, use
+button with \p - sign. The same rule applies to the other data source 
+parameters selected from the list. 
+\endnote
+
+\image html data_source_radar.png
+
+Click \p Next. Next step is selection of file object according to ODIM_H5 
+model specification. Select object from the drop-down list and use \p + and 
+\p - signs just like in the previous step. It is possible to select more than 
+one file object. In such case all selected objects will be available with 
+this data source.  
+
+\image html data_source_file_object.png
+
+Click \p Next. Last step of data source configuration is selection of users 
+for which this data source will be available. This means that users selected at
+this stage will be able to subscribe the data source and will receive data 
+matching its parameters defined in the previous steps. 
+\note
+The desired user account might not be available in the system at the stage 
+of data source configuration. This is because user accounts with role \p peer
+(typically used for data exchange) are created automatically upon first 
+incoming connection. It is possible however to configure data source with no 
+user accounts assigned and add given account as soon as it is created.   
+\endnote 
+
+\image html data_source_user.png
+
+Click \p Next to move to summary page. Click \p Save button to save data source 
+configuration.
+
+\image html data_source_summary.png
+
+\note
+Use \p Edit and \p Remove options available in <tt>Data sources</tt> menu in 
+order to modify data source parameters or delete data source from the system.
+Note that in case when name of existing data source is modified, it will
+be saved as a new data source.      
+\endnote 
+
+\subsection quick_keys Key exchange
+
+Each message exchanged within BALTRAD network is authenticated. For the process
+of authentication, private/public key pair is used. Outgoing message is signed
+with node's private key and incoming message is verified and authenticated 
+with public key. According to this approach, local node's public key has to be 
+available in the peer node's keystore. Therefore, before connecting to peer
+node, local node's public key has to be extracted from the keystore and
+and delivered to peer node using a trusted transfer method. Assuming that local
+keystore is located in the default location and local node name is 
+\p test.baltrad.eu, do the following:
+
+\code
+$ cd /opt/baltrad/etc/bltnode-keys
+$ tar cvzf test.baltrad.eu.pub.tar.gz test.baltrad.eu.pub/
+\endcode
+
+The tarball containing public key has to be sent to the peer node's
+administrator and stored in the keystore. 
+\n
+The same operation has to performed at the peer node's side. That is peer 
+node's public key has to be extracted from the keystore, delivered in a secure 
+way and stored in local keystore. 
+\n
+From now on authenticated connections should be possible in both directions.  
+
+See section \ref build_dex for information about how to configure and access 
+the keystore.     
+
+\section conn Connecting to peer node
+
+Basic BaltradDex functionality allows to connect to peer node and access and 
+subscribe data sources available for a given user. In order to connect, sign in
+to BaltradDex, select \p Exchange tab and click \p Connect option from the main 
+menu. Assuming that connection to a given node is made for the first time,
+type node address in the text box <tt>Peer node's URL address</tt> according 
+to the example below.   
+
+\image html connect_address.png
+
+\note
+Make sure to type address in the correct format: 
+\n
+\n
+<tt>http://server.name.org:[port number]</tt>
+\n
+\n
+If incorrect address is specified, system will issue a following message:
+
+\image html invalid_address.png 
+\endnote
+
+Clict \p Connect. Upon successful connection, peer node will render the view
+with a list od data sources available for the user to subscribe (see the image
+below). In order to subscribe a given data source, click a checkbox next to 
+data source name and description. Once selection is made, click \p OK. The
+system will ask to confirm the selection by clicking \p OK on the next screen
+and submitting subscripions request at the peer node.      
+
+\image html connect_data_sources.png
+
+If subscription request was successfully completed, user is presented with the 
+following message confirming the operation. Clicking \OK will redirect user
+to subscription status page.
+
+\image html connect_success.png
+
+Subscription status page (see image below) allows to access subscription list
+on per node basis, that is to access and manage subscriptions made at each peer 
+node separately. Click peer node name to access subscription management page.
+\note
+User can access subscription status page at all times by selecting \p Exchange 
+tab and clicking \p Subscriptions option.
+\endnote  
+
+\image html peer_subscription.png
+
+After clicking on peer node name, system displays list of data sources 
+subscribed at this node. This page allows to modify subscription status by 
+activating or cancelling subscription of particular data sources. 
+\n
+\n
+Refer to \ref subscribe section for details.
+
+\image html subscriptions.png
+
+\section subscribe Managing subscriptions
+
+To access subcription management page, select \p Exchange tab and click on 
+\p Subscriptions option. Click name of desired peer node to access subscriptions
+available at this node. Now it is possible start or cancel subscription of 
+a given data source. Simply check or uncheck a corresponding check box and 
+click \p OK button.   
+
+\image html subscriptions_selected.png  
+
+Next page shows subcription request that will be sent to the peer node and 
+serves as a confirmation. Green arrow denotes activating subscription, whereas
+red circle means that subscription of a given data source will be cancelled.
+Click \p Back to go back to selection page or \p OK to send subscription 
+request.
+
+\image html subscriptions_requested.png 
+
+Assuming that the request was successfully posted at the peer node, the system
+will display the following message to confirm that subscription status was
+modified. Click \p OK to go back to initial subacription status page. 
+
+\image html subscriptions_status.png 
+
+\note
+Detailed information on system activity, i.e. node connections, subscription
+requests, incoming data etc. can be accessed with message logging interface.  
+Refer to \ref log section for details. 
+\endnote
+
+\section subscription_status Checking subscription status 
+
+\section registry Data delivery registry
+
+If there are active subscriptions and local node is supplied with data from
+local production system, user can check the status of data delivery to the peer    
+nodes that subscribed local data sources.
+\n
+To check data delivery status, select \p Exchange tab and click <tt> Delivery
+registry</tt> option in the main menu. Delivery registry page is shown in
+the image below.
+
+\image html delivery_registry.png
+
+Each entry in the registry contains timestamp, recipient (user) name, data file 
+signature and delivery status (green circle denotes delivery success, red
+circle - failure). User can navigate through registry entries in a standard way,
+using either buttons with page numbers or scroll buttons. 
+
+\section log Message logging
+
+System messages interface allows to access and display detailed information 
+on system activity. It is possible to browse system messages in two modes. 
+First mode allows to update message display automatically. Select \p Home tab,
+click <tt>System messages</tt> option from the main menu and select \p Latest.
+New messages will be displayed automatically each time a new event is 
+registered in the system. 
+
+\image html latest_messages.png
+
+The second mode allows to access full system log. Select \p Home tab, click 
+<tt>System messages</tt> and select \p All option. Navigate through pages either 
+clicking page numbers of scroll buttons. Click \p > sign to move to next page, 
+\p < to move to previous page. Clicking \p << sign will display the first page, 
+and \p >> the last page of system log.   
+  
+
+\image html all_messages.png
+
+\note
+There are 3 types of messages - informative messages (displayed in green), 
+warnings (blue) and errors (red).
+\endnote
+
+\section more_data_sources More on data sources
+
+Section \ref quick_data_sources showed how to configure and save a data source.
+Existing data sources are available from \p Home tab with <tt>Data sources</tt>
+option. Image below shows list of data sources available in the system. 
+
+\image html data_sources.png 
+
+Data source interface allows to access, browse, display and download data 
+files matching its parameters. Click on a given data source name to list the
+matching files. Use page numbers and scroll buttons to navigate through pages. 
+
+\image html data_source_files.png      
+
+File listing page provides user with access to detailed file information and 
+quick file preview as well as allows to download selected file. User can download 
+selected file clicking \p Download link next to the given file entry. Browser
+will display standard file download dialog, allowing to select target storage
+directory. In order to display detailed information about selected file, user
+clicks \p Details option. File details and data preview are available on 
+the page below.   
+
+\image html data_source_file_details.png
+
+File details page is divided into two sections. Upper section presents basic
+file's metadata, like file's name, timestamp, source radar and and file object
+type according to ODIM_H5 specification. Bottom section displays data preview 
+for each antenna elevation and each data type separately. The example above
+presents data preview for volume file consisting of 10 scans. Each image 
+representing a single scan is associated with information about antenna 
+elevation angle and data type - in this case horizontally polarized 
+reflectivity.
+\n
+\n
+Next feature is full-sized data preview. Click on any image representing 
+a single scan. The system will generate full size image based on original 
+radar data resolution stored in files's metadata. The image will be 
+displayed as an overlay in Google Maps interface, like in the example below.             
+
+\image html data_source_file_image.png
+
+Use \p Opacity slider to adjust radar data layer's opacity and <tt>Toggle
+visibility</tt> button to turn radar data layer on and off.
+
+\section data_browse Data browsing and access 
+
+Data browsing interface allows user to browse and access radar data files in 
+a flexible way. Select \p Home tab and click <tt>Browse files</tt> option to 
+start browsing files.
+\n
+\n
+There are several parameters available to specify while browsing data. 
+The parameters include source radar station, file object type according to 
+ODIM_H5 specification and time span. Select radar station and file object type
+from the drop-down lists, set dates clicking on calendar icon next to 
+<tt>Start date</tt> and <tt>End date</tt> fields. Once parameters are set, 
+click \p Select button. Files matching defined criteria will be fetched 
+from the database.   
+
+\image html browse_files.png
+
+User navigates through the list of selected files in a standard way, clicking 
+page numbers and scroll buttons. File listing can be sorted by date, time,
+source and type. I order to sort the list, user clicks on the header of 
+selected column, e.g. \p Source.
+File listing provides acces to file details page, as described in \ref
+more_data_sources section. Click \p Details to access file details and data 
+preview page, click \p Download to store file on the local disk.  
+
+
+\section admin Administrative tasks
+\subsection accounts User account management
+\subsection registry_admin Delivery registry settings
+\subsection messages_admin Messages settings 
 
 
 <!-- \section conf Configuration
-\subsection radars Setting radar stations
+\subsection 
 \subsection data_sources Setting data sources
 \subsection accounts User accounts
 \section conn Connecting to peer node
-\section subscribe Managing subscriptions -->	
+ -->	
 
 
 

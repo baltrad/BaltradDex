@@ -364,8 +364,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <target name="init-keystore">
     <chmod file="${script.dir}/init-keyczar-keystore.sh" perm="755"/>
     <exec executable="${script.dir}/init-keyczar-keystore.sh">
-        <arg value="${keystore.dir}"/>
-        <arg value="${hostname}"/>    
+        <arg value="${keystore.directory}"/>
+        <arg value="${node.name}"/>    
     </exec>
   </target>
 
@@ -375,20 +375,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <target name="init.test">
     <mkdir dir="${build.test.dir}"/>
     <mkdir dir="${test.conf.dir}"/>
-    
-    
-    
-    
-    
     <copy file="${etc.dir}/testdb.properties" todir="${build.classes.dir}"/>
-    <copy file="${etc.dir}/develop.properties" todir="${build.classes.dir}"/>
-    
-    <echo message="______ current dir = ${basedir}"/>
-    <echo message="______ keystore dir = ${keystore.dir}"/>
-    <echo message="______ host name = ${hostname}"/>
-    
-    
-    
+    <copy file="${etc.dir}/develop.properties" todir="${build.classes.dir}"/> 
     <chmod file="${script.dir}/init-keyczar-keystore.sh" perm="755"/>
     <exec executable="${script.dir}/init-keyczar-keystore.sh">
         <arg value="${build.test.dir}/${keystore.dir}"/>
@@ -678,7 +666,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <mkdir dir="${doxygen.dir}"/>
         <mkdir dir="${javadoc.dir}"/>
         <doxygen configFilename="${basedir}/doxygen/dex_doxygen.cfg"/>
-        <!--javadoc packagenames="eu.baltrad.*" 
+        <javadoc packagenames="eu.baltrad.*" 
                  sourcepath="${src.dir}"
                  destdir="${javadoc.dir}"
                  author="true"
@@ -692,7 +680,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <bottom><![CDATA[<i>Copyright 2009 - 2012 Institute of Meteorology 
                     and Water Management</i>]]></bottom>
             <classpath refid="lib.path"/>         
-        </javadoc-->
+        </javadoc>
         <echo message="Doxygen documentation created in ${doxygen.dir}"/>
         <echo message="Javadoc documentation created in ${javadoc.dir}"/>
     </target>
