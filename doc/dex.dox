@@ -31,7 +31,7 @@
 	-# \ref start
 	-# \ref login 
 	-# \ref quick_setup 
-		-# \ref quick_node_props
+		-# \ref quick_node_settings
 		-# \ref quick_radars
  		-# \ref quick_data_sources 
 		-# \ref quick_keys
@@ -42,11 +42,16 @@
 	-# \ref log
 	-# \ref more_data_sources
 	-# \ref data_browse
+	-# \ref data_processing 
 	-# \ref admin
-		-# \ref accounts
-		-# \ref registry_admin
-		-# \ref messages_admin	
-	
+		-# \ref radars
+		-# \ref data_sources
+		-# \ref subscription_settings
+		-# \ref registry_settings
+		-# \ref exchange_settings
+		-# \ref messages_settings
+		-# \ref accounts	
+		-# \ref node_settings
 
 - \subpage trouble
 
@@ -375,6 +380,11 @@ http://localhost:8084/
 Default user name is \p admin with password \p admin. It strongly recommended 
 to change the standard password immediately.
 
+\attention
+BaltradDex was tested with the following browsers: Firefox, Opera, 
+Google Chrome and Konqueror. Usage of Internet Explorer is currently not 
+supported.  
+
 \section login Login/Logout
 
 Sign in typing your user name and password in the textbox available on the 
@@ -395,7 +405,7 @@ credentials have been successfully removed from HTTP session.
 In order to configure a fully functional system ready to exchange data, several 
 things have to be done.
 
-\subsection quick_node_props Node properties
+\subsection quick_node_settings Node settings
 
 First thing to do is to configure node properties. Since setting node properties
 require administrative privileges, it is necessary to sign in as user \p admin.
@@ -606,7 +616,38 @@ requests, incoming data etc. can be accessed with message logging interface.
 Refer to \ref log section for details. 
 \endnote
 
-\section subscription_status Checking subscription status 
+\section subscription_status Checking subscription status
+
+User can check current subscription (data exchange) status with 
+<tt>Exchange status</tt> option available in \p Home tab. Once clicked, 
+menu section will expand revealing the following items:
+\n
+- Download - data download status. Use this option in order to check the status 
+of your subscriptions to data sources available on peer nodes.      
+\n 
+- Upload - data upload status. Click this item to access information about 
+local data sources subscribed by peer nodes.  
+
+\n
+For example, clicking \p Download option will display the list of peer nodes
+where data sources were subscribed. The image below represents the situation,
+where user subscribed data sources at the peer node \p baltrad.imgw.pl.    
+
+\image html subscription_download.png
+
+Click the node name in order to access the list of data sources subscribed at 
+\p baltrad.imgw.pl. Node name item will expand, revealing the list of data 
+sources. The list contains information on when subscription was started and 
+subscription status. Green arrow indicates active data download, while red 
+circle indicates that subscription is currently stopped (inactive).   
+
+\image html subscription_download_expand.png   
+ 
+By analogy, clicking \p Upload item will display the list of peer nodes which
+subscribed local data sources. Clicking a peer node name will expand the list 
+of local data source names subscribed by a given peer. 
+
+\image html subscription_upload.png
 
 \section registry Data delivery registry
 
@@ -719,27 +760,199 @@ File listing provides acces to file details page, as described in \ref
 more_data_sources section. Click \p Details to access file details and data 
 preview page, click \p Download to store file on the local disk.  
 
+\section data_processing Data processing
+
+BaltradDex constitutes interface to data processing functionality. Data 
+processing options are grouped in \p Processing tab. Refer to 
+<a href="http://git.baltrad.eu/pgf.html">BALTRAD User Manual</a> for further
+information. 
 
 \section admin Administrative tasks
+
+This section addresses administrative tasks related to node management and 
+settings. Features presented here are grouped in \p Settings tab, which is 
+only available for node's administrator.  
+
+\subsection radars Radars
+
+Refer to \ref quick_radars section.
+
+\subsection data_sources Data sources
+
+Refer to \ref quick_data_sources section.
+
+\subsection subscription_settings Subscription settings
+
+Subscription settings is useful feature in case when subscription status between
+two nodes is not synchronized. This situation may occur when e.g. node A 
+subscribes data source X on node B. Then subscription status on node A is erased
+due to some kind of error or faulty database operation. In such case information
+about subscribed data source X still exists on node B, but no longer on node A.
+To get rid of invalid subscription, user at node B should click \p Subscriptions 
+item to expand menu. Here are two options: \p Download and \p Upload, by analogy
+to subscription types described in \ref subscription_status. In this particular 
+case there is invalid subscription of data source X at node B. User should 
+click \p Upload item. The following page will be displayed.     
+
+\image html subscription_upload_settings.png
+
+The page presents information about local data sources and respective 
+subscribers. Click \p Select checkbox next to the desired subscription entry
+and \p OK to remove. Invalid subscription entry will be deleted.   
+\n
+\n
+The same operation can be performed on data downloads, that is subscriptions of
+data sources at peer nodes. User can remove subscriptions selecting \p 
+Download option from the menu. The following page presents information 
+about data downloads.   
+
+\image html subscription_download_settings.png
+
+The page contains information about subscribed data sources and respective
+operators (peer nodes), as well as about subscription status (active /inactive).
+In order to remove subscription, click \p Select checkbox next to the desired 
+subscription entry and \p OK to remove. Selected subscription entry will be
+deleted     
+
+\note
+System will prevent user from removing active subscription. In case of an 
+attempt to remove active subscription, the following message will be shown.
+\n
+\n
+\image html subscription_download_settings_warning.png
+\n
+The assumption behind this design is to prevent situations where subscription 
+status between the nodes becomes unsynchronized due to improper usage of 
+subscription management functionality. Nevertheless this concept will probably 
+be modified or dropped due to negative users' feedback.       
+\endnote
+
+\subsection registry_settings Delivery registry settings
+
+<tt>Delivery registry</tt> settings allow to keep track of the number of 
+delivery registry entries stored in the system. Click 
+<tt>Delivery registry</tt> to expand available options. \p Configure option 
+allows to set maximum number of delivery registry entries or maximum age of 
+entries. See the image below.      
+
+\image html registry_settings.png
+
+The <tt>Set active</tt> checkbox activates selected limit. If both checkboxes 
+are checked, delivery registry entries will be deleted based on both maximum 
+number and maximum age of entries, whichever criterion is met. 
+\n
+\n
+\p Clear option allows to immediately remove all delivery registry entries. 
+This option should be used with care. It is recommended to set limit on either 
+number or age of delivery registry entries instead, as described above.     
+
+\image html registry_clear.png
+
+\subsection exchange_settings Exchange settings
+
+When user connects to a peer node, connection parameters are stored, so the 
+next time user connects to the same node, node address doesn't have to be typed,
+but instead it is available in the drop-down list (see \ref conn section for 
+details). In some situations it may be necessary to get rid of outdated 
+connections (e.g. when stored peer node address is no longer valid). In such 
+case, click \p Exchange option and select \p Connections item. 
+
+\image html exchange_settings.png
+
+The page contains list of all stored node connections. To remove invalid node 
+connection, click a checkbox next to a given node name. Click \p OK. Selected
+connection will be removed from the system.  
+
+\subsection messages_settings Messages settings 
+
+<tt>System messages</tt> settings allow to keep track of the number of log 
+entries stored in the system. Click <tt>System messages</tt> to expand 
+available options. \p Configure option allows to set maximum number of log
+entries or maximum age of log entries. See the image below.      
+
+\image html messages_settings.png
+
+The <tt>Set active</tt> checkbox activates selected limit. If both checkboxes 
+are checked, log entries will be deleted based on both maximum number and 
+maximum age of log entries, whichever criterion is met. 
+\n
+\n
+\p Clear option allows to immediately remove all log entries. This option should
+be used with care. It is recommended to set limit on either number or age of log 
+entries instead, as described above.     
+
+\image html messages_clear.png
+
 \subsection accounts User account management
-\subsection registry_admin Delivery registry settings
-\subsection messages_admin Messages settings 
 
+	- Adding user account
 
-<!-- \section conf Configuration
-\subsection 
-\subsection data_sources Setting data sources
-\subsection accounts User accounts
-\section conn Connecting to peer node
- -->	
+Click <tt>User accounts</tt> and \p Add to set new user account. User will be 
+presented with the following form.  
 
+\image html account_add.png
+
+Fill in the form and click \p Save in order to save new user account. The system 
+will issue an appropriate message depending on the operation status. 
+
+\note
+It is of key importance to select a suitable role for the newly established 
+account. It is achieved by selecting user's role from \p Role selection 
+drop-down list. System functionality available in the GUI is different for users 
+with particular roles. The following roles are available: 
+\n
+- \p user - Basic role with very limited access to the system. User with this role
+can browse data and system messages, access subscription and data source status 
+information.   
+- \p operator - Advanced user that can connect to peer nodes as well as start 
+and stop subscriptions and access data processing tab. This role also extends 
+user-level functionality.    
+- \p admin - Node administrator with unlimited access to system options.
+- \p peer - This role is reserved for data exchange and it is not available 
+in the drop-down list.
+\endnote
+
+	- Modifying user account setttings
+
+Click <tt>User accounts</tt> and \p Edit to modify existing user account. The
+following form will be displayed.
+
+\image html account_edit.png
+
+Click given user's name to access account details page. Edit account settings 
+and click \p Save. The system will confirm operation with suitable message.
+\n
+User's password can be modified independently from the rest of account's 
+settings. Click <tt>User accounts</tt>, \p Edit, then click \p Change option 
+next to the selected account. Type new password, retype to confirm and click
+\p Save. From now on user can sign in using new password. 
+
+\image html account_passwd.png 
+
+\note
+User accounts with peer-type role can't be modified, since this could affect 
+data exchange process. It is still possible to remove this type of account. 
+\endnote
+
+	- Deleting user account 
+
+To remove user account, click <tt>User accounts</tt> and select \p Remove 
+option. The list of user accounts will be displayed.
+
+\image html account_remove.png
+
+Click a checkbox next to the account that is to be removed and click \p Submit.
+The system will confirm operation with suitable message.
+
+\subsection node_settings Node settings
+
+Refer to \ref quick_node_settings section.
 
 
 \page trouble Troubleshooting
 
-
-
-dealing with different server response error codes 
+This section will be gradually updated, as the list of known problems is build
+based on users' feedback.
 
 \page exchange_format Data exchange format
 
