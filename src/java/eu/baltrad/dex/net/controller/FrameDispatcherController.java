@@ -210,11 +210,16 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
                 response.setStatus(HttpServletResponse.SC_OK);
                 // Send data source listing to the client
-                List<Integer> dataSourceIds = dataSourceManager.getDataSourceIds(user.getId());
+                
+                List<DataSource> dsList = dataSourceManager
+                        .loadByUser(user.getId());
+                
+                /*List<Integer> dataSourceIds = dataSourceManager.getDataSourceIds(user.getId());
                 List<DataSource> dsList = new ArrayList<DataSource>();
                 for (int i = 0; i < dataSourceIds.size(); i++) {
-                    dsList.add(dataSourceManager.getDataSource(dataSourceIds.get(i)));
-                }
+                    dsList.add(dataSourceManager.load(dataSourceIds.get(i)));
+                }*/
+                
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(
                     InitAppUtil.getConf().getKeystoreDir(), InitAppUtil.getConf().getNodeName(), 
@@ -257,7 +262,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 if (validate(subRequest)) {
                     for (int i = 0; i < subRequest.size(); i++) {
                         DataSource dsRequest = subRequest.get(i);
-                        DataSource dsLocal = dataSourceManager.getDataSource(dsRequest.getName());
+                        DataSource dsLocal = dataSourceManager.load(dsRequest.getName());
                         User user = userManager.getByName(Frame.getNodeName(parms));
                         // make sure user hasn't already subscribed the selected data sources
                         if (subscriptionManager.load(user.getName(), dsLocal.getName(),
@@ -318,7 +323,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 Subscription sub = (Subscription) readObjectFromFile(Frame.getPayloadFile(parms));
                 // Check if subscribed data source is available
                 try {
-                    DataSource dataSource = dataSourceManager.getDataSource(
+                    DataSource dataSource = dataSourceManager.load(
                             sub.getDataSourceName());
                     if (dataSource == null) {
                         sub.setSynkronized(false);

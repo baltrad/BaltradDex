@@ -64,7 +64,7 @@ public class ShowDataSourcesController implements Controller {
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
-        List<DataSource> dataSources = dataSourceManager.getDataSources();
+        List<DataSource> dataSources = dataSourceManager.load();
         Collections.sort( dataSources );
         return new ModelAndView( getSuccessView(), DATA_SOURCES_KEY, dataSources );
     }

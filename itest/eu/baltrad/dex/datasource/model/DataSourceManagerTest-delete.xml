@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    <dex_data_sources id="1" name="DataSource1"
+        description="A test data source"/>
+    <dex_data_sources id="3" name="DataSource3"
+        description="Yet one more test data source"/>
+          
+    <dex_data_source_radars id="1" data_source_id="1" radar_id="10"/>
+    
+    <dex_data_source_file_objects id="3" data_source_id="3" 
+                                  file_object_id="15"/>
+    
+    <dex_data_source_users id="1" data_source_id="1" user_id="1"/>      
+    <dex_data_source_users id="2" data_source_id="2" user_id="2"/>      
+          
+    <dex_data_source_filters id="1" data_source_id="1" filter_id="7"/>      
+</dataset>

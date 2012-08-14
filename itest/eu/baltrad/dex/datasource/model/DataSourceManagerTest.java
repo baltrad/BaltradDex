@@ -22,21 +22,18 @@
 package eu.baltrad.dex.datasource.model;
 
 import eu.baltrad.dex.db.itest.DexDBITestHelper;
+import eu.baltrad.dex.radar.model.Radar;
+import eu.baltrad.dex.user.model.User;
 
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 
-import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.Assertion;
 
 import junit.framework.TestCase;
 
 import java.util.List;
-import java.util.Date;
-
-import java.text.DateFormat; 
-import java.text.SimpleDateFormat;
 
 /**
  * Data source manager integration test.
@@ -50,7 +47,6 @@ public class DataSourceManagerTest extends TestCase {
     private DataSourceManager classUnderTest;
     private AbstractApplicationContext context;
     private DexDBITestHelper helper;
-    private FlatXmlDataSet dataSet;
     
     @Override
     public void setUp() throws Exception {
@@ -82,82 +78,106 @@ public class DataSourceManagerTest extends TestCase {
         verifyDBTables(null, "dex_data_source_users");
     }
     
-    public void testLoadByUserId() throws Exception {
-        List<DataSource> userDataSources = classUnderTest.load(2);
+    public void testLoadAll() throws Exception {
+        List<DataSource> dataSources = classUnderTest.load();
+        assertNotNull(dataSources);
+        assertTrue(dataSources.size() == 3);
         verifyAll();
-        assertNotNull(userDataSources);
-        assertEquals(2, userDataSources.size());
-    } 
-    
-    
-    
-    /*public void testLoadById() throws Exception {
-        Subscription expected = new Subscription();
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
-        Date date = format.parse("2012-04-24 13:00:00.00");
-        expected.setTimeStamp(new Timestamp(date.getTime()));
-        expected.setUserName("User2");
-        expected.setDataSourceName("DataSource2");
-        expected.setOperatorName("Operator2");
-        expected.setType("upload");
-        expected.setActive(false);
-        expected.setSynkronized(true);
-        expected.setNodeAddress("http://baltrad.org");
-        
-        verifyDBTables(null);
-        Subscription actual = classUnderTest.load(2);
-        assertNotNull(actual);
-        assertTrue(classUnderTest.compare(expected, actual));
     }
     
-    public void testLoadByType() throws Exception {
-        List<Subscription> subs = classUnderTest.load("download");
-        verifyDBTables(null);
-        assertNotNull(subs);
-        assertEquals(2, subs.size());
+    public void testLoadById() throws Exception {
+        DataSource dataSource = classUnderTest.load(2);
+        assertEquals(2, dataSource.getId());
+        assertEquals("DataSource2", dataSource.getName());
+        assertEquals("Another test data source", dataSource.getDescription());
+        verifyAll();
+    }
+    
+    public void testLoadByName() throws Exception {
+        DataSource dataSource = classUnderTest.load("DataSource3");
+        assertEquals(3, dataSource.getId());
+        assertEquals("DataSource3", dataSource.getName());
+        assertEquals("Yet one more test data source", 
+                dataSource.getDescription());
+        verifyAll();
+    }
+    
+    public void testLoadByUser() throws Exception {
+        List<DataSource> userDataSources = classUnderTest.loadByUser(2);
+        assertNotNull(userDataSources);
+        assertEquals(2, userDataSources.size());
+        verifyAll();
     }
     
     public void testStore() throws Exception {
-        Subscription s = new Subscription();
-        s.setId(4);
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
-        Date date = format.parse("2012-04-25 15:00:00.00");
-        s.setTimeStamp(new Timestamp(date.getTime()));
-        s.setUserName("User4");
-        s.setDataSourceName("DataSource4");
-        s.setOperatorName("Operator4");
-        s.setType("upload");
-        s.setActive(true);
-        s.setSynkronized(false);
-        s.setNodeAddress("http://test.baltrad.eu");
-        
-        classUnderTest.store(s);
-        verifyDBTables("store");
+        DataSource dataSource = new DataSource("DataSource4", 
+                "Stored data source");
+        dataSource.setId(4);   
+        assertEquals(1, classUnderTest.store(dataSource));
+        assertEquals("DataSource4", dataSource.getName());
+        assertEquals("Stored data source", dataSource.getDescription());
+        verifyDBTables("store", "dex_data_sources");
     }
     
     public void testUpdate() throws Exception {
-        Subscription s = new Subscription();
-        s.setId(2);
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SS");
-        Date date = format.parse("2012-04-24 13:00:00.00");
-        s.setTimeStamp(new Timestamp(date.getTime()));
-        s.setUserName("User2");
-        s.setDataSourceName("DataSource2");
-        s.setOperatorName("Operator2");
-        s.setType("download");
-        s.setActive(true);
-        s.setSynkronized(false);
-        s.setNodeAddress("http://baltrad.org");
-        
-        classUnderTest.update(s);
-        verifyDBTables("update");
+        DataSource dataSource = new DataSource("DataSource3", 
+                "Updated data source");
+        dataSource.setId(3);
+        assertEquals(1, classUnderTest.update(dataSource));
+        assertEquals("DataSource3", dataSource.getName());
+        assertEquals("Updated data source", dataSource.getDescription());
+        verifyDBTables("update", "dex_data_sources");
     }
     
     public void testDelete() throws Exception {
-        Subscription s = new Subscription();
-        s.setId(2);
-        
-        classUnderTest.delete(s);
-        verifyDBTables("delete");   
-    }*/
+        assertEquals(1, classUnderTest.delete(2));
+        verifyDBTables("delete", "dex_data_sources");
+    }
+    
+    public void testLoadRadar() throws Exception {
+        List<Radar> radars = classUnderTest.loadRadar(2);
+        assertNotNull(radars);
+        assertEquals(2, radars.size());
+        verifyAll();
+    }
+    
+    public void testDeleteRadar() throws Exception {
+        assertEquals(2, classUnderTest.deleteRadar(2));
+        verifyDBTables("delete", "dex_data_source_radars");
+    }
+    
+    public void testLoadFileObject() throws Exception {
+        List<FileObject> fobjects = classUnderTest.loadFileObject(1);
+        assertNotNull(fobjects);
+        assertEquals(2, fobjects.size());
+        verifyAll();
+    } 
+    
+    public void testDeleteFileObject() throws Exception {
+        assertEquals(2, classUnderTest.deleteFileObject(1));
+        verifyDBTables("delete", "dex_data_source_file_objects");
+    }
+    
+    public void testLoadUser() throws Exception {
+        List<User> users = classUnderTest.loadUser(3);
+        assertNotNull(users);
+        assertEquals(2, users.size());
+        verifyAll();
+    }
+    
+    public void testDeleteUser() throws Exception {
+        assertEquals(2, classUnderTest.deleteUser(3));
+        verifyDBTables("delete", "dex_data_source_users");
+    }
+    
+    public void testLoadFilterId() throws Exception {
+        assertEquals(7, classUnderTest.loadFilterId(1));
+        verifyAll();
+    }
+    
+    public void testDeleteFilter() throws Exception {
+        assertEquals(2, classUnderTest.deleteFilter(2));
+        verifyDBTables("delete", "dex_data_source_filters");
+    }
+    
 }

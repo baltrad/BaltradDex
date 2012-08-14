@@ -69,7 +69,7 @@ public class SaveRadarController extends SimpleFormController {
         Radar channel = null;
         if( request.getParameter( CHANNEL_ID ) != null
                 && request.getParameter( CHANNEL_ID ).trim().length() > 0 ) {
-            channel = radarManager.getChannel( Integer.parseInt(
+            channel = radarManager.getRadar( Integer.parseInt(
                     request.getParameter( CHANNEL_ID ) ) );
         } else {
             channel = new Radar();
@@ -91,12 +91,12 @@ public class SaveRadarController extends SimpleFormController {
         Radar channel = ( Radar )command;
         try {
             radarManager.saveOrUpdate( channel );
-            String msg = "Local radar station successfully saved: " + channel.getChannelName();
+            String msg = "Local radar station successfully saved: " + channel.getRadarName();
             request.setAttribute( OK_MSG_KEY, msg  );
             log.warn( msg );
         } catch( Exception e ) {
             request.removeAttribute( OK_MSG_KEY );
-            String msg = "Failed to save local radar station " + channel.getChannelName();
+            String msg = "Failed to save local radar station " + channel.getRadarName();
             request.setAttribute( ERROR_MSG_KEY, msg  );
             log.error( msg, e );
         }

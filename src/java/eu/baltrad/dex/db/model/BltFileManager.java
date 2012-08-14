@@ -102,9 +102,9 @@ public class BltFileManager implements IBltFileManager {
     public IFilter getFilter( String dsName ) {
         IFilter attributeFilter = null;
         try {
-            DataSource dataSource = dataSourceManager.getDataSource(dsName);
+            DataSource dataSource = dataSourceManager.load(dsName);
             attributeFilter = coreFilterManager.load(
-                    dataSourceManager.getFilterId(dataSource.getId()));
+                    dataSourceManager.loadFilterId(dataSource.getId()));
         } catch( Exception e ) {
             log.error( "getFilter(): Failed to get filter ID:", e );
         }

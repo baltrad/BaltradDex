@@ -14,6 +14,7 @@
   <script src="includes/js/load_menu.js" type="text/javascript"></script>
   <script src="includes/js/datetimepicker_css.js" type="text/javascript"></script>
   <script src="includes/js/validate_time_input.js" type="text/javascript"></script>
+  <script src="includes/js/copy_select_option.js" type="text/javascript"></script>
   <jsp:invoke fragment="extraHeader"/>
   <!-- favicon -->
   <link rel="icon" type="image/png" href="includes/images/favicon.png"/>

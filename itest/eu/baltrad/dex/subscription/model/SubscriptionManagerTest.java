@@ -179,7 +179,6 @@ public class SubscriptionManagerTest extends TestCase {
                 Subscription.SUBSCRIPTION_DOWNLOAD);
         verifyDBTables(null);
         assertEquals(2, subscriptions.size());
-        
     }
     
 }

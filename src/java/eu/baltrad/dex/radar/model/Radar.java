@@ -24,7 +24,7 @@ package eu.baltrad.dex.radar.model;
 import java.io.Serializable;
 
 /**
- * Class implements data channel object.
+ * Class implements radar object.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
@@ -33,7 +33,7 @@ import java.io.Serializable;
 public class Radar implements Serializable {
 //---------------------------------------------------------------------------------------- Variables
     private int id;
-    private String channelName;
+    private String radarName;
     private String wmoNumber;
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -43,27 +43,27 @@ public class Radar implements Serializable {
     /**
      * Constructor setting field values.
      *
-     * @param id Channel ID
-     * @param channelName Channel name
-     * @param wmoNumber Channel WMO number
+     * @param id Radar ID
+     * @param radarName Radar name
+     * @param wmoNumber Radar WMO number
      */
-    public Radar( int id, String channelName, String wmoNumber ) {
+    public Radar( int id, String radarName, String wmoNumber ) {
         this.id = id;
-        this.channelName = channelName;
+        this.radarName = radarName;
         this.wmoNumber = wmoNumber;
     }
     /**
      * Constructor setting field values.
      *
-     * @param channelName Channel name
-     * @param wmoNumber Channel WMO number
+     * @param radarName Radar name
+     * @param wmoNumber Radar WMO number
      */
-    public Radar( String channelName, String wmoNumber ) {
-        this.channelName = channelName;
+    public Radar( String radarName, String wmoNumber ) {
+        this.radarName = radarName;
         this.wmoNumber = wmoNumber;
     }
     /**
-     * Compares channel object with another object.
+     * Compares radar object with another object.
      *
      * @param o Object to compare with
      * @return True if objects are equal, false otherwise
@@ -72,55 +72,55 @@ public class Radar implements Serializable {
     public boolean equals( Object o ) {
         boolean res = false;
         if( getClass() == o.getClass() ) {
-            if( this.getChannelName().equals( ( ( Radar )o ).getChannelName() ) ) {
+            if( this.getRadarName().equals( ( ( Radar )o ).getRadarName() ) ) {
                 res = true;
             }
         }
         return res;
     }
     /**
-     * Creates channel name hash code.
+     * Creates radar name hash code.
      *
-     * @return Channel name hash code or 0 if channel name is null
+     * @return Radar name hash code or 0 if radar name is null
      */
     @Override
     public int hashCode() {
-        return( channelName != null ? channelName.hashCode() : 0 );
+        return( radarName != null ? radarName.hashCode() : 0 );
     }
     /**
-     * Method gets data channel id.
+     * Method gets radar id.
      *
-     * @return Data channel id
+     * @return Radar id
      */
     public int getId() { return id; }
     /**
-     * Method sets data channel id.
+     * Method sets radar id.
      *
-     * @param id Data channel id
+     * @param id Radar id
      */
     public void setId( int id ) { this.id = id; }
     /**
-     * Method gets data channel name.
+     * Method gets radar name.
      *
-     * @return Data channel name
+     * @return Radar name
      */
-    public String getChannelName() { return channelName; }
+    public String getRadarName() { return radarName; }
     /**
-     * Method sets data channel name.
+     * Method sets radar name.
      *
-     * @param name Data channel name
+     * @param name Radar name
      */
-    public void setChannelName( String channelName ) { this.channelName = channelName; }
+    public void setRadarName( String radarName ) { this.radarName = radarName; }
     /**
-     * Method gets data channel's WMO number.
+     * Method gets WMO number.
      *
-     * @return Data channel's WMO number
+     * @return WMO number
      */
     public String getWmoNumber() { return wmoNumber; }
     /**
-     * Method sets data channel's WMO number.
+     * Method sets WMO number.
      *
-     * @param wmoNumber Data channel's WMO number
+     * @param wmoNumber WMO number
      */
     public void setWmoNumber( String wmoNumber ) { this.wmoNumber = wmoNumber; }
 }

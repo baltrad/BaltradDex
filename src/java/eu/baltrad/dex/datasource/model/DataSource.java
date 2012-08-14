@@ -22,6 +22,7 @@
 package eu.baltrad.dex.datasource.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Class implements data source object.
@@ -53,6 +54,7 @@ public class DataSource implements Serializable, Comparable<DataSource> {
         this.name = name;
         this.description = description;
     }
+    
     /**
      * Constructor.
      *

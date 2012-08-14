@@ -632,59 +632,102 @@ input:focus, textarea:focus {
 .addradar .wmonumber input {
     width:200px;
 }
-/* Save data source page -------------------------------------------------------------------------*/
-.row .leftcol, .row .rightcol {
-    margin-top:12px;
+/* Save data source page -----------------------------------------------------*/
+.dssave {
+    width:100%;
 }
-.dssave .leftcol {
+.dsparam, .dssave > .separator {
+    width:96%;
+    float:left;
+    clear:both;
+    margin:8px 12px 8px 12px;
+    font-size:14px;
+    color:#444444;
+}
+.dssave > .separator {
+    border-bottom:1px dotted #000000;
+}
+.dsparam > .row {
+    width:100%;
+    float:left;
+    clear:both;
+    padding:12px 0px 8px 0px;
+}
+.dsparam > .row > .dsid {
+    float:left;
+    clear:left;
     width:20%;
 }
-.dssave .dsname {
+.dsparam > .row > .hdr, .dsparam > .row > .dsid {
+    font-weight:bolder;
+    color:#4C6EB3;
+}
+.dsparam > .row > .input {
     float:left;
+    clear:right;
 }
-.dssave .dsname input {
-    width:200px; 
-}
-.dsdescription textarea {
+.dsparam > .row > .leftcol {
     float:left;
-    width:200px;
-    height:64px;
+    clear:left;
+    width:40%;
+    padding-left:18px;
+    text-align:left; 
 }
-.stepno {
-    float:right;
-}
-.dssave select {
-    width:280px;
+.dsparam > .row > .midcol {
     float:left;
+    width:10%;
 }
-.dscontrol {
+.dsparam > .row > .rightcol {
     float:left;
+    clear:right;
+    width:40%;
+    font-size:14px;
+    font-weight:normal; 
+    color:#444444;
 }
-.dscontrol input {
-    padding:2px;
-    height:24px;
-    width:24px;
-    font-size:12px;
-    margin: 0px 4px 0px 4px;
-    background-color:#A0CB6F;
+.dsparam textarea {
+    width:260px;
+    height: 100px;
+    resize: none;
 }
-.dscontrol input:hover {
+.dsparam > .row > .leftcol select, .dsparam > .row > .rightcol select {
+    width:100%;
+}
+.dsparam > .row > .midcol > .select {
+    width:50%;
+    margin:22px auto;
+}
+.dsparam > .row > .midcol > .select input:hover {
     background-color:#5CA420;
 }
-.dsparam {
-    width:540px;
-    border:1px solid #429602;
-    color:#444444;
-    font-weight:normal;
-    -moz-border-radius:4px;
-    border-radius:4px;
-    margin:4px 0px 4px 0px;
+.dsparam > .row > .midcol > .select input {
+    float:left;
+    clear:both;
+    margin-top:8px; 
     padding:2px;
+    height:21px;
+    width:21px;
+    font-size:12px;
+    background-color:#A0CB6F;
 }
-.dssave .rightcol {
-    padding-left:24px;
-}
-/* Show data sources page ------------------------------------------------------------------------*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Show data sources page ----------------------------------------------------*/
 .dsshow .name {
     width:30%;
 }

@@ -69,7 +69,7 @@ Author     : szewczenko
                                         <c:set var="count" value="${count + 1}"/>
                                     </div>
                                     <div id="cell" class="name">
-                                        <a href="save_datasource.htm?dsName=${dataSource.name}">
+                                        <a href="save_datasource.htm?ds_id=${dataSource.id}">
                                             <c:out value="${dataSource.name}"/>
                                         </a>
                                     </div>

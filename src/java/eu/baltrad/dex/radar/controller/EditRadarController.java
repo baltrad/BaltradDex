@@ -49,7 +49,7 @@ public class EditRadarController implements Controller {
 //------------------------------------------------------------------------------------------ Methods
      public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
-         List channels = radarManager.getChannels();
+         List channels = radarManager.getRadars();
          return new ModelAndView( getSuccessView(), MODEL_KEY, channels );
      }
      /**

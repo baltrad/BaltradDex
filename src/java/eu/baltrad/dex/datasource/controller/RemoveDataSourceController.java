@@ -89,9 +89,9 @@ public class RemoveDataSourceController extends MultiActionController {
      */
     public ModelAndView remove_datasource( HttpServletRequest request, 
             HttpServletResponse response ) {
-        List<DataSource> dataSources = dataSourceManager.getDataSources();
+        List<DataSource> dataSources = dataSourceManager.load();
         Collections.sort( dataSources );
-        return new ModelAndView( DS_SELECT_REMOVE_VIEW, DS_SELECT_REMOVE_KEY, dataSources );
+        return new ModelAndView(DS_SELECT_REMOVE_VIEW, DS_SELECT_REMOVE_KEY, dataSources);
     }
     /**
      * Prepares a list of data sources selected for removal.
@@ -111,7 +111,7 @@ public class RemoveDataSourceController extends MultiActionController {
             if( parameterValues != null ) {
                 for( int i = 0; i < parameterValues.length; i++ ) {
                     try {
-                        dataSources.add( dataSourceManager.getDataSource(
+                        dataSources.add( dataSourceManager.load(
                                 Integer.parseInt( parameterValues[ i ] ) ) );
                     } catch( Exception e ) {
                         String msg = "Failed to fetch data sources";
@@ -122,7 +122,7 @@ public class RemoveDataSourceController extends MultiActionController {
                 modelAndView = new ModelAndView( DS_TO_REMOVE_VIEW, DS_SELECT_REMOVE_KEY,
                         dataSources );
             } else {
-                modelAndView.addObject( DS_SELECT_REMOVE_KEY, dataSourceManager.getDataSources() );
+                modelAndView.addObject(DS_SELECT_REMOVE_KEY, dataSourceManager.load());
                 modelAndView.setViewName( DS_SELECT_REMOVE_VIEW );
             }
         }
@@ -145,16 +145,16 @@ public class RemoveDataSourceController extends MultiActionController {
             if( parameterValues != null ) {
                 for( int i = 0; i < parameterValues.length; i++ ) {
                     try {
-                        DataSource dataSource = dataSourceManager.getDataSource(
+                        DataSource dataSource = dataSourceManager.load(
                                 Integer.parseInt( parameterValues[ i ] ) );
                         String dataSourceName = dataSource.getName();
                         // Delete filters
-                        int filterId = dataSourceManager.getFilterId( dataSource.getId() );
+                        int filterId = dataSourceManager.loadFilterId( dataSource.getId() );
                         IFilter filter = coreFilterManager.load( filterId );
                         coreFilterManager.remove( filter );
                         // Delete data source
-                        dataSourceManager.deleteDataSource( Integer.parseInt(
-                                parameterValues[ i ] ) );
+                        dataSourceManager
+                                .delete(Integer.parseInt(parameterValues[i]));
                         String msg = "Data source successfully removed: " + dataSourceName;
                         log.warn( msg );
                     } catch( Exception e ) {
@@ -166,7 +166,7 @@ public class RemoveDataSourceController extends MultiActionController {
                 modelAndView.addObject( DS_REMOVE_MSG_KEY, msg );
                 modelAndView.setViewName( DS_REMOVE_VIEW );
             } else {
-                modelAndView.addObject( DS_SELECT_REMOVE_KEY, dataSourceManager.getDataSources() );
+                modelAndView.addObject(DS_SELECT_REMOVE_KEY, dataSourceManager.load());
                 modelAndView.setViewName( DS_SELECT_REMOVE_VIEW );
             }
         }

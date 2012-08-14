@@ -59,7 +59,7 @@ public class RadarManager {
      *
      * @return List of all available data channels
      */
-    public List<Radar> getChannels() {
+    public List<Radar> getRadars() {
         Connection conn = null;
         List<Radar> channels = new ArrayList<Radar>();
         try {
@@ -87,7 +87,7 @@ public class RadarManager {
      * @param id Data channel ID
      * @return Data channel with a given ID
      */
-    public Radar getChannel( int id ) {
+    public Radar getRadar( int id ) {
         Connection conn = null;
         Radar channel = null;
         try {
@@ -115,7 +115,7 @@ public class RadarManager {
      * @param channelName Data channel name
      * @return Data channel with a given name
      */
-    public Radar getChannel( String channelName ) {
+    public Radar getRadar( String channelName ) {
         Connection conn = null;
         Radar channel = null;
         try {
@@ -154,10 +154,10 @@ public class RadarManager {
             // record does not exists, do insert
             if( channel.getId() == 0 ) {
                 sql = "INSERT INTO dex_radars (name, wmo_number) VALUES ('" +
-                    channel.getChannelName() + "', '" + channel.getWmoNumber() + "');";
+                    channel.getRadarName() + "', '" + channel.getWmoNumber() + "');";
             } else {
                 // record exists, do update
-                sql = "UPDATE dex_radars SET name = '" + channel.getChannelName() + "', " +
+                sql = "UPDATE dex_radars SET name = '" + channel.getRadarName() + "', " +
                     "wmo_number = '" + channel.getWmoNumber() + "' WHERE id = " +
                     channel.getId() + ";";
             }
@@ -178,7 +178,7 @@ public class RadarManager {
      * @return Number of deleted records
      * @throws Exception
      */
-    public int deleteChannel( int id ) throws Exception {
+    public int deleteRadar( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
         try {

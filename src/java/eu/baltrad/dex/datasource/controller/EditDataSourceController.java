@@ -58,7 +58,7 @@ public class EditDataSourceController implements Controller {
      * @return The prepared model and view
      */
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response ) {
-        List<DataSource> dataSources = dataSourceManager.getDataSources();
+        List<DataSource> dataSources = dataSourceManager.load();
         Collections.sort( dataSources );
         return new ModelAndView( getSuccessView(), DS_SELECT_EDIT_KEY, dataSources );
     }

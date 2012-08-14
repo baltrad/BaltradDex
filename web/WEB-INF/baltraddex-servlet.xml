@@ -65,12 +65,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="radar_to_remove.htm">removeRadarController</prop>
                 <prop key="remove_radar_status.htm">removeRadarController</prop>
                 
-                <prop key="save_datasource.htm">saveDataSourceController</prop>
-                <prop key="save_datasource_radar.htm">saveDataSourceController</prop>
-                <prop key="save_datasource_file_object.htm">saveDataSourceController</prop>
-                <prop key="save_datasource_user.htm">saveDataSourceController</prop>
-                <prop key="save_datasource_summary.htm">saveDataSourceController</prop>
-                <prop key="save_datasource_config.htm">saveDataSourceController</prop>
                 <prop key="edit_datasource.htm">editDataSourceController</prop>
                 <prop key="remove_datasource.htm">removeDataSourceController</prop>
                 <prop key="remove_selected_datasource.htm">removeDataSourceController</prop>
@@ -636,11 +630,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="metadataMatcher" 
           class="eu.baltrad.bdb.oh5.MetadataMatcher"/>
 
-
-    
-
-    
-
     <!--
         Message digest utility.
     -->
@@ -747,14 +736,16 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="dataSourceManager" 
           class="eu.baltrad.dex.datasource.model.DataSourceManager"
           autowire="byType"/>
+          
+    <!-- DataSourceValidator -->
+    <bean name="dataSourceValidator" 
+          class="eu.baltrad.dex.datasource.util.DataSourceValidator" 
+          autowire="byType"/>      
 
     <!-- SaveDataSourceController -->
-    <bean name="saveDataSourceController"
-            class="eu.baltrad.dex.datasource.controller.SaveDataSourceController">
-        <property name="coreFilterManager">
-            <ref bean="coreFilterManager"/>
-        </property>
-    </bean>
+    <bean id="saveDataSourceController"
+          class="eu.baltrad.dex.datasource.controller.SaveDataSourceController"
+          autowire="byType"/>
 
     <!-- ShowDataSourcesController -->
     <bean name="showDataSourcesController"

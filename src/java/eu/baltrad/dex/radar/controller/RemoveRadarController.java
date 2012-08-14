@@ -76,7 +76,7 @@ public class RemoveRadarController extends MultiActionController {
      */
     public ModelAndView remove_radar( HttpServletRequest request,
             HttpServletResponse response ) {
-        List channels = radarManager.getChannels();
+        List channels = radarManager.getRadars();
         return new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
     }
     /**
@@ -93,11 +93,11 @@ public class RemoveRadarController extends MultiActionController {
         if( channelIds != null ) {
             List< Radar > channels = new ArrayList< Radar >();
             for( int i = 0; i < channelIds.length; i++ ) {
-                channels.add( radarManager.getChannel( Integer.parseInt( channelIds[ i ] ) ) );
+                channels.add( radarManager.getRadar( Integer.parseInt( channelIds[ i ] ) ) );
             }
             modelAndView = new ModelAndView( SELECTED_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
         } else {
-            List channels = radarManager.getChannels();
+            List channels = radarManager.getRadars();
             modelAndView = new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
         }
         return modelAndView;
@@ -115,9 +115,9 @@ public class RemoveRadarController extends MultiActionController {
         String channelName = "";
         try {
             for( int i = 0; i < channelIds.length; i++ ) {
-                Radar channel = radarManager.getChannel( Integer.parseInt( channelIds[ i ] ) );
-                channelName = channel.getChannelName();
-                radarManager.deleteChannel( Integer.parseInt( channelIds[ i ] ) );
+                Radar channel = radarManager.getRadar( Integer.parseInt( channelIds[ i ] ) );
+                channelName = channel.getRadarName();
+                radarManager.deleteRadar( Integer.parseInt( channelIds[ i ] ) );
                 log.warn( "Local radar station successfully removed: " + channelName );
             }
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(

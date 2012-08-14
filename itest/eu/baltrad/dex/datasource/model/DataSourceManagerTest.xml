@@ -2,10 +2,8 @@
 <dataset>
     <dex_data_sources id="1" name="DataSource1"
         description="A test data source"/>
-        
     <dex_data_sources id="2" name="DataSource2"
         description="Another test data source"/>
-        
     <dex_data_sources id="3" name="DataSource3"
         description="Yet one more test data source"/>
           
@@ -14,13 +12,32 @@
     <dex_users id="1" name="User1" role_name="peer" password=""
                org_name="" org_unit="" locality="" state="" country_code="" 
                node_address="http://localhost"/>
-               
     <dex_users id="2" name="User2" role_name="peer" password=""
                org_name="" org_unit="" locality="" state="" country_code="" 
                node_address="http://localhost"/>
-        
+    
     <dex_data_source_users id="1" data_source_id="1" user_id="1"/>      
     <dex_data_source_users id="2" data_source_id="2" user_id="2"/>      
-    <dex_data_source_users id="3" data_source_id="3" user_id="2"/>      
-        
+    <dex_data_source_users id="3" data_source_id="3" user_id="2"/>
+    <dex_data_source_users id="4" data_source_id="3" user_id="1"/>
+    
+    <dex_radars id="10" name="Radar1" wmo_number="11222"/>
+    <dex_radars id="11" name="Radar2" wmo_number="11333"/>
+    <dex_radars id="12" name="Radar3" wmo_number="11444"/>  
+    
+    <dex_data_source_radars id="1" data_source_id="1" radar_id="10"/>      
+    <dex_data_source_radars id="2" data_source_id="2" radar_id="11"/>      
+    <dex_data_source_radars id="3" data_source_id="2" radar_id="12"/>
+    
+    <dex_file_objects id="13" file_object="FileObject1" description="A file object"/>
+    <dex_file_objects id="14" file_object="FileObject2" description="Another file object"/>
+    <dex_file_objects id="15" file_object="FileObject3" description="One more file object"/>  
+    
+    <dex_data_source_file_objects id="1" data_source_id="1" file_object_id="13"/>      
+    <dex_data_source_file_objects id="2" data_source_id="1" file_object_id="14"/>      
+    <dex_data_source_file_objects id="3" data_source_id="3" file_object_id="15"/>
+    
+    <dex_data_source_filters id="1" data_source_id="1" filter_id="7"/>      
+    <dex_data_source_filters id="2" data_source_id="2" filter_id="8"/>      
+    <dex_data_source_filters id="3" data_source_id="2" filter_id="9"/>    
 </dataset>

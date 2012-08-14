@@ -182,7 +182,7 @@ public class DataSourceListServletTest {
         
         IDataSourceManager dataSourceManagerMock = createMock(
                 IDataSourceManager.class);
-        expect(dataSourceManagerMock.load(0))
+        expect(dataSourceManagerMock.loadByUser(0))
                 .andReturn(new ArrayList<DataSource>()).anyTimes();
         replay(dataSourceManagerMock);
         

@@ -129,7 +129,7 @@ public class DataSourceListServlet extends HttpServlet {
                 }
                 // Get data sources available for the user
                 List<DataSource> userDataSources = dataSourceManager
-                        .load(user.getId());
+                        .loadByUser(user.getId());
                 PrintWriter writer = new PrintWriter(res.getOutputStream());
                 try {
                     writer.print(jsonUtil.dataSourcesToJson(

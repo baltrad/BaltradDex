@@ -496,7 +496,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </exec> 
   </target>   
   <!-- Execute integration tests -->
-  <target name="execute-itest" depends="compile.itest,init.itest,
+  <target name="execute-itest" depends="dist,compile.itest,init.itest,
                                         start-bdb-server">
     <mkdir dir="${dist.dir}/junit-reports" />
     <junit dir="${build.itest.dir}" showoutput="true" forkmode="perBatch" 
