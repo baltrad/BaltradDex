@@ -448,36 +448,48 @@ be saved as a new radar.
 
 Next step is configuration of data sources. Data source is an interface
 allowing to access data injected into baltrad node from local production 
-system. Go to \p Settings tab and click <tt>Data Sources</tt> and \p Add.
-Provide a significant data source name and description like in the 
-example given below.
+system. Data available with a given data source must exactly match its 
+parameters. 
+\n Go to \p Settings tab and click <tt>Data Sources</tt> and \p Add.
+At the top of the page, fill in the textboxes providing a significant data 
+source name and description like in the example given below. Typically, data
+sources are named after radars, including some additional parameters, like 
+data type in the example below. 
 
 \image html data_source_name.png
 
-Click \p Next and move on to radar selection page. Select one or more radar 
-station for a data source. Remember that data files coming from these radars 
-will be available with this data source.  
+Next scroll down to radar selection box. General rule for setting data source
+parameters is to add parameters from left options box to the right. Select a
+parameter in the left options box, then use button marked with \p > sign in 
+order to add the parameter to the options box in the right. Use \p < button to
+remove unwanted parameter. Select one or more radars according to your needs. 
+Typically only one radar is selected for a data source, but more radars is 
+still possible. Remember that data files coming from these radars will be 
+available with this data source.  
 \note
-Each time after selecting radar from the drop-down list, confirm your selection 
-using \p + button. In order to remove previously selected radar station, use
-button with \p - sign. The same rule applies to the other data source 
-parameters selected from the list. 
+At least one radar is required. In case of an attempt to save data source 
+without selected radar, user will be warned with a relevant message.  
 \endnote
 
 \image html data_source_radar.png
 
-Click \p Next. Next step is selection of file object according to ODIM_H5 
-model specification. Select object from the drop-down list and use \p + and 
-\p - signs just like in the previous step. It is possible to select more than 
-one file object. In such case all selected objects will be available with 
-this data source.  
+Scroll the page down. Next step is selection of file object according to ODIM_H5 
+model specification. Select file object from the left options box and use \p >
+button in order to add it to selected options box, just like in the previous 
+step. It is possible to select more than one file object. In such case all 
+selected objects will be available with this data source.  
 
 \image html data_source_file_object.png
 
-Click \p Next. Last step of data source configuration is selection of users 
-for which this data source will be available. This means that users selected at
-this stage will be able to subscribe the data source and will receive data 
-matching its parameters defined in the previous steps. 
+\note
+Move mouse cursor over a selected option to get detailed file object description 
+displayed as tooltip. 
+\endnote
+
+Scroll the page to the bottom. Last step of data source configuration is 
+selection of users for which this data source will be available. This means 
+that users selected at this stage will be able to subscribe the data source and 
+will receive data matching its parameters defined in the previous steps. 
 \note
 The desired user account might not be available in the system at the stage 
 of data source configuration. This is because user accounts with role \p peer
@@ -488,8 +500,10 @@ user accounts assigned and add given account as soon as it is created.
 
 \image html data_source_user.png
 
-Click \p Next to move to summary page. Click \p Save button to save data source 
-configuration.
+Once the above steps are completed, press \p Save to store data source 
+configuration. User will be redirected to status page indicating whether saving
+of data source was successful. Clicking \p OK in the status page will take user 
+to data source selection page.
 
 \image html data_source_summary.png
 
