@@ -23,7 +23,6 @@ package eu.baltrad.dex.util;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Utility class implementing MD5 hash function used to protect passwords.
@@ -42,13 +41,18 @@ public class MessageDigestUtil {
      */
     public static String createHash(String algorithm, int hashLen, 
             String message) {
-        String hashString = "";
+        String hashString = null;
         try {
             MessageDigest md = MessageDigest.getInstance(algorithm);
-            byte[] messageDigest = md.digest(message.getBytes());
+            md.reset();
+            md.update(message.getBytes("UTF-8"));
+            byte[] messageDigest = md.digest();
             BigInteger number = new BigInteger(1, messageDigest);
             hashString = number.toString(hashLen);
-        } catch(NoSuchAlgorithmException e) {
+            while (hashString.length() < 32) {
+                hashString = "0" + hashString;
+            }
+        } catch (Exception e) {
             throw new RuntimeException("Error while initializing hash function", 
                     e);
         }

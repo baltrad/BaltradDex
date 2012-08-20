@@ -28,7 +28,7 @@ INSERT INTO dex_roles (id, role) VALUES (1, 'admin'), (2, 'operator'),
 -- dex_users ---------------------------------------------------------------------------------------
 INSERT INTO dex_users (name, role_name, password, org_name, org_unit, locality, 
                         state, country_code, node_address)
-    VALUES ('admin', 'admin', MD5('admin'), 'IMGW', 'OTN', 'Warsaw',
+    VALUES ('admin', 'admin', MD5('baltrad'), 'IMGW', 'OTN', 'Warsaw',
 
             'Poland', 'PL', 'http://127.0.0.1:8084'),
 

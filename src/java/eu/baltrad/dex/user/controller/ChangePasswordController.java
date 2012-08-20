@@ -96,7 +96,7 @@ public class ChangePasswordController extends SimpleFormController {
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             log.warn( msg );
         } catch( Exception e ) {
-            String msg = "Failed change password for user " + user.getName();
+            String msg = "Failed to change password for user " + user.getName();
             request.getSession().removeAttribute( OK_MSG_KEY );
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
             log.error( msg, e );
