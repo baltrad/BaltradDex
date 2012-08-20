@@ -619,13 +619,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <target name="context-status">
     <property name="running" value="${mgr.path}:running"/>
     <property name="stopped" value="${mgr.path}:stopped"/>
-
     <list url="${mgr.url}"
       		outputproperty="ctx.status"
       		username="${mgr.username}"
       		password="${mgr.password}">
     </list>
-
     <condition property="context.running">
       <contains string="${ctx.status}" substring="${running}"/>
     </condition>
@@ -658,6 +656,60 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </or>
     </condition>
   </target>
+  
+    <!-- Test deployment -->
+    <target name="test-deploy" depends="dist, insert-data, test-context-status"
+            if="test.context.deployable">
+        <echo message="Deploying ${test.mgr.path} to ${test.mgr.url}"/>
+        <deploy url="${test.mgr.url}"
+                username="${test.mgr.username}"
+                password="${test.mgr.password}"
+                path="${test.mgr.path}"
+                update="${test.mgr.update}"
+                war="file:${dist.dir}/BaltradDex.war"/>
+    </target>
+    <!-- Test context status -->
+    <target name="test-context-status">
+        <property name="running" value="${test.mgr.path}:running"/>
+        <property name="stopped" value="${test.mgr.path}:stopped"/>
+        <list url="${test.mgr.url}"
+      		outputproperty="ctx.status"
+      		username="${test.mgr.username}"
+      		password="${test.mgr.password}">
+        </list>
+        <condition property="context.running">
+            <contains string="${ctx.status}" substring="${running}"/>
+        </condition>
+        <condition property="context.stopped">
+            <contains string="${ctx.status}" substring="${stopped}"/>
+        </condition>
+        <condition property="context.notInstalled">
+            <and>
+                <isfalse value="${context.running}"/>
+                <isfalse value="${context.stopped}"/>
+            </and>
+        </condition>
+        <condition property="test.context.deployable">
+            <or>
+                <istrue value="${context.notInstalled}"/>
+                <and>
+                    <istrue value="${context.running}"/>
+                    <istrue value="${test.mgr.update}"/>
+                </and>
+                <and>
+                    <istrue value="${context.stopped}"/>
+                    <istrue value="${test.mgr.update}"/>
+                </and>
+            </or>
+        </condition>
+        <condition property="test.context.undeployable">
+            <or>
+                <istrue value="${context.running}"/>
+                <istrue value="${context.stopped}"/>
+            </or>
+        </condition>
+    </target>
+    
     
     <!-- Generate source code documentation -->
     <target name="doc" description="Generates source code documentation">

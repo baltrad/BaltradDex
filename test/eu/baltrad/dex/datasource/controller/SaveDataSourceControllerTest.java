@@ -112,10 +112,6 @@ public class SaveDataSourceControllerTest {
                 .andReturn(new DataSource(101, "TestDataSource", 
                 "A test data source"));
         
-        
-        
-        
-        
         replayAll();
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         
@@ -159,9 +155,6 @@ public class SaveDataSourceControllerTest {
         String viewName = classUnderTest.processSubmit(dataSource, result, 
                 model, request, null, null, null);
         assertEquals("save_datasource", viewName);
-        
-        System.out.println("______________________ missing radar: " + request.getAttribute(viewName));
-        
     }
     
     @Test 

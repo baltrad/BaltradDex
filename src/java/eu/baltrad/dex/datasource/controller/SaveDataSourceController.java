@@ -49,7 +49,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.validation.BindingResult;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.Validator;
 
 import org.apache.log4j.Logger;
 

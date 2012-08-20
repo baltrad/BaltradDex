@@ -81,12 +81,9 @@
         <security:intercept-url pattern="/remove_radar_status.htm" access="ROLE_ADMIN" />
         
         <security:intercept-url pattern="/save_datasource.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/save_datasource_radar.htm" access="ROLE_ADMIN" /> 
-        <security:intercept-url pattern="/save_datasource_file_object.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/save_datasource_user.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/save_datasource_summary.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/save_datasource_config.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/edit_datasource.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/save_datasource_status" access="ROLE_ADMIN"/>
+        
         <security:intercept-url pattern="/remove_datasource.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/remove_selected_datasource.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/remove_datasource_status.htm" access="ROLE_ADMIN" />
