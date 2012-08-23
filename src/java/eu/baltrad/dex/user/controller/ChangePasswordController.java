@@ -25,6 +25,7 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Password;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.util.MessageDigestUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,8 +73,8 @@ public class ChangePasswordController extends SimpleFormController {
      */
     @Override
     protected Object formBackingObject( HttpServletRequest request ) {
-        user = userManager.get( Integer.parseInt( request.getParameter( USER_ID ) ) );
-        Password passwd = new Password( user.getName() );
+        user = userManager.load(Integer.parseInt(request.getParameter(USER_ID)));
+        Password passwd = new Password(user.getName());
         return passwd;
     }
     /**
@@ -90,8 +91,9 @@ public class ChangePasswordController extends SimpleFormController {
             Object command, BindException errors) {
         Password passwd = ( Password )command;
         try {
-            user.setPassword( passwd.getNewPasswd() );
-            userManager.saveOrUpdate( user );
+            userManager.updatePassword(user.getId(), 
+                    MessageDigestUtil.createHash("MD5", 16, 
+                    passwd.getNewPasswd()));
             String msg = "Password successfully changed for user " + user.getName();
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             log.warn( msg );

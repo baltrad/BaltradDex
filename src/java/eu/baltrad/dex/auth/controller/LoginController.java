@@ -1,4 +1,4 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
 * Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.auth.controller;
 
@@ -90,7 +90,7 @@ public class LoginController {
     @RequestMapping("/home.htm")
     public String welcome(Model model, Principal principal, HttpSession session) 
     {
-        User user = userManager.getByName(principal.getName());
+        User user = userManager.load(principal.getName());
         SecurityManager.setSessionUser(session, user);
         log.info("User " + user.getName() + " logged on");
         return "home";

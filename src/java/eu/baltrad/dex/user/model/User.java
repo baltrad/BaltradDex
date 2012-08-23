@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,11 +17,9 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.user.model;
-
-import eu.baltrad.dex.util.MessageDigestUtil;
 
 /**
  * Class implements user object.
@@ -30,14 +28,14 @@ import eu.baltrad.dex.util.MessageDigestUtil;
  * @version 1.0
  * @since 1.0
  */
-public class User {
-//---------------------------------------------------------------------------------------- Constants
+public class User implements Comparable<User> {
+
     // Role key values
     public final static String ROLE_ADMIN = "admin";
     public final static String ROLE_OPERATOR = "operator";
     public final static String ROLE_PEER = "peer";
     public final static String ROLE_USER = "user";
-//---------------------------------------------------------------------------------------- Variables
+
     private int id;
     private String name;
     private String roleName;
@@ -50,7 +48,7 @@ public class User {
     private String countryCode;
     private String nodeAddress;
     private boolean checked;
-//------------------------------------------------------------------------------------------ Methods
+
     /**
      * Default constructor.
      */
@@ -92,8 +90,9 @@ public class User {
      * @param nodeAddress 
      */
     public User(int id, String name, String roleName, String password,
-            String confirmPassword, String organizationName, String organizationUnit, 
-            String localityName, String stateName, String countryCode, String nodeAddress) {
+            String confirmPassword, String organizationName, 
+            String organizationUnit, String localityName, String stateName, 
+            String countryCode, String nodeAddress) {
         this.id = id;
         this.name = name;
         this.roleName = roleName;
@@ -121,8 +120,9 @@ public class User {
      * @param nodeAddress 
      */
     public User(int id, String name, String roleName, String password, 
-            String organizationName, String organizationUnit, String localityName, String stateName, 
-            String countryCode, String nodeAddress ) {
+            String organizationName, String organizationUnit, 
+            String localityName, String stateName, String countryCode, 
+            String nodeAddress ) {
         this.id = id;
         this.name = name;
         this.roleName = roleName;
@@ -147,8 +147,8 @@ public class User {
      * @param nodeAddress 
      */
     public User(String name, String roleName, String organizationName, 
-            String organizationUnit, String localityName, String stateName, String countryCode, 
-            String nodeAddress ) {
+            String organizationUnit, String localityName, String stateName, 
+            String countryCode, String nodeAddress ) {
         this.name = name;
         this.roleName = roleName;
         this.organizationName = organizationName;
@@ -319,5 +319,13 @@ public class User {
     public void setNodeAddress(String nodeAddress) {
         this.nodeAddress = nodeAddress;
     }
+    
+    /**
+     * Compare objects based on user name.
+     * @param user User object to compare with
+     * @return 0 if objects are equal
+     */
+    public int compareTo(User user) { 
+        return getName().compareTo(user.getName()); 
+    }
 }
-//--------------------------------------------------------------------------------------------------

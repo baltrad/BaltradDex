@@ -209,7 +209,7 @@ public class SaveDataSourceController {
                     if (selectedUsers != null) {
                         for (int i = 0; i < selectedUsers.length; i++) {
                             int userId = (userManager
-                                    .getByName(selectedUsers[i])).getId();
+                                    .load(selectedUsers[i])).getId();
                             dataSourceManager.saveUser(dataSourceId, userId);
                         }
                     }
@@ -352,14 +352,14 @@ public class SaveDataSourceController {
             List<User> selectedUsers = dataSourceManager
                     .loadUser(Integer.parseInt(dsId));
             List<User> allButSelectedUsers = new ArrayList<User>();
-            for (User user : userManager.get()) {
+            for (User user : userManager.load()) {
                 if (!containsUser(selectedUsers, user)) {
                     allButSelectedUsers.add(user);
                 }
             }
             return allButSelectedUsers;
         } else {
-            return userManager.get();
+            return userManager.load();
         }
     }
     

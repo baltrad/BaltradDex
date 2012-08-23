@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,292 +17,227 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.user.model;
 
-import eu.baltrad.dex.util.JDBCConnectionManager;
-import eu.baltrad.dex.log.model.MessageLogger;
+import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 
-import eu.baltrad.dex.util.MessageDigestUtil;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
-import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
- * User manager class implementing user object handling functionality.
+ * User manager.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.0
- * @since 1.0
+ * @version 1.2.1
+ * @since 1.2.1
  */
 public class UserManager implements IUserManager {
-//---------------------------------------------------------------------------------------- Variables
-    /** Reference to JDBCConnector class object */
-    private JDBCConnectionManager jdbcConnectionManager;
-    /** Logger */
-    private Logger log;
-    private static Logger logger = LogManager.getLogger(UserManager.class);
+
+    /** JDBC template */
+    private SimpleJdbcOperations jdbcTemplate;
+    /** Row mappers */
+    private UserMapper userMapper;
+    private RoleMapper roleMapper;
     
-//------------------------------------------------------------------------------------------ Methods
     /**
-     * Constructor gets reference to JDBCConnectionManager instance.
+     * Constructor.
      */
     public UserManager() {
-        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.userMapper = new UserMapper();
+        this.roleMapper = new RoleMapper();
     }
+    
     /**
-     * Gets all users.
-     *
-     * @return List of all registered users
+     * @param jdbcTemplate the jdbcTemplate to set
      */
-    public List<User> get() {
-        Connection conn = null;
-        List<User> users = new ArrayList<User>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_users;";
-            ResultSet resultSet = stmt.executeQuery(sql);
-            while (resultSet.next()) {
-                int userId = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-                String role = resultSet.getString("role_name");
-                String passwd = resultSet.getString("password");
-                String orgName = resultSet.getString("org_name");
-                String orgUnit = resultSet.getString("org_unit");
-                String locality = resultSet.getString("locality");
-                String state = resultSet.getString("state");
-                String countryCode = resultSet.getString("country_code");
-                String nodeAddress = resultSet.getString("node_address");
-                User user = new User(userId, name, role, passwd, orgName, orgUnit, 
-                        locality, state, countryCode, nodeAddress);
-                users.add(user);
-            }
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to select users", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return users;
+    @Autowired
+    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
+    
     /**
-     * Gets user with a given ID.
-     *
-     * @param id User ID
-     * @return User with a given ID
+     * Load all users.
+     * @return List of all existing users.
      */
-    public User get(int id) {
-        Connection conn = null;
-        User user = null;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_users WHERE id = " + id + ";";
-            ResultSet resultSet = stmt.executeQuery(sql);
-            while (resultSet.next()) {
-                int userId = resultSet.getInt("id");
-                String name = resultSet.getString("name");
-                String role = resultSet.getString("role_name");
-                String passwd = resultSet.getString("password");
-                String orgName = resultSet.getString("org_name");
-                String orgUnit = resultSet.getString("org_unit");
-                String locality = resultSet.getString("locality");
-                String state = resultSet.getString("state");
-                String countryCode = resultSet.getString("country_code");
-                String nodeAddress = resultSet.getString("node_address");
-                user = new User(userId, name, role, passwd, orgName, orgUnit, locality, 
-                        state, countryCode, nodeAddress);
-            }
-            stmt.close();
-        } catch(Exception e) {
-            log.error( "Failed to select user", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return user;
+    public List<User> load() {
+        String sql = "SELECT * FROM dex_users";
+	List<User> users = jdbcTemplate.query(sql, userMapper);
+	return users;
     }
+    
     /**
-     * Gets user with a given name.
-     *
+     * Load user by id.
+     * @param id User id
+     * @return User with a given id.
+     */
+    public User load(int id) {
+        String sql = "SELECT * FROM dex_users WHERE id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, userMapper, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Load user by name.
      * @param name User name
      * @return User with a given name
      */
-    public User getByName(String name) {
-        Connection conn = null;
-        User user = null;
+    public User load(String name) {
+        String sql = "SELECT * FROM dex_users WHERE name = ?";
         try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_users WHERE name = '" + name + "';";
-            ResultSet resultSet = stmt.executeQuery(sql);
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String userName = resultSet.getString("name");
-                String role = resultSet.getString("role_name");
-                String passwd = resultSet.getString("password");
-                String orgName = resultSet.getString("org_name");
-                String orgUnit = resultSet.getString("org_unit");
-                String locality = resultSet.getString("locality");
-                String state = resultSet.getString("state");
-                String countryCode = resultSet.getString("country_code");
-                String nodeAddress = resultSet.getString("node_address");
-                user = new User(id, userName, role, passwd, orgName, orgUnit, locality, 
-                        state, countryCode, nodeAddress);
-            }
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to select user", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
+            return jdbcTemplate.queryForObject(sql, userMapper, name);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
-        return user;
     }
+    
     /**
-     * Gets all roles.
-     *
-     * @return List of all roles defined in the system
+     * Load all roles.
+     * @return All existing roles
      */
-    public List<Role> getRoles() {
-        Connection conn = null;
-        List<Role> roles = new ArrayList<Role>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery("SELECT * FROM dex_roles");
-            while (resultSet.next()) {
-                int roleId = resultSet.getInt("id");
-                String roleName = resultSet.getString("role");
-                Role role = new Role(roleId, roleName);
-                // Peer accounts can't be established by administrator
-                if (!role.getRole().matches("peer")) {
-                    roles.add(role);
-                }
-            }
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to select user role", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return roles;
+    public List<Role> loadRoles() {
+        String sql = "SELECT * FROM dex_roles";
+	List<Role> roles = jdbcTemplate.query(sql, roleMapper);
+	return roles;
     }
+    
     /**
-     * Saves or updates user account.
-     *
-     * @param user User account
-     * @return Number of saved or updated records
-     * @throws Exception
+     * Store user object in the db.
+     * @param user User to store
+     * @return Number of records stored
      */
-    public int saveOrUpdate(User user) throws Exception {
-        Connection conn = null;
-        int update = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "";
-            // record does not exists, do insert
-            if (user.getId() == 0) {
-                sql = "INSERT INTO dex_users (name, role_name, password, org_name, " +
-                    "org_unit, locality, state, country_code, node_address) VALUES ('" +
-                    user.getName() + "', '" + user.getRoleName() + "', '" + 
-                    MessageDigestUtil.createHash("MD5", 16, user.getPassword()) + "', '" + 
-                    user.getOrganizationName() + "', '" + user.getOrganizationUnit() + "', '" + 
-                    user.getLocalityName() + "', '" + user.getStateName() + "', '" + 
-                    user.getCountryCode() + "', '" + user.getNodeAddress() + "');";
-                update = stmt.executeUpdate(sql);
-            } else {
-                // record exists, do update
-                sql = "UPDATE dex_users SET name = '" + user.getName() + 
-                    "', role_name = '" + user.getRoleName() + "', " 
-                    + "password = '" + MessageDigestUtil.createHash("MD5", 16, user.getPassword()) + 
-                    "', org_name = '" + user.getOrganizationName() + "', org_unit = '" + 
-                    user.getOrganizationUnit() + "', locality = '" + user.getLocalityName() + 
-                    "', state = '" + user.getStateName() + "', country_code = '" + 
-                    user.getCountryCode() + "', node_address = '" + user.getNodeAddress() + 
-                    "' WHERE id = " + user.getId() + ";";
-                update = stmt.executeUpdate(sql) ;
-                stmt.close();
-            }
-        } catch(Exception e) {
-            log.error("Failed to save user account", e);
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return update;
+    public int store(User user) {
+        return jdbcTemplate.update("INSERT INTO dex_users (id, name, role_name,"
+                + " password, org_name, org_unit, locality, state, " +
+                "country_code, node_address) VALUES (?,?,?,?,?,?,?,?,?,?)",
+            user.getId(),
+            user.getName(),
+            user.getRoleName(),
+            user.getPassword(),
+            user.getOrganizationName(),
+            user.getOrganizationUnit(),
+            user.getLocalityName(),
+            user.getStateName(),
+            user.getCountryCode(),
+            user.getNodeAddress());
     }
+    
     /**
-     * Saves or updates user account.
-     *
-     * @param user User account
-     * @return Number of saved or updated records
-     * @throws Exception
+     * Store user object in the db.
+     * @param user User to store
+     * @return Number of records stored
      */
-    public int saveOrUpdatePeer(User user) throws Exception {
-        Connection conn = null;
-        int update = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "";
-            // record does not exists, do insert
-            if (user.getId() == 0) {
-              logger.debug("Atempting to create peer user: " + user.getName() + ", address: " + user.getNodeAddress());
-                sql = "INSERT INTO dex_users (name, role_name, node_address) VALUES ('" +
-                    user.getName() + "', '" + user.getRoleName() + "', '" + user.getNodeAddress() + 
-                    "');";
-                update = stmt.executeUpdate(sql);
-            } else {
-                // record exists, do update
-              logger.debug("Updating peer user: " + user.getName() + ", address: " + user.getNodeAddress());
-              sql = "UPDATE dex_users SET name = '" + user.getName() + "', role_name = '" + 
-                    user.getRoleName() + "', node_address = '" + user.getNodeAddress() + 
-                    "' WHERE id = " + user.getId() + ";";
-                update = stmt.executeUpdate(sql) ;
-                stmt.close();
-            }
-        } catch(Exception e) {
-            log.error("Failed to save user account", e);
-            logger.debug("Failed to save user account", e);
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return update;
+    public int storeNoId(User user) {
+        return jdbcTemplate.update("INSERT INTO dex_users (name, role_name,"
+                + " password, org_name, org_unit, locality, state, " +
+                "country_code, node_address) VALUES (?,?,?,?,?,?,?,?,?)",
+            user.getName(),
+            user.getRoleName(),
+            user.getPassword(),
+            user.getOrganizationName(),
+            user.getOrganizationUnit(),
+            user.getLocalityName(),
+            user.getStateName(),
+            user.getCountryCode(),
+            user.getNodeAddress());
     }
+    
     /**
-     * Deletes user account with a given ID.
-     *
-     * @param id User account ID
-     * @return Number of deleted records
-     * @throws Exception
+     * Update user object in the db. 
+     * @param user User to store
+     * @return Number of records updated 
      */
-    public int deleteUser(int id) throws Exception {
-        Connection conn = null;
-        int delete = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DELETE FROM dex_users WHERE id = " + id + ";";
-            delete = stmt.executeUpdate(sql);
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to delete user account", e);
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return delete;
+    public int update(User user) { 
+        return jdbcTemplate.update("UPDATE dex_users SET name = ?, " + 
+                "role_name = ?, org_name = ?, org_unit = ?, locality = ?,"
+                + "state = ?, country_code = ?, node_address = ? WHERE id = ?",
+            user.getName(),
+            user.getRoleName(),
+            user.getOrganizationName(),
+            user.getOrganizationUnit(),
+            user.getLocalityName(),
+            user.getStateName(),
+            user.getCountryCode(),
+            user.getNodeAddress(),
+            user.getId());
+    }           
+    
+    /**
+     * Update user's password.
+     * @param id User id
+     * @param password Password to set
+     * @return Number of records updated.
+     */
+    public int updatePassword(int id, String password) {
+        return jdbcTemplate.update("UPDATE dex_users SET password = ? "
+                + "WHERE id = ?", password, id);
     }
+    
+    /**
+     * Delete user with a given id.
+     * @param id User id
+     * @return Number of deleted records.
+     */
+    public int delete(int id) {
+         return jdbcTemplate.update("DELETE FROM dex_users WHERE id = ?", id);
+    }
+    
+    /**
+     * User row mapper.
+     */
+    private static final class UserMapper
+                                implements ParameterizedRowMapper<User> {
+        /**
+         * Maps records to result set. 
+         * @param rs Result set 
+         * @param rowNum Row number
+         * @return User object
+         * @throws SQLException 
+         */
+        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+            User user = new User();
+            user.setId(rs.getInt("id"));
+            user.setName(rs.getString("name"));
+            user.setRoleName(rs.getString("role_name"));
+            user.setPassword(rs.getString("password"));
+            user.setOrganizationName(rs.getString("org_name"));
+            user.setOrganizationUnit(rs.getString("org_unit"));
+            user.setLocalityName(rs.getString("locality"));
+            user.setStateName(rs.getString("state"));
+            user.setCountryCode(rs.getString("country_code"));
+            user.setNodeAddress(rs.getString("node_address"));
+            return user;
+        }
+    }
+    
+    /**
+     * Role row mapper.
+     */
+    private final static class RoleMapper
+                                implements ParameterizedRowMapper<Role> {
+        /**
+         * Maps records to result set. 
+         * @param rs Result set 
+         * @param rowNum Row number
+         * @return User object
+         * @throws SQLException 
+         */
+        public Role mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Role role = new Role();
+            role.setId(rs.getInt("id"));
+            role.setRole(rs.getString("role"));
+            return role;
+        }
+    }
+    
 }
-//--------------------------------------------------------------------------------------------------
+

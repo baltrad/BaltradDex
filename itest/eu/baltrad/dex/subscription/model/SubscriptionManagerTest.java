@@ -28,7 +28,6 @@ import eu.baltrad.dex.db.itest.DexDBITestHelper;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 
-import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.dataset.ITable;
 import org.dbunit.Assertion;
 
@@ -52,7 +51,6 @@ public class SubscriptionManagerTest extends TestCase {
     private SubscriptionManager classUnderTest;
     private AbstractApplicationContext context;
     private DexDBITestHelper helper;
-    private FlatXmlDataSet dataSet;
     
     @Override
     public void setUp() throws Exception {

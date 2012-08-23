@@ -1,4 +1,4 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
 * Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.util;
 
@@ -33,17 +33,17 @@ import javax.servlet.ServletContextListener;
  * @since 0.1.0
  */
 public class ServletContextUtil implements ServletContextListener {
-//---------------------------------------------------------------------------------------- Constants
+    
     private static final String SERVLET_VIRTUAL_PATH = "/";
-//---------------------------------------------------------------------------------------- Variables
+    
     private static ServletContext servletContext;
-//------------------------------------------------------------------------------------------ Methods
+    
     /**
      * Method sets servlet context.
      *
      * @param contextEvent Servlet context event
      */
-    public void contextInitialized( ServletContextEvent contextEvent ) {
+    public void contextInitialized(ServletContextEvent contextEvent) {
         servletContext = contextEvent.getServletContext();
     }
     /**
@@ -51,7 +51,7 @@ public class ServletContextUtil implements ServletContextListener {
      *
      * @param contextEvent Servlet context event
      */
-    public void contextDestroyed( ServletContextEvent contextEvent ) {
+    public void contextDestroyed(ServletContextEvent contextEvent) {
         servletContext = contextEvent.getServletContext();
     }
     /**
@@ -60,7 +60,6 @@ public class ServletContextUtil implements ServletContextListener {
      * @return Real servlet context path
      */
     public static String getServletContextPath() {
-        return servletContext.getRealPath( SERVLET_VIRTUAL_PATH );
+        return servletContext.getRealPath(SERVLET_VIRTUAL_PATH);
     }
 }
-//--------------------------------------------------------------------------------------------------

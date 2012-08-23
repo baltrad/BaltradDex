@@ -120,12 +120,17 @@ public class DataSourceListServlet extends HttpServlet {
                     req.getNodeName())) {
                 // TODO User account will be created when 
                 // keys are exchanged
-                User user = userManager.getByName(req.getNodeName());
+                User user = userManager.load(req.getNodeName());
                 if (user == null) {
                     user = new User(req.getNodeName(), 
-                        User.ROLE_PEER, req.getNodeAddress());       
-                    userManager.saveOrUpdatePeer(user);
-                    log.warn("New peer account created: " + user.getName());
+                        User.ROLE_PEER, req.getNodeAddress());
+                    if (user.getId() > 0) {
+                        userManager.update(user);
+                        log.warn("Peer account updated: " + user.getName());
+                    } else {
+                        userManager.store(user);
+                        log.warn("New peer account created: " + user.getName());
+                    }
                 }
                 // Get data sources available for the user
                 List<DataSource> userDataSources = dataSourceManager

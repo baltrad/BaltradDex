@@ -164,7 +164,7 @@ public class PostFileServlet extends HttpServlet {
                                 .getFilter(s.getDataSourceName());                        
                         boolean match = matcher.match(entry.getMetadata(), 
                                 filter.getExpression());
-                        User receiver = userManager.getByName(s.getUserName());
+                        User receiver = userManager.load(s.getUserName());
                         if (match && !registryManager.entryExists(
                                 receiver.getId(), uuid.toString())) {
                             RequestFactory requestFactory = 

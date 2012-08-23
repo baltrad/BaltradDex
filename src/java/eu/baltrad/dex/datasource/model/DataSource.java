@@ -22,7 +22,6 @@
 package eu.baltrad.dex.datasource.model;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Class implements data source object.
@@ -32,14 +31,14 @@ import java.util.List;
  * @since 0.6.4
  */
 public class DataSource implements Serializable, Comparable<DataSource> {
-//---------------------------------------------------------------------------------------- Variables
+
     /** Data source ID */
     private int id;
     /** Data source name */
     private String name;
     /** Description */
     private String description;
-//------------------------------------------------------------------------------------------ Methods
+
     /**
      * Default constructor.
      */
@@ -127,7 +126,9 @@ public class DataSource implements Serializable, Comparable<DataSource> {
      *
      * @param description Data source description to set
      */
-    public void setDescription( String description ) { this.description = description; }
+    public void setDescription( String description ) { 
+        this.description = description; 
+    }
     /**
      * Implements comparable interface. Allows to sort data source objects based 
      * on data source name.
@@ -135,6 +136,8 @@ public class DataSource implements Serializable, Comparable<DataSource> {
      * @param ds DataSource
      * @return 0 if objects are equal
      */
-    public int compareTo( DataSource ds ) { return getName().compareTo( ds.getName() ); }
+    public int compareTo( DataSource ds ) { 
+        return getName().compareTo( ds.getName() ); 
+    }
 }
 //--------------------------------------------------------------------------------------------------

@@ -138,9 +138,9 @@ public class DataSourceListServletTest {
         setAttributes(request);
         replay(authMock);
         IUserManager userManagerMock = createMock(IUserManager.class);
-        expect(userManagerMock.getByName("test.baltrad.eu")).andReturn(null)
+        expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
                 .anyTimes();
-        expect(userManagerMock.saveOrUpdatePeer(isA(User.class)))
+        expect(userManagerMock.store(isA(User.class)))
                 .andThrow(new Exception("Internal server error")).anyTimes();
         replay(userManagerMock);
         
@@ -169,9 +169,9 @@ public class DataSourceListServletTest {
         replay(authMock);
         
         IUserManager userManagerMock = createMock(IUserManager.class);
-        expect(userManagerMock.getByName("test.baltrad.eu")).andReturn(null)
+        expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
                 .anyTimes();
-        expect(userManagerMock.saveOrUpdatePeer(isA(User.class)))
+        expect(userManagerMock.store(isA(User.class)))
                 .andReturn(1).anyTimes();
         replay(userManagerMock);
         

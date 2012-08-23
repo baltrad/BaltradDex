@@ -328,7 +328,7 @@ public class PostFileServletTest {
                 (IUserManager) createMock(IUserManager.class);
         User user = new User(1, "user", "user", "passwd", "passwd", "org", 
                 "locality", "state", "PL", "http://test.baltrad.eu");
-        expect(userManagerMock.getByName(isA(String.class)))
+        expect(userManagerMock.load(isA(String.class)))
                 .andReturn(user).anyTimes();
         
         IDeliveryRegistryManager deliveryRegistryManagerMock =

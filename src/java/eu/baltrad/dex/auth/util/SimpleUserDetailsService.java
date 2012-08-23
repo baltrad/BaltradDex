@@ -23,6 +23,7 @@ package eu.baltrad.dex.auth.util;
 
 import eu.baltrad.dex.user.model.UserManager;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.GrantedAuthority;
 import org.springframework.security.GrantedAuthorityImpl;
 import org.springframework.security.userdetails.User;
@@ -35,12 +36,14 @@ import org.springframework.security.userdetails.UserDetails;
  * @version 1.1.0
  * @since 1.1.0
  */
-public class SimpleUserDetailsService implements UserDetailsService {
+public class SimpleUserDetailsService implements UserDetailsService  {
     
     /** Authorities */
     private GrantedAuthority authAdmin;
     private GrantedAuthority authOperator;
     private GrantedAuthority authUser;
+    /** User manager */
+    private UserManager userManager;
     
     /**
      * Constructor.
@@ -57,8 +60,7 @@ public class SimpleUserDetailsService implements UserDetailsService {
      * @return User details 
      */
     public UserDetails loadUserByUsername(String name) {
-        UserManager manager = new UserManager();
-        eu.baltrad.dex.user.model.User dbUser = manager.getByName(name);
+        eu.baltrad.dex.user.model.User dbUser = userManager.load(name);
         if (dbUser == null) {
             return null;
         } else {
@@ -77,5 +79,14 @@ public class SimpleUserDetailsService implements UserDetailsService {
                     true, authorities);
             return user;
         }
-    } 
+    }
+
+    /**
+     * @param userManager the userManager to set
+     */
+    @Autowired
+    public void setUserManager(UserManager userManager) {
+        this.userManager = userManager;
+    }
+   
 }

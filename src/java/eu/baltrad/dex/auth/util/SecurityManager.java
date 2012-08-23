@@ -18,6 +18,7 @@
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
 ***************************************************************************************************/
+
 package eu.baltrad.dex.auth.util;
 
 import eu.baltrad.dex.user.model.User;
@@ -25,7 +26,7 @@ import eu.baltrad.dex.user.model.User;
 import javax.servlet.http.HttpSession;
 
 /**
- * Implements session management functionality and user authentication control.
+ * Implements session management functionality.
  *
  * @author Maciej Szewczykowski :: maciej@baltrad.eu
  * @version 1.1.1

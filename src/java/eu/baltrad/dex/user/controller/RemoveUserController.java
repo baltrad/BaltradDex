@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.apache.log4j.Logger;
 
@@ -80,7 +81,7 @@ public class RemoveUserController extends MultiActionController {
      * @return Model and view containing list of all user accounts registered in the system
      */
     public ModelAndView remove_user_account( HttpServletRequest request, HttpServletResponse response ) {
-        List<User> allUsers = userManager.get();
+        List<User> allUsers = userManager.load();
         removeUsers.clear();
         for (int i = 0; i < allUsers.size(); i++) {
             if (!allUsers.get(i).getRoleName().equals(User.ROLE_ADMIN)) {
@@ -94,6 +95,7 @@ public class RemoveUserController extends MultiActionController {
                 users.remove( i );
             }
         }*/
+        Collections.sort(removeUsers);
         return new ModelAndView( REMOVE_ACCOUNT_VIEW, REMOVE_ACCOUNT_KEY, removeUsers );
     }
     /**
@@ -110,9 +112,10 @@ public class RemoveUserController extends MultiActionController {
         if( userIds != null ) {
             List< User > users = new ArrayList< User >();
             for( int i = 0; i < userIds.length; i++ ) {
-                users.add( userManager.get( Integer.parseInt( userIds[ i ] ) ) );
+                users.add( userManager.load(Integer.parseInt(userIds[i])));
             }
-            modelAndView = new ModelAndView( ACCOUNT_TO_REMOVE_VIEW, ACCOUNT_TO_REMOVE_KEY, users );
+            modelAndView = new ModelAndView(ACCOUNT_TO_REMOVE_VIEW, 
+                    ACCOUNT_TO_REMOVE_KEY, users);
         } else {
             
             /*List users = userManager.get();
@@ -123,6 +126,7 @@ public class RemoveUserController extends MultiActionController {
                     users.remove( i );
                 }
             }*/
+            Collections.sort(removeUsers);
             modelAndView = new ModelAndView(REMOVE_ACCOUNT_VIEW, REMOVE_ACCOUNT_KEY, removeUsers);
         }
         return modelAndView;
@@ -139,8 +143,8 @@ public class RemoveUserController extends MultiActionController {
         String[] userIds = request.getParameterValues( REMOVED_USERS_KEY );
         try {
             for (int i = 0; i < userIds.length; i++) {
-                User user = userManager.get(Integer.parseInt(userIds[i]));
-                userManager.deleteUser(Integer.parseInt(userIds[i]));
+                User user = userManager.load(Integer.parseInt(userIds[i]));
+                userManager.delete(Integer.parseInt(userIds[i]));
                 log.warn("User account" + user.getName() + " successfully removed");
             }
             String msg = "User account(s) successfully removed.";

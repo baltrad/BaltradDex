@@ -10,26 +10,21 @@
              scope="session"
              class="eu.baltrad.dex.auth.util.SecurityManager">
 </jsp:useBean>
-<jsp:useBean id="userManager"
-             scope="session"
-             class="eu.baltrad.dex.user.model.UserManager">
-</jsp:useBean>
 
 <%
-    Logger log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    Logger log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     User sessionUser = (User) securityManager.getSessionUser(session);
-    User dbUser = userManager.getByName( sessionUser.getName() );
-    if( dbUser.getRoleName().equals( User.ROLE_ADMIN ) ) {
-        request.getSession().setAttribute( "userRole", 0 );
+    if (sessionUser.getRoleName().equals(User.ROLE_ADMIN)) {
+        request.getSession().setAttribute("userRole", 0);
     }
-    if( dbUser.getRoleName().equals( User.ROLE_OPERATOR ) ) {
-        request.getSession().setAttribute( "userRole", 1 );
+    if (sessionUser.getRoleName().equals(User.ROLE_OPERATOR)) {
+        request.getSession().setAttribute("userRole", 1);
     }
-    if( dbUser.getRoleName().equals( User.ROLE_PEER ) ) {
-        request.getSession().setAttribute( "userRole", 2 );
+    if (sessionUser.getRoleName().equals(User.ROLE_PEER)) {
+        request.getSession().setAttribute("userRole", 2);
     }
-    if( dbUser.getRoleName().equals( User.ROLE_USER ) ) {
-        request.getSession().setAttribute( "userRole", 3 );
+    if (sessionUser.getRoleName().equals(User.ROLE_USER)) {
+        request.getSession().setAttribute("userRole", 3);
     }    
 %>
 

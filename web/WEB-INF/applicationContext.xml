@@ -125,6 +125,34 @@
     </security:authentication-provider>
     
     <beans:bean id="simpleUserDetailsService" 
-                class="eu.baltrad.dex.auth.util.SimpleUserDetailsService"/>        
+                class="eu.baltrad.dex.auth.util.SimpleUserDetailsService"
+                autowire="byType">          
+    </beans:bean>
+    
+    <beans:bean id="userManager" class="eu.baltrad.dex.user.model.UserManager"
+                autowire="byType">          
+    </beans:bean>
+    
+    <beans:bean id="jdbcTemplate" 
+          class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+        <beans:constructor-arg ref="dataSource"/>
+    </beans:bean>
+    
+    <beans:bean id="dataSource" destroy-method="close" 
+          class="org.apache.commons.dbcp.BasicDataSource">
+        <beans:property name="driverClassName" value="${db.driver}"/>
+        <beans:property name="url" value="${db.url}"/>
+        <beans:property name="username" value="${db.user}"/>
+        <beans:property name="password" value="${db.pwd}"/>
+    </beans:bean>
+    
+    <beans:bean id="propertyConfigurer" 
+                class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <beans:property name="locations">
+            <beans:list>
+                <beans:value>db.properties</beans:value>
+            </beans:list>
+        </beans:property>
+    </beans:bean>
             
 </beans:beans>

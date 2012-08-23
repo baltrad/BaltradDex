@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.user.controller;
 
@@ -32,6 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * Controller class registers new user in the system.
@@ -41,12 +42,12 @@ import java.util.List;
  * @since 1.0
  */
 public class EditUserController implements Controller {
-//---------------------------------------------------------------------------------------- Constants
+
     private static final String MODEL_KEY = "registered_users";
-//---------------------------------------------------------------------------------------- Variables
+
     private String successView;
     private UserManager userManager;
-//------------------------------------------------------------------------------------------ Methods
+
     /**
      * Creates list of registered users.
      * 
@@ -56,9 +57,10 @@ public class EditUserController implements Controller {
      * @throws ServletException
      * @throws IOException
      */
-    public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
-            throws ServletException, IOException {
-         List users = userManager.get();
+    public ModelAndView handleRequest( HttpServletRequest request, 
+           HttpServletResponse response ) throws ServletException, IOException {
+         List users = userManager.load();
+         Collections.sort(users);
          return new ModelAndView( getSuccessView(), MODEL_KEY, users );
     }
     /**
@@ -72,7 +74,9 @@ public class EditUserController implements Controller {
      *
      * @param successView Reference to success view name string
      */
-    public void setSuccessView( String successView ) { this.successView = successView; }
+    public void setSuccessView( String successView ) { 
+        this.successView = successView; 
+    }
     /**
      * Method gets reference to user manager object.
      *
@@ -84,6 +88,8 @@ public class EditUserController implements Controller {
      *
      * @param userManager Reference to user manager object
      */
-    public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
+    public void setUserManager( UserManager userManager ) { 
+        this.userManager = userManager; 
+    }
 }
-//--------------------------------------------------------------------------------------------------
+

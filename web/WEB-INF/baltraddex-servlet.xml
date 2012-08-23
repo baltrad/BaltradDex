@@ -328,10 +328,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
     </bean>
 
-    <!--
-        User manager.
-    -->
-    <bean name="userManager" class="eu.baltrad.dex.user.model.UserManager"/>
+    <!-- User manager -->
+    <bean id="userManager" class="eu.baltrad.dex.user.model.UserManager"
+          autowire="byType"/>      
 
     <!--
         Delivery register manager
@@ -800,14 +799,16 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         </property>
     </bean>
 
-    <bean id="dataSource" destroy-method="close" class="org.apache.commons.dbcp.BasicDataSource">
+    <bean id="dataSource" destroy-method="close" 
+          class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName" value="${db.driver}"/>
         <property name="url" value="${db.url}"/>
         <property name="username" value="${db.user}"/>
         <property name="password" value="${db.pwd}"/>
     </bean>
 
-    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+    <bean id="jdbcTemplate" 
+          class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
         <constructor-arg ref="dataSource"/>
     </bean>
  

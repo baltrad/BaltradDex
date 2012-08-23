@@ -199,12 +199,17 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 log.info(Frame.getNodeName(parms) + " requested data source listing");
                 // create user account
                 User user = null;
-                if ((user = userManager.getByName(Frame.getNodeName(parms))) == null) {
+                if ((user = userManager.load(Frame.getNodeName(parms))) == null) {
                     // Create user with just a name and address 
                     user = new User(Frame.getNodeName(parms), User.ROLE_PEER,
                             Frame.getLocalUri(parms));
-                    userManager.saveOrUpdatePeer(user);
-                    log.warn("New peer account created: " + user.getName());
+                    if (user.getId() > 0) {
+                        userManager.update(user);
+                        log.warn("Peer account updated: " + user.getName());
+                    } else {
+                        userManager.store(user);
+                        log.warn("New peer account created: " + user.getName());
+                    }
                 }
                 // Set node name as response header
                 addHeader(response, HDR_NODE_NAME, InitAppUtil.getConf().getNodeName());
@@ -263,7 +268,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     for (int i = 0; i < subRequest.size(); i++) {
                         DataSource dsRequest = subRequest.get(i);
                         DataSource dsLocal = dataSourceManager.load(dsRequest.getName());
-                        User user = userManager.getByName(Frame.getNodeName(parms));
+                        User user = userManager.load(Frame.getNodeName(parms));
                         // make sure user hasn't already subscribed the selected data sources
                         if (subscriptionManager.load(user.getName(), dsLocal.getName(),
                                 Subscription.SUBSCRIPTION_UPLOAD) != null) {
@@ -285,7 +290,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 }
                 // Send subscription confirmation                
                 response.setStatus(HttpServletResponse.SC_OK);
-                User user = userManager.getByName(Frame.getNodeName(parms));
+                User user = userManager.load(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(), 
                     InitAppUtil.getConf().getNodeName(), timestamp);
@@ -334,7 +339,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 }
                 // Send response
                 response.setStatus(HttpServletResponse.SC_OK);
-                User user = userManager.getByName(Frame.getNodeName(parms));
+                User user = userManager.load(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(),    
                     InitAppUtil.getConf().getNodeName(), timestamp); 
@@ -418,7 +423,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 }
                 // Send response
                 response.setStatus(HttpServletResponse.SC_OK);
-                User user = userManager.getByName(Frame.getNodeName(parms));
+                User user = userManager.load(Frame.getNodeName(parms));
                 long timestamp = System.currentTimeMillis();
                 String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(),    
                     InitAppUtil.getConf().getNodeName(), timestamp); 
@@ -476,7 +481,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             filter.getExpression());
                     // Make sure that user exists locally
 
-                    User receiver = userManager.getByName(sub.getUserName());
+                    User receiver = userManager.load(sub.getUserName());
                     DeliveryRegisterEntry dre = deliveryRegisterManager.getEntry(
                             receiver.getId(), fileEntry.getUuid().toString());
                     if (matches && dre == null) {

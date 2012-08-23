@@ -29,6 +29,8 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.util.WebValidator;
 
+import java.util.List;
+
 /**
  * Validator class used to validate input from add user form.
  *
