@@ -46,6 +46,7 @@ import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
@@ -68,6 +69,7 @@ public class DataSourceListServletTest {
     
     private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
     
+    private List<Object> mocks;
     private DateFormat format;
     private DSLServlet classUnderTest;
     private MessageResourceUtil messages;
@@ -83,9 +85,33 @@ public class DataSourceListServletTest {
         public void initConfiguration() {}
     }
     
+    private Object createMock(Class clazz) {
+        Object mock = EasyMock.createMock(clazz);
+        mocks.add(mock);
+        return mock;
+    }
+    
+    private void replayAll() {
+        for (Object mock : mocks) {
+            replay(mock);
+        }
+    }
+    
+    private void verifyAll() {
+        for (Object mock : mocks) {
+            verify(mock);
+        }
+    }
+    
+    private void resetAll() {
+        for (Object mock : mocks) {
+            reset(mock);
+        }
+    }
     
     @Before
     public void setUp() throws Exception {
+        mocks = new ArrayList<Object>();
         classUnderTest = new DSLServlet();
         classUnderTest.setLog(MessageLogger.getLogger(MessageLogger.SYS_DEX));
         messages = new MessageResourceUtil("resources/messages");
@@ -113,78 +139,47 @@ public class DataSourceListServletTest {
     
     @Test
     public void handleRequest_Unauthorized() throws Exception {
-        Authenticator authMock = createMock(Authenticator.class);
+        Authenticator authMock = (Authenticator) createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.FALSE).anyTimes();
         setAttributes(request);
-        replay(authMock);
+        replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.handleRequest(request, response);
         
-        verify(authMock);
+        verifyAll();
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
         assertEquals(
                 messages.getMessage("datasource.server.unauthorized_request"), 
                 response.getErrorMessage());
-        reset(authMock);
+        resetAll();
     }
     
     @Test 
     public void handleRequest_InternalServerError() throws Exception {
-        Authenticator authMock = createMock(Authenticator.class);
+        Authenticator authMock = 
+                (Authenticator) createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
         setAttributes(request);
-        replay(authMock);
-        IUserManager userManagerMock = createMock(IUserManager.class);
-        expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
-                .anyTimes();
-        expect(userManagerMock.store(isA(User.class)))
-                .andThrow(new Exception("Internal server error")).anyTimes();
-        replay(userManagerMock);
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setUserManager(userManagerMock);
-        classUnderTest.handleRequest(request, response);
-        
-        verify(authMock);
-        verify(userManagerMock);
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-                response.getStatus());
-        assertEquals(
-                messages.getMessage("datasource.server.internal_server_error",
-                    new String[] {"Internal server error"}), 
-                response.getErrorMessage());
-        reset(authMock);
-        reset(userManagerMock);
-    }
-    
-    @Test 
-    public void handleRequest_OK() throws Exception {
-        Authenticator authMock = createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-        setAttributes(request);
-        replay(authMock);
-        
-        IUserManager userManagerMock = createMock(IUserManager.class);
+        IUserManager userManagerMock = 
+                (IUserManager) createMock(IUserManager.class);
         expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
                 .anyTimes();
         expect(userManagerMock.store(isA(User.class)))
                 .andReturn(1).anyTimes();
-        replay(userManagerMock);
-        
-        IJsonUtil jsonUtilMock = createMock(IJsonUtil.class);
+        IJsonUtil jsonUtilMock = 
+                (IJsonUtil) createMock(IJsonUtil.class);
         expect(jsonUtilMock.dataSourcesToJson(isA(HashSet.class)))
-                .andReturn(JSON_SOURCES).anyTimes();
-        replay(jsonUtilMock);
-        
-        IDataSourceManager dataSourceManagerMock = createMock(
-                IDataSourceManager.class);
+                .andThrow(new RuntimeException("Internal server error"))
+                .anyTimes();
+        IDataSourceManager dataSourceManagerMock = 
+                (IDataSourceManager) createMock(IDataSourceManager.class);
         expect(dataSourceManagerMock.loadByUser(0))
                 .andReturn(new ArrayList<DataSource>()).anyTimes();
-        replay(dataSourceManagerMock);
+        
+        replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setUserManager(userManagerMock);
@@ -192,10 +187,52 @@ public class DataSourceListServletTest {
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         classUnderTest.handleRequest(request, response);
         
-        verify(authMock);
-        verify(userManagerMock);
-        verify(jsonUtilMock);
-        verify(dataSourceManagerMock);
+        verifyAll();
+        
+        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+                response.getStatus());
+        assertEquals(
+                messages.getMessage("datasource.server.internal_server_error",
+                    new String[] {"Internal server error"}), 
+                response.getErrorMessage());
+        
+        resetAll();
+    }
+    
+    @Test 
+    public void handleRequest_OK() throws Exception {
+        Authenticator authMock = 
+                (Authenticator) createMock(Authenticator.class);
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
+        setAttributes(request);
+        
+        IUserManager userManagerMock = 
+                (IUserManager) createMock(IUserManager.class);
+        expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
+                .anyTimes();
+        expect(userManagerMock.store(isA(User.class)))
+                .andReturn(1).anyTimes();
+        
+        IJsonUtil jsonUtilMock = (IJsonUtil) createMock(IJsonUtil.class);
+        expect(jsonUtilMock.dataSourcesToJson(isA(HashSet.class)))
+                .andReturn(JSON_SOURCES).anyTimes();
+        
+        IDataSourceManager dataSourceManagerMock = 
+                (IDataSourceManager) createMock(IDataSourceManager.class);
+        expect(dataSourceManagerMock.loadByUser(0))
+                .andReturn(new ArrayList<DataSource>()).anyTimes();
+        
+        replayAll();
+        
+        classUnderTest.setAuthenticator(authMock);
+        classUnderTest.setUserManager(userManagerMock);
+        classUnderTest.setJsonUtil(jsonUtilMock);
+        classUnderTest.setDataSourceManager(dataSourceManagerMock);
+        classUnderTest.handleRequest(request, response);
+        
+        verifyAll();
+        
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         
         String dataSourceString = response.getContentAsString();
@@ -205,10 +242,7 @@ public class DataSourceListServletTest {
         assertNotNull(dataSources);
         assertEquals(3, dataSources.size());
         
-        reset(authMock);
-        reset(userManagerMock);
-        reset(jsonUtilMock);
-        reset(dataSourceManagerMock);
+        resetAll();
     }
     
 }

@@ -92,7 +92,7 @@ public class LoginController {
     {
         User user = userManager.load(principal.getName());
         SecurityManager.setSessionUser(session, user);
-        log.info("User " + user.getName() + " logged on");
+        log.info("User " + user.getName() + " signed in");
         return "home";
     }  
     
