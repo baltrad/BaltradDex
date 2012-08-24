@@ -621,6 +621,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           class="eu.baltrad.dex.net.servlet.PostFileServlet" 
           autowire="byType"/>
           
+    <!-- Post message servlet -->
+    <bean id="postMessageServlet" 
+          class="eu.baltrad.dex.net.servlet.PostMessageServlet" 
+          autowire="byType"/>      
+          
     <!-- Incoming file namer -->      
     <bean id="incomingFileNamer" 
           class="eu.baltrad.dex.net.util.IncomingFileNamer"/>

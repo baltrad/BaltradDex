@@ -81,24 +81,8 @@ import java.io.IOException;
  * @version 0.1.6
  * @since 0.1.6
  */
+@Deprecated
 public class FrameDispatcherController extends HttpServlet implements Controller, InitializingBean {
-//---------------------------------------------------------------------------------------- Constants
-    // path to HDF5 dataset used to generate image thumb
-    /*private static final String H5_THUMB_DATASET_PATH = "/dataset1/data1/data";
-    // path to HDF5 metadata group used to generate image thumb
-    private static final String H5_THUMB_GROUP_PATH = "/dataset1/where";
-    // image thumb size
-    private static final int THUMB_IMAGE_SIZE = 64;
-    // range rings distance
-    private static final short THUMB_RANGE_RINGS_DISTANCE = 0;
-    // range mask line stroke
-    private static final float THUMB_RANGE_MASK_STROKE = 6.0f;
-    // range rings color string
-    private static final String THUMB_RANGE_RINGS_COLOR = "#FFFFFF";
-    // range mask color string
-    private static final String THUMB_RANGE_MASK_COLOR = "#FFFFFF";
-    // image file extension
-    private static final String IMAGE_FILE_EXT = ".png";*/
 //---------------------------------------------------------------------------------------- Variables
     private UserManager userManager;
     private DataSourceManager dataSourceManager;

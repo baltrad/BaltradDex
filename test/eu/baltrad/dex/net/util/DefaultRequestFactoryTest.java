@@ -134,6 +134,22 @@ public class DefaultRequestFactoryTest {
     }
     
     @Test
+    public void createPostMessageRequest() {
+        HttpUriRequest request = classUnderTest.createPostMessageRequest(
+                "localnode", "http://localhost", "Hello world!");
+        assertEquals("POST", request.getMethod());
+        assertEquals(URI.create(
+            "http://example.com/BaltradDex/post_message.htm"), 
+            request.getURI());
+        assertEquals("localnode", getHeader(request, "Node-Name"));
+        assertEquals("http://localhost", getHeader(request, "Node-Address"));
+        assertEquals("text/html", getHeader(request, "Content-Type"));
+        assertNotNull(getHeader(request, "Content-MD5"));
+        assertNotNull(getHeader(request, "Date"));
+    }
+    
+    
+    @Test
     public void getRequestUri_ServerWithoutSlash() {
         classUnderTest = new DefaultRequestFactory(
             URI.create("http://example.com:8084")

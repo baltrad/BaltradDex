@@ -236,4 +236,30 @@ public class DefaultRequestFactory implements RequestFactory {
         httpPost.addHeader("Date", dateFormat.format(new Date()));
         return httpPost;
     }
+    
+    /**
+     * Creates post message request.
+     * @param nodeName Name of the node making a request
+     * @param nodeAddress Address of the node making a request
+     * @param message Message to post
+     * @return Http POST request 
+     */
+    public HttpPost createPostMessageRequest(String nodeName, 
+            String nodeAddress, String message) {
+        HttpPost httpPost = new HttpPost(getRequestUri("post_message.htm"));
+        StringEntity entity = null;
+        try {
+            entity = new StringEntity(message, "UTF-8");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        httpPost.setEntity(entity);
+        httpPost.addHeader("Node-Name", nodeName);
+        httpPost.addHeader("Node-Address", nodeAddress);
+        httpPost.addHeader("Content-Type", "text/html");
+        httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
+                message.getBytes()));
+        httpPost.addHeader("Date", dateFormat.format(new Date()));
+        return httpPost;
+    }
 }

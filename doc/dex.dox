@@ -65,6 +65,7 @@
 	-# \ref exchange_post_subscription
 	-# \ref exchange_get_subscription
 	-# \ref exchange_post_file
+	-# \ref exchange_post_message
 
 - \subpage support 
 
@@ -1122,7 +1123,7 @@ subscribed data sources.
 \n
 \n <b>Example:</b>
 \code
-GET http://example.baltrad.eu:8084/BaltradDex/post_subscription.htm HTTP/1.1
+POST http://example.baltrad.eu:8084/BaltradDex/post_subscription.htm HTTP/1.1
 Node-Name: test.baltrad.eu
 Node-Address: http://test.baltrad.eu
 Content-Type: application/json
@@ -1200,7 +1201,7 @@ subscriptions.
 \n
 \n <b>Example:</b>
 \code
-GET http://example.baltrad.eu:8084/BaltradDex/get_subscription.htm HTTP/1.1
+POST http://example.baltrad.eu:8084/BaltradDex/get_subscription.htm HTTP/1.1
 Node-Name: test.baltrad.eu
 Node-Address: http://test.baltrad.eu
 Content-Type: application/json
@@ -1280,8 +1281,6 @@ Node-Address: http://example.baltrad.eu
 \endcode
 
 
-
-
 \section exchange_post_file Post file request
 \par
 \b Description
@@ -1300,7 +1299,7 @@ Node-Address: http://example.baltrad.eu
 \n
 \n <b>Example:</b>
 \code
-GET http://example.baltrad.eu:8084/BaltradDex/post_file.htm HTTP/1.1
+POST http://example.baltrad.eu:8084/BaltradDex/post_file.htm HTTP/1.1
 Node-Name: test.baltrad.eu
 Node-Address: http://test.baltrad.eu
 Content-Type: application/x-hdf5
@@ -1332,6 +1331,63 @@ Node-Name: example.baltrad.eu
 Node-Address: http://example.baltrad.eu
 \endcode
 
+
+\section exchange_post_message Post message request
+\par
+\b Description
+\n 
+\n Post message request. Message body is processed by Beast messaginng 
+interface. Reponse indicates post message operation result. 
+
+\par 
+\b Request
+
+\par
+- Request URI: <tt>post_message.htm</tt>
+- Method: <tt>POST</tt>
+- Headers: <tt>Node-Name, Node-Address, Content-Type, Content-MD5, Date, 
+				Authorization</tt>
+- Body: <tt>Message string</tt>
+\n
+\n <b>Example:</b>
+\code
+POST http://example.baltrad.eu:8084/BaltradDex/post_message.htm HTTP/1.1
+Node-Name: test.baltrad.eu
+Node-Address: http://test.baltrad.eu
+Content-Type: text/html
+Content-MD5: aHR0cDovLzE ...
+Date: Fri, 6 Jul 2012 13:00:26 CEST
+Authorization: test.baltrad.eu:APa7608wLQI ...
+<Message body>
+\endcode
+\par
+\note
+Content-MD5 header value consists of Base64-encoded message body.   
+
+\par 
+\b Response
+
+\par
+- Headers: <tt>Node-Name, Node-Address</tt>
+- Status: 
+     - <tt>200 OK</tt> : Success
+     - <tt>401 Unauthorized</tt> : Server failed to authenticate request
+     - <tt>500 Internal server error</tt> : Server error / Unsupported message
+											format  		
+- Body: <tt>No content</tt>
+\n
+\n <b>Example:</b>
+\code
+Node-Name: example.baltrad.eu
+Node-Address: http://example.baltrad.eu
+\endcode
+
+\attention
+Because message body is processed by Beast messaging interface, its format 
+should match XML-based message format defined by Beast. In case of attempt to
+pass a message of unsupported format, the server will respond with 
+<tt> Internal Server Error (500)</tt>. Refer to Beast framework documentation 
+for details.
 
 
 \page support Support & feedback 

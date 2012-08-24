@@ -41,32 +41,32 @@ import java.util.ArrayList;
  */
 public class JsonUtilTest {
     
-    private JsonUtil classUnderTest;
-    private Set<DataSource> dataSources;
-    private List<Subscription> subscriptions;
-    private String jsonSources;
-    private String jsonSubscriptions;
-    
-    @Before
-    public void setUp() {
-        jsonSources = "[{\"name\":\"DS1\",\"id\":1,\"description\":\"A test "
+    private static final String JSON_SOURCES = 
+              "[{\"name\":\"DS1\",\"id\":1,\"description\":\"A test "
             + "data source\"},{\"name\":\"DS2\",\"id\":2,\"description\":\"One "
             + "more test data source\"},{\"name\":\"DS3\",\"id\":3,\"" 
             + "description\":\"Yet another test data source\"}]";
         
-        jsonSubscriptions = "[{\"id\":1,\"type\":\"download\",\"timeStamp\"" 
-            + ":1340189763867,\"userName\":\"User1\",\"nodeAddress\":" 
-            + "\"http://test.baltrad.eu\",\"dataSourceName\":\"DS1\"," 
-            + "\"operatorName\":\"Operator1\",\"active\":true,\"synkronized\""
-            + ":true},{\"id\":2,\"type\":\"download\",\"timeStamp\"" 
-            + ":1340189763867,\"userName\":\"User2\",\"nodeAddress\":"
-            + "\"http://baltrad.eu\",\"dataSourceName\":\"DS2\","
-            + "\"operatorName\":\"Operator2\",\"active\":true,\"synkronized\":"
-            + "false},{\"id\":3,\"type\":\"upload\",\"timeStamp\":"
-            + "1340189763867,\"userName\":\"User3\",\"nodeAddress\":"
-            + "\"http://baltrad.imgw.pl\",\"dataSourceName\":\"DS3\","
-            + "\"operatorName\":\"Operator3\",\"active\":false,\"synkronized\""
-            + ":true}]";
+    private static final String JSON_SUBSCRIPTIONS = 
+              "[{\"id\":1,\"type\":\"download\",\"timeStamp\""
+            + ":1340189763867,\"userName\":\"User1\",\"nodeAddress\"" 
+            + ":\"http://test.baltrad.eu\",\"active\":true,\"dataSourceName\":"
+            + "\"DS1\",\"synkronized\":true,\"operatorName\":\"Operator1\"},"
+            + "{\"id\":2,\"type\":\"download\",\"timeStamp\":1340189763867,"
+            + "\"userName\":\"User2\",\"nodeAddress\":\"http://baltrad.eu\","
+            + "\"active\":true,\"dataSourceName\":\"DS2\",\"synkronized\":"
+            + "false,\"operatorName\":\"Operator2\"},{\"id\":3,\"type\":"
+            + "\"upload\",\"timeStamp\":1340189763867,\"userName\":\"User3\","
+            + "\"nodeAddress\":\"http://baltrad.imgw.pl\",\"active\":false,"
+            + "\"dataSourceName\":\"DS3\",\"synkronized\":true,\"operatorName\""
+            + ":\"Operator3\"}]";
+    
+    private JsonUtil classUnderTest;
+    private Set<DataSource> dataSources;
+    private List<Subscription> subscriptions;
+    
+    @Before
+    public void setUp() {
         
         classUnderTest = new JsonUtil();
         dataSources = new HashSet<DataSource>();
@@ -97,13 +97,13 @@ public class JsonUtilTest {
     public void dataSourcesToJsonString() {
         String s = classUnderTest.dataSourcesToJson(dataSources);
         assertNotNull(s);
-        assertEquals(jsonSources, s);
+        assertEquals(JSON_SOURCES, s);
     }
     
     @Test
     public void jsonStringToDataSources() throws Exception  {
         HashSet<DataSource> sources = (HashSet<DataSource>)
-                             classUnderTest.jsonToDataSources(jsonSources);
+                             classUnderTest.jsonToDataSources(JSON_SOURCES);
         assertNotNull(sources);
         assertEquals(3, sources.size());
         for (DataSource ds : sources) {
@@ -118,13 +118,13 @@ public class JsonUtilTest {
     public void subscriptionsToJsonString() {
         String s = classUnderTest.subscriptionsToJson(subscriptions);
         assertNotNull(s);
-        assertEquals(jsonSubscriptions, s);
+        assertEquals(JSON_SUBSCRIPTIONS, s);
     }
     
     @Test
     public void jsonStringToSubscriptions() throws Exception  {
         ArrayList<Subscription> subs = (ArrayList<Subscription>)
-                         classUnderTest.jsonToSubscriptions(jsonSubscriptions);
+                         classUnderTest.jsonToSubscriptions(JSON_SUBSCRIPTIONS);
         assertNotNull(subs);
         assertEquals(3, subs.size());
         for (Subscription s : subs) {

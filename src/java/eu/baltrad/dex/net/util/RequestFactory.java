@@ -45,4 +45,6 @@ public interface RequestFactory {
     public HttpUriRequest createPostFileRequest(String nodeName,
             String nodeAddress, InputStream fileContent);
     
+    public HttpUriRequest createPostMessageRequest(String nodeName,
+            String nodeAddress, String message);
 }
