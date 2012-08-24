@@ -64,6 +64,9 @@ Author     : szewczenko
         firstPage = numPages - ( DeliveryRegisterManager.SCROLL_RANGE - 1 );
         lastPage = numPages;
     }
+    request.getSession().setAttribute("first_page", firstPage);
+    request.getSession().setAttribute("last_page", lastPage);
+    request.getSession().setAttribute("current_page", currentPage);
 %>
 
 <t:page_tabbed pageTitle="Data delivery registry" activeTab="exchange">
@@ -83,7 +86,6 @@ Author     : szewczenko
                     <div class="table">
                         <div class="register">
                             <div id="tablecontrol">
-                                <c:set var="curPage" scope="page" value="${currentPage}"/>
                                 <form action="registry.htm" method="post">
                                     <input type="submit" name="pagenum" value="<<"
                                             title="First page">
@@ -91,10 +93,10 @@ Author     : szewczenko
                                     <input type="submit" name="pagenum" value="<"
                                             title="Previous page">
                                     <span></span>
-                                    <c:forEach var="i" begin="${firstPage}" end="${lastPage}"
+                                    <c:forEach var="i" begin="${first_page}" end="${last_page}"
                                                 step="1" varStatus ="status">
                                             <c:choose>
-                                                <c:when test="${curPage == i}">
+                                                <c:when test="${current_page == i}">
                                                     <input style="background:#FFFFFF" type="submit"
                                                             name="pagenum" value="${i}">
                                                 </c:when>
