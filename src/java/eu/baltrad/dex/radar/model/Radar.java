@@ -33,7 +33,7 @@ import java.io.Serializable;
 public class Radar implements Serializable {
 //---------------------------------------------------------------------------------------- Variables
     private int id;
-    private String radarName;
+    private String name;
     private String wmoNumber;
 //------------------------------------------------------------------------------------------ Methods
     /**
@@ -44,22 +44,22 @@ public class Radar implements Serializable {
      * Constructor setting field values.
      *
      * @param id Radar ID
-     * @param radarName Radar name
+     * @param name Radar name
      * @param wmoNumber Radar WMO number
      */
-    public Radar( int id, String radarName, String wmoNumber ) {
+    public Radar( int id, String name, String wmoNumber ) {
         this.id = id;
-        this.radarName = radarName;
+        this.name = name;
         this.wmoNumber = wmoNumber;
     }
     /**
      * Constructor setting field values.
      *
-     * @param radarName Radar name
+     * @param name Radar name
      * @param wmoNumber Radar WMO number
      */
-    public Radar( String radarName, String wmoNumber ) {
-        this.radarName = radarName;
+    public Radar( String name, String wmoNumber ) {
+        this.name = name;
         this.wmoNumber = wmoNumber;
     }
     /**
@@ -72,7 +72,7 @@ public class Radar implements Serializable {
     public boolean equals( Object o ) {
         boolean res = false;
         if( getClass() == o.getClass() ) {
-            if( this.getRadarName().equals( ( ( Radar )o ).getRadarName() ) ) {
+            if( this.getName().equals( ( ( Radar )o ).getName() ) ) {
                 res = true;
             }
         }
@@ -85,7 +85,7 @@ public class Radar implements Serializable {
      */
     @Override
     public int hashCode() {
-        return( radarName != null ? radarName.hashCode() : 0 );
+        return( name != null ? name.hashCode() : 0 );
     }
     /**
      * Method gets radar id.
@@ -104,13 +104,13 @@ public class Radar implements Serializable {
      *
      * @return Radar name
      */
-    public String getRadarName() { return radarName; }
+    public String getName() { return name; }
     /**
      * Method sets radar name.
      *
      * @param name Radar name
      */
-    public void setRadarName( String radarName ) { this.radarName = radarName; }
+    public void setName( String name ) { this.name = name; }
     /**
      * Method gets WMO number.
      *

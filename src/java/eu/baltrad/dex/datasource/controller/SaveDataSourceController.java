@@ -176,9 +176,9 @@ public class SaveDataSourceController {
                     if (selectedRadars != null) {    
                         for (int i = 0; i < selectedRadars.length; i++) {
                             int radarId = (radarManager
-                                    .getRadar(selectedRadars[i])).getId();
+                                    .load(selectedRadars[i])).getId();
                             String wmoNumber = (radarManager
-                                    .getRadar(selectedRadars[i])).getWmoNumber();
+                                    .load(selectedRadars[i])).getWmoNumber();
 
                             dataSourceManager.saveRadar(dataSourceId, radarId);
                             // Set filter value
@@ -275,14 +275,14 @@ public class SaveDataSourceController {
             List<Radar> selectedRadars = dataSourceManager
                     .loadRadar(Integer.parseInt(dsId));
             List<Radar> allButSelectedRadars = new ArrayList<Radar>();
-            for (Radar radar : radarManager.getRadars()) {
+            for (Radar radar : radarManager.load()) {
                 if (!selectedRadars.contains(radar)) {
                     allButSelectedRadars.add(radar);
                 }
             }
             return allButSelectedRadars;
         } else {
-            return radarManager.getRadars();
+            return radarManager.load();
         }
     }
     

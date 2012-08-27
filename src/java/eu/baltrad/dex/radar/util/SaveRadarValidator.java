@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.radar.util;
 
@@ -28,14 +28,14 @@ import org.springframework.validation.ValidationUtils;
 import eu.baltrad.dex.radar.model.Radar;
 
 /**
- * Validator class used to validate add channel form input.
+ * Validates save radar form input.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 0.1.6
  * @since 0.1.6
  */
 public class SaveRadarValidator implements Validator {
-//------------------------------------------------------------------------------------------ Methods
+
     /**
      * Declares classes supported by this validator.
      *
@@ -52,10 +52,11 @@ public class SaveRadarValidator implements Validator {
      * @param errors Errors object
      */
     public void validate( Object command, Errors errors ) {
-        Radar channel = ( Radar )command;
-        if( channel == null ) return;
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "channelName", "error.missing.radarname" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "wmoNumber", "error.missing.wmonumber" );
+        Radar radar = ( Radar )command;
+        if( radar == null ) return;
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "name", 
+                "error.missing.radarname" );
+        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "wmoNumber", 
+                "error.missing.wmonumber" );
     }
 }
-//--------------------------------------------------------------------------------------------------

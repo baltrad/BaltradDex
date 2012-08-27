@@ -27,14 +27,6 @@ Author     : szewczenko
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
 <%@ page import="java.util.List" %>
-<%
-    List channels = ( List )request.getAttribute( "channels" );
-    if( channels == null || channels.size() <= 0 ) {
-        request.getSession().setAttribute( "channels_status", 0 );
-    } else {
-        request.getSession().setAttribute( "channels_status", 1 );
-    }
-%>
 
 <t:page_tabbed pageTitle="Remove radar station" activeTab="settings">
     <jsp:body>
@@ -46,7 +38,7 @@ Author     : szewczenko
                 Remove radar station
             </div>
             <c:choose>
-                <c:when test="${channels_status == 1}">
+                <c:when test="${not empty radars}">
                     <div class="blttext">
                         Select radar stations to remove.
                     </div>
@@ -66,21 +58,21 @@ Author     : szewczenko
                                     </div>
                                 </div>
                                 <c:set var="count" scope="page" value="1"/>
-                                <c:forEach var="channel" items="${channels}">
+                                <c:forEach var="radar" items="${radars}">
                                     <div class="entry">
                                         <div id="cell" class="count">
                                             <c:out value="${count}"/>
                                             <c:set var="count" value="${count + 1}"/>
                                         </div>
                                         <div id="cell" class="station">
-                                            <c:out value="${channel.channelName}"/>
+                                            <c:out value="${radar.name}"/>
                                         </div>
                                         <div id="cell" class="wmonumber">
-                                            <c:out value="${channel.wmoNumber}"/>
+                                            <c:out value="${radar.wmoNumber}"/>
                                         </div>
                                         <div class="check">
-                                            <input type="checkbox" name="selected_channels"
-                                                value="${channel.id}"/>
+                                            <input type="checkbox" name="selected_radars"
+                                                value="${radar.id}"/>
                                         </div>
                                     </div>
                                 </c:forEach>

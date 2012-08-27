@@ -22,7 +22,6 @@
 package eu.baltrad.dex.datasource.model;
 
 import eu.baltrad.dex.radar.model.Radar;
-import eu.baltrad.dex.datasource.model.FileObject;
 import eu.baltrad.dex.user.model.User;
 
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
@@ -159,24 +158,24 @@ public class DataSourceManager implements IDataSourceManager {
     
     /**
      * Delete data source with a given id.
-     * @param dataSourceId Data source id
+     * @param id Data source id
      * @return Number of deleted records
      */
-    public int delete(int dataSourceId) {
+    public int delete(int id) {
         return jdbcTemplate.update("DELETE FROM dex_data_sources WHERE id = ?", 
-                dataSourceId);
+                id);
     }
     
     /**
      * Get list of radars for a given data source id.
-     * @param DataSourceId Data source id
+     * @param id Data source id
      * @return List of radars
      */
-    public List<Radar> loadRadar(int DataSourceId) {
+    public List<Radar> loadRadar(int id) {
         String sql = "SELECT * FROM dex_radars WHERE id IN (SELECT radar_id " +
                 "FROM dex_data_source_radars WHERE data_source_id = ?)";
         try {
-            return jdbcTemplate.query(sql, radarMapper, DataSourceId);
+            return jdbcTemplate.query(sql, radarMapper, id);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -353,7 +352,7 @@ public class DataSourceManager implements IDataSourceManager {
         public Radar mapRow(ResultSet rs, int rowNum) throws SQLException {
             Radar radar = new Radar(); 
             radar.setId(rs.getInt("id"));
-            radar.setRadarName(rs.getString("name"));
+            radar.setName(rs.getString("name"));
             radar.setWmoNumber(rs.getString("wmo_number"));
             return radar;
         }

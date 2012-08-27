@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.radar.controller;
 
@@ -37,35 +37,35 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Multi action controller handling data channel removal functionality.
+ * Controller implementing radar removal functionality.
  *
  * @author szewczenko
- * @version 1.0
- * @since 1.0
+ * @version 1.2.1
+ * @since 1.0.0
  */
 public class RemoveRadarController extends MultiActionController {
-//---------------------------------------------------------------------------------------- Constants
+
     // model keys
-    private static final String SHOW_CHANNELS_KEY = "channels";
-    private static final String SELECTED_CHANNELS_KEY = "selected_channels";
-    private static final String REMOVED_CHANNELS_KEY = "removed_channels";
+    private static final String SHOW_RADARS_KEY = "radars";
+    private static final String SELECTED_RADARS_KEY = "selected_radars";
+    private static final String REMOVED_RADARS_KEY = "removed_radars";
     private static final String OK_MSG_KEY = "message";
     private static final String ERROR_MSG_KEY = "error";
     // view names
-    private static final String SHOW_CHANNELS_VIEW = "remove_radar";
-    private static final String SELECTED_CHANNELS_VIEW = "radar_to_remove";
-    private static final String REMOVED_CHANNELS_VIEW = "remove_radar_status";
-//---------------------------------------------------------------------------------------- Variables
+    private static final String SHOW_RADARS_VIEW = "remove_radar";
+    private static final String SELECTED_RADARS_VIEW = "radar_to_remove";
+    private static final String REMOVED_RADARS_VIEW = "remove_radar_status";
+
     // Radar manager
     private RadarManager radarManager;
     // Message logger
     private Logger log;
-//------------------------------------------------------------------------------------------ Methods
+
     /*
      * Constructor.
      */
     public RemoveRadarController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     /**
      * Shows all available channels.
@@ -76,8 +76,8 @@ public class RemoveRadarController extends MultiActionController {
      */
     public ModelAndView remove_radar( HttpServletRequest request,
             HttpServletResponse response ) {
-        List channels = radarManager.getRadars();
-        return new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
+        List channels = radarManager.load();
+        return new ModelAndView(SHOW_RADARS_VIEW, SHOW_RADARS_KEY, channels);
     }
     /**
      * Shows channels selected for removal.
@@ -86,49 +86,57 @@ public class RemoveRadarController extends MultiActionController {
      * @param response Http response
      * @return Model and view containing list of channels selected for removal
      */
-    public ModelAndView radar_to_remove( HttpServletRequest request,
-            HttpServletResponse response ) {
+    public ModelAndView radar_to_remove(HttpServletRequest request,
+            HttpServletResponse response) {
         ModelAndView modelAndView = null;
-        String[] channelIds = request.getParameterValues( SELECTED_CHANNELS_KEY );
-        if( channelIds != null ) {
-            List< Radar > channels = new ArrayList< Radar >();
-            for( int i = 0; i < channelIds.length; i++ ) {
-                channels.add( radarManager.getRadar( Integer.parseInt( channelIds[ i ] ) ) );
+        String[] radarIds = request.getParameterValues(SELECTED_RADARS_KEY);
+        if (radarIds != null) {
+            List<Radar> radars = new ArrayList<Radar>();
+            for (int i = 0; i < radarIds.length; i++) {
+                radars.add( radarManager.load(Integer.parseInt(radarIds[i])));
             }
-            modelAndView = new ModelAndView( SELECTED_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
+            modelAndView = new ModelAndView(SELECTED_RADARS_VIEW, 
+                    SHOW_RADARS_KEY, radars);
         } else {
-            List channels = radarManager.getRadars();
-            modelAndView = new ModelAndView( SHOW_CHANNELS_VIEW, SHOW_CHANNELS_KEY, channels );
+            List radars = radarManager.load();
+            modelAndView = new ModelAndView(SHOW_RADARS_VIEW, SHOW_RADARS_KEY, 
+                    radars);
         }
         return modelAndView;
     }
     /**
-     * Displays information about channel removal status and errors if occured.
+     * Displays information about radar removal status and errors if occured.
      *
      * @param request Http request
      * @param response Http response
      * @return Model and view containing data access exception errors if occured.
      */
-    public ModelAndView remove_radar_status( HttpServletRequest request,
-            HttpServletResponse response ) {
-        String[] channelIds = request.getParameterValues( REMOVED_CHANNELS_KEY );
-        String channelName = "";
+    public ModelAndView remove_radar_status(HttpServletRequest request,
+            HttpServletResponse response) {
+        String[] radarIds = request.getParameterValues(REMOVED_RADARS_KEY);
+        String radarName = "";
         try {
-            for( int i = 0; i < channelIds.length; i++ ) {
-                Radar channel = radarManager.getRadar( Integer.parseInt( channelIds[ i ] ) );
-                channelName = channel.getRadarName();
-                radarManager.deleteRadar( Integer.parseInt( channelIds[ i ] ) );
-                log.warn( "Local radar station successfully removed: " + channelName );
+            for (int i = 0; i < radarIds.length; i++) {
+                Radar radar = radarManager.load(Integer.parseInt(radarIds[i]));
+                radarName = radar.getName();
+                if (radarManager.delete(Integer.parseInt(radarIds[i])) > 0) {
+                    log.warn("Radar station " + radarName + 
+                        " successfully removed");
+                } else {
+                    log.error("Failed to remove radar station: " + radarName);
+                }
             }
-            request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
-                    "message.removeradar.removesuccess" ) );
-        } catch( Exception e ) {
+            request.getSession().setAttribute(OK_MSG_KEY, 
+                    getMessageSourceAccessor().getMessage(
+                        "message.removeradar.removesuccess" ) );
+        } catch(Exception e) {
             request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, getMessageSourceAccessor().getMessage(
-                    "message.removeradar.removefail" ) );
-            log.warn( "Failed to remove local radar station", e );
+            request.getSession().setAttribute( ERROR_MSG_KEY, 
+                    getMessageSourceAccessor().getMessage(
+                        "message.removeradar.removefail" ) );
+            log.warn("Failed to remove radar station", e);
         }
-        return new ModelAndView( REMOVED_CHANNELS_VIEW );
+        return new ModelAndView( REMOVED_RADARS_VIEW );
     }
     /*
      * Method returns reference to radar manager object.
@@ -145,4 +153,4 @@ public class RemoveRadarController extends MultiActionController {
         this.radarManager = radarManager;
     }
 }
-//--------------------------------------------------------------------------------------------------
+

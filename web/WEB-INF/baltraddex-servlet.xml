@@ -261,7 +261,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Radar manager.
     -->
-    <bean name="radarManager" class="eu.baltrad.dex.radar.model.RadarManager"/>
+    <bean name="radarManager" class="eu.baltrad.dex.radar.model.RadarManager"
+          autowire="byType"/>
 
     <!--
         Data source files manager

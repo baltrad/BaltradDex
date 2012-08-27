@@ -27,14 +27,6 @@ Author     : szewczenko
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
 <%@ page import="java.util.List" %>
-<%
-    List channels = ( List )request.getAttribute( "registered_channels" );
-    if( channels == null || channels.size() <= 0 ) {
-        request.getSession().setAttribute( "channels_status", 0 );
-    } else {
-        request.getSession().setAttribute( "channels_status", 1 );
-    }
-%>
 
 <t:page_tabbed pageTitle="Edit radar station" activeTab="settings">
     <jsp:body>
@@ -46,7 +38,7 @@ Author     : szewczenko
                 Edit radar station
             </div>
             <c:choose>
-                <c:when test="${channels_status == 1}">
+                <c:when test="${not empty radars}">
                     <div class="blttext">
                         List of local radar stations. Click on station name in order to
                         modify radar settings.
@@ -63,19 +55,19 @@ Author     : szewczenko
                                 </div>
                             </div>
                             <c:set var="count" scope="page" value="1"/>
-                            <c:forEach var="channel" items="${registered_channels}">
+                            <c:forEach var="radar" items="${radars}">
                                 <div class="entry">
                                     <div id="cell" class="count">
                                         <c:out value="${count}"/>
                                         <c:set var="count" value="${count + 1}"/>
                                     </div>
                                     <div id="cell" class="station">
-                                        <a href="save_radar.htm?channelId=${channel.id}">
-                                            <c:out value="${channel.channelName}"/>
+                                        <a href="save_radar.htm?id=${radar.id}">
+                                            <c:out value="${radar.name}"/>
                                         </a>
                                     </div>
                                     <div id="cell" class="wmonumber">
-                                        <c:out value="${channel.wmoNumber}"/>
+                                        <c:out value="${radar.wmoNumber}"/>
                                     </div>
                                 </div>
                             </c:forEach>
@@ -111,37 +103,3 @@ Author     : szewczenko
         </div>
     </jsp:body>
 </t:page_tabbed>
-
-
-<%--html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>BALTRAD | Edit radar station</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
-            </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/settingsTab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/settingsMenu.jsp"%>
-                    </div>
-                    
-                                                
-                                                
-                                                
-                                                
-                </div>
-            </div>
-        </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
-        </div>
-    </body>
-</html--%>

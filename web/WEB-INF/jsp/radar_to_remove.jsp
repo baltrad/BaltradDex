@@ -51,21 +51,21 @@ Author     : szewczenko
                             </div>
                         </div>
                         <c:set var="count" scope="page" value="1"/>
-                        <c:forEach var="channel" items="${channels}">
+                        <c:forEach var="radar" items="${radars}">
                             <div class="entry">
                                 <div id="cell" class="count">
                                     <c:out value="${count}"/>
                                     <c:set var="count" value="${count + 1}"/>
                                 </div>
                                 <div id="cell" class="station">
-                                    <c:out value="${channel.channelName}"/>
+                                    <c:out value="${radar.name}"/>
                                 </div>
                                 <div id="cell" class="wmonumber">
-                                    <c:out value="${channel.wmoNumber}"/>
+                                    <c:out value="${radar.wmoNumber}"/>
                                 </div>
                                 <div class="hidden">
-                                    <input type="checkbox" name="removed_channels"
-                                        value="${channel.id}" checked/>
+                                    <input type="checkbox" name="removed_radars"
+                                        value="${radar.id}" checked/>
                                 </div>
                             </div>
                         </c:forEach>

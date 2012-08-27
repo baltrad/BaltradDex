@@ -49,12 +49,12 @@ Author     : szewczenko
                         <div class="rightcol">
                             <div class="row">
                                 <div class="radarname">
-                                    <form:input path="command.channelName"/>
+                                    <form:input path="command.name"/>
                                     <div class="hint">
                                         Name of the local radar station
                                     </div>
                                 </div>
-                                <form:errors path="command.channelName" cssClass="error"/>
+                                <form:errors path="command.name" cssClass="error"/>
                             </div>
                             <div class="row">
                                 <div class="wmonumber">

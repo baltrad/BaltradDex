@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,183 +17,153 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.radar.model;
 
-import eu.baltrad.dex.util.JDBCConnectionManager;
-import eu.baltrad.dex.log.model.MessageLogger;
+import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import org.apache.log4j.Logger;
-
-import java.sql.Connection;
-import java.sql.Statement;
+import java.sql.SQLException;
 import java.sql.ResultSet;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
- * Data channel manager class implementing data channel handling functionality.
+ * Radar manager.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.0
- * @since 1.0
+ * @version 1.2.1
+ * @since 1.2.1
  */
-public class RadarManager {
-//---------------------------------------------------------------------------------------- Variables
-    /** Reference to JDBCConnector class object */
-    private JDBCConnectionManager jdbcConnectionManager;
-    /** Logger */
-    private Logger log;
-//------------------------------------------------------------------------------------------ Methods    
+public class RadarManager implements IRadarManager {
+
+    /** JDBC template */
+    private SimpleJdbcOperations jdbcTemplate;
+    /** Row mapper */
+    private RadarMapper mapper;
+    
     /**
-     * Constructor gets reference to JDBCConnectionManager instance.
+     * Constructor.
      */
     public RadarManager() {
-        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.mapper = new RadarMapper();
     }
+    
     /**
-     * Gets all data channels.
-     *
-     * @return List of all available data channels
+     * @param jdbcTemplate the jdbcTemplate to set
      */
-    public List<Radar> getRadars() {
-        Connection conn = null;
-        List<Radar> channels = new ArrayList<Radar>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_radars" );
-            while( resultSet.next() ) {
-                int chnlId = resultSet.getInt( "id" );
-                String name = resultSet.getString( "name" );
-                String wmoNumber = resultSet.getString( "wmo_number" );
-                Radar channel = new Radar( chnlId, name, wmoNumber );
-                channels.add( channel );
-            }
-            stmt.close();
-        } catch( Exception e ) {
-            log.error( "Failed to select data channels", e );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return channels;
+    @Autowired
+    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
+    
     /**
-     * Gets data channel with a given ID.
-     *
-     * @param id Data channel ID
-     * @return Data channel with a given ID
+     * Load all radars.
+     * @return List of all available radars
      */
-    public Radar getRadar( int id ) {
-        Connection conn = null;
-        Radar channel = null;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_radars WHERE" +
-                    " id = " + id + ";" );
-            while( resultSet.next() ) {
-                int chnlId = resultSet.getInt( "id" );
-                String name = resultSet.getString( "name" );
-                String wmoNumber = resultSet.getString( "wmo_number" );
-                channel = new Radar( chnlId, name, wmoNumber );
-            }
-            stmt.close();
-        } catch( Exception e ) {
-            log.error( "Failed to select data channels", e );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return channel;
+    public List<Radar> load() {
+        String sql = "SELECT * FROM dex_radars";
+	List<Radar> radars = jdbcTemplate.query(sql, mapper);
+	return radars;
     }
+    
     /**
-     * Gets data channel with a given name.
-     *
-     * @param channelName Data channel name
-     * @return Data channel with a given name
+     * Load radar with a given id.
+     * @param id Radar id
+     * @return Radar with a given id
      */
-    public Radar getRadar( String channelName ) {
-        Connection conn = null;
-        Radar channel = null;
+    public Radar load(int id) {
+        String sql = "SELECT * FROM dex_radars WHERE id = ?";
         try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_radars WHERE" +
-                    " name = '" + channelName + "';");
-            while( resultSet.next() ) {
-                int chnlId = resultSet.getInt( "id" );
-                String name = resultSet.getString( "name" );
-                String wmoNumber = resultSet.getString( "wmo_number" );
-                channel = new Radar( chnlId, name, wmoNumber );
-            }
-            stmt.close();
-        } catch( Exception e ) {
-            log.error( "Failed to select data channels", e );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            return jdbcTemplate.queryForObject(sql, mapper, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
-        return channel;
     }
+    
     /**
-     * Saves or updates data channel.
-     *
-     * @param channel Data channel
-     * @return Number of saved or updated records
-     * @throws Exception
+     * Load radar with a given name.
+     * @param name Radar name
+     * @return Radar with a given name
      */
-    public int saveOrUpdate( Radar channel ) throws Exception {
-        Connection conn = null;
-        int update = 0;
+    public Radar load(String name) {
+        String sql = "SELECT * FROM dex_radars WHERE name = ?";
         try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "";
-            // record does not exists, do insert
-            if( channel.getId() == 0 ) {
-                sql = "INSERT INTO dex_radars (name, wmo_number) VALUES ('" +
-                    channel.getRadarName() + "', '" + channel.getWmoNumber() + "');";
-            } else {
-                // record exists, do update
-                sql = "UPDATE dex_radars SET name = '" + channel.getRadarName() + "', " +
-                    "wmo_number = '" + channel.getWmoNumber() + "' WHERE id = " +
-                    channel.getId() + ";";
-            }
-            update = stmt.executeUpdate( sql ) ;
-            stmt.close();
-        } catch( Exception e ) {
-            log.error( "Failed to save data channel", e );
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            return jdbcTemplate.queryForObject(sql, mapper, name);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
-        return update;
     }
+    
     /**
-     * Deletes channel with a given ID.
-     *
-     * @param id Channel ID
-     * @return Number of deleted records
-     * @throws Exception
+     * Stores radar object in database. 
+     * @param radar Radar object to store
+     * @return Number of records stored
      */
-    public int deleteRadar( int id ) throws Exception {
-        Connection conn = null;
-        int delete = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DELETE FROM dex_radars WHERE id = " + id + ";";
-            delete = stmt.executeUpdate( sql );
-            stmt.close();
-        } catch( Exception e ) {
-            log.error( "Failed to delete data channel", e );
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return delete;
+    public int store(Radar radar) {
+        return jdbcTemplate.update("INSERT INTO dex_radars " +
+            "(id, name, wmo_number) VALUES (?,?,?)",
+            radar.getId(),
+            radar.getName(),
+            radar.getWmoNumber());
     }
+    
+    /**
+     * Stores radar object in database.
+     * @param radar Radar object to store
+     * @return Number of records stored. 
+     */
+    public int storeNoId(Radar radar) {
+        return jdbcTemplate.update("INSERT INTO dex_radars " +
+            "(name, wmo_number) VALUES (?,?)",
+            radar.getName(),
+            radar.getWmoNumber());
+    }
+    
+    /**
+     * Update radar object in the db. 
+     * @param radar Radar to store
+     * @return Number of records updated
+     */
+    public int update(Radar radar) {
+        return jdbcTemplate.update("UPDATE dex_radars SET name = ?," + 
+                " wmo_number = ? WHERE id = ?",
+            radar.getName(),
+            radar.getWmoNumber(),
+            radar.getId());
+    } 
+    
+    /**
+     * Delete radar with a given id.
+     * @param id Radar id 
+     * @return Number of records deleted.
+     */
+    public int delete(int id) {
+        return jdbcTemplate.update("DELETE FROM dex_radars WHERE id = ?", id);
+    }
+    
+    /**
+     * Radar row mapper.
+     */
+    private static final class RadarMapper
+                                implements ParameterizedRowMapper<Radar> {
+        /**
+         * Maps records to result set. 
+         * @param rs Result set 
+         * @param rowNum Row number
+         * @return Radar object
+         * @throws SQLException 
+         */
+        public Radar mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Radar radar = new Radar(); 
+            radar.setId(rs.getInt("id"));
+            radar.setName(rs.getString("name"));
+            radar.setWmoNumber(rs.getString("wmo_number"));
+            return radar;
+        }
+    }
+    
 }
-//--------------------------------------------------------------------------------------------------
