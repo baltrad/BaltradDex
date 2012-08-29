@@ -24,7 +24,7 @@ package eu.baltrad.dex.config.controller;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
-import eu.baltrad.dex.registry.model.DeliveryRegisterManager;
+import eu.baltrad.dex.registry.model.RegistryManager;
 
 import org.apache.log4j.Logger;
 import org.springframework.web.servlet.mvc.SimpleFormController;
@@ -54,7 +54,7 @@ public class SaveRegistryConfigurationController extends SimpleFormController {
     /** Reference to configuration manager */
     private ConfigurationManager configurationManager;
     /** Reference to delivery registry manager object */
-    private DeliveryRegisterManager deliveryRegisterManager;
+    private RegistryManager registryManager;
     /** Reference to logger object */
     private Logger log;
 //------------------------------------------------------------------------------------------ Methods
@@ -106,17 +106,17 @@ public class SaveRegistryConfigurationController extends SimpleFormController {
         try {
             configurationManager.saveRegConf( regConf );
             if( regConf.getTrimByNumber() ) {
-                deliveryRegisterManager.setTrimmer( regConf.getRecordLimit() );
+                registryManager.setTrimmer( regConf.getRecordLimit() );
             } else {
-                deliveryRegisterManager.removeTrimmer(
-                        DeliveryRegisterManager.TRIM_REG_BY_NUMBER_TG );
+                registryManager.removeTrimmer(
+                        RegistryManager.TRIM_REG_BY_NUMBER_TG );
             }
             if( regConf.getTrimByAge() ) {
-                deliveryRegisterManager.setTrimmer( regConf.getMaxAgeDays(),
+                registryManager.setTrimmer( regConf.getMaxAgeDays(),
                         regConf.getMaxAgeHours(), regConf.getMaxAgeMinutes() );
             } else {
-                deliveryRegisterManager.removeTrimmer(
-                        DeliveryRegisterManager.TRIM_REG_BY_AGE_TG );
+                registryManager.removeTrimmer(
+                        RegistryManager.TRIM_REG_BY_AGE_TG );
             }
             request.getSession().setAttribute( OK_MSG_KEY, getMessageSourceAccessor().getMessage(
                     "message.saveregconf.savesuccess" ) );
@@ -149,14 +149,14 @@ public class SaveRegistryConfigurationController extends SimpleFormController {
      *
      * @return logManager Reference to delivery registry manager object
      */
-    public DeliveryRegisterManager getDeliveryRegisterManager() { return deliveryRegisterManager; }
+    public RegistryManager getDeliveryRegisterManager() { return registryManager; }
     /**
      * Sets reference to delivery registry manager object.
      *
      * @param deliveryRegisterManager Reference to delivery registry manager object
      */
-    public void setDeliveryRegisterManager( DeliveryRegisterManager deliveryRegisterManager ) {
-        this.deliveryRegisterManager = deliveryRegisterManager;
+    public void setRegistryManager( RegistryManager registryManager ) {
+        this.registryManager = registryManager;
     }
 }
 //--------------------------------------------------------------------------------------------------

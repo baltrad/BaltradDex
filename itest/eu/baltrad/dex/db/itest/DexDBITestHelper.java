@@ -51,7 +51,6 @@ import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.db.Database;
 import eu.baltrad.bdb.db.rest.RestfulDatabase;
 
-
 /**
  * Baltrad-db integration test helper.
  *
@@ -212,7 +211,7 @@ public class DexDBITestHelper extends TestCase {
     {
         IDatabaseConnection connection = new DatabaseConnection(conn);
         connection.getConfig().setProperty(
-                DatabaseConfig.PROPERTY_DATATYPE_FACTORY, getFactory());    
+                DatabaseConfig.PROPERTY_DATATYPE_FACTORY, getFactory());
         return connection;
     }
     
@@ -230,6 +229,7 @@ public class DexDBITestHelper extends TestCase {
         template.update("DELETE FROM dex_users");
         template.update("DELETE FROM dex_roles");
         template.update("DELETE FROM dex_radars");
+        template.update("DELETE FROM dex_delivery_registry");
     }
     
     /**
@@ -258,7 +258,8 @@ public class DexDBITestHelper extends TestCase {
      * @return
      * @throws Exception 
      */
-    private FlatXmlDataSet getXMLDataset(Object tc, String suffix) throws Exception {
+    private FlatXmlDataSet getXMLDataset(Object tc, String suffix) 
+            throws Exception {
         String className = getClassName(tc.getClass());
         String resourceName = className;
         if (suffix != null) {
@@ -294,7 +295,8 @@ public class DexDBITestHelper extends TestCase {
      * @return
      * @throws Exception 
      */
-    public ITable getXMLTable(Object tc, String suffix, String name) throws Exception {
+    public ITable getXMLTable(Object tc, String suffix, String name) 
+            throws Exception {
         IDataSet dataset = getXMLDataset(tc, suffix);
         return dataset.getTable(name);
     }

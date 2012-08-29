@@ -54,7 +54,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <!-- Operator pages -->
                 <prop key="exchange.htm">urlFilenameController</prop>
                 <prop key="processing.htm">urlFilenameController</prop>
-                <prop key="registry.htm">registerController</prop>
+                <prop key="registry.htm">registryController</prop>
                 
                 <!-- Admin pages -->
                 <prop key="settings.htm">urlFilenameController</prop>
@@ -78,8 +78,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="remove_upload_status.htm">subscriptionController</prop>
                 
                 <prop key="configure_registry.htm">saveRegistryConfigurationController</prop>
-                <prop key="clear_registry.htm">registerController</prop>
-                <prop key="clear_registry_status.htm">registerController</prop>
+                <prop key="clear_registry.htm">registryController</prop>
+                <prop key="clear_registry_status.htm">registryController</prop>
                 
                 <prop key="remove_connection.htm">nodeConnectionController</prop>
                 <prop key="remove_selected_connection.htm">nodeConnectionController</prop>
@@ -291,7 +291,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="framePublisher" class="eu.baltrad.dex.net.util.FramePublisher"/>
 
     <!-- Frame dispatcher controller -->
-    <!-- @@@ deprecated, to be removed-->
     <bean name="frameDispatcherController"
         class="eu.baltrad.dex.net.controller.FrameDispatcherController">
         <property name="userManager">
@@ -318,8 +317,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="framePublisher">
             <ref bean="framePublisher"/>
         </property>
-        <property name="deliveryRegisterManager">
-            <ref bean="deliveryRegisterManager"/>
+        <property name="registryManager">
+            <ref bean="registryManager"/>
         </property>
         <property name="bltFileManager">
             <ref bean="bltFileManager" />
@@ -336,8 +335,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Delivery register manager
     -->
-    <bean name="deliveryRegisterManager"
-                        class="eu.baltrad.dex.registry.model.DeliveryRegisterManager"/>
+    <bean name="registryManager"
+          class="eu.baltrad.dex.registry.model.RegistryManager"
+          autowire="byType"/>
 
     <!--
         Clear message table controller - deletes records from message table
@@ -384,12 +384,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Register controller - handles data delivery register
     -->
-    <bean name="registerController" class="eu.baltrad.dex.registry.controller.RegisterController">
+    <bean name="registryController" 
+          class="eu.baltrad.dex.registry.controller.RegistryController">
         <property name="successView">
             <value>showRegister</value>
         </property>
-        <property name="deliveryRegisterManager">
-            <ref bean="deliveryRegisterManager"/>
+        <property name="registryManager">
+            <ref bean="registryManager"/>
         </property>
         <property name="userManager">
             <ref bean="userManager"/>
@@ -402,7 +403,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         Configure registry controller
     -->
     <bean name="saveRegistryConfigurationController"
-            class="eu.baltrad.dex.config.controller.SaveRegistryConfigurationController">
+          class="eu.baltrad.dex.config.controller.SaveRegistryConfigurationController">
         <property name="successView">
             <value>redirect:configure_registry.htm</value>
         </property>
@@ -418,8 +419,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="configurationManager">
             <ref bean="configurationManager"/>
         </property>
-        <property name="deliveryRegisterManager">
-            <ref bean="deliveryRegisterManager"/>
+        <property name="registryManager">
+            <ref bean="registryManager"/>
         </property>
     </bean>
     <!--

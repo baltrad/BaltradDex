@@ -67,9 +67,25 @@ EXCEPTION WHEN OTHERS THEN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION rename_registry_table() RETURNS void AS $$
+BEGIN
+    PERFORM true FROM information_schema.tables
+        WHERE table_name = 'dex_delivery_register';
+    IF FOUND THEN
+        RAISE NOTICE 'renaming table dex_delivery_register into dex_delivery_registry';
+        ALTER TABLE dex_delivery_register RENAME TO dex_delivery_registry;
+    ELSE
+        RAISE NOTICE 'table "dex_delivery_register" already renamed';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
 SELECT remove_name_hash_from_dex_users();
 --SELECT reset_user_passwords();
+SELECT rename_registry_table();
 
 DROP FUNCTION make_plpgsql(); 
 DROP FUNCTION remove_name_hash_from_dex_users();
 DROP FUNCTION reset_user_passwords();
+DROP FUNCTION rename_registry_table();

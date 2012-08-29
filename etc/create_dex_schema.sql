@@ -23,7 +23,7 @@ Author     : szewczenko
 
 -- drop tables if exist ----------------------------------------------------------------------------
 DROP TABLE IF EXISTS dex_subscriptions CASCADE;
-DROP TABLE IF EXISTS dex_delivery_register;
+DROP TABLE IF EXISTS dex_delivery_registry;
 DROP TABLE IF EXISTS dex_channel_permissions CASCADE;
 DROP TABLE IF EXISTS dex_users CASCADE;
 DROP TABLE IF EXISTS dex_roles;
@@ -49,7 +49,7 @@ DROP SEQUENCE IF EXISTS log_entry_id_seq;
 DROP SEQUENCE IF EXISTS radar_id_seq;
 DROP SEQUENCE IF EXISTS user_id_seq;	
 DROP SEQUENCE IF EXISTS subscription_id_seq;
-DROP SEQUENCE IF EXISTS delivery_register_id_seq;
+DROP SEQUENCE IF EXISTS delivery_registry_id_seq;
 DROP SEQUENCE IF EXISTS node_connection_id_seq;
 DROP SEQUENCE IF EXISTS channel_permission_id_seq;
 DROP SEQUENCE IF EXISTS file_object_id_seq;
@@ -141,11 +141,11 @@ CREATE TABLE dex_subscriptions
     PRIMARY KEY (id)
 );
 -- delivery_register_id_seq ------------------------------------------------------------------------
-CREATE SEQUENCE delivery_register_id_seq;
+CREATE SEQUENCE delivery_registry_id_seq;
 -- dex_delivery_register ---------------------------------------------------------------------------
-CREATE TABLE dex_delivery_register
+CREATE TABLE dex_delivery_registry
 (
-    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('delivery_register_id_seq'),
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('delivery_registry_id_seq'),
     user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE,
     uuid VARCHAR(128) NOT NULL,
     user_name VARCHAR(32) NOT NULL,
@@ -154,7 +154,7 @@ CREATE TABLE dex_delivery_register
     PRIMARY KEY (id)
 );
 -- dex_messages_timestamp_idx ----------------------------------------------------------------------
-CREATE UNIQUE INDEX dex_delivery_register_timestamp_idx ON dex_delivery_register (timestamp);
+CREATE UNIQUE INDEX dex_delivery_registry_timestamp_idx ON dex_delivery_registry (timestamp);
 
 -- node connection id sequence ---------------------------------------------------------------------
 CREATE SEQUENCE node_connection_id_seq;
@@ -337,7 +337,7 @@ CREATE OR REPLACE FUNCTION dex_trim_registry_by_number() RETURNS trigger AS $$
         records_limit INTEGER;
     BEGIN
         records_limit = TG_ARGV[0];
-        DELETE FROM dex_delivery_register WHERE id IN (SELECT id FROM dex_delivery_register
+        DELETE FROM dex_delivery_registry WHERE id IN (SELECT id FROM dex_delivery_registry
             ORDER BY timestamp DESC OFFSET records_limit);
         RETURN NEW; 
     END;
@@ -349,8 +349,8 @@ CREATE OR REPLACE FUNCTION dex_trim_registry_by_age() RETURNS trigger AS $$
     BEGIN
         SELECT (TG_ARGV[0] || ' days ' || TG_ARGV[1] || ' hours ' || TG_ARGV[2] ||
             ' minutes')::INTERVAL INTO max_age;
-        DELETE FROM dex_delivery_register WHERE timestamp IN (SELECT timestamp FROM
-            dex_delivery_register WHERE age(now(), timestamp) > max_age);
+        DELETE FROM dex_delivery_registry WHERE timestamp IN (SELECT timestamp FROM
+            dex_delivery_registry WHERE age(now(), timestamp) > max_age);
         RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;

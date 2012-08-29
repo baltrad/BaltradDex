@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.net.util;
 
-import eu.baltrad.dex.registry.model.DeliveryRegisterManager;
-import eu.baltrad.dex.registry.model.DeliveryRegisterEntry;
+import eu.baltrad.dex.registry.model.RegistryManager;
+import eu.baltrad.dex.registry.model.RegistryEntry;
 import eu.baltrad.dex.log.model.MessageLogger;
 import eu.baltrad.dex.user.model.User;
 
@@ -42,7 +42,7 @@ import org.apache.http.client.methods.HttpUriRequest;
  */
 public class PostFileTask implements Runnable {
     
-    private DeliveryRegisterManager deliveryRegistry;
+    private RegistryManager deliveryRegistry;
     private Logger log;
     private IHttpClientUtil httpClient;
     private HttpUriRequest request;
@@ -62,7 +62,7 @@ public class PostFileTask implements Runnable {
         this.request = request;
         this.uuid = uuid;
         this.user = user;
-        this.deliveryRegistry = new DeliveryRegisterManager();
+        this.deliveryRegistry = new RegistryManager();
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
@@ -73,13 +73,13 @@ public class PostFileTask implements Runnable {
     public void run() {
         try {
             HttpResponse response = httpClient.post(request);
-            DeliveryRegisterEntry entry = null;
+            RegistryEntry entry = null;
             if (response.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_OK) {
-                entry = new DeliveryRegisterEntry(user.getId(), uuid, 
+                entry = new RegistryEntry(user.getId(), uuid, 
                         user.getName(), new Date(), 
-                        DeliveryRegisterEntry.MSG_SUCCESS);
-                deliveryRegistry.addEntry(entry);
+                        RegistryEntry.MSG_SUCCESS);
+                deliveryRegistry.store(entry);
             } else {
                 // Retry sending data 
                 boolean success = false;
@@ -92,15 +92,15 @@ public class PostFileTask implements Runnable {
                     }
                 }
                 if (success) {
-                    entry = new DeliveryRegisterEntry(user.getId(), uuid, 
+                    entry = new RegistryEntry(user.getId(), uuid, 
                         user.getName(), new Date(), 
-                        DeliveryRegisterEntry.MSG_SUCCESS);
-                    deliveryRegistry.addEntry(entry);
+                        RegistryEntry.MSG_SUCCESS);
+                    deliveryRegistry.store(entry);
                 } else {
-                    entry = new DeliveryRegisterEntry(user.getId(), uuid, 
+                    entry = new RegistryEntry(user.getId(), uuid, 
                         user.getName(), new Date(), 
-                        DeliveryRegisterEntry.MSG_FAILURE);
-                    deliveryRegistry.addEntry(entry);
+                        RegistryEntry.MSG_FAILURE);
+                    deliveryRegistry.store(entry);
                 }
             }
         } catch (Exception e) {

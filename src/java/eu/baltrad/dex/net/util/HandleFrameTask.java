@@ -45,7 +45,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class HandleFrameTask implements Runnable {
 //---------------------------------------------------------------------------------------- Variables
-    private DeliveryRegisterManager drManager;
+    private RegistryManager drManager;
     private Handler handler;
     private Logger log;
     private User user;
@@ -62,7 +62,7 @@ public class HandleFrameTask implements Runnable {
      * @param entry File entry
      * @param frame Data delivery frame 
      */
-    public HandleFrameTask(DeliveryRegisterManager drManager, Logger log, 
+    public HandleFrameTask(RegistryManager drManager, Logger log, 
             User user, FileEntry entry, Frame frame) 
     {
         this.drManager = drManager;
@@ -78,19 +78,19 @@ public class HandleFrameTask implements Runnable {
     public void run() {
         try {
             HttpResponse response = handler.post(frame);
-            DeliveryRegisterEntry dre = new DeliveryRegisterEntry();
+            RegistryEntry dre = new RegistryEntry();
             if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
-                dre = new DeliveryRegisterEntry(user.getId(), entry.getUuid().toString(), 
-                        user.getName(), new Date(), DeliveryRegisterEntry.MSG_SUCCESS);
+                dre = new RegistryEntry(user.getId(), entry.getUuid().toString(), 
+                        user.getName(), new Date(), RegistryEntry.MSG_SUCCESS);
                 log.info("File entry " + entry.getUuid().toString() + " sent to user " + 
                         user.getName());
             } else {
-                dre = new DeliveryRegisterEntry(user.getId(), entry.getUuid().toString(), 
-                        user.getName(), new Date(), DeliveryRegisterEntry.MSG_FAILURE);
+                dre = new RegistryEntry(user.getId(), entry.getUuid().toString(), 
+                        user.getName(), new Date(), RegistryEntry.MSG_FAILURE);
                 log.error("Failed to send file entry " + entry.getUuid().toString() + " to user " +
                         user.getName());
             }
-            drManager.addEntry(dre);
+            drManager.store(dre);
         } catch( Exception e ) {
           logger.debug("Caught exception in HandleFrameTask", e);
             log.error("Failed to complete handle frame task", e);

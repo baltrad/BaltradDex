@@ -26,49 +26,6 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@page import="eu.baltrad.dex.registry.model.DeliveryRegisterManager"%>
-<%@page import="eu.baltrad.dex.registry.controller.RegisterController"%>
-<%@page import="java.util.List"%>
-
-<%
-    // get delivery register
-    List deliveryRegister = ( List )request.getAttribute( "entries" );
-    if( deliveryRegister == null || deliveryRegister.size() <= 0 ) {
-        request.getSession().setAttribute( "register_status", 0 );
-    } else {
-        request.getSession().setAttribute( "register_status", 1 );
-    }
-    DeliveryRegisterManager manager = new DeliveryRegisterManager();
-    RegisterController controller = new RegisterController();
-    long numEntries = manager.countEntries();
-    int numPages = ( int )Math.ceil( numEntries / DeliveryRegisterManager.ENTRIES_PER_PAGE );
-    if( numPages < 1 ) {
-        numPages = 1;
-    }
-    int currentPage = controller.getCurrentPage();
-    int scrollStart = ( DeliveryRegisterManager.SCROLL_RANGE - 1 ) / 2;
-    int firstPage = 1;
-    int lastPage = DeliveryRegisterManager.SCROLL_RANGE;
-    if( numPages <= DeliveryRegisterManager.SCROLL_RANGE && currentPage <=
-            DeliveryRegisterManager.SCROLL_RANGE ) {
-        firstPage = 1;
-        lastPage = numPages;
-    }
-    if( numPages > DeliveryRegisterManager.SCROLL_RANGE && currentPage > scrollStart &&
-            currentPage < numPages - scrollStart ) {
-        firstPage = currentPage - scrollStart;
-        lastPage = currentPage + scrollStart;
-    }
-    if( numPages > DeliveryRegisterManager.SCROLL_RANGE && currentPage > scrollStart &&
-            currentPage >= numPages - ( DeliveryRegisterManager.SCROLL_RANGE - 1 ) ) {
-        firstPage = numPages - ( DeliveryRegisterManager.SCROLL_RANGE - 1 );
-        lastPage = numPages;
-    }
-    request.getSession().setAttribute("first_page", firstPage);
-    request.getSession().setAttribute("last_page", lastPage);
-    request.getSession().setAttribute("current_page", currentPage);
-%>
-
 <t:page_tabbed pageTitle="Data delivery registry" activeTab="exchange">
     <jsp:body>
         <div class="left">
@@ -79,7 +36,7 @@ Author     : szewczenko
                 Data delivery registry
             </div>
             <c:choose>
-                <c:when test="${register_status == 1}">
+                <c:when test="${not empty entries}">
                     <div class="blttext">
                         All data delivery registry entries.
                     </div>

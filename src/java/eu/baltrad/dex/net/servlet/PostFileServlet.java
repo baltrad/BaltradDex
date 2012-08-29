@@ -30,7 +30,7 @@ import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.net.model.ISubscriptionManager;
 import eu.baltrad.dex.db.model.IBltFileManager;
-import eu.baltrad.dex.registry.model.IDeliveryRegistryManager;
+import eu.baltrad.dex.registry.model.IRegistryManager;
 import eu.baltrad.dex.user.model.IUserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.net.util.RequestFactory;
@@ -89,7 +89,7 @@ public class PostFileServlet extends HttpServlet {
     private MetadataMatcher matcher;
     private IBltMessageManager messageManager;
     private IBltFileManager fileManager;
-    private IDeliveryRegistryManager registryManager;
+    private IRegistryManager registryManager;
     private IUserManager userManager;
     private IHttpClientUtil httpClient;
     private FramePublisherManager framePublisherManager;
@@ -165,8 +165,8 @@ public class PostFileServlet extends HttpServlet {
                         boolean match = matcher.match(entry.getMetadata(), 
                                 filter.getExpression());
                         User receiver = userManager.load(s.getUserName());
-                        if (match && !registryManager.entryExists(
-                                receiver.getId(), uuid.toString())) {
+                        if (match && registryManager.load(receiver.getId(), 
+                                uuid.toString()) != null) {
                             RequestFactory requestFactory = 
                                 new DefaultRequestFactory(
                                     URI.create(receiver.getNodeAddress()));
@@ -277,7 +277,7 @@ public class PostFileServlet extends HttpServlet {
      * @param registryManager the registryManager to set
      */
     @Autowired
-    public void setRegistryManager(IDeliveryRegistryManager registryManager) {
+    public void setRegistryManager(IRegistryManager registryManager) {
         this.registryManager = registryManager;
     }
 

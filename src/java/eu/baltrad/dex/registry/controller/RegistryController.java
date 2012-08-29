@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.registry.controller;
 
-import eu.baltrad.dex.registry.model.DeliveryRegisterEntry;
-import eu.baltrad.dex.registry.model.DeliveryRegisterManager;
+import eu.baltrad.dex.registry.model.RegistryEntry;
+import eu.baltrad.dex.registry.model.RegistryManager;
 import eu.baltrad.dex.db.model.BltFileManager;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.util.ITableScroller;
@@ -47,7 +47,7 @@ import java.util.List;
  * @version 1.0
  * @since 1.0
  */
-public class RegisterController extends MultiActionController implements ITableScroller {
+public class RegistryController extends MultiActionController implements ITableScroller {
 //---------------------------------------------------------------------------------------- Constants
     /** Data delivery register entries map key */
     private static final String REGISTER_ENTRIES = "entries";
@@ -64,7 +64,7 @@ public class RegisterController extends MultiActionController implements ITableS
     private Logger log;
     private LogManager logManager;
     private String successView;
-    private DeliveryRegisterManager deliveryRegisterManager;
+    private RegistryManager registryManager;
     private BltFileManager bltFileManager;
     private UserManager userManager;
     /** Holds current page number, used for page scrolling */
@@ -73,9 +73,43 @@ public class RegisterController extends MultiActionController implements ITableS
     /**
      * Constructor
      */
-    public RegisterController() {
+    public RegistryController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
+    
+    /**
+     * Get page numbers for a current set of entries.
+     * @return Numbers of first, last and current page for a given dataset 
+     */
+    private int[] getPages() {
+        long numEntries = registryManager.count();
+        int numPages = ( int )Math.ceil( numEntries 
+                / RegistryManager.ENTRIES_PER_PAGE );
+        if( numPages < 1 ) {
+            numPages = 1;
+        }
+        int curPage = getCurrentPage();
+        int scrollStart = ( RegistryManager.SCROLL_RANGE - 1 ) / 2;
+        int firstPage = 1;
+        int lastPage = RegistryManager.SCROLL_RANGE;
+        if( numPages <= RegistryManager.SCROLL_RANGE && curPage <=
+                RegistryManager.SCROLL_RANGE ) {
+            firstPage = 1;
+            lastPage = numPages;
+        }
+        if( numPages > RegistryManager.SCROLL_RANGE && curPage > scrollStart &&
+                curPage < numPages - scrollStart ) {
+            firstPage = curPage - scrollStart;
+            lastPage = curPage + scrollStart;
+        }
+        if( numPages > RegistryManager.SCROLL_RANGE && curPage > scrollStart &&
+                curPage >= numPages - ( RegistryManager.SCROLL_RANGE - 1 ) ) {
+            firstPage = numPages - ( RegistryManager.SCROLL_RANGE - 1 );
+            lastPage = numPages;
+        }
+        return new int[] {firstPage, lastPage, curPage};
+    }
+    
     /**
      * Creates delivery entries list.
      *
@@ -88,12 +122,12 @@ public class RegisterController extends MultiActionController implements ITableS
     public ModelAndView registry( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
         String pageNum = request.getParameter( PAGE_NUMBER );
-        List<DeliveryRegisterEntry> entries = null;
+        List<RegistryEntry> entries = null;
         if( pageNum != null ) {
             if( pageNum.matches( "<<" ) ) {
                 firstPage();
-                entries = deliveryRegisterManager.getEntries( 0,
-                        DeliveryRegisterManager.ENTRIES_PER_PAGE );
+                entries = getRegistryManager().load( 0,
+                        RegistryManager.ENTRIES_PER_PAGE );
             } else {
                 if( pageNum.matches( ">>" ) ) {
                     lastPage();
@@ -105,17 +139,27 @@ public class RegisterController extends MultiActionController implements ITableS
                     int page = Integer.parseInt( pageNum );
                     setCurrentPage( page );
                 }
-                int offset = ( getCurrentPage() * DeliveryRegisterManager.ENTRIES_PER_PAGE )
-                        - DeliveryRegisterManager.ENTRIES_PER_PAGE;
-                entries = deliveryRegisterManager.getEntries( offset,
-                        DeliveryRegisterManager.ENTRIES_PER_PAGE );
+                int offset = ( getCurrentPage() * RegistryManager.ENTRIES_PER_PAGE )
+                        - RegistryManager.ENTRIES_PER_PAGE;
+                entries = getRegistryManager().load( offset,
+                        RegistryManager.ENTRIES_PER_PAGE );
             }
         } else {
             setCurrentPage( 1 );
-            entries = deliveryRegisterManager.getEntries( 0,
-                    DeliveryRegisterManager.ENTRIES_PER_PAGE );
+            entries = getRegistryManager().load( 0,
+                    RegistryManager.ENTRIES_PER_PAGE );
         }
-        return new ModelAndView( SHOW_REGISTER_VIEW, REGISTER_ENTRIES, entries );
+        
+        int pages[] = getPages();
+        
+        ModelAndView modelAndView = new ModelAndView(SHOW_REGISTER_VIEW);
+        
+        modelAndView.addObject("first_page", pages[0]);
+        modelAndView.addObject("last_page", pages[1]);
+        modelAndView.addObject("current_page", pages[2]);
+        modelAndView.addObject(REGISTER_ENTRIES, entries);
+        
+        return modelAndView;
     }
     /**
      * Gets the number of entries
@@ -129,7 +173,7 @@ public class RegisterController extends MultiActionController implements ITableS
     public ModelAndView clear_registry( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
         return new ModelAndView( CLEAR_REGISTER_VIEW, CLEAR_REGISTER_KEY,
-                deliveryRegisterManager.countEntries() );
+                getRegistryManager().count() );
     }
     /**
      * Removes all entries from data delivery register
@@ -143,7 +187,7 @@ public class RegisterController extends MultiActionController implements ITableS
     public ModelAndView clear_registry_status( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
         try {
-            int deletedEntries = deliveryRegisterManager.deleteEntries();
+            int deletedEntries = getRegistryManager().delete();
             String msg = "Successfully deleted " + Integer.toString( deletedEntries )
                     + " registry entries.";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
@@ -171,8 +215,8 @@ public class RegisterController extends MultiActionController implements ITableS
      * Sets page number to the next page number.
      */
     public void nextPage() {
-        int lastPage = ( int )Math.ceil( deliveryRegisterManager.countEntries() /
-                DeliveryRegisterManager.ENTRIES_PER_PAGE );
+        int lastPage = ( int )Math.ceil( getRegistryManager().count() /
+                RegistryManager.ENTRIES_PER_PAGE );
         if( lastPage == 0 ) {
             ++lastPage;
         }
@@ -198,8 +242,9 @@ public class RegisterController extends MultiActionController implements ITableS
      * Sets page number to the last page.
      */
     public void lastPage() {
-        long numEntries = deliveryRegisterManager.countEntries();
-        int lastPage = ( int )Math.ceil( numEntries / DeliveryRegisterManager.ENTRIES_PER_PAGE );
+        long numEntries = getRegistryManager().count();
+        int lastPage = ( int )Math.ceil( numEntries / 
+                RegistryManager.ENTRIES_PER_PAGE );
         if( lastPage == 0 ) {
             ++lastPage;
         }
@@ -217,20 +262,6 @@ public class RegisterController extends MultiActionController implements ITableS
      * @param successView Reference to success view name string
      */
     public void setSuccessView( String successView ) { this.successView = successView; }
-    /**
-     * Method gets reference to DeliveryRegisterManager class instance.
-     *
-     * @return Reference to DeliveryRegisterManager class instance
-     */
-    public DeliveryRegisterManager getDeliveryRegisterManager() { return deliveryRegisterManager; }
-    /**
-     * Method sets reference to DeliveryRegisterManager class instance.
-     *
-     * @param deliveryRegisterManager Reference to DeliveryRegisterManager class instance
-     */
-    public void setDeliveryRegisterManager( DeliveryRegisterManager deliveryRegisterManager ) {
-        this.deliveryRegisterManager = deliveryRegisterManager;
-    }
     /**
      * Method gets reference to user manager object.
      *
@@ -269,5 +300,19 @@ public class RegisterController extends MultiActionController implements ITableS
      * @param logManager Reference to log manager object
      */
     public void setLogManager( LogManager logManager ) { this.logManager = logManager; }
+
+    /**
+     * @return the registryManager
+     */
+    public RegistryManager getRegistryManager() {
+        return registryManager;
+    }
+
+    /**
+     * @param registryManager the registryManager to set
+     */
+    public void setRegistryManager(RegistryManager registryManager) {
+        this.registryManager = registryManager;
+    }
 }
 //--------------------------------------------------------------------------------------------------

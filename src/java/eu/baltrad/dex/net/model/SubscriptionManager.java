@@ -43,14 +43,14 @@ import java.util.List;
  * @since 1.0
  */
 public class SubscriptionManager implements ISubscriptionManager {
-//-------------------------------------------------------------------- Variables
+
     /** JDBC template */
     private SimpleJdbcOperations jdbcTemplate;
     /** Logger */
     private Logger log;
     /** Row mapper */
     private Mapper mapper;
-//---------------------------------------------------------------------- Methods
+
     /**
      * Constructor.
      */
@@ -286,7 +286,8 @@ public class SubscriptionManager implements ISubscriptionManager {
             if (!s1.getDataSourceName().equals(s2.getDataSourceName()) ||
                     !s1.getNodeAddress().equals(s2.getNodeAddress()) ||
                     !s1.getOperatorName().equals(s2.getOperatorName()) ||
-                    !s1.getType().equals( s2.getType()) || s1.getActive() != s2.getActive()) {
+                    !s1.getType().equals( s2.getType()) || s1.getActive() 
+                    != s2.getActive()) {
                 res = false;
             }
         } catch(Exception e) {
@@ -295,4 +296,4 @@ public class SubscriptionManager implements ISubscriptionManager {
         return res;
     }
 }
-//--------------------------------------------------------------------------------------------------
+

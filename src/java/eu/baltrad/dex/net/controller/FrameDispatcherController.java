@@ -104,7 +104,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
     // Frame publisher object
     private FramePublisher framePublisher;
     /** References delivery register manager */
-    private DeliveryRegisterManager deliveryRegisterManager;
+    private RegistryManager registryManager;
     /** Reference to BltFileManager */
     private BltFileManager bltFileManager;
 //------------------------------------------------------------------------------------------ Methods
@@ -466,7 +466,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     // Make sure that user exists locally
 
                     User receiver = userManager.load(sub.getUserName());
-                    DeliveryRegisterEntry dre = deliveryRegisterManager.getEntry(
+                    RegistryEntry dre = registryManager.load(
                             receiver.getId(), fileEntry.getUuid().toString());
                     if (matches && dre == null) {
                         long timestamp = System.currentTimeMillis();
@@ -482,7 +482,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             InitAppUtil.getConf().getNodeAddress(),
                             InitAppUtil.getConf().getNodeName(), timestamp, signature, payloadFile);
                         // Create frame delivery task
-                        HandleFrameTask task = new HandleFrameTask(getDeliveryRegisterManager(),
+                        HandleFrameTask task = new HandleFrameTask(registryManager,
                             log, receiver, fileEntry, frame);
                         // Add task to publisher manager
                         framePublisherManager.getFramePublisher(
@@ -679,8 +679,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @return Reference to delivery register manager object
      * @see DeliveryRegisterManager
      */
-    public DeliveryRegisterManager getDeliveryRegisterManager() {
-        return deliveryRegisterManager;
+    public RegistryManager getRegistryManager() {
+        return registryManager;
     }
     /**
      * Sets reference to delivery register manager object.
@@ -688,8 +688,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * @param deliveryRegisterManager Reference to delivery register manager to set
      * @see DeliveryRegisterManager
      */
-    public void setDeliveryRegisterManager( DeliveryRegisterManager deliveryRegisterManager ) {
-        this.deliveryRegisterManager = deliveryRegisterManager;
+    public void setRegistryManager( RegistryManager registryManager ) {
+        this.registryManager = registryManager;
     }
     /**
      * Method returns reference to file manager object.

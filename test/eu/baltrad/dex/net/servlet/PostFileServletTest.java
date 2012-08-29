@@ -42,7 +42,8 @@ import eu.baltrad.beast.message.IBltMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.dex.net.util.FramePublisherManager;
-import eu.baltrad.dex.registry.model.IDeliveryRegistryManager;
+import eu.baltrad.dex.registry.model.IRegistryManager;
+import eu.baltrad.dex.registry.model.RegistryEntry;
 import eu.baltrad.dex.user.model.IUserManager;
 import eu.baltrad.dex.user.model.User;
 
@@ -331,10 +332,10 @@ public class PostFileServletTest {
         expect(userManagerMock.load(isA(String.class)))
                 .andReturn(user).anyTimes();
         
-        IDeliveryRegistryManager deliveryRegistryManagerMock =
-          (IDeliveryRegistryManager) createMock(IDeliveryRegistryManager.class);
-        expect(deliveryRegistryManagerMock.entryExists(1, ENTRY_UUID))
-                .andReturn(Boolean.FALSE).anyTimes();
+        IRegistryManager deliveryRegistryManagerMock =
+          (IRegistryManager) createMock(IRegistryManager.class);
+        expect(deliveryRegistryManagerMock.load(1, ENTRY_UUID))
+                .andReturn(new RegistryEntry()).anyTimes();
         
         HttpResponse res = createResponse(HttpServletResponse.SC_OK, null);
         IHttpClientUtil httpClientMock = 

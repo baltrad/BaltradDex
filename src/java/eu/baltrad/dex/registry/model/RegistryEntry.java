@@ -30,7 +30,7 @@ import java.util.Date;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class DeliveryRegisterEntry {
+public class RegistryEntry {
 //---------------------------------------------------------------------------------------- Constants
     public static final String MSG_SUCCESS = "SUCCESS";
     public static final String MSG_FAILURE = "FAILURE";
@@ -51,7 +51,7 @@ public class DeliveryRegisterEntry {
     /**
      * Default constructor
      */
-    public DeliveryRegisterEntry() {}
+    public RegistryEntry() {}
     /**
      * Constructor sets field values.
      *
@@ -61,7 +61,7 @@ public class DeliveryRegisterEntry {
      * @param timeStamp Delivery timestamp
      * @param deliveryStatus Delivery status tells whether user received a delivery
      */
-    public DeliveryRegisterEntry( int userId, String uuid, String userName, Date timeStamp,
+    public RegistryEntry( int userId, String uuid, String userName, Date timeStamp,
             String deliveryStatus ) {
         this.userId = userId;
         this.uuid = uuid;
@@ -79,7 +79,7 @@ public class DeliveryRegisterEntry {
      * @param timeStamp Delivery timestamp
      * @param deliveryStatus Delivery status tells whether user received a delivery
      */
-    public DeliveryRegisterEntry( int id, int userId, String uuid, String userName, Date timeStamp,
+    public RegistryEntry( int id, int userId, String uuid, String userName, Date timeStamp,
             String deliveryStatus ) {
         this.id = id;
         this.userId = userId;

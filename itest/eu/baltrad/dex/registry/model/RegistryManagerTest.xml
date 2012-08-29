@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+ 
+    <dex_roles id="1" role="peer"/>
+ 
+    <dex_users id="1" name="User1" role_name="peer" password=""
+               org_name="" org_unit="" locality="" state="" country_code="" 
+               node_address="http://localhost"/>
+    <dex_users id="2" name="User2" role_name="peer" password=""
+               org_name="" org_unit="" locality="" state="" country_code="" 
+               node_address="http://localhost"/>
+ 
+    <dex_delivery_registry id="1" user_id="1" uuid="111111111111" 
+        user_name="User1" timestamp="2012-08-24 10:20:04.0" status="SUCCESS"/>
+    <dex_delivery_registry id="2" user_id="1" uuid="222222222222" 
+        user_name="User1" timestamp="2012-08-24 10:30:04.0" status="SUCCESS"/>
+    <dex_delivery_registry id="3" user_id="1" uuid="333333333333" 
+        user_name="User1" timestamp="2012-08-24 10:40:04.0" status="SUCCESS"/>
+    <dex_delivery_registry id="4" user_id="1" uuid="444444444444" 
+        user_name="User1" timestamp="2012-08-24 10:50:04.0" status="SUCCESS"/>
+    <dex_delivery_registry id="5" user_id="2" uuid="555555555555" 
+        user_name="User2" timestamp="2012-08-24 11:00:04.0" status="SUCCESS"/>
+    <dex_delivery_registry id="6" user_id="2" uuid="666666666666" 
+        user_name="User2" timestamp="2012-08-24 11:20:04.0" status="FAILURE"/>
+    <dex_delivery_registry id="7" user_id="2" uuid="777777777777" 
+        user_name="User2" timestamp="2012-08-24 11:30:04.0" status="SUCCESS"/>
+    <dex_delivery_registry id="8" user_id="2" uuid="888888888888" 
+        user_name="User2" timestamp="2012-08-24 11:40:04.0" status="SUCCESS"/>
+    <dex_delivery_registry id="9" user_id="2" uuid="999999999999" 
+        user_name="User2" timestamp="2012-08-24 12:50:04.0" status="FAILURE"/>
+    <dex_delivery_registry id="10" user_id="2" uuid="101010101010" 
+        user_name="User2" timestamp="2012-08-24 12:00:04.0" status="FAILURE"/>
+    <dex_delivery_registry id="11" user_id="2" uuid="110110110110" 
+        user_name="User2" timestamp="2012-08-24 12:10:04.0" status="SUCCESS"/>
+        
+</dataset>
