@@ -19,38 +19,37 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.registry.model;
+package eu.baltrad.dex.log.model;
 
 import java.util.List;
 
 /**
- * Data delivery registry interface.
+ * Message logger interface.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.2.1
- * @since 1.2.1
+ * @since 0.6.6
  */
-public interface IRegistryManager {
+public interface ILogManager {
     
     public long count();
     
-    public List<RegistryEntry> load();
+    public List<LogEntry> load();
     
-    public RegistryEntry load(int userId, String uuid);
+    public List<LogEntry> load(int limit); 
     
-    public List<RegistryEntry> load(int offset, int limit);
+    public List<LogEntry> load(int offset, int limit);
     
-    public int store(RegistryEntry entry);
+    public int store(LogEntry entry);
     
-    public int storeNoId(RegistryEntry entry);
+    public int storeNoId(LogEntry entry);
     
     public int delete();
-    
-    public int delete(int id);
     
     public void setTrimmer(int limit);
     
     public void setTrimmer(int days, int hours, int minutes);
     
     public void removeTrimmer(String name);
+    
 }

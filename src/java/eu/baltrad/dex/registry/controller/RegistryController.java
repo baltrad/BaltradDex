@@ -26,7 +26,7 @@ import eu.baltrad.dex.registry.model.RegistryManager;
 import eu.baltrad.dex.db.model.BltFileManager;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.util.ITableScroller;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.log.model.LogManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,7 +48,7 @@ import java.util.List;
  * @since 1.0
  */
 public class RegistryController extends MultiActionController implements ITableScroller {
-//---------------------------------------------------------------------------------------- Constants
+
     /** Data delivery register entries map key */
     private static final String REGISTER_ENTRIES = "entries";
     private static final String CLEAR_REGISTER_KEY = "number_of_entries";
@@ -60,7 +60,7 @@ public class RegistryController extends MultiActionController implements ITableS
     private static final String SHOW_CLEAR_REGISTER_STATUS_VIEW = "clear_registry_status";
     /** Page number map key */
     private static final String PAGE_NUMBER = "pagenum";
-//---------------------------------------------------------------------------------------- Variables
+
     private Logger log;
     private LogManager logManager;
     private String successView;
@@ -69,7 +69,7 @@ public class RegistryController extends MultiActionController implements ITableS
     private UserManager userManager;
     /** Holds current page number, used for page scrolling */
     private static int currentPage;
-//------------------------------------------------------------------------------------------ Methods
+
     /**
      * Constructor
      */
@@ -83,28 +83,30 @@ public class RegistryController extends MultiActionController implements ITableS
      */
     private int[] getPages() {
         long numEntries = registryManager.count();
-        int numPages = ( int )Math.ceil( numEntries 
-                / RegistryManager.ENTRIES_PER_PAGE );
-        if( numPages < 1 ) {
+        int numPages = (int) Math.ceil(numEntries / RegistryManager.ENTRIES_PER_PAGE);
+        if ((numPages * RegistryManager.ENTRIES_PER_PAGE) < numEntries) {
+            ++numPages;
+        }
+        if (numPages < 1) {
             numPages = 1;
         }
         int curPage = getCurrentPage();
-        int scrollStart = ( RegistryManager.SCROLL_RANGE - 1 ) / 2;
+        int scrollStart = (RegistryManager.SCROLL_RANGE - 1) / 2;
         int firstPage = 1;
         int lastPage = RegistryManager.SCROLL_RANGE;
-        if( numPages <= RegistryManager.SCROLL_RANGE && curPage <=
-                RegistryManager.SCROLL_RANGE ) {
+        if (numPages <= RegistryManager.SCROLL_RANGE && curPage 
+                <= RegistryManager.SCROLL_RANGE) {
             firstPage = 1;
             lastPage = numPages;
         }
-        if( numPages > RegistryManager.SCROLL_RANGE && curPage > scrollStart &&
-                curPage < numPages - scrollStart ) {
+        if (numPages > RegistryManager.SCROLL_RANGE && curPage > scrollStart 
+                && curPage < numPages - scrollStart) {
             firstPage = curPage - scrollStart;
             lastPage = curPage + scrollStart;
         }
-        if( numPages > RegistryManager.SCROLL_RANGE && curPage > scrollStart &&
-                curPage >= numPages - ( RegistryManager.SCROLL_RANGE - 1 ) ) {
-            firstPage = numPages - ( RegistryManager.SCROLL_RANGE - 1 );
+        if (numPages > RegistryManager.SCROLL_RANGE && curPage > scrollStart 
+                && curPage >= numPages - (RegistryManager.SCROLL_RANGE - 1)) {
+            firstPage = numPages - (RegistryManager.SCROLL_RANGE - 1);
             lastPage = numPages;
         }
         return new int[] {firstPage, lastPage, curPage};
@@ -199,6 +201,7 @@ public class RegistryController extends MultiActionController implements ITableS
         }
         return new ModelAndView( SHOW_CLEAR_REGISTER_STATUS_VIEW );
     }
+    
     /**
      * Gets current page number.
      *
@@ -215,8 +218,11 @@ public class RegistryController extends MultiActionController implements ITableS
      * Sets page number to the next page number.
      */
     public void nextPage() {
-        int lastPage = ( int )Math.ceil( getRegistryManager().count() /
-                RegistryManager.ENTRIES_PER_PAGE );
+        int lastPage = ( int )Math.ceil( registryManager.count() 
+                / RegistryManager.ENTRIES_PER_PAGE );
+        if( ( lastPage * RegistryManager.ENTRIES_PER_PAGE ) < registryManager.count() ) {
+            ++lastPage;
+        }
         if( lastPage == 0 ) {
             ++lastPage;
         }
@@ -227,7 +233,7 @@ public class RegistryController extends MultiActionController implements ITableS
     /**
      * Sets page number to the previous page number.
      */
-    public void previousPage() {
+    public void previousPage() { 
         if( getCurrentPage() != 1 ) {
             --currentPage;
         }
@@ -242,14 +248,19 @@ public class RegistryController extends MultiActionController implements ITableS
      * Sets page number to the last page.
      */
     public void lastPage() {
-        long numEntries = getRegistryManager().count();
-        int lastPage = ( int )Math.ceil( numEntries / 
-                RegistryManager.ENTRIES_PER_PAGE );
+        long numEntries = registryManager.count();
+        int lastPage = ( int )Math.ceil( numEntries 
+                / RegistryManager.ENTRIES_PER_PAGE );
+        if( ( lastPage * RegistryManager.ENTRIES_PER_PAGE ) 
+                < registryManager.count() ) {
+            ++lastPage;
+        }
         if( lastPage == 0 ) {
             ++lastPage;
         }
         currentPage = lastPage;
     }
+    
     /**
      * Method returns reference to success view name string.
      *

@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.log.controller;
 
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.log.model.LogManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +56,7 @@ public class RemoveMessagesController implements Controller {
      */
     public RemoveMessagesController() {
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
-        this.logManager = new LogManager();
+        this.logManager = LogManager.getInstance();
     }
     /**
      * Deletes all mesages from message stack and returns model and view.
@@ -70,13 +70,13 @@ public class RemoveMessagesController implements Controller {
     public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException {
         try {
-            int deletedEntries = logManager.deleteEntries();
+            int deletedEntries = logManager.delete();
             String msg = "Successfully deleted " + Integer.toString( deletedEntries ) 
                     + " message(s).";
             request.getSession().setAttribute( OK_MSG_KEY, msg );
             log.warn( msg );
         } catch( Exception e ) {
-            String msg = "Failed to remove system messages";
+            String msg = "Failed to remove system messages ";
             request.getSession().setAttribute( ERROR_MSG_KEY, msg );
             log.error( msg, e );
         }

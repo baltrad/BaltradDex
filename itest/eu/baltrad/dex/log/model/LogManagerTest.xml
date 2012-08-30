@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+ 
+    <dex_messages id="1" timestamp="2012-08-24 10:20:04.0" system="DEX"
+                  type="INFO" message="Message 1"/>
+    <dex_messages id="2" timestamp="2012-08-24 10:30:04.0" system="DEX"
+                  type="INFO" message="Message 2"/>
+    <dex_messages id="3" timestamp="2012-08-24 10:40:04.0" system="DEX"
+                  type="INFO" message="Message 3"/>
+    <dex_messages id="4" timestamp="2012-08-24 10:50:04.0" system="DEX"
+                  type="INFO" message="Message 4"/>
+    <dex_messages id="5" timestamp="2012-08-24 11:00:04.0" system="DEX"
+                  type="WARN" message="Message 5"/>
+    <dex_messages id="6" timestamp="2012-08-24 11:10:04.0" system="DEX"
+                  type="WARN" message="Message 6"/>
+    <dex_messages id="7" timestamp="2012-08-24 11:20:04.0" system="DEX"
+                  type="INFO" message="Message 7"/>
+    <dex_messages id="8" timestamp="2012-08-24 11:30:04.0" system="DEX"
+                  type="INFO" message="Message 8"/>
+    <dex_messages id="9" timestamp="2012-08-24 11:40:04.0" system="DEX"
+                  type="INFO" message="Message 9"/>
+    <dex_messages id="10" timestamp="2012-08-24 11:50:04.0" system="DEX"
+                  type="ERROR" message="Message 10"/>
+    <dex_messages id="11" timestamp="2012-08-24 12:00:04.0" system="DEX"
+                  type="ERROR" message="Message 11"/>
+    <dex_messages id="12" timestamp="2012-08-24 12:10:04.0" system="DEX"
+                  type="INFO" message="Message 12"/>              
+        
+</dataset>

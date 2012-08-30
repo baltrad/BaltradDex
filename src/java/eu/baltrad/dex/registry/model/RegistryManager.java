@@ -177,15 +177,14 @@ public class RegistryManager implements IRegistryManager {
      * Set trigger. Trigger activates trimmer function deleting records when 
      * given number of records is exceeded.
      * @param limit Maximum number of records
-     * @return Number of rows affected
      */
-    public int setTrimmer(int limit) {
+    public void setTrimmer(int limit) {
         String sql = "DROP TRIGGER IF EXISTS dex_trim_registry_by_number_tg " +
             "ON dex_delivery_registry;" +
             " CREATE TRIGGER dex_trim_registry_by_number_tg AFTER INSERT ON " +
             "dex_delivery_registry FOR EACH ROW EXECUTE PROCEDURE " + 
              "dex_trim_registry_by_number(" + limit + ");";
-        return jdbcTemplate.update(sql);
+        jdbcTemplate.update(sql);
     }
     
     /**
@@ -194,27 +193,25 @@ public class RegistryManager implements IRegistryManager {
      * @param days Maximum days
      * @param hours Maximum hours 
      * @param minutes Maximum minutes
-     * @return Number of rows affected 
      */
-    public int setTrimmer(int days, int hours, int minutes) {
+    public void setTrimmer(int days, int hours, int minutes) {
         String sql = "DROP TRIGGER IF EXISTS dex_trim_registry_by_age_tg ON " +
             "dex_delivery_registry;" +
             " CREATE TRIGGER dex_trim_registry_by_age_tg AFTER INSERT ON " +
             "dex_delivery_registry FOR EACH ROW EXECUTE PROCEDURE " + 
             "dex_trim_registry_by_age(" + days + ", " + hours + ", " + 
              minutes + ");";
-        return jdbcTemplate.update(sql);
+        jdbcTemplate.update(sql);
     }
     
     /**
      * Removes trigger from registry table.
      * @param name Trigger name
-     * @return Number of rows affected
      */
-    public int removeTrimmer(String name) {
+    public void removeTrimmer(String name) {
         String sql = "DROP TRIGGER IF EXISTS " + name + 
                 " ON dex_delivery_registry;";
-        return jdbcTemplate.update(sql);
+        jdbcTemplate.update(sql);
     }
     
     /**

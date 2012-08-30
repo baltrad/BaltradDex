@@ -22,7 +22,7 @@
 package eu.baltrad.dex.net.model;
 
 import eu.baltrad.dex.util.JDBCConnectionManager;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.apache.log4j.Logger;
 

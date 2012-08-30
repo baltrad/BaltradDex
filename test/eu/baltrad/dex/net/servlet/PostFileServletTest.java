@@ -26,7 +26,7 @@ import eu.baltrad.dex.net.util.IHttpClientUtil;
 import eu.baltrad.dex.net.model.ISubscriptionManager;
 import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.db.model.IBltFileManager;
 
 import eu.baltrad.bdb.FileCatalog;

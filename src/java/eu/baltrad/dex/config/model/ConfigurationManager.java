@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.config.model;
 
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import eu.baltrad.dex.util.ServletContextUtil;
 import org.apache.log4j.Logger;

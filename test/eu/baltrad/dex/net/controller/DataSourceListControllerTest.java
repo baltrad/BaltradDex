@@ -25,7 +25,7 @@ import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.net.model.*;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import javax.servlet.http.HttpServletResponse;
 

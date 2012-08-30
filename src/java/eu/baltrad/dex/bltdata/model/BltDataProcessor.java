@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.bltdata.model;
 
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.h5.H5File;

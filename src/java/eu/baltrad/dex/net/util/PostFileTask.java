@@ -23,7 +23,7 @@ package eu.baltrad.dex.net.util;
 
 import eu.baltrad.dex.registry.model.RegistryManager;
 import eu.baltrad.dex.registry.model.RegistryEntry;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.user.model.User;
 
 import org.apache.log4j.Logger;

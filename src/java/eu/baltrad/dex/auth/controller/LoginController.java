@@ -23,7 +23,7 @@ package eu.baltrad.dex.auth.controller;
 
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.auth.util.SecurityManager;
 
 import org.springframework.stereotype.Controller;
@@ -40,8 +40,8 @@ import java.security.Principal;
  * Login controller class implementing basic user authentication functionality.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.1.1
- * @since 1.0
+ * @version 1.2.2
+ * @since 1.0.0
  */
 
 @Controller
@@ -90,9 +90,11 @@ public class LoginController {
     @RequestMapping("/home.htm")
     public String welcome(Model model, Principal principal, HttpSession session) 
     {
-        User user = userManager.load(principal.getName());
-        SecurityManager.setSessionUser(session, user);
-        log.info("User " + user.getName() + " signed in");
+        if (SecurityManager.getSessionUser(session) == null) {
+            User user = userManager.load(principal.getName());
+            SecurityManager.setSessionUser(session, user);
+            log.info("User " + user.getName() + " signed in");
+        }
         return "home";
     }  
     
@@ -119,4 +121,4 @@ public class LoginController {
     }
     
 }
-//--------------------------------------------------------------------------------------------------
+

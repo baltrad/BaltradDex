@@ -3,8 +3,6 @@
 <%@ attribute name="activeTab" required="true" description="name of the active tab"%>
 
 <%@ tag import="eu.baltrad.dex.user.model.User" %>
-<%@ tag import="eu.baltrad.dex.log.model.MessageLogger" %>
-<%@ tag import="org.apache.log4j.Logger" %>
 
 <jsp:useBean id="securityManager"
              scope="session"
@@ -12,7 +10,6 @@
 </jsp:useBean>
 
 <%
-    Logger log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     User sessionUser = (User) securityManager.getSessionUser(session);
     if (sessionUser.getRoleName().equals(User.ROLE_ADMIN)) {
         request.getSession().setAttribute("userRole", 0);

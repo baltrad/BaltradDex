@@ -282,7 +282,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Message logger
     -->
-    <bean name="messageLogger" class="eu.baltrad.dex.log.model.MessageLogger"/>
+    <bean name="messageLogger" class="eu.baltrad.dex.log.util.MessageLogger"/>
 
     <!-- FramePublisherManager -->
     <bean name="framePublisherManager" class="eu.baltrad.dex.net.util.FramePublisherManager"/>
@@ -380,7 +380,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Log manager
     -->
-    <bean name="logManager" class="eu.baltrad.dex.log.model.LogManager"/>
+    <bean name="logManager" class="eu.baltrad.dex.log.model.LogManager"
+          autowire="byType"/>     
+          
     <!--
         Register controller - handles data delivery register
     -->
@@ -544,7 +546,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!--
         Add radar validator
     -->
-    <bean name="saveRadarValidator" class="eu.baltrad.dex.radar.util.SaveRadarValidator"/>
+    <bean name="saveRadarValidator" 
+        class="eu.baltrad.dex.radar.util.SaveRadarValidator"/>
 
     <!--
         Edit radar controller

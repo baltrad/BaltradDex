@@ -24,7 +24,7 @@ package eu.baltrad.dex.subscription.controller;
 import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.net.model.SubscriptionManager;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;

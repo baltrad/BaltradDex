@@ -50,7 +50,7 @@ import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.util.JDBCConnectionManager;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 /**
  * Data manager - interacts with baltrad-db component.

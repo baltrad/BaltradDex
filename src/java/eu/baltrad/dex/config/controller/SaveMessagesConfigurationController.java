@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.config.controller;
 
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.log.model.LogManager;

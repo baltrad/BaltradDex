@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,13 +17,12 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.log.model;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Class implements system message object.
@@ -33,58 +32,66 @@ import java.text.SimpleDateFormat;
  * @since 1.0
  */
 public class LogEntry implements Serializable {
-//---------------------------------------------------------------------------------------- Constants
-    /** Date format string */
-    private final static String DATE_FORMAT = "yyyy/MM/dd";
-    /** Time format string */
-    private final static String TIME_FORMAT = "HH:mm:ss";
-//---------------------------------------------------------------------------------------- Variables
+    
     /** Log entry ID */
     private int id;
     /** Timestamp */
-    private Timestamp timeStamp;
+    private Date timeStamp;
     /** Determines the system that generated the message */
     private String system;
     /** Message type */
     private String type;
     /** Actual message string */
     private String message;
-    /** Auxiliary variable storing date as string */
-    private String dateStr;
-    /** Auxiliary variable storing time as string */
-    private String timeStr;
-//------------------------------------------------------------------------------------------ Methods
+    
     /**
-     * Constructor
-     *
+     * Default constructor.
+     */
+    public LogEntry() {}
+    
+    /**
+     * Constructor.
+     * @param id Record id
      * @param Timestamp Current time as timestamp
      * @param system Determines system that produced the message
      * @param type Determines type of the message
      * @param message Actual message string
      */
-    public LogEntry(  Timestamp timeStamp, String system, String type, String message ) {
+    public LogEntry(int id, Date timeStamp, String system, String type, 
+            String message) {
+        this.id = id;
         this.timeStamp = timeStamp;
         this.system = system;
         this.type = type;
         this.message = message;
-        setDateStr( timeStamp );
-        setTimeStr( timeStamp );
     }
+    
     /**
-     * Constructor
-     *
-     * @param Timestamp Current time in milliseconds
+     * Constructor.
+     * @param Timestamp Current time as timestamp
      * @param system Determines system that produced the message
      * @param type Determines type of the message
      * @param message Actual message string
      */
-    public LogEntry(  long time, String system, String type, String message ) {
-        this.timeStamp = new Timestamp( time );
+    public LogEntry(Date timeStamp, String system, String type, 
+            String message) {
+        this.timeStamp = timeStamp;
         this.system = system;
         this.type = type;
         this.message = message;
-        setDateStr( getTimeStamp() );
-        setTimeStr( getTimeStamp() );
+    }
+    /**
+     * Constructor.
+     * @param time Current time in milliseconds
+     * @param system Determines system that produced the message
+     * @param type Determines type of the message
+     * @param message Actual message string
+     */
+    public LogEntry(long time, String system, String type, String message) {
+        this.timeStamp = new Date(time);
+        this.system = system;
+        this.type = type;
+        this.message = message;
     }
     /**
      * Method gets log entry ID.
@@ -103,13 +110,13 @@ public class LogEntry implements Serializable {
      *
      * @return TimeStamp
      */
-    public Timestamp getTimeStamp() { return timeStamp; }
+    public Date getTimeStamp() { return timeStamp; }
     /**
      * Sets timstamp
      *
      * @param timeStamp Timestamp to set
      */
-    public void setTimeStamp( Timestamp timeStamp ) { this.timeStamp = timeStamp; }
+    public void setTimeStamp( Date timeStamp ) { this.timeStamp = timeStamp; }
     /**
      * Gets name of the system that generated the message.
      *
@@ -146,35 +153,4 @@ public class LogEntry implements Serializable {
      * @param Message string to set
      */
     public void setMessage( String message ) { this.message = message; }
-    /**
-     * Gets date string.
-     *
-     * @return Date string
-     */
-    public String getDateStr() { return dateStr; }
-    /**
-     * Sets date string.
-     *
-     * @param dateStr Date string to set
-     */
-    public void setDateStr( Timestamp timeStamp ) {
-        SimpleDateFormat format = new SimpleDateFormat( DATE_FORMAT );
-        this.dateStr = format.format( timeStamp );
-    }
-    /**
-     * Gets time string.
-     *
-     * @return Time string
-     */
-    public String getTimeStr() { return timeStr; }
-    /**
-     * Sets time string.
-     *
-     * @param timeStr Time string to set
-     */
-    public void setTimeStr( Timestamp timeStamp ) {
-        SimpleDateFormat format = new SimpleDateFormat( TIME_FORMAT );
-        this.timeStr = format.format( timeStamp );
-    }
 }
-//--------------------------------------------------------------------------------------------------

@@ -23,7 +23,7 @@ package eu.baltrad.dex.datasource.controller;
 
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import eu.baltrad.beast.db.CoreFilterManager;
 import eu.baltrad.beast.db.IFilter;

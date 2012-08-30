@@ -25,7 +25,7 @@ import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.util.ServletContextUtil;
 import eu.baltrad.dex.util.InitAppUtil;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.apache.log4j.Logger;
 

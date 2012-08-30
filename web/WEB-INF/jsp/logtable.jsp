@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,11 +15,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Message table page
 Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
                                                 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -69,12 +69,12 @@ Author     : szewczenko
             <div class="entry">
                 <div id="cell" class="logdate">
                     <div class="<%=style%>">
-                        <c:out value="${entry.dateStr}"/>
+                        <c:out value="${fn:substring(entry.timeStamp, 0, 10)}"/>
                     </div>
                 </div>
                 <div id="cell" class="logtime">
                     <div class="<%=style%>">
-                        <c:out value="${entry.timeStr}"/>
+                        <c:out value="${fn:substring(entry.timeStamp, 10, 19)}"/>
                     </div>
                 </div>
                 <c:choose>

@@ -26,16 +26,12 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 <%@ page import="eu.baltrad.dex.user.model.User" %>
-<%@ page import="eu.baltrad.dex.log.model.MessageLogger" %>
-<%@ page import="org.apache.log4j.Logger" %>
-<%@ page import="java.util.Date" %>
 
 <jsp:useBean id="securityManager" scope="session"
              class="eu.baltrad.dex.auth.util.SecurityManager">
 </jsp:useBean>
 
 <%
-    Logger log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     User sessionUser = (User) securityManager.getSessionUser(session);
     if( sessionUser.getRoleName().equals( User.ROLE_ADMIN ) ) {
         request.getSession().setAttribute( "userRole", 0 );

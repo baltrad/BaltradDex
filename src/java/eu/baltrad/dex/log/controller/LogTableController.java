@@ -53,7 +53,7 @@ public class LogTableController implements Controller {
      * Constructor.
      */
     public LogTableController() {
-        this.logManager = new LogManager();
+        this.logManager = LogManager.getInstance();
     }
     /**
      * Method handles http request. Returns ModelAndView object containing log entry list.
@@ -66,7 +66,7 @@ public class LogTableController implements Controller {
      */
     public ModelAndView handleRequest( HttpServletRequest request,
             HttpServletResponse response ) throws ServletException, IOException {
-        List<LogEntry> entries = logManager.getEntries( LogManager.ENTRIES_PER_PAGE );
+        List<LogEntry> entries = logManager.load( LogManager.ENTRIES_PER_PAGE );
         return new ModelAndView( successView, MAP_KEY, entries );
     }
 

@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,287 +17,226 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.log.model;
 
-import eu.baltrad.dex.util.JDBCConnectionManager;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import org.apache.log4j.Logger;
-
-import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.Timestamp;
+import java.sql.SQLException;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
- * Class implements custom log message appender.
+ * Message logger. 
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 0.6.6
+ * @version 1.2.1
  * @since 0.6.6
  */
-public class LogManager {
-//---------------------------------------------------------------------------------------- Constants
+public class LogManager implements ILogManager, InitializingBean {
+
     /** Number of log entries per page */
     public final static int ENTRIES_PER_PAGE = 12;
     /** Number of pages in the scroll bar, must be an odd number >= 3 */
     public final static int SCROLL_RANGE = 11;
     /** Trim messages by number trigger */
-    public static final String TRIM_MSG_BY_NUMBER_TG = "dex_trim_messages_by_number_tg";
+    public static final String TRIM_MSG_BY_NUMBER_TG = 
+            "dex_trim_messages_by_number_tg";
     /** Trim messages by date trigger */
-    public static final String TRIM_MSG_BY_AGE_TG = "dex_trim_messages_by_age_tg";
-//---------------------------------------------------------------------------------------- Variables
-    /** Reference to JDBCConnector class object */
-    private JDBCConnectionManager jdbcConnectionManager;
+    public static final String TRIM_MSG_BY_AGE_TG = 
+            "dex_trim_messages_by_age_tg";
     
-    /** Logger */
-    private Logger log;
-//------------------------------------------------------------------------------------------ Methods
+    /** Static instance */
+    private static LogManager instance;
+    /** JDBC template */
+    private SimpleJdbcOperations jdbcTemplate;
+    /** Row mapper */
+    private LogEntryMapper mapper;
+
     /**
-     * Constructor gets reference to JDBCConnectionManager and Log4j Logger.
+     * Constructor.
      */
     public LogManager() {
-        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX ); // Probably not a good idea to send errors back to myself
+        this.mapper = new LogEntryMapper();
     }
+    
     /**
-     * Adds log entry to the system log stored in the database
-     *
-     * @param event LogEntry
+     * Implements InitializingBean
      */
-    public synchronized void addEntry( LogEntry entry ) {
-        Connection conn = null;
+    public void afterPropertiesSet() throws Exception {
+        instance = this;
+    }
+    
+    public static LogManager getInstance() {
+        return instance;
+    } 
+    
+    /**
+     * @param jdbcTemplate the jdbcTemplate to set
+     */
+    @Autowired
+    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+    
+    /**
+     * Counts entries.
+     * @return Total number of entries in the log
+     */
+    public long count() {
+        String sql = "SELECT count(*) FROM dex_messages";
+        return jdbcTemplate.queryForLong(sql);
+    }
+    
+    /**
+     * Load all log entries.
+     * @return All log entries
+     */
+    public List<LogEntry> load() {
+        String sql = "SELECT * FROM dex_messages";
+	List<LogEntry> entries = jdbcTemplate.query(sql, mapper);
+	return entries;
+    }
+    
+    /**
+     * Load log entries.
+     * @param limit Limit
+     * @return List of log entries
+     */
+    public List<LogEntry> load(int limit) {
+        String sql = "SELECT * FROM dex_messages ORDER BY timestamp" +
+                " DESC LIMIT ?";
         try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String msg = entry.getMessage();
-            if (msg != null) {
-              msg = msg.replace('\'','"');
-            }
-            String sql = "INSERT INTO dex_messages (timestamp, system, type, message) VALUES ('" +
-                entry.getTimeStamp() + "', '" + entry.getSystem() + "', '" + entry.getType() +
-                "', '" + msg + "');";
-            stmt.executeUpdate( sql );
-            stmt.close();
-        } catch( Exception e ) {
-          // We probably shouldn't send log messages if this goes wrong since we might end up here again
-          System.out.println("Failed to add log entry");
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            return jdbcTemplate.query(sql, mapper, limit);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
+    
     /**
-     * Gets number of log entries stored in a table.
-     *
-     * @return Number of log entries
+     * Load log entries.
+     * @param offset Offset
+     * @param limit Limit
+     * @return List of log entries
      */
-    public long countEntries() {
-        Connection conn = null;
-        long count = 0;
+    public List<LogEntry> load(int offset, int limit) {
+        String sql = "SELECT * FROM dex_messages ORDER BY timestamp" +
+                " DESC OFFSET ? LIMIT ?";
         try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt. executeQuery( "SELECT count(*) FROM dex_messages;" );
-            while( resultSet.next() ) {
-                count = resultSet.getLong( 1 );
-            }
-            stmt.close();
-        } catch( Exception e ) {
-            log.error( "Failed to determine number of entries", e );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return count;
-    }
-    /**
-     * Gets all entries available in the system log.
-     *
-     * @return List of all available log entries
-     */
-    public List<LogEntry> getEntries() {
-        Connection conn = null;
-        List<LogEntry> entries = new ArrayList<LogEntry>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
-                "timestamp DESC;" );
-            while( resultSet.next() ) {
-                Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
-                String system = resultSet.getString( "system" );
-                String type = resultSet.getString( "type" );
-                String msg = resultSet.getString( "message" );
-                LogEntry entry = new LogEntry( timeStamp, system, type, msg );
-                entries.add( entry );
-            }
-            stmt.close();
-        } catch( Exception e ) {
-          log.error( "Failed to select log entries", e );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return entries;
-    }
-    /**
-     * Gets given number of entries from the system log.
-     * 
-     * @param limit Number of entries to select
-     * @return List containing given number of entries
-     */
-    public List<LogEntry> getEntries( int limit ) {
-        Connection conn = null;
-        List<LogEntry> entries = new ArrayList<LogEntry>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
-                "timestamp DESC LIMIT " + limit + ";");
-            while( resultSet.next() ) {
-                Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
-                String system = resultSet.getString( "system" );
-                String type = resultSet.getString( "type" );
-                String msg = resultSet.getString( "message" );
-                LogEntry entry = new LogEntry( timeStamp, system, type, msg );
-                entries.add( entry );
-            }
-            stmt.close();
-        } catch( Exception e ) {
-          log.error( "Failed to select log entries", e );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return entries;
-    }
-    /**
-     * Gets given number of entries from the system log.
-     *
-     * @param offset Number of entries to skip
-     * @param limit Number of entries to select
-     * @return List containing given number of entries
-     */
-    public List<LogEntry> getEntries( int offset, int limit ) {
-        Connection conn = null;
-        List<LogEntry> entries = new ArrayList<LogEntry>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            ResultSet resultSet = stmt.executeQuery( "SELECT * FROM dex_messages ORDER BY " +
-                "timestamp DESC OFFSET " + offset + " LIMIT " + limit );
-            while( resultSet.next() ) {
-                Timestamp timeStamp = resultSet.getTimestamp( "timestamp" );
-                String system = resultSet.getString( "system" );
-                String type = resultSet.getString( "type" );
-                String msg = resultSet.getString( "message" );
-                LogEntry entry = new LogEntry( timeStamp, system, type, msg );
-                entries.add( entry );
-            }
-            stmt.close();
-        } catch( Exception e ) {
-          log.error( "Failed to select log entries", e );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return entries;
-    }
-    /**
-     * Deletes all entries from the system log.
-     *
-     * @return Number of deleted entries
-     */
-    public int deleteEntries() {
-        Connection conn = null;
-        int delete = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DELETE FROM dex_messages;";
-            delete = stmt.executeUpdate( sql );
-            stmt.close();
-        } catch( Exception e ) {
-          log.error( "Failed to delete log entries", e );
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
-        return delete;
-    }
-    /**
-     * Creates trigger on messages table. Trigger activates trimmer function which deletes records
-     * from messages table.
-     * 
-     * @param recordLimit Trimmer function is activated if records number given by this parameter
-     * is exceeded
-     * @throws Exception
-     */
-    public void setTrimmer( int recordLimit ) throws Exception {
-        Connection conn = null;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DROP TRIGGER IF EXISTS dex_trim_messages_by_number_tg ON dex_messages; " +
-                "CREATE TRIGGER dex_trim_messages_by_number_tg AFTER INSERT ON " +
-                "dex_messages FOR EACH ROW EXECUTE PROCEDURE dex_trim_messages_by_number(" +
-                recordLimit + ");";
-            stmt.execute( sql );
-            stmt.close();
-        } catch( Exception e ) {
-          log.error( "Failed to set message log trimmer", e );
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
+            return jdbcTemplate.query(sql, mapper, offset, limit);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
     }
+    
     /**
-     * Creates trigger on messages table. Trigger activates trimmer function which deletes records
-     * older than a given age limit.
-     *
-     * @param maxAgeDays Age limit - number of days
-     * @param maxAgeHours Age limit - number of hours
-     * @param maxAgeMinutes Age limit - number of minutes
-     * @throws Exception
+     * Store log entry in database.
+     * @param entry Log entry to store
+     * @return Number of records stored
      */
-    public void setTrimmer( int maxAgeDays, int maxAgeHours, int maxAgeMinutes )
-            throws Exception {
-        Connection conn = null;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DROP TRIGGER IF EXISTS dex_trim_messages_by_age_tg ON dex_messages; " +
-                "CREATE TRIGGER dex_trim_messages_by_age_tg AFTER INSERT ON dex_messages" +
-                " FOR EACH ROW EXECUTE PROCEDURE dex_trim_messages_by_age(" + maxAgeDays + ", " +
-                maxAgeHours + ", " + maxAgeMinutes + ");";
-            stmt.execute( sql );
-            stmt.close();
-        } catch( Exception e ) {
-          log.error( "Failed to set message log trimmer", e );
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
+    public int store(LogEntry entry) {
+        return jdbcTemplate.update("INSERT INTO dex_messages " +
+            "(id, timestamp, system, type, message) VALUES " +
+            "(?,?,?,?,?)",
+            entry.getId(),
+            entry.getTimeStamp(),
+            entry.getSystem(),
+            entry.getType(),
+            entry.getMessage());
     }
+    
     /**
-     * Removes trigger on message table.
-     *
-     * @param triggerName Name of the trigger
-     * @throws Exception
+     * Store log entry in database.
+     * @param entry Log entry to store
+     * @return Number of records stored
      */
-    public void removeTrimmer( String triggerName ) throws Exception {
-        Connection conn = null;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DROP TRIGGER IF EXISTS " + triggerName + " ON dex_messages;";
-            stmt.execute( sql );
-            stmt.close();
-        } catch( Exception e ) {
-          log.error( "Failed to remove message log trimmer", e );
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection( conn );
-        }
+    public int storeNoId(LogEntry entry) {
+        return jdbcTemplate.update("INSERT INTO dex_messages " +
+            "(timestamp, system, type, message) VALUES " +
+            "(?,?,?,?)",
+            entry.getTimeStamp(),
+            entry.getSystem(),
+            entry.getType(),
+            entry.getMessage());
     }
-}
-//--------------------------------------------------------------------------------------------------
+    
+    /**
+     * Delete all log entries.
+     * @return Number of records deleted
+     */
+    public int delete() {
+        return jdbcTemplate.update("DELETE FROM dex_messages");
+    }
+    
+    /**
+     * Set trigger. Trigger activates trimmer function deleting records when 
+     * given number of records is exceeded.
+     * @param limit Maximum number of records
+     */
+    public void setTrimmer(int limit) {
+        String sql = "DROP TRIGGER IF EXISTS dex_trim_messages_by_number_tg " +
+            "ON dex_messages;" +
+            " CREATE TRIGGER dex_trim_messages_by_number_tg AFTER INSERT ON " +
+            "dex_messages FOR EACH ROW EXECUTE PROCEDURE " + 
+             "dex_trim_messages_by_number(" + limit + ");";
+        jdbcTemplate.update(sql);
+    }
+    
+    /**
+     * Set trigger. Trigger activates trimmer function deleting records when 
+     * given expiry period is exceeded.
+     * @param days Maximum days
+     * @param hours Maximum hours 
+     * @param minutes Maximum minutes
+     */
+    public void setTrimmer(int days, int hours, int minutes) {
+        String sql = "DROP TRIGGER IF EXISTS dex_trim_messages_by_age_tg ON " +
+            "dex_messages;" +
+            " CREATE TRIGGER dex_trim_messages_by_age_tg AFTER INSERT ON " +
+            "dex_messages FOR EACH ROW EXECUTE PROCEDURE " + 
+            "dex_trim_messages_by_age(" + days + ", " + hours + ", " + 
+             minutes + ");";
+        jdbcTemplate.update(sql);
+    }
+    
+    /**
+     * Removes trigger from registry table.
+     * @param name Trigger name
+     */
+    public void removeTrimmer(String name) {
+        String sql = "DROP TRIGGER IF EXISTS " + name + 
+                " ON dex_messages;";
+        jdbcTemplate.update(sql);
+    }
+    
+    /**
+     * Log entry row mapper.
+     */
+    private static final class LogEntryMapper
+                            implements ParameterizedRowMapper<LogEntry> {
+        /**
+         * Maps records to result set. 
+         * @param rs Result set 
+         * @param rowNum Row number
+         * @return Log entry object
+         * @throws SQLException 
+         */
+        public LogEntry mapRow(ResultSet rs, int rowNum) 
+                throws SQLException {
+            LogEntry entry = new LogEntry(); 
+            entry.setId(rs.getInt("id"));
+            entry.setTimeStamp(rs.getTimestamp("timestamp"));
+            entry.setSystem(rs.getString("system"));
+            entry.setType(rs.getString("type"));
+            entry.setMessage(rs.getString("message"));
+            return entry;
+        }
+    }   
+    
+ }

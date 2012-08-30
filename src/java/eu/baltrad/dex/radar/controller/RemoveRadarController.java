@@ -23,7 +23,7 @@ package eu.baltrad.dex.radar.controller;
 
 import eu.baltrad.dex.radar.model.RadarManager;
 import eu.baltrad.dex.radar.model.Radar;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.apache.log4j.Logger;
 

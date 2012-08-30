@@ -32,7 +32,7 @@ import eu.baltrad.dex.datasource.model.IDataSourceManager;
 import eu.baltrad.dex.datasource.util.DataSourceValidator;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.AttributeFilter;

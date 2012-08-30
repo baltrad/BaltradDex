@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,50 +15,16 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : All system messages
 Created on : Sep 30, 2010, 14:45 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-
-<%@page import="eu.baltrad.dex.log.model.LogManager"%>
-<%@page import="eu.baltrad.dex.log.controller.JournalController"%>
-
-<%
-    LogManager manager = new LogManager();
-    JournalController controller = new JournalController();
-    long numEntries = manager.countEntries();
-    int numPages = ( int )Math.ceil( numEntries / LogManager.ENTRIES_PER_PAGE );
-    if( ( numPages * LogManager.ENTRIES_PER_PAGE ) < numEntries ) {
-        ++numPages;
-    }
-    if( numPages < 1 ) {
-        numPages = 1;
-    }
-    int currentPage = controller.getCurrentPage();
-    int scrollStart = ( LogManager.SCROLL_RANGE - 1 ) / 2;
-    int firstPage = 1;
-    int lastPage = LogManager.SCROLL_RANGE;
-    if( numPages <= LogManager.SCROLL_RANGE && currentPage <= LogManager.SCROLL_RANGE ) {
-        firstPage = 1;
-        lastPage = numPages;
-    }
-    if( numPages > LogManager.SCROLL_RANGE && currentPage > scrollStart && currentPage < numPages
-            - scrollStart ) {
-        firstPage = currentPage - scrollStart;
-        lastPage = currentPage + scrollStart;
-    }
-    if( numPages > LogManager.SCROLL_RANGE && currentPage > scrollStart && currentPage >= numPages
-            - ( LogManager.SCROLL_RANGE - 1 ) ) {
-        firstPage = numPages - ( LogManager.SCROLL_RANGE - 1 );
-        lastPage = numPages;
-    }
-%>
 
 <html>
     <head>
@@ -89,7 +55,7 @@ Author     : szewczenko
                         <div class="table">
                             <div class="log">
                                 <div id="tablecontrol">
-                                    <c:set var="curPage" scope="page" value="<%=currentPage%>"/>
+                                    <c:set var="curPage" scope="page" value="${current_page}"/>
                                     <form action="all_messages.htm" method="post">
                                         <input type="submit" name="pagenum" value="<<"
                                                title="First page">
@@ -97,10 +63,10 @@ Author     : szewczenko
                                         <input type="submit" name="pagenum" value="<"
                                                title="Previous page">
                                         <span></span>
-                                        <c:forEach var="i" begin="<%=firstPage%>" end="<%=lastPage%>"
+                                        <c:forEach var="i" begin="${first_page}" end="${last_page}"
                                                    step="1" varStatus ="status">
                                             <c:choose>
-                                                <c:when test="${curPage == i}">
+                                                <c:when test="${current_page == i}">
                                                     <input style="background:#FFFFFF" type="submit"
                                                            name="pagenum" value="${i}">
                                                 </c:when>
@@ -154,12 +120,12 @@ Author     : szewczenko
                                         <div class="entry">
                                             <div id="cell" class="logdate">
                                                 <div class="<%=style%>">
-                                                    <c:out value="${entry.dateStr}"/>
+                                                    <c:out value="${fn:substring(entry.timeStamp, 0, 10)}"/>
                                                 </div>
                                             </div>
                                             <div id="cell" class="logtime">
                                                 <div class="<%=style%>">
-                                                    <c:out value="${entry.timeStr}"/>
+                                                    <c:out value="${fn:substring(entry.timeStamp, 10, 19)}"/>
                                                 </div>
                                             </div>
                                             <c:choose>

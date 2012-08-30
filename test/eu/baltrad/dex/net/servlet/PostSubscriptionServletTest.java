@@ -27,7 +27,7 @@ import eu.baltrad.dex.net.util.JsonUtil;
 import eu.baltrad.dex.net.model.ISubscriptionManager;
 import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;

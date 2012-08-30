@@ -23,7 +23,7 @@ package eu.baltrad.dex.net.controller;
 
 import eu.baltrad.dex.net.model.NodeConnectionManager;
 import eu.baltrad.dex.net.model.NodeConnection;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;

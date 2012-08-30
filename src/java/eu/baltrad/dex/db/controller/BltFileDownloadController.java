@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.db.controller;
 
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.auth.util.SecurityManager;
 

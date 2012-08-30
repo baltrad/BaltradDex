@@ -23,7 +23,7 @@ package eu.baltrad.dex.bltdata.controller;
 
 import eu.baltrad.dex.bltdata.model.BltDataProcessor;
 import eu.baltrad.dex.util.ServletContextUtil;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.Group;

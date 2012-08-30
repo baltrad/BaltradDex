@@ -29,7 +29,7 @@ import eu.baltrad.dex.user.model.IUserManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.IDataSourceManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;

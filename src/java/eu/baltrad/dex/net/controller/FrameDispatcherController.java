@@ -32,7 +32,7 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 import eu.baltrad.dex.net.util.FramePublisherManager;

@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.log.model.MessageLogger;
+import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.net.model.NodeRequest;
 import eu.baltrad.dex.net.model.NodeResponse;
 import eu.baltrad.dex.net.util.Authenticator;

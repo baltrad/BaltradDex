@@ -92,9 +92,9 @@ Author     : szewczenko
                                                 multiple>
                                             <c:forEach items="${all_radars}" 
                                                        var="radar">
-                                                <option value="${radar.radarName}">    
+                                                <option value="${radar.name}">    
                                                     <c:out value="${radar.wmoNumber}:
-                                                        ${radar.radarName}"/>
+                                                        ${radar.name}"/>
                                                 </option>
                                             </c:forEach>
                                         </select>
@@ -103,9 +103,9 @@ Author     : szewczenko
                                                     multiple>
                                                 <c:forEach items="${all_radars}" 
                                                            var="radar">
-                                                    <option value="${radar.radarName}">    
+                                                    <option value="${radar.name}">    
                                                         <c:out value="${radar.wmoNumber}:
-                                                            ${radar.radarName}"/>
+                                                            ${radar.name}"/>
                                                     </option>
                                                 </c:forEach>
                                             </select>
@@ -142,9 +142,9 @@ Author     : szewczenko
                                                        scope="session"/>
                                             </c:if> 
                                             <c:forEach items="${selected_radars}" var="radar">
-                                                <option value="${radar.radarName}">    
+                                                <option value="${radar.name}">    
                                                     <c:out value="${radar.wmoNumber}:
-                                                        ${radar.radarName}"/>
+                                                        ${radar.name}"/>
                                                 </option>
                                             </c:forEach>
                                         </select>
@@ -153,9 +153,9 @@ Author     : szewczenko
                                             <select name="selected_radars_hid" size="6" 
                                                     multiple>
                                                 <c:forEach items="${selected_radars}" var="radar">
-                                                    <option value="${radar.radarName}">    
+                                                    <option value="${radar.name}">    
                                                         <c:out value="${radar.wmoNumber}:
-                                                            ${radar.radarName}"/>
+                                                            ${radar.name}"/>
                                                     </option>
                                                 </c:forEach>    
                                             </select>                  
