@@ -151,7 +151,7 @@ public class BltFileBrowserController extends SimpleFormController implements IT
     @Override
     protected HashMap referenceData( HttpServletRequest request ) throws Exception {
         HashMap model = new HashMap();
-        model.put( FILE_OBJECTS_KEY, fileObjectManager.getFileObjects() );
+        model.put( FILE_OBJECTS_KEY, fileObjectManager.load() );
         model.put( RADAR_STATIONS_KEY, bltFileManager.getDistinctRadarStations() );
         return model;
     }
@@ -169,7 +169,7 @@ public class BltFileBrowserController extends SimpleFormController implements IT
             BindException errors, Object obj )
             throws Exception {
         ModelAndView modelAndView = new ModelAndView( getSuccessView() );
-        modelAndView.addObject( FILE_OBJECTS_KEY, fileObjectManager.getFileObjects() );
+        modelAndView.addObject( FILE_OBJECTS_KEY, fileObjectManager.load() );
         modelAndView.addObject( RADAR_STATIONS_KEY, bltFileManager.getDistinctRadarStations() );
         if( obj != null ) {
             modelAndView.addObject( FILE_ENTRIES_KEY, obj );

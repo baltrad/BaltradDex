@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+ 
+    <dex_file_objects id="1" file_object="FileObject1" 
+                      description="File object 1"/>
+    <dex_file_objects id="2" file_object="FileObject2" 
+                      description="File object 2"/>
+    <dex_file_objects id="3" file_object="FileObject3" 
+                      description="File object 3"/>
+    <dex_file_objects id="4" file_object="FileObject4" 
+                      description="File object 4"/>
+    <dex_file_objects id="5" file_object="FileObject5" 
+                      description="File object 5"/>
+    <dex_file_objects id="6" file_object="FileObject6" 
+                      description="File object 6"/>    
+</dataset>

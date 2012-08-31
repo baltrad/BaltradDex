@@ -191,7 +191,7 @@ public class SaveDataSourceController {
                     if (selectedFileObjects != null) {
                         for (int i = 0; i < selectedFileObjects.length; i++) {
                             int fileObjectId = (fileObjectManager
-                                .getFileObject(selectedFileObjects[i])).getId();
+                                .load(selectedFileObjects[i])).getId();
                             dataSourceManager.saveFileObject(dataSourceId, 
                                     fileObjectId);
                             // Set filter value
@@ -314,14 +314,14 @@ public class SaveDataSourceController {
                     .loadFileObject(Integer.parseInt(dsId));
             List<FileObject> allButSelectedFileObjects = 
                     new ArrayList<FileObject>();
-            for (FileObject fileObject : fileObjectManager.getFileObjects()) {
+            for (FileObject fileObject : fileObjectManager.load()) {
                 if (!selectedFileObjects.contains(fileObject)) {
                     allButSelectedFileObjects.add(fileObject);
                 }
             }
             return allButSelectedFileObjects;
         } else {
-            return fileObjectManager.getFileObjects();
+            return fileObjectManager.load();
         }
     }
     

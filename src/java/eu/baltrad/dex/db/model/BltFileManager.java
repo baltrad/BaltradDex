@@ -49,7 +49,6 @@ import eu.baltrad.bdb.oh5.Metadata;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
-import eu.baltrad.dex.util.JDBCConnectionManager;
 import eu.baltrad.dex.log.util.MessageLogger;
 
 /**
@@ -60,7 +59,7 @@ import eu.baltrad.dex.log.util.MessageLogger;
  * @since 0.1.6
  */
 public class BltFileManager implements IBltFileManager {
-//-------------------------------------------------------------------- Constants
+
     /** Date format string */
     private static final String FC_DATE_STR = "yyyyMMdd";
     /** Time format string */
@@ -71,7 +70,7 @@ public class BltFileManager implements IBltFileManager {
     public final static int ENTRIES_PER_PAGE = 12;
     /** Number of pages in the scroll bar, must be an odd number >= 3 */
     public final static int SCROLL_RANGE = 11;
-//-------------------------------------------------------------------- Variables
+
     /** Date and time format string */
     private static SimpleDateFormat format = new SimpleDateFormat( FC_DATE_STR + 
             "'T'" + FC_TIME_STR );
@@ -81,16 +80,13 @@ public class BltFileManager implements IBltFileManager {
     private DataSourceManager dataSourceManager;
     /** References CoreFilterManager */
     private CoreFilterManager coreFilterManager;
-    /** Reference to JDBCConnector class object */
-    private JDBCConnectionManager jdbcConnectionManager;
     /** Logger */
     private Logger log;
-//---------------------------------------------------------------------- Methods
+
     /**
      * Constructor
      */
     public BltFileManager() {
-        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
         this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
@@ -501,4 +497,4 @@ public class BltFileManager implements IBltFileManager {
         this.fileCatalog = fileCatalog; 
     }
 }
-//--------------------------------------------------------------------------------------------------
+
