@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+ 
+    <dex_node_connections id="1" node_name="TestNode1" 
+                          node_address="NodeAddress1"/>
+    <dex_node_connections id="2" node_name="TestNode2" 
+                          node_address="NodeAddress2"/>
+    <dex_node_connections id="3" node_name="TestNode3" 
+                          node_address="NodeAddress3"/>
+    <dex_node_connections id="4" node_name="TestNode4" 
+                          node_address="NodeAddress4"/>
+    <dex_node_connections id="5" node_name="TestNode5" 
+                          node_address="NodeAddress5"/>
+    <dex_node_connections id="6" node_name="TestNode6" 
+                          node_address="NodeAddress6"/>
+            
+</dataset>

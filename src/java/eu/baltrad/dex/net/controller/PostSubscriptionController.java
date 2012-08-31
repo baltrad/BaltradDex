@@ -222,7 +222,7 @@ public class PostSubscriptionController implements MessageSetter {
         }
         String dataSourceString = jsonUtil
                 .dataSourcesToJson(selectedPeerDataSources);
-        NodeConnection conn = nodeConnectionManager.get(peerName);
+        NodeConnection conn = nodeConnectionManager.load(peerName);
         requestFactory = new DefaultRequestFactory(
                 URI.create(conn.getNodeAddress()));
         HttpUriRequest req = requestFactory

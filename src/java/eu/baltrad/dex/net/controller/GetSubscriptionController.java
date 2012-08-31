@@ -398,7 +398,7 @@ public class GetSubscriptionController implements MessageSetter {
         String subscriptionString = jsonUtil.subscriptionsToJson(
                 createSubscriptionRequest(activeSubscriptionIds, 
                     inactiveSubscriptionIds));
-        NodeConnection conn = nodeConnectionManager.get(peerName);
+        NodeConnection conn = nodeConnectionManager.load(peerName);
         requestFactory = new DefaultRequestFactory(
                                             URI.create(conn.getNodeAddress()));
         HttpUriRequest req = requestFactory.createGetSubscriptionRequest(

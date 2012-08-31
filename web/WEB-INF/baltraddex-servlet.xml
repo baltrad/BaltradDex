@@ -583,7 +583,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           
     <!-- Node connection manager -->
     <bean id="nodeConnectionManager" 
-          class="eu.baltrad.dex.net.model.NodeConnectionManager"/>
+          class="eu.baltrad.dex.net.model.NodeConnectionManager"
+          autowire="byType"/>
           
     <!-- URL address validator -->
     <bean id="urlValidator" class="eu.baltrad.dex.net.util.UrlValidatorUtil"/>

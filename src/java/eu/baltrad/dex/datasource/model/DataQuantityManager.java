@@ -21,10 +21,10 @@
 
 package eu.baltrad.dex.datasource.model;
 
-import eu.baltrad.dex.util.JDBCConnectionManager;
-import eu.baltrad.dex.log.util.MessageLogger;
+//import eu.baltrad.dex.util.JDBCConnectionManager;
+//import eu.baltrad.dex.log.util.MessageLogger;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -43,22 +43,22 @@ import java.util.ArrayList;
 public class DataQuantityManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
-    private JDBCConnectionManager jdbcConnectionManager;
+    //private JDBCConnectionManager jdbcConnectionManager;
     /** Logger */
-    private Logger log;
+    //private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public DataQuantityManager() {
-        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        //this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        //this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets all data quantities.
      *
      * @return List of all available data quantities.
-     */
+     *
     public List<DataQuantity> getDataQuantities() {
         Connection conn = null;
         List<DataQuantity> dataQuantities = new ArrayList<DataQuantity>();
@@ -88,7 +88,7 @@ public class DataQuantityManager {
      *
      * @param id Data quantity ID
      * @return Data quantity with a given ID
-     */
+     *
     public DataQuantity getDataQuantity( int id ) {
         Connection conn = null;
         DataQuantity dataQuantity = null;
@@ -118,7 +118,7 @@ public class DataQuantityManager {
      *
      * @param identifier Data quantity identifier
      * @return Data quantity matching a given identifier
-     */
+     *
     public DataQuantity getDataQuantity( String identifier ) {
         Connection conn = null;
         DataQuantity dataQuantity = null;
@@ -149,7 +149,7 @@ public class DataQuantityManager {
      * @param dataQuantity Data quantity
      * @return Number of saved or updated records
      * @throws Exception
-     */
+     *
     public int saveOrUpdate( DataQuantity dataQuantity ) throws Exception {
         Connection conn = null;
         int update = 0;
@@ -185,7 +185,7 @@ public class DataQuantityManager {
      * @param id Data quantity ID
      * @return Number of deleted records
      * @throws Exception
-     */
+     *
     public int deleteDataQuantity( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
@@ -202,6 +202,6 @@ public class DataQuantityManager {
             jdbcConnectionManager.returnConnection( conn );
         }
         return delete;
-    }
+    }*/
 }
 //--------------------------------------------------------------------------------------------------

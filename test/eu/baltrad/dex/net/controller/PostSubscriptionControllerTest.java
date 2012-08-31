@@ -112,7 +112,7 @@ public class PostSubscriptionControllerTest {
         nodeConnectionManagerMock = createMock(INodeConnectionManager.class);
         subscriptionManagerMock = createMock(ISubscriptionManager.class);
         
-        expect(nodeConnectionManagerMock.get("test.baltrad.eu"))
+        expect(nodeConnectionManagerMock.load("test.baltrad.eu"))
             .andReturn(new NodeConnection("test.baltrad.eu",
                 "http://test.baltrad.eu")).anyTimes();
         replay(nodeConnectionManagerMock);

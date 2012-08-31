@@ -27,15 +27,23 @@ import java.util.List;
  * Node connection manager interface.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.1.1
+ * @version 1.2.1
  * @since 1.1.1
  */
 public interface INodeConnectionManager {
     
-    public NodeConnection get(String name);
+    public List<NodeConnection> load();
     
-    public List<NodeConnection> get();
+    public NodeConnection load(int id);
     
-    public int saveOrUpdate(NodeConnection conn);
+    public NodeConnection load(String nodeName);
+    
+    public int store(NodeConnection conn);
+    
+    public int storeNoId(NodeConnection conn);
+    
+    public int delete(int id);
+    
+    public int delete();
     
 }

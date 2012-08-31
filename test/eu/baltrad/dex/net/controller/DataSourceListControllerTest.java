@@ -98,10 +98,10 @@ public class DataSourceListControllerTest {
         classUnderTest.setLog(log);
         
         connectionManagerMock = createMock(INodeConnectionManager.class);
-        expect(connectionManagerMock.get("test.baltrad.eu"))
+        expect(connectionManagerMock.load("test.baltrad.eu"))
             .andReturn(new NodeConnection("test.baltrad.eu", 
                 "http://test.baltrad.eu")).anyTimes();
-        expect(connectionManagerMock.get()).andReturn(null).anyTimes();
+        expect(connectionManagerMock.load()).andReturn(null).anyTimes();
         replay(connectionManagerMock);
         classUnderTest.setNodeConnectionManager(connectionManagerMock);
         jsonUtilMock = createMock(IJsonUtil.class);

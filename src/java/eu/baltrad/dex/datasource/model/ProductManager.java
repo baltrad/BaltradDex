@@ -21,10 +21,10 @@
 
 package eu.baltrad.dex.datasource.model;
 
-import eu.baltrad.dex.util.JDBCConnectionManager;
-import eu.baltrad.dex.log.util.MessageLogger;
+//import eu.baltrad.dex.util.JDBCConnectionManager;
+//import eu.baltrad.dex.log.util.MessageLogger;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -43,22 +43,22 @@ import java.util.ArrayList;
 public class ProductManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
-    private JDBCConnectionManager jdbcConnectionManager;
+    //private JDBCConnectionManager jdbcConnectionManager;
     /** Logger */
-    private Logger log;
+    //private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public ProductManager() {
-        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        //this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        //this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets all products.
      *
      * @return List of all available products.
-     */
+     *
     public List<Product> getProducts() {
         Connection conn = null;
         List<Product> products = new ArrayList<Product>();
@@ -86,7 +86,7 @@ public class ProductManager {
      *
      * @param id Product ID
      * @return Product with a given ID
-     */
+     *
     public Product getProduct( int id ) {
         Connection conn = null;
         Product product = null;
@@ -114,7 +114,7 @@ public class ProductManager {
      *
      * @param identifier Product identifier
      * @return Product matching a given identifier
-     */
+     *
     public Product getProduct( String identifier ) {
         Connection conn = null;
         Product product = null;
@@ -143,7 +143,7 @@ public class ProductManager {
      * @param product Product
      * @return Number of saved or updated records
      * @throws Exception
-     */
+     *
     public int saveOrUpdate( Product product ) throws Exception {
         Connection conn = null;
         int update = 0;
@@ -177,7 +177,7 @@ public class ProductManager {
      * @param id Product ID
      * @return Number of deleted records
      * @throws Exception
-     */
+     *
     public int deleteProduct( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
@@ -194,6 +194,6 @@ public class ProductManager {
             jdbcConnectionManager.returnConnection( conn );
         }
         return delete;
-    }
+    }*/
 }
 //--------------------------------------------------------------------------------------------------

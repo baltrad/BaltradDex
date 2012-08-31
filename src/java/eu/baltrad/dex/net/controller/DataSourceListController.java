@@ -178,7 +178,7 @@ public class DataSourceListController implements MessageSetter {
      */
     @RequestMapping("/connect_to_node.htm")
     public String connect2Node(Model model) { 
-        model.addAttribute(CONNECTIONS_KEY, nodeConnectionManager.get());
+        model.addAttribute(CONNECTIONS_KEY, nodeConnectionManager.load());
         return DS_CONNECT_VIEW;
     }
     
@@ -199,7 +199,7 @@ public class DataSourceListController implements MessageSetter {
         // Validate node's URL address 
         String urlSelect = null;
         if (InitAppUtil.validate(nodeSelect)) {
-            NodeConnection conn = nodeConnectionManager.get(nodeSelect);
+            NodeConnection conn = nodeConnectionManager.load(nodeSelect);
             urlSelect = conn.getNodeAddress();
         }
         String url = urlValidator.validate(urlInput) ? urlInput : urlSelect;
@@ -224,10 +224,10 @@ public class DataSourceListController implements MessageSetter {
                             res.getFirstHeader("Node-Address").getValue();
                     model.addAttribute(PEER_NAME_KEY, peerNodeName);
                     // Add connection to the list
-                    if (nodeConnectionManager.get(peerNodeName) == null) {
+                    if (nodeConnectionManager.load(peerNodeName) == null) {
                         NodeConnection conn = new NodeConnection(peerNodeName, 
                                 peerNodeAddress);
-                        nodeConnectionManager.saveOrUpdate(conn);
+                        nodeConnectionManager.storeNoId(conn);
                     }    
                     // Make data sources available for other methods
                     peerDataSources = readDataSources(res);
@@ -270,7 +270,7 @@ public class DataSourceListController implements MessageSetter {
                 log.error(errorMsg + ": " + errorDetails);
             }
         }
-        model.addAttribute(CONNECTIONS_KEY, nodeConnectionManager.get());
+        model.addAttribute(CONNECTIONS_KEY, nodeConnectionManager.load());
         return viewName;
     }
     

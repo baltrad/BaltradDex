@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,212 +17,151 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-********************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.net.model;
 
-import eu.baltrad.dex.util.JDBCConnectionManager;
-import eu.baltrad.dex.log.util.MessageLogger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.dao.EmptyResultDataAccessException;
 
-import org.apache.log4j.Logger;
-
-import java.sql.Connection;
-import java.sql.Statement;
 import java.sql.ResultSet;
 
 import java.util.List;
-import java.util.ArrayList;
 
-import java.io.IOException;
+import java.sql.SQLException;
 
 /**
- * Node manager class implementing node connection object handling functionality.
+ * Node connection manager.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.0
- * @since 1.0
+ * @version 1.2.1
+ * @since 1.0.0
  */
 public class NodeConnectionManager implements INodeConnectionManager {
-//---------------------------------------------------------------------------------------- Variables
-    /** Reference to JDBCConnector class object */
-    private JDBCConnectionManager jdbcConnectionManager;
-    /** Logger */
-    private Logger log;
-//------------------------------------------------------------------------------------------ Methods
+
+    /** JDBC template */
+    private SimpleJdbcOperations jdbcTemplate;
+    /** Row mapper */
+    private NodeConnectionMapper mapper;
+
     /**
-     * Constructor gets reference to JDBCConnectionManager instance.
+     * Constructor.
      */
     public NodeConnectionManager() {
-        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        this.mapper = new NodeConnectionMapper();
     }
+    
     /**
-     * Gets all existing node connections.
-     *
-     * @return List of all existing node connections
+     * @param jdbcTemplate the jdbcTemplate to set
      */
-    public List<NodeConnection> get() {
-        Connection conn = null;
-        List<NodeConnection> nodeConnections = new ArrayList<NodeConnection>();
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_node_connections";
-            ResultSet resultSet = stmt.executeQuery(sql);
-            while (resultSet.next()) {
-                int connId = resultSet.getInt("id");
-                String nodeName = resultSet.getString("node_name");
-                String nodeAddress = resultSet.getString("node_address");
-                NodeConnection nodeConn = new NodeConnection(connId, nodeName, nodeAddress);
-                nodeConnections.add(nodeConn);
-            }
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to select node connections", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return nodeConnections;
+    @Autowired
+    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
     }
+    
     /**
-     * Gets node connection with a given ID.
-     *
-     * @param id Node connection ID
-     * @return Node connection with a given ID
+     * Load all connections.
+     * @return List of all existing connections.
      */
-    public NodeConnection get(int id) {
-        Connection conn = null;
-        NodeConnection nodeConnection = null;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_node_connections WHERE id = " + id + ";";
-            ResultSet resultSet = stmt.executeQuery(sql);
-            while (resultSet.next()) {
-                int connId = resultSet.getInt("id");
-                String nodeName = resultSet.getString("node_name");
-                String nodeAddress = resultSet.getString("node_address");
-                nodeConnection = new NodeConnection(connId, nodeName, nodeAddress);
-            }
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to select node connections", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return nodeConnection;
+    public List<NodeConnection> load() {
+        String sql = "SELECT * FROM dex_node_connections";
+	List<NodeConnection> conns = jdbcTemplate.query(sql, mapper);
+	return conns;
     }
+    
     /**
-     * Gets node connection with a given name.
-     *
+     * Load connection by id.
+     * @param id Connection id
+     * @return Connection with a given id
+     */
+    public NodeConnection load(int id) {
+        String sql = "SELECT * FROM dex_node_connections WHERE id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, mapper, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Load connection by node name.
      * @param nodeName Node name
-     * @return Node connection with a given name
+     * @return Connection with a given node name
      */
-    public NodeConnection get(String nodeName) {
-        Connection conn = null;
-        NodeConnection nodeConnection = null;
+    public NodeConnection load(String nodeName) {
+        String sql = "SELECT * FROM dex_node_connections WHERE node_name = ?";
         try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT * FROM dex_node_connections WHERE node_name = '" + nodeName + "';";
-            ResultSet resultSet = stmt.executeQuery(sql);
-            while (resultSet.next()) {
-                int connId = resultSet.getInt("id");
-                String name = resultSet.getString("node_name");
-                String nodeAddress = resultSet.getString("node_address");
-                nodeConnection = new NodeConnection(connId, name, nodeAddress);
-            }
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to select node connections", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
+            return jdbcTemplate.queryForObject(sql, mapper, nodeName);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
         }
-        return nodeConnection;
     }
+    
     /**
-     * Saves or updates node connection.
-     *
-     * @param nodeConn Node connection
-     * @return Number of saved or updated records
-     * @throws Exception
+     * Store node connection in database.
+     * @param conn Node connection to be stored
+     * @return Number of records stored
      */
-    public int saveOrUpdate(NodeConnection nodeConn) {
-        Connection conn = null;
-        int update = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "";
-            int connId = 0;
-            int addressId = 0;
-            // record does not exists, do insert
-            if (nodeConn.getId() == 0) {
-                sql = "INSERT INTO dex_node_connections (node_name, node_address) VALUES ('" + 
-                    nodeConn.getNodeName() + "', '" + nodeConn.getNodeAddress() + "');";
-                update = stmt.executeUpdate(sql);
-                stmt.close();
-            } else {
-                // record exists, do update
-                sql = "UPDATE dex_node_connections SET node_name = '" + nodeConn.getNodeName() +
-                    "', node_address = '" + nodeConn.getNodeAddress() + "' WHERE id = " +
-                    nodeConn.getId() + ";";
-                update = stmt.executeUpdate(sql);
-                stmt.close();
-            }
-        } catch(Exception e) {
-            log.error("Failed to save node connection", e);
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return update;
+    public int store(NodeConnection conn) {
+        return jdbcTemplate.update("INSERT INTO dex_node_connections" +
+            "(id, node_name, node_address) VALUES (?,?,?)",
+            conn.getId(),
+            conn.getNodeName(),
+            conn.getNodeAddress());
     }
+    
     /**
-     * Deletes node connection with a given ID.
-     *
-     * @param id Node connection ID
+     * Store node connection in database.
+     * @param conn Node connection to be stored
+     * @return Number of records stored
+     */
+    public int storeNoId(NodeConnection conn) {
+        return jdbcTemplate.update("INSERT INTO dex_node_connections" +
+            "(node_name, node_address) VALUES (?,?)",
+            conn.getNodeName(),
+            conn.getNodeAddress());
+    }
+    
+    /**
+     * Delete node connection with a given id.
+     * @param id Node connection id
      * @return Number of deleted records
-     * @throws Exception
      */
-    public int delete(int id) throws Exception {
-        Connection conn = null;
-        int delete = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DELETE FROM dex_node_connections WHERE id = " + id + ";";
-            delete = stmt.executeUpdate(sql);
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to delete node connection", e);
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return delete;
+    public int delete(int id) {
+        return jdbcTemplate.update("DELETE FROM dex_node_connections WHERE " +
+                "id = ?", id);
     }
+    
     /**
-     * Deletes all node connections.
-     *
-     * @return Number of deleted entries
-     * @throws Exception
+     * Delete all node connections.
+     * @return Number of deleted records
      */
-    public int delete() throws Exception {
-        Connection conn = null;
-        int delete = 0;
-        try {
-            conn = jdbcConnectionManager.getConnection();
-            Statement stmt = conn.createStatement();
-            String sql = "DELETE FROM dex_node_connections;";
-            delete = stmt.executeUpdate(sql);
-            stmt.close();
-        } catch(Exception e) {
-            log.error("Failed to delete node connections", e);
-            throw e;
-        } finally {
-            jdbcConnectionManager.returnConnection(conn);
-        }
-        return delete;
+    public int delete() {
+        return jdbcTemplate.update("DELETE FROM dex_node_connections");
     }
+    
+    /**
+     * Node connection row mapper.
+     */
+    private static final class NodeConnectionMapper
+                            implements ParameterizedRowMapper<NodeConnection> {
+        /**
+         * Maps records to result set. 
+         * @param rs Result set 
+         * @param rowNum Row number
+         * @return Registry entry object
+         * @throws SQLException 
+         */
+        public NodeConnection mapRow(ResultSet rs, int rowNum) 
+                throws SQLException {
+            NodeConnection conn = new NodeConnection(); 
+            conn.setId(rs.getInt("id"));
+            conn.setNodeName(rs.getString("node_name"));
+            conn.setNodeAddress(rs.getString("node_address"));
+            return conn;
+        }
+    }
+    
 }
-//--------------------------------------------------------------------------------------------------

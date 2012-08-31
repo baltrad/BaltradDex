@@ -21,10 +21,10 @@
 
 package eu.baltrad.dex.datasource.model;
 
-import eu.baltrad.dex.util.JDBCConnectionManager;
-import eu.baltrad.dex.log.util.MessageLogger;
+//import eu.baltrad.dex.util.JDBCConnectionManager;
+//import eu.baltrad.dex.log.util.MessageLogger;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Statement;
@@ -43,22 +43,22 @@ import java.util.ArrayList;
 public class ProductParameterManager {
 //---------------------------------------------------------------------------------------- Variables
     /** Reference to JDBCConnector class object */
-    private JDBCConnectionManager jdbcConnectionManager;
+    //private JDBCConnectionManager jdbcConnectionManager;
     /** Logger */
-    private Logger log;
+    //private Logger log;
 //------------------------------------------------------------------------------------------ Methods
     /**
      * Constructor gets reference to JDBCConnectionManager instance.
      */
     public ProductParameterManager() {
-        this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        //this.jdbcConnectionManager = JDBCConnectionManager.getInstance();
+        //this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
     }
     /**
      * Gets all product parameters.
      *
      * @return List of all available product parameters.
-     */
+     *
     public List<ProductParameter> getProductParameters() {
         Connection conn = null;
         List<ProductParameter> productParameters = new ArrayList<ProductParameter>();
@@ -87,7 +87,7 @@ public class ProductParameterManager {
      *
      * @param id Product parameter ID
      * @return Product parameter with a given ID
-     */
+     *
     public ProductParameter getProductParameter( int id ) {
         Connection conn = null;
         ProductParameter productParameter = null;
@@ -116,7 +116,7 @@ public class ProductParameterManager {
      *
      * @param identifier Product parameter identifier
      * @return Product parameter matching a given identifier
-     */
+     *
     public ProductParameter getProductParameter( String identifier ) {
         Connection conn = null;
         ProductParameter productParameter = null;
@@ -146,7 +146,7 @@ public class ProductParameterManager {
      * @param productParameter Product parameter
      * @return Number of saved or updated records
      * @throws Exception
-     */
+     *
     public int saveOrUpdate( ProductParameter productParameter ) throws Exception {
         Connection conn = null;
         int update = 0;
@@ -182,7 +182,7 @@ public class ProductParameterManager {
      * @param id Product parameter ID
      * @return Number of deleted records
      * @throws Exception
-     */
+     *
     public int deleteProductParameter( int id ) throws Exception {
         Connection conn = null;
         int delete = 0;
@@ -207,7 +207,7 @@ public class ProductParameterManager {
      * @param parameterId Product parameter ID
      * @return Product parameter value as string
      * @throws Exception
-     */
+     *
     public String getProductParameterValue( int dataSourceId, int parameterId ) throws Exception {
         Connection conn = null;
         String parameterValue = null;
@@ -228,6 +228,6 @@ public class ProductParameterManager {
             jdbcConnectionManager.returnConnection( conn );
         }
         return parameterValue;
-    }
+    }*/
 }
 //--------------------------------------------------------------------------------------------------

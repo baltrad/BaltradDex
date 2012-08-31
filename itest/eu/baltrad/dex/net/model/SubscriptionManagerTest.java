@@ -19,7 +19,7 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.subscription.model;
+package eu.baltrad.dex.net.model;
 
 import eu.baltrad.dex.net.model.SubscriptionManager;
 import eu.baltrad.dex.net.model.Subscription;
