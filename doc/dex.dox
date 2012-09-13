@@ -378,9 +378,6 @@ the following in the address bar:
 http://localhost:8084/
 \endcode
 
-Default user name is \p admin with password \p admin. It strongly recommended 
-to change the standard password immediately.
-
 \attention
 BaltradDex was tested with the following browsers: Firefox, Opera, 
 Google Chrome and Konqueror. Usage of Internet Explorer is currently not 
@@ -389,7 +386,13 @@ supported.
 \section login Login/Logout
 
 Sign in typing your user name and password in the textbox available on the 
-login screen. In order to sign out, use \p Logout link available in the upper 
+login screen. During installation, default administrator's account is created 
+with user name \p admin and password \p baltrad.
+
+\attention
+It is absolutely crucial that you change administrator's password immediately after signing in for the first time. Refer to \ref accounts section for details.  
+
+In order to sign out, use \p Logout link available in the upper 
 right corner of each page.  
 
 \note 
