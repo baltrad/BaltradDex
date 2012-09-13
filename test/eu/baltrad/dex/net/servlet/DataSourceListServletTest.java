@@ -167,7 +167,7 @@ public class DataSourceListServletTest {
                 (IUserManager) createMock(IUserManager.class);
         expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
                 .anyTimes();
-        expect(userManagerMock.store(isA(User.class)))
+        expect(userManagerMock.storeNoId(isA(User.class)))
                 .andReturn(1).anyTimes();
         IJsonUtil jsonUtilMock = 
                 (IJsonUtil) createMock(IJsonUtil.class);
@@ -211,7 +211,7 @@ public class DataSourceListServletTest {
                 (IUserManager) createMock(IUserManager.class);
         expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
                 .anyTimes();
-        expect(userManagerMock.store(isA(User.class)))
+        expect(userManagerMock.storeNoId(isA(User.class)))
                 .andReturn(1).anyTimes();
         
         IJsonUtil jsonUtilMock = (IJsonUtil) createMock(IJsonUtil.class);
