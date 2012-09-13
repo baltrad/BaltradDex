@@ -1,4 +1,4 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
 * Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
@@ -17,11 +17,11 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.net.util;
 
-import eu.baltrad.dex.registry.model.RegistryManager;
+import eu.baltrad.dex.registry.model.IRegistryManager;
 import eu.baltrad.dex.registry.model.RegistryEntry;
 import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.user.model.User;
@@ -37,12 +37,12 @@ import org.apache.http.client.methods.HttpUriRequest;
  * Implements data delivery task executed in a separate thread.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.2.0
+ * @version 1.2.1
  * @since 1.2.0
  */
 public class PostFileTask implements Runnable {
     
-    private RegistryManager deliveryRegistry;
+    private IRegistryManager manager;
     private Logger log;
     private IHttpClientUtil httpClient;
     private HttpUriRequest request;
@@ -52,17 +52,18 @@ public class PostFileTask implements Runnable {
     /**
      * Constructor.
      * @param httpClient Http client
+     * @param manager Delivery registry manager
      * @param request Data delivery request
      * @param uuid File entry identifier string
      * @param user Recipient
      */
-    public PostFileTask(IHttpClientUtil httpClient, HttpUriRequest request,
-            String uuid, User user) {
+    public PostFileTask(IHttpClientUtil httpClient, IRegistryManager manager,
+            HttpUriRequest request, String uuid, User user) {
         this.httpClient = httpClient;
+        this.manager = manager;
         this.request = request;
         this.uuid = uuid;
         this.user = user;
-        this.deliveryRegistry = new RegistryManager();
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
@@ -73,40 +74,47 @@ public class PostFileTask implements Runnable {
     public void run() {
         try {
             HttpResponse response = httpClient.post(request);
-            RegistryEntry entry = null;
             if (response.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_OK) {
-                entry = new RegistryEntry(user.getId(), uuid, 
+                RegistryEntry entry = new RegistryEntry(user.getId(), uuid, 
                         user.getName(), new Date(), 
                         RegistryEntry.MSG_SUCCESS);
-                deliveryRegistry.store(entry);
+                log.info("File " + uuid + " sent to user " + user.getName());
+                manager.storeNoId(entry);
             } else {
-                // Retry sending data 
-                boolean success = false;
-                for (int i = 0; i < 3; i++) {
-                    response = httpClient.post(request);
-                    if (response.getStatusLine().getStatusCode() ==
-                            HttpServletResponse.SC_OK) {
-                        success = true;
-                        break;
+                // don't retry if file is already delivered 
+                if (response.getStatusLine().getStatusCode() 
+                        != HttpServletResponse.SC_CONFLICT) {
+                    boolean success = false;
+                    for (int i = 0; i < 3; i++) {
+                        response = httpClient.post(request);
+                        if (response.getStatusLine().getStatusCode() ==
+                                HttpServletResponse.SC_OK) {
+                            success = true;
+                            break;
+                        }
+                    }
+                    if (success) {
+                        RegistryEntry entry = new RegistryEntry(user.getId(), 
+                                uuid, user.getName(), new Date(), 
+                                RegistryEntry.MSG_SUCCESS);
+                        log.info("File " + uuid + " sent to user " 
+                                + user.getName());
+                        manager.storeNoId(entry);
+                    } else {
+                        RegistryEntry entry = new RegistryEntry(user.getId(), 
+                                uuid, user.getName(), new Date(), 
+                                RegistryEntry.MSG_FAILURE);
+                        log.error("Failed to deliver file " + uuid + " to user " 
+                                + user.getName());
+                        manager.storeNoId(entry);
                     }
                 }
-                if (success) {
-                    entry = new RegistryEntry(user.getId(), uuid, 
-                        user.getName(), new Date(), 
-                        RegistryEntry.MSG_SUCCESS);
-                    deliveryRegistry.store(entry);
-                } else {
-                    entry = new RegistryEntry(user.getId(), uuid, 
-                        user.getName(), new Date(), 
-                        RegistryEntry.MSG_FAILURE);
-                    deliveryRegistry.store(entry);
-                }
-            }
+            }    
         } catch (Exception e) {
             log.error("Failed to deliver file " + uuid + " to user " 
                     + user.getName(), e);
         }
     }
 }
-//--------------------------------------------------------------------------------------------------
+

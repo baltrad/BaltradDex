@@ -161,12 +161,10 @@ public class PostFileServlet extends HttpServlet {
                             Subscription.SUBSCRIPTION_UPLOAD);
                     for (Subscription s : uploads) {
                         IFilter filter = fileManager
-                                .getFilter(s.getDataSourceName());                        
-                        boolean match = matcher.match(entry.getMetadata(), 
-                                filter.getExpression());
+                                .getFilter(s.getDataSourceName());
                         User receiver = userManager.load(s.getUserName());
-                        if (match && registryManager.load(receiver.getId(), 
-                                uuid.toString()) != null) {
+                        if (matcher.match(entry.getMetadata(), 
+                                filter.getExpression())) {
                             RequestFactory requestFactory = 
                                 new DefaultRequestFactory(
                                     URI.create(receiver.getNodeAddress()));
@@ -176,10 +174,11 @@ public class PostFileServlet extends HttpServlet {
                             authenticator.addCredentials(deliveryRequest, 
                                     nodeName);
                             PostFileTask task = new PostFileTask(httpClient, 
-                                    deliveryRequest, entry.getUuid().toString(), 
+                                    registryManager, deliveryRequest, 
+                                    entry.getUuid().toString(), 
                                     receiver);
                             framePublisherManager.getFramePublisher(
-                                    receiver.getName()).addTask(task);   
+                                    receiver.getName()).addTask(task);
                         }  
                     }
                 } else {

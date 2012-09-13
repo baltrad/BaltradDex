@@ -28,20 +28,13 @@ INSERT INTO dex_roles (id, role) VALUES (1, 'admin'), (2, 'operator'),
 -- dex_users ---------------------------------------------------------------------------------------
 INSERT INTO dex_users (name, role_name, password, org_name, org_unit, locality, 
                         state, country_code, node_address)
-    VALUES ('admin', 'admin', MD5('baltrad'), 'IMGW', 'OTN', 'Warsaw',
-
-            'Poland', 'PL', 'http://127.0.0.1:8084'),
-
-        ('operator', 'operator', MD5('operator'), 'IMGW', 'OTN', 'Warsaw',
-        'Poland', 'PL', 'http://127.0.0.1:8084'),
-
-        ('user', 'user', MD5('user'), 'IMGW', 'OTN', 'Warsaw', 'Poland',
-        'PL', 'http://127.0.0.1:8084');
+    VALUES ('admin', 'admin', MD5('baltrad'), 'Organization name', 'Unit name', 
+            'City', 'Country', 'XX', 'http://127.0.0.1:8084');
 
 -- dex_radars --------------------------------------------------------------------------------------
-INSERT INTO dex_radars (name, wmo_number) VALUES ('Legionowo', '12374'),
-    ('Świdwin', '12220'), ('Brzuchania', '12568'), ('Pastewnik', '12544'),
-    ('Rzeszów', '12579'), ('Ramża', '12514'), ('Poznań', '12331'), ('Gdańsk', '12151');
+--INSERT INTO dex_radars (name, wmo_number) VALUES ('Legionowo', '12374'),
+--    ('Świdwin', '12220'), ('Brzuchania', '12568'), ('Pastewnik', '12544'),
+--    ('Rzeszów', '12579'), ('Ramża', '12514'), ('Poznań', '12331'), ('Gdańsk', '12151');
 
 -- dex_data_quantity -------------------------------------------------------------------------------
 INSERT INTO dex_data_quantities (data_quantity, unit, description) VALUES

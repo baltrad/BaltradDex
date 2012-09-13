@@ -72,8 +72,11 @@ BEGIN
     PERFORM true FROM information_schema.tables
         WHERE table_name = 'dex_delivery_register';
     IF FOUND THEN
-        RAISE NOTICE 'renaming table dex_delivery_register into dex_delivery_registry';
-        ALTER TABLE dex_delivery_register RENAME TO dex_delivery_registry;
+        IF NOT EXISTS (SELECT * FROM information_schema.tables 
+                WHERE table_name = 'dex_delivery_registry') THEN  
+            RAISE NOTICE 'renaming table dex_delivery_register into dex_delivery_registry';
+            ALTER TABLE dex_delivery_register RENAME TO dex_delivery_registry;
+	END IF;
     ELSE
         RAISE NOTICE 'table "dex_delivery_register" already renamed';
     END IF;

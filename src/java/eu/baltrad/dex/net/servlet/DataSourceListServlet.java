@@ -128,7 +128,7 @@ public class DataSourceListServlet extends HttpServlet {
                         userManager.update(user);
                         log.warn("Peer account updated: " + user.getName());
                     } else {
-                        userManager.store(user);
+                        userManager.storeNoId(user);
                         log.warn("New peer account created: " + user.getName());
                     }
                 }

@@ -90,7 +90,7 @@ public class HandleFrameTask implements Runnable {
                 log.error("Failed to send file entry " + entry.getUuid().toString() + " to user " +
                         user.getName());
             }
-            drManager.store(dre);
+            drManager.storeNoId(dre);
         } catch( Exception e ) {
           logger.debug("Caught exception in HandleFrameTask", e);
             log.error("Failed to complete handle frame task", e);
