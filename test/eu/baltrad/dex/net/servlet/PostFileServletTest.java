@@ -336,6 +336,8 @@ public class PostFileServletTest {
           (IRegistryManager) createMock(IRegistryManager.class);
         expect(deliveryRegistryManagerMock.load(1, ENTRY_UUID))
                 .andReturn(new RegistryEntry()).anyTimes();
+        expect(deliveryRegistryManagerMock
+                .storeNoId(isA(RegistryEntry.class))).andReturn(1).anyTimes();
         
         HttpResponse res = createResponse(HttpServletResponse.SC_OK, null);
         IHttpClientUtil httpClientMock = 

@@ -183,8 +183,7 @@ public class GetSubscriptionControllerTest {
     
     @Test
     public void subscribedPeers() {
-        expect(subscriptionManagerMock.loadOperators(
-                Subscription.SUBSCRIPTION_DOWNLOAD)).andReturn(subscriptions);
+        expect(subscriptionManagerMock.loadOperators()).andReturn(subscriptions);
         replay(subscriptionManagerMock);
         
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);

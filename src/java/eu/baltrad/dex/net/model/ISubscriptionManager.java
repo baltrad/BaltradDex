@@ -40,7 +40,9 @@ public interface ISubscriptionManager {
     public Subscription load(String user, String dataSource, 
             String type);
     
-    public List<Subscription> loadOperators(String type);
+    public List<Subscription> loadUsers();
+    
+    public List<Subscription> loadOperators();
     
     public int store(Subscription s);
     

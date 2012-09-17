@@ -65,8 +65,7 @@ public class DownloadStatusController implements Controller {
         throws ServletException, IOException {
         ModelAndView modelAndView = new ModelAndView( getSuccessView() );
         // get operators
-        List<Subscription> subscription = subscriptionManager
-                .loadOperators(Subscription.SUBSCRIPTION_DOWNLOAD);
+        List<Subscription> subscription = subscriptionManager.loadOperators();
         List<String> operators = new ArrayList<String>();
         for (Subscription s : subscription) {
             operators.add(s.getOperatorName());

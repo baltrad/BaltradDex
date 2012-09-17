@@ -65,8 +65,7 @@ public class UploadStatusController implements Controller {
         throws ServletException, IOException {
         ModelAndView modelAndView = new ModelAndView( getSuccessView() );
         // get users
-        List<Subscription> subscription = subscriptionManager
-                .loadOperators(Subscription.SUBSCRIPTION_UPLOAD);
+        List<Subscription> subscription = subscriptionManager.loadUsers();
         List<String> users = new ArrayList<String>();
         for (Subscription s : subscription) {
             users.add(s.getUserName());

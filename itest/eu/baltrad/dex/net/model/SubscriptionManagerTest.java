@@ -172,9 +172,14 @@ public class SubscriptionManagerTest extends TestCase {
         verifyDBTables("delete");   
     }
     
+    public void testLoadUsers() throws Exception {
+        List<Subscription> subscriptions = classUnderTest.loadUsers();
+        verifyDBTables(null);
+        assertEquals(1, subscriptions.size());
+    }
+    
     public void testLoadOperators() throws Exception {
-        List<Subscription> subscriptions = classUnderTest.loadOperators(
-                Subscription.SUBSCRIPTION_DOWNLOAD);
+        List<Subscription> subscriptions = classUnderTest.loadOperators();
         verifyDBTables(null);
         assertEquals(2, subscriptions.size());
     }

@@ -1,4 +1,4 @@
-/***************************************************************************************************
+/*******************************************************************************
 Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
@@ -15,13 +15,13 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-****************************************************************************************************
+********************************************************************************
 Document   : SQL script creates BaltradDex schema
 Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
-***************************************************************************************************/
+*******************************************************************************/
 
--- drop tables if exist ----------------------------------------------------------------------------
+-- drop tables if exist --------------------------------------------------------
 DROP TABLE IF EXISTS dex_subscriptions CASCADE;
 DROP TABLE IF EXISTS dex_delivery_registry;
 DROP TABLE IF EXISTS dex_channel_permissions CASCADE;

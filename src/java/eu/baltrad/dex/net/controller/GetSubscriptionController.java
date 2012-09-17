@@ -298,8 +298,8 @@ public class GetSubscriptionController implements MessageSetter {
      */
     @RequestMapping("/subscribed_peers.htm")
     public String subscribedPeers(Model model) {
-        List<Subscription> subscribedPeers = subscriptionManager.loadOperators(
-                Subscription.SUBSCRIPTION_DOWNLOAD);
+        List<Subscription> subscribedPeers = 
+                subscriptionManager.loadOperators();
         model.addAttribute(SUBSCRIBED_PEERS_KEY, subscribedPeers);
         return SUBSCRIBED_PEERS_VIEW;
         

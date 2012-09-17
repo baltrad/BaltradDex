@@ -131,15 +131,28 @@ public class SubscriptionManager implements ISubscriptionManager {
     }
     
     /**
+     * Loads distinct users.
+     * @return List of distinct users
+     */
+    public List<Subscription> loadUsers() {
+        String sql = "SELECT DISTINCT ON (user_name) * FROM " +
+                "dex_subscriptions WHERE type = 'upload'";
+        try {
+            return jdbcTemplate.query(sql, mapper);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
      * Loads distinct operators.
-     * @param type Subscription type 
      * @return List of distinct operators 
      */
-    public List<Subscription> loadOperators(String type) {
+    public List<Subscription> loadOperators() {
         String sql = "SELECT DISTINCT ON (operator_name) * FROM " +
-                "dex_subscriptions WHERE type = ?";
+                "dex_subscriptions WHERE type = 'download'";
         try {
-            return jdbcTemplate.query(sql, mapper, type);
+            return jdbcTemplate.query(sql, mapper);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
