@@ -490,8 +490,6 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     }
                 } 
                 response.setStatus(HttpServletResponse.SC_OK);
-                 // Delete temporary files
-                cleanUpTempFiles(InitAppUtil.getWorkDir());
             } catch (DuplicateEntry e) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                 log.error("Duplicate entry error", e);
@@ -508,6 +506,8 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     log.error("Failed to close the strem", e);
                 }
+                // Delete temporary files
+                cleanUpTempFiles(InitAppUtil.getWorkDir());
             }
         } else {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

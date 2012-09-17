@@ -218,18 +218,18 @@ public class InitAppUtil {
      * @param directory Directory where temporary files are stored
      * @param maxAge Maximum age of temporary file
      */
-    public static void cleanUpTempFiles( String directory ) {
+    public static void cleanUpTempFiles(String directory) {
         File dir = new File( directory );
         File[] tempFiles = dir.listFiles();
-        for( int i = 0; i < tempFiles.length; i++ ) {
-            if( tempFiles[ i ].getName().startsWith( TEMP_FILE_PREFIX ) &&
-                    tempFiles[ i ].getName().endsWith( TEMP_FILE_SUFFIX ) ) {
+        for (int i = 0; i < tempFiles.length; i++) {
+            if (tempFiles[i].getName().startsWith(TEMP_FILE_PREFIX) &&
+                    tempFiles[i].getName().endsWith(TEMP_FILE_SUFFIX)) {
                 Date date = new Date();
                 long now = date.getTime();
-                long modified = tempFiles[ i ].lastModified();
+                long modified = tempFiles[i].lastModified();
                 // check if the files is older than a given age
-                if( ( now - modified ) > TEMP_FILE_MAX_AGE ) {
-                    deleteFile( tempFiles[ i ] );
+                if ((now - modified) > TEMP_FILE_MAX_AGE) {
+                    deleteFile(tempFiles[i]);
                 }
             }
         }
