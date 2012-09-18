@@ -285,6 +285,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         Message logger
     -->
     <bean name="messageLogger" class="eu.baltrad.dex.log.util.MessageLogger"/>
+    
+    
+    
+    <bean name="logAppender" class="eu.baltrad.dex.log.util.LogAppender"/>
+    
+    
+    
 
     <!-- FramePublisherManager -->
     <bean name="framePublisherManager" class="eu.baltrad.dex.net.util.FramePublisherManager"/>
