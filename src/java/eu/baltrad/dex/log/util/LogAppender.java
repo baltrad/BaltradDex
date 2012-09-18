@@ -37,11 +37,37 @@ import org.apache.log4j.Logger;
  */
 public class LogAppender extends AppenderSkeleton {
     
-    private LogManager logManger;
+    private static LogManager logManager;
   
-    private static Logger logger = 
-            MessageLogger.getLogger(MessageLogger.SYS_DEX);
+    //private static Logger logger = 
+    //        MessageLogger.getLogger(MessageLogger.SYS_DEX);
 
+    private static Logger logger;
+    
+    public LogAppender() {
+        
+        //System.out.println("LogAppender(): Logger not initialized ...");
+        
+        logger = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        logManager = LogManager.getInstance();
+        
+        if (logger == null) {
+            System.out.println("LogAppender(): Logger not initialized ...");
+        } else {
+            System.out.println("LogAppender(): Logger OK ...");
+        }
+        
+        if (logManager == null) {
+            System.out.println("LogAppender(): LogManager not initialized ...");
+        } else {
+            System.out.println("LogAppender(): LogManager OK ...");
+        }
+        
+        
+    }
+    
+    
+    
     public boolean requiresLayout() {
         return false;
     }
@@ -54,21 +80,21 @@ public class LogAppender extends AppenderSkeleton {
      */
     public void append(LoggingEvent event) {
       
-      this.logManger = LogManager.getInstance(); 
+      //this.logManger = LogManager.getInstance(); 
       
-      if (this.logManger != null) {
+      if (/*this.*/logManager != null) {
           
-          System.out.println("append(): Logger OK ...");
+          System.out.println("append(): LogManager OK, adding entry ...");
         
           
-          this.logManger.storeNoId(new LogEntry(
+          /*this.*/logManager.storeNoId(new LogEntry(
                     event.getTimeStamp(),
                     event.getLoggerName(), 
                     event.getLevel().toString(), 
                     event.getRenderedMessage()));
       } else {
           
-          System.out.println("append(): Logger not initialized ...");
+          System.out.println("append(): LogManager not initialized ...");
           
           
           logger.debug(event.getRenderedMessage());
