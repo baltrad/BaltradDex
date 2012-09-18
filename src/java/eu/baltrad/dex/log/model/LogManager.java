@@ -157,13 +157,22 @@ public class LogManager implements ILogManager, InitializingBean {
      * @return Number of records stored
      */
     public int storeNoId(LogEntry entry) {
-        return jdbcTemplate.update("INSERT INTO dex_messages " +
+        
+        
+        System.out.println("storeNoId(): Storing ...");
+        
+        
+        int i = jdbcTemplate.update("INSERT INTO dex_messages " +
             "(timestamp, system, type, message) VALUES " +
             "(?,?,?,?)",
             entry.getTimeStamp(),
             entry.getSystem(),
             entry.getType(),
             entry.getMessage());
+        
+        System.out.println("append(): Number of records stored: " + i);
+        
+        return i;
     }
     
     /**

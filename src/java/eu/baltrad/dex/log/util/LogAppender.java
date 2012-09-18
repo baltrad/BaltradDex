@@ -57,12 +57,20 @@ public class LogAppender extends AppenderSkeleton {
       this.logManger = LogManager.getInstance(); 
       
       if (this.logManger != null) {
-            this.logManger.storeNoId(new LogEntry(
+          
+          System.out.println("append(): Logger OK ...");
+        
+          
+          this.logManger.storeNoId(new LogEntry(
                     event.getTimeStamp(),
                     event.getLoggerName(), 
                     event.getLevel().toString(), 
                     event.getRenderedMessage()));
       } else {
+          
+          System.out.println("append(): Logger not initialized ...");
+          
+          
           logger.debug(event.getRenderedMessage());
       }  
   }

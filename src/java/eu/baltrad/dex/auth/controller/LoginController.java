@@ -55,6 +55,14 @@ public class LoginController {
      */
     public LoginController() {
         this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        
+        if (log == null) {
+            System.out.println("LoginController(): Logger not initialized ...");
+        } else {
+            System.out.println("LoginController(): Logger OK ...");
+        }
+        
+        
         log.info("BALTRAD system started");
     }
     
@@ -93,6 +101,14 @@ public class LoginController {
         if (SecurityManager.getSessionUser(session) == null) {
             User user = userManager.load(principal.getName());
             SecurityManager.setSessionUser(session, user);
+            
+            if (log == null) {
+                System.out.println("welcome(): Logger not initialized ...");
+            } else {
+                System.out.println("welcome(): Logger OK ...");
+            }
+            
+            
             log.info("User " + user.getName() + " signed in");
         }
         return "home";
