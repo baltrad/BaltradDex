@@ -2,12 +2,25 @@
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
     <context-param>
         <param-name>log4jConfigLocation</param-name>
-        <param-value>/log4j.properties</param-value>
+        <param-value>/log4j.dex.properties</param-value>
     </context-param>
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>/WEB-INF/applicationContext.xml</param-value>
     </context-param>
+    
+    
+    
+    <!--context-param>
+        <param-name>webAppRootKey</param-name>
+        <param-value>baltraddex</param-value>
+    </context-param-->
+    
+
+    
+
+    
+    
     <listener>
         <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
     </listener>
