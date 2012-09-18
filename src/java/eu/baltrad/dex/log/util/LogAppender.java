@@ -27,6 +27,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implements custom log message appender.
@@ -37,16 +38,39 @@ import org.apache.log4j.Logger;
  */
 public class LogAppender extends AppenderSkeleton {
     
-    private static LogManager logManager;
+    private static LogManager logManager = LogManager.getInstance();
   
-    //private static Logger logger = 
-    //        MessageLogger.getLogger(MessageLogger.SYS_DEX);
+    private static Logger logger = 
+            MessageLogger.getLogger(MessageLogger.SYS_DEX);
 
-    private static Logger logger;
     
-    public LogAppender() {
+    /*public LogAppender() {
+        System.out.println("_____________________ konstruktor");
+        System.out.println("_____________________ setting log manager");
         
-        //System.out.println("LogAppender(): Logger not initialized ...");
+        logManager = LogManager.getInstance();
+        
+        
+        if (logManager == null) {
+            System.out.println("____________________ konstruktor: LogManager not initialized ...");
+        } else {
+            System.out.println("____________________ konstruktor: LogManager OK ...");
+        }
+        
+    }*/
+    
+
+    /**
+     * @param aLogManager the logManager to set
+     */
+    /*@Autowired
+    public void setLogManager(LogManager logManager) {
+        this.logManager = logManager;
+    }*/
+    
+    /*public LogAppender() {
+        
+        System.out.println("___________________ LogAppender()");
         
         logger = MessageLogger.getLogger(MessageLogger.SYS_DEX);
         logManager = LogManager.getInstance();
@@ -64,7 +88,7 @@ public class LogAppender extends AppenderSkeleton {
         }
         
         
-    }
+    }*/
     
     
     
@@ -80,7 +104,11 @@ public class LogAppender extends AppenderSkeleton {
      */
     public void append(LoggingEvent event) {
       
-      //this.logManger = LogManager.getInstance(); 
+      logManager = LogManager.getInstance(); 
+        
+        
+        
+        
       
       if (/*this.*/logManager != null) {
           

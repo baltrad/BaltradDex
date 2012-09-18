@@ -383,7 +383,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         Log manager
     -->
     <bean name="logManager" class="eu.baltrad.dex.log.model.LogManager"
-          autowire="byType"/>     
+          autowire="byType"/> 
+          
+          
+          
+    <!--bean name="LogAppender" class="eu.baltrad.dex.log.util.LogAppender"
+          autowire="byType"/-->
+          
+          
           
     <!--
         Register controller - handles data delivery register
