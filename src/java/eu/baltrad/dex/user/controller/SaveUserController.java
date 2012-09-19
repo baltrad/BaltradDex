@@ -24,7 +24,6 @@ package eu.baltrad.dex.user.controller;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.util.MessageDigestUtil;
 import java.util.ArrayList;
 
@@ -61,7 +60,7 @@ public class SaveUserController extends SimpleFormController {
      * Constructor.
      */
     public SaveUserController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Fetches User object with a given USER_ID passed as request parameter,

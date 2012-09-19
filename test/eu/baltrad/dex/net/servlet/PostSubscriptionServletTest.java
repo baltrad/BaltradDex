@@ -27,13 +27,14 @@ import eu.baltrad.dex.net.util.JsonUtil;
 import eu.baltrad.dex.net.model.ISubscriptionManager;
 import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
+
+import org.apache.log4j.Logger;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -89,7 +90,7 @@ public class PostSubscriptionServletTest {
     @Before
     public void setUp() {
         classUnderTest = new PSServlet();
-        classUnderTest.setLog(MessageLogger.getLogger(MessageLogger.SYS_DEX));
+        classUnderTest.setLog(Logger.getLogger("DEX"));
         messages = new MessageResourceUtil("resources/messages");
         classUnderTest.setMessages(messages);
         jsonUtil = new JsonUtil();

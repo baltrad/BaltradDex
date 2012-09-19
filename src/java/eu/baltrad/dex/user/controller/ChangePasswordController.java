@@ -24,7 +24,6 @@ package eu.baltrad.dex.user.controller;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Password;
 import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.util.MessageDigestUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,7 +62,7 @@ public class ChangePasswordController extends SimpleFormController {
      * Constructor.
      */
     public ChangePasswordController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Constructs password objects matching a given user identified by ID.

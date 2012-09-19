@@ -21,8 +21,6 @@
 
 package eu.baltrad.dex.util;
 
-
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.frame.model.Handler;
@@ -50,7 +48,7 @@ public class InitAppUtil {
     private static final long TEMP_FILE_MAX_AGE = 180000;
 //---------------------------------------------------------------------------------------- Variables
     /** References logger object */
-    private static Logger log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+    private static Logger log = Logger.getLogger("DEX");
     /** Configuration object holding all necessary settings */
     private static AppConfiguration appConf; 
     /** Work directory */

@@ -21,7 +21,6 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.net.model.NodeRequest;
 import eu.baltrad.dex.net.model.NodeResponse;
 import eu.baltrad.dex.net.util.Authenticator;
@@ -79,7 +78,7 @@ public class PostMessageServlet extends HttpServlet {
      * Constructor.
      */
     public PostMessageServlet() {
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        this.log = Logger.getLogger("DEX");
     }
     
     /**

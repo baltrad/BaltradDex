@@ -49,7 +49,6 @@ import eu.baltrad.bdb.oh5.Metadata;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 /**
  * Data manager - interacts with baltrad-db component.
@@ -87,7 +86,7 @@ public class BltFileManager implements IBltFileManager {
      * Constructor
      */
     public BltFileManager() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Gets filter associated with a given data source.

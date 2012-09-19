@@ -23,7 +23,6 @@ package eu.baltrad.dex.user.controller;
 
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -70,8 +69,8 @@ public class RemoveUserController extends MultiActionController {
      * Constructor.
      */
     public RemoveUserController() {
-        removeUsers = new ArrayList<User>();
-        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.removeUsers = new ArrayList<User>();
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Gets list of all registered users except for currently signed user.

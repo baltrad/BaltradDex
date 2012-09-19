@@ -21,8 +21,6 @@
 
 package eu.baltrad.dex.config.model;
 
-import eu.baltrad.dex.log.util.MessageLogger;
-
 import eu.baltrad.dex.util.ServletContextUtil;
 import org.apache.log4j.Logger;
 
@@ -124,7 +122,7 @@ public class ConfigurationManager {
      * Constructor
      */
     public ConfigurationManager() {
-        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );   
+        this.log = Logger.getLogger("DEX"); 
     }
     /**
      * Loads properties from files into hash map object.

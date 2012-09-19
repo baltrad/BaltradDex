@@ -25,7 +25,6 @@ import eu.baltrad.dex.net.model.NodeRequest;
 import eu.baltrad.dex.net.model.NodeResponse;
 import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.util.InitAppUtil;
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.net.model.ISubscriptionManager;
@@ -86,7 +85,7 @@ public class GetSubscriptionServlet extends HttpServlet {
      * Default constructor.
      */
     public GetSubscriptionServlet() {
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        this.log = Logger.getLogger("DEX");
     }
     
     /**

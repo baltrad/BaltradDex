@@ -26,7 +26,6 @@ import eu.baltrad.dex.registry.model.RegistryManager;
 import eu.baltrad.dex.db.model.BltFileManager;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.util.ITableScroller;
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.log.model.LogManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,7 +73,7 @@ public class RegistryController extends MultiActionController implements ITableS
      * Constructor
      */
     public RegistryController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     
     /**

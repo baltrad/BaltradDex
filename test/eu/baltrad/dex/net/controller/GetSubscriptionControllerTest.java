@@ -23,9 +23,7 @@ package eu.baltrad.dex.net.controller;
 
 import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.net.model.*;
-import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -121,7 +119,7 @@ public class GetSubscriptionControllerTest {
         classUnderTest.setAuthenticator(new EasyAuthenticator());
         messages = new MessageResourceUtil("resources/messages"); 
         classUnderTest.setMessages(messages);
-        log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        log = Logger.getLogger("DEX");
         classUnderTest.setLog(log);
         httpClientMock = createMock(IHttpClientUtil.class);
         nodeConnectionManagerMock = createMock(INodeConnectionManager.class);

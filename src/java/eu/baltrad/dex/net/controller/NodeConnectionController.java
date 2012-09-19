@@ -23,7 +23,6 @@ package eu.baltrad.dex.net.controller;
 
 import eu.baltrad.dex.net.model.NodeConnectionManager;
 import eu.baltrad.dex.net.model.NodeConnection;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
@@ -64,7 +63,7 @@ public class NodeConnectionController extends MultiActionController {
      * Constructor.
      */
     public NodeConnectionController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Shows all registered node connections.

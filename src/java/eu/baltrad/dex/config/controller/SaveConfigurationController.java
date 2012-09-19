@@ -25,7 +25,6 @@ import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.util.ServletContextUtil;
 import eu.baltrad.dex.util.InitAppUtil;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.apache.log4j.Logger;
 
@@ -72,7 +71,7 @@ public class SaveConfigurationController extends SimpleFormController {
      * Constructor.
      */
     public SaveConfigurationController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Fetches Configuration object from the database.

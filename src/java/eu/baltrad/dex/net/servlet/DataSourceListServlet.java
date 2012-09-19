@@ -28,7 +28,6 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.IUserManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.IDataSourceManager;
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
@@ -77,7 +76,7 @@ public class DataSourceListServlet extends HttpServlet {
      * Default constructor.
      */
     public DataSourceListServlet() {
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        this.log = Logger.getLogger("DEX");
     }
     
     /**

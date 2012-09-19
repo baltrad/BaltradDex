@@ -23,7 +23,6 @@ package eu.baltrad.dex.bltdata.controller;
 
 import eu.baltrad.dex.bltdata.model.BltDataProcessor;
 import eu.baltrad.dex.util.ServletContextUtil;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.Group;
@@ -57,7 +56,7 @@ public class BltDataProcessorController {
      * Constructor.
      */
     public BltDataProcessorController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Wrapper method creating image from a given file containing polar datasets.

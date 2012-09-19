@@ -21,7 +21,6 @@
 
 package eu.baltrad.dex.config.controller;
 
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.config.model.ConfigurationManager;
 import eu.baltrad.dex.log.model.LogManager;
@@ -62,7 +61,7 @@ public class SaveMessagesConfigurationController extends SimpleFormController {
      * Constructor.
      */
     public SaveMessagesConfigurationController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Retrieve a backing object for the current form from the given request.

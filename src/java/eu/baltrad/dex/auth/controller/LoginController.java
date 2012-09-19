@@ -23,7 +23,6 @@ package eu.baltrad.dex.auth.controller;
 
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.auth.util.SecurityManager;
 
 import org.springframework.stereotype.Controller;
@@ -35,9 +34,6 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
-//import eu.baltrad.dex.log.model.LogManager;
-//import eu.baltrad.dex.log.util.LogAppender;
-//import org.apache.log4j.spi.LoggingEvent;
 
 /**
  * Login controller class implementing basic user authentication functionality.
@@ -53,24 +49,11 @@ public class LoginController {
     private UserManager userManager;
     private Logger log;
     
-    
-    //private LogAppender logAppender;
-    
     /**
      * Default constructor.
      */
     public LoginController() {
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
-        
-        if (log == null) {
-            System.out.println("LoginController(): Logger not initialized ...");
-        } else {
-            System.out.println("LoginController(): Logger OK ...");
-        }
-        
-        //logAppender = new LogAppender();
-        //logAppender.setLogManager(LogManager.getInstance());
-        
+        this.log = Logger.getLogger("DEX");
         log.info("BALTRAD system started");
     }
     
@@ -109,14 +92,6 @@ public class LoginController {
         if (SecurityManager.getSessionUser(session) == null) {
             User user = userManager.load(principal.getName());
             SecurityManager.setSessionUser(session, user);
-            
-            if (log == null) {
-                System.out.println("welcome(): Logger not initialized ...");
-            } else {
-                System.out.println("welcome(): Logger OK ...");
-            }
-            
-            
             log.info("User " + user.getName() + " signed in");
         }
         return "home";

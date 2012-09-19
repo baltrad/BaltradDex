@@ -24,7 +24,6 @@ package eu.baltrad.dex.log.controller;
 import eu.baltrad.dex.util.ITableScroller;
 import eu.baltrad.dex.log.model.LogManager;
 import eu.baltrad.dex.log.model.LogEntry;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -66,7 +65,7 @@ public class JournalController implements Controller, ITableScroller {
      * Constructor.
      */
     public JournalController() {
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        this.log = Logger.getLogger("DEX");
         this.logManager = LogManager.getInstance();
     }
     

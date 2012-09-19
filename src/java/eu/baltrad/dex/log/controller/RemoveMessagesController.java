@@ -21,7 +21,6 @@
 
 package eu.baltrad.dex.log.controller;
 
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.log.model.LogManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +54,7 @@ public class RemoveMessagesController implements Controller {
      * Constructor.
      */
     public RemoveMessagesController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
         this.logManager = LogManager.getInstance();
     }
     /**

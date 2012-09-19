@@ -26,7 +26,6 @@ import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.net.model.*;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,7 +106,7 @@ public class DataSourceListController implements MessageSetter {
      * Default constructor.
      */
     public DataSourceListController() {
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        this.log = Logger.getLogger("DEX");
     }
     
     /**

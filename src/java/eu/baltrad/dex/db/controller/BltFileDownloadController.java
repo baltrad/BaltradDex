@@ -21,7 +21,6 @@
 
 package eu.baltrad.dex.db.controller;
 
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.auth.util.SecurityManager;
 
@@ -62,7 +61,7 @@ public class BltFileDownloadController implements Controller {
      * Controller.
      */
     public BltFileDownloadController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Method handles file download request.

@@ -64,16 +64,6 @@ public class LogManager implements ILogManager, InitializingBean {
      */
     public LogManager() {
         this.mapper = new LogEntryMapper();
-        
-        System.out.println("________________ LogManager()");
-        
-        if (jdbcTemplate == null) {
-            System.out.println("__________________LogManager(): jdbcTemplate is null");
-        } else {
-            System.out.println("__________________LogManager(): jdbcTemplate OK!!!");
-        }
-        
-        
     }
     
     /**
@@ -167,22 +157,13 @@ public class LogManager implements ILogManager, InitializingBean {
      * @return Number of records stored
      */
     public int storeNoId(LogEntry entry) {
-        
-        
-        System.out.println("storeNoId(): Storing ...");
-        
-        
-        int i = jdbcTemplate.update("INSERT INTO dex_messages " +
+        return jdbcTemplate.update("INSERT INTO dex_messages " +
             "(timestamp, system, type, message) VALUES " +
             "(?,?,?,?)",
             entry.getTimeStamp(),
             entry.getSystem(),
             entry.getType(),
             entry.getMessage());
-        
-        System.out.println("append(): Number of records stored: " + i);
-        
-        return i;
     }
     
     /**

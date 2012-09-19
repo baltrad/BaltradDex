@@ -29,7 +29,6 @@ import eu.baltrad.dex.user.model.IUserManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.IDataSourceManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -38,6 +37,7 @@ import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -113,7 +113,7 @@ public class DataSourceListServletTest {
     public void setUp() throws Exception {
         mocks = new ArrayList<Object>();
         classUnderTest = new DSLServlet();
-        classUnderTest.setLog(MessageLogger.getLogger(MessageLogger.SYS_DEX));
+        classUnderTest.setLog(Logger.getLogger("DEX"));
         messages = new MessageResourceUtil("resources/messages");
         classUnderTest.setMessages(messages);
         request = new MockHttpServletRequest();

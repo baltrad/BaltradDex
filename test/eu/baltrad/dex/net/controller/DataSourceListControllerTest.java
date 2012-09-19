@@ -25,7 +25,6 @@ import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.net.model.*;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -94,7 +93,7 @@ public class DataSourceListControllerTest {
         jsonUtil = new JsonUtil(); 
         messages = new MessageResourceUtil("resources/messages");
         classUnderTest.setMessages(messages);
-        log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        log = Logger.getLogger("DEX");
         classUnderTest.setLog(log);
         
         connectionManagerMock = createMock(INodeConnectionManager.class);

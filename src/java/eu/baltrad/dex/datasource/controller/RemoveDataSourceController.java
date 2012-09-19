@@ -23,7 +23,6 @@ package eu.baltrad.dex.datasource.controller;
 
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import eu.baltrad.beast.db.CoreFilterManager;
 import eu.baltrad.beast.db.IFilter;
@@ -78,7 +77,7 @@ public class RemoveDataSourceController extends MultiActionController {
      * Constructor.
      */
     public RemoveDataSourceController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Renders select data source page.

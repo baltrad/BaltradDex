@@ -32,7 +32,6 @@ import eu.baltrad.dex.datasource.model.IDataSourceManager;
 import eu.baltrad.dex.datasource.util.DataSourceValidator;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.AttributeFilter;
@@ -94,13 +93,13 @@ public class SaveDataSourceController {
     private CoreFilterManager coreFilterManager;
     private DataSourceValidator validator;
     private MessageResourceUtil messages;
-    private Logger logger;
+    private Logger log;
     
     /**
      * Constructor.
      */
     public SaveDataSourceController() {
-        this.logger = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        this.log = Logger.getLogger("DEX");
     }
     
     /**
@@ -244,20 +243,20 @@ public class SaveDataSourceController {
                             .getMessage(SAVE_DATASOURCE_OK_MSG_KEY, 
                             new Object[] {dataSource.getName()});
                     model.addAttribute(OK_MSG_KEY, msg);
-                    logger.warn(msg);
+                    log.warn(msg);
                 } else {
                     String msg = messages
                             .getMessage(SAVE_DATASOURCE_ERROR_MSG_KEY, 
                             new Object[] {dataSource.getName()});
                     model.addAttribute(ERROR_MSG_KEY, msg);
-                    logger.error(msg);
+                    log.error(msg);
                 }   
             } catch (Exception e) {
                 String msg = messages
                             .getMessage(SAVE_DATASOURCE_ERROR_MSG_KEY, 
                             new Object[] {dataSource.getName()});
                 model.addAttribute(ERROR_MSG_KEY, msg);
-                logger.error(msg, e);
+                log.error(msg, e);
             }
             return SUCCESS_VIEW;
         }

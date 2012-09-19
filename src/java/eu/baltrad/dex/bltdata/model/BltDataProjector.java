@@ -21,8 +21,6 @@
 
 package eu.baltrad.dex.bltdata.model;
 
-import eu.baltrad.dex.log.util.MessageLogger;
-
 import com.jhlabs.map.proj.Projection;
 import com.jhlabs.map.proj.ProjectionFactory;
 import com.jhlabs.map.proj.ProjectionException;
@@ -47,7 +45,7 @@ public class BltDataProjector {
      * Constructor.
      */
     public BltDataProjector() {
-        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Initializes projection object according to PROJ4 library specification.

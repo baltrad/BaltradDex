@@ -21,8 +21,6 @@
 
 package eu.baltrad.dex.net.model;
 
-import eu.baltrad.dex.log.util.MessageLogger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -55,7 +53,7 @@ public class SubscriptionManager implements ISubscriptionManager {
      * Constructor.
      */
     public SubscriptionManager() {
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        this.log = Logger.getLogger("DEX");
         this.mapper = new Mapper();
     }
     

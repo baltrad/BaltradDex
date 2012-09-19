@@ -26,7 +26,6 @@ import eu.baltrad.dex.net.util.IHttpClientUtil;
 import eu.baltrad.dex.net.model.ISubscriptionManager;
 import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.db.model.IBltFileManager;
 
 import eu.baltrad.bdb.FileCatalog;
@@ -60,6 +59,7 @@ import org.apache.http.message.BasicStatusLine;
 import org.apache.http.HttpResponse;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.ProtocolVersion;
+import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -170,7 +170,7 @@ public class PostFileServletTest {
     public void setUp() {
         mocks = new ArrayList();
         classUnderTest = new PFServlet();
-        classUnderTest.setLog(MessageLogger.getLogger(MessageLogger.SYS_DEX));
+        classUnderTest.setLog(Logger.getLogger("DEX"));
         messages = new MessageResourceUtil("resources/messages");
         classUnderTest.setMessages(messages);
         request = new MockHttpServletRequest();

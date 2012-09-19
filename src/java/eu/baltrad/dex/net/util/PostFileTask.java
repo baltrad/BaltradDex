@@ -23,7 +23,6 @@ package eu.baltrad.dex.net.util;
 
 import eu.baltrad.dex.registry.model.IRegistryManager;
 import eu.baltrad.dex.registry.model.RegistryEntry;
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.user.model.User;
 
 import org.apache.log4j.Logger;
@@ -59,12 +58,12 @@ public class PostFileTask implements Runnable {
      */
     public PostFileTask(IHttpClientUtil httpClient, IRegistryManager manager,
             HttpUriRequest request, String uuid, User user) {
+        this.log = Logger.getLogger("DEX");
         this.httpClient = httpClient;
         this.manager = manager;
         this.request = request;
         this.uuid = uuid;
         this.user = user;
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
     }
     
     /**

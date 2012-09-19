@@ -21,8 +21,6 @@
 
 package eu.baltrad.dex.bltdata.model;
 
-import eu.baltrad.dex.log.util.MessageLogger;
-
 import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.Group;
@@ -116,7 +114,7 @@ public class BltDataProcessor {
      * Constructor.
      */
     public BltDataProcessor() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Opens HDF5 file.

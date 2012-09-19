@@ -32,7 +32,6 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.bltdata.controller.BltDataProcessorController;
 import eu.baltrad.dex.net.util.FramePublisherManager;
@@ -112,7 +111,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
      * Constructor.
      */
     public FrameDispatcherController() {
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Required by the Spring's Controller interface, wraps actual doGet method used to

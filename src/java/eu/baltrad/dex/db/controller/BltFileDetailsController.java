@@ -26,7 +26,6 @@ import eu.baltrad.dex.db.model.BltFileManager;
 import eu.baltrad.dex.db.model.BltFile;
 import eu.baltrad.dex.db.model.BltDataset;
 import eu.baltrad.dex.bltdata.model.BltDataProjector;
-import eu.baltrad.dex.log.util.MessageLogger;
 import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.bdb.FileCatalog;
@@ -95,7 +94,7 @@ public class BltFileDetailsController implements Controller {
      * Constructor.
      */
     public BltFileDetailsController() {
-        this.log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Fetches detailed information about a file and prepares dataset image thumbs.

@@ -23,7 +23,6 @@ package eu.baltrad.dex.radar.controller;
 
 import eu.baltrad.dex.radar.model.RadarManager;
 import eu.baltrad.dex.radar.model.Radar;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.apache.log4j.Logger;
 
@@ -65,7 +64,7 @@ public class RemoveRadarController extends MultiActionController {
      * Constructor.
      */
     public RemoveRadarController() {
-        this.log = MessageLogger.getLogger(MessageLogger.SYS_DEX);
+        this.log = Logger.getLogger("DEX");
     }
     /**
      * Shows all available channels.

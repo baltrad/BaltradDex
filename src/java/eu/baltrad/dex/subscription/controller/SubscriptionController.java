@@ -24,7 +24,6 @@ package eu.baltrad.dex.subscription.controller;
 import eu.baltrad.dex.net.model.Subscription;
 import eu.baltrad.dex.datasource.model.DataSourceManager;
 import eu.baltrad.dex.net.model.SubscriptionManager;
-import eu.baltrad.dex.log.util.MessageLogger;
 
 import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 import org.springframework.web.servlet.ModelAndView;
@@ -78,7 +77,7 @@ public class SubscriptionController extends MultiActionController {
      * Constructor.
      */
     public SubscriptionController() {
-        log = MessageLogger.getLogger( MessageLogger.SYS_DEX );
+        this.log = Logger.getLogger("DEX");
     }
     
     /**
