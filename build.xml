@@ -270,7 +270,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </fileset>
       <fileset dir="${etc.dir}">
         <include name="db.properties" />
-        <!--include name="log4j.properties" /-->
+        <include name="log4j-dex.properties" />
         <include name="dex.user.properties" />
         <include name="dex.default.properties" />
       </fileset>

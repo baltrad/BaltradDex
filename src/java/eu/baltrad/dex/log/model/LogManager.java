@@ -64,6 +64,16 @@ public class LogManager implements ILogManager, InitializingBean {
      */
     public LogManager() {
         this.mapper = new LogEntryMapper();
+        
+        System.out.println("________________ LogManager()");
+        
+        if (jdbcTemplate == null) {
+            System.out.println("__________________LogManager(): jdbcTemplate is null");
+        } else {
+            System.out.println("__________________LogManager(): jdbcTemplate OK!!!");
+        }
+        
+        
     }
     
     /**

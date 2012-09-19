@@ -35,6 +35,9 @@ import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpSession;
 import java.security.Principal;
+//import eu.baltrad.dex.log.model.LogManager;
+//import eu.baltrad.dex.log.util.LogAppender;
+//import org.apache.log4j.spi.LoggingEvent;
 
 /**
  * Login controller class implementing basic user authentication functionality.
@@ -50,6 +53,9 @@ public class LoginController {
     private UserManager userManager;
     private Logger log;
     
+    
+    //private LogAppender logAppender;
+    
     /**
      * Default constructor.
      */
@@ -62,6 +68,8 @@ public class LoginController {
             System.out.println("LoginController(): Logger OK ...");
         }
         
+        //logAppender = new LogAppender();
+        //logAppender.setLogManager(LogManager.getInstance());
         
         log.info("BALTRAD system started");
     }
