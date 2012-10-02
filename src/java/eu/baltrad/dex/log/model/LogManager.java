@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.log.model;
 
+import static eu.baltrad.dex.util.InitAppUtil.validate;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -86,11 +88,98 @@ public class LogManager implements ILogManager, InitializingBean {
     }
     
     /**
+     * Creates db query based on given log parameters.
+     * @param param Log parameter
+     * @param count Select /count query toggle  
+     * @return Query string
+     */
+    public String createQuery(LogParameter param, boolean count) {
+        String sql = "";
+        if (count) {
+            sql = "SELECT count(*) FROM dex_messages";
+        } else {
+            sql = "SELECT * FROM dex_messages";
+        }
+        boolean hasParameters = false;
+        if (validate(param.getLogger()) && !param.getLogger().equals("ALL")) {
+            sql += " WHERE system = '" + param.getLogger() + "'";
+            hasParameters = true;
+        }
+        if (validate(param.getFlag()) && !param.getFlag().equals("ALL")) {
+            if (hasParameters) {
+                sql += " AND type = '" + param.getFlag() + "'";
+            } else {
+                sql += " WHERE type = '" + param.getFlag() + "'";
+                hasParameters = true;
+            }
+        }
+        if (validate(param.getStartDate())) {
+            String startDate = param.getStartDate();
+            if (validate(param.getStartHour())) {
+                startDate += " " + param.getStartHour() + ":";
+            } else {
+                startDate += " 00:";
+            }
+            if (validate(param.getStartMinutes())) {
+                startDate += param.getStartMinutes() + ":";
+            } else {
+                startDate += "00:";
+            }
+            if (validate(param.getStartSeconds())) {
+                startDate += param.getStartSeconds();
+            } else {
+                startDate += "00";
+            }
+            if (hasParameters) {
+                sql += " AND timestamp >= '" + startDate + "'";
+            } else {
+                sql += " WHERE timestamp >= '" + startDate + "'";
+                hasParameters = true;
+            }
+        }
+        if (validate(param.getEndDate())) {
+            String endDate = param.getEndDate();
+            if (validate(param.getEndHour())) {
+                endDate += " " + param.getEndHour() + ":";
+            } else {
+                endDate += " 00:";
+            }
+            if (validate(param.getEndMinutes())) {
+                endDate += param.getEndMinutes() + ":";
+            } else {
+                endDate += "00:";
+            }
+            if (validate(param.getEndSeconds())) {
+                endDate += param.getEndSeconds();
+            } else {
+                endDate += "00";
+            }
+            if (hasParameters) {
+                sql += " AND timestamp <= '" + endDate + "'";
+            } else {
+                sql += " WHERE timestamp <= '" + endDate + "'";
+                hasParameters = true;
+            }
+        }
+        if (validate(param.getPhrase())) {
+            if (hasParameters) {
+                sql += " AND message SIMILAR TO '%" + param.getPhrase() + "%'";
+            } else {
+                sql += " WHERE message SIMILAR TO '%" + param.getPhrase() + "%'";
+                hasParameters = true;
+            }
+        }
+        if (!count) {
+            sql += " ORDER BY timestamp DESC OFFSET ? LIMIT ?";
+        }
+        return sql;
+    }
+    
+    /**
      * Counts entries.
      * @return Total number of entries in the log
      */
-    public long count() {
-        String sql = "SELECT count(*) FROM dex_messages";
+    public long count(String sql) {
         return jdbcTemplate.queryForLong(sql);
     }
     
@@ -128,6 +217,21 @@ public class LogManager implements ILogManager, InitializingBean {
     public List<LogEntry> load(int offset, int limit) {
         String sql = "SELECT * FROM dex_messages ORDER BY timestamp" +
                 " DESC OFFSET ? LIMIT ?";
+        try {
+            return jdbcTemplate.query(sql, mapper, offset, limit);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Load log entries .
+     * @param param Log entry parameters
+     * @param offset Offset 
+     * @param limit Limit
+     * @return List of log entries matching given parameters
+     */
+    public List<LogEntry> load(String sql, int offset, int limit) {
         try {
             return jdbcTemplate.query(sql, mapper, offset, limit);
         } catch (EmptyResultDataAccessException e) {

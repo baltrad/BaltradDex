@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -19,39 +19,19 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.log.model;
+$(document).ready(function()
+{
+    $(".msg_body").hide();
+    $(".msg_head").click(function()
+    {
+        $(this).next(".msg_body").toggle();
+        if(document.getElementById("msg_node").innerHTML=="Hide details") {
+            document.getElementById("msg_node").innerHTML="Show details";
+        } else {
+            document.getElementById("msg_node").innerHTML="Hide details";
+        }
+    });
+});
 
-import java.util.List;
 
-/**
- * Message logger interface.
- *
- * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.2.1
- * @since 0.6.6
- */
-public interface ILogManager {
-    
-    public long count(String sql);
-    
-    public List<LogEntry> load();
-    
-    public List<LogEntry> load(int limit); 
-    
-    public List<LogEntry> load(int offset, int limit);
-    
-    public List<LogEntry> load(String sql, int offset, int limit);
-    
-    public int store(LogEntry entry);
-    
-    public int storeNoId(LogEntry entry);
-    
-    public int delete();
-    
-    public void setTrimmer(int limit);
-    
-    public void setTrimmer(int days, int hours, int minutes);
-    
-    public void removeTrimmer(String name);
-    
-}
+

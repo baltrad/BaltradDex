@@ -26,106 +26,82 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <!--meta name="save" content="history" /-->
-        <noscript>
-            <style type="text/css"><!--.dspcont{display:block;}--></style>
-        </noscript>
-        <script type="text/javascript" language="javascript" src="includes/js/expandable.js"></script>
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>BALTRAD | Data upload</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
-            </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/home_tab.jsp"%>
+<t:page_tabbed pageTitle="Data upload" activeTab="home">
+  <jsp:body>
+    <div class="left">
+        <t:menu_home/>
+    </div>
+    <div class="right">
+        <div class="blttitle">
+            <img src="includes/images/icons/upload.png" alt="">
+            Data upload status
+        </div>
+        <div class="blttext">
+            Data sent to users subscribing local data sources.
+        </div>
+        <c:choose>
+            <c:when test="${not empty users}">
+                <div class="blttext">
+                    Click on user name to view detailed information
+                    on subscriber.
                 </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/home_menu.jsp"%>
-                    </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            <img src="includes/images/icons/upload.png" alt="">
-                            Data upload status
-                        </div>
-                        <div class="blttext">
-                            Data sent to users subscribing local data sources.
-                        </div>
-                        <c:choose>
-                            <c:when test="${not empty users}">
-                                <div class="blttext">
-                                    Click on user name to view detailed information
-                                    on subscriber.
+                <c:forEach var="user" items="${users}">
+                <c:set var="usr" scope="page" value="${user}"></c:set>
+                <div class="expandable">
+                    <div class="save">
+                        <div class="item">
+                            <a href="javascript:void(0)" class="dsphead"
+                            onclick="dsp(this)">
+                                <span class="dspchar">
+                                    <img src="includes/images/icons/expand.png"
+                                        alt="+" title="Show">
+                                </span>
+                                <div class="user">
+                                    <c:out value="${user}"/>
                                 </div>
-                                <c:forEach var="user" items="${users}">
-                                <c:set var="usr" scope="page" value="${user}"></c:set>
-                                <div class="expandable">
-                                    <div class="save">
-                                        <div class="item">
-                                            <a href="javascript:void(0)" class="dsphead"
-                                            onclick="dsp(this)">
-                                                <span class="dspchar">
-                                                    <img src="includes/images/icons/expand.png"
-                                                     alt="+" title="Show">
-                                                </span>
-                                                <div class="user">
-                                                    <c:out value="${user}"/>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div class="dspcont">
-                                            <div class="statustable">
-                                                <c:choose>
-                                                    <c:when test="${not empty remote}">
-                                                        <div class="header">
-                                                            <div id="cell" class="station">
-                                                                Data source
-                                                            </div>
-                                                            <div id="cell" class="timestamp">
-                                                                Started at
-                                                            </div>
-                                                        </div>
-                                                        <c:forEach var="sub" items="${remote}">
-                                                            <c:if test="${sub.userName == usr}">
-                                                                <div class="entry">
-                                                                    <div id="cell" class="station">
-                                                                        <c:out value="${sub.dataSourceName}"/>
-                                                                    </div>
-                                                                    <div id="cell" class="timestamp">
-                                                                        <fmt:formatDate value="${sub.timeStamp}" 
-                                                                                        pattern="yyyy/dd/MM HH:mm:ss"/>
-                                                                    </div>
-                                                                </div>
-                                                            </c:if>
-                                                        </c:forEach>
-                                                    </c:when>
-                                                </c:choose>
+                            </a>
+                        </div>
+                        <div class="dspcont">
+                            <div class="statustable">
+                                <c:choose>
+                                    <c:when test="${not empty remote}">
+                                        <div class="header">
+                                            <div id="cell" class="station">
+                                                Data source
+                                            </div>
+                                            <div id="cell" class="timestamp">
+                                                Started at
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                                </c:forEach>
-                            </c:when>
-                            <c:otherwise>
-                                <div class="blttext">
-                                    Your local data sources are currently not subscribed
-                                    by peers.
-                                </div>
-                            </c:otherwise>
-                        </c:choose>
+                                        <c:forEach var="sub" items="${remote}">
+                                            <c:if test="${sub.userName == usr}">
+                                                <div class="entry">
+                                                    <div id="cell" class="station">
+                                                        <c:out value="${sub.dataSourceName}"/>
+                                                    </div>
+                                                    <div id="cell" class="timestamp">
+                                                        <fmt:formatDate value="${sub.timeStamp}" 
+                                                                        pattern="yyyy/dd/MM HH:mm:ss"/>
+                                                    </div>
+                                                </div>
+                                            </c:if>
+                                        </c:forEach>
+                                    </c:when>
+                                </c:choose>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
-        </div>
-    </body>
-</html>
+                </c:forEach>
+            </c:when>
+            <c:otherwise>
+                <div class="blttext">
+                    Your local data sources are currently not subscribed
+                    by peers.
+                </div>
+            </c:otherwise>
+        </c:choose>
+    </div>
+    </div>
+  </jsp:body>
+</t:page_tabbed>

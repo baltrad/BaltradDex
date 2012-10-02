@@ -88,7 +88,7 @@ Author     : szewczenko
                 Browse files
             </div>
             <div class="blttext">
-                Use the following parameters to select and browse data files.
+                Use the following options to search and browse data files.
             </div>
             <div class="filebrowser">
                 <div class="row">
@@ -137,12 +137,18 @@ Author     : szewczenko
                         </div>
                     </div>
                     <div class="midcol">
-                        <input type="text" name="startHour" title="Start hour (24 hour format)"
-                               value="${startHour}" onchange="validateStartHour()">
-                        : <input type="text" name="startMinute" title="Start minute"
-                               value="${startMinute}" onchange="validateStartMinute()">
-                        : <input type="text" name="startSecond" title="Start second"
-                               value="${startSecond}" onchange="validateStartSecond()">
+                        <input type="text" name="startHour" id="start_hour"
+                               title="Start hour (24 hour format)"
+                               value="${startHour}" 
+                               onchange="validateHour('start_hour')">: 
+                        <input type="text" name="startMinute" 
+                               id="start_minutes" title="Start minutes"
+                               value="${startMinute}" 
+                               onchange="validateMinSec('start_minutes')">: 
+                        <input type="text" name="startSecond" 
+                               id="start_seconds" title="Start seconds"
+                               value="${startSecond}" 
+                               onchange="validateMinSec('start_seconds')">
                         <div class="hint">
                             Start time
                         </div>
@@ -159,12 +165,16 @@ Author     : szewczenko
                         </div>
                     </div>
                     <div class="midcol">
-                        <input type="text" name="endHour" title="End hour (24 hour format)"
-                               value="${endHour}"onchange="validateEndHour()">
-                        : <input type="text" name="endMinute" title="End minute"
-                                 value="${endMinute}" onchange="validateEndMinute()">
-                        : <input type="text" name="endSecond" title="End second"
-                                 value="${endSecond}" onchange="validateEndSecond()">
+                        <input type="text" name="endHour" id="end_hour"
+                               title="End hour (24 hour format)"
+                               value="${endHour}" 
+                               onchange="validateHour('end_hour')">: 
+                        <input type="text" name="endMinute" id="end_minutes"
+                               title="End minutes" value="${endMinute}" 
+                               onchange="validateMinSec('end_minutes')">: 
+                        <input type="text" name="endSecond" id="end_seconds"
+                               title="End seconds" value="${endSecond}" 
+                               onchange="validateMinSec('end_seconds')">
                         <div class="hint">
                             End time
                         </div>

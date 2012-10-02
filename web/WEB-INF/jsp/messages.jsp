@@ -21,23 +21,6 @@ Created on : May 18, 2012, 8:58:02 AM
 Author     : szewczenko
 ------------------------------------------------------------------------------%>
 
-<script type="text/javascript" src="includes/js/jQuery.js"></script>
-<script type="text/javascript">
-$(document).ready(function()
-{
-  $(".expand_body").hide();
-  $(".expand_head").click(function()
-  {
-    $(this).next(".expand_body").toggle();
-    if(document.getElementById("expand_node").innerHTML=="Hide details") {
-        document.getElementById("expand_node").innerHTML="Show details";
-    } else {
-        document.getElementById("expand_node").innerHTML="Hide details";
-    }
-  });
-});
-</script>
-
 <c:if test="${not empty error_message}">
     <div class="systemerror">
         <div class="header">
@@ -48,10 +31,10 @@ $(document).ready(function()
             <c:set var="error_message" value="" scope="session" />
         </div>        
         <c:if test="${not empty error_details}">
-            <div class="expand_head" id="expand_node">
+            <div class="msg_head" id="msg_node">
                 Show details
             </div>
-            <div class="expand_body">
+            <div class="msg_body">
                 <c:out value="${error_details}"/>
                 <c:set var="error_details" value="" scope="session" />
             </div>
@@ -68,10 +51,10 @@ $(document).ready(function()
             <c:set var="success_message" value="" scope="session" />
         </div>        
         <c:if test="${not empty success_details}">
-            <div class="expand_head" id="expand_node">
+            <div class="msg_head" id="msg_node">
                 Show details
             </div>
-            <div class="expand_body">
+            <div class="msg_body">
                 <c:out value="${success_details}"/>
                 <c:set var="success_details" value="" scope="session" />
             </div>

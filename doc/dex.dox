@@ -693,21 +693,38 @@ click <tt>System messages</tt> option from the main menu and select \p Latest.
 New messages will be displayed automatically each time a new event is 
 registered in the system. 
 
-\image html latest_messages.png
-
-The second mode allows to access full system log. Select \p Home tab, click 
-<tt>System messages</tt> and select \p All option. Navigate through pages either 
-clicking page numbers of scroll buttons. Click \p > sign to move to next page, 
-\p < to move to previous page. Clicking \p << sign will display the first page, 
-and \p >> the last page of system log.   
-  
-
-\image html all_messages.png
-
 \note
 There are 3 types of messages - informative messages (displayed in green), 
 warnings (blue) and errors (red).
 \endnote
+
+\image html latest_messages.png
+
+The second mode allows to access full system log, as well as search for messages
+based on selected criteria. Select \p Home tab, click 
+<tt>System messages</tt> and select \p All option. Upper part of the page allows
+to define message search criteria. The following options are available:
+
+- Message logger - message logger (software component) that produced the
+message. The following loggers are available: \p DEX (data exchange component),
+\p BEAST (data processing component) and \p PGF (product generation framework).
+- Message flag - one of the following message types: informative - INFO, 
+warning - \p WARN or error messages - \p ERROR.  
+- Start date - starting date of messages' timespan. Click calendar's icon to 
+pick start date.
+- Start time - starting time of messages' timespan.   
+- End date - end date of messages' timespan. Click calendar's icon to pick 
+end date.
+- End time - end time of messages' timespan.
+- Message phrase - phrase to look for in message body.     
+
+\image html all_messages.png
+
+Once search options are set, click \pSelect button. Navigate through pages 
+either clicking page numbers of scroll buttons. Click \p > sign to move to 
+next page, \p < to move to previous page. Clicking \p << sign will display 
+the first page, and \p >> the last page of system log. Use \p Reset button
+to reset message search options.
 
 \section more_data_sources More on data sources
 

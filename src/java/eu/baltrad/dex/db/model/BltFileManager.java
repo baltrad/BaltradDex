@@ -23,8 +23,6 @@ package eu.baltrad.dex.db.model;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Collections;
 
 import java.io.File;
@@ -94,14 +92,14 @@ public class BltFileManager implements IBltFileManager {
      * @param dsName Data source name
      * @return Filter associated with a given data source
      */
-    public IFilter getFilter( String dsName ) {
+    public IFilter getFilter(String dsName) {
         IFilter attributeFilter = null;
         try {
             DataSource dataSource = dataSourceManager.load(dsName);
             attributeFilter = coreFilterManager.load(
                     dataSourceManager.loadFilterId(dataSource.getId()));
-        } catch( Exception e ) {
-            log.error( "getFilter(): Failed to get filter ID:", e );
+        } catch (Exception e) {
+            log.error("getFilter(): Failed to get filter ID:", e);
         }
         return attributeFilter;
     }

@@ -40,7 +40,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="dispatch.htm">frameDispatcherController</prop>
                 <!-- @@@-->
                 <prop key="latest_messages.htm">urlFilenameController</prop>
-                <prop key="all_messages.htm">journalController</prop>
                 <prop key="logtable.htm">logTableController</prop>
                 <prop key="data_download.htm">downloadStatusController</prop>
                 <prop key="data_upload.htm">uploadStatusController</prop>
@@ -234,12 +233,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
 
     <!--
-        System journal controller
+        System log controller
     -->
-    <bean name="journalController" class="eu.baltrad.dex.log.controller.JournalController">
-        <property name="successView">
-            <value>all_messages</value>
-        </property>
+    <bean name="logController" 
+          class="eu.baltrad.dex.log.controller.LogController"
+          autowire="byType">
     </bean>
 
     <!--

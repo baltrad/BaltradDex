@@ -102,7 +102,8 @@ public class LogManagerTest extends TestCase {
     
     
     public void testCount() throws Exception {
-        assertEquals(12, classUnderTest.count());
+        assertEquals(12, classUnderTest.count(
+                classUnderTest.createQuery(new LogParameter(), true)));
         verifyAll();
     }
     
@@ -125,13 +126,13 @@ public class LogManagerTest extends TestCase {
         assertNotNull(entries);
         
         LogEntry entry5 = new LogEntry(5, format.parse("2012-08-24 11:00:04.0"),
-                "DEX", "WARN", "Message 5");
+                "BEAST", "WARN", "BEAST message");
         LogEntry entry6 = new LogEntry(6, format.parse("2012-08-24 11:10:04.0"),
-                "DEX", "WARN", "Message 6");
+                "DEX", "WARN", "DEX message");
         LogEntry entry7 = new LogEntry(7, format.parse("2012-08-24 11:20:04.0"),
-                "DEX", "INFO", "Message 7");
+                "BEAST", "INFO", "BEAST message");
         LogEntry entry8 = new LogEntry(8, format.parse("2012-08-24 11:30:04.0"),
-                "DEX", "INFO", "Message 8");
+                "DEX", "INFO", "DEX message");
         
         assertEquals(3, entries.size());
         assertTrue(containsEntry(entries, entry5));
@@ -140,9 +141,96 @@ public class LogManagerTest extends TestCase {
         assertFalse(containsEntry(entries, entry8));
     }
     
+    public void testLoadByLogger() {
+        LogParameter param = new LogParameter();
+        param.setLogger("DEX");
+        List<LogEntry> entries = classUnderTest
+                .load(classUnderTest.createQuery(param, false), 0, 20);
+        assertEquals(7, entries.size());
+        param.setLogger("BEAST");
+        entries = classUnderTest
+                .load(classUnderTest.createQuery(param, false), 0, 20);
+        assertEquals(3, entries.size());
+        param.setLogger("PGF");
+        entries = classUnderTest
+                .load(classUnderTest.createQuery(param, false), 0, 20);
+        assertEquals(2, entries.size());
+    }
+    
+    public void testLoadByFlag() {
+        LogParameter param = new LogParameter();
+        param.setFlag("INFO");
+        List<LogEntry> entries = classUnderTest
+                .load(classUnderTest.createQuery(param, false), 0, 20);
+        assertEquals(8, entries.size());
+        param.setFlag("WARN");
+        entries = classUnderTest
+                .load(classUnderTest.createQuery(param, false), 0, 20);
+        assertEquals(2, entries.size());
+        param.setFlag("ERROR");
+        entries = classUnderTest
+                .load(classUnderTest.createQuery(param, false), 0, 20);
+        assertEquals(2, entries.size());
+    }
+    
+    public void testLoadByDate() {
+        LogParameter param = new LogParameter();
+        param.setStartDate("2012/08/24");
+        param.setStartHour("11");
+        param.setStartMinutes("0");
+        param.setStartSeconds("4");
+        param.setEndDate("2012/08/24");
+        param.setEndHour("11");
+        param.setEndMinutes("30");
+        param.setEndSeconds("4");
+        List<LogEntry> entries = classUnderTest
+                .load(classUnderTest.createQuery(param, false), 0, 20);
+        assertEquals(4, entries.size());
+    }
+    
+    public void testLoadByPhrase() {
+        LogParameter param = new LogParameter();
+        param.setPhrase("DEX");
+        List<LogEntry> entries = classUnderTest
+                .load(classUnderTest.createQuery(param, false), 0, 20);
+        assertEquals(7, entries.size());
+        param.setPhrase("BEAST");
+        entries = classUnderTest
+                .load(classUnderTest.createQuery(param, false), 0, 20);
+        assertEquals(3, entries.size());
+        param.setPhrase("PGF");
+        entries = classUnderTest
+                .load(classUnderTest.createQuery(param, false), 0, 20);
+        assertEquals(2, entries.size());
+    }
+    
+    public void testLoadWithSeveralParams() throws Exception {
+        LogParameter param = new LogParameter();
+        param.setLogger("DEX");
+        param.setFlag("INFO");
+        param.setStartDate("2012/08/24");
+        param.setStartHour("10");
+        param.setStartMinutes("40");
+        param.setStartSeconds("4");
+        param.setEndDate("2012/08/24");
+        param.setEndHour("11");
+        param.setEndMinutes("30");
+        param.setEndSeconds("4");
+        param.setPhrase("DEX");
+        List<LogEntry> entries = classUnderTest
+                .load(classUnderTest.createQuery(param, false), 0, 20);
+        assertEquals(2, entries.size());
+        LogEntry entry3 = new LogEntry(3, format.parse("2012-08-24 10:40:04.0"),
+                "DEX", "INFO", "DEX message");
+        LogEntry entry8 = new LogEntry(8, format.parse("2012-08-24 11:30:04.0"),
+                "DEX", "INFO", "DEX message");
+        assertTrue(containsEntry(entries, entry3));
+        assertTrue(containsEntry(entries, entry8));
+    }
+    
     public void testStore() throws Exception {
         LogEntry entry = new LogEntry(13, format.parse("2012-08-24 12:20:04.0"),
-                "DEX", "ERROR", "Message 13");
+                "DEX", "ERROR", "DEX message");
         int store = classUnderTest.store(entry);
         assertEquals(1, store);
         verifyDBTables("store", "dex_messages");
@@ -179,7 +267,6 @@ public class LogManagerTest extends TestCase {
         int deltaMinutes = (int) Math.floor((deltaMillis - 
                 (deltaDays * MILLIS_PER_DAY + deltaHours * MILLIS_PER_HOUR))
                     / MILLIS_PER_MINUTE);
-        
         List<LogEntry> entries = classUnderTest.load();
         assertEquals(12, entries.size());
         classUnderTest.setTrimmer(deltaDays, deltaHours, deltaMinutes);

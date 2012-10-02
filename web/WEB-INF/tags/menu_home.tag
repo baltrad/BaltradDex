@@ -5,7 +5,7 @@
             <a href="#">System messages</a>
             <ul>
                 <li><a href="latest_messages.htm">Latest</a></li>
-                <li><a href="all_messages.htm">All</a></li>
+                <li><a href="system_messages.htm">All</a></li>
             </ul>
         </li>
         <li>

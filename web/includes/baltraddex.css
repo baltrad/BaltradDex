@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,9 +17,9 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
-/* general styles --------------------------------------------------------------------------------*/
+/* general styles ------------------------------------------------------------*/
 * {
     margin:0;
     padding:0;
@@ -30,7 +30,7 @@ html, body {
     background-color:#FFFFFF;
     font-family: Verdana, Arial, Tahoma, sans-serif;
 }
-/* wrapper for all elements of the page ----------------------------------------------------------*/
+/* wrapper for all elements of the page --------------------------------------*/
 #bltcontainer {
     width:1024px;
     min-height:100%;
@@ -40,7 +40,7 @@ html, body {
 * html #bltcontainer {
     height:100%;
 }
-/* page header -----------------------------------------------------------------------------------*/
+/* page header ---------------------------------------------------------------*/
 #bltheader {
     width:1024px;
     height:88px;
@@ -61,7 +61,7 @@ html, body {
 #bltheader .help a:hover {
     text-decoration:underline;
 }
-/* login section ---------------------------------------------------------------------------------*/
+/* login section -------------------------------------------------------------*/
 #bltmain .login {
     width:592px;
     margin-left:auto;
@@ -133,7 +133,7 @@ html, body {
     height:100%;
     min-height:100%;
 }
-/* page footer -----------------------------------------------------------------------------------*/
+/* page footer ---------------------------------------------------------------*/
 #bltfooter {
     width:1024px;
     height:24px;
@@ -162,7 +162,7 @@ html, body {
     float:right;
     padding-right:24px;
 }
-/* buttons ---------------------------------------------------------------------------------------*/
+/* buttons -------------------------------------------------------------------*/
 button {
     border:0 none;
     cursor:pointer;
@@ -197,7 +197,7 @@ button.rounded:hover span {
 button::-moz-focus-inner {
     border:none;
 }
-/* links -----------------------------------------------------------------------------------------*/
+/* links ---------------------------------------------------------------------*/
 a {
     color:#4C6EB3;
     text-decoration:none;
@@ -206,7 +206,7 @@ a {
 a:hover {
     text-decoration:underline;
 }
-/* text-box messages -----------------------------------------------------------------------------*/
+/* text-box messages ---------------------------------------------------------*/
 .systemerror {
     background-color:#FFF2F2;
     border:1px solid #FFBDBD;
@@ -249,7 +249,7 @@ a:hover {
     font-size:0.8em;
     font-weight:bold;
 }
-/* input fields and textareas --------------------------------------------------------------------*/
+/* input fields and textareas ------------------------------------------------*/
 input, textarea {
     border:1px solid #A7A7A7;
     -moz-border-radius:4px;
@@ -259,7 +259,7 @@ input, textarea {
 input:focus, textarea:focus {
     border:1px solid #429602;
 }
-/* tabs ------------------------------------------------------------------------------------------*/
+/* tabs ----------------------------------------------------------------------*/
 #tabs {
     float:left;
     clear:both;
@@ -325,7 +325,7 @@ input:focus, textarea:focus {
     -moz-border-radius:4px;
     border-radius:4px;
 }
-/* context menu in the left column ---------------------------------------------------------------*/
+/* context menu in the left column -------------------------------------------*/
 .menu ul li {
     width:224px;
     padding-right:16px;
@@ -376,7 +376,7 @@ input:focus, textarea:focus {
     padding-left:0px;
     color:#4C6EB3;
 }
-/* Right column title section --------------------------------------------------------------------*/
+/* Right column title section ------------------------------------------------*/
 .blttitle {
     width:96%;
     clear:both;
@@ -405,7 +405,7 @@ input:focus, textarea:focus {
 .blttext p {
     padding:4px;
 }
-/* Tables ----------------------------------------------------------------------------------------*/
+/* Tables --------------------------------------------------------------------*/
 .table {
     width:96%;
     padding:12px;
@@ -472,7 +472,7 @@ input:focus, textarea:focus {
     overflow:hidden;
     padding:0px 2px 0px 2px;
 }
-/* Log tables ------------------------------------------------------------------------------------*/
+/* Log tables ----------------------------------------------------------------*/
 .logdate {
     width:12%;   
 }
@@ -499,13 +499,13 @@ input:focus, textarea:focus {
     font-weight:bold;
     padding-left:12px;
 }
-/* Counter ---------------------------------------------------------------------------------------*/
+/* Counter -------------------------------------------------------------------*/
 .count {
     width:32px;
     text-align:right;
     margin-right:18px;
 }
-/* Radar table -----------------------------------------------------------------------------------*/
+/* Radar table ---------------------------------------------------------------*/
 .station {
     width:30%;
 }
@@ -517,12 +517,12 @@ input:focus, textarea:focus {
     float:right;
     text-align:center;
 }
-/* Hidden class ----------------------------------------------------------------------------------*/
+/* Hidden class --------------------------------------------------------------*/
 .hidden {
     display:none;
     visibility:hidden;
 }
-/* Table control section -------------------------------------------------------------------------*/
+/* Table control section -----------------------------------------------------*/
 #tablecontrol {
     width:100%;
     float:left;
@@ -539,7 +539,7 @@ input:focus, textarea:focus {
     font-size:12px;
     background-color:#A0CB6F;
 }
-/* Node settings page ----------------------------------------------------------------------------*/
+/* Node settings page --------------------------------------------------------*/
 .props .row {
     height:32px;
 }
@@ -597,7 +597,7 @@ input:focus, textarea:focus {
 .adminmail input {
     width:200px;
 }
-/* Node connection page --------------------------------------------------------------------------*/
+/* Node connection page ------------------------------------------------------*/
 .connect .row {
     height:32px;
 }
@@ -616,7 +616,7 @@ input:focus, textarea:focus {
 .connect .nodeaddress input {
     width:360px;
 }
-/* Add radar page --------------------------------------------------------------------------------*/
+/* Add radar page ------------------------------------------------------------*/
 .addradar .row {
     height:32px;
 }
@@ -711,22 +711,6 @@ input:focus, textarea:focus {
     background-color:#A0CB6F;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* Show data sources page ----------------------------------------------------*/
 .dsshow .name {
     width:30%;
@@ -734,7 +718,7 @@ input:focus, textarea:focus {
 .dsshow .description {
     width:60%;
 }
-/* Browse data source files page -----------------------------------------------------------------*/
+/* Browse data source files page ---------------------------------------------*/
 .dsfiles .date {
     width:12%;
     text-align:center;
@@ -759,7 +743,7 @@ input:focus, textarea:focus {
     width:12%;
     text-align:center;
 }
-/* Remove data source page -----------------------------------------------------------------------*/
+/* Remove data source page ---------------------------------------------------*/
 .dsremove .name {
     width:30%;
 }
@@ -770,7 +754,7 @@ input:focus, textarea:focus {
     float:right;
     text-align:center;
 }
-/* Save user account page ------------------------------------------------------------------------*/
+/* Save user account page ----------------------------------------------------*/
 .addaccount .row {
     height:32px;
 }
@@ -852,7 +836,7 @@ input:focus, textarea:focus {
     float:left;
     width:340px;
 }
-/* Edit user account page ------------------------------------------------------------------------*/
+/* Edit user account page ----------------------------------------------------*/
 .editaccount .username {
     width:24%;
     margin-right:2%;
@@ -869,7 +853,7 @@ input:focus, textarea:focus {
     width:12%;
     text-align:center;
 }
-/* Change password page --------------------------------------------------------------------------*/
+/* Change password page ------------------------------------------------------*/
 .changepasswd .row {
     height:32px;
 }
@@ -885,7 +869,7 @@ input:focus, textarea:focus {
 .changepasswd .password input {
     width:200px;
 }
-/* Remove user account page ----------------------------------------------------------------------*/
+/* Remove user account page --------------------------------------------------*/
 .removeaccount .username {
     width:24%;
     margin-right:2%;
@@ -902,7 +886,7 @@ input:focus, textarea:focus {
     float:right;
     text-align:center;
 }
-/* Connect to data source page -------------------------------------------------------------------*/
+/* Connect to data source page -----------------------------------------------*/
 .dsconnect .name {
     width:30%;
 }
@@ -914,7 +898,7 @@ input:focus, textarea:focus {
     text-align:center;
 }
 
-/* Subscription management page ------------------------------------------------------------------*/
+/* Subscription management page ----------------------------------------------*/
 .subscriptions .name {
     width:35%;
 }
@@ -946,7 +930,7 @@ input:focus, textarea:focus {
     width:10%;
     text-align:center;
 }
-/* Data delivery register page -------------------------------------------------------------------*/
+/* Data delivery register page -----------------------------------------------*/
 .register .date {
     width:12%;
 }
@@ -963,7 +947,7 @@ input:focus, textarea:focus {
     width:10%;
     text-align:center;
 }
-/* Remove node connection page -------------------------------------------------------------------*/
+/* Remove node connection page -----------------------------------------------*/
 .removeconnection .name {
     width:20%;
     float:left;
@@ -977,7 +961,7 @@ input:focus, textarea:focus {
     text-align:center;
     float:right;
 }
-/*---------------------------------------------------------------------------- Expandable section */
+/*-------------------------------------------------------- Expandable section */
 .expandable {
     width:94%;
     float:left;
@@ -1046,7 +1030,7 @@ input:focus, textarea:focus {
     border-bottom:none;
     width:100%;
 }
-/* Adaptors page ---------------------------------------------------------------------------------*/
+/* Adaptors page -------------------------------------------------------------*/
 .adaptors .name {
     width:30%;
 }
@@ -1062,7 +1046,7 @@ input:focus, textarea:focus {
 .modifyadaptor input, .modifyadaptor select {
     width:260px;
 }
-/* Anomaly detectors page ---------------------------------------------------------------------------------*/
+/* Anomaly detectors page ----------------------------------------------------*/
 .anomalydetectors .name {
     width:30%;
 }
@@ -1078,7 +1062,7 @@ input:focus, textarea:focus {
 .modify_anomaly_detector input, .modify_anomaly_detector select {
     width:260px;
 }
-/* Routes and schedule pages ---------------------------------------------------------------------*/
+/* Routes and schedule pages -------------------------------------------------*/
 .showroutes .name {
     width:20%;
 }
@@ -1116,11 +1100,11 @@ input:focus, textarea:focus {
     width:512px;
     height:360px;
 }
-/* Schedule page ---------------------------------------------------------------------------------*/
+/* Schedule page -------------------------------------------------------------*/
 .schedules .id {
     text-align:center;
 }
-/* File details page -----------------------------------------------------------------------------*/
+/* File details page ---------------------------------------------------------*/
 .break {
     width:100%;
     height:12px;
@@ -1149,7 +1133,7 @@ input:focus, textarea:focus {
 .thumb .image, .thumb .caption {
     text-align:center; 
 }
-/* Data preview with Google Maps -----------------------------------------------------------------*/
+/* Data preview with Google Maps ---------------------------------------------*/
 #map_canvas {
     height: 90%;
 }
@@ -1192,7 +1176,7 @@ input:focus, textarea:focus {
 .slider .handle:hover {
     background: #5E9626;
 }
-/* File browser page -----------------------------------------------------------------------------*/
+/* File browser page ---------------------------------------------------------*/
 .filebrowser {
     float:left;
     clear:right;
@@ -1223,6 +1207,53 @@ input:focus, textarea:focus {
 .filebrowser .midcol input {
     width:26px;
 }
+/* Message browser -----------------------------------------------------------*/
+.messagebrowser {
+    float:left;
+    clear:right;
+    padding:12px 12px 0px 12px;
+}
+.messagebrowser .leftcol {
+    float:left;
+    clear:left;
+    width:200px;
+    margin:0px 12px 0px 12px;
+}
+.messagebrowser .midcol {
+    float:left;
+    width:200px;
+    margin:0px 12px 0px 12px;
+}
+.messagebrowser .rightcol {
+    float:left;
+    width:200px;
+    clear:right;
+    margin:0px 0px 0px 24px;
+}
+.messagebrowser .leftcol input {
+    width:80%;
+}
+.messagebrowser .midcol input {
+    width:26px;
+}
+.messagebrowser select {
+    width:100%;
+}
+.messagebrowser .phrase {
+    float:left;
+    clear:left;
+    width:420px;
+    margin:8px 0px 0px 12px; 
+}
+.messagebrowser .phrase > input {
+    width:100%;
+}
+.messagebrowser .submit {
+    float:left;
+    margin-left:84px;
+}
+
+/* Table header section ------------------------------------------------------*/
 .tableheader .date input, .tableheader .time input, .tableheader .source input,
         .tableheader .type input {
     background:none;
@@ -1234,15 +1265,15 @@ input:focus, textarea:focus {
     font-weight:bold;
     color:#4C6EB3;
 }
-.tableheader .date input:hover, .tableheader .time input:hover, .tableheader .source input:hover,
-        .tableheader .type input:hover {
+.tableheader .date input:hover, .tableheader .time input:hover, 
+    .tableheader .source input:hover, .tableheader .type input:hover {
     border-top:0;
     border-right:0;
     border-left:0;
     border-bottom:1px solid #4C6EB3;
     padding-bottom:0px;
 }
-/* Log configuration page ------------------------------------------------------------------------*/
+/* Log configuration page ----------------------------------------------------*/
 .logconf .leftcol {
     float:left;
     clear:left;
@@ -1291,7 +1322,7 @@ input:focus, textarea:focus {
 
 
 
-/* Certificate management page--------------------------------------------------------------------*/
+/* Certificate management page------------------------------------------------*/
 .certs .alias {
     width:40%;
     margin-right:2%;
@@ -1301,7 +1332,7 @@ input:focus, textarea:focus {
     margin-right:2%;
     text-align:center; 
 }
-/* BDB filters -----------------------------------------------------------------------------------*/
+/* BDB filters ---------------------------------------------------------------*/
 
 .bdbCombinedFilter ul {
   list-style-type: none;
@@ -1335,13 +1366,12 @@ input:focus, textarea:focus {
   float: left;
   clear: left;
 }
-/* Expandable section --------------------------------------------------------*/
-.expand_head {
+/* Expandable sections -------------------------------------------------------*/
+.msg_head, .options_head {
     cursor:pointer;
     text-decoration:underline;
     padding:8px 0px 4px 0px;
 }
-.expand_body {}
 
 
 /*----------------------------------------------------------------------------*/

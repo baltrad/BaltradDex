@@ -70,7 +70,7 @@ Author     : szewczenko
             Latest system messages
         </div>
         <div class="blttext">
-            Most recent set of system messages. Display is refreshed automatically.
+            Latest messages. Display is refreshed automatically.
         </div>
         <div class="table">
             <div class="log">

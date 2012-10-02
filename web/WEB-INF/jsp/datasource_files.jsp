@@ -32,7 +32,6 @@ Author     : szewczenko
 <%@page import="eu.baltrad.dex.bltdata.controller.BltDataSourceController"%>
 
 <%
-    // determine channel name
     String name = null;
     if( request.getParameter( "dsName" ) != null ) {
         name = request.getParameter( "dsName" );
@@ -73,144 +72,130 @@ Author     : szewczenko
         firstPage = numPages - ( BltFileManager.SCROLL_RANGE - 1 );
         lastPage = numPages;
     }
+    request.getSession().setAttribute("name", name);
+    request.getSession().setAttribute("firstPage", firstPage);
+    request.getSession().setAttribute("lastPage", lastPage);
+    request.getSession().setAttribute("currentPage", currentPage);
 %>
 
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>BALTRAD | Browse data</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
-            </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/home_tab.jsp"%>
+
+<t:page_tabbed pageTitle="Browse data" activeTab="home">
+  <jsp:body>
+    <div class="left">
+        <t:menu_home/>
+    </div>
+    <div class="right">
+        <div class="blttitle">
+            Data from ${name}
+        </div>
+        <c:choose>
+            <c:when test="${dataStatus == 1}">
+                <div class="blttext">
+                    Data files available for data source ${name}.
                 </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/home_menu.jsp"%>
-                    </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            Data from <%= name %>
+                <div class="table">
+                    <div class="dsfiles">
+                        <div id="tablecontrol">
+                            <c:set var="curPage" scope="page" value="${currentPage}"/>
+                            <form action="datasource_files.htm" method="post">
+                                <input type="submit" name="pagenum" value="<<"
+                                        title="First page">
+                                <span></span>
+                                <input type="submit" name="pagenum" value="<"
+                                        title="Previous page">
+                                <span></span>
+                                <c:forEach var="i" begin="${firstPage}" end="${lastPage}"
+                                            step="1" varStatus ="status">
+                                        <c:choose>
+                                            <c:when test="${curPage == i}">
+                                                <input style="background:#FFFFFF" type="submit"
+                                                        name="pagenum" value="${i}">
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="submit" name="pagenum" value="${i}">
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:forEach>
+                                <span></span>
+                                <input type="submit" name="pagenum" value=">"
+                                        title="Next page">
+                                <span></span>
+                                <input type="submit" name="pagenum" value=">>"
+                                        title="Last page">
+                            </form>
                         </div>
-                        <c:choose>
-                            <c:when test="${dataStatus == 1}">
-                                <div class="blttext">
-                                    Data files available for data source <%= name %>.
+                        <div class="tableheader">
+                            <div id="cell" class="date">
+                                Date
+                            </div>
+                            <div id="cell" class="time">
+                                Time
+                            </div>
+                            <div id="cell" class="source">
+                                Source
+                            </div>
+                            <div id="cell" class="type">
+                                Type
+                            </div>
+                            <div id="cell" class="details">&nbsp;</div>
+                            <div id="cell" class="download">&nbsp;</div>
+                        </div>
+                        <c:forEach var="entry" items="${fileEntries}">
+                            <div class="entry">
+                                <div id="cell" class="date">
+                                    <fmt:formatDate pattern="yyyy-MM-dd"
+                                        value="${entry.timeStamp}"/>
                                 </div>
-                                <div class="table">
-                                    <div class="dsfiles">
-                                        <div id="tablecontrol">
-                                            <c:set var="curPage" scope="page" value="<%=currentPage%>"/>
-                                            <form action="datasource_files.htm" method="post">
-                                                <input type="submit" name="pagenum" value="<<"
-                                                       title="First page">
-                                                <span></span>
-                                                <input type="submit" name="pagenum" value="<"
-                                                       title="Previous page">
-                                                <span></span>
-                                                <c:forEach var="i" begin="<%=firstPage%>" end="<%=lastPage%>"
-                                                           step="1" varStatus ="status">
-                                                        <c:choose>
-                                                            <c:when test="${curPage == i}">
-                                                                <input style="background:#FFFFFF" type="submit"
-                                                                       name="pagenum" value="${i}">
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <input type="submit" name="pagenum" value="${i}">
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </c:forEach>
-                                                <span></span>
-                                                <input type="submit" name="pagenum" value=">"
-                                                       title="Next page">
-                                                <span></span>
-                                                <input type="submit" name="pagenum" value=">>"
-                                                       title="Last page">
-                                            </form>
-                                        </div>
-                                        <div class="tableheader">
-                                            <div id="cell" class="date">
-                                                Date
-                                            </div>
-                                            <div id="cell" class="time">
-                                                Time
-                                            </div>
-                                            <div id="cell" class="source">
-                                                Source
-                                            </div>
-                                            <div id="cell" class="type">
-                                                Type
-                                            </div>
-                                            <div id="cell" class="details">&nbsp;</div>
-                                            <div id="cell" class="download">&nbsp;</div>
-                                        </div>
-                                        <c:forEach var="entry" items="${fileEntries}">
-                                            <div class="entry">
-                                                <div id="cell" class="date">
-                                                    <fmt:formatDate pattern="yyyy-MM-dd"
-                                                        value="${entry.timeStamp}"/>
-                                                </div>
-                                                <div id="cell" class="time">
-                                                    <fmt:formatDate pattern="HH:mm:ss"
-                                                        value="${entry.timeStamp}"/>
-                                                </div>
-                                                <div id="cell" class="source">
-                                                    <c:out value="${entry.source}"></c:out>
-                                                </div>
-                                                <div id="cell" class="type">
-                                                    <c:out value="${entry.type}"></c:out>
-                                                </div>
-                                                <div id="cell" class="details">
-                                                    <a href="file_details.htm?uuid=${entry.uuid}">
-                                                        <c:out value="Details"/>
-                                                    </a>
-                                                </div>
-                                                <div id="cell" class="download">
-                                                    <a href="download.htm?path=${entry.path}">
-                                                        <c:out value="Download"/>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </c:forEach>
-                                        <div class="tablefooter">
-                                            <div class="buttons">
-                                                <button class="rounded" type="button"
-                                                    onclick="window.location.href='datasources.htm'">
-                                                    <span>Back</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div id="cell" class="time">
+                                    <fmt:formatDate pattern="HH:mm:ss"
+                                        value="${entry.timeStamp}"/>
                                 </div>
-                            </c:when>
-                            <c:otherwise>
-                                <div class="blttext">
-                                    No files found for the selected data source.
+                                <div id="cell" class="source">
+                                    <c:out value="${entry.source}"></c:out>
                                 </div>
-                                <div class="table">
-                                    <div class="tablefooter">
-                                        <div class="buttons">
-                                            <button class="rounded" type="button"
-                                                onclick="window.location.href='datasources.htm'">
-                                                <span>OK</span>
-                                            </button>
-                                        </div>
-                                    </div>
+                                <div id="cell" class="type">
+                                    <c:out value="${entry.type}"></c:out>
                                 </div>
-                            </c:otherwise>
-                        </c:choose>
+                                <div id="cell" class="details">
+                                    <a href="file_details.htm?uuid=${entry.uuid}">
+                                        <c:out value="Details"/>
+                                    </a>
+                                </div>
+                                <div id="cell" class="download">
+                                    <a href="download.htm?path=${entry.path}">
+                                        <c:out value="Download"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </c:forEach>
+                        <div class="tablefooter">
+                            <div class="buttons">
+                                <button class="rounded" type="button"
+                                    onclick="window.location.href='datasources.htm'">
+                                    <span>Back</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
-        </div>
-    </body>
-</html>
+            </c:when>
+            <c:otherwise>
+                <div class="blttext">
+                    No files found for the selected data source.
+                </div>
+                <div class="table">
+                    <div class="tablefooter">
+                        <div class="buttons">
+                            <button class="rounded" type="button"
+                                onclick="window.location.href='datasources.htm'">
+                                <span>OK</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </c:otherwise>
+        </c:choose>
+    </div>
+    </div>
+  </jsp:body>
+</t:page_tabbed>

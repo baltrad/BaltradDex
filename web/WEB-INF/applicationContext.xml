@@ -20,7 +20,7 @@
         -->
         <security:intercept-url pattern="/home.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/latest_messages.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/all_messages.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/system_messages.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/logtable.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/data_download.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/data_upload.htm" access="ROLE_USER" />

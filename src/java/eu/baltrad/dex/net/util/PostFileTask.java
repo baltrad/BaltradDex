@@ -71,7 +71,7 @@ public class PostFileTask implements Runnable {
      * separate thread.
      */
     public void run() {
-        try {
+        try { 
             HttpResponse response = httpClient.post(request);
             if (response.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_OK) {
@@ -108,7 +108,7 @@ public class PostFileTask implements Runnable {
                                 + user.getName());
                         manager.storeNoId(entry);
                     }
-                }
+                }    
             }    
         } catch (Exception e) {
             log.error("Failed to deliver file " + uuid + " to user " 
