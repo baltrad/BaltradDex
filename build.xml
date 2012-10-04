@@ -18,10 +18,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 -->
 
-<!--
-	Build script for BaltradDex application
--->
-
 <project name="BaltradDex" basedir="." default="dist">
   <description>Builds and deploys BaltradDex application</description>
   <property name="app.name" value="BaltradDex | Data Exchange System"/>
@@ -68,17 +64,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
   <property name="beast.path" value="/opt/baltrad/beast" />
 
-  <available file="${baltrad.db.path}/share/baltrad-bdb/java/baltrad-bdb-client.jar" property="baltrad-bdb-client.jar.available" />
-  <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
-  <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
-  <available file="${javahdf.path}/lib/jhdf5.jar" property="javahdf.lib.available"/>
-
-  <fail unless="baltrad-bdb-client.jar.available" message="baltrad.db.path must specify the installation dir of baltrad-db" />
-  <fail unless="beast.jar.available" message="beast.path must specify the installation dir of beast" />
-  <fail unless="beast.libs.available" message="beast.path must specify the installation dir of beast" />
-  <fail unless="javahdf.lib.available" message="javahdf.path must specify the installation dir of hdf-java" />
-
-
   <!-- Configure ant tasks for tomcat deployment -->
   <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"
 		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
@@ -105,22 +90,26 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fileset dir="${extralib.dir}">
       <include name="**/*.jar"/>
     </fileset>
+  </path>
+  
+  <!-- initialize dependent library path -->
+  <path id="dep.lib.path">
     <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java">
-      <include name="baltrad-bdb-client.jar"/>
+        <include name="baltrad-bdb-client.jar"/>
     </fileset>
     <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java/libs">
-      <include name="*.jar"/>
+        <include name="*.jar"/>
     </fileset>
     <fileset dir="${beast.path}/bin">
-      <include name="*.jar"/>
+        <include name="*.jar"/>
     </fileset>
     <fileset dir="${beast.path}/libs">
-      <include name="*.jar"/>
+        <include name="*.jar"/>
     </fileset>
     <fileset dir="${javahdf.path}/lib">
-      <include name="*.jar"/>
+        <include name="*.jar"/>
     </fileset>
-  </path>
+  </path>     
 
   <!-- path for testing -->
   <path id="test.lib.path">
@@ -150,7 +139,25 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </fileset>
   </path>
 	
-<target name="init">
+<!-- separate target for dependency check -->
+<target name="dep-check">
+    <available file="${baltrad.db.path}/share/baltrad-bdb/java/baltrad-bdb-client.jar" 
+             property="baltrad-bdb-client.jar.available" />
+    <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
+    <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
+    <available file="${javahdf.path}/lib/jhdf5.jar" property="javahdf.lib.available"/>
+
+    <fail unless="baltrad-bdb-client.jar.available" 
+            message="baltrad.db.path must specify the installation dir of baltrad-db" />
+    <fail unless="beast.jar.available" 
+            message="beast.path must specify the installation dir of beast" />
+    <fail unless="beast.libs.available" 
+            message="beast.path must specify the installation dir of beast" />
+    <fail unless="javahdf.lib.available" 
+            message="javahdf.path must specify the installation dir of hdf-java" />   
+</target>        
+        
+<target name="init" depends="dep-check">
     <!-- create directory structure -->
     <delete dir="${build.dir}"/>
     <mkdir dir="${build.web.dir}"/>
@@ -319,7 +326,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     	<include name="beast-log-messages.xml"/>
       </fileset>
     </copy>
-
 </target>
 
   <!-- compile source files -->
@@ -330,6 +336,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
            includeAntRuntime="${compile.includeAntRuntime}">
       <include name="**/*.java"/>
       <classpath refid="lib.path"/>
+      <classpath refid="dep.lib.path"/>
     </javac>
   </target>
 
@@ -393,6 +400,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
            destdir="${build.test.dir}">
       <classpath location="${build.classes.dir}"/>
       <classpath refid="lib.path"/>
+      <classpath refid="dep.lib.path"/>
       <classpath refid="test.lib.path"/>
     </javac>
   	
@@ -423,6 +431,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 	  <classpath refid="test.lib.path"/>
 	  <classpath location="${build.classes.dir}"/>
 	  <classpath refid="lib.path"/>
+          <classpath refid="dep.lib.path"/>
 	  <classpath location="${build.test.dir}" />
 	  <batchtest fork="yes" todir="${dist.dir}/junit-reports">
 	    <fileset dir="${build.test.dir}" includes="**/*Test.class"/>
@@ -444,6 +453,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
            optimize="${compile.optimize}" destdir="${build.itest.dir}">
       <classpath location="${build.classes.dir}"/>
       <classpath refid="lib.path"/>
+      <classpath refid="dep.lib.path"/>
       <classpath refid="test.lib.path"/>
     </javac>
     <!-- copy any resources -->
@@ -507,6 +517,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <classpath refid="test.lib.path"/>
       <classpath location="${build.classes.dir}"/>
       <classpath refid="lib.path"/>
+      <classpath refid="dep.lib.path"/>
       <classpath location="${build.itest.dir}" />
       <batchtest fork="yes" todir="${dist.dir}/junit-reports">
         <fileset dir="${build.itest.dir}" includes="**/*Test.class"/>
@@ -736,6 +747,5 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <echo message="Doxygen documentation created in ${doxygen.dir}"/>
         <echo message="Javadoc documentation created in ${javadoc.dir}"/>
     </target>
-    
 </project>
 
