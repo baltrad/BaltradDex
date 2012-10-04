@@ -17,17 +17,14 @@
     if (sessionUser.getRoleName().equals(User.ROLE_OPERATOR)) {
         request.getSession().setAttribute("userRole", 1);
     }
-    if (sessionUser.getRoleName().equals(User.ROLE_PEER)) {
-        request.getSession().setAttribute("userRole", 2);
-    }
     if (sessionUser.getRoleName().equals(User.ROLE_USER)) {
-        request.getSession().setAttribute("userRole", 3);
+        request.getSession().setAttribute("userRole", 2);
     }    
 %>
 
 <div id="tab" class="${activeTab == 'home' ? 'active' : ''}">
     <a href="home.htm">Home</a>
-</div>
+</div>    
 <c:if test="${userRole == 0 || userRole == 1}">
     <div id="tab" class="${activeTab == 'exchange' ? 'active' : ''}">
         <a href="exchange.htm">Exchange</a>
@@ -40,4 +37,9 @@
     <div id="tab" class="${activeTab == 'settings' ? 'active' : ''}">
         <a href="settings.htm">Settings</a>
     </div>
+</c:if>
+<c:if test="${userRole == 1 || userRole == 2}">
+    <div id="tab" class="${activeTab == 'settings' ? 'active' : ''}">
+        <a href="user_settings.htm">Settings</a>
+    </div>  
 </c:if>

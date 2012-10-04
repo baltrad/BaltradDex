@@ -322,6 +322,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <ref bean="fileCatalog" />
         </property>
     </bean>
+    
+    <!-- Change user password controller -->
+    <bean id="changeUserPasswordController"
+          class="eu.baltrad.dex.user.controller.ChangeUserPasswordController"
+          autowire="byType"/>
 
     <!-- User manager -->
     <bean id="userManager" class="eu.baltrad.dex.user.model.UserManager"

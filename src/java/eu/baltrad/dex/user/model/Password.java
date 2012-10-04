@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.user.model;
 
@@ -25,24 +25,38 @@ package eu.baltrad.dex.user.model;
  * Class implements password object.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 0.7.1
+ * @version 1.2.2
  * @since 0.7.1
  */
 public class Password {
-//---------------------------------------------------------------------------------------- Variables
+
     /* User name associated with a given account */
     private String userName;
     /* New password */
     private String newPasswd;
     /* New password confirmed */
     private String confirmNewPasswd;
-//------------------------------------------------------------------------------------------ Methods
+
     /**
      * Constructor.
      * 
      * @param userName User name
      */
     public Password( String userName ) { this.userName = userName; }
+    
+    /**
+     * Constructor.
+     * @param userName User name
+     * @param newPasswd New password to set
+     * @param confirmNewPasswd Repeated password 
+     */
+    public Password(String userName, String newPasswd, String confirmNewPasswd) 
+    { 
+        this.userName = userName; 
+        this.newPasswd = newPasswd;
+        this.confirmNewPasswd = confirmNewPasswd;
+    }
+    
     /**
      * Gets user name.
      *
@@ -84,4 +98,4 @@ public class Password {
         this.confirmNewPasswd = confirmNewPasswd;
     }
 }
-//--------------------------------------------------------------------------------------------------
+

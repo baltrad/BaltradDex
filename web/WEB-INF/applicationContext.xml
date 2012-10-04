@@ -14,7 +14,6 @@
                              authentication-failure-url="/login_failed.htm" 
                              always-use-default-target="true"/>
         <security:logout logout-success-url="/logout.htm"/>
-        
         <!-- 
             User pages 
         -->
@@ -30,6 +29,7 @@
         <security:intercept-url pattern="/file_details.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/data_preview.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/download.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/user_settings.htm" access="ROLE_USER" />
         <!-- 
             Operator pages 
         -->
@@ -38,14 +38,11 @@
         <security:intercept-url pattern="/connect_to_node.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/node_connected.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/selected_datasource.htm" access="ROLE_OPERATOR" />
-        
         <security:intercept-url pattern="/subscribed_peers.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/subscription_by_peer.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/selected_subscription.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/subscription_status.htm" access="ROLE_OPERATOR" />
-        
         <security:intercept-url pattern="/registry.htm" access="ROLE_OPERATOR" />
-        
         <security:intercept-url pattern="/adaptors.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/anomalydetector_create.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/anomalydetector_show.htm" access="ROLE_OPERATOR" />

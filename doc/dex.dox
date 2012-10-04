@@ -29,7 +29,8 @@
 - \subpage running
 
 	-# \ref start
-	-# \ref login 
+	-# \ref login
+	-# \ref change_password 
 	-# \ref quick_setup 
 		-# \ref quick_node_settings
 		-# \ref quick_radars
@@ -403,6 +404,24 @@ credentials have been successfully removed from HTTP session.
 \n
 \image html logout.png
 \endnote
+
+\section change_password Change user's password
+
+It is important for the user to change the default password set by system 
+administrator. In order to change the password, select \p Setings tab. User 
+will be presented with a page allowing to modify the password.
+
+\image html change_user_password.png
+
+Enter new password, confirm it by typing the password again and click \p Save.
+System will display a message confirming that password has been changed. 
+From now on new password will be used in order to sign in.
+
+\image html change_user_password_status.png
+
+\attention
+For security reasons, it is strongly recommended that user changes the password 
+as soon as possible, preferably after signing in for the first time.
 
 \section quick_setup Quick setup
 

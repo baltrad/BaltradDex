@@ -1,4 +1,4 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
 * Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.user.util;
 
@@ -35,18 +35,18 @@ import org.springframework.validation.ValidationUtils;
  * @since 0.7.1
  */
 public class ChangePasswordValidator implements Validator {
-//---------------------------------------------------------------------------------------- Constants
+
     /* Minimum password length */
     private static final int MIN_PASSWD_LENGTH = 6;
-//------------------------------------------------------------------------------------------ Methods
+
     /**
      * Declares classes supported by this validator.
      *
      * @param aClass Class instance of supported type
      * @return True if class is supported, false otherwise
      */
-    public boolean supports( Class aClass ) {
-        return Password.class.equals( aClass );
+    public boolean supports(Class clazz) {
+        return Password.class.equals(clazz);
     }
     /**
      * Validates form object.
@@ -54,27 +54,29 @@ public class ChangePasswordValidator implements Validator {
      * @param obj Form object
      * @param errors Errors object
      */
-    public void validate( Object command, Errors errors ) {
-        Password passwd = ( Password )command;
+    public void validate(Object command, Errors errors) {
+        Password passwd = (Password) command;
         // Password object is null
-        if( passwd == null ) return;
+        if (passwd == null) return;
         // User submits empty fields
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "newPasswd", "error.missing.newpasswd" );
-        ValidationUtils.rejectIfEmptyOrWhitespace( errors, "confirmNewPasswd",
-                "error.missing.confirmnewpasswd" );
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "newPasswd", 
+                "error.missing.newpasswd");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "confirmNewPasswd",
+                "error.missing.confirmnewpasswd");
         // New password is too short
-        if( !errors.hasFieldErrors( "newPasswd") ) {
-            if( passwd.getNewPasswd().trim().length() < MIN_PASSWD_LENGTH ) {
-                errors.rejectValue( "newPasswd", "error.field.passwd.tooshort" );
+        if (!errors.hasFieldErrors("newPasswd")) {
+            if (passwd.getNewPasswd().trim().length() < MIN_PASSWD_LENGTH) {
+                errors.rejectValue("newPasswd", "error.field.passwd.tooshort");
             }
         }
         // New password and confirmed password don't match
-        if( !errors.hasFieldErrors( "newPasswd" ) &&
-                !errors.hasFieldErrors( "confirmNewPasswd" ) ) {
-            if( !passwd.getNewPasswd().equals( passwd.getConfirmNewPasswd() ) ) {
-                errors.rejectValue( "confirmNewPasswd", "error.field.passwd.mismatch" );
+        if (!errors.hasFieldErrors("newPasswd") &&
+                !errors.hasFieldErrors("confirmNewPasswd")) {
+            if (!passwd.getNewPasswd().equals( passwd.getConfirmNewPasswd())) {
+                errors.rejectValue("confirmNewPasswd", 
+                        "error.field.passwd.mismatch" );
             }
         }
     }
 }
-//--------------------------------------------------------------------------------------------------
+

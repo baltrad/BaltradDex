@@ -30,7 +30,6 @@ INSERT INTO dex_users (name, role_name, password, org_name, org_unit, locality,
                         state, country_code, node_address)
     VALUES ('admin', 'admin', MD5('baltrad'), 'Organization name', 'Unit name', 
             'City', 'Country', 'XX', 'http://127.0.0.1:8084');
-
 -- dex_radars --------------------------------------------------------------------------------------
 --INSERT INTO dex_radars (name, wmo_number) VALUES ('Legionowo', '12374'),
 --    ('Świdwin', '12220'), ('Brzuchania', '12568'), ('Pastewnik', '12544'),

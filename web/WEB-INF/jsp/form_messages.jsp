@@ -1,4 +1,4 @@
-<%--------------------------------------------------------------------------------------------------
+<%------------------------------------------------------------------------------
 Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
@@ -15,11 +15,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Display messages page
 Created on : Jun 22, 2010, 11:57:02 AM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!-- Error message -->
 <spring:bind path="command.*">
