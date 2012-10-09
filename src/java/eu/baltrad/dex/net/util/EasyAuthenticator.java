@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.net.util;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import org.apache.http.client.methods.HttpUriRequest;
 
 /**
@@ -36,8 +38,8 @@ public class EasyAuthenticator implements Authenticator {
      * @param request Http URI request 
      * @param keyName Private key used to sign a message 
      */
-    public void addCredentials(HttpUriRequest request, String keyName) {
-        
+    public void addCredentials(HttpUriRequest request, String keyName) 
+                throws KeyczarException {
     }
     
     /**
@@ -48,7 +50,7 @@ public class EasyAuthenticator implements Authenticator {
      * @return True upon successful authentication, false otherwise
      */ 
     public boolean authenticate(String message, String signature, 
-            String keyName) {
+            String keyName) throws KeyczarException {
         return true;
     }
     

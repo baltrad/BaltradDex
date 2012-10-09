@@ -50,6 +50,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
+import org.keyczar.exceptions.KeyczarException;
 
 /**
  * Receives and handles subscription requests.
@@ -63,6 +64,8 @@ public class GetSubscriptionServlet extends HttpServlet {
     
     private static final String GS_INTERNAL_SERVER_ERROR_KEY = 
             "getsubscription.server.internal_server_error";
+    private static final String GS_MESSAGE_VERIFIER_ERROR_KEY = 
+            "postsubscription.server.message_verifier_error";    
     private static final String GS_UNAUTHORIZED_REQUEST_KEY =
             "getsubscription.server.unauthorized_request";
     private static final String GS_SUBSCRIPTION_SUCCESS_KEY = 
@@ -257,6 +260,9 @@ public class GetSubscriptionServlet extends HttpServlet {
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
                     messages.getMessage(GS_UNAUTHORIZED_REQUEST_KEY));
             }
+        } catch (KeyczarException e) {
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
+                    messages.getMessage(GS_MESSAGE_VERIFIER_ERROR_KEY));
         } catch (Exception e) {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(GS_INTERNAL_SERVER_ERROR_KEY));

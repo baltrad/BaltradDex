@@ -33,6 +33,8 @@ import eu.baltrad.dex.util.MessageResourceUtil;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
 
@@ -75,6 +77,7 @@ public class DataSourceListServletTest {
     private MessageResourceUtil messages;
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
+    private Authenticator authenticatorMock;
     
     class DSLServlet extends DataSourceListServlet {
         public DSLServlet() {
@@ -112,6 +115,8 @@ public class DataSourceListServletTest {
     @Before
     public void setUp() throws Exception {
         mocks = new ArrayList<Object>();
+        authenticatorMock = (Authenticator) createMock(Authenticator.class);
+        
         classUnderTest = new DSLServlet();
         classUnderTest.setLog(Logger.getLogger("DEX"));
         messages = new MessageResourceUtil("resources/messages");
@@ -119,14 +124,16 @@ public class DataSourceListServletTest {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         format = new SimpleDateFormat(DATE_FORMAT);
+        setRequestAttributes(request);
     }
     
     @After
     public void tearDown() {
         classUnderTest = null;
+        resetAll();
     }
     
-    private void setAttributes(MockHttpServletRequest request) {
+    private void setRequestAttributes(MockHttpServletRequest request) {
         request.setAttribute("Content-Type", "text/html");  
         request.setAttribute("Content-MD5", Base64.encodeBase64String(
                 request.getRequestURI().getBytes()));
@@ -138,14 +145,34 @@ public class DataSourceListServletTest {
     }
     
     @Test
-    public void handleRequest_Unauthorized() throws Exception {
-        Authenticator authMock = (Authenticator) createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.FALSE).anyTimes();
-        setAttributes(request);
+    public void handleRequest_MessageVerificationError() throws Exception {
+        authenticatorMock.authenticate(isA(String.class), isA(String.class),
+                isA(String.class));
+        
+        expectLastCall().andThrow(new KeyczarException(
+                "Failed to verify message"));
+        
         replayAll();
         
-        classUnderTest.setAuthenticator(authMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
+        classUnderTest.handleRequest(request, response);
+        
+        verifyAll();
+        
+        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+        assertEquals(
+                messages.getMessage("datasource.server.message_verifier_error"), 
+                response.getErrorMessage());
+    }
+    
+    @Test
+    public void handleRequest_Unauthorized() throws Exception {
+        expect(authenticatorMock.authenticate(isA(String.class), 
+                isA(String.class), isA(String.class)))
+                .andReturn(Boolean.FALSE).anyTimes();
+        replayAll();
+        
+        classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.handleRequest(request, response);
         
         verifyAll();
@@ -153,16 +180,13 @@ public class DataSourceListServletTest {
         assertEquals(
                 messages.getMessage("datasource.server.unauthorized_request"), 
                 response.getErrorMessage());
-        resetAll();
     }
     
     @Test 
     public void handleRequest_InternalServerError() throws Exception {
-        Authenticator authMock = 
-                (Authenticator) createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-        setAttributes(request);
+        expect(authenticatorMock.authenticate(isA(String.class), 
+                isA(String.class), isA(String.class)))
+                .andReturn(Boolean.TRUE).anyTimes();
         IUserManager userManagerMock = 
                 (IUserManager) createMock(IUserManager.class);
         expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
@@ -181,7 +205,7 @@ public class DataSourceListServletTest {
         
         replayAll();
         
-        classUnderTest.setAuthenticator(authMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
@@ -195,17 +219,13 @@ public class DataSourceListServletTest {
                 messages.getMessage("datasource.server.internal_server_error",
                     new String[] {"Internal server error"}), 
                 response.getErrorMessage());
-        
-        resetAll();
     }
     
     @Test 
     public void handleRequest_OK() throws Exception {
-        Authenticator authMock = 
-                (Authenticator) createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-        setAttributes(request);
+        expect(authenticatorMock.authenticate(isA(String.class), 
+                isA(String.class), isA(String.class)))
+                .andReturn(Boolean.TRUE).anyTimes();
         
         IUserManager userManagerMock = 
                 (IUserManager) createMock(IUserManager.class);
@@ -225,7 +245,7 @@ public class DataSourceListServletTest {
         
         replayAll();
         
-        classUnderTest.setAuthenticator(authMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
@@ -241,8 +261,6 @@ public class DataSourceListServletTest {
                 .jsonToDataSources(dataSourceString);
         assertNotNull(dataSources);
         assertEquals(3, dataSources.size());
-        
-        resetAll();
     }
     
 }

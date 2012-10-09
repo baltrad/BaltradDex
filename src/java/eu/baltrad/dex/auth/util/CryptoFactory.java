@@ -19,20 +19,24 @@ along with BaltradFrame. If not, see <http://www.gnu.org/licenses/>.
 
 package eu.baltrad.dex.auth.util;
 
+import org.keyczar.exceptions.KeyczarException;
+
 public interface CryptoFactory {
   /**
    * Create a Signer instance identified by name
    *
    * @param name Factory specific name for the signer (most likely key
    *             lookup)
+   * @throws KeyczarException
    */
-  Signer createSigner(String keyName);
+  public Signer createSigner(String keyName) throws KeyczarException;
   
   /**
    * Create a Verifier instance identified by name
    *
    * @param name Factory specific name for the verifier (most likely key
    *             lookup)
+   * @throws KeyczarException
    */
-  Verifier createVerifier(String alias);
+  public Verifier createVerifier(String alias) throws KeyczarException;
 }

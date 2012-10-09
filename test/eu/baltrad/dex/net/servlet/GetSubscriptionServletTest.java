@@ -37,14 +37,19 @@ import static org.easymock.EasyMock.*;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import javax.servlet.http.HttpServletResponse;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
+
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -74,6 +79,7 @@ public class GetSubscriptionServletTest {
     private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
     
     private GSServlet classUnderTest;
+    private List<Object> mocks;
     private JsonUtil jsonUtil;
     private MessageResourceUtil messages;
     private MockHttpServletRequest request;
@@ -90,8 +96,33 @@ public class GetSubscriptionServletTest {
         public void initConfiguration() {}
     }
     
+    private Object createMock(Class clazz) {
+        Object mock = EasyMock.createMock(clazz);
+        mocks.add(mock);
+        return mock;
+    }
+    
+    private void replayAll() {
+        for (Object mock : mocks) {
+            replay(mock);
+        }
+    }
+    
+    private void verifyAll() {
+        for (Object mock : mocks) {
+            verify(mock);
+        }
+    }
+    
+    private void resetAll() {
+        for (Object mock : mocks) {
+            reset(mock);
+        }
+    }
+    
     @Before
     public void setUp() {
+        mocks = new ArrayList<Object>();
         classUnderTest = new GSServlet();
         classUnderTest.setLog(Logger.getLogger("DEX"));
         messages = new MessageResourceUtil("resources/messages");
@@ -101,12 +132,15 @@ public class GetSubscriptionServletTest {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         format = new SimpleDateFormat(DATE_FORMAT);
-        subscriptionManagerMock = createMock(ISubscriptionManager.class);
+        subscriptionManagerMock = (ISubscriptionManager)
+                createMock(ISubscriptionManager.class);
+        setAttributes(request);
     }
     
     @After
     public void tearDown() {
         classUnderTest = null;
+        resetAll();
     }
     
     private void setAttributes(MockHttpServletRequest request) {
@@ -121,143 +155,163 @@ public class GetSubscriptionServletTest {
     }
     
     @Test
+    public void handleRequest_MessageVerificationError() throws Exception {
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.authenticate(isA(String.class), isA(String.class),
+                isA(String.class));
+        
+        expectLastCall().andThrow(new KeyczarException(
+                "Failed to verify message"));
+        
+        replayAll();
+        
+        classUnderTest.setAuthenticator(authenticatorMock);
+        classUnderTest.handleRequest(request, response);
+        
+        verifyAll();
+        
+        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+        assertEquals(messages
+                .getMessage("postsubscription.server.message_verifier_error"), 
+                    response.getErrorMessage());
+    }
+    
+    @Test
     public void handleRequest_Unauthorized() throws Exception {
-        Authenticator authMock = createMock(Authenticator.class);
+        Authenticator authMock = (Authenticator) 
+                createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.FALSE).anyTimes();
-        setAttributes(request);
-        replay(authMock);
+        
+        replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.handleRequest(request, response);
         
-        verify(authMock);
+        verifyAll();
+        
         assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
         assertEquals(
             messages.getMessage("getsubscription.server.unauthorized_request"), 
             response.getErrorMessage());
-        reset(authMock);
     }
     
     @Test 
     public void handleRequest_InternalServerError() throws Exception {
-        Authenticator authMock = createMock(Authenticator.class);
+        Authenticator authMock = (Authenticator) 
+                createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-        setAttributes(request);
-        replay(authMock);
         
-        IJsonUtil jsonUtilMock = createMock(IJsonUtil.class);
+        IJsonUtil jsonUtilMock = (IJsonUtil) createMock(IJsonUtil.class);
         expect(jsonUtilMock.jsonToSubscriptions(JSON_SUBSCRIPTIONS))
                 .andThrow(new RuntimeException());
-        replay(jsonUtilMock);
+        
+        replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
         request.setContent(JSON_SUBSCRIPTIONS.getBytes());
         classUnderTest.handleRequest(request, response);
         
-        verify(authMock);
-        verify(jsonUtilMock);
+        verifyAll();
+        
         assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 response.getStatus());
         assertEquals(
             messages.getMessage("getsubscription.server.internal_server_error"), 
             response.getErrorMessage());
-        reset(authMock);
-        reset(jsonUtilMock);
     }
     
     @Test
     public void handleRequest_SubscriptionFailedError() throws Exception {
-        Authenticator authMock = createMock(Authenticator.class);
+        Authenticator authMock = (Authenticator) 
+                createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-        setAttributes(request);
-        replay(authMock);
-        expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
+        
+        expect(subscriptionManagerMock.load(isA(String.class), 
+                isA(String.class),
                 isA(String.class))).andReturn(null).anyTimes();
         expect(subscriptionManagerMock.storeNoId(isA(Subscription.class)))
                 .andReturn(0).anyTimes();
-        replay(subscriptionManagerMock);
+        
+        replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         request.setContent(JSON_SUBSCRIPTIONS.getBytes());
         classUnderTest.handleRequest(request, response);
         
-        verify(authMock);
-        verify(subscriptionManagerMock);
+        verifyAll();
+        
         assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
         assertEquals(
             messages.getMessage(
                 "getsubscription.server.generic_subscription_error"), 
             response.getErrorMessage());
-        
-        reset(authMock);
-        reset(subscriptionManagerMock);
     }
     
     @Test
     public void handleRequest_PartialSubscriptionError() throws Exception {
-        Authenticator authMock = createMock(Authenticator.class);
+        Authenticator authMock = (Authenticator)
+                createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-        setAttributes(request);
-        replay(authMock);
-        expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
+        
+        expect(subscriptionManagerMock.load(isA(String.class), 
+                isA(String.class), 
                 isA(String.class))).andReturn(null).anyTimes();
         expect(subscriptionManagerMock.storeNoId(isA(Subscription.class)))
                 .andReturn(1).times(2);
         expect(subscriptionManagerMock.storeNoId(isA(Subscription.class)))
                 .andReturn(0).times(1);
-        replay(subscriptionManagerMock);
+        
+        replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         request.setContent(JSON_SUBSCRIPTIONS.getBytes());
         classUnderTest.handleRequest(request, response);
         
-        verify(authMock);
-        verify(subscriptionManagerMock);
+        verifyAll();
+        
         assertEquals(HttpServletResponse.SC_PARTIAL_CONTENT, 
                 response.getStatus());
         assertNotNull(response.getContentAsString());
         List<Subscription> subs = 
                 jsonUtil.jsonToSubscriptions(response.getContentAsString()); 
         assertEquals(2, subs.size());
-        reset(authMock);
-        reset(subscriptionManagerMock);
     }
     
     @Test 
     public void handleRequest_OK() throws Exception {
-        Authenticator authMock = createMock(Authenticator.class);
+        Authenticator authMock = (Authenticator)
+                createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-        setAttributes(request);
-        replay(authMock);
-        expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
+    
+        expect(subscriptionManagerMock.load(isA(String.class), 
+                isA(String.class),
                 isA(String.class))).andReturn(null).anyTimes();
         expect(subscriptionManagerMock.storeNoId(isA(Subscription.class)))
                 .andReturn(1).times(3);
-        replay(subscriptionManagerMock);
+        
+        replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         request.setContent(JSON_SUBSCRIPTIONS.getBytes());
         classUnderTest.handleRequest(request, response);
         
-        verify(authMock);
-        verify(subscriptionManagerMock);
+        verifyAll();
+        
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
         assertNotNull(response.getContentAsString());
         List<Subscription> subs = 
                 jsonUtil.jsonToSubscriptions(response.getContentAsString()); 
         assertEquals(3, subs.size());
-        
-        reset(authMock);
-        reset(subscriptionManagerMock);
     }    
     
 }

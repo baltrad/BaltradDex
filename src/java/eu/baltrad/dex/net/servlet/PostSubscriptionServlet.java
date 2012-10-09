@@ -35,6 +35,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.http.HttpServlet;
@@ -63,6 +65,8 @@ public class PostSubscriptionServlet extends HttpServlet {
  
     private static final String PS_UNAUTHORIZED_REQUEST_KEY =
             "postsubscription.server.unauthorized_request";
+    private static final String PS_MESSAGE_VERIFIER_ERROR_KEY = 
+            "postsubscription.server.message_verifier_error";    
     private static final String PS_INTERNAL_SERVER_ERROR_KEY = 
             "postsubscription.server.internal_server_error";
     private static final String PS_SUBSCRIPTION_SUCCESS_KEY = 
@@ -234,6 +238,9 @@ public class PostSubscriptionServlet extends HttpServlet {
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
                     messages.getMessage(PS_UNAUTHORIZED_REQUEST_KEY));
             }
+        } catch (KeyczarException e) {
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
+                    messages.getMessage(PS_MESSAGE_VERIFIER_ERROR_KEY));
         } catch (Exception e) {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(PS_INTERNAL_SERVER_ERROR_KEY));

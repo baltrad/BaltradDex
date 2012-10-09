@@ -29,20 +29,18 @@ public class KeyczarSigner implements Signer {
    *
    * @param keyLocation location of the key to use for signing
    */
-  public KeyczarSigner(String keyLocation) {
-    try {
+  public KeyczarSigner(String keyLocation) throws KeyczarException {
       signer = new org.keyczar.Signer(keyLocation);
-    } catch (KeyczarException e) {
-      throw new RuntimeException("could not create Keyczar Signer", e);
-    }
   }
   
+  /**
+   * Signs a message.
+   * @param message Message to sign
+   * @return Base64 encoded signature
+   * @throws KeyczarException 
+   */
   @Override
-  public String sign(String message) {
-    try {
-      return signer.sign(message);
-    } catch (KeyczarException e) {
-      throw new RuntimeException("signing failed", e);
-    }
+  public String sign(String message) throws KeyczarException {
+      return signer.sign(message);  
   }
 }

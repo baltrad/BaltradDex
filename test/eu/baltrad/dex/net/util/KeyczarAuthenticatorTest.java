@@ -25,6 +25,8 @@ import eu.baltrad.dex.net.model.NodeRequest;
 import eu.baltrad.dex.auth.util.Signer;
 import eu.baltrad.dex.auth.util.KeyczarCryptoFactory;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.Header;
 
@@ -76,8 +78,25 @@ public class KeyczarAuthenticatorTest {
         request.setAttribute("Date", format.format(new Date()));
     }
     
+    @Test(expected = KeyczarException.class)
+    public void addCredentials_InvalidKeystore() throws Exception {
+        classUnderTest = new KeyczarAuthenticator("invalid_keystore");
+        HttpUriRequest request = requestFactory.createGetSubscriptionRequest(
+            "localnode", "http://localhost",
+                "json string will be passed here");
+        classUnderTest.addCredentials(request, "localhost");
+    } 
+    
+    @Test(expected = KeyczarException.class)
+    public void addCredentials_InvalidKey() throws Exception {
+        HttpUriRequest request = requestFactory.createGetSubscriptionRequest(
+            "localnode", "http://localhost",
+                "json string will be passed here");
+        classUnderTest.addCredentials(request, "invalid_key");
+    } 
+    
     @Test
-    public void addCredentials() {
+    public void addCredentials_OK() throws Exception {
         HttpUriRequest request = requestFactory.createGetSubscriptionRequest(
             "localnode", "http://localhost",
                 "json string will be passed here");
@@ -87,8 +106,8 @@ public class KeyczarAuthenticatorTest {
         assertNotNull(header.getValue());
     }
     
-    @Test 
-    public void authenticate_Success() {
+    @Test(expected = KeyczarException.class)
+    public void authenticate_InvalidKeystore() throws Exception {
         HttpServletRequest request = new MockHttpServletRequest("GET", 
                 "/get_datasource_listing.htm");
         setAttributes(request);
@@ -96,12 +115,26 @@ public class KeyczarAuthenticatorTest {
         Signer signer = cryptoFactory.createSigner("localhost");
         String signature = signer.sign(req.getMessage());
         req.setAttribute("Authorization", "localhost" + ":" + signature);
-        assertTrue(classUnderTest.authenticate(req.getMessage(), 
-                req.getSignature(), "localhost"));
+        classUnderTest = new KeyczarAuthenticator("invalid_keystore");
+        classUnderTest.authenticate(req.getMessage(), req.getSignature(), 
+                "localhost");
+    }
+    
+    @Test(expected = KeyczarException.class)
+    public void authenticate_InvalidKey() throws Exception {
+        HttpServletRequest request = new MockHttpServletRequest("GET", 
+                "/get_datasource_listing.htm");
+        setAttributes(request);
+        NodeRequest req = new NodeRequest(request);
+        Signer signer = cryptoFactory.createSigner("localhost");
+        String signature = signer.sign(req.getMessage());
+        req.setAttribute("Authorization", "localhost" + ":" + signature);
+        classUnderTest.authenticate(req.getMessage(), req.getSignature(), 
+                "invalid_key");
     }
     
     @Test
-    public void authenticate_Failure() {
+    public void authenticate_Failure() throws Exception {
         HttpServletRequest request = new MockHttpServletRequest("GET", 
                 "/get_datasource_listing.htm");
         setAttributes(request);
@@ -111,6 +144,19 @@ public class KeyczarAuthenticatorTest {
         req.setAttribute("Authorization", "localhost" + ":" + signature);
         request.setAttribute("Date", "");
         assertFalse(classUnderTest.authenticate(req.getMessage(), 
+                req.getSignature(), "localhost"));
+    }
+    
+    @Test 
+    public void authenticate_Success() throws Exception {
+        HttpServletRequest request = new MockHttpServletRequest("GET", 
+                "/get_datasource_listing.htm");
+        setAttributes(request);
+        NodeRequest req = new NodeRequest(request);
+        Signer signer = cryptoFactory.createSigner("localhost");
+        String signature = signer.sign(req.getMessage());
+        req.setAttribute("Authorization", "localhost" + ":" + signature);
+        assertTrue(classUnderTest.authenticate(req.getMessage(), 
                 req.getSignature(), "localhost"));
     }
     

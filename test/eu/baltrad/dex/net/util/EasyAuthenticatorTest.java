@@ -41,7 +41,7 @@ public class EasyAuthenticatorTest {
     }
     
     @Test
-    public void authenticate() {
+    public void authenticate() throws Exception {
         assertTrue(classUnderTest.authenticate(null, null, ""));
     }
     

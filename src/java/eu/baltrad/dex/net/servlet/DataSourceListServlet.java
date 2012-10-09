@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.HashSet;
+import org.keyczar.exceptions.KeyczarException;
 
 /**
  * Receives and handles data source listing requests.
@@ -58,6 +59,9 @@ public class DataSourceListServlet extends HttpServlet {
     /** Unauthorized request error key */
     private static final String DS_UNAUTHORIZED_REQUEST_KEY = 
             "datasource.server.unauthorized_request";
+    /** Message verifier error key */
+    private static final String DS_MESSAGE_VERIFIER_ERROR_KEY = 
+            "datasource.server.message_verifier_error";
     /** Internal server error key */
     private static final String DS_INTERNAL_SERVER_ERROR_KEY = 
             "datasource.server.internal_server_error";
@@ -148,6 +152,9 @@ public class DataSourceListServlet extends HttpServlet {
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
                         messages.getMessage(DS_UNAUTHORIZED_REQUEST_KEY));
             }
+        } catch (KeyczarException e) {
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
+                    messages.getMessage(DS_MESSAGE_VERIFIER_ERROR_KEY));
         } catch (Exception e) {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(DS_INTERNAL_SERVER_ERROR_KEY,

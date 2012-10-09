@@ -39,6 +39,8 @@ import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import org.dom4j.Document;
 
 import org.apache.commons.codec.binary.Base64;
@@ -133,7 +135,31 @@ public class PostMessageServletTest {
     }
     
     @Test
-    public void handleRequest_Unauthorized() {
+    public void handleRequest_MessageVerificationError() throws Exception {
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.authenticate(isA(String.class), isA(String.class),
+                isA(String.class));
+        
+        expectLastCall().andThrow(new KeyczarException(
+                "Failed to verify message"));
+        
+        replayAll();
+        
+        setAttributes(request, "Hi there!");
+        classUnderTest.setAuthenticator(authenticatorMock);
+        classUnderTest.handleRequest(request, response);
+        
+        verifyAll();
+        
+        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+        assertEquals(messages
+                .getMessage("postmessage.server.message_verifier_error"), 
+                    response.getErrorMessage());
+    }
+    
+    @Test
+    public void handleRequest_Unauthorized() throws Exception {
         Authenticator authMock = (Authenticator) createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.FALSE);
@@ -151,7 +177,7 @@ public class PostMessageServletTest {
     }
     
     @Test 
-    public void handleRequest_InternalServerError() {
+    public void handleRequest_InternalServerError() throws Exception {
         Authenticator authMock = (Authenticator) createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
@@ -170,7 +196,7 @@ public class PostMessageServletTest {
     }
     
     @Test
-    public void handleRequest_OK() {
+    public void handleRequest_OK() throws Exception {
         IBltXmlMessage bltmsg = new IBltXmlMessage() {
             public Document toDocument() { return null; }
             public void fromDocument(Document arg0) {}
@@ -201,7 +227,7 @@ public class PostMessageServletTest {
     }
     
     @Test
-    public void handleRequest_NotABeastMessage() {
+    public void handleRequest_NotABeastMessage() throws Exception {
         Authenticator authMock = (Authenticator) createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);

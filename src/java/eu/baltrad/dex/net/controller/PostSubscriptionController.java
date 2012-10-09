@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.HttpResponse;
 import org.apache.commons.io.IOUtils;
@@ -62,7 +64,9 @@ public class PostSubscriptionController implements MessageSetter {
     
     /** Initial view */
     private static final String SUBSCRIBE_VIEW = "subscribe";
-    
+    /** Message signer error key */
+    private static final String PS_MESSAGE_SIGNER_ERROR_KEY = 
+            "postsubscription.controller.message_signer_error";
     /** Subscription connection error key */
     private final static String PS_HTTP_CONN_ERROR_KEY = 
             "postsubscription.controller.http_connection_error";        
@@ -227,8 +231,8 @@ public class PostSubscriptionController implements MessageSetter {
         HttpUriRequest req = requestFactory
                 .createPostSubscriptionRequest(nodeName, nodeAddress,
                     dataSourceString);
-        authenticator.addCredentials(req, nodeName);
         try {
+            authenticator.addCredentials(req, nodeName);
             HttpResponse res = httpClient.post(req);
             if (res.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_OK) {
@@ -260,27 +264,29 @@ public class PostSubscriptionController implements MessageSetter {
                         errorDetails);
                 log.error(errorMsg + ": " + errorDetails);
             }  
+        } catch (KeyczarException e) { 
+            String errorMsg = messages.getMessage(PS_MESSAGE_SIGNER_ERROR_KEY);     
+            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                    e.getMessage());
+            log.error(errorMsg + ": " + e.getMessage());
         } catch (InternalControllerException e) {
             String errorMsg = messages.getMessage(
-                    PS_INTERNAL_CONTROLLER_ERROR_KEY, new String[] {peerName}); 
-            String errorDetails = e.getMessage();
+                    PS_INTERNAL_CONTROLLER_ERROR_KEY, new String[] {peerName});
             setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                    errorDetails);
-            log.error(errorMsg + ": " + errorDetails);
+                    e.getMessage());
+            log.error(errorMsg + ": " + e.getMessage());
         } catch (IOException e) {
             String errorMsg = messages.getMessage(
                     PS_HTTP_CONN_ERROR_KEY, new String[] {peerName});
-            String errorDetails = e.getMessage();
             setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                    errorDetails);
-            log.error(errorMsg + ": " + errorDetails);
+                    e.getMessage());
+            log.error(errorMsg + ": " + e.getMessage());
         } catch (Exception e) {
             String errorMsg = messages.getMessage(
                     PS_GENERIC_CONN_ERROR_KEY, new String[] {peerName});
-            String errorDetails = e.getMessage();
             setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                    errorDetails);
-            log.error(errorMsg + ": " + errorDetails);
+                    e.getMessage());
+            log.error(errorMsg + ": " + e.getMessage());
         }
         model.addAttribute(PEER_NAME_KEY, peerName);
         return SUBSCRIBE_VIEW;

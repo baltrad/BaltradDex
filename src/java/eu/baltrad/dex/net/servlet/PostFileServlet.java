@@ -50,6 +50,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.log4j.Logger;
 
@@ -71,6 +73,8 @@ import java.util.UUID;
 @Controller
 public class PostFileServlet extends HttpServlet {
  
+    private static final String PF_MESSAGE_VERIFIER_ERROR_KEY = 
+            "postfile.server.message_verifier_error"; 
     private static final String PF_UNAUTHORIZED_REQUEST_KEY =
             "postfile.server.unauthorized_request";
     private static final String PF_INTERNAL_SERVER_ERROR_KEY = 
@@ -188,6 +192,9 @@ public class PostFileServlet extends HttpServlet {
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
                     messages.getMessage(PF_UNAUTHORIZED_REQUEST_KEY));
             }
+        } catch (KeyczarException e) {   
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
+                    messages.getMessage(PF_MESSAGE_VERIFIER_ERROR_KEY));    
         } catch (DuplicateEntry e) {
             res.setStatus(HttpServletResponse.SC_CONFLICT,
                     messages.getMessage(PF_DUPLICATE_ENTRY_ERROR_KEY));

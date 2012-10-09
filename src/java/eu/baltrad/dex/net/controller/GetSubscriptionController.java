@@ -35,6 +35,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.HttpResponse;
 import org.apache.commons.io.IOUtils;
@@ -89,6 +91,9 @@ public class GetSubscriptionController implements MessageSetter {
     /** Subscription modification status key */
     private static final String STATUS_NOT_CHANGED_KEY = "status_not_changed";
     
+    /** Message signer error key */
+    private static final String GS_MESSAGE_SIGNER_ERROR_KEY = 
+            "getsubscription.controller.message_signer_error";
     /** Subscription server - success message */
     private static final String GS_SERVER_SUCCESS_KEY = 
             "getsubscription.controller.subscription_server_success";
@@ -401,8 +406,8 @@ public class GetSubscriptionController implements MessageSetter {
                                             URI.create(conn.getNodeAddress()));
         HttpUriRequest req = requestFactory.createGetSubscriptionRequest(
                 nodeName, nodeAddress, subscriptionString);
-        authenticator.addCredentials(req, nodeName);
         try {
+            authenticator.addCredentials(req, nodeName);
             HttpResponse res = httpClient.post(req);
             if (res.getStatusLine().getStatusCode() 
                     == HttpServletResponse.SC_OK) {
@@ -435,6 +440,11 @@ public class GetSubscriptionController implements MessageSetter {
                         errorDetails);
                 log.error(errorMsg + ": " + errorDetails);   
             }
+        } catch (KeyczarException e) {
+            String errorMsg = messages.getMessage(GS_MESSAGE_SIGNER_ERROR_KEY);
+            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                    e.getMessage());
+            log.error(errorMsg + ": " + e.getMessage());
         } catch (InternalControllerException e) {
             String errorMsg = messages.getMessage(
                     GS_INTERNAL_CONTROLLER_ERROR_KEY, new String[] {peerName}); 

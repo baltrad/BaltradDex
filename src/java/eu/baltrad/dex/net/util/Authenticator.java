@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.net.util;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import org.apache.http.client.methods.HttpUriRequest;
 
 /**
@@ -33,8 +35,10 @@ public interface Authenticator {
      * Add credentials to outgoing request.
      * @param request Http URI request to add credentials to
      * @param keyName Private key used to sign a message 
+     * @throws KeyczarException
      */
-    public void addCredentials(HttpUriRequest request, String keyName);
+    public void addCredentials(HttpUriRequest request, String keyName)
+            throws KeyczarException;
     
     /**
      * Authenticates request at servlet side.
@@ -42,8 +46,9 @@ public interface Authenticator {
      * @param signature Signature to authenticate with
      * @param keyName Public key used to verify a message 
      * @return True upon successful authentication, false otherwise
+     * @throws KeyczarException
      */
     public boolean authenticate(String message, String signture, 
-            String keyName);
+            String keyName) throws KeyczarException;
     
 }

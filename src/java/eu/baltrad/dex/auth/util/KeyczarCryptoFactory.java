@@ -20,6 +20,7 @@ along with BaltradFrame. If not, see <http://www.gnu.org/licenses/>.
 package eu.baltrad.dex.auth.util;
 
 import java.io.*;
+import org.keyczar.exceptions.KeyczarException;
 
 /**
  * Construct Keyczar signers and verifiers.
@@ -42,18 +43,20 @@ public class KeyczarCryptoFactory implements CryptoFactory {
 
   /**
    * Create a signer using key from $keyStoreRoot/$name.priv
+   * @throws KeyczarException
    */
   @Override
-  public Signer createSigner(String name) {
+  public Signer createSigner(String name) throws KeyczarException {
     File keyLocation = getKeyLocation(name + ".priv");
     return new KeyczarSigner(keyLocation.toString());
   }
 
   /**
    * Create a signer using key from $keyStoreRoot/$name.pub
+   * @throws KeyczarException
    */
   @Override
-  public Verifier createVerifier(String name) {
+  public Verifier createVerifier(String name) throws KeyczarException {
     File keyLocation = getKeyLocation(name + ".pub");
     return new KeyczarVerifier(keyLocation.toString());
   }

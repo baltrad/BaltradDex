@@ -46,6 +46,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+import org.keyczar.exceptions.KeyczarException;
 
 /**
  * Controls access to data sources available at the peer node for subscription.
@@ -70,6 +71,9 @@ public class DataSourceListController implements MessageSetter {
     /** Peer node name key */
     private static final String PEER_NAME_KEY = "peer_name";
     
+    /** Message signer error key */
+    private static final String DS_MESSAGE_SIGNER_ERROR_KEY = 
+            "datasource.controller.message_signer_error";
     /** Invalid URL address message key */
     private static final String DS_INVALID_NODE_URL_KEY = 
             "datasource.controller.invalid_node_url";
@@ -77,8 +81,8 @@ public class DataSourceListController implements MessageSetter {
     private static final String DS_INTERNAL_CONTROLLER_ERROR_KEY = 
             "datasource.controller.internal_controller_error";
     /** Data source server error key */
-    private static final String DS_INTERNAL_SERVER_ERROR_KEY = 
-            "datasource.controller.internal_server_error";
+    private static final String DS_SERVER_ERROR_KEY = 
+            "datasource.controller.server_error";
     /** Data source connection error key */
     private final static String DS_HTTP_CONN_ERROR_KEY = 
             "datasource.controller.http_connection_error";        
@@ -211,8 +215,8 @@ public class DataSourceListController implements MessageSetter {
             requestFactory = new DefaultRequestFactory(URI.create(url));
             HttpUriRequest req = requestFactory
                 .createGetDataSourceListingRequest(nodeName, nodeAddress);
-            authenticator.addCredentials(req, nodeName);
             try {
+                authenticator.addCredentials(req, nodeName);
                 HttpResponse res = httpClient.post(req);
                 // Server reponse is OK, process data source list 
                 if (res.getStatusLine().getStatusCode() == 
@@ -232,41 +236,45 @@ public class DataSourceListController implements MessageSetter {
                     peerDataSources = readDataSources(res);
                     viewName = DS_CONNECTED_VIEW;
                     model.addAttribute(DATA_SOURCES_KEY, peerDataSources);
-                // Server failed to respond, retrieve error message      
+                // Server failed to respond correctly, retrieve error message      
                 } else {
                     viewName = DS_CONNECT_VIEW;
                     String errorMsg = messages.getMessage(
-                        DS_INTERNAL_SERVER_ERROR_KEY);
+                        DS_SERVER_ERROR_KEY);
                     String errorDetails = res.getStatusLine().getReasonPhrase(); 
                     setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
                             errorMsg, errorDetails);
                     log.error(errorMsg + ": " + errorDetails);
                 }
+            } catch (KeyczarException e){ 
+                viewName = DS_CONNECT_VIEW;
+                String errorMsg = messages.getMessage(
+                        DS_MESSAGE_SIGNER_ERROR_KEY); 
+                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                        errorMsg, e.getMessage());
+                log.error(errorMsg + ": " + e.getMessage());
             } catch (InternalControllerException e) {
                  viewName = DS_CONNECT_VIEW;
                  String errorMsg = messages.getMessage(
                      DS_INTERNAL_CONTROLLER_ERROR_KEY, 
                      new String[] {peerNodeName});
-                 String errorDetails = e.getMessage();
                  setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                        errorMsg, errorDetails);
-                 log.error(errorMsg + ": " + errorDetails);
+                        errorMsg, e.getMessage());
+                 log.error(errorMsg + ": " + e.getMessage());
             } catch (IOException e) {
                 viewName = DS_CONNECT_VIEW;
                 String errorMsg = messages.getMessage(DS_HTTP_CONN_ERROR_KEY,
                         new String[] {url});
-                String errorDetails = e.getMessage();
                 setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                        errorMsg, errorDetails);
-                log.error(errorMsg + ": " + errorDetails);
+                        errorMsg, e.getMessage());
+                log.error(errorMsg + ": " + e.getMessage());
             } catch (Exception e) {
                 viewName = DS_CONNECT_VIEW;
                 String errorMsg = messages.getMessage(DS_GENERIC_CONN_ERROR_KEY,
                         new String[] {url});
-                String errorDetails = e.getMessage();
                 setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                        errorMsg, errorDetails);
-                log.error(errorMsg + ": " + errorDetails);
+                        errorMsg, e.getMessage());
+                log.error(errorMsg + ": " + e.getMessage());
             }
         }
         model.addAttribute(CONNECTIONS_KEY, nodeConnectionManager.load());

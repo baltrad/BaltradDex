@@ -63,16 +63,11 @@ public class KeyczarAuthenticator implements Authenticator {
      * @param request Http request
      * @param keyName Private key used to sign a message 
      */
-    public void addCredentials(HttpUriRequest request, String keyName) {
+    public void addCredentials(HttpUriRequest request, String keyName) 
+                throws KeyczarException {
         String message = getMessage(request);
-        String signature;
-        try {
-            Signer signer = cryptoFactory.createSigner(keyName);
-            signature = signer.sign(message);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to sign message", e);
-        }
-        request.addHeader(AUTH_HDR, keyName + ":" + signature);   
+        Signer signer = cryptoFactory.createSigner(keyName);
+        request.addHeader(AUTH_HDR, keyName + ":" + signer.sign(message));   
     }
     
     /**
@@ -83,16 +78,9 @@ public class KeyczarAuthenticator implements Authenticator {
      * @return True upon success, false otherwise
      */
     public boolean authenticate(String message, String signature, 
-            String keyName) {
-        boolean result = false;
-        try {
-            Verifier verifier = cryptoFactory.createVerifier(keyName);
-            result = verifier.verify(message, signature);
-        } catch (KeyczarException e) {
-            System.out.println("Failed to authenticate message: " 
-                    + e.getMessage());
-        }
-        return result;
+            String keyName) throws KeyczarException {
+        Verifier verifier = cryptoFactory.createVerifier(keyName);
+        return verifier.verify(message, signature);
     }
     
     /**

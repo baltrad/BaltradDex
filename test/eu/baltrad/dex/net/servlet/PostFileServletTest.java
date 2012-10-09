@@ -52,6 +52,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.StatusLine;
@@ -184,6 +186,7 @@ public class PostFileServletTest {
         s2 = new Subscription(2, time, "User2", "DS2", "test.baltrad.eu", 
                 "upload", true, true, "http://test.baltrad.eu");
         subscriptions.add(s2);
+        setAttributes(request);
     }
     
     @After
@@ -193,13 +196,35 @@ public class PostFileServletTest {
     }
     
     @Test
-    public void handleRequest_Unauthorized() {
+    public void handleRequest_MessageVerificationError() throws Exception {
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.authenticate(isA(String.class), isA(String.class),
+                isA(String.class));
+        
+        expectLastCall().andThrow(new KeyczarException(
+                "Failed to verify message"));
+        
+        replayAll();
+        
+        classUnderTest.setAuthenticator(authenticatorMock);
+        classUnderTest.handleRequest(request, response);
+        
+        verifyAll();
+        
+        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+        assertEquals(messages
+                .getMessage("postfile.server.message_verifier_error"), 
+                    response.getErrorMessage());
+    }
+    
+    @Test
+    public void handleRequest_Unauthorized() throws Exception {
         Authenticator authMock = (Authenticator) createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.FALSE);
         replayAll();
         
-        setAttributes(request);
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.handleRequest(request, response);
         verifyAll();
@@ -211,7 +236,7 @@ public class PostFileServletTest {
     }
     
     @Test
-    public void handleRequest_GenericError() {
+    public void handleRequest_GenericError() throws Exception {
         Authenticator authMock = (Authenticator) createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
@@ -221,7 +246,6 @@ public class PostFileServletTest {
         expect(fileCatalogMock.store(isA(InputStream.class))).andReturn(null);
         replayAll();
         
-        setAttributes(request);
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setCatalog(fileCatalogMock);
         classUnderTest.handleRequest(request, response);
@@ -234,7 +258,7 @@ public class PostFileServletTest {
     }
     
     @Test
-    public void handleRequest_DuplicateEntry() {
+    public void handleRequest_DuplicateEntry() throws Exception {
         Authenticator authMock = (Authenticator) createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
@@ -244,7 +268,6 @@ public class PostFileServletTest {
                 .andThrow(new DuplicateEntry());
         replayAll();
         
-        setAttributes(request);
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setCatalog(fileCatalogMock);
         classUnderTest.handleRequest(request, response);
@@ -257,7 +280,7 @@ public class PostFileServletTest {
     }
     
     @Test
-    public void handleRequest_DatabaseError() {
+    public void handleRequest_DatabaseError() throws Exception {
         Authenticator authMock = (Authenticator) createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
@@ -267,7 +290,6 @@ public class PostFileServletTest {
                 .andThrow(new DatabaseError());
         replayAll();
         
-        setAttributes(request);
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setCatalog(fileCatalogMock);
         classUnderTest.handleRequest(request, response);
@@ -345,9 +367,8 @@ public class PostFileServletTest {
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andReturn(res).anyTimes();
         
-        replayAll(); 
+        replayAll();
         
-        setAttributes(request);
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setCatalog(fileCatalogMock);
         classUnderTest.setNamer(namerMock);

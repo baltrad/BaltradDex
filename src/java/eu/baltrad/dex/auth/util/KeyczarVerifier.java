@@ -26,23 +26,22 @@ public class KeyczarVerifier implements Verifier {
 
   /**
    * Constructor.
-   *
-   * @param keyLocation location of the key to use for signing
+   * @param keyLocation Location of the key to use for signing
+   * @throws KeyczarException
    */
-  public KeyczarVerifier(String keyLocation) {
-    try {
+  public KeyczarVerifier(String keyLocation) throws KeyczarException {
       verifier = new org.keyczar.Verifier(keyLocation);
-    } catch (KeyczarException e) {
-      throw new RuntimeException("could not create Keyczar Verifier", e);
-    }
   }
   
+  /**
+   * Verifies message.
+   * @param message Message to verify
+   * @param signature Signature used for verification
+   * @return True in case of successful verification, false upon failure
+   * @throws KeyczarException 
+   */
   public boolean verify(String message, String signature) 
           throws KeyczarException {
-    try {
-      return verifier.verify(message, signature);      
-    } catch (KeyczarException e) {
-        throw new KeyczarException("verification failed", e);
-    }
+      return verifier.verify(message, signature);
   }
 }

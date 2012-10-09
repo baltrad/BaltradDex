@@ -53,6 +53,7 @@ import java.util.ArrayList;
 
 import java.io.IOException;
 import java.io.InputStream;
+import org.keyczar.exceptions.KeyczarException;
 
 /**
  * Post subscription request controller test.
@@ -89,6 +90,7 @@ public class GetSubscriptionControllerTest {
             + ":true}]";
     
     private GSController classUnderTest;
+    private List<Object> mocks;
     private IHttpClientUtil httpClientMock;
     private INodeConnectionManager nodeConnectionManagerMock;
     private ISubscriptionManager subscriptionManagerMock;
@@ -111,9 +113,34 @@ public class GetSubscriptionControllerTest {
         public void initConfiguration() {}
     }
     
+    private Object createMock(Class clazz) {
+        Object mock = EasyMock.createMock(clazz);
+        mocks.add(mock);
+        return mock;
+    }
+    
+    private void replayAll() {
+        for (Object mock : mocks) {
+            replay(mock);
+        }
+    }
+    
+    private void verifyAll() {
+        for (Object mock : mocks) {
+            verify(mock);
+        }
+    }
+    
+    private void resetAll() {
+        for (Object mock : mocks) {
+            reset(mock);
+        }
+    }
+    
     @Before
     public void setUp() throws Exception {
         classUnderTest = new GSController();
+        mocks = new ArrayList<Object>();
         jsonUtil = new JsonUtil();
         classUnderTest.setJsonUtil(jsonUtil);
         classUnderTest.setAuthenticator(new EasyAuthenticator());
@@ -121,15 +148,11 @@ public class GetSubscriptionControllerTest {
         classUnderTest.setMessages(messages);
         log = Logger.getLogger("DEX");
         classUnderTest.setLog(log);
-        httpClientMock = createMock(IHttpClientUtil.class);
-        nodeConnectionManagerMock = createMock(INodeConnectionManager.class);
-        subscriptionManagerMock = createMock(ISubscriptionManager.class);
-        
-        expect(nodeConnectionManagerMock.load("test.baltrad.eu"))
-            .andReturn(new NodeConnection("test.baltrad.eu",
-                "http://test.baltrad.eu")).anyTimes();
-        replay(nodeConnectionManagerMock);
-        classUnderTest.setNodeConnectionManager(nodeConnectionManagerMock);
+        httpClientMock = (IHttpClientUtil) createMock(IHttpClientUtil.class);
+        nodeConnectionManagerMock = (INodeConnectionManager)
+                createMock(INodeConnectionManager.class);
+        subscriptionManagerMock = (ISubscriptionManager)
+                createMock(ISubscriptionManager.class);
         
         long time = 1340189763867L;
         subscriptions = new ArrayList<Subscription>();
@@ -156,6 +179,7 @@ public class GetSubscriptionControllerTest {
     @After
     public void tearDown() throws Exception {
         classUnderTest = null;
+        resetAll();
     }
     
     private HttpResponse createResponse(int code, String reason, 
@@ -182,7 +206,8 @@ public class GetSubscriptionControllerTest {
     @Test
     public void subscribedPeers() {
         expect(subscriptionManagerMock.loadOperators()).andReturn(subscriptions);
-        replay(subscriptionManagerMock);
+        
+        replayAll();
         
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
@@ -191,15 +216,14 @@ public class GetSubscriptionControllerTest {
         assertTrue(model.containsAttribute("subscribed_peers"));
         assertEquals(subscriptions, model.asMap().get("subscribed_peers"));
         
-        verify(subscriptionManagerMock);
-        reset(subscriptionManagerMock);
+        verifyAll();
     }
     
     @Test
     public void subscriptionByPeer() {
         expect(subscriptionManagerMock.load("test.baltrad.eu",
             Subscription.SUBSCRIPTION_DOWNLOAD)).andReturn(subscriptionByPeer);
-        replay(subscriptionManagerMock);
+        replayAll();
         
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
@@ -212,8 +236,7 @@ public class GetSubscriptionControllerTest {
         assertEquals(subscriptionByPeer, 
                 model.asMap().get("subscription_by_peer"));
         
-        verify(subscriptionManagerMock);
-        reset(subscriptionManagerMock);
+        verifyAll();
     }
     
     @Test
@@ -224,7 +247,8 @@ public class GetSubscriptionControllerTest {
         expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();
         expect(subscriptionManagerMock.load(2)).andReturn(s2).anyTimes();
         expect(subscriptionManagerMock.load(3)).andReturn(s3).anyTimes();
-        replay(subscriptionManagerMock);
+    
+        replayAll();
         
         String[] currentSubscriptionIds = {"1", "2", "3"};
         String[] selectedSubscriptionIds = {"1", "2", "3"};
@@ -239,8 +263,7 @@ public class GetSubscriptionControllerTest {
         assertEquals(subscriptions, 
                 model.asMap().get("subscription_by_peer"));
         
-        verify(subscriptionManagerMock);
-        reset(subscriptionManagerMock);
+        verifyAll();
     }
     
     @Test
@@ -252,7 +275,8 @@ public class GetSubscriptionControllerTest {
         expect(subscriptionManagerMock.load(2)).andReturn(s2).times(1, 1);
         expect(subscriptionManagerMock.load(2)).andReturn(s4).times(1, 2);
         expect(subscriptionManagerMock.load(3)).andReturn(s3).anyTimes();
-        replay(subscriptionManagerMock);
+    
+        replayAll();
         
         String[] currentSubscriptionIds = {"1", "2", "3"};
         String[] selectedSubscriptionIds = {"1", "2", "3"};
@@ -267,20 +291,120 @@ public class GetSubscriptionControllerTest {
         assertEquals("test.baltrad.eu", model.asMap().get("peer_name"));
         assertEquals(subscriptions, model.asMap().get("selected_subscription"));
         
-        verify(subscriptionManagerMock);
-        reset(subscriptionManagerMock);
+        verifyAll();
+    }
+    
+    @Test
+    public void getSubscription_AddCredentialsError() throws Exception {
+        expect(nodeConnectionManagerMock.load("test.baltrad.eu"))
+            .andReturn(new NodeConnection("test.baltrad.eu", 
+                "http://test.baltrad.eu")).anyTimes();
+        
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
+                isA(String.class));
+        expectLastCall().andThrow(new KeyczarException(
+                "Failed to sign message"));
+        
+        expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();
+        expect(subscriptionManagerMock.load(2)).andReturn(s2).anyTimes();
+        expect(subscriptionManagerMock.load(3)).andReturn(s3).anyTimes();
+        
+        replayAll();
+        
+        classUnderTest.setNodeConnectionManager(nodeConnectionManagerMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
+        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        Model model = new ExtendedModelMap();
+        String[] activeSubscriptionIds = {"1", "2"};
+        String[] inactiveSubscriptionIds = {"3"};
+        String viewName = classUnderTest.getSubscription(
+                model, "test.baltrad.eu", activeSubscriptionIds, 
+                inactiveSubscriptionIds);
+        assertEquals("subscription_status", viewName);
+        assertTrue(model.containsAttribute("error_message"));
+        assertEquals(messages.getMessage(
+                "getsubscription.controller.message_signer_error",
+                new String[] {"test.baltrad.eu"}),
+                model.asMap().get("error_message"));
+        assertTrue(model.containsAttribute("error_details"));
+        assertEquals("Failed to sign message", 
+                model.asMap().get("error_details"));
+        
+        verifyAll();
+    }
+    
+    @Test
+    public void getSubscription_MessageVerificationError() throws Exception {
+        expect(nodeConnectionManagerMock.load("test.baltrad.eu"))
+            .andReturn(new NodeConnection("test.baltrad.eu", 
+                "http://test.baltrad.eu")).anyTimes();
+        
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
+                isA(String.class));
+        
+        HttpResponse res = createResponse(
+                HttpServletResponse.SC_UNAUTHORIZED, 
+                "Failed to verify message", "");
+        
+        expect(httpClientMock.post(isA(HttpUriRequest.class)))
+                .andReturn(res);
+        
+        expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();
+        expect(subscriptionManagerMock.load(2)).andReturn(s2).anyTimes();
+        expect(subscriptionManagerMock.load(3)).andReturn(s3).anyTimes();
+        
+        replayAll();
+        
+        classUnderTest.setNodeConnectionManager(nodeConnectionManagerMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
+        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setHttpClient(httpClientMock);
+        Model model = new ExtendedModelMap();
+        String[] activeSubscriptionIds = {"1", "2"};
+        String[] inactiveSubscriptionIds = {"3"};
+        String viewName = classUnderTest.getSubscription(
+                model, "test.baltrad.eu", activeSubscriptionIds, 
+                inactiveSubscriptionIds);
+        
+        verifyAll();
+        
+        assertEquals("subscription_status", viewName);
+        assertTrue(model.containsAttribute("error_message"));
+        assertEquals(
+            messages.getMessage(
+                "getsubscription.controller.subscription_server_error",
+                new String[] {"test.baltrad.eu"}),
+            model.asMap().get("error_message"));
+        assertTrue(model.containsAttribute("error_details"));
+        assertEquals("Failed to verify message", model.asMap()
+                .get("error_details"));
     }
     
     @Test
     public void getSubscription_HttpConnectionError() throws Exception {
+        expect(nodeConnectionManagerMock.load("test.baltrad.eu"))
+            .andReturn(new NodeConnection("test.baltrad.eu", 
+                "http://test.baltrad.eu")).anyTimes();
+        
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
+                isA(String.class));
+        
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andThrow(new IOException("Http connection error"));
         expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();
         expect(subscriptionManagerMock.load(2)).andReturn(s2).anyTimes();
         expect(subscriptionManagerMock.load(3)).andReturn(s3).anyTimes();
-        replay(httpClientMock);
-        replay(subscriptionManagerMock);
         
+        replayAll();
+        
+        classUnderTest.setNodeConnectionManager(nodeConnectionManagerMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
@@ -300,24 +424,30 @@ public class GetSubscriptionControllerTest {
         assertEquals("Http connection error", 
                 model.asMap().get("error_details"));
         
-        verify(httpClientMock);
-        verify(subscriptionManagerMock);
-        verify(nodeConnectionManagerMock);
-        reset(httpClientMock);
-        reset(subscriptionManagerMock);
-        reset(nodeConnectionManagerMock);
+        verifyAll();
     }
     
     @Test
     public void getSubscription_GenericConnectionError() throws Exception {
+        expect(nodeConnectionManagerMock.load("test.baltrad.eu"))
+            .andReturn(new NodeConnection("test.baltrad.eu", 
+                "http://test.baltrad.eu")).anyTimes();
+        
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
+                isA(String.class));
+        
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andThrow(new Exception("Generic connection error"));
         expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();
         expect(subscriptionManagerMock.load(2)).andReturn(s2).anyTimes();
         expect(subscriptionManagerMock.load(3)).andReturn(s3).anyTimes();
-        replay(httpClientMock);
-        replay(subscriptionManagerMock);
         
+        replayAll();
+        
+        classUnderTest.setNodeConnectionManager(nodeConnectionManagerMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
@@ -337,16 +467,20 @@ public class GetSubscriptionControllerTest {
         assertEquals("Generic connection error", 
                 model.asMap().get("error_details"));
         
-        verify(httpClientMock);
-        verify(subscriptionManagerMock);
-        verify(nodeConnectionManagerMock);
-        reset(httpClientMock);
-        reset(subscriptionManagerMock);
-        reset(nodeConnectionManagerMock);
+        verifyAll();
     }
     
     @Test
     public void getSubscription_InternalControllerError() throws Exception {
+        expect(nodeConnectionManagerMock.load("test.baltrad.eu"))
+            .andReturn(new NodeConnection("test.baltrad.eu", 
+                "http://test.baltrad.eu")).anyTimes();
+        
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
+                isA(String.class));
+        
         HttpResponse response = createResponse(HttpServletResponse.SC_OK, 
                 null, "");
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
@@ -354,9 +488,11 @@ public class GetSubscriptionControllerTest {
         expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();
         expect(subscriptionManagerMock.load(2)).andReturn(s2).anyTimes();
         expect(subscriptionManagerMock.load(3)).andReturn(s3).anyTimes();
-        replay(httpClientMock);
-        replay(subscriptionManagerMock);
         
+        replayAll();
+        
+        classUnderTest.setNodeConnectionManager(nodeConnectionManagerMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
@@ -376,16 +512,20 @@ public class GetSubscriptionControllerTest {
         assertEquals("Failed to convert JSON string to data sources", 
                 model.asMap().get("error_details"));
         
-        verify(httpClientMock);
-        verify(subscriptionManagerMock);
-        verify(nodeConnectionManagerMock);
-        reset(httpClientMock);
-        reset(subscriptionManagerMock);
-        reset(nodeConnectionManagerMock);
+        verifyAll();
     }
     
     @Test
     public void getSubscription_InternalServerError() throws Exception {
+        expect(nodeConnectionManagerMock.load("test.baltrad.eu"))
+            .andReturn(new NodeConnection("test.baltrad.eu", 
+                "http://test.baltrad.eu")).anyTimes();
+        
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
+                isA(String.class));
+        
         HttpResponse response = createResponse(
             HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
             "Internal server error", "");
@@ -394,9 +534,11 @@ public class GetSubscriptionControllerTest {
         expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();
         expect(subscriptionManagerMock.load(2)).andReturn(s2).anyTimes();
         expect(subscriptionManagerMock.load(3)).andReturn(s3).anyTimes();
-        replay(httpClientMock);
-        replay(subscriptionManagerMock);
         
+        replayAll();
+        
+        classUnderTest.setNodeConnectionManager(nodeConnectionManagerMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
@@ -416,16 +558,20 @@ public class GetSubscriptionControllerTest {
         assertEquals("Internal server error", 
                 model.asMap().get("error_details"));
         
-        verify(httpClientMock);
-        verify(subscriptionManagerMock);
-        verify(nodeConnectionManagerMock);
-        reset(httpClientMock);
-        reset(subscriptionManagerMock);
-        reset(nodeConnectionManagerMock);
+        verifyAll();
     }
     
     @Test
     public void getSubscription_SubscriptionFailedError() throws Exception {
+        expect(nodeConnectionManagerMock.load("test.baltrad.eu"))
+            .andReturn(new NodeConnection("test.baltrad.eu", 
+                "http://test.baltrad.eu")).anyTimes();
+        
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
+                isA(String.class));
+        
         HttpResponse response = createResponse(
             HttpServletResponse.SC_NOT_FOUND, "Subscription error", "");
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
@@ -433,9 +579,11 @@ public class GetSubscriptionControllerTest {
         expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();
         expect(subscriptionManagerMock.load(2)).andReturn(s2).anyTimes();
         expect(subscriptionManagerMock.load(3)).andReturn(s3).anyTimes();
-        replay(httpClientMock);
-        replay(subscriptionManagerMock);
         
+        replayAll();
+        
+        classUnderTest.setNodeConnectionManager(nodeConnectionManagerMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
@@ -455,16 +603,20 @@ public class GetSubscriptionControllerTest {
         assertEquals("Subscription error", 
                 model.asMap().get("error_details"));
         
-        verify(httpClientMock);
-        verify(subscriptionManagerMock);
-        verify(nodeConnectionManagerMock);
-        reset(httpClientMock);
-        reset(subscriptionManagerMock);
-        reset(nodeConnectionManagerMock);
+        verifyAll();
     }
     
     @Test
     public void getSubscription_PartialSubscriptionError() throws Exception {
+        expect(nodeConnectionManagerMock.load("test.baltrad.eu"))
+            .andReturn(new NodeConnection("test.baltrad.eu", 
+                "http://test.baltrad.eu")).anyTimes();
+        
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
+                isA(String.class));
+        
         HttpResponse response = createResponse(
             HttpServletResponse.SC_PARTIAL_CONTENT, null, 
                 JSON_SUBSCRIPTIONS_PARTIAL);
@@ -478,9 +630,10 @@ public class GetSubscriptionControllerTest {
         expect(subscriptionManagerMock.storeNoId(isA(Subscription.class)))
                 .andReturn(1).anyTimes();
         
-        replay(httpClientMock);
-        replay(subscriptionManagerMock);
+        replayAll();
         
+        classUnderTest.setNodeConnectionManager(nodeConnectionManagerMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
@@ -503,17 +656,21 @@ public class GetSubscriptionControllerTest {
         assertNotNull(subs);
         assertEquals(2, subs.size());
         
-        verify(httpClientMock);
-        verify(subscriptionManagerMock);
-        verify(nodeConnectionManagerMock);
-        reset(httpClientMock);
-        reset(subscriptionManagerMock);
-        reset(nodeConnectionManagerMock);
+        verifyAll();
     }      
     
     @Test
     public void getSubscription_OK() throws Exception {
-         HttpResponse response = createResponse(HttpServletResponse.SC_OK, 
+        expect(nodeConnectionManagerMock.load("test.baltrad.eu"))
+            .andReturn(new NodeConnection("test.baltrad.eu", 
+                "http://test.baltrad.eu")).anyTimes();
+        
+        Authenticator authenticatorMock = (Authenticator) 
+                createMock(Authenticator.class);
+        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
+                isA(String.class));
+        
+        HttpResponse response = createResponse(HttpServletResponse.SC_OK, 
                 null, JSON_SUBSCRIPTIONS_OK);
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andReturn(response);
@@ -525,9 +682,10 @@ public class GetSubscriptionControllerTest {
         expect(subscriptionManagerMock.storeNoId(isA(Subscription.class)))
                 .andReturn(1).anyTimes();
         
-        replay(httpClientMock);
-        replay(subscriptionManagerMock);
+        replayAll();
         
+        classUnderTest.setNodeConnectionManager(nodeConnectionManagerMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
@@ -550,12 +708,7 @@ public class GetSubscriptionControllerTest {
         assertNotNull(subs);
         assertEquals(3, subs.size());
         
-        verify(httpClientMock);
-        verify(subscriptionManagerMock);
-        verify(nodeConnectionManagerMock);
-        reset(httpClientMock);
-        reset(subscriptionManagerMock);
-        reset(nodeConnectionManagerMock);   
+        verifyAll();
     }
     
 }

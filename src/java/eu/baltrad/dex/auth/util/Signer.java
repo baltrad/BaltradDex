@@ -19,6 +19,8 @@ along with BaltradFrame. If not, see <http://www.gnu.org/licenses/>.
 
 package eu.baltrad.dex.auth.util;
 
+import org.keyczar.exceptions.KeyczarException;
+
 public interface Signer {
   /**
    * Sign a message.
@@ -26,5 +28,5 @@ public interface Signer {
    * @param message the message to sign
    * @return base64 encoded signature
    */
-  String sign(String message);
+  String sign(String message) throws KeyczarException;
 }

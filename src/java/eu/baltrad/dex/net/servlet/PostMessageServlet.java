@@ -48,6 +48,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.StringWriter;
 import java.io.IOException;
+import org.keyczar.exceptions.KeyczarException;
 
 
 /**
@@ -59,10 +60,12 @@ import java.io.IOException;
 @Controller
 public class PostMessageServlet extends HttpServlet {
     
+    private static final String PM_MESSAGE_VERIFIER_ERROR_KEY = 
+            "postmessage.server.message_verifier_error"; 
     private static final String PM_UNAUTHORIZED_REQUEST_KEY =
             "postmessage.server.unauthorized_request";
     private static final String PM_INTERNAL_SERVER_ERROR_KEY = 
-            "postmessage.server.internal_server_error"; 
+            "postmessage.server.internal_server_error";
     
     private Logger log;
     private Authenticator authenticator;
@@ -149,6 +152,9 @@ public class PostMessageServlet extends HttpServlet {
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
                     messages.getMessage(PM_UNAUTHORIZED_REQUEST_KEY));
             }
+        } catch (KeyczarException e) {   
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
+                    messages.getMessage(PM_MESSAGE_VERIFIER_ERROR_KEY));
         } catch (Exception e) {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(PM_INTERNAL_SERVER_ERROR_KEY));
