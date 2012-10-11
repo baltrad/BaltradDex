@@ -37,6 +37,7 @@ import eu.baltrad.beast.db.CoreFilterManager;
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.bdb.db.AttributeQuery;
 import eu.baltrad.bdb.db.AttributeResult;
+import eu.baltrad.bdb.db.DatabaseError;
 import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.db.FileQuery;
 import eu.baltrad.bdb.db.FileResult;
@@ -52,7 +53,7 @@ import eu.baltrad.dex.datasource.model.DataSourceManager;
  * Data manager - interacts with baltrad-db component.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.1.0
+ * @version 1.2.2
  * @since 0.1.6
  */
 public class BltFileManager implements IBltFileManager {
@@ -108,103 +109,122 @@ public class BltFileManager implements IBltFileManager {
      *
      * @param dsName Data source name
      * @return Number of file entries.
+     * @throws DatabaseError In case when file catalog is not available
      */
-    public long countDSFileEntries(String dsName) {
-        IFilter attributeFilter = getFilter( dsName );
-        AttributeQuery q = new AttributeQuery();
-        ExpressionFactory xpr = new ExpressionFactory();
-        q.setFilter(attributeFilter.getExpression());
-        q.fetch("fileCount", xpr.count( xpr.attribute("_bdb/uuid")));
-        AttributeResult r = fileCatalog.getDatabase().execute(q);
-        long count;
+    public long countDSFileEntries(String dsName) throws DatabaseError {
         try {
-          r.next();
-          count = r.getLong("fileCount");
-        } finally {
-          r.close();
+            IFilter attributeFilter = getFilter( dsName );
+            AttributeQuery q = new AttributeQuery();
+            ExpressionFactory xpr = new ExpressionFactory();
+            q.setFilter(attributeFilter.getExpression());
+            q.fetch("fileCount", xpr.count( xpr.attribute("_bdb/uuid")));
+            AttributeResult r = fileCatalog.getDatabase().execute(q);
+            long count;
+            try {
+                r.next();   
+                count = r.getLong("fileCount");
+            } finally {
+                r.close();
+            }
+            return count;
+        } catch (Exception e) {
+            throw new DatabaseError(e);
         }
-        return count;
     }
     
     /**
-     * Convert a FileEntry instance to a BltFile instance
+     * Convert a FileEntry instance to a BltFile instance.
+     * @param entry File entry to convert
+     * @return BltFile
+     * @throws DatabaseError In case when file catalog is not available
+     * @throws ParseException 
      */
-    protected BltFile fileEntryToBltFile(FileEntry entry) 
-            throws ParseException {
-        Metadata metadata = entry.getMetadata();
-        return new BltFile(
-            entry.getUuid().toString(),
-            fileCatalog.getLocalStorage().store( entry ).toString(),
-            format.parse(
-                metadata.getWhatDate().toIsoString() + "T" + 
-                metadata.getWhatTime().toIsoString()
-            ),
-            format.parse(
-                entry.getStoredDate().toIsoString() + "T" + 
-                entry.getStoredTime().toIsoString()
-            ),
-            metadata.getWhatSource(),
-            metadata.getWhatObject(),
-            InitAppUtil.getConf().getThumbsDir() + File.separator + 
-                entry.getUuid().toString() + IMAGE_FILE_EXT);
+    protected BltFile fileEntryToBltFile(FileEntry entry) throws DatabaseError {
+        BltFile file = null;
+        try {
+            Metadata metadata = entry.getMetadata();
+            file = new BltFile(
+                entry.getUuid().toString(),
+                fileCatalog.getLocalStorage().store( entry ).toString(),
+                format.parse(
+                    metadata.getWhatDate().toIsoString() + "T" + 
+                    metadata.getWhatTime().toIsoString()
+                ),
+                format.parse(
+                    entry.getStoredDate().toIsoString() + "T" + 
+                    entry.getStoredTime().toIsoString()
+                ),
+                metadata.getWhatSource(),
+                metadata.getWhatObject(),
+                InitAppUtil.getConf().getThumbsDir() + File.separator + 
+                    entry.getUuid().toString() + IMAGE_FILE_EXT);
+        } catch (ParseException e) {
+            log.error("Failed to parse file's timestamp", e);
+        } catch (Exception e) {
+            throw new DatabaseError(e);
+        }
+        return file;
     }
     /**
      * Gets data set for a given data source.
-     *
      * @param dsName Data source name
      * @param offset Dataset offset
      * @param limit Dataset size limit
      * @return Dataset from a given data source
+     * @throws DatabaseError In case when file catalog is not available
      */
-    public List<BltFile> getFileEntries(String dsName, int offset, int limit) {
-        ExpressionFactory xpr = new ExpressionFactory();
-        FileQuery q = new FileQuery();
-        IFilter attributeFilter = getFilter(dsName);
-        q.setLimit(limit);
-        q.setSkip(offset);
-        q.appendOrderClause(xpr.desc(xpr.combinedDateTime("what/date", 
-                                                                "what/time")));
-        q.setFilter(attributeFilter.getExpression());
-        FileResult r = fileCatalog.getDatabase().execute(q);
-        List<BltFile> bltFiles = new ArrayList<BltFile>();
+    public List<BltFile> getFileEntries(String dsName, int offset, int limit) 
+                    throws DatabaseError {
         try {
-            while (r.next()) {
-                try {
+            ExpressionFactory xpr = new ExpressionFactory();
+            FileQuery q = new FileQuery();
+            IFilter attributeFilter = getFilter(dsName);
+            q.setLimit(limit);
+            q.setSkip(offset);
+            q.appendOrderClause(xpr.desc(xpr.combinedDateTime("what/date", 
+                                                                    "what/time")));
+            q.setFilter(attributeFilter.getExpression());
+            FileResult r = fileCatalog.getDatabase().execute(q);
+            List<BltFile> bltFiles = new ArrayList<BltFile>();
+            try {
+                while (r.next()) {
                     bltFiles.add(fileEntryToBltFile(r.getFileEntry()));
-                } catch (ParseException e) {
-                    log.error("Error while parsing file's timestamp", e);
                 }
+            } finally {
+                r.close();
             }
-        } finally {
-            r.close();
+            return bltFiles;
+        } catch (Exception e) {
+            log.error("Failed to select file entries", e);
+            throw new DatabaseError(e);
         }
-        return bltFiles;
     }
     /**
      * Gets file entry with a given identity string.
      *
      * @param uuid File entry's identity string
      * @return File entry with a given ID
+     * @throws DatabaseError In case when file catalog is not available
      */
-    public BltFile getFileEntry(String uuid) {
-        ExpressionFactory xpr = new ExpressionFactory();
-        FileQuery q = new FileQuery();
-        // filter the query with a given file identity string
-        q.setFilter(xpr.eq(xpr.attribute("_bdb/uuid"), xpr.literal(uuid)));
-        FileResult r = fileCatalog.getDatabase().execute(q);
-        BltFile bltFile = null;
+    public BltFile getFileEntry(String uuid) throws DatabaseError {
         try {
-            if (r.next()) {
-                try {
+            ExpressionFactory xpr = new ExpressionFactory();
+            FileQuery q = new FileQuery();
+            // filter the query with a given file identity string
+            q.setFilter(xpr.eq(xpr.attribute("_bdb/uuid"), xpr.literal(uuid)));
+            FileResult r = fileCatalog.getDatabase().execute(q);
+            BltFile bltFile = null;
+            try {
+                if (r.next()) {
                     bltFile = fileEntryToBltFile(r.getFileEntry());
-                } catch (ParseException e) {
-                    log.error("Error while parsing file's timestamp", e);
                 }
+            } finally {
+                r.close();
             }
-        } finally {
-          r.close();
+            return bltFile;
+        } catch (Exception e) {
+            throw new DatabaseError(e);
         }
-        return bltFile;
     }
     /**
      * Gets distinct radar stations. Stations are discovered based on the 
@@ -212,22 +232,27 @@ public class BltFileManager implements IBltFileManager {
      *
      * @return List containing distinct radar stations names.
      */
-    public List<String> getDistinctRadarStations() {
-        AttributeQuery q = new AttributeQuery();
-        ExpressionFactory xpr = new ExpressionFactory();
-        q.fetch("plc", xpr.attribute("_bdb/source:PLC"));
-        // Workaround for #56: bdb doesn't seem to handle diacritics properly,
-        // so we fetch WMO identifier to be used with file queries
-        q.fetch("wmo", xpr.attribute("_bdb/source:WMO"));
-        q.setDistinct(true);
-        AttributeResult r = fileCatalog.getDatabase().execute(q);
-        List<String> result = new ArrayList<String>();
-        while (r.next()) {
-            String identifier = r.getString("wmo") + " " + r.getString("plc");
-            result.add(identifier);
+    public List<String> getDistinctRadarStations() throws DatabaseError {
+        try {
+            List<String> result = new ArrayList<String>();
+            AttributeQuery q = new AttributeQuery();
+            ExpressionFactory xpr = new ExpressionFactory();
+            q.fetch("plc", xpr.attribute("_bdb/source:PLC"));
+            // Workaround for #56: bdb doesn't seem to handle diacritics properly,
+            // so we fetch WMO identifier to be used with file queries
+            q.fetch("wmo", xpr.attribute("_bdb/source:WMO"));
+            q.setDistinct(true);
+            AttributeResult r = fileCatalog.getDatabase().execute(q);
+            //List<String> result = new ArrayList<String>();
+            while (r.next()) {
+                String identifier = r.getString("wmo") + " " + r.getString("plc");
+                result.add(identifier);
+            }
+            Collections.sort(result);
+            return result;
+        } catch (Exception e) {
+            throw new DatabaseError(e);
         }
-        Collections.sort(result);
-        return result;
     }
     /**
      * Counts file entries matching criteria given by parameters. 
@@ -239,29 +264,32 @@ public class BltFileManager implements IBltFileManager {
      * @param endDate Upper date limit
      * @param endTime Lower time limit
      * @return Number of file entries matching giver criteria
+     * @throws DatabaseError In case when file catalog is not available
      */
     public long countFileEntries(String radarStation, String fileObject,
-            String startDate, String startTime, String endDate, String endTime) 
-    {
-        ExpressionFactory xpr = new ExpressionFactory();
-        AttributeQuery q = new AttributeQuery();
-        Expression ex = getExpression(radarStation, fileObject, startDate, 
-                startTime, endDate, endTime); 
-        if (ex != null) {
-            q.setFilter(ex);
-        }
-        q.fetch("entryCount", xpr.count(xpr.attribute("_bdb/uuid")));
-        AttributeResult r = fileCatalog.getDatabase().execute(q);
-        long count = 0;
+            String startDate, String startTime, String endDate, String endTime)
+                throws DatabaseError {
         try {
-            r.next();
-            count = r.getLong("entryCount");
+            ExpressionFactory xpr = new ExpressionFactory();
+            AttributeQuery q = new AttributeQuery();
+            Expression ex = getExpression(radarStation, fileObject, startDate, 
+                    startTime, endDate, endTime); 
+            if (ex != null) {
+                q.setFilter(ex);
+            }
+            q.fetch("entryCount", xpr.count(xpr.attribute("_bdb/uuid")));
+            AttributeResult r = fileCatalog.getDatabase().execute(q);
+            long count = 0;
+            try {
+                r.next();
+                count = r.getLong("entryCount");
+            } finally {
+                r.close();
+            }
+            return count;
         } catch (Exception e) {
-            log.error("Failed to get number of file entries", e);
-        } finally {
-          r.close();
+            throw new DatabaseError(e);
         }
-        return count;
     }
     
     /**
@@ -285,6 +313,7 @@ public class BltFileManager implements IBltFileManager {
      * @param sortByObjectAsc Sort by object ascending
      * @param sortByObjectDesc Sort by object descending
      * @return Set of file entries matching given criteria
+     * @throws DatabaseError In case when file catalog is not available
      */
     public List<BltFile> getFileEntries(String radarStation, String fileObject,
             String startDate, String startTime, String endDate, String endTime, 
@@ -292,60 +321,63 @@ public class BltFileManager implements IBltFileManager {
             boolean sortByDateDesc, boolean sortByTimeAsc, 
             boolean sortByTimeDesc, boolean sortBySourceAsc, 
             boolean sortBySourceDesc, boolean sortByObjectAsc, 
-            boolean sortByObjectDesc) {
-        ExpressionFactory xpr = new ExpressionFactory();
-        FileQuery q = new FileQuery();    
-        Expression ex = getExpression(radarStation, fileObject, startDate, 
-                startTime, endDate, endTime); 
-        if (ex != null) {
-            q.setFilter(ex);
-        }
-        if (InitAppUtil.validate(offset)) {
-            q.setSkip(Integer.parseInt(offset));
-        }
-        if (InitAppUtil.validate(limit)) {
-            q.setLimit(Integer.parseInt(limit));
-        }
-        if (sortByDateAsc) {
-            q.appendOrderClause(xpr.asc(xpr.combinedDateTime("what/date", 
-                                                                "what/time")));
-        }
-        if (sortByDateDesc) {
-            q.appendOrderClause(xpr.desc(xpr.combinedDateTime("what/date", 
-                                                                "what/time")));
-        }
-        if (sortByTimeAsc) {
-            q.appendOrderClause(xpr.asc(xpr.combinedDateTime("what/date", 
-                                                                "what/time")));
-        }
-        if (sortByTimeDesc) {
-            q.appendOrderClause(xpr.desc(xpr.combinedDateTime("what/date", 
-                                                                "what/time")));
-        }
-        if (sortBySourceAsc) {
-            q.appendOrderClause(xpr.asc(xpr.attribute("_bdb/source:PLC")));
-        }
-        if (sortBySourceDesc) {
-            q.appendOrderClause(xpr.desc(xpr.attribute("_bdb/source:PLC")));
-        }
-        if (sortByObjectAsc) {
-            q.appendOrderClause(xpr.asc(xpr.attribute("what/object")));
-        }
-        if (sortByObjectDesc) {
-            q.appendOrderClause(xpr.desc(xpr.attribute("what/object")));
-        }
-        FileResult r = fileCatalog.getDatabase().execute(q);
-        List<BltFile> bltFiles = new ArrayList<BltFile>();
+            boolean sortByObjectDesc) 
+                throws DatabaseError {
         try {
-            while (r.next()) {
-                bltFiles.add(fileEntryToBltFile(r.getFileEntry()));
+            ExpressionFactory xpr = new ExpressionFactory();
+            FileQuery q = new FileQuery();    
+            Expression ex = getExpression(radarStation, fileObject, startDate, 
+                    startTime, endDate, endTime); 
+            if (ex != null) {
+                q.setFilter(ex);
             }
+            if (InitAppUtil.validate(offset)) {
+                q.setSkip(Integer.parseInt(offset));
+            }
+            if (InitAppUtil.validate(limit)) {
+                q.setLimit(Integer.parseInt(limit));
+            }
+            if (sortByDateAsc) {
+                q.appendOrderClause(xpr.asc(
+                        xpr.combinedDateTime("what/date", "what/time")));
+            }
+            if (sortByDateDesc) {
+                q.appendOrderClause(xpr.desc(
+                        xpr.combinedDateTime("what/date", "what/time")));
+            }
+            if (sortByTimeAsc) {
+                q.appendOrderClause(xpr.asc(
+                        xpr.combinedDateTime("what/date", "what/time")));
+            }
+            if (sortByTimeDesc) {
+                q.appendOrderClause(xpr.desc(
+                        xpr.combinedDateTime("what/date", "what/time")));
+            }
+            if (sortBySourceAsc) {
+                q.appendOrderClause(xpr.asc(xpr.attribute("_bdb/source:PLC")));
+            }
+            if (sortBySourceDesc) {
+                q.appendOrderClause(xpr.desc(xpr.attribute("_bdb/source:PLC")));
+            }
+            if (sortByObjectAsc) {
+                q.appendOrderClause(xpr.asc(xpr.attribute("what/object")));
+            }
+            if (sortByObjectDesc) {
+                q.appendOrderClause(xpr.desc(xpr.attribute("what/object")));
+            }
+            FileResult r = fileCatalog.getDatabase().execute(q);
+            List<BltFile> bltFiles = new ArrayList<BltFile>();
+            try {
+                while (r.next()) {
+                    bltFiles.add(fileEntryToBltFile(r.getFileEntry()));
+                }
+            } finally {
+                r.close();
+            }
+            return bltFiles;
         } catch (Exception e) {
-            log.error("Failed to fetch file entry", e);
-        } finally {
-            r.close();
+            throw new DatabaseError(e);
         }
-        return bltFiles;
     }
     
     /**

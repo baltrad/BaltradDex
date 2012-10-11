@@ -1,4 +1,4 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
 * Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
@@ -17,14 +17,16 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.db.controller;
 
+import eu.baltrad.bdb.db.DatabaseError;
 import eu.baltrad.dex.db.model.BltFileManager;
 import eu.baltrad.dex.db.model.BltFile;
 import eu.baltrad.dex.datasource.model.FileObjectManager;
 import eu.baltrad.dex.util.ITableScroller;
+import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.ModelAndView;
@@ -37,14 +39,21 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * File browser controller implements fileset selection and browsing functionality.
- *
+ * File browser controller implements fileset selection and browsing 
+ * functionality.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.1.0
  * @since 0.7.2
  */
-public class BltFileBrowserController extends SimpleFormController implements ITableScroller {
-//---------------------------------------------------------------------------------------- Constants
+public class BltFileBrowserController extends SimpleFormController 
+            implements ITableScroller {
+
+    /** File catalog error key */
+    private static final String FC_ERROR_KEY = "file_catalog_error";
+    /** File catalog error message key */
+    private static final String FC_ERROR_MESSAGE_KEY = 
+            "browsefiles.error.file_catalog_error";
+    
     /** File objects list key */
     private static final String FILE_OBJECTS_KEY = "file_objects";
     /** Radar stations list key */
@@ -83,7 +92,7 @@ public class BltFileBrowserController extends SimpleFormController implements IT
     private static final String SORT_BY_SRC_PARAM = "sortBySource";
     /** Sort by type parameter */
     private static final String SORT_BY_TYPE_PARAM = "sortByType";
-//---------------------------------------------------------------------------------------- Variables
+
     /** Reference to file object manager */
     private FileObjectManager fileObjectManager;
     /** Reference to file manager */
@@ -132,7 +141,9 @@ public class BltFileBrowserController extends SimpleFormController implements IT
     private static boolean sortByTypeAsc;
     /** Sort by type in descending order */
     private static boolean sortByTypeDesc;
-//------------------------------------------------------------------------------------------ Methods
+    
+    private MessageResourceUtil messages;
+
     /**
      * Retrieve a backing object for the current form from the given request.
      * 
@@ -140,7 +151,9 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      * @return The backing object
      */
     @Override
-    protected Object formBackingObject( HttpServletRequest request ) { return new Object(); }
+    protected Object formBackingObject(HttpServletRequest request) { 
+        return new Object(); 
+    }
     /**
      * Create a reference data map for the given request.
      *
@@ -149,10 +162,16 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      * @throws Exception
      */
     @Override
-    protected HashMap referenceData( HttpServletRequest request ) throws Exception {
+    protected HashMap referenceData(HttpServletRequest request) 
+            throws Exception {
         HashMap model = new HashMap();
-        model.put( FILE_OBJECTS_KEY, fileObjectManager.load() );
-        model.put( RADAR_STATIONS_KEY, bltFileManager.getDistinctRadarStations() );
+        model.put(FILE_OBJECTS_KEY, fileObjectManager.load());
+        try {
+            model.put(RADAR_STATIONS_KEY, 
+                    bltFileManager.getDistinctRadarStations());
+        } catch (DatabaseError e) {
+            model.put(FC_ERROR_KEY, messages.getMessage(FC_ERROR_MESSAGE_KEY));
+        } 
         return model;
     }
     /**
@@ -165,14 +184,20 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      * @return The prepared form view, or null if handled directly
      * @throws Exception
      */
-    protected ModelAndView showForm( HttpServletRequest request, HttpServletResponse response,
-            BindException errors, Object obj )
-            throws Exception {
-        ModelAndView modelAndView = new ModelAndView( getSuccessView() );
-        modelAndView.addObject( FILE_OBJECTS_KEY, fileObjectManager.load() );
-        modelAndView.addObject( RADAR_STATIONS_KEY, bltFileManager.getDistinctRadarStations() );
-        if( obj != null ) {
-            modelAndView.addObject( FILE_ENTRIES_KEY, obj );
+    protected ModelAndView showForm(HttpServletRequest request, 
+            HttpServletResponse response, BindException errors, Object obj)
+                throws Exception {
+        ModelAndView modelAndView = new ModelAndView(getSuccessView());
+        modelAndView.addObject(FILE_OBJECTS_KEY, fileObjectManager.load());
+        try {
+            modelAndView.addObject(RADAR_STATIONS_KEY, 
+                bltFileManager.getDistinctRadarStations());
+            if (obj != null) {
+                modelAndView.addObject(FILE_ENTRIES_KEY, obj);
+            }
+        } catch (DatabaseError e) {
+            modelAndView.addObject(FC_ERROR_KEY, 
+                    messages.getMessage(FC_ERROR_MESSAGE_KEY));
         }
         return modelAndView;
     }
@@ -189,89 +214,93 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      * @throws Exception
      */
     @Override
-    protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
-            Object command, BindException errors ) throws Exception {
-        String pageNum = request.getParameter( PAGE_NUM_PARAM );
-        // set sort parameters
-        setSortByDate( request );
-        setSortByTime( request );
-        setSortBySource( request );
-        setSortByType( request );
-        List<BltFile> fileEntries;
-        /* File selection option */
-        if( pageNum == null ) {
-            setRadarStation(request.getParameter(RADARS_LIST_PARAM) );
-            if( getRadarStation().equals( DEFAULT_LIST_OPTION_KEY ) ) setRadarStation("");
-            setFileObject(request.getParameter(FILE_OBJECTS_LIST_PARAM));
-            if( getFileObject().equals( DEFAULT_LIST_OPTION_KEY ) ) setFileObject("");
-            setStartDate(request.getParameter(START_DATE_PARAM) );
-            setStartHour( request.getParameter( START_HOUR_PARAM ) );
-            setStartMinute( request.getParameter( START_MINUTE_PARAM ) );
-            setStartSecond( request.getParameter( START_SECOND_PARAM ) );
-            setEndDate(request.getParameter(END_DATE_PARAM) );
-            setEndHour( request.getParameter( END_HOUR_PARAM ) );
-            setEndMinute( request.getParameter( END_MINUTE_PARAM ) );
-            setEndSecond( request.getParameter( END_SECOND_PARAM ) );
-            startTime = getTimeString( startHour, startMinute, startSecond);
-            endTime = getTimeString( endHour, endMinute, endSecond );
-            /* Set current page number */
-            setCurrentPage( 1 );
-            /* Count selected files */
-            setNumEntries(bltFileManager.countFileEntries(
-                getRadarStation().trim(), getFileObject(), getStartDate(), 
-                startTime, getEndDate(), endTime));
-            
-            /* Select files */
-            fileEntries = bltFileManager.getFileEntries(
-                getRadarStation().trim(), getFileObject(), getStartDate(), 
-                startTime, getEndDate(), endTime, Integer.toString(0), 
-                Integer.toString(BltFileManager.ENTRIES_PER_PAGE), 
-                getSortByDateAsc(), getSortByDateDesc(), getSortByTimeAsc(), 
-                getSortByTimeDesc(), getSortBySourceAsc(), 
-                getSortBySourceDesc(), getSortByTypeAsc(), getSortByTypeDesc());
-            
-            
-        } else {
-            /* Page scrolling option */
-            if( pageNum.matches( "<<" ) ) {
-                firstPage(); 
-                fileEntries = bltFileManager.getFileEntries(getRadarStation(), 
-                    getFileObject(), getStartDate(), startTime, getEndDate(), 
-                    endTime, Integer.toString(0), Integer.toString( 
-                    BltFileManager.ENTRIES_PER_PAGE), getSortByDateAsc(), 
-                    getSortByDateDesc(), getSortByTimeAsc(), 
+    protected ModelAndView onSubmit(HttpServletRequest request, 
+            HttpServletResponse response, Object command, BindException errors) 
+                throws Exception {
+        try {
+            String pageNum = request.getParameter( PAGE_NUM_PARAM );
+            // set sort parameters
+            setSortByDate( request );
+            setSortByTime( request );
+            setSortBySource( request );
+            setSortByType( request );
+            List<BltFile> fileEntries;
+            /* File selection option */
+            if( pageNum == null ) {
+                setRadarStation(request.getParameter(RADARS_LIST_PARAM) );
+                if( getRadarStation().equals( DEFAULT_LIST_OPTION_KEY ) ) setRadarStation("");
+                setFileObject(request.getParameter(FILE_OBJECTS_LIST_PARAM));
+                if( getFileObject().equals( DEFAULT_LIST_OPTION_KEY ) ) setFileObject("");
+                setStartDate(request.getParameter(START_DATE_PARAM) );
+                setStartHour( request.getParameter( START_HOUR_PARAM ) );
+                setStartMinute( request.getParameter( START_MINUTE_PARAM ) );
+                setStartSecond( request.getParameter( START_SECOND_PARAM ) );
+                setEndDate(request.getParameter(END_DATE_PARAM) );
+                setEndHour( request.getParameter( END_HOUR_PARAM ) );
+                setEndMinute( request.getParameter( END_MINUTE_PARAM ) );
+                setEndSecond( request.getParameter( END_SECOND_PARAM ) );
+                startTime = getTimeString( startHour, startMinute, startSecond);
+                endTime = getTimeString( endHour, endMinute, endSecond );
+                /* Set current page number */
+                setCurrentPage( 1 );
+                /* Count selected files */
+                setNumEntries(bltFileManager.countFileEntries(
+                    getRadarStation().trim(), getFileObject(), getStartDate(), 
+                    startTime, getEndDate(), endTime));
+                /* Select files */
+                fileEntries = bltFileManager.getFileEntries(
+                    getRadarStation().trim(), getFileObject(), getStartDate(), 
+                    startTime, getEndDate(), endTime, Integer.toString(0), 
+                    Integer.toString(BltFileManager.ENTRIES_PER_PAGE), 
+                    getSortByDateAsc(), getSortByDateDesc(), getSortByTimeAsc(), 
                     getSortByTimeDesc(), getSortBySourceAsc(), 
-                    getSortBySourceDesc(), getSortByTypeAsc(), 
-                    getSortByTypeDesc());
-                
+                    getSortBySourceDesc(), getSortByTypeAsc(), getSortByTypeDesc());
             } else {
-                if( pageNum.matches( ">>" ) ) {
-                    lastPage();
-                } else if( pageNum.matches( ">" ) ) {
-                    nextPage();
-                } else if( pageNum.matches( "<" ) ) {
-                    previousPage();
+                /* Page scrolling option */
+                if( pageNum.matches( "<<" ) ) {
+                    firstPage(); 
+                    fileEntries = bltFileManager.getFileEntries(getRadarStation(), 
+                        getFileObject(), getStartDate(), startTime, getEndDate(), 
+                        endTime, Integer.toString(0), Integer.toString( 
+                        BltFileManager.ENTRIES_PER_PAGE), getSortByDateAsc(), 
+                        getSortByDateDesc(), getSortByTimeAsc(), 
+                        getSortByTimeDesc(), getSortBySourceAsc(), 
+                        getSortBySourceDesc(), getSortByTypeAsc(), 
+                        getSortByTypeDesc());
                 } else {
-                    int page = Integer.parseInt( pageNum );
-                    setCurrentPage( page );
+                    if( pageNum.matches( ">>" ) ) {
+                        lastPage();
+                    } else if( pageNum.matches( ">" ) ) {
+                        nextPage();
+                    } else if( pageNum.matches( "<" ) ) {
+                        previousPage();
+                    } else {
+                        int page = Integer.parseInt( pageNum );
+                        setCurrentPage( page );
+                    }
+                    int offset = ( getCurrentPage() * BltFileManager.ENTRIES_PER_PAGE )
+                            - BltFileManager.ENTRIES_PER_PAGE;
+                    fileEntries = bltFileManager.getFileEntries(getRadarStation(), 
+                        getFileObject(), getStartDate(), startTime, getEndDate(), 
+                        endTime, Integer.toString(offset), Integer.toString(
+                        BltFileManager.ENTRIES_PER_PAGE ), getSortByDateAsc(), 
+                        getSortByDateDesc(), getSortByTimeAsc(), 
+                        getSortByTimeDesc(), getSortBySourceAsc(),
+                        getSortBySourceDesc(), getSortByTypeAsc(), 
+                        getSortByTypeDesc());
                 }
-                int offset = ( getCurrentPage() * BltFileManager.ENTRIES_PER_PAGE )
-                        - BltFileManager.ENTRIES_PER_PAGE;
-                fileEntries = bltFileManager.getFileEntries(getRadarStation(), 
-                    getFileObject(), getStartDate(), startTime, getEndDate(), 
-                    endTime, Integer.toString(offset), Integer.toString(
-                    BltFileManager.ENTRIES_PER_PAGE ), getSortByDateAsc(), 
-                    getSortByDateDesc(), getSortByTimeAsc(), 
-                    getSortByTimeDesc(), getSortBySourceAsc(),
-                    getSortBySourceDesc(), getSortByTypeAsc(), 
-                    getSortByTypeDesc());
             }
+            /*
+            * Form view and success view have the same address, so we call 
+            * showForm() instead of directly returning model and view object.
+            */
+            return showForm(request, response, errors, fileEntries);
+        } catch (DatabaseError e) {
+            ModelAndView modelAndView = new ModelAndView(getSuccessView());
+            modelAndView.addObject(FC_ERROR_KEY, 
+                    messages.getMessage(FC_ERROR_MESSAGE_KEY));
+            return modelAndView;
         }
-        /*
-         * Form view and success view have the same address, so we call showForm() instead of
-         * directly returning model and view object.
-         */
-        return showForm( request, response, errors, fileEntries );
     }
     /**
      * Creates time string from given time parameters.
@@ -309,7 +338,9 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      *
      * @param _radarStation Radar station name parameter to set
      */
-    public static void setRadarStation( String _radarStation ) { radarStation = _radarStation; }
+    public static void setRadarStation( String _radarStation ) { 
+        radarStation = _radarStation; 
+    }
     /**
      * Gets file object parameter.
      *
@@ -321,7 +352,9 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      *
      * @param _fileObject File object parameter to set
      */
-    public static void setFileObject( String _fileObject ) { fileObject = _fileObject; }
+    public static void setFileObject( String _fileObject ) { 
+        fileObject = _fileObject; 
+    }
     /**
      * Gets start date parameter.
      *
@@ -333,7 +366,9 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      *
      * @param _startDate Start date parameter to set
      */
-    public static void setStartDate( String _startDate ) { startDate = _startDate; }
+    public static void setStartDate( String _startDate ) { 
+        startDate = _startDate; 
+    }
     /**
      * Gets end date parameter.
      *
@@ -357,7 +392,9 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      *
      * @param _startHour Start hour parameter to set
      */
-    public static void setStartHour( String _startHour ) { startHour = _startHour; }
+    public static void setStartHour( String _startHour ) { 
+        startHour = _startHour; 
+    }
     /**
      * Gets start minute parameter.
      *
@@ -369,7 +406,9 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      *
      * @param _startMinute Start minute parameter to set
      */
-    public static void setStartMinute( String _startMinute ) { startMinute = _startMinute; }
+    public static void setStartMinute( String _startMinute ) { 
+        startMinute = _startMinute; 
+    }
     /**
      * Gets start second parameter.
      *
@@ -381,7 +420,9 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      *
      * @param _startSecond Start second parameter to set
      */
-    public static void setStartSecond( String _startSecond ) { startSecond = _startSecond; }
+    public static void setStartSecond( String _startSecond ) { 
+        startSecond = _startSecond; 
+    }
     /**
      * Gets end hour parameter.
      *
@@ -405,7 +446,9 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      *
      * @param _endMinute End minute parameter to set
      */
-    public static void setEndMinute( String _endMinute ) { endMinute = _endMinute; }
+    public static void setEndMinute( String _endMinute ) { 
+        endMinute = _endMinute; 
+    }
     /**
      * Gets end second parameter
      *
@@ -417,7 +460,9 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      *
      * @param _endSecond End second parameter to set
      */
-    public static void setEndSecond( String _endSecond) { endSecond = _endSecond; }
+    public static void setEndSecond( String _endSecond) { 
+        endSecond = _endSecond; 
+    }
     /**
      * Gets current page number.
      *
@@ -440,7 +485,8 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      * Sets page number to the next page number.
      */
     public void nextPage() {
-        int lastPage = ( int )Math.ceil( getNumEntries() / BltFileManager.ENTRIES_PER_PAGE );
+        int lastPage = ( int )Math.ceil( 
+                getNumEntries() / BltFileManager.ENTRIES_PER_PAGE );
         if( ( lastPage * BltFileManager.ENTRIES_PER_PAGE ) < getNumEntries() ) {
             ++lastPage;
         }
@@ -469,7 +515,8 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      * Sets page number to the last page.
      */
     public void lastPage() {
-        int lastPage = ( int )Math.ceil( getNumEntries() / BltFileManager.ENTRIES_PER_PAGE );
+        int lastPage = ( int )Math.ceil( 
+                getNumEntries() / BltFileManager.ENTRIES_PER_PAGE );
         if( ( lastPage * BltFileManager.ENTRIES_PER_PAGE ) < getNumEntries() ) {
             ++lastPage;
         }
@@ -489,7 +536,9 @@ public class BltFileBrowserController extends SimpleFormController implements IT
      *
      * @param aNumEntries Number of selected file entries
      */
-    public static void setNumEntries( long _numEntries ) { numEntries = _numEntries; }
+    public static void setNumEntries( long _numEntries ) { 
+        numEntries = _numEntries; 
+    }
     /**
      * Gets reference to FileObjectManager object.
      *
@@ -630,5 +679,19 @@ public class BltFileBrowserController extends SimpleFormController implements IT
             }
         }
     }
+
+    /**
+     * @param messages the messages to set
+     */
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
+    }
+
+    /**
+     * @return the messages
+     */
+    public MessageResourceUtil getMessages() {
+        return messages;
+    }
 }
-//--------------------------------------------------------------------------------------------------
+
