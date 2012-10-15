@@ -24,8 +24,6 @@ Author     : szewczenko
 -- drop tables -------------------------------------------------------------------------------------
 DROP TABLE IF EXISTS dex_subscriptions CASCADE;
 DROP TABLE IF EXISTS dex_delivery_registry CASCADE;
-DROP TABLE IF EXISTS dex_channel_permissions CASCADE;
-DROP TABLE IF EXISTS dex_channels CASCADE;
 DROP TABLE IF EXISTS dex_users CASCADE;
 DROP TABLE IF EXISTS dex_roles CASCADE;
 DROP TABLE IF EXISTS dex_messages CASCADE;
@@ -55,7 +53,6 @@ DROP SEQUENCE IF EXISTS subscription_id_seq;
 DROP SEQUENCE IF EXISTS delivery_registry_id_seq;
 DROP SEQUENCE IF EXISTS node_connection_id_seq;
 DROP SEQUENCE IF EXISTS configuration_id_seq;
-DROP SEQUENCE IF EXISTS channel_permission_id_seq;
 DROP SEQUENCE IF EXISTS file_object_id_seq;
 DROP SEQUENCE IF EXISTS data_quantity_id_seq;
 DROP SEQUENCE IF EXISTS product_id_seq;

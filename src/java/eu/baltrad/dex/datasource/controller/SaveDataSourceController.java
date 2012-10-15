@@ -27,6 +27,8 @@ import eu.baltrad.dex.datasource.model.FileObject;
 import eu.baltrad.dex.datasource.model.FileObjectManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.UserManager;
+import eu.baltrad.dex.net.model.Subscription;
+import eu.baltrad.dex.net.model.SubscriptionManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.IDataSourceManager;
 import eu.baltrad.dex.datasource.util.DataSourceValidator;
@@ -91,6 +93,7 @@ public class SaveDataSourceController {
     private UserManager userManager;
     private IDataSourceManager dataSourceManager;
     private CoreFilterManager coreFilterManager;
+    private SubscriptionManager subscriptionManager;
     private DataSourceValidator validator;
     private MessageResourceUtil messages;
     private Logger log;
@@ -203,15 +206,69 @@ public class SaveDataSourceController {
                         fileObjectAttrValue = fileObjectAttrValue
                             .substring( 0, fileObjectAttrValue.lastIndexOf(","));
                     }
+                    
+                    
+                    
+                    List<User> oldUsers = dataSourceManager.loadUser(dataSourceId);
+                    List<User> removedUsers = new ArrayList<User>();
+                    System.out.println("________ old users size: " + oldUsers.size());
+                    
+                    
                     // Save user parameter
                     dataSourceManager.deleteUser(dataSourceId);
                     if (selectedUsers != null) {
+                        
                         for (int i = 0; i < selectedUsers.length; i++) {
                             int userId = (userManager
                                     .load(selectedUsers[i])).getId();
                             dataSourceManager.saveUser(dataSourceId, userId);
                         }
+                        
+                        // remove subscriptions if data source access right 
+                        // was revoked
+
+                        
+                        /*List<User> newUsers = dataSourceManager.loadUser(dataSourceId);
+                        
+                        System.out.println("________ new users size: " + newUsers.size());
+                        
+                        
+                        
+                        for (User old : oldUsers) {
+                            if (!containsUser(newUsers, old)) {
+                                removedUsers.add(old);
+                            }
+                        }*/
+                        
+                        
+                    } else {
+                        /*System.out.println("___________ no users selected");
+                        
+                        for (User old : oldUsers) {
+                            removedUsers.add(old);
+                        }*/
                     }
+                    
+                    /*for (User rem : removedUsers) {
+                            
+                        System.out.println("_____ user to remove: " + rem.getName());
+                        System.out.println("_____ data source name: " + dataSource.getName());
+
+                        Subscription s = null;
+                        if ((s = subscriptionManager.load(rem.getName(), 
+                                dataSource.getName(),
+                                Subscription.SUBSCRIPTION_UPLOAD)) != null) 
+                        {
+                            // remove subscription
+                        }
+                    }*/
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                     // Configure filters
                     CombinedFilter combinedFilter = new CombinedFilter();
                     combinedFilter.setMatchType(CombinedFilter.MatchType.ALL);
@@ -448,5 +505,14 @@ public class SaveDataSourceController {
     @Autowired
     public void setMessages(MessageResourceUtil messages) {
         this.messages = messages;
+    }
+
+    /**
+     * @param subscriptionManager the subscriptionManager to set
+     */
+    @Autowired
+    public void setSubscriptionManager(SubscriptionManager subscriptionManager) 
+    {
+        this.subscriptionManager = subscriptionManager;
     }
 }

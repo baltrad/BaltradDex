@@ -24,7 +24,6 @@ Author     : szewczenko
 -- drop tables if exist --------------------------------------------------------
 DROP TABLE IF EXISTS dex_subscriptions CASCADE;
 DROP TABLE IF EXISTS dex_delivery_registry;
-DROP TABLE IF EXISTS dex_channel_permissions CASCADE;
 DROP TABLE IF EXISTS dex_users CASCADE;
 DROP TABLE IF EXISTS dex_roles;
 DROP TABLE IF EXISTS dex_messages;
@@ -51,7 +50,6 @@ DROP SEQUENCE IF EXISTS user_id_seq;
 DROP SEQUENCE IF EXISTS subscription_id_seq;
 DROP SEQUENCE IF EXISTS delivery_registry_id_seq;
 DROP SEQUENCE IF EXISTS node_connection_id_seq;
-DROP SEQUENCE IF EXISTS channel_permission_id_seq;
 DROP SEQUENCE IF EXISTS file_object_id_seq;
 DROP SEQUENCE IF EXISTS data_quantity_id_seq CASCADE;
 DROP SEQUENCE IF EXISTS product_id_seq;
@@ -113,17 +111,6 @@ CREATE TABLE dex_radars
     PRIMARY KEY (id)
 );
 
--- channel_permission_id_seq -----------------------------------------------------------------------
-CREATE SEQUENCE channel_permission_id_seq;
--- dex_channel_permissions -------------------------------------------------------------------------
-CREATE TABLE dex_channel_permissions
-(
-    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('channel_permission_id_seq'),
-    channel_id INT NOT NULL REFERENCES dex_radars (id),
-    user_id INT NOT NULL REFERENCES dex_users (id),
-    PRIMARY KEY (id)
-);
-
 -- subscription_id_seq -----------------------------------------------------------------------------
 CREATE SEQUENCE subscription_id_seq;
 -- dex_subscriptions -------------------------------------------------------------------------------
@@ -166,6 +153,16 @@ CREATE TABLE dex_node_connections
     node_address VARCHAR(256) NOT NULL,
     PRIMARY KEY (id)
 );
+-- data source id sequence -------------------------------------------------------------------------
+CREATE SEQUENCE data_source_id_seq;
+-- dex_data_sources --------------------------------------------------------------------------------
+CREATE TABLE dex_data_sources
+(
+    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('data_source_id_seq'),
+    name VARCHAR(128) UNIQUE NOT NULL,
+    description TEXT,
+    PRIMARY KEY (id)
+);
 -- file object id sequence -------------------------------------------------------------------------
 CREATE SEQUENCE file_object_id_seq;
 -- dex_file_objects --------------------------------------------------------------------------------
@@ -206,16 +203,6 @@ CREATE TABLE dex_product_parameters
     id INT NOT NULL UNIQUE DEFAULT NEXTVAL('product_parameter_id_seq'),
     parameter VARCHAR(32) NOT NULL UNIQUE,
     description TEXT NOT NULL,
-    PRIMARY KEY (id)
-);
--- data source id sequence -------------------------------------------------------------------------
-CREATE SEQUENCE data_source_id_seq;
--- dex_data_sources --------------------------------------------------------------------------------
-CREATE TABLE dex_data_sources
-(
-    id INT NOT NULL UNIQUE DEFAULT NEXTVAL('data_source_id_seq'),
-    name VARCHAR(128) UNIQUE NOT NULL,
-    description TEXT,
     PRIMARY KEY (id)
 );
 -- dex_data_source_quantities ----------------------------------------------------------------------
