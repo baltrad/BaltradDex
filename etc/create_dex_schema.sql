@@ -311,7 +311,7 @@ CREATE OR REPLACE FUNCTION dex_trim_messages_by_age() RETURNS trigger AS $$
     DECLARE
         max_age INTERVAL;
     BEGIN
-        SELECT (TG_ARGV[0] || ' days ' || TG_ARGV[1] || ' hours ' || TG_ARGV[2] ||
+        SELECT (TG_ARGV[0] || ' days ' || TG_ARGV[1] || ' hours ' || TG_Ab52RGV[2] ||
             ' minutes')::INTERVAL INTO max_age;
         DELETE FROM dex_messages WHERE timestamp IN (SELECT timestamp FROM dex_messages WHERE
             age(now(), timestamp) > max_age);

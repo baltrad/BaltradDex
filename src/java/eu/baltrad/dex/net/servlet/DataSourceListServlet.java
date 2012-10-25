@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 import java.io.PrintWriter;
 import java.util.List;
 import java.util.HashSet;
+import org.apache.http.util.EntityUtils;
 import org.keyczar.exceptions.KeyczarException;
 
 /**

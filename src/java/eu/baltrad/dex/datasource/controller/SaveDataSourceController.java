@@ -241,13 +241,13 @@ public class SaveDataSourceController {
                         }*/
                         
                         
-                    } else {
+                    } //else {
                         /*System.out.println("___________ no users selected");
                         
                         for (User old : oldUsers) {
                             removedUsers.add(old);
                         }*/
-                    }
+                    //}
                     
                     /*for (User rem : removedUsers) {
                             

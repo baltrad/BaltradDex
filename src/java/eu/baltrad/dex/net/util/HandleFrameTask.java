@@ -77,14 +77,28 @@ public class HandleFrameTask implements Runnable {
      */
     public void run() {
         try {
+            
+            log.warn("HandleFrameTask: preparing to post frame");
+            
             HttpResponse response = handler.post(frame);
+            
+            log.warn("HandleFrameTask: frame posted");
+            
             RegistryEntry dre = new RegistryEntry();
             if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+                
+                log.warn("HandleFrameTask: response code: " + response.getStatusLine().getStatusCode());
+                log.warn("HandleFrameTask: reason phrase: " + response.getStatusLine().getReasonPhrase());
+                
                 dre = new RegistryEntry(user.getId(), entry.getUuid().toString(), 
                         user.getName(), new Date(), RegistryEntry.MSG_SUCCESS);
                 log.info("File entry " + entry.getUuid().toString() + " sent to user " + 
                         user.getName());
             } else {
+                
+                log.warn("HandleFrameTask: response code: " + response.getStatusLine().getStatusCode());
+                log.warn("HandleFrameTask: reason phrase: " + response.getStatusLine().getReasonPhrase());
+                
                 dre = new RegistryEntry(user.getId(), entry.getUuid().toString(), 
                         user.getName(), new Date(), RegistryEntry.MSG_FAILURE);
                 log.error("Failed to send file entry " + entry.getUuid().toString() + " to user " +

@@ -444,14 +444,26 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 File payloadFile = Frame.getPayloadFile(parms);
                 FileEntry fileEntry = null;
                 fis = new FileInputStream(payloadFile.getAbsolutePath());
+                
+                log.warn("handleDataDeliveryRequest(): attemting to store the file " + payloadFile.getName());
+                
                 fileEntry = fileCatalog.store(fis);
+                
+                log.warn("handleDataDeliveryRequest(): file " + payloadFile.getName() + " successfully stored");
+                
                 IncomingFileNamer namer = new IncomingFileNamer();
                 String friendlyName = namer.name(fileEntry);
                 log.info(friendlyName + " stored with UUID " + fileEntry.getUuid().toString());
                 // Send message to the Beast framework
+                
+                log.warn("handleDataDeliveryRequest(): sending message to beast framework");
+                
                 BltDataMessage message = new BltDataMessage();
                 message.setFileEntry(fileEntry);
                 bltMessageManager.manage(message);
+                
+                log.warn("handleDataDeliveryRequest(): message sent to beast framework");
+                
                 MetadataMatcher metadataMatcher = new MetadataMatcher();
                 // Iterate through subscriptions list to send data to the users
                 List<Subscription> subs = subscriptionManager.load(
@@ -459,15 +471,27 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                 for (Subscription sub : subs) {
                     // Check if file entry matches the subscribed data source's filter
                     String dataSourceName = sub.getDataSourceName();
+                    
+                    log.warn("handleDataDeliveryRequest(): trying to fetch filter");
+                    
                     IFilter filter = bltFileManager.getFilter(dataSourceName);
+                    
+                    log.warn("handleDataDeliveryRequest(): filter OK, matching ... ");
+                    
                     boolean matches = metadataMatcher.match(fileEntry.getMetadata(), 
                             filter.getExpression());
+                    
+                    
                     // Make sure that user exists locally
 
                     User receiver = userManager.load(sub.getUserName());
                     RegistryEntry dre = registryManager.load(
                             receiver.getId(), fileEntry.getUuid().toString());
                     if (matches && dre == null) {
+                        
+                        
+                        log.warn("handleDataDeliveryRequest(): entry matches filter criteria");
+                        
                         long timestamp = System.currentTimeMillis();
                         String signature = getSignatureString(InitAppUtil.getConf().getKeystoreDir(),    
                             InitAppUtil.getConf().getNodeName(), timestamp);
@@ -477,10 +501,15 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                             receiver.setNodeAddress(receiver.getNodeAddress() + "/BaltradDex/dispatch.htm");
                         }                        
                         
+                        
+                        
                         Frame frame = Frame.postDataDeliveryRequest(receiver.getNodeAddress(), 
                             InitAppUtil.getConf().getNodeAddress(),
                             InitAppUtil.getConf().getNodeName(), timestamp, signature, payloadFile);
                         // Create frame delivery task
+                        
+                        log.warn("handleDataDeliveryRequest(): preparing to send frame to peers");
+                        
                         HandleFrameTask task = new HandleFrameTask(registryManager,
                             log, receiver, fileEntry, frame);
                         // Add task to publisher manager
@@ -503,7 +532,7 @@ public class FrameDispatcherController extends HttpServlet implements Controller
                     fis.close();
                 } catch (IOException e) {
                     response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    log.error("Failed to close the strem", e);
+                    log.error("Failed to close the stream", e);
                 }
                 // Delete temporary files
                 cleanUpTempFiles(InitAppUtil.getWorkDir());

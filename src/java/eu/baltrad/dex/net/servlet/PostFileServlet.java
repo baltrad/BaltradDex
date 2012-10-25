@@ -44,6 +44,7 @@ import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
+import java.io.InputStream;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,6 +64,7 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.net.URI;
 import java.util.UUID;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Receives and handles post file requests.
@@ -149,25 +151,57 @@ public class PostFileServlet extends HttpServlet {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
         try {
+            
+            log.warn("PostFileServlet: authenticating message");
+            
             if (authenticator.authenticate(req.getMessage(), 
                     req.getSignature(), req.getNodeName())) {
-                log.info("New data file received from " + req.getNodeName());
-                FileEntry entry = catalog.store(req.getInputStream());
+                
+                log.warn("PostFileServlet: new data file received from " + req.getNodeName());
+                
+                FileEntry entry = null;   
+                InputStream is = null;
+                
+                log.warn("PostFileServlet: storing data file in the db");
+                
+                try {
+                    is = req.getInputStream();
+                    entry = catalog.store(is);
+                } finally {
+                    is.close();
+                }
+                
+                log.warn("PostFileServlet: data file stored");
+                
                 if (entry != null) {
                     String name = namer.name(entry);
                     UUID uuid = entry.getUuid();
-                    log.info(name + " stored with UUID " + uuid.toString());
+                    log.warn("PostFileServlet: " + name + " stored with UUID " + uuid.toString());
                     BltDataMessage msg = new BltDataMessage();
                     msg.setFileEntry(entry);
+                    
+                    
+                    log.warn("PostFileServlet: sending message to beast framework");
+                    
                     messageManager.manage(msg);
+                    
+                    log.warn("PostFileServlet: message sent to beast ");
+                    
                     List<Subscription> uploads = subscriptionManager.load(
                             Subscription.SUBSCRIPTION_UPLOAD);
                     for (Subscription s : uploads) {
                         IFilter filter = fileManager
                                 .getFilter(s.getDataSourceName());
                         User receiver = userManager.load(s.getUserName());
+                        
+                        log.warn("PostFileServlet: matching files against filter");
+                        
                         if (matcher.match(entry.getMetadata(), 
                                 filter.getExpression())) {
+                            
+                            log.warn("PostFileServlet: file matched");
+                            
+                            
                             RequestFactory requestFactory = 
                                 new DefaultRequestFactory(
                                     URI.create(receiver.getNodeAddress()));
@@ -176,6 +210,9 @@ public class PostFileServlet extends HttpServlet {
                                         nodeAddress, entry.getContentStream());
                             authenticator.addCredentials(deliveryRequest, 
                                     nodeName);
+                            
+                            log.warn("PostFileServlet: sending file to peers");
+                            
                             PostFileTask task = new PostFileTask(httpClient, 
                                     registryManager, deliveryRequest, 
                                     entry.getUuid().toString(), 

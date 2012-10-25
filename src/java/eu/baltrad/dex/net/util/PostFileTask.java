@@ -71,7 +71,7 @@ public class PostFileTask implements Runnable {
      * separate thread.
      */
     public void run() {
-        try { 
+        try {
             HttpResponse response = httpClient.post(request);
             if (response.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_OK) {
