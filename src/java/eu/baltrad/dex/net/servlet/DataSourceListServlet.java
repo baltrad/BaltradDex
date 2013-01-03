@@ -44,8 +44,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.ServletInputStream;
 
 import org.apache.log4j.Logger;
+
+import org.apache.commons.io.IOUtils;
 
 import org.keyczar.exceptions.KeyczarException;
 
@@ -53,9 +56,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.HashSet;
-import javax.servlet.ServletInputStream;
-import org.apache.commons.io.IOUtils;
-
 
 /**
  * Receives and handles data source listing requests.

@@ -240,6 +240,7 @@ public class SaveDataSourceController {
                             {
                                 subscriptionManager.delete(s.getId());
                             }
+
                         }
                     }
                     // Configure filters

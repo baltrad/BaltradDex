@@ -255,7 +255,6 @@ CREATE TABLE dex_data_source_filters
     filter_id INT NOT NULL
 );
 
-
 CREATE OR REPLACE FUNCTION make_plpgsql()
 RETURNS VOID
   LANGUAGE SQL

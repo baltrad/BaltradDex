@@ -49,6 +49,7 @@ import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
+import java.io.InputStream;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,6 +70,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+//import org.apache.commons.io.IOUtils;
 
 /**
  * Receives and handles post file requests.
@@ -158,11 +160,10 @@ public class PostFileServlet extends HttpServlet {
     {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
-        try {
+        try {            
             if (authenticator.authenticate(req.getMessage(), 
                     req.getSignature(), req.getNodeName())) {
                 log.info("New data file received from " + req.getNodeName());
-                
                 FileEntry entry = null;   
                 InputStream is = null;
                 try {
@@ -171,11 +172,11 @@ public class PostFileServlet extends HttpServlet {
                 } finally {
                     is.close();
                 }
-                
                 if (entry != null) {
                     String name = namer.name(entry);
                     UUID uuid = entry.getUuid();
-                    log.info(name + " stored with UUID " + uuid.toString());
+                    log.warn("File " + name + " stored with UUID " 
+                            + uuid.toString());
                     BltDataMessage msg = new BltDataMessage();
                     msg.setFileEntry(entry);
                     messageManager.manage(msg);
@@ -193,7 +194,7 @@ public class PostFileServlet extends HttpServlet {
                             HttpUriRequest deliveryRequest = requestFactory
                                 .createPostFileRequest(localNode, 
                                     entry.getContentStream());
-                            authenticator.addCredentials(deliveryRequest, 
+                            authenticator.addCredentials(deliveryRequest,
                                     localNode.getName());
                             PostFileTask task = new PostFileTask(httpClient, 
                                     registryManager, deliveryRequest, 
