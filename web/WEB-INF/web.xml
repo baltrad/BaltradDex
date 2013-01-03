@@ -35,6 +35,7 @@
         <welcome-file>index.htm</welcome-file>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+
     <!-- Encoding filter -->
     <filter>
         <filter-name>encodingFilter</filter-name>

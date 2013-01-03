@@ -22,9 +22,10 @@
 package eu.baltrad.dex.user.controller;
 
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.Password;
-import eu.baltrad.dex.user.model.IUserManager;
-import eu.baltrad.dex.user.util.ChangePasswordValidator;
+import eu.baltrad.dex.user.manager.IAccountManager;
+import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.validator.PasswordValidator;
+import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BindingResult;
@@ -49,14 +50,24 @@ public class ChangeUserPasswordControllerTest {
 
     private ChangeUserPasswordController classUnderTest;
     private MockHttpServletRequest request;
-    private IUserManager userManagerMock;
+    private IAccountManager userManagerMock;
+    private MessageResourceUtil messages;
+    private PasswordValidator validator;
+    private Account test;
     
     @Before
     public void setUp() {
         classUnderTest = new ChangeUserPasswordController();
         request = new MockHttpServletRequest();
-        classUnderTest.setValidator(new ChangePasswordValidator());
-        userManagerMock = createMock(IUserManager.class);
+        messages = new MessageResourceUtil();
+        messages.setBasename("resources/messages");
+        validator = new PasswordValidator();
+        validator.setMessages(messages);
+        classUnderTest.setValidator(validator);
+        classUnderTest.setMessages(messages);
+        userManagerMock = createMock(IAccountManager.class);
+        test = new Account(1, "baltrad", "passw0rd", "org", "unit", 
+                "locality", "state", "XX", "user", "http://test.baltrad.eu");
     }
     
     @After
@@ -68,77 +79,75 @@ public class ChangeUserPasswordControllerTest {
     
     @Test
     public void setupForm() {
-        User user = new User("baltrad", "s3cret");
-        request.getSession().setAttribute("session_user", user);
+        expect(userManagerMock.load(1)).andReturn(test);
+        replay(userManagerMock);
+        
+        classUnderTest.setAccountManager(userManagerMock);
+        request.getSession().setAttribute("session_user", test);
         ModelMap model = new ModelMap();
         String viewName = classUnderTest.setupForm(model, request);
+        
         assertEquals("user_settings", viewName);
-        assertTrue(model.containsAttribute("password"));
-        Password passwd = (Password) model.get("password");
-        assertEquals("baltrad", passwd.getUserName());
+        assertTrue(model.containsAttribute("user_account"));
+        
+        Account account = (Account) model.get("user_account");
+        
+        assertEquals("baltrad", account.getName());
     }
     
     @Test
     public void processSubmit_ValidationFailure() {
         ModelMap model = new ModelMap();
-        Password passwd = new Password("baltrad", "s3cret", "secret");
-        model.addAttribute("password", passwd);
-        BindingResult result = new BeanPropertyBindingResult(passwd, 
-                                "password");
-        String viewName = classUnderTest.processSubmit(model, passwd, result);
+        test.setRepeatPassword("password");
+        BindingResult result = new BeanPropertyBindingResult(test, 
+                                "user_account");
+        String viewName = classUnderTest.processSubmit(model, test, result);
         assertEquals("user_settings", viewName);
         assertTrue(result.hasErrors());
-        assertTrue(model.containsAttribute("password"));
     }
     
     @Test
-    public void processSubmit_UpdateFailure() {
+    public void processSubmit_UpdateFailure() throws Exception {
         ModelMap model = new ModelMap();
-        Password passwd = new Password("baltrad", "passw0rd", "passw0rd");
-        model.addAttribute("password", passwd);
-        BindingResult result = new BeanPropertyBindingResult(passwd, 
-                                "password");
-        User user = new User("baltrad", "s3cret");
-        user.setId(222);
+        test.setRepeatPassword("passw0rd");
+        BindingResult result = new BeanPropertyBindingResult(test, 
+                                "user_account");
         
-        expect(userManagerMock.load("baltrad")).andReturn(user);
-        expect(userManagerMock.updatePassword(222, 
-                "bed128365216c019988915ed3add75fb")).andReturn(0);
+        expect(userManagerMock.updatePassword(test.getId(), 
+                "bed128365216c019988915ed3add75fb")).andThrow(new Exception());
         replay(userManagerMock);
         
-        classUnderTest.setUserManager(userManagerMock);
-        String viewName = classUnderTest.processSubmit(model, passwd, result);
+        classUnderTest.setAccountManager(userManagerMock);
+        String viewName = classUnderTest.processSubmit(model, test, result);
+        
+        verify(userManagerMock);
         
         assertEquals("user_settings", viewName);
         assertTrue(model.containsAttribute("error"));
         assertEquals("Failed to change password for user baltrad", 
                 (String) model.get("error"));
-        assertTrue(model.containsAttribute("password"));
     }
     
     @Test
-    public void processSubmit_OK() {
+    public void processSubmit_OK() throws Exception {
         ModelMap model = new ModelMap();
-        Password passwd = new Password("baltrad", "passw0rd", "passw0rd");
-        model.addAttribute("password", passwd);
-        BindingResult result = new BeanPropertyBindingResult(passwd, 
-                                "password");
-        User user = new User("baltrad", "s3cret");
-        user.setId(222);
+        test.setRepeatPassword("passw0rd");
         
-        expect(userManagerMock.load("baltrad")).andReturn(user);
-        expect(userManagerMock.updatePassword(222, 
+        BindingResult result = new BeanPropertyBindingResult(test, 
+                                "user_account");
+        expect(userManagerMock.updatePassword(test.getId(), 
                 "bed128365216c019988915ed3add75fb")).andReturn(1);
         replay(userManagerMock);
         
-        classUnderTest.setUserManager(userManagerMock);
-        String viewName = classUnderTest.processSubmit(model, passwd, result);
+        classUnderTest.setAccountManager(userManagerMock);
+        String viewName = classUnderTest.processSubmit(model, test, result);
+        
+        verify(userManagerMock);
         
         assertEquals("user_settings", viewName);
         assertTrue(model.containsAttribute("message"));
         assertEquals("Password successfully changed for user baltrad", 
                 (String) model.get("message"));
-        assertTrue(model.containsAttribute("password"));
     }
     
 }

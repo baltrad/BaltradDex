@@ -54,9 +54,9 @@ Author     : szewczenko
                                     <select name="node_select"
                                             title="Select peer node to connect to">
                                         <option selected/>
-                                        <c:forEach items="${connections}" var="conn">
-                                            <option value="${conn.nodeName}"> 
-                                                <c:out value="${conn.nodeName}"/>
+                                        <c:forEach items="${nodes}" var="node">
+                                            <option value="${node.name}"> 
+                                                <c:out value="${node.name}"/>
                                             </option>
                                         </c:forEach>
                                     </select>             

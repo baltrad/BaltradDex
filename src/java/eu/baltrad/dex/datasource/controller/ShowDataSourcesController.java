@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,21 +17,17 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.datasource.controller;
 
-import eu.baltrad.dex.datasource.model.DataSourceManager;
+import eu.baltrad.dex.datasource.manager.impl.DataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 
-import org.springframework.web.servlet.mvc.Controller;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-
-import java.io.IOException;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
 
 import java.util.List;
 import java.util.Collections;
@@ -43,56 +39,51 @@ import java.util.Collections;
  * @version 0.6.4
  * @since 0.6.4
  */
-public class ShowDataSourcesController implements Controller {
-//---------------------------------------------------------------------------------------- Constants
-    /** Data sources list model key */
+@Controller
+public class ShowDataSourcesController {
+
+    // View names
+    private static final String SHOW_DATA_SOURCES_VIEW = "show_datasources";
+    private static final String EDIT_DATA_SOURCES_VIEW = "edit_datasources";
+    
+    // Model keys
     private static final String DATA_SOURCES_KEY = "data_sources";
-//---------------------------------------------------------------------------------------- Variables
-    /** References DataSourceManager */
+    
     private DataSourceManager dataSourceManager;
-    /** Success view */
-    private String successView;
-//------------------------------------------------------------------------------------------ Methods
+    
     /**
-     * Process the request and return a ModelAndView object which the DispatcherServlet will render.
-     *
-     * @param request current HTTP request
-     * @param response current HTTP response
-     * @return a ModelAndView to render, or null if handled directly
-     * @throws ServletException
-     * @throws IOException
+     * Show data sources.
+     * @param model Model map
+     * @return View name
      */
-    public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
-            throws ServletException, IOException {
+    @RequestMapping("/show_datasources.htm")
+    public String showDataSources(ModelMap model) {
         List<DataSource> dataSources = dataSourceManager.load();
-        Collections.sort( dataSources );
-        return new ModelAndView( getSuccessView(), DATA_SOURCES_KEY, dataSources );
+        Collections.sort(dataSources);
+        model.addAttribute(DATA_SOURCES_KEY, dataSources);
+        return SHOW_DATA_SOURCES_VIEW;
     }
+    
     /**
-     * Gets reference to DataSourceManager
-     *
-     * @return Reference to DataSourceManager
+     * Edit data sources.
+     * @param model Model map
+     * @return View name
      */
-    public DataSourceManager getDataSourceManager() { return dataSourceManager; }
+    @RequestMapping("/edit_datasources.htm")
+    public String editDataSources(ModelMap model) {
+        List<DataSource> dataSources = dataSourceManager.load();
+        Collections.sort(dataSources);
+        model.addAttribute(DATA_SOURCES_KEY, dataSources);
+        return EDIT_DATA_SOURCES_VIEW;
+    }
+
     /**
-     * Sets reference to DataSourceManager
-     *
-     * @param dataSourceManager Reference to DataSourceManager
+     * @param dataSourceManager the dataSourceManager to set
      */
-    public void setDataSourceManager( DataSourceManager dataSourceManager ) {
+    @Autowired
+    public void setDataSourceManager(DataSourceManager dataSourceManager) {
         this.dataSourceManager = dataSourceManager;
     }
-    /**
-     * Gets success view.
-     *
-     * @return Success view
-     */
-    public String getSuccessView() { return successView; }
-    /**
-     * Sets success view.
-     *
-     * @param successView Success view to set
-     */
-    public void setSuccessView( String successView ) { this.successView = successView; }
+    
 }
-//--------------------------------------------------------------------------------------------------
+

@@ -17,6 +17,7 @@
   <script src="includes/js/copy_select_option.js" type="text/javascript"></script>
   <script src="includes/js/expandable.js" type="text/javascript"></script>  
   <script src="includes/js/show_hide_message_details.js" type="text/javascript"></script>  
+  <script src="includes/js/submit_center_id.js" type="text/javascript"></script>  
   
   <jsp:invoke fragment="extraHeader"/>
   <!-- favicon -->

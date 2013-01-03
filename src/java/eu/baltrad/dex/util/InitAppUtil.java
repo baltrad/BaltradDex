@@ -22,7 +22,7 @@
 package eu.baltrad.dex.util;
 
 import eu.baltrad.dex.config.model.AppConfiguration;
-import eu.baltrad.dex.config.model.ConfigurationManager;
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.frame.model.Handler;
 
 import org.apache.log4j.Logger;

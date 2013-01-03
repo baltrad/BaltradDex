@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,47 +15,68 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Remove system messages page.
 Created on : Oct 5, 2010, 3:06 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<t:page_tabbed pageTitle="Configure messages" activeTab="settings">
+<t:page_tabbed pageTitle="Clear messages" activeTab="settings">
     <jsp:body>
         <div class="left">
             <t:menu_settings/>
         </div>
         <div class="right">
             <div class="blttitle">
-                Remove messages
+                Clear messages
             </div>
-            <div class="blttext">
-                Click OK in order to remove all system messages.
-            </div>
-            <div class="table">
-                <div class="addradar">
-                    <%@include file="/WEB-INF/jsp/generic_messages.jsp"%>
-                    <div class="tablefooter">
-                        <form action="clear_messages_status.htm">
-                            <div class="buttons">
-                                <button class="rounded" type="button"
-                                        onclick="window.location.href='settings.htm'">
-                                    <span>Back</span>
-                                </button>
-                                <button class="rounded" type="submit">
-                                    <span>OK</span>
-                                </button>
-                            </div>
-                        </form>
+            <c:choose>
+                <c:when test="${number_of_entries == 0}">
+                    <div class="blttext">
+                        No entries found in system log.
                     </div>
-                </div>
-            </div>
+                    <div class="table">
+                        <div class="addradar">
+                            <div class="tablefooter">
+                                <div class="buttons">
+                                    <button class="rounded" type="button"
+                                            onclick="window.location.href='settings.htm'">
+                                        <span>OK</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="blttext">
+                        Click OK to delete ${number_of_entries} messages
+                        from system log.
+                    </div>
+                    <div class="table">
+                        <div class="addradar">
+                            <div class="tablefooter">
+                                <form action="clear_messages_status.htm">
+                                    <div class="buttons">
+                                        <button class="rounded" type="button"
+                                            onclick="window.location='settings.htm'">
+                                            <span>Back</span>
+                                        </button>
+                                        <button class="rounded" type="submit">
+                                            <span>OK</span>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </c:otherwise>
+            </c:choose>
         </div>
     </jsp:body>
 </t:page_tabbed>    

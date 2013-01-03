@@ -92,9 +92,10 @@ Author     : szewczenko
                                                 multiple>
                                             <c:forEach items="${all_radars}" 
                                                        var="radar">
-                                                <option value="${radar.name}">    
-                                                    <c:out value="${radar.wmoNumber}:
-                                                        ${radar.name}"/>
+                                                <option value="${radar.radarPlace}">    
+                                                    <c:out value="${radar.radarPlace} 
+                                                               / ${radar.radarCode}
+                                                               / ${radar.radarWmo}"/>
                                                 </option>
                                             </c:forEach>
                                         </select>
@@ -103,9 +104,10 @@ Author     : szewczenko
                                                     multiple>
                                                 <c:forEach items="${all_radars}" 
                                                            var="radar">
-                                                    <option value="${radar.name}">    
-                                                        <c:out value="${radar.wmoNumber}:
-                                                            ${radar.name}"/>
+                                                    <option value="${radar.radarPlace}">    
+                                                        <c:out value="${radar.radarPlace} 
+                                                               / ${radar.radarCode}
+                                                               / ${radar.radarWmo}" />
                                                     </option>
                                                 </c:forEach>
                                             </select>
@@ -138,24 +140,24 @@ Author     : szewczenko
                                                     <c:out value="${missing_radar_error}"/>
                                                 </option>
                                                 <c:set var="missing_radar_error" 
-                                                       value="" 
-                                                       scope="session"/>
+                                                       value="" scope="session"/>
                                             </c:if> 
                                             <c:forEach items="${selected_radars}" var="radar">
-                                                <option value="${radar.name}">    
-                                                    <c:out value="${radar.wmoNumber}:
-                                                        ${radar.name}"/>
+                                                <option value="${radar.radarPlace}">    
+                                                    <c:out value="${radar.radarPlace} 
+                                                            / ${radar.radarCode}
+                                                            / ${radar.radarWmo}" />
                                                 </option>
                                             </c:forEach>
-                                        </select>
-                                                
+                                        </select>  
                                         <div class="hidden">            
                                             <select name="selected_radars_hid" size="6" 
                                                     multiple>
                                                 <c:forEach items="${selected_radars}" var="radar">
-                                                    <option value="${radar.name}">    
-                                                        <c:out value="${radar.wmoNumber}:
-                                                            ${radar.name}"/>
+                                                    <option value="${radar.radarPlace}">    
+                                                        <c:out value="${radar.radarPlace} 
+                                                               / ${radar.radarCode}
+                                                               / ${radar.radarWmo}" />
                                                     </option>
                                                 </c:forEach>    
                                             </select>                  
@@ -176,9 +178,9 @@ Author     : szewczenko
                                         <select name="all_file_objects" size="6" 
                                                 multiple>
                                             <c:forEach items="${all_file_objects}" var="fobject">
-                                                <option value="${fobject.fileObject}" 
+                                                <option value="${fobject.name}" 
                                                         title="${fobject.description}">
-                                                    <c:out value="${fobject.fileObject}"/>
+                                                    <c:out value="${fobject.name}"/>
                                                 </option>
                                             </c:forEach>
                                         </select>
@@ -186,9 +188,9 @@ Author     : szewczenko
                                             <select name="all_file_objects_hid" 
                                                     size="6" multiple>
                                                 <c:forEach items="${all_file_objects}" var="fobject">
-                                                    <option value="${fobject.fileObject}" 
+                                                    <option value="${fobject.name}" 
                                                             title="${fobject.description}">
-                                                        <c:out value="${fobject.fileObject}"/>
+                                                        <c:out value="${fobject.name}"/>
                                                     </option>
                                                 </c:forEach>
                                             </select>        
@@ -218,9 +220,9 @@ Author     : szewczenko
                                                 size="6" multiple>
                                             <c:forEach items="${selected_file_objects}" 
                                                        var="fobject">
-                                                <option value="${fobject.fileObject}" 
+                                                <option value="${fobject.name}" 
                                                         title="${fobject.description}">
-                                                    <c:out value="${fobject.fileObject}"/>
+                                                    <c:out value="${fobject.name}"/>
                                                 </option>
                                             </c:forEach>
                                         </select>
@@ -229,9 +231,9 @@ Author     : szewczenko
                                                     size="6" multiple>
                                                 <c:forEach items="${selected_file_objects}" 
                                                         var="fobject">
-                                                    <option value="${fobject.fileObject}" 
+                                                    <option value="${fobject.name}" 
                                                             title="${fobject.description}">
-                                                        <c:out value="${fobject.fileObject}"/>
+                                                        <c:out value="${fobject.name}"/>
                                                     </option>
                                                 </c:forEach>
                                             </select>        

@@ -26,16 +26,6 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@ page import="java.util.List" %>
-<%
-    List users = ( List )request.getAttribute( "users" );
-    if( users == null || users.size() <= 0 ) {
-        request.getSession().setAttribute( "users_status", 0 );
-    } else {
-        request.getSession().setAttribute( "users_status", 1 );
-    }
-%>
-
 <t:page_tabbed pageTitle="Remove user account" activeTab="settings">
     <jsp:body>
         <div class="left">
@@ -46,7 +36,7 @@ Author     : szewczenko
                 Remove user account
             </div>
             <c:choose>
-                <c:when test="${users_status == 1}">
+                <c:when test="${not empty accounts}">
                     <div class="blttext">
                         List of user accounts. Select user accounts to remove.
                     </div>
@@ -69,24 +59,25 @@ Author     : szewczenko
                                     </div>
                                 </div>
                                 <c:set var="count" scope="page" value="1"/>
-                                <c:forEach var="user" items="${users}">
+                                <c:forEach var="account" items="${accounts}">
                                     <div class="entry">
                                         <div id="cell" class="count">
                                             <c:out value="${count}"/>
                                             <c:set var="count" value="${count + 1}"/>
                                         </div>
                                         <div id="cell" class="username">
-                                            <c:out value="${user.name}"/>
+                                            <c:out value="${account.name}"/>
                                         </div>
                                         <div id="cell" class="rolename">
-                                            <c:out value="${user.roleName}"/>
+                                            <c:out value="${account.roleName}"/>
                                         </div>
                                         <div id="cell" class="orgname">
-                                            <c:out value="${user.organizationName}"/>
+                                            <c:out value="${account.orgName}"/>
                                         </div>
                                         <div id="cell" class="check">
-                                            <input type="checkbox" name="selected_users"
-                                                value="${user.id}"/>
+                                        <input type="checkbox" 
+                                               name="accounts"
+                                               value="${account.id}"/>
                                         </div>
                                     </div>
                                 </c:forEach>

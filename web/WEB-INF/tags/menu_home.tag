@@ -18,7 +18,7 @@
         </li>
         <li>
             <img src="includes/images/icons/data-source.png" alt="">
-            <a href="datasources.htm">Data sources</a>
+            <a href="show_datasources.htm">Data sources</a>
         </li>
         <li>
             <img src="includes/images/icons/browse.png" alt="">

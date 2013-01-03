@@ -1,4 +1,4 @@
-<%--------------------------------------------------------------------------------------------------
+<%------------------------------------------------------------------------------
 Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
@@ -15,11 +15,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Data upload status page
 Created on : Apr 1, 2011, 12:13 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -37,16 +37,16 @@ Author     : szewczenko
             Data upload status
         </div>
         <div class="blttext">
-            Data sent to users subscribing local data sources.
+            Data uploaded to subscribers.
         </div>
         <c:choose>
-            <c:when test="${not empty users}">
+            <c:when test="${not empty peers}">
                 <div class="blttext">
                     Click on user name to view detailed information
                     on subscriber.
                 </div>
-                <c:forEach var="user" items="${users}">
-                <c:set var="usr" scope="page" value="${user}"></c:set>
+                <c:forEach var="peer" items="${peers}">
+                <c:set var="peer_name" scope="page" value="${peer.name}"></c:set>
                 <div class="expandable">
                     <div class="save">
                         <div class="item">
@@ -57,14 +57,14 @@ Author     : szewczenko
                                         alt="+" title="Show">
                                 </span>
                                 <div class="user">
-                                    <c:out value="${user}"/>
+                                    <c:out value="${peer.name}"/>
                                 </div>
                             </a>
                         </div>
                         <div class="dspcont">
                             <div class="statustable">
                                 <c:choose>
-                                    <c:when test="${not empty remote}">
+                                    <c:when test="${not empty subscriptions}">
                                         <div class="header">
                                             <div id="cell" class="station">
                                                 Data source
@@ -73,14 +73,14 @@ Author     : szewczenko
                                                 Started at
                                             </div>
                                         </div>
-                                        <c:forEach var="sub" items="${remote}">
-                                            <c:if test="${sub.userName == usr}">
+                                        <c:forEach var="sub" items="${subscriptions}">
+                                            <c:if test="${sub.user == peer_name}">
                                                 <div class="entry">
                                                     <div id="cell" class="station">
-                                                        <c:out value="${sub.dataSourceName}"/>
+                                                        <c:out value="${sub.dataSource}"/>
                                                     </div>
                                                     <div id="cell" class="timestamp">
-                                                        <fmt:formatDate value="${sub.timeStamp}" 
+                                                        <fmt:formatDate value="${sub.timestamp}" 
                                                                         pattern="yyyy/dd/MM HH:mm:ss"/>
                                                     </div>
                                                 </div>

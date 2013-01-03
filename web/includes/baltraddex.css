@@ -505,18 +505,6 @@ input:focus, textarea:focus {
     text-align:right;
     margin-right:18px;
 }
-/* Radar table ---------------------------------------------------------------*/
-.station {
-    width:30%;
-}
-.wmonumber {
-    text-align:left;
-}
-.check {
-    width:10%;
-    float:right;
-    text-align:center;
-}
 /* Hidden class --------------------------------------------------------------*/
 .hidden {
     display:none;
@@ -573,11 +561,23 @@ input:focus, textarea:focus {
 .orgname input {
     width:320px;
 }
-.orgaddress {
+.country {
     float:left;
 }
-.orgaddress input {
-    width:320px;
+.country input {
+    width:200px;
+}
+.city {
+    float:left;
+}
+.city input {
+    width:200px;
+}
+.zipcode {
+    float:left;
+}
+.zipcode input {
+    width:100px;
 }
 .timezone {
     float:left;
@@ -616,22 +616,57 @@ input:focus, textarea:focus {
 .connect .nodeaddress input {
     width:360px;
 }
-/* Add radar page ------------------------------------------------------------*/
-.addradar .row {
-    height:32px;
+
+/* Show radar page -----------------------------------------------------------*/
+.showradar {
+    width:100%;
 }
-.addradar .radarname {
+.showradar .country_code {
+    width:10%;
+}
+.showradar .center_code {
+    width:12%;
+}
+.showradar .radar_place {
+    width:26%;
+}
+.showradar .radar_code {
+    width:12%;
+}
+.showradar .select {
+    width:10%;
+    margin-left:16%;
+    text-align:center; 
+}
+
+/* Save radar page -----------------------------------------------------------*/
+.saveradar {
+    width:100%;
+} 
+.saveradar > .row {
+    width:100%;
     float:left;
+    clear:both;
+    padding:12px 0px 8px 0px;
 }
-.addradar .wmonumber {
+.saveradar > .row > .leftcol, .saveradar > .row > .rightcol {
     float:left;
+    width:280px;
+    font-size:14px;
+    font-weight:normal; 
+    color:#444444;
+    text-align:left; 
 }
-.addradar .radarname input {
-    width:200px
+.saveradar > .row > .rightcol {
+    margin-left:40px;
 }
-.addradar .wmonumber input {
-    width:200px;
-}
+.saveradar > .row > .leftcol > select, 
+.saveradar > .row > .rightcol > select {
+    width:100%;
+    float:left;
+    clear:both;
+    margin-top:8px;
+}    
 /* Save data source page -----------------------------------------------------*/
 .dssave {
     width:100%;
@@ -1307,6 +1342,9 @@ input:focus, textarea:focus {
 .alert {
     width:100%;
     padding:4px;
+    margin-bottom:22px;
+    clear:both;
+    float:left;
 }
 .alert .icon {
     float:left;

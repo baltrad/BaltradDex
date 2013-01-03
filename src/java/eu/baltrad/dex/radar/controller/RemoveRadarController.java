@@ -21,13 +21,20 @@
 
 package eu.baltrad.dex.radar.controller;
 
-import eu.baltrad.dex.radar.model.RadarManager;
+import eu.baltrad.dex.radar.manager.impl.RadarManager;
 import eu.baltrad.dex.radar.model.Radar;
+import eu.baltrad.dex.util.MessageResourceUtil;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import org.apache.log4j.Logger;
-
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,121 +42,139 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.ArrayList;
 
+import java.io.IOException;
+
 /**
- * Controller implementing radar removal functionality.
+ * Remove radar.
  *
  * @author szewczenko
- * @version 1.2.1
+ * @version 1.2.2
  * @since 1.0.0
  */
-public class RemoveRadarController extends MultiActionController {
-
-    // model keys
-    private static final String SHOW_RADARS_KEY = "radars";
-    private static final String SELECTED_RADARS_KEY = "selected_radars";
-    private static final String REMOVED_RADARS_KEY = "removed_radars";
+@Controller
+public class RemoveRadarController {
+    
+    private static final String REMOVE_RADAR_VIEW = "remove_radar";
+    private static final String REMOVE_SELECTED_RADAR_VIEW = 
+            "remove_selected_radar";
+    private static final String REMOVE_RADAR_STATUS_VIEW = 
+            "remove_radar_status";
+    
+    private static final String RADARS_KEY = "radars";
+    private static final String REMOVE_RADAR_OK_MSG_KEY = "removeradar.success";
+    private static final String REMOVE_RADAR_COMPLETED_OK_MSG_KEY = 
+            "removeradar.completed_success";
+    private static final String REMOVE_RADAR_COMPLETED_ERROR_MSG_KEY = 
+            "removeradar.completed_failure";
+    
     private static final String OK_MSG_KEY = "message";
-    private static final String ERROR_MSG_KEY = "error";
-    // view names
-    private static final String SHOW_RADARS_VIEW = "remove_radar";
-    private static final String SELECTED_RADARS_VIEW = "radar_to_remove";
-    private static final String REMOVED_RADARS_VIEW = "remove_radar_status";
+    private static final String ERROR_MSG_KEY = "error";   
 
-    // Radar manager
     private RadarManager radarManager;
-    // Message logger
+    private PlatformTransactionManager transactionManager;
+    private MessageResourceUtil messages;
     private Logger log;
 
-    /*
+    /**
      * Constructor.
      */
     public RemoveRadarController() {
         this.log = Logger.getLogger("DEX");
     }
+    
     /**
-     * Shows all available channels.
-     *
-     * @param request Http request
-     * @param response Http response
-     * @return Models and view containing list of all available channels
+     * Loads all radars.
+     * @param model Model map 
+     * @return View name
      */
-    public ModelAndView remove_radar( HttpServletRequest request,
-            HttpServletResponse response ) {
-        List channels = radarManager.load();
-        return new ModelAndView(SHOW_RADARS_VIEW, SHOW_RADARS_KEY, channels);
+    @RequestMapping("/remove_radar.htm")
+    public String removeRadar(ModelMap model) {
+        model.addAttribute(RADARS_KEY, radarManager.load());
+        return REMOVE_RADAR_VIEW;
     }
+    
     /**
-     * Shows channels selected for removal.
-     *
+     * Lists radars selected for removal.
      * @param request Http request
      * @param response Http response
-     * @return Model and view containing list of channels selected for removal
+     * @param model Model map
+     * @return View name
+     * @throws IOException 
      */
-    public ModelAndView radar_to_remove(HttpServletRequest request,
-            HttpServletResponse response) {
-        ModelAndView modelAndView = null;
-        String[] radarIds = request.getParameterValues(SELECTED_RADARS_KEY);
+    @RequestMapping("/remove_selected_radar.htm")
+    public String removeSelectedRadar(HttpServletRequest request,
+            HttpServletResponse response, ModelMap model) throws IOException {
+        String[] radarIds = request.getParameterValues(RADARS_KEY);
         if (radarIds != null) {
             List<Radar> radars = new ArrayList<Radar>();
             for (int i = 0; i < radarIds.length; i++) {
-                radars.add( radarManager.load(Integer.parseInt(radarIds[i])));
+                radars.add(radarManager.load(Integer.parseInt(radarIds[i])));
             }
-            modelAndView = new ModelAndView(SELECTED_RADARS_VIEW, 
-                    SHOW_RADARS_KEY, radars);
+            model.addAttribute(RADARS_KEY, radars);
         } else {
-            List radars = radarManager.load();
-            modelAndView = new ModelAndView(SHOW_RADARS_VIEW, SHOW_RADARS_KEY, 
-                    radars);
+            response.sendRedirect("remove_radar.htm");
         }
-        return modelAndView;
+        return REMOVE_SELECTED_RADAR_VIEW;
     }
+    
     /**
-     * Displays information about radar removal status and errors if occured.
-     *
+     * Removes radars and renders status page.
      * @param request Http request
-     * @param response Http response
-     * @return Model and view containing data access exception errors if occured.
+     * @param model Model map
+     * @return View name
      */
-    public ModelAndView remove_radar_status(HttpServletRequest request,
-            HttpServletResponse response) {
-        String[] radarIds = request.getParameterValues(REMOVED_RADARS_KEY);
-        String radarName = "";
+    @RequestMapping("/remove_radar_status.htm")
+    public String removeRadarStatus(HttpServletRequest request, 
+                    ModelMap model) {
+        String[] radarIds = request.getParameterValues(RADARS_KEY);
+        // begin transaction
+        TransactionDefinition def = new DefaultTransactionDefinition();
+        TransactionStatus status = transactionManager.getTransaction(def);
         try {
             for (int i = 0; i < radarIds.length; i++) {
-                Radar radar = radarManager.load(Integer.parseInt(radarIds[i]));
-                radarName = radar.getName();
-                if (radarManager.delete(Integer.parseInt(radarIds[i])) > 0) {
-                    log.warn("Radar station " + radarName + 
-                        " successfully removed");
-                } else {
-                    log.error("Failed to remove radar station: " + radarName);
-                }
-            }
+                Radar radar = radarManager.load(
+                        Integer.parseInt(radarIds[i]));
+                radarManager.delete(Integer.parseInt(radarIds[i]));
+                String msg = messages.getMessage(REMOVE_RADAR_OK_MSG_KEY, 
+                                new Object[] {radar.getRadarPlace(),
+                                radar.getRadarCode(), radar.getRadarWmo()});
+                log.warn(msg);
+            }    
+            transactionManager.commit(status);
             request.getSession().setAttribute(OK_MSG_KEY, 
-                    getMessageSourceAccessor().getMessage(
-                        "message.removeradar.removesuccess" ) );
-        } catch(Exception e) {
-            request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, 
-                    getMessageSourceAccessor().getMessage(
-                        "message.removeradar.removefail" ) );
-            log.warn("Failed to remove radar station", e);
+                messages.getMessage(REMOVE_RADAR_COMPLETED_OK_MSG_KEY));
+        } catch (Exception e) {   
+            transactionManager.rollback(status);
+            request.getSession().setAttribute(ERROR_MSG_KEY, 
+                messages.getMessage(REMOVE_RADAR_COMPLETED_ERROR_MSG_KEY));
         }
-        return new ModelAndView( REMOVED_RADARS_VIEW );
+        return REMOVE_RADAR_STATUS_VIEW;
     }
-    /*
-     * Method returns reference to radar manager object.
-     *
-     * @return Reference to radar manager object
-     */
-    public RadarManager getRadarManager() { return radarManager; }
+    
     /**
-     * Method sets reference to radar manager object.
-     *
-     * @param Reference to radar manager object
+     * @param radarManager 
      */
-    public void setRadarManager( RadarManager radarManager ) {
+    @Autowired
+    public void setRadarManager(RadarManager radarManager) {
         this.radarManager = radarManager;
     }
+
+    /**
+     * @param transactionManager the transactionManager to set
+     */
+    @Autowired
+    public void setTransactionManager(
+            PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+
+    /**
+     * @param messages the messages to set
+     */
+    @Autowired
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
+    }
+    
 }
 

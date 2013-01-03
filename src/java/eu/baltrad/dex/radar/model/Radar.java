@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,111 +17,173 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.radar.model;
 
 import java.io.Serializable;
 
 /**
- * Class implements radar object.
+ * Implements radar object.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 0.1.6
+ * @version 1.2.2
  * @since 0.1.6
  */
 public class Radar implements Serializable {
-//---------------------------------------------------------------------------------------- Variables
+
     private int id;
-    private String name;
-    private String wmoNumber;
-//------------------------------------------------------------------------------------------ Methods
+    private String countryCode;
+    private String centerCode;
+    private int centerNumber;
+    private String radarPlace;
+    private String radarCode;
+    private String radarWmo;
+
     /**
      * Default constructor
      */
     public Radar() {}
+    
     /**
-     * Constructor setting field values.
-     *
-     * @param id Radar ID
-     * @param name Radar name
-     * @param wmoNumber Radar WMO number
+     * Constructor.
+     * @param id Id
+     * @param countryCode Country code
+     * @param centerCode Center code
+     * @param centerNumber Center number
+     * @param radarPlace Radar place name
+     * @param radarCode Radar code
+     * @param radarWmo  Radar WMO number
      */
-    public Radar( int id, String name, String wmoNumber ) {
+    public Radar(int id, String countryCode, String centerCode, 
+            int centerNumber, String radarPlace, String radarCode, 
+            String radarWmo) {
         this.id = id;
-        this.name = name;
-        this.wmoNumber = wmoNumber;
+        this.countryCode = countryCode;
+        this.centerCode = centerCode;
+        this.centerNumber = centerNumber;
+        this.radarPlace = radarPlace;
+        this.radarCode = radarCode;
+        this.radarWmo = radarWmo;
     }
+
     /**
-     * Constructor setting field values.
-     *
-     * @param name Radar name
-     * @param wmoNumber Radar WMO number
+     * Constructor.
+     * @param countryCode Country code
+     * @param centerCode Center code
+     * @param centerNumber Center number
+     * @param radarPlace Radar place name
+     * @param radarCode Radar code
+     * @param radarWmo  Radar WMO number
      */
-    public Radar( String name, String wmoNumber ) {
-        this.name = name;
-        this.wmoNumber = wmoNumber;
+    public Radar(String countryCode, String centerCode, int centerNumber, 
+            String radarPlace, String radarCode, String radarWmo) {
+        this.countryCode = countryCode;
+        this.centerCode = centerCode;
+        this.centerNumber = centerNumber;
+        this.radarPlace = radarPlace;
+        this.radarCode = radarCode;
+        this.radarWmo = radarWmo;
     }
+    
+    
     /**
-     * Compares radar object with another object.
-     *
-     * @param o Object to compare with
-     * @return True if objects are equal, false otherwise
+     * @return the id
      */
-    @Override
-    public boolean equals( Object o ) {
-        boolean res = false;
-        if( getClass() == o.getClass() ) {
-            if( this.getName().equals( ( ( Radar )o ).getName() ) ) {
-                res = true;
-            }
-        }
-        return res;
+    public int getId() {
+        return id;
     }
+
     /**
-     * Creates radar name hash code.
-     *
-     * @return Radar name hash code or 0 if radar name is null
+     * @param id the id to set
      */
-    @Override
-    public int hashCode() {
-        return( name != null ? name.hashCode() : 0 );
+    public void setId(int id) {
+        this.id = id;
     }
+
     /**
-     * Method gets radar id.
-     *
-     * @return Radar id
+     * @return the countryCode
      */
-    public int getId() { return id; }
+    public String getCountryCode() {
+        return countryCode;
+    }
+
     /**
-     * Method sets radar id.
-     *
-     * @param id Radar id
+     * @param countryCode the countryCode to set
      */
-    public void setId( int id ) { this.id = id; }
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+    
     /**
-     * Method gets radar name.
-     *
-     * @return Radar name
+     * @return the centerCode
      */
-    public String getName() { return name; }
+    public String getCenterCode() {
+        return centerCode;
+    }
+
     /**
-     * Method sets radar name.
-     *
-     * @param name Radar name
+     * @param centerCode the centerCode to set
      */
-    public void setName( String name ) { this.name = name; }
+    public void setCenterCode(String centerCode) {
+        this.centerCode = centerCode;
+    }
+
     /**
-     * Method gets WMO number.
-     *
-     * @return WMO number
+     * @return the centerNumber
      */
-    public String getWmoNumber() { return wmoNumber; }
+    public int getCenterNumber() {
+        return centerNumber;
+    }
+
     /**
-     * Method sets WMO number.
-     *
-     * @param wmoNumber WMO number
+     * @param centerNumber the centerNumber to set
      */
-    public void setWmoNumber( String wmoNumber ) { this.wmoNumber = wmoNumber; }
+    public void setCenterNumber(int centerNumber) {
+        this.centerNumber = centerNumber;
+    }
+
+    /**
+     * @return the radarPlace
+     */
+    public String getRadarPlace() {
+        return radarPlace;
+    }
+
+    /**
+     * @param radarPlace the radarPlace to set
+     */
+    public void setRadarPlace(String radarPlace) {
+        this.radarPlace = radarPlace;
+    }
+
+    /**
+     * @return the radarCode
+     */
+    public String getRadarCode() {
+        return radarCode;
+    }
+
+    /**
+     * @param radarCode the radarCode to set
+     */
+    public void setRadarCode(String radarCode) {
+        this.radarCode = radarCode;
+    }
+
+    /**
+     * @return the radarWmo
+     */
+    public String getRadarWmo() {
+        return radarWmo;
+    }
+
+    /**
+     * @param radarWmo the radarWmo to set
+     */
+    public void setRadarWmo(String radarWmo) {
+        this.radarWmo = radarWmo;
+    }
+    
 }
-//--------------------------------------------------------------------------------------------------
+

@@ -21,12 +21,13 @@
 
 package eu.baltrad.dex.user.controller;
 
-import eu.baltrad.dex.user.model.Password;
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.IUserManager;
-import eu.baltrad.dex.user.util.ChangePasswordValidator;
-import eu.baltrad.dex.auth.util.SecurityManager;
+import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.IAccountManager;
+import eu.baltrad.dex.user.validator.PasswordValidator;
+import eu.baltrad.dex.auth.manager.SecurityManager;
 import eu.baltrad.dex.util.MessageDigestUtil;
+import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,20 +51,22 @@ import org.apache.log4j.Logger;
  */
 @Controller
 @RequestMapping("/user_settings.htm")
-@SessionAttributes("password")
+@SessionAttributes("user_account")
 public class ChangeUserPasswordController {
     
-    /** Form view */
     private static final String FORM_VIEW = "user_settings";
-    /** Password model key */
-    private static final String PASSWD_KEY = "password";
-    /* Success message key */
+    
+    private static final String USER_ACCOUNT_MODEL_KEY = "user_account";
+    private static final String CHANGE_PASSWORD_ERROR_MSG_KEY = 
+            "changepassword.failure";
+    private static final String CHANGE_PASSWORD_OK_MSG_KEY = 
+            "changepassword.success";
     private static final String OK_MSG_KEY = "message";
-    /* Error message key */
     private static final String ERROR_MSG_KEY = "error";
     
-    private IUserManager userManager;
-    private ChangePasswordValidator validator;
+    private IAccountManager accountManager;
+    private PasswordValidator validator;
+    private MessageResourceUtil messages;
     private Logger log;
     
     /**
@@ -74,22 +77,6 @@ public class ChangeUserPasswordController {
     }
     
     /**
-     * @param userManager the userManager to set
-     */
-    @Autowired
-    public void setUserManager(IUserManager userManager) {
-        this.userManager = userManager;
-    }
-    
-    /**
-     * @param validator the validator to set
-     */
-    @Autowired
-    public void setValidator(ChangePasswordValidator validator) {
-        this.validator = validator;
-    }
-    
-    /**
      * Set up form.
      * @param model Model map
      * @param request Http servlet request
@@ -97,9 +84,9 @@ public class ChangeUserPasswordController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public String setupForm(ModelMap model, HttpServletRequest request) {
-        Password passwd = new Password(SecurityManager
-                .getSessionUser(request.getSession()).getName());
-        model.addAttribute(PASSWD_KEY, passwd);
+        User user = SecurityManager.getSessionUser(request.getSession());
+        Account account = accountManager.load(user.getId()); 
+        model.addAttribute(USER_ACCOUNT_MODEL_KEY, account);
         return FORM_VIEW;
     }
     
@@ -111,29 +98,51 @@ public class ChangeUserPasswordController {
      * @return Form view name
      */
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(ModelMap model, @ModelAttribute("password") 
-            Password passwd, BindingResult result) {    
-        validator.validate(passwd, result);
-        if (!result.hasErrors()) {
-            User user = userManager.load(passwd.getUserName());
-            int update = userManager.updatePassword(user.getId(), 
-                MessageDigestUtil.createHash("MD5", 16, 
-                    passwd.getNewPasswd()));
-            if (update > 0) {
-                String msg = "Password successfully changed for user " + 
-                                user.getName();
-                model.addAttribute(OK_MSG_KEY, msg);
-                log.warn(msg);
-            } else {
-                String msg = "Failed to change password for user " + 
-                    user.getName();
-                model.remove(OK_MSG_KEY);
-                model.addAttribute(ERROR_MSG_KEY, msg);
-                log.error(msg);
-            }
+    public String processSubmit(ModelMap model, @ModelAttribute("user_account") 
+            Account account, BindingResult result) {
+        validator.validate(account, result);
+        if (result.hasErrors()) {
+            return FORM_VIEW;
         }
-        model.addAttribute(PASSWD_KEY, passwd);
+        try {
+            accountManager.updatePassword(account.getId(), 
+                    MessageDigestUtil.createHash(
+                        "MD5", 16, account.getPassword()));
+            String msg = messages.getMessage(CHANGE_PASSWORD_OK_MSG_KEY, 
+                            new Object[] {account.getName()});
+            model.addAttribute(OK_MSG_KEY, msg);
+            log.warn(msg);        
+        } catch (Exception e) {
+            String msg = messages.getMessage(CHANGE_PASSWORD_ERROR_MSG_KEY, 
+                            new Object[] {account.getName()});
+            model.addAttribute(ERROR_MSG_KEY, msg);
+            log.error(msg, e);   
+        }
         return FORM_VIEW;
+    }
+    
+    /**
+     * @param userManager the userManager to set
+     */
+    @Autowired
+    public void setAccountManager(IAccountManager accountManager) {
+        this.accountManager = accountManager;
+    }
+    
+    /**
+     * @param validator the validator to set
+     */
+    @Autowired
+    public void setValidator(PasswordValidator validator) {
+        this.validator = validator;
+    }
+    
+    /**
+     * @param messages the messages to set
+     */
+    @Autowired
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
     }
     
 }

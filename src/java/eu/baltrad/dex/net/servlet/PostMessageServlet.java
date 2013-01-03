@@ -21,10 +21,10 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.net.model.NodeRequest;
-import eu.baltrad.dex.net.model.NodeResponse;
-import eu.baltrad.dex.net.util.Authenticator;
-import eu.baltrad.dex.net.util.KeyczarAuthenticator;
+import eu.baltrad.dex.net.request.impl.NodeRequest;
+import eu.baltrad.dex.net.response.impl.NodeResponse;
+import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
@@ -37,6 +37,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,7 +50,6 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.StringWriter;
 import java.io.IOException;
-import org.keyczar.exceptions.KeyczarException;
 
 
 /**
@@ -73,10 +74,7 @@ public class PostMessageServlet extends HttpServlet {
     
     private IXmlMessageParser xmlMessageParser;
     private IBltMessageManager bltMessageManager;
-    
-    protected String nodeName;
-    protected String nodeAddress;
-    
+        
     /**
      * Constructor.
      */
@@ -90,8 +88,6 @@ public class PostMessageServlet extends HttpServlet {
     protected void initConfiguration() {
         this.setAuthenticator(new KeyczarAuthenticator(
                  InitAppUtil.getConf().getKeystoreDir()));
-        this.nodeName = InitAppUtil.getConf().getNodeName();
-        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
     }
     
     /**

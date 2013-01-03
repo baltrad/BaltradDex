@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,18 +17,27 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.datasource.controller;
 
-import eu.baltrad.dex.datasource.model.DataSourceManager;
+import eu.baltrad.dex.datasource.manager.impl.DataSourceManager;
+import eu.baltrad.dex.net.manager.impl.SubscriptionManager;
 import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.util.MessageResourceUtil;
 
 import eu.baltrad.beast.db.CoreFilterManager;
 import eu.baltrad.beast.db.IFilter;
 
-import org.springframework.web.servlet.mvc.multiaction.MultiActionController;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.stereotype.Controller;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.ui.ModelMap;
 
 import org.apache.log4j.Logger;
 
@@ -37,169 +46,175 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Collections;
+
+import java.io.IOException;
 
 /**
  * Allows to select and remove existing data source.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 0.6.5
+ * @version 1.2.2
  * @since 0.6.5
  */
-public class RemoveDataSourceController extends MultiActionController {
-//---------------------------------------------------------------------------------------- Constants
-    /** Select remove data source view */
-    private static final String DS_SELECT_REMOVE_VIEW = "remove_datasource";
-    /** Data source selection view */
-    private static final String DS_TO_REMOVE_VIEW = "remove_selected_datasource";
-    /** Remove data source view */
-    private static final String DS_REMOVE_VIEW = "remove_datasource_status";
-    /** Data sources list model key */
-    private static final String DS_SELECT_REMOVE_KEY = "dataSources";
-    /** Submit button key */
-    private static final String DS_SUBMIT_BUTTON_KEY = "submitButton";
-    /** Selected data sources key */
-    private static final String DS_SELECTED_SOURCES = "selectedSources";
-    /** Remove data source message key */
-    private static final String DS_REMOVE_MSG_KEY = "message";
-    /** Remove data source error key */
-    private static final String DS_REMOVE_ERROR_KEY = "error";
-//---------------------------------------------------------------------------------------- Variables
-    /** References data source manager object */
+@Controller
+public class RemoveDataSourceController {
+
+    // View names
+    private static final String DS_REMOVE_VIEW = "remove_datasource";
+    private static final String DS_REMOVE_SELECTED_VIEW = 
+            "remove_selected_datasource";
+    private static final String DS_REMOVE_STATUS_VIEW = 
+            "remove_datasource_status";
+    
+    // Model keys
+    private static final String DS_KEY = "data_sources";
+    private static final String DS_SELECTED_KEY = "selected_data_sources";
+    
+    private static final String REMOVE_DS_OK_MSG_KEY = 
+            "removedatasource.success";
+    private static final String REMOVE_DS_COMPLETED_OK_MSG_KEY = 
+            "removedatasource.completed_success";
+    private static final String REMOVE_DS_COMPLETED_ERROR_MSG_KEY = 
+            "removedatasource.completed_failure"; 
+    private static final String OK_MSG_KEY = "message";
+    private static final String ERROR_MSG_KEY = "error";
+
     private DataSourceManager dataSourceManager;
-    /** References core filter manager object */
-    private CoreFilterManager coreFilterManager;
-    /** References message logger */
+    private SubscriptionManager subscriptionManager;
+    private CoreFilterManager filterManager;
+    private PlatformTransactionManager txManager;
+    private MessageResourceUtil messages;
     private Logger log;
-//------------------------------------------------------------------------------------------ Methods
+
     /**
      * Constructor.
      */
     public RemoveDataSourceController() {
         this.log = Logger.getLogger("DEX");
     }
+    
     /**
-     * Renders select data source page.
-     *
-     * @param request Current HTTP request
-     * @param response Current HTTP response
-     * @return The prepared model and view
+     * Renders show data sources page.
+     * @param model Model map
+     * @return View name
      */
-    public ModelAndView remove_datasource( HttpServletRequest request, 
-            HttpServletResponse response ) {
+    @RequestMapping("/remove_datasource.htm")
+    public String removeDatasources(ModelMap model) {
         List<DataSource> dataSources = dataSourceManager.load();
-        Collections.sort( dataSources );
-        return new ModelAndView(DS_SELECT_REMOVE_VIEW, DS_SELECT_REMOVE_KEY, dataSources);
+        Collections.sort(dataSources);
+        model.addAttribute(DS_KEY, dataSources);
+        return DS_REMOVE_VIEW;
     }
+
     /**
-     * Prepares a list of data sources selected for removal.
-     * 
-     * @param request Current HTTP request
-     * @param response Current HTTP response
-     * @return The prepared model and view
+     * Renders data source selection page.
+     * @param request Http servlet request
+     * @param response Http servlet response
+     * @param model Model map
+     * @return View name
+     * @throws IOException 
      */
-    public ModelAndView remove_selected_datasource( HttpServletRequest request, 
-            HttpServletResponse response ) {
-        ModelAndView modelAndView = new ModelAndView();
-        Map parameterMap = request.getParameterMap();
-        String[] parameterValues = null;
-        List<DataSource> dataSources = new ArrayList<DataSource>();
-        if( parameterMap.containsKey( DS_SUBMIT_BUTTON_KEY ) ) {
-            parameterValues = ( String[] )parameterMap.get( DS_SELECTED_SOURCES );
-            if( parameterValues != null ) {
-                for( int i = 0; i < parameterValues.length; i++ ) {
-                    try {
-                        dataSources.add( dataSourceManager.load(
-                                Integer.parseInt( parameterValues[ i ] ) ) );
-                    } catch( Exception e ) {
-                        String msg = "Failed to fetch data sources";
-                        modelAndView.addObject( DS_REMOVE_ERROR_KEY, msg );
-                        log.error( msg, e );
+    @RequestMapping("/remove_selected_datasource.htm")
+    public String removeSelectedDataSources(HttpServletRequest request,
+            HttpServletResponse response, ModelMap model) throws IOException {
+        String[] dataSourceIds = request.getParameterValues(DS_SELECTED_KEY);
+        if (dataSourceIds != null) {
+            List<DataSource> dataSources = new ArrayList<DataSource>();
+            for (int i = 0; i < dataSourceIds.length; i++) {
+                dataSources.add(dataSourceManager
+                        .load(Integer.parseInt(dataSourceIds[i])));
+            }
+            model.addAttribute(DS_SELECTED_KEY, dataSources);
+        } else {
+            response.sendRedirect("remove_datasource.htm");
+        }
+        return DS_REMOVE_SELECTED_VIEW;
+    }
+    
+    /**
+     * Remove selected data sources.
+     * @param request Http servlet request
+     * @param model Model map
+     * @return View name
+     */
+    @RequestMapping("/remove_datasource_status.htm")
+    public String removeDatasourcesStatus(HttpServletRequest request, 
+            ModelMap model) {
+        TransactionDefinition def = new DefaultTransactionDefinition();
+        TransactionStatus status = txManager.getTransaction(def);
+        try {
+            String[] dataSourceIds = request.getParameterValues(DS_SELECTED_KEY);
+            List<Subscription> uploads = 
+                        subscriptionManager.load(Subscription.UPLOAD);
+            for (int i = 0; i < dataSourceIds.length; i++) {
+                int dsId = Integer.parseInt(dataSourceIds[i]);
+                String dsName = dataSourceManager.load(dsId).getName();
+                int filterId = dataSourceManager.loadFilterId(dsId);
+                IFilter filter = filterManager.load(filterId);
+                filterManager.remove(filter);
+                dataSourceManager.delete(dsId);
+                // Remove subscriptions
+                for (Subscription s : uploads) {
+                    if (s.getDataSource().equals(dsName)) {
+                        subscriptionManager.delete(s.getId());
                     }
                 }
-                modelAndView = new ModelAndView( DS_TO_REMOVE_VIEW, DS_SELECT_REMOVE_KEY,
-                        dataSources );
-            } else {
-                modelAndView.addObject(DS_SELECT_REMOVE_KEY, dataSourceManager.load());
-                modelAndView.setViewName( DS_SELECT_REMOVE_VIEW );
+                String msg = messages.getMessage(REMOVE_DS_OK_MSG_KEY, 
+                                new Object[] {dsName});
+                log.warn(msg);
             }
+            txManager.commit(status);
+            request.getSession().setAttribute(OK_MSG_KEY, 
+            messages.getMessage(REMOVE_DS_COMPLETED_OK_MSG_KEY));
+        } catch (Exception e) {
+            txManager.rollback(status);
+            request.getSession().setAttribute(ERROR_MSG_KEY, 
+                messages.getMessage(REMOVE_DS_COMPLETED_ERROR_MSG_KEY));
         }
-        return modelAndView;
+        return DS_REMOVE_STATUS_VIEW;
     }
+    
     /**
-     * Removes selected data sources.
-     *
-     * @param request Current HTTP request
-     * @param response Current HTTP response
-     * @return The prepared model and view
+     * @param dataSourceManager the dataSourceManager to set
      */
-    public ModelAndView remove_datasource_status( HttpServletRequest request, 
-            HttpServletResponse response ) {
-        ModelAndView modelAndView = new ModelAndView();
-        Map parameterMap = request.getParameterMap();
-        String[] parameterValues = null;
-        if( parameterMap.containsKey( DS_SUBMIT_BUTTON_KEY ) ) {
-            parameterValues = ( String[] )parameterMap.get( DS_SELECTED_SOURCES );
-            if( parameterValues != null ) {
-                for( int i = 0; i < parameterValues.length; i++ ) {
-                    try {
-                        DataSource dataSource = dataSourceManager.load(
-                                Integer.parseInt( parameterValues[ i ] ) );
-                        String dataSourceName = dataSource.getName();
-                        // Delete filters
-                        int filterId = dataSourceManager.loadFilterId( dataSource.getId() );
-                        IFilter filter = coreFilterManager.load( filterId );
-                        coreFilterManager.remove( filter );
-                        // Delete data source
-                        dataSourceManager
-                                .delete(Integer.parseInt(parameterValues[i]));
-                        String msg = "Data source successfully removed: " + dataSourceName;
-                        log.warn( msg );
-                    } catch( Exception e ) {
-                        modelAndView.addObject( DS_REMOVE_ERROR_KEY, "SQL exception" );
-                        log.error( "Failed to remove data source", e );
-                    }
-                }
-                String msg = "Selected data sources have been removed.";
-                modelAndView.addObject( DS_REMOVE_MSG_KEY, msg );
-                modelAndView.setViewName( DS_REMOVE_VIEW );
-            } else {
-                modelAndView.addObject(DS_SELECT_REMOVE_KEY, dataSourceManager.load());
-                modelAndView.setViewName( DS_SELECT_REMOVE_VIEW );
-            }
-        }
-        return modelAndView;
-    }
-    /**
-     * Gets reference to DataSourceManager
-     *
-     * @return Reference to DataSourceManager
-     */
-    public DataSourceManager getDataSourceManager() { return dataSourceManager; }
-    /**
-     * Sets reference to DataSourceManager
-     *
-     * @param dataSourceManager Reference to DataSourceManager
-     */
-    public void setDataSourceManager( DataSourceManager dataSourceManager ) {
+    @Autowired
+    public void setDataSourceManager(DataSourceManager dataSourceManager) {
         this.dataSourceManager = dataSourceManager;
     }
+    
     /**
-     * Gets reference to CoreFilterManager.
-     *
-     * @return Reference to CoreFilterManager
+     * @param subscriptionManager the subscriptionManager to set
      */
-    public CoreFilterManager getCoreFilterManager() {
-        return coreFilterManager;
+    @Autowired
+    public void setSubscriptionManager(SubscriptionManager subscriptionManager) 
+    {
+        this.subscriptionManager = subscriptionManager;
     }
+
     /**
-     * Sets reference to CoreFilterManager.
-     *
-     * @param coreFilterManager Reference tp CoreFilterManager to set
+     * @param filterManager the filterManager to set
      */
-    public void setCoreFilterManager( CoreFilterManager coreFilterManager ) {
-        this.coreFilterManager = coreFilterManager;
+    @Autowired
+    public void setFilterManager(CoreFilterManager filterManager) {
+        this.filterManager = filterManager;
     }
+
+    /**
+     * @param txManager the txManager to set
+     */
+    @Autowired
+    public void setTxManager(PlatformTransactionManager txManager) {
+        this.txManager = txManager;
+    }
+
+    /**
+     * @param messages the messages to set
+     */
+    @Autowired
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
+    }
+    
 }
-//--------------------------------------------------------------------------------------------------
+

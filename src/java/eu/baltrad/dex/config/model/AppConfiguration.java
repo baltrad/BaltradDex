@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.config.model;
 
@@ -25,11 +25,11 @@ package eu.baltrad.dex.config.model;
  * Class implements system configuration object.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.0
+ * @version 1.2.2
  * @since 1.0
  */
 public class AppConfiguration {
-//---------------------------------------------------------------------------------------- Variables
+
     /** Node name, e.g. baltrad.imgw.pl */
     private String nodeName;
     /** Fully qualified node address */
@@ -43,9 +43,15 @@ public class AppConfiguration {
     /** Connection timeout */
     private int connTimeout;
     /** Organization's name */
-    private String organization;
-    /** Organization's address */
-    private String address;
+    private String orgName;
+    /** Organization's unit */
+    private String orgUnit;
+    /** Locality / city */
+    private String locality;
+    /** State */
+    private String state;
+    /** Country code*/
+    private String countryCode;
     /** Host time zone */
     private String timeZone;
     /** Work directory */
@@ -58,7 +64,7 @@ public class AppConfiguration {
     private String email;
     /** Keystore directory */
     private String keystoreDir;
-//------------------------------------------------------------------------------------------ Methods
+
     /**
      * Constructor
      *
@@ -71,16 +77,21 @@ public class AppConfiguration {
      * @param workDir Work directory
      * @param imagesDir Images storage directory
      * @param thumbsDir Thumbnails storage directory
-     * @param organization Organization's name
-     * @param address Organization's address
+     * @param orgName Organization's name
+     * @param orgUnit Organization's unit
+     * @param locality Locality / city
+     * @param state State / country
+     * @param countryCode Country code
      * @param timeZone Time zone
      * @param email Node admin's email
      * @param keystorePass Keystore password  
      * @param keystoreDir Keystore directory
      */
-    public AppConfiguration( String nodeName, String nodeAddress, String nodeType, String version, 
-            int soTimeout, int connTimeout, String workDir, String imagesDir, String thumbsDir, 
-            String organization, String address, String timeZone, String email, 
+    public AppConfiguration( String nodeName, String nodeAddress, 
+            String nodeType, String version, int soTimeout, int connTimeout, 
+            String workDir, String imagesDir, String thumbsDir, 
+            String orgName, String orgUnit, String locality, String state,
+            String countryCode, String timeZone, String email, 
             String keystoreDir) {
         this.nodeName = nodeName;
         this.nodeAddress = nodeAddress;
@@ -91,8 +102,11 @@ public class AppConfiguration {
         this.workDir = workDir;
         this.imagesDir = imagesDir;
         this.thumbsDir = thumbsDir;
-        this.organization = organization;
-        this.address= address;
+        this.orgName = orgName;
+        this.orgUnit = orgUnit;
+        this.locality = locality;
+        this.state = state;
+        this.countryCode = countryCode;
         this.timeZone = timeZone;
         this.email = email;
         this.keystoreDir = keystoreDir;
@@ -117,8 +131,11 @@ public class AppConfiguration {
                 appConf.getWorkDir().equals( this.getWorkDir() ) &&
                 appConf.getImagesDir().equals( this.getImagesDir() ) &&
                 appConf.getThumbsDir().equals( this.getThumbsDir() ) &&
-                appConf.getOrganization().equals( this.getOrganization() ) &&
-                appConf.getAddress().equals( this.getAddress() ) &&
+                appConf.getOrgName().equals( this.getOrgName() ) &&
+                appConf.getOrgUnit().equals( this.getOrgUnit() ) &&    
+                appConf.getLocality().equals( this.getLocality() ) &&
+                appConf.getState().equals( this.getState() ) &&
+                appConf.getCountryCode().equals( this.getCountryCode() ) &&
                 appConf.getTimeZone().equals( this.getTimeZone() ) &&
                 appConf.getEmail().equals( this.getEmail() ) &&
                 appConf.getKeystoreDir().equals(this.getKeystoreDir());
@@ -149,7 +166,9 @@ public class AppConfiguration {
      * 
      * @param nodeAddress Fully qualified node address
      */
-    public void setNodeAddress(String nodeAddress) { this.nodeAddress = nodeAddress; }
+    public void setNodeAddress(String nodeAddress) { 
+        this.nodeAddress = nodeAddress; 
+    }
     /**
      * Gets node type.
      *
@@ -197,31 +216,78 @@ public class AppConfiguration {
      *
      * @param connTimeout Connection timeout to set
      */
-    public void setConnTimeout( int connTimeout ) { this.connTimeout = connTimeout; }
+    public void setConnTimeout( int connTimeout ) { 
+        this.connTimeout = connTimeout; 
+    }
     /**
-     * Gets organization name.
-     *
-     * @return Organization name
+     * @return the orgName
      */
-    public String getOrganization() { return organization; }
+    public String getOrgName() {
+        return orgName;
+    }
+
     /**
-     * Sets organization name.
-     *
-     * @param organization Organization name
+     * @param orgName the orgName to set
      */
-    public void setOrganization( String organization ) { this.organization = organization; }
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
     /**
-     * Gets organization's address.
-     *
-     * @return Organization's address
+     * @return the orgUnit
      */
-    public String getAddress() { return address; }
+    public String getOrgUnit() {
+        return orgUnit;
+    }
+
     /**
-     * Sets organization's address.
-     *
-     * @param organization Organization's address
+     * @param orgUnit the orgUnit to set
      */
-    public void setAddress( String address ) { this.address = address; }
+    public void setOrgUnit(String orgUnit) {
+        this.orgUnit = orgUnit;
+    }
+
+    /**
+     * @return the locality
+     */
+    public String getLocality() {
+        return locality;
+    }
+
+    /**
+     * @param locality the locality to set
+     */
+    public void setLocality(String locality) {
+        this.locality = locality;
+    }
+
+    /**
+     * @return the state
+     */
+    public String getState() {
+        return state;
+    }
+
+    /**
+     * @param state the state to set
+     */
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    /**
+     * @return the countryCode
+     */
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    /**
+     * @param countryCode the countryCode to set
+     */
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
     /**
      * Gets local time zone.
      *
@@ -296,4 +362,4 @@ public class AppConfiguration {
         this.keystoreDir = keystoreDir;
     }
 }
-//--------------------------------------------------------------------------------------------------
+

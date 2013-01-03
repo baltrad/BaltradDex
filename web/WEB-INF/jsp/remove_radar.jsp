@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,18 +15,16 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Remove local radar station
 Created on : Oct 5, 2010, 11:49 AM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-
-<%@ page import="java.util.List" %>
 
 <t:page_tabbed pageTitle="Remove radar station" activeTab="settings">
     <jsp:body>
@@ -40,20 +38,26 @@ Author     : szewczenko
             <c:choose>
                 <c:when test="${not empty radars}">
                     <div class="blttext">
-                        Select radar stations to remove.
+                        Click check box to select radar station to be removed.  
                     </div>
                     <div class="table">
-                        <div class="removeradar">
-                            <form action="radar_to_remove.htm">
+                        <div class="showradar">
+                            <form action="remove_selected_radar.htm">
                                 <div class="tableheader">
                                     <div id="cell" class="count">&nbsp;</div>
-                                    <div id="cell" class="station">
-                                        Name
+                                    <div id="cell" class="country_code">
+                                        Country
                                     </div>
-                                    <div id="cell" class="wmonumber">
-                                        WMO number
+                                    <div id="cell" class="center_code">
+                                        Center
                                     </div>
-                                    <div class="check">
+                                    <div id="cell" class="radar_place">
+                                        Place
+                                    </div>
+                                    <div id="cell" class="radar_code">
+                                        Radar code
+                                    </div>
+                                    <div id ="cell" class="select">
                                         Select
                                     </div>
                                 </div>
@@ -64,15 +68,26 @@ Author     : szewczenko
                                             <c:out value="${count}"/>
                                             <c:set var="count" value="${count + 1}"/>
                                         </div>
-                                        <div id="cell" class="station">
-                                            <c:out value="${radar.name}"/>
+                                        <div id="cell" class="country_code" 
+                                            title="Country code">
+                                            <c:out value="${radar.countryCode}"/>
                                         </div>
-                                        <div id="cell" class="wmonumber">
-                                            <c:out value="${radar.wmoNumber}"/>
+                                        <div id="cell" class="center_code"
+                                            title="GTS code / Center number">
+                                            <c:out value="${radar.centerCode} / ${radar.centerNumber}"/>
                                         </div>
-                                        <div class="check">
-                                            <input type="checkbox" name="selected_radars"
-                                                value="${radar.id}"/>
+                                        <div id="cell" class="radar_place" 
+                                            title="Radar place">
+                                            <c:out value="${radar.radarPlace}"/>
+                                        </div>
+                                        <div id="cell" class="radar_code"
+                                            title="Radar code / WMO number">
+                                            <c:out value="${radar.radarCode} / ${radar.radarWmo}"/>
+                                        </div>
+                                        <div id="cell" class="select">
+                                            <input type="checkbox" 
+                                                   name="radars"
+                                                   value="${radar.id}"/>
                                         </div>
                                     </div>
                                 </c:forEach>
@@ -87,8 +102,8 @@ Author     : szewczenko
                                         </button>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </c:when>
                 <c:otherwise>
@@ -106,7 +121,7 @@ Author     : szewczenko
                                 </button>
                             </div>
                         </div>
-                    </div>    
+                    </div>
                 </c:otherwise>
             </c:choose>
         </div>

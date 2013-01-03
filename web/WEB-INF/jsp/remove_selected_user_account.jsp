@@ -54,24 +54,24 @@ Author     : szewczenko
                             </div>
                         </div>
                         <c:set var="count" scope="page" value="1"/>
-                        <c:forEach var="user" items="${selected_users}">
+                        <c:forEach var="account" items="${accounts}">
                             <div class="entry">
                                 <div id="cell" class="count">
                                     <c:out value="${count}"/>
                                     <c:set var="count" value="${count + 1}"/>
                                 </div>
                                 <div id="cell" class="username">
-                                    <c:out value="${user.name}"/>
+                                    <c:out value="${account.name}"/>
                                 </div>
                                 <div id="cell" class="rolename">
-                                    <c:out value="${user.roleName}"/>
+                                    <c:out value="${account.roleName}"/>
                                 </div>
                                 <div id="cell" class="orgname">
-                                    <c:out value="${user.organizationName}"/>
+                                    <c:out value="${account.orgName}"/>
                                 </div>
                                 <div class="hidden">
-                                    <input type="checkbox" name="removed_users"
-                                        value="${user.id}" checked/>
+                                    <input type="checkbox" name="accounts"
+                                        value="${account.id}" checked/>
                                 </div>
                             </div>
                         </c:forEach>

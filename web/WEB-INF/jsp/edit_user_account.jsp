@@ -1,4 +1,4 @@
-<%--------------------------------------------------------------------------------------------------
+<%------------------------------------------------------------------------------
 Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
@@ -15,27 +15,17 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Edit user account page
 Created on : Oct 4, 2010, 2:27 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-
-<%@ page import="java.util.List" %>
-<%
-    List users = ( List )request.getAttribute( "registered_users" );
-    if( users == null || users.size() <= 0 ) {
-        request.getSession().setAttribute( "users_status", 0 );
-    } else {
-        request.getSession().setAttribute( "users_status", 1 );
-    }
-%>
 
 <t:page_tabbed pageTitle="Edit user account" activeTab="settings">
     <jsp:body>
@@ -47,7 +37,7 @@ Author     : szewczenko
                 Edit user account
             </div>
             <c:choose>
-                <c:when test="${users_status == 1}">
+                <c:when test="${not empty accounts}">
                     <div class="blttext">
                         List of user accounts. Click on user name in order to
                         modify account settings.
@@ -70,26 +60,26 @@ Author     : szewczenko
                                 </div>
                             </div>
                             <c:set var="count" scope="page" value="1"/>
-                            <c:forEach var="user" items="${registered_users}">
+                            <c:forEach var="account" items="${accounts}">
                                 <div class="entry">
                                     <div id="cell" class="count">
                                         <c:out value="${count}"/>
                                         <c:set var="count" value="${count + 1}"/>
                                     </div>
                                     <div id="cell" class="username">
-                                        <a href="save_user_account.htm?userId=${user.id}">
-                                            <c:out value="${user.name}"/>
+                                        <a href="save_user_account.htm?user_id=${account.id}">
+                                            <c:out value="${account.name}"/>
                                         </a>
                                     </div>
                                     <div id="cell" class="rolename">
-                                        <c:out value="${user.roleName}"/>
+                                        <c:out value="${account.roleName}"/>
                                     </div>
                                     <div id="cell" class="orgname">
-                                        <c:out value="${user.organizationName}"/>
+                                        <c:out value="${account.orgName}"/>
                                     </div>
-                                    <c:if test="${user.roleName != 'peer'}">
+                                    <c:if test="${account.roleName != 'peer'}">
                                         <div id="cell" class="passwdchange">
-                                            <a href="change_user_password.htm?userId=${user.id}">
+                                            <a href="change_user_password.htm?user_id=${account.id}">
                                                 Change
                                             </a>
                                         </div>

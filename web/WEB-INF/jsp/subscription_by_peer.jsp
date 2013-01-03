@@ -77,10 +77,10 @@ Author     : szewczenko
                                             <c:set var="count" value="${count + 1}"/>
                                         </div>
                                         <div id="cell" class="name">
-                                            <c:out value="${sub.dataSourceName}"/>
+                                            <c:out value="${sub.dataSource}"/>
                                         </div>
                                         <div id="cell" class="timestamp">
-                                            <fmt:formatDate value="${sub.timeStamp}" 
+                                            <fmt:formatDate value="${sub.timestamp}" 
                                                             pattern="yyyy/dd/MM HH:mm:ss"/>
                                         </div>
                                         <div id="cell" class="active">

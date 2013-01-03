@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    
+    <dex_data_sources id="1" name="DataSource1"
+        description="A test data source"/>
+    <dex_data_sources id="2" name="DataSource2"
+        description="Another test data source"/>
+    <dex_data_sources id="3" name="DataSource3"
+        description="Yet one more test data source"/>
+    <dex_data_sources id="4" name="DataSource4"
+        description="Stored data source"/>   
+    
+</dataset>

@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.net.util.Authenticator;
+import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
@@ -73,10 +73,7 @@ public class PostMessageServletTest {
     private MockHttpServletResponse response;
     
     protected class PMServlet extends PostMessageServlet {
-        public PMServlet() {
-            this.nodeName = "test.baltrad.eu";
-            this.nodeAddress = "http://test.baltrad.eu";
-        }
+        public PMServlet() {}
         @Override
         public void initConfiguration() {}
     }
@@ -121,7 +118,8 @@ public class PostMessageServletTest {
     public void setUp() {
         classUnderTest = new PMServlet();
         mocks = new ArrayList<Object>();
-        messages = new MessageResourceUtil("resources/messages");
+        messages = new MessageResourceUtil();
+        messages.setBasename("resources/messages");
         classUnderTest.setMessages(messages);
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();

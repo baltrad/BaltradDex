@@ -22,6 +22,10 @@
 package eu.baltrad.dex.log.model;
 
 import java.io.Serializable;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
 
 /**
@@ -33,124 +37,130 @@ import java.util.Date;
  */
 public class LogEntry implements Serializable {
     
+    private final static String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
+    
     /** Log entry ID */
     private int id;
-    /** Timestamp */
-    private Date timeStamp;
-    /** Determines the system that generated the message */
-    private String system;
-    /** Message type */
-    private String type;
-    /** Actual message string */
+    /** Current time in milliseconds */
+    private long timeStamp;
+    /** Date and time in a given format */
+    private String dateTime;
+    /** Logger that generated the message */
+    private String logger;
+    /** Message level: INFO, WARN, ERROR */
+    private String level;
+    /** Message body */
     private String message;
-    
-    /**
-     * Default constructor.
-     */
-    public LogEntry() {}
+    /** Date format */
+    private DateFormat format = new SimpleDateFormat(DATE_FORMAT);
     
     /**
      * Constructor.
      * @param id Record id
-     * @param Timestamp Current time as timestamp
-     * @param system Determines system that produced the message
-     * @param type Determines type of the message
-     * @param message Actual message string
+     * @param timeStamp Current time in milliseconds
+     * @param logger Logger that generated the message
+     * @param level Message level
+     * @param message Message body
      */
-    public LogEntry(int id, Date timeStamp, String system, String type, 
+    public LogEntry(int id, long timeStamp, String logger, String level, 
             String message) {
         this.id = id;
         this.timeStamp = timeStamp;
-        this.system = system;
-        this.type = type;
+        this.dateTime = format.format(new Date(timeStamp));
+        this.logger = logger;
+        this.level = level;
         this.message = message;
     }
     
     /**
      * Constructor.
-     * @param Timestamp Current time as timestamp
-     * @param system Determines system that produced the message
-     * @param type Determines type of the message
-     * @param message Actual message string
+     * @param timeStamp Current time in milliseconds
+     * @param logger Logger that generated the message
+     * @param level Message level
+     * @param message Message body
      */
-    public LogEntry(Date timeStamp, String system, String type, 
-            String message) {
+    public LogEntry(long timeStamp, String logger, String level, String message) {
         this.timeStamp = timeStamp;
-        this.system = system;
-        this.type = type;
+        this.dateTime = format.format(new Date(timeStamp));
+        this.logger = logger;
+        this.level = level;
         this.message = message;
     }
+    
     /**
-     * Constructor.
-     * @param time Current time in milliseconds
-     * @param system Determines system that produced the message
-     * @param type Determines type of the message
-     * @param message Actual message string
-     */
-    public LogEntry(long time, String system, String type, String message) {
-        this.timeStamp = new Date(time);
-        this.system = system;
-        this.type = type;
-        this.message = message;
-    }
-    /**
-     * Method gets log entry ID.
-     *
-     * @return Log entry ID
+     * Get record id.
+     * @return Record id 
      */
     public int getId() { return id; }
+    
     /**
-     * Method sets log entry ID.
-     *
-     * @param id Log entry ID
+     * Set record id.
+     * @param id Id to set
      */
     public void setId( int id ) { this.id = id; }
+    
     /**
-     * Gets timestamp
-     *
-     * @return TimeStamp
+     * Get timestamp.
+     * @return Timestamp
      */
-    public Date getTimeStamp() { return timeStamp; }
+    public long getTimeStamp() { return timeStamp; }
+    
     /**
-     * Sets timstamp
-     *
-     * @param timeStamp Timestamp to set
+     * Set timestamp.
+     * @param timeStamp Timestamp to set 
      */
-    public void setTimeStamp( Date timeStamp ) { this.timeStamp = timeStamp; }
+    public void setTimeStamp(long timeStamp ) { this.timeStamp = timeStamp; }
+    
     /**
-     * Gets name of the system that generated the message.
-     *
-     * @return System name
+     * Get formatted date and time.
+     * @return Formatted date and time
      */
-    public String getSystem() { return system; }
+    public String getDateTime() {
+        return dateTime;
+    }
+
     /**
-     * Sets name of the system that generated the message.
-     *
-     * @param source the source to set
+     * Set formatted date and time.
+     * @param dateTime Formatted date and time
      */
-    public void setSystem( String system ) { this.system = system; }
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+    
     /**
-     * Gets message type
-     *
-     * @return Message type
+     * Get logger name.
+     * @return Logger name
      */
-    public String getType() { return type; }
+    public String getLogger() { return logger; }
+    
     /**
-     * Sets message type
-     *
-     * @param type Message type to set
+     * Set logger name.
+     * @param logger Logger name to set
      */
-    public void setType( String type ) { this.type = type; }
+    public void setLogger( String logger ) { this.logger = logger; }
+    
     /**
-     * Gets message
-     *
-     * @return Message string
+     * Get message level.
+     * @return Message level
+     */
+    public String getLevel() { return level; }
+    
+    /**
+     * Set message level.
+     * @param level Message level to set
+     */
+    public void setLevel( String level ) { this.level = level; }
+   
+    /**
+     * Get message body. 
+     * @return Message body
      */
     public String getMessage() { return message; }
+    
     /**
-     * Sets message
-     *
-     * @param Message string to set
+     * Set message body.
+     * @param message Message body to set
      */
     public void setMessage( String message ) { this.message = message; }
+    
 }

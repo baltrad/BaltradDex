@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,25 +15,25 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Remove system messages page.
 Created on : Oct 5, 2010, 3:06 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<t:page_tabbed pageTitle="Configure messages" activeTab="settings">
+<t:page_tabbed pageTitle="Clear messages" activeTab="settings">
     <jsp:body>
         <div class="left">
             <t:menu_settings/>
         </div>
         <div class="right">
             <div class="blttitle">
-                Remove messages
+                Clear messages
             </div>
             <div class="blttext">
                 System messages removal status.

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    
+    <dex_data_sources id="1" name="DataSource1"
+        description="A test data source"/>
+    <dex_data_sources id="2" name="DataSource2"
+        description="Another test data source"/>
+    <dex_data_sources id="3" name="DataSource3"
+        description="Yet one more test data source"/>
+          
+    <dex_roles id="1" name="peer"/>     
+        
+    <dex_users id="1" name="User1" password="passw0rd" org_name="org" 
+               org_unit="unit" locality="locality " state="state" 
+               country_code="XX"/>
+    <dex_users id="2" name="User2" password="passw0rd" org_name="org" 
+               org_unit="unit" locality="locality " state="state" 
+               country_code="XX"/>      
+               
+    <dex_users_roles id="1" user_id="1" role_id="1"/>
+    <dex_users_roles id="2" user_id="2" role_id="1"/>
+    
+    <dex_nodes id="1" name="TestNode1" address="http://test1.eu"/>    
+    <dex_nodes id="2" name="TestNode2" address="http://test2.eu"/>
+    
+    <dex_users_nodes id="1" user_id="1" node_id="1"/>
+    <dex_users_nodes id="2" user_id="2" node_id="2"/>
+    
+    <dex_data_source_users id="1" data_source_id="1" user_id="1"/>      
+    <dex_data_source_users id="2" data_source_id="2" user_id="2"/>      
+    <dex_data_source_users id="3" data_source_id="3" user_id="2"/>
+    <dex_data_source_users id="4" data_source_id="3" user_id="1"/>
+    
+    <dex_radars id="1" country_code="XX" center_code="SOWR" center_number="220" 
+                rad_place="Neverhood" rad_code="XX11" rad_wmo="11111" />
+    <dex_radars id="2" country_code="XX" center_code="SOWR" center_number="220" 
+                rad_place="Nowhere" rad_code="XX22" rad_wmo="22222" />
+    <dex_radars id="3" country_code="XX" center_code="SOWR" center_number="220" 
+                rad_place="Somewhere" rad_code="XX33" rad_wmo="33333" />
+    
+    <dex_data_source_radars id="1" data_source_id="1" radar_id="1"/>      
+    <dex_data_source_radars id="2" data_source_id="2" radar_id="2"/>      
+    <dex_data_source_radars id="3" data_source_id="2" radar_id="3"/>
+    
+    <dex_file_objects id="1" name="FileObject1" description="A file object"/>
+    <dex_file_objects id="2" name="FileObject2" description="Another file object"/>
+    <dex_file_objects id="3" name="FileObject3" description="One more file object"/>  
+    
+    <dex_data_source_file_objects id="1" data_source_id="1" file_object_id="1"/>      
+    <dex_data_source_file_objects id="2" data_source_id="1" file_object_id="2"/>      
+    <dex_data_source_file_objects id="3" data_source_id="3" file_object_id="3"/>
+    
+    <dex_data_source_filters id="1" data_source_id="1" filter_id="1"/>      
+    <dex_data_source_filters id="2" data_source_id="2" filter_id="2"/>      
+    <dex_data_source_filters id="3" data_source_id="2" filter_id="3"/>    
+    
+</dataset>

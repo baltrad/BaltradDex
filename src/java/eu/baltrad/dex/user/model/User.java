@@ -30,29 +30,20 @@ package eu.baltrad.dex.user.model;
  */
 public class User implements Comparable<User> {
 
-    // Role key values
-    public final static String ROLE_ADMIN = "admin";
-    public final static String ROLE_OPERATOR = "operator";
-    public final static String ROLE_PEER = "peer";
-    public final static String ROLE_USER = "user";
-
     private int id;
     private String name;
-    private String roleName;
     private String password;
-    private String confirmPassword;
-    private String organizationName;
-    private String organizationUnit;
-    private String localityName;
-    private String stateName;
+    private String orgName;
+    private String orgUnit;
+    private String locality;
+    private String state;
     private String countryCode;
-    private String nodeAddress;
-    private boolean checked;
-
+    
     /**
      * Default constructor.
      */
     public User() {}
+    
     /**
      * Constructor supporting login mechanism.
      * 
@@ -63,143 +54,65 @@ public class User implements Comparable<User> {
         this.name = name;
         this.password = password;
     }
+    
     /**
-     * Constructor. 
-     * 
-     * @param name User name
-     * @param nodeAddress Node address
-     * @param roleName Role
-     */
-    public User(String name, String roleName, String nodeAddress) {
-        this.name = name;
-        this.roleName = roleName;
-        this.nodeAddress = nodeAddress;
-    }
-    /**
-     * 
+     * Constructor.
      * @param id
      * @param name
-     * @param roleName
      * @param password
-     * @param confirmPassword
-     * @param organizationName
-     * @param organizationUnit
-     * @param localityName
-     * @param stateName
+     * @param orgName
+     * @param orgUnit
+     * @param locality
+     * @param state
      * @param countryCode
-     * @param nodeAddress 
      */
-    public User(int id, String name, String roleName, String password,
-            String confirmPassword, String organizationName, 
-            String organizationUnit, String localityName, String stateName, 
-            String countryCode, String nodeAddress) {
+    public User(int id, String name, String password, String orgName, 
+            String orgUnit, String locality, String state, String countryCode) {
         this.id = id;
         this.name = name;
-        this.roleName = roleName;
         this.password = password;
-        this.confirmPassword = confirmPassword;
-        this.organizationName = organizationName;
-        this.organizationUnit = organizationUnit;
-        this.localityName = localityName;
-        this.stateName = stateName;
+        this.orgName = orgName;
+        this.orgUnit = orgUnit;
+        this.locality = locality;
+        this.state = state;
         this.countryCode = countryCode;
-        this.nodeAddress = nodeAddress;
     }
-    /**
-     * 
-     * @param id
-     * @param name
-     * @param nameHash
-     * @param roleName
-     * @param password
-     * @param organizationName
-     * @param organizationUnit
-     * @param localityName
-     * @param stateName
-     * @param countryCode
-     * @param nodeAddress 
-     */
-    public User(int id, String name, String roleName, String password, 
-            String organizationName, String organizationUnit, 
-            String localityName, String stateName, String countryCode, 
-            String nodeAddress ) {
-        this.id = id;
-        this.name = name;
-        this.roleName = roleName;
-        this.password = password;
-        this.organizationName = organizationName;
-        this.organizationUnit = organizationUnit;
-        this.localityName = localityName;
-        this.stateName = stateName;
-        this.countryCode = countryCode;
-        this.nodeAddress = nodeAddress;
-    }
-    /**
-     * 
-     * 
-     * @param name
-     * @param roleName
-     * @param organizationName
-     * @param organizationUnit
-     * @param localityName
-     * @param stateName
-     * @param countryCode
-     * @param nodeAddress 
-     */
-    public User(String name, String roleName, String organizationName, 
-            String organizationUnit, String localityName, String stateName, 
-            String countryCode, String nodeAddress ) {
-        this.name = name;
-        this.roleName = roleName;
-        this.organizationName = organizationName;
-        this.organizationUnit = organizationUnit;
-        this.localityName = localityName;
-        this.stateName = stateName;
-        this.countryCode = countryCode;
-        this.nodeAddress = nodeAddress;
-    }
+    
     /**
      * Gets user id.
      *
      * @return User id
      */
     public int getId() { return id; }
+    
     /**
      * Sets user id.
      *
      * @param id User id
      */
     public void setId( int id ) { this.id = id; }
-    /**
-     * Gets role name.
-     *
-     * @return Role name
-     */
-    public String getRoleName() { return roleName; }
-    /**
-     * Sets role name.
-     *
-     * @param roleName Role name
-     */
-    public void setRoleName( String roleName ) { this.roleName = roleName; }
+    
     /**
      * Method gets user name.
      *
      * @return User name
      */
     public String getName() { return name; }
+    
     /**
      * Method sets user name.
      *
      * @param name User name
      */
     public void setName( String name ) { this.name = name; }
+    
     /**
      * Gets password.
      * 
      * @return Password
      */
     public String getPassword() { return password; }
+    
     /**
      * Sets password as hash.
      * 
@@ -208,88 +121,61 @@ public class User implements Comparable<User> {
     public void setPassword( String password ) {
         this.password = password;
     }
+
     /**
-     * Gets confirmed password.
-     * 
-     * @return confirmPassword Confirmed password
+     * @return the orgName
      */
-    public String getConfirmPassword() { return confirmPassword; }
-    /**
-     * Sets confirmed password as hash.
-     * 
-     * @param confirmPassword Confirmed password to set
-     */
-    public void setConfirmPassword( String confirmPassword ) {
-        this.confirmPassword = confirmPassword;
-    }
-    /**
-     * @return the checked
-     */
-    public boolean isChecked() {
-        return checked;
+    public String getOrgName() {
+        return orgName;
     }
 
     /**
-     * @param checked the checked to set
+     * @param orgName the orgName to set
      */
-    public void setChecked(boolean checked) {
-        this.checked = checked;
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
     }
 
     /**
-     * @return the organizationName
+     * @return the orgUnit
      */
-    public String getOrganizationName() {
-        return organizationName;
+    public String getOrgUnit() {
+        return orgUnit;
     }
 
     /**
-     * @param organizationName the organizationName to set
+     * @param orgUnit the orgUnit to set
      */
-    public void setOrganizationName(String organizationName) {
-        this.organizationName = organizationName;
+    public void setOrgUnit(String orgUnit) {
+        this.orgUnit = orgUnit;
     }
 
     /**
-     * @return the organizationUnit
+     * @return the locality
      */
-    public String getOrganizationUnit() {
-        return organizationUnit;
+    public String getLocality() {
+        return locality;
     }
 
     /**
-     * @param organizationUnit the organizationUnit to set
+     * @param locality the locality to set
      */
-    public void setOrganizationUnit(String organizationUnit) {
-        this.organizationUnit = organizationUnit;
+    public void setLocality(String locality) {
+        this.locality = locality;
     }
 
     /**
-     * @return the localityName
+     * @return the state
      */
-    public String getLocalityName() {
-        return localityName;
+    public String getState() {
+        return state;
     }
 
     /**
-     * @param localityName the localityName to set
+     * @param state the state to set
      */
-    public void setLocalityName(String localityName) {
-        this.localityName = localityName;
-    }
-
-    /**
-     * @return the stateName
-     */
-    public String getStateName() {
-        return stateName;
-    }
-
-    /**
-     * @param stateName the stateName to set
-     */
-    public void setStateName(String stateName) {
-        this.stateName = stateName;
+    public void setState(String state) {
+        this.state = state;
     }
 
     /**
@@ -304,20 +190,6 @@ public class User implements Comparable<User> {
      */
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
-    }
-
-    /**
-     * @return the nodeAddress
-     */
-    public String getNodeAddress() {
-        return nodeAddress;
-    }
-
-    /**
-     * @param nodeAddress the nodeAddress to set
-     */
-    public void setNodeAddress(String nodeAddress) {
-        this.nodeAddress = nodeAddress;
     }
     
     /**

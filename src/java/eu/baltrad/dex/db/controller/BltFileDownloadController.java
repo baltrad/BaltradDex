@@ -22,16 +22,18 @@
 package eu.baltrad.dex.db.controller;
 
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.auth.util.SecurityManager;
+import eu.baltrad.dex.auth.manager.SecurityManager;
 
 import eu.baltrad.bdb.FileCatalog;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletContext;
 
-import org.springframework.web.servlet.mvc.Controller;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.util.FileCopyUtils;
 
 import org.apache.log4j.Logger;
@@ -46,17 +48,18 @@ import java.util.UUID;
  * Download controller class implementing data download functionality.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.0
+ * @version 1.2.2
  * @since 1.0
  */
-public class BltFileDownloadController implements Controller {
-//-------------------------------------------------------------------- Constants
-    public static final String ENTRY_UUID = "uuid";
-//-------------------------------------------------------------------- Variables
+@Controller
+public class BltFileDownloadController {
+
+    private static final String SUCCESS_VIEW = "download";
+    private static final String ENTRY_UUID = "uuid";
+
     private Logger log;
     private FileCatalog fileCatalog;
-    private String successView;
-//---------------------------------------------------------------------- Methods
+
     /**
      * Controller.
      */
@@ -70,7 +73,8 @@ public class BltFileDownloadController implements Controller {
      * @param response Http response
      * @return Model and view
      */
-    public ModelAndView handleRequest(HttpServletRequest request, 
+    @RequestMapping("/download.htm")
+    public String handleRequest(HttpServletRequest request, 
             HttpServletResponse response) {
         User user = (User) SecurityManager.getSessionUser(
                 request.getSession());
@@ -79,6 +83,9 @@ public class BltFileDownloadController implements Controller {
         File fi = fileCatalog.getLocalPathForUuid(UUID.fromString(entryUuid));
         String filePath = fi.getAbsolutePath();
         String fileName = fi.getName();
+        if (!fileName.endsWith(".h5")) {
+            fileName += ".h5";
+        }
         int fileSize = (int) fi.length();
         BufferedInputStream bis = null;
         if( fileSize > 0 ) {
@@ -105,28 +112,16 @@ public class BltFileDownloadController implements Controller {
         } else {
             log.error("Invalid file size: " + fileSize);
         }
-        return null;
+        return SUCCESS_VIEW;
     }
-    /**
-     * Method returns reference to success view name string.
-     *
-     * @return Reference to success view name string
-     */
-    public String getSuccessView() {
-        return successView;
-    }
-    /**
-     * Method sets reference to success view name string.
-     *
-     * @param Reference to success view name string
-     */
-    public void setSuccessView( String successView ) {
-        this.successView = successView;
-    }
-    public FileCatalog getFileCatalog() { return fileCatalog; }
 
+    /**
+     * @param fileCatalog the fileCatalog to set
+     */
+    @Autowired
     public void setFileCatalog(FileCatalog fileCatalog) {
         this.fileCatalog = fileCatalog;
     }
+    
 }
-//--------------------------------------------------------------------------------------------------
+

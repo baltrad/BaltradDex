@@ -51,12 +51,12 @@ Author     : szewczenko
                         </div>
                     </div>
                     <div class="midcol">
-                        <form:select path="flag" title="Select message flag">
+                        <form:select path="level" title="Select message level">
                             <form:option value="ALL" label="ALL"/>
-                            <form:options items="${flags}"/>
+                            <form:options items="${levels}"/>
                         </form:select>    
                         <div class="hint">
-                            Message flag
+                            Message level
                         </div>
                     </div>
                     <div class="leftcol">
@@ -140,8 +140,7 @@ Author     : szewczenko
                 <div class="log">
                     <c:choose>
                         <c:when test="${not empty log_entries}">
-                            <div id="tablecontrol">
-                                <c:set var="curPage" scope="page" value="${current_page}"/>                        
+                            <div id="tablecontrol">                   
                                 <input type="submit" name="selected_page" value="<<"
                                         title="First page">
                                 <span></span>
@@ -185,15 +184,15 @@ Author     : szewczenko
                                 </div>
                                 <c:forEach var="entry" items="${log_entries}">
                                     <c:choose>
-                                        <c:when test="${entry.type == 'INFO'}">
+                                        <c:when test="${entry.level == 'INFO'}">
                                             <c:set var="style" value="info-entry" 
                                                 scope="page"/>
                                         </c:when>
-                                        <c:when test="${entry.type == 'WARN'}">
+                                        <c:when test="${entry.level == 'WARN'}">
                                             <c:set var="style" value="warning-entry" 
                                                 scope="page"/>
                                         </c:when>
-                                        <c:when test="${entry.type == 'ERROR'}">
+                                        <c:when test="${entry.level == 'ERROR'}">
                                             <c:set var="style" value="error-entry" 
                                                 scope="page"/>
                                         </c:when>
@@ -201,24 +200,24 @@ Author     : szewczenko
                                     <div class="entry">
                                         <div id="cell" class="logdate">
                                             <div class="${style}">
-                                                <c:out value="${fn:substring(entry.timeStamp, 
+                                                <c:out value="${fn:substring(entry.dateTime, 
                                                                 0, 10)}"/>
                                             </div>
                                         </div>
                                         <div id="cell" class="logtime">
                                             <div class="${style}">
-                                                <c:out value="${fn:substring(entry.timeStamp, 
+                                                <c:out value="${fn:substring(entry.dateTime, 
                                                                 10, 19)}"/>
                                             </div>
                                         </div>
                                         <c:choose>
-                                            <c:when test="${entry.type == 'ERROR'}">
+                                            <c:when test="${entry.level == 'ERROR'}">
                                                 <div id="cell" class="logflag">
                                                     <img src="includes/images/icons/error.png"
                                                         alt="error"/>
                                                 </div>
                                             </c:when>
-                                            <c:when test="${entry.type == 'WARN'}">
+                                            <c:when test="${entry.level == 'WARN'}">
                                                 <div id="cell" class="logflag">
                                                     <img src="includes/images/icons/warning.png"
                                                         alt="warn"/>

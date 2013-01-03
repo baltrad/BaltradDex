@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    
+    <dex_subscriptions id="1" time_stamp="1335268800000"
+                       type="download" active="true" sync="true"/>
+    <dex_subscriptions id="2" time_stamp="1335269400000" 
+                       type="download" active="true" sync="true"/>
+    <dex_subscriptions id="3" time_stamp="1335273600000" 
+                       type="download" active="true" sync="false"/>
+                       
+</dataset>

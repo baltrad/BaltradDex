@@ -23,7 +23,7 @@
         <security:intercept-url pattern="/logtable.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/data_download.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/data_upload.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/datasources.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/show_datasources.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/browse_files.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/datasource_files.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/file_details.htm" access="ROLE_USER" />
@@ -71,34 +71,30 @@
         -->
         <security:intercept-url pattern="/settings.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/save_radar.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/edit_radar.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/show_radar.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/save_radar_status" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/remove_radar.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/radar_to_remove.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_selected_radar.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/remove_radar_status.htm" access="ROLE_ADMIN" />
         
         <security:intercept-url pattern="/save_datasource.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/edit_datasource.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/edit_datasources.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/save_datasource_status" access="ROLE_ADMIN"/>
         
         <security:intercept-url pattern="/remove_datasource.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/remove_selected_datasource.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/remove_datasource_status.htm" access="ROLE_ADMIN" />
         
-        <security:intercept-url pattern="/remove_download.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_upload.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_selected_download.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_selected_upload.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_download_status.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_upload_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_downloads.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_uploads.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_selected_downloads.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_selected_uploads.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_downloads_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/remove_uploads_status.htm" access="ROLE_ADMIN" />
         
         <security:intercept-url pattern="/configure_registry.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/clear_registry.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/clear_registry_status.htm" access="ROLE_ADMIN" />
-        
-        <security:intercept-url pattern="/remove_connection.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_selected_connection.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_connection_status.htm" access="ROLE_ADMIN" />
         
         <security:intercept-url pattern="/configure_messages.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/clear_messages.htm" access="ROLE_ADMIN" />
@@ -126,7 +122,8 @@
                 autowire="byType">          
     </beans:bean>
     
-    <beans:bean id="userManager" class="eu.baltrad.dex.user.model.UserManager"
+    <beans:bean id="accountManager" 
+                class="eu.baltrad.dex.user.manager.impl.AccountManager"
                 autowire="byType">          
     </beans:bean>
     

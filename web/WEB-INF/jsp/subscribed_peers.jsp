@@ -53,20 +53,20 @@ Author     : szewczenko
                                 </div>
                             </div>
                             <c:set var="count" scope="page" value="1"/>
-                            <c:forEach items="${subscribed_peers}" var="sub">
+                            <c:forEach items="${subscribed_peers}" var="node">
                                 <div class="entry">
                                     <div id="cell" class="count">
                                         <c:out value="${count}"/>
                                         <c:set var="count" value="${count + 1}"/>
                                     </div>
                                     <div id="cell" class="operator">
-                                        <a href="subscription_by_peer.htm?peer_name=${sub.operatorName}" 
+                                        <a href="subscription_by_peer.htm?peer_name=${node.name}" 
                                             title="Click to access subscribed data sources">
-                                            <c:out value="${sub.operatorName}" />
+                                            <c:out value="${node.name}" />
                                         </a>
                                     </div>
                                     <div id="cell" class="nodeaddress">
-                                        <c:out value="${sub.nodeAddress}"/>
+                                        <c:out value="${node.address}"/>
                                     </div>
                                 </div>
                             </c:forEach>

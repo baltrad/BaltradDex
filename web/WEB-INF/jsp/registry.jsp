@@ -90,20 +90,20 @@ Author     : szewczenko
                             <c:forEach var="entry" items="${entries}">
                                 <div class="entry">
                                     <div id="cell" class="date">
-                                        <c:out value="${fn:substring(entry.timeStamp, 0, 10)}"/>
+                                        <c:out value="${fn:substring(entry.dateTime, 0, 10)}"/>
                                     </div>
                                     <div id="cell" class="time">
-                                        <c:out value="${fn:substring(entry.timeStamp, 10, 19)}"/>
+                                        <c:out value="${fn:substring(entry.dateTime, 10, 19)}"/>
                                     </div>
                                     <div id="cell" class="recipient">
-                                        <c:out value="${entry.userName}"/>
+                                        <c:out value="${entry.user}"/>
                                     </div>
                                     <div id="cell" class="signature">
                                         <c:out value="${entry.uuid}"/>
                                     </div>
                                     <div id="cell" class="status">
                                         <c:choose>
-                                            <c:when test="${entry.deliveryStatus == 'SUCCESS'}">
+                                            <c:when test="${entry.status == 'SUCCESS'}">
                                                 <img src="includes/images/icons/success.png"
                                                         alt="Success" title="Delivery success">
                                             </c:when>

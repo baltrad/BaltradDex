@@ -23,24 +23,20 @@ package eu.baltrad.dex.util;
 
 import org.springframework.context.support.ResourceBundleMessageSource;
 
+import java.util.Locale;
+
 /**
  * Message resource utility.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.1.0
- * @since 1.1.0
+ * @version 1.2.2
+ * @since 1.2.2
  */
-public class MessageResourceUtil {
-
-    private ResourceBundleMessageSource messages;
+public class MessageResourceUtil extends ResourceBundleMessageSource {
     
     /**
      * Constructor.
-     * @param basename Resource basename  
      */
-    public MessageResourceUtil(String basename) {
-        this.messages = new ResourceBundleMessageSource();
-        this.messages.setBasename(basename);
-    }
+    public MessageResourceUtil() {}
     
     /**
      * Gets message from resource file.
@@ -48,7 +44,7 @@ public class MessageResourceUtil {
      * @return Message body
      */
     public String getMessage(String messageCode) {
-        return messages.getMessage(messageCode, null, null);
+        return getMessage(messageCode, null, Locale.ROOT);
     }
     
     /**
@@ -58,7 +54,7 @@ public class MessageResourceUtil {
      * @return Message body filled with arguments
      */
     public String getMessage(String messageCode, Object[] args) {
-        return messages.getMessage(messageCode, args, null);
+        return getMessage(messageCode, args, Locale.ROOT);
     }
     
 }

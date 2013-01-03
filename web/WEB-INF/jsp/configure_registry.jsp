@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,11 +15,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : System messages settings page
 Created on : Aug 25, 2011, 12:12 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
@@ -37,7 +37,7 @@ Author     : szewczenko
             </div>
             <div class="logconf">
                 <div class="table">
-                    <form method="post">
+                    <form:form method="POST" commandName="config">
                         <%@include file="/WEB-INF/jsp/form_messages.jsp"%>
                         <div class="blttext">
                             Set maximum number of registry entries
@@ -48,12 +48,13 @@ Author     : szewczenko
                                     Limit
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="command.recordLimit"
+                                    <form:input path="recordLimit"
                                                 title="Maximum number of registry entries"/>
                                     <div class="hint">
                                         Max number of registry entries
                                     </div>
-                                    <form:errors path="command.recordLimit" cssClass="error"/>
+                                    <form:errors path="recordLimit" 
+                                                 cssClass="error"/>
                                 </div>
                             </div>
                             <div class="rightcol">
@@ -61,7 +62,7 @@ Author     : szewczenko
                                     Set active
                                 </div>
                                 <div class="col">
-                                    <form:checkbox path="command.trimByNumber"
+                                    <form:checkbox path="trimByNumber"
                                                    title="Set active/inactive"/>
                                 </div>
                             </div>
@@ -76,11 +77,13 @@ Author     : szewczenko
                                     Days
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="command.maxAgeDays" title="Set number of days"/>
+                                    <form:input path="maxAgeDays" 
+                                                title="Set number of days"/>
                                     <div class="hint">
                                         Number of days
                                     </div>
-                                    <form:errors path="command.maxAgeDays" cssClass="error"/>
+                                    <form:errors path="maxAgeDays" 
+                                                 cssClass="error"/>
                                 </div>
                             </div>
                             <div class="rightcol">
@@ -88,7 +91,7 @@ Author     : szewczenko
                                     Set active
                                 </div>
                                 <div class="col">
-                                    <form:checkbox path="command.trimByAge"
+                                    <form:checkbox path="trimByAge"
                                                    title="Set active/inactive"/>
                                 </div>
                             </div>
@@ -99,12 +102,13 @@ Author     : szewczenko
                                     Hours
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="command.maxAgeHours"
+                                    <form:input path="maxAgeHours"
                                                 title="Set number of hours"/>
                                     <div class="hint">
                                         Number of hours
                                     </div>
-                                    <form:errors path="command.maxAgeHours" cssClass="error"/>
+                                    <form:errors path="maxAgeHours" 
+                                                 cssClass="error"/>
                                 </div>
                             </div>
                         </div>
@@ -114,12 +118,13 @@ Author     : szewczenko
                                     Minutes
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="command.maxAgeMinutes"
+                                    <form:input path="maxAgeMinutes"
                                                 title="Set number of minutes"/>
                                     <div class="hint">
                                         Number of minutes
                                     </div>
-                                    <form:errors path="command.maxAgeMinutes" cssClass="error"/>
+                                    <form:errors path="maxAgeMinutes" 
+                                                 cssClass="error"/>
                                 </div>
                             </div>
                         </div>
@@ -130,7 +135,7 @@ Author     : szewczenko
                                 </button>
                             </div>
                         </div>
-                    </form>
+                    </form:form>
                 </div>
             </div>
         </div>

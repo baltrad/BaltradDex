@@ -22,7 +22,7 @@
 package eu.baltrad.dex.datasource.controller;
 
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.datasource.model.IDataSourceManager;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.util.DataSourceValidator;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
@@ -95,23 +95,17 @@ public class SaveDataSourceControllerTest {
     public void setUp() throws Exception {
         mocks = new ArrayList();
         classUnderTest = new SaveDataSourceController();
-        
-        
-        messages = new MessageResourceUtil("resources/messages");
+        messages = new MessageResourceUtil();
+        messages.setBasename("resources/messages");
         classUnderTest.setMessages(messages);
-        
         validator = new DataSourceValidator();
         validator.setMessages(messages);
-        
         classUnderTest.setValidator(validator);
-        
-        
         dataSourceManagerMock = (IDataSourceManager) 
                                         createMock(IDataSourceManager.class);
         expect(dataSourceManagerMock.load(101))
                 .andReturn(new DataSource(101, "TestDataSource", 
                 "A test data source"));
-        
         replayAll();
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         

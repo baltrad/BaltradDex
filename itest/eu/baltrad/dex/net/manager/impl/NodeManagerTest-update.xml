@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    
+    <dex_roles id="1" name="peer"/>     
+        
+    <dex_users id="1" name="User1" password="passw0rd" org_name="org" 
+               org_unit="unit" locality="locality " state="state" 
+               country_code="XX"/>
+    <dex_users id="2" name="User2" password="passw0rd" org_name="org" 
+               org_unit="unit" locality="locality " state="state" 
+               country_code="XX"/>
+    <dex_users id="3" name="User3" password="passw0rd" org_name="org" 
+               org_unit="unit" locality="locality " state="state" 
+               country_code="XX"/>
+    <dex_users id="4" name="User4" password="passw0rd" org_name="org" 
+               org_unit="unit" locality="locality " state="state" 
+               country_code="XX"/>
+    <dex_users id="5" name="User5" password="passw0rd" org_name="org" 
+               org_unit="unit" locality="locality " state="state" 
+               country_code="XX"/>            
+               
+    <dex_users_roles id="1" user_id="1" role_id="1"/>
+    <dex_users_roles id="2" user_id="2" role_id="1"/>
+    
+    <dex_nodes id="1" name="TestNode1" address="http://test1.eu"/>
+    <dex_nodes id="2" name="TestNode2" address="http://test2.eu"/>
+    <dex_nodes id="3" name="TestNode3" address="http://test3.eu"/>
+    <dex_nodes id="4" name="TestNode4" address="http://test4.eu"/>
+    <dex_nodes id="5" name="TestNode5" address="http://test5.eu"/>
+    
+    <dex_users_nodes id="1" user_id="1" node_id="1"/>
+    <dex_users_nodes id="2" user_id="1" node_id="2"/>
+    <dex_users_nodes id="3" user_id="2" node_id="3"/>
+    <dex_users_nodes id="4" user_id="4" node_id="4"/>
+    <dex_users_nodes id="5" user_id="5" node_id="5"/>
+    
+</dataset>

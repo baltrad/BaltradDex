@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,81 +17,102 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.log.controller;
 
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.manager.impl.LogManager;
+import eu.baltrad.dex.util.MessageResourceUtil;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-
-import org.springframework.web.servlet.mvc.Controller;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.apache.log4j.Logger;
 
-import java.io.IOException;
-
 /**
- * Controller deleting records from message table.
+ * Clear system log.
  *
- *@author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.0
- * @since 1.0
+ * @author Maciej Szewczykowski | maciej@baltrad.eu
+ * @version 1.2.2
+ * @since 1.0.0
  */
-public class RemoveMessagesController implements Controller {
-//---------------------------------------------------------------------------------------- Constants
+@Controller
+public class RemoveMessagesController {
+
+    // View names
+    private static final String CLEAR_MESSAGES_VIEW = "clear_messages";
+    private static final String CLEAR_MESSAGES_STATUS_VIEW = 
+            "clear_messages_status";
+    
+    // Model keys
+    private static final String NUMBER_OF_ENTRIES_KEY = "number_of_entries";
+    private static final String CLEAR_MESSAGES_OK_MSG_KEY = 
+            "clearmessages.completed_success";
+    private static final String CLEAR_MESSAGES_ERROR_MSG_KEY = 
+            "clearmessages.completed_failure";
     private static final String OK_MSG_KEY = "message";
     private static final String ERROR_MSG_KEY = "error";
-//---------------------------------------------------------------------------------------- Variables
-    private String successView;
+
     private Logger log;
     private LogManager logManager;
-//------------------------------------------------------------------------------------------ Methods
+    private MessageResourceUtil messages;
+
     /**
      * Constructor.
      */
     public RemoveMessagesController() {
         this.log = Logger.getLogger("DEX");
-        this.logManager = LogManager.getInstance();
     }
+    
     /**
-     * Deletes all mesages from message stack and returns model and view.
-     *
-     * @param request HTTP request
-     * @param response HTTP response
-     * @return ModelAndView object containing number of deleted records
-     * @throws ServletException
-     * @throws IOException
+     * Renders clear system log page.
+     * @param model Model map
+     * @return View name
      */
-    public ModelAndView handleRequest( HttpServletRequest request, HttpServletResponse response )
-            throws ServletException, IOException {
+    @RequestMapping("/clear_messages.htm")
+    public String clearMessages(ModelMap model) {
+        model.addAttribute(NUMBER_OF_ENTRIES_KEY, logManager.count());
+        return CLEAR_MESSAGES_VIEW;
+    }
+    
+    /**
+     * Removes all messages from system log.
+     * @param model Model map
+     * @return View name
+     */
+    @RequestMapping("/clear_messages_status.htm")
+    public String clearMessagesStatus(ModelMap model) {
         try {
-            int deletedEntries = logManager.delete();
-            String msg = "Successfully deleted " + Integer.toString( deletedEntries ) 
-                    + " message(s).";
-            request.getSession().setAttribute( OK_MSG_KEY, msg );
-            log.warn( msg );
-        } catch( Exception e ) {
-            String msg = "Failed to remove system messages ";
-            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg, e );
+            int delete = logManager.delete();
+            String msg = messages.getMessage(CLEAR_MESSAGES_OK_MSG_KEY, 
+                    new String[] {Integer.toString(delete)});
+            model.addAttribute(OK_MSG_KEY, msg);
+            log.warn(msg);
+        } catch (Exception e) {
+            String msg = messages.getMessage(CLEAR_MESSAGES_ERROR_MSG_KEY);
+            model.addAttribute(ERROR_MSG_KEY, msg);
+            log.error(msg, e);
         }
-        return new ModelAndView( getSuccessView() );
+        return CLEAR_MESSAGES_STATUS_VIEW;
     }
+
     /**
-     * Method returns reference to success view name string.
-     *
-     * @return Reference to success view name string
+     * @param logManager the logManager to set
      */
-    public String getSuccessView() { return successView; }
+    @Autowired
+    public void setLogManager(LogManager logManager) {
+        this.logManager = logManager;
+    }
+    
     /**
-     * Method sets reference to success view name string.
-     *
-     * @param successView Reference to success view name string
+     * @param messages the messages to set
      */
-    public void setSuccessView( String successView ) { this.successView = successView; }
+    @Autowired
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
+    }
+    
 }
-//--------------------------------------------------------------------------------------------------
+

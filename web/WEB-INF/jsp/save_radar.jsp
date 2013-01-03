@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,11 +15,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Save local radar station
 Created on : Oct 5, 2010, 11:49 AM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
@@ -36,49 +36,62 @@ Author     : szewczenko
                 Save radar station
             </div>
             <div class="blttext">
-                Save new local radar station or modify an existing one.
+                Select center ID and radar station from the list. 
+                Click save button to store settings.  
             </div>
             <div class="table">
-                <div class="addradar">
-                    <%@include file="/WEB-INF/jsp/form_messages.jsp"%>
-                    <form method="post">
-                        <div class="leftcol">
-                            <div class="row">Radar station name</div>
-                            <div class="row">WMO number</div>
-                        </div>
-                        <div class="rightcol">
-                            <div class="row">
-                                <div class="radarname">
-                                    <form:input path="command.name"/>
-                                    <div class="hint">
-                                        Name of the local radar station
-                                    </div>
-                                </div>
-                                <form:errors path="command.name" cssClass="error"/>
+                <form:form method="POST" commandName="radar">
+                    <div class="saveradar">
+                        <div class="row">
+                            <div class="leftcol">
+                                Center ID
+                                <select name="center_id" size="6" multiple 
+                                        onchange="submitCenterId(this.form)">
+                                    <c:forEach items="${centers}" 
+                                               var="center">
+                                        <c:choose>
+                                            <c:when test="${center == center_selected}">
+                                                <option value="${center}" selected 
+                                                        title="Country - GTS code - Center number">    
+                                                    <c:out value="${center}"/>
+                                                </option>    
+                                            </c:when>
+                                            <c:otherwise>
+                                                <option value="${center}"
+                                                        title="Country - GTS code - Center number">    
+                                                    <c:out value="${center}"/>
+                                                </option>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:forEach>
+                                <select>
                             </div>
-                            <div class="row">
-                                <div class="wmonumber">
-                                    <form:input path="command.wmoNumber"/>
-                                    <div class="hint">
-                                        Radar station's WMO number as string
-                                    </div>
-                                </div>
-                                <form:errors path="command.wmoNumber" cssClass="error"/>
+                            <div class="rightcol">
+                                Radar station
+                                <select name="radar_id" size="6" multiple>
+                                    <c:forEach items="${radars}" 
+                                               var="radar">
+                                        <option value="${radar}"
+                                                title="Place - Code - WMO number">    
+                                            <c:out value="${radar}"/>
+                                        </option>
+                                    </c:forEach>
+                                <select>
                             </div>
                         </div>
-                        <div class="tablefooter">
-                            <div class="buttons">
-                                <button class="rounded" type="button"
-                                    onclick="window.location.href='settings.htm'">
-                                    <span>Back</span>
-                                </button>
-                                <button class="rounded" type="submit">
-                                    <span>Save</span>
-                                </button>
-                            </div>
+                    </div>    
+                    <div class="tablefooter">
+                        <div class="buttons">
+                            <button class="rounded" type="button"
+                                onclick="window.location.href='settings.htm'">
+                                <span>Back</span>
+                            </button>
+                            <button class="rounded" type="submit">
+                                <span>Save</span>
+                            </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form:form>    
             </div>
         </div>
     </jsp:body>

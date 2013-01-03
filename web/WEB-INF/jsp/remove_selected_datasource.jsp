@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,25 +15,16 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
-Document   : Displays available data sources allowing to select data source for removal
+--------------------------------------------------------------------------------
+Document   : Displays data sources selected for removal
 Created on : Apr 4, 2011, 14:03 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@page import="java.util.List"%>
-<%
-    List dataSources = ( List )request.getAttribute( "dataSources" );
-    if( dataSources == null || dataSources.size() <= 0 ) {
-        request.getSession().setAttribute( "dsStatus", 0 );
-    } else {
-        request.getSession().setAttribute( "dsStatus", 1 );
-    }
-%>
 
 <t:page_tabbed pageTitle="Remove data source" activeTab="settings">
     <jsp:body>
@@ -45,9 +36,19 @@ Author     : szewczenko
                 Remove data source
             </div>
             <c:choose>
-                <c:when test="${dsStatus == 1}">
+                <c:when test="${not empty selected_data_sources}">
                     <div class="blttext">
-                        The following data sources will be removed from the system.
+                        <div class ="alert">
+                            <div class="icon">
+                                <img src="includes/images/icons/circle-alert.png" 
+                                     alt="">
+                            </div>
+                            <div class="text">
+                                <br/>
+                                The following data sources will be removed 
+                                from the system.
+                            </div>
+                        </div>
                     </div>
                     <div class="table">
                         <div class="dsremove">
@@ -62,21 +63,21 @@ Author     : szewczenko
                                     </div>
                                 </div>
                                 <c:set var="count" scope="page" value="1"/>
-                                <c:forEach items="${dataSources}" var="dataSource">
+                                <c:forEach items="${selected_data_sources}" var="ds">
                                     <div class="entry">
                                         <div id="cell" class="count">
                                             <c:out value="${count}"/>
                                             <c:set var="count" value="${count + 1}"/>
                                         </div>
                                         <div id="cell" class="name">
-                                            <c:out value="${dataSource.name}"/>
+                                            <c:out value="${ds.name}"/>
                                         </div>
                                         <div id="cell" class="description">
-                                            <c:out value="${dataSource.description}"/>
+                                            <c:out value="${ds.description}"/>
                                         </div>
                                         <div id="cell" class="hidden">
-                                            <input type="checkbox" name="selectedSources"
-                                                    value="${dataSource.id}" checked>
+                                            <input type="checkbox" name="selected_data_sources"
+                                                   value="${ds.id}" checked>
                                         </div>
                                     </div>
                                 </c:forEach>
@@ -86,8 +87,7 @@ Author     : szewczenko
                                             onclick="window.location.href='remove_datasource.htm'">
                                             <span>Back</span>
                                         </button>
-                                        <button class="rounded" type="submit"
-                                                name="submitButton">
+                                        <button class="rounded" type="submit">
                                             <span>OK</span>
                                         </button>
                                     </div>

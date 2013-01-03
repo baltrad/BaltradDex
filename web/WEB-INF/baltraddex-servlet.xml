@@ -35,544 +35,204 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
         <property name="mappings">
             <props>
-                <!-- User pages-->
-                <!-- @@@ deprecated, to be removed soon -->
-                <prop key="dispatch.htm">frameDispatcherController</prop>
-                <!-- @@@-->
                 <prop key="latest_messages.htm">urlFilenameController</prop>
-                <prop key="logtable.htm">logTableController</prop>
-                <prop key="data_download.htm">downloadStatusController</prop>
-                <prop key="data_upload.htm">uploadStatusController</prop>
-                <prop key="datasources.htm">showDataSourcesController</prop>
-                <prop key="datasource_files.htm">bltDataSourceController</prop>
-                <prop key="browse_files.htm">bltFileBrowserController</prop>
-                <prop key="file_details.htm">bltFileDetailsController</prop>
-                <prop key="download.htm">bltFileDownloadController</prop>
-                <prop key="data_preview.htm">bltImagePreviewController</prop>
-                
-                <!-- Operator pages -->
                 <prop key="exchange.htm">urlFilenameController</prop>
                 <prop key="processing.htm">urlFilenameController</prop>
-                <prop key="registry.htm">registryController</prop>
-                
-                <!-- Admin pages -->
                 <prop key="settings.htm">urlFilenameController</prop>
-                <prop key="save_radar.htm">saveRadarController</prop>
-                <prop key="edit_radar.htm">editRadarController</prop>
                 <prop key="save_radar_status">urlFilenameController</prop>
-                <prop key="remove_radar.htm">removeRadarController</prop>
-                <prop key="radar_to_remove.htm">removeRadarController</prop>
-                <prop key="remove_radar_status.htm">removeRadarController</prop>
-                
-                <prop key="edit_datasource.htm">editDataSourceController</prop>
-                <prop key="remove_datasource.htm">removeDataSourceController</prop>
-                <prop key="remove_selected_datasource.htm">removeDataSourceController</prop>
-                <prop key="remove_datasource_status.htm">removeDataSourceController</prop>
-                
-                <prop key="remove_download.htm">subscriptionController</prop>
-                <prop key="remove_upload.htm">subscriptionController</prop>
-                <prop key="remove_selected_download.htm">subscriptionController</prop>
-                <prop key="remove_selected_upload.htm">subscriptionController</prop>
-                <prop key="remove_download_status.htm">subscriptionController</prop>
-                <prop key="remove_upload_status.htm">subscriptionController</prop>
-                
-                <prop key="configure_registry.htm">saveRegistryConfigurationController</prop>
-                <prop key="clear_registry.htm">registryController</prop>
-                <prop key="clear_registry_status.htm">registryController</prop>
-                
-                <prop key="remove_connection.htm">nodeConnectionController</prop>
-                <prop key="remove_selected_connection.htm">nodeConnectionController</prop>
-                <prop key="remove_connection_status.htm">nodeConnectionController</prop>
-                
-                <prop key="configure_messages.htm">saveMessagesConfigurationController</prop>
-                <prop key="clear_messages.htm">urlFilenameController</prop>
-                <prop key="clear_messages_status.htm">removeMessagesController</prop>
-                
-                <prop key="save_user_account.htm">saveUserController</prop>
                 <prop key="save_user_account_status.htm">urlFilenameController</prop>
-                <prop key="edit_user_account.htm">editUserController</prop>
-                <prop key="remove_user_account.htm">removeUserController</prop>
-                <prop key="remove_selected_user_account.htm">removeUserController</prop>
-                <prop key="remove_user_account_status.htm">removeUserController</prop>
-                <prop key="change_user_password.htm">changePasswordController</prop>
                 <prop key="change_user_password_status.htm">urlFilenameController</prop>
-                
-                <prop key="node_settings.htm">saveConfigurationController</prop>
             </props>
         </property>
     </bean>
 
-    <!--
-        View resolver.
-    -->
+    <!-- View resolver -->
     <bean id="viewResolver"
           class="org.springframework.web.servlet.view.InternalResourceViewResolver"
           p:prefix="/WEB-INF/jsp/"
           p:suffix=".jsp" />
-    <!--
-        URL filename view controller.
-    -->
+          
+    <!-- Message source -->
+    <bean id="messageSource"
+          class="eu.baltrad.dex.util.MessageResourceUtil">  
+	<property name="basename">
+            <value>resources/messages</value>
+	</property>
+    </bean>      
+          
+    <!-- URL filename view controller -->
     <bean id="urlFilenameController"
           class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
 
-    <!--
-         Download status controller
-    -->
+    <!-- Download status controller -->
     <bean id="downloadStatusController"
-            class="eu.baltrad.dex.subscription.controller.DownloadStatusController">
-        <property name="subscriptionManager">
-            <ref bean="subscriptionManager"/>
-        </property>
-        <property name="successView">
-            <value>data_download</value>
-        </property>
-    </bean>
-    <!--
-         Upload status controller
-    -->
+          class="eu.baltrad.dex.net.controller.DownloadStatusController"
+          autowire="byType"/>
+    
+    <!-- Upload status controller -->
     <bean id="uploadStatusController"
-            class="eu.baltrad.dex.subscription.controller.UploadStatusController">
-        <property name="subscriptionManager">
-            <ref bean="subscriptionManager"/>
-        </property>
-        <property name="successView">
-            <value>data_upload</value>
-        </property>
-    </bean>
+          class="eu.baltrad.dex.net.controller.UploadStatusController"
+          autowire="byType"/>
 
-    <!--
-        Login/logout controller.
-    -->
-    <bean name="loginController" 
+    <!-- Login/logout controller -->
+    <bean id="loginController" 
           class="eu.baltrad.dex.auth.controller.LoginController"
           autowire="byType"/>      
 
-    <!--
-        Data from data source controller.
-    -->
-    <bean name="bltDataSourceController"
-        class="eu.baltrad.dex.bltdata.controller.BltDataSourceController">
-        <property name="bltFileManager">
-            <ref bean="bltFileManager" />
-        </property>
-        <property name="successView">
-            <value>datasource_files</value>
-        </property>
-    </bean>
-
-    <!--
-        File details controller.
-    -->
-    <bean name="bltFileDetailsController"
-        class="eu.baltrad.dex.db.controller.BltFileDetailsController">
-        <property name="bltDataProcessor">
-            <ref bean="bltDataProcessor"/>
-        </property>
-        <property name="bltDataProjector">
-            <ref bean="bltDataProjector"/>
-        </property>
-        <property name="bltFileManager">
-            <ref bean="bltFileManager" />
-        </property>
-        <property name="bltDataProcessorController">
-            <ref bean="bltDataProcessorController"/>
-        </property>
-	<property name="fileCatalog">
-	    <ref bean="fileCatalog" />
-	</property>
-        <property name="successView">
-            <value>file_details</value>
-        </property>
-    </bean>
-    <!--
-        File browser controller
-    -->
-    <bean name="bltFileBrowserController"
-            class="eu.baltrad.dex.db.controller.BltFileBrowserController">
-        <property name="successView">
-            <value>browse_files</value>
-        </property>
-        <property name="formView">
-            <value>browse_files</value>
-        </property>
-        <property name="sessionForm">
-            <value>false</value>
-        </property>
-        <property name="bltFileManager">
-            <ref bean="bltFileManager"/>
-        </property>
-        <property name="fileObjectManager">
-            <ref bean="fileObjectManager"/>
-        </property>
-        <property name="messages">
-            <ref bean="messages"/>
-        </property>
-    </bean>
-
-    <!--
-        File object manager
-    -->
-    <bean name="fileObjectManager" 
-          class="eu.baltrad.dex.datasource.model.FileObjectManager"
+    <!-- Data source file listing controller -->
+    <bean id="dataSourceController"
+          class="eu.baltrad.dex.datasource.controller.DataSourceFilesController"
           autowire="byType"/>
 
-    <!--
-        Subscription controller
-    -->
-    <bean name="subscriptionController"
-        class="eu.baltrad.dex.subscription.controller.SubscriptionController">
-        <property name="subscriptionManager">
-            <ref bean="subscriptionManager"/>
-        </property>
-    </bean>
+    <!-- File details controller -->
+    <bean id="bltFileDetailsController"
+          class="eu.baltrad.dex.db.controller.BltFileDetailsController"
+          autowire="byType"/>
+          
+    <!-- File browser controller -->
+    <bean id="bltFileBrowserController"
+          class="eu.baltrad.dex.db.controller.BltFileBrowserController"
+          autowire="byType"/>
 
-    <!--
-        Log messages controller
-    -->
-    <bean name="logTableController" class="eu.baltrad.dex.log.controller.LogTableController">
-        <property name="successView">
-            <value>logtable</value>
-        </property>
-    </bean>
+    <!-- File object manager -->
+    <bean id="fileObjectManager" 
+          class="eu.baltrad.dex.datasource.manager.impl.FileObjectManager"
+          autowire="byType"/>
 
-    <!--
-        System log controller
-    -->
-    <bean name="logController" 
+    <!-- Remove subscription controller -->
+    <bean id="removeSubscriptionController"
+          class="eu.baltrad.dex.net.controller.RemoveSubscriptionController"
+          autowire="byType"/>
+
+    <!-- Log table controller -->
+    <bean id="logTableController" 
+          class="eu.baltrad.dex.log.controller.LogTableController"
+          autowire="byType"/>
+
+    <!-- System log controller -->
+    <bean id="logController" 
           class="eu.baltrad.dex.log.controller.LogController"
-          autowire="byType">
-    </bean>
+          autowire="byType"/>
 
-    <!--
-        Data download controller.
-    -->
-    <bean name="bltFileDownloadController"
-            class="eu.baltrad.dex.db.controller.BltFileDownloadController">
-        <property name="successView">
-            <value>radarData</value>
-        </property>
-        <property name="fileCatalog">
-	    <ref bean="fileCatalog" />
-	</property>
-    </bean>
+    <!-- Data download controller -->
+    <bean id="bltFileDownloadController"
+          class="eu.baltrad.dex.db.controller.BltFileDownloadController"
+          autowire="byType"/>
 
-    <!--
-        Application initializing utility.
-    -->
+    <!-- Application initialization utility -->
     <bean id="initAppUtil" class="eu.baltrad.dex.util.InitAppUtil"/>
 
-    <!--
-        Radar manager.
-    -->
-    <bean name="radarManager" class="eu.baltrad.dex.radar.model.RadarManager"
+    <!-- Radar manager -->
+    <bean id="radarManager" class="eu.baltrad.dex.radar.manager.impl.RadarManager"
           autowire="byType"/>
 
-    <!--
-        Data source files manager
-    -->
-    <bean id="bltFileManager" class="eu.baltrad.dex.db.model.BltFileManager">
-        <property name="dataSourceManager">
-            <ref bean="dataSourceManager"/>
-        </property>
-        <property name="coreFilterManager">
-            <ref bean="coreFilterManager"/>
-        </property>
-	<property name="fileCatalog">
-	    <ref bean="fileCatalog" />
-	</property>
-    </bean>
+    <!-- File manager -->
+    <bean id="bltFileManager" 
+          class="eu.baltrad.dex.db.manager.impl.BltFileManager" 
+          autowire="byType"/>
    
-    <!-- FramePublisherManager -->
-    <bean name="framePublisherManager" class="eu.baltrad.dex.net.util.FramePublisherManager"/>
+    <!-- Frame publisher manager -->
+    <bean id="framePublisherManager" 
+          class="eu.baltrad.dex.net.util.FramePublisherManager"/>
 
-    <!-- FramePublisher -->
-    <bean name="framePublisher" class="eu.baltrad.dex.net.util.FramePublisher"/>
-
-    <!-- Frame dispatcher controller -->
-    <bean name="frameDispatcherController"
-        class="eu.baltrad.dex.net.controller.FrameDispatcherController">
-        <property name="userManager">
-            <ref bean="userManager" />
-        </property>
-        <property name="dataSourceManager">
-            <ref bean="dataSourceManager" />
-        </property>
-        <property name="subscriptionManager">
-            <ref bean="subscriptionManager"/>
-        </property>
-        <property name="xmlMessageParser">
-            <ref bean="xmlmsgParser"/>
-        </property>        
-        <property name="bltMessageManager">
-            <ref bean="bltmanager"/>
-        </property>
-        <property name="bltDataProcessorController">
-            <ref bean="bltDataProcessorController"/>
-        </property>
-        <property name="framePublisherManager">
-            <ref bean="framePublisherManager"/>
-        </property>
-        <property name="framePublisher">
-            <ref bean="framePublisher"/>
-        </property>
-        <property name="registryManager">
-            <ref bean="registryManager"/>
-        </property>
-        <property name="bltFileManager">
-            <ref bean="bltFileManager" />
-        </property>
-        <property name="fileCatalog">
-            <ref bean="fileCatalog" />
-        </property>
-    </bean>
+    <!-- Frame publisher -->
+    <bean id="framePublisher" class="eu.baltrad.dex.net.util.FramePublisher"/>
     
     <!-- Change user password controller -->
     <bean id="changeUserPasswordController"
           class="eu.baltrad.dex.user.controller.ChangeUserPasswordController"
           autowire="byType"/>
 
-    <!-- User manager -->
-    <bean id="userManager" class="eu.baltrad.dex.user.model.UserManager"
+    <!-- Account manager -->
+    <bean id="accountManager" 
+          class="eu.baltrad.dex.user.manager.impl.AccountManager"
           autowire="byType"/>      
 
-    <!--
-        Delivery register manager
-    -->
-    <bean name="registryManager"
-          class="eu.baltrad.dex.registry.model.RegistryManager"
+    <!-- Role manager -->
+    <bean id="roleManager" class="eu.baltrad.dex.user.manager.impl.RoleManager"
+          autowire="byType"/>       
+
+    <!-- Delivery register manager -->
+    <bean id="registryManager"
+          class="eu.baltrad.dex.registry.manager.impl.RegistryManager"
           autowire="byType"/>
 
-    <!--
-        Clear message table controller - deletes records from message table
-    -->
-    <bean name="removeMessagesController"
-            class="eu.baltrad.dex.log.controller.RemoveMessagesController">
-        <property name="successView">
-            <value>clear_messages_status</value>
-        </property>
-    </bean>
-    <!--
-        Configure messages controller
-    -->
-    <bean name="saveMessagesConfigurationController"
-            class="eu.baltrad.dex.config.controller.SaveMessagesConfigurationController">
-        <property name="successView">
-            <value>redirect:configure_messages.htm</value>
-        </property>
-        <property name="formView">
-            <value>configure_messages</value>
-        </property>
-        <property name="commandClass">
-            <value>eu.baltrad.dex.config.model.LogConfiguration</value>
-        </property>
-        <property name="validator">
-            <ref bean="saveMessagesConfigurationValidator"/>
-        </property>
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
-        <property name="logManager">
-            <ref bean="logManager"/>
-        </property>
-    </bean>
-    <!--
-        Configure messages validator
-    -->
-    <bean name="saveMessagesConfigurationValidator"
-            class="eu.baltrad.dex.config.util.SaveMessagesConfigurationValidator"/>
-    <!--
-        Log manager
-    -->
-    <bean name="logManager" class="eu.baltrad.dex.log.model.LogManager"
-          autowire="byType"/> 
+    <!-- Clear messages controller -->
+    <bean id="removeMessagesController" 
+          class="eu.baltrad.dex.log.controller.RemoveMessagesController"
+          autowire="byType"/>
+
+    <!-- Configure messages controller -->
+    <bean id="messagesConfigurationController"
+          class="eu.baltrad.dex.config.controller.MessagesConfigurationController"
+          autowire="byType"/>
+    
+    <!-- Configure messages validator -->
+    <bean id="messagesConfigurationValidator"
+          class="eu.baltrad.dex.config.validator.MessagesConfigurationValidator"/>
+    
+    <!-- Log manager -->
+    <bean id="logManager" class="eu.baltrad.dex.log.manager.impl.LogManager"
+          autowire="byType"/>
           
-    <!--
-        Register controller - handles data delivery register
-    -->
-    <bean name="registryController" 
-          class="eu.baltrad.dex.registry.controller.RegistryController">
-        <property name="successView">
-            <value>showRegister</value>
-        </property>
-        <property name="registryManager">
-            <ref bean="registryManager"/>
-        </property>
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-        <property name="bltFileManager">
-            <ref bean="bltFileManager" />
-        </property>
-    </bean>
-    <!--
-        Configure registry controller
-    -->
-    <bean name="saveRegistryConfigurationController"
-          class="eu.baltrad.dex.config.controller.SaveRegistryConfigurationController">
-        <property name="successView">
-            <value>redirect:configure_registry.htm</value>
-        </property>
-        <property name="formView">
-            <value>configure_registry</value>
-        </property>
-        <property name="commandClass">
-            <value>eu.baltrad.dex.config.model.LogConfiguration</value>
-        </property>
-        <property name="validator">
-            <ref bean="saveRegistryConfigurationValidator"/>
-        </property>
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
-        <property name="registryManager">
-            <ref bean="registryManager"/>
-        </property>
-    </bean>
-    <!--
-        Configure messages validator
-    -->
-    <bean name="saveRegistryConfigurationValidator"
-            class="eu.baltrad.dex.config.util.SaveRegistryConfigurationValidator"/>
-    <!--
-        Edit user controller - allows to modify user credentials
-    -->
-    <bean name="editUserController" class="eu.baltrad.dex.user.controller.EditUserController">
-        <property name="successView">
-            <value>edit_user_account</value>
-        </property>
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-    </bean>
+    <!-- Registry controller -->
+    <bean id="registryController" 
+          class="eu.baltrad.dex.registry.controller.RegistryController"
+          autowire="byType"/>
+        
+    <!-- Configure registry controller -->
+    <bean id="registryConfigurationController"
+          class="eu.baltrad.dex.config.controller.RegistryConfigurationController"
+          autowire="byType"/>
+    
+    <!-- Configure registry validator -->
+    <bean id="registryConfigurationValidator"
+          class="eu.baltrad.dex.config.validator.RegistryConfigurationValidator"/>
 
-    <!--
-        Add user controller - registers new user in the system
-    -->
-    <bean name="saveUserController" class="eu.baltrad.dex.user.controller.SaveUserController">
-        <property name="successView">
-            <value>save_user_account_status</value>
-        </property>
-        <property name="commandClass">
-            <value>eu.baltrad.dex.user.model.User</value>
-        </property>
-        <property name="formView">
-            <value>save_user_account</value>
-        </property>
-        <property name="validator">
-            <ref bean="saveUserValidator"/>
-        </property>
-        <property name="sessionForm">
-            <value>false</value>
-        </property>
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-    </bean>
+    <!-- Save user account controller -->
+    <bean id="saveAccountController" 
+          class="eu.baltrad.dex.user.controller.SaveAccountController"
+          autowire="byType"/>
+          
+    <!-- Edit user account controller -->
+    <bean id="editAccountController" 
+          class="eu.baltrad.dex.user.controller.EditAccountController"
+          autowire="byType"/>      
 
-    <!--
-        Add user validator
-    -->
-    <bean name="saveUserValidator" class="eu.baltrad.dex.user.util.SaveUserValidator">
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-        <property name="webValidator">
-            <ref bean="webValidator"/>
-        </property>
-    </bean>
+    <!-- Remove user account controller -->
+    <bean id="removeAccountController"
+          class="eu.baltrad.dex.user.controller.RemoveAccountController"
+          autowire="byType"/>
 
-    <!--
-        Change password controller
-    -->
-    <bean name="changePasswordController"
-            class="eu.baltrad.dex.user.controller.ChangePasswordController">
-        <property name="successView">
-            <value>change_user_password_status</value>
-        </property>
-        <property name="commandClass">
-            <value>eu.baltrad.dex.user.model.Password</value>
-        </property>
-        <property name="formView">
-            <value>change_user_password</value>
-        </property>
-        <property name="validator">
-            <ref bean="changePasswordValidator"/>
-        </property>
-        <property name="sessionForm">
-            <value>false</value>
-        </property>
-        <property name="userManager">
-            <ref bean="userManager"/>
-        </property>
-    </bean>
+    <!-- Save user account validator -->
+    <bean id="accountValidator" 
+          class="eu.baltrad.dex.user.validator.AccountValidator"
+          autowire="byType"/>
 
-    <!--
-        Change password validator
-    -->
-    <bean name="changePasswordValidator" class="eu.baltrad.dex.user.util.ChangePasswordValidator"/>
+    <!-- Change password controller -->
+    <bean id="changePasswordController"
+          class="eu.baltrad.dex.user.controller.ChangePasswordController"
+          autowire="byType"/>
+    
+    <!-- Change password validator -->
+    <bean id="changePasswordValidator" 
+          class="eu.baltrad.dex.user.validator.PasswordValidator"
+          autowire="byType"/>
 
-    <!--
-        Remove user account controller extends MultiActionController
-    -->
-    <bean id="removeUserController"
-        class="eu.baltrad.dex.user.controller.RemoveUserController">
-        <property name="userManager">
-            <ref bean="userManager" />
-        </property>
-    </bean>
-
-    <!--
-        Add radar controller
-    -->
-    <bean name="saveRadarController"
-        class="eu.baltrad.dex.radar.controller.SaveRadarController">
-        <property name="formView">
-            <value>save_radar</value>
-        </property>
-        <property name="successView">
-            <value>save_radar_status</value>
-        </property>
-        <property name="commandClass">
-            <value>eu.baltrad.dex.radar.model.Radar</value>
-        </property>
-        <property name="sessionForm">
-            <value>false</value>
-        </property>
-        <property name="radarManager">
-            <ref bean="radarManager"/>
-        </property>
-        <property name="validator">
-            <ref bean="saveRadarValidator"/>
-        </property>     
-    </bean>
-
-    <!--
-        Add radar validator
-    -->
-    <bean name="saveRadarValidator" 
-        class="eu.baltrad.dex.radar.util.SaveRadarValidator"/>
-
-    <!--
-        Edit radar controller
-    -->
-    <bean name="editRadarController" class="eu.baltrad.dex.radar.controller.EditRadarController">
-        <property name="successView">
-            <value>edit_radar</value>
-        </property>
-        <property name="radarManager">
-            <ref bean="radarManager"/>
-        </property>
-    </bean>
-
-    <!--
-        Remove radar controller
-    -->
+    <!-- Save radar controller -->
+    <bean id="saveRadarController"
+          class="eu.baltrad.dex.radar.controller.SaveRadarController"
+          autowire="byType"/>
+        
+    <!-- Show radar controller -->
+    <bean id="showRadarController" 
+          class="eu.baltrad.dex.radar.controller.ShowRadarController"
+          autowire="byType"/>
+        
+    <!-- Remove radar controller -->
     <bean id="removeRadarController"
-        class="eu.baltrad.dex.radar.controller.RemoveRadarController">
-        <property name="radarManager">
-            <ref bean="radarManager" />
-        </property>
-    </bean>
+          class="eu.baltrad.dex.radar.controller.RemoveRadarController"
+          autowire="byType"/>
 
     <!-- Data source list controller -->
     <bean id="dataSourceListController" 
@@ -584,45 +244,39 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           class="eu.baltrad.dex.net.servlet.DataSourceListServlet"
           autowire="byType"/>
           
-    <!-- Node connection manager -->
-    <bean id="nodeConnectionManager" 
-          class="eu.baltrad.dex.net.model.NodeConnectionManager"
+    <!-- Node manager -->
+    <bean id="nodeManager" class="eu.baltrad.dex.net.manager.impl.NodeManager" 
           autowire="byType"/>
           
     <!-- URL address validator -->
     <bean id="urlValidator" class="eu.baltrad.dex.net.util.UrlValidatorUtil"/>
     
-    <!-- Message source utility -->
-    <bean id="messages" class="eu.baltrad.dex.util.MessageResourceUtil">
-        <constructor-arg value="resources/messages"/>
-    </bean>
-    
     <!-- JSON format utility -->
-    <bean id="jsonUtil" class="eu.baltrad.dex.net.util.JsonUtil"/>
+    <bean id="jsonUtil" class="eu.baltrad.dex.net.util.json.impl.JsonUtil"/>
     
     <!-- Post subscription controller -->
     <bean id="postSubscriptionController" 
-          class="eu.baltrad.dex.net.controller.PostSubscriptionController"
+          class="eu.baltrad.dex.net.controller.StartSubscriptionController"
           autowire="byType"/>
           
     <!-- Post subscription servlet -->
     <bean id="postSubscriptionServlet" 
-          class="eu.baltrad.dex.net.servlet.PostSubscriptionServlet"
+          class="eu.baltrad.dex.net.servlet.StartSubscriptionServlet"
           autowire="byType"/>
           
     <!-- Get subscription controller -->
     <bean id="getSubscriptionController" 
-          class="eu.baltrad.dex.net.controller.GetSubscriptionController" 
+          class="eu.baltrad.dex.net.controller.UpdateSubscriptionController" 
           autowire="byType"/>
           
     <!-- Get subscription servlet -->
     <bean id="getSubscriptionServlet" 
-          class="eu.baltrad.dex.net.servlet.GetSubscriptionServlet"
+          class="eu.baltrad.dex.net.servlet.UpdateSubscriptionServlet"
           autowire="byType"/>
           
     <!-- Subscription manager -->
     <bean id="subscriptionManager" 
-          class="eu.baltrad.dex.net.model.SubscriptionManager" 
+          class="eu.baltrad.dex.net.manager.impl.SubscriptionManager" 
           autowire="byType"/>
           
     <!-- Post file servlet -->
@@ -643,115 +297,51 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="metadataMatcher" 
           class="eu.baltrad.bdb.oh5.MetadataMatcher"/>
 
-    <!--
-        Message digest utility.
-    -->
-    <bean name="messageDigestUtil" class="eu.baltrad.dex.util.MessageDigestUtil"/>
+    <!-- Message digest utility -->
+    <bean id="messageDigestUtil" 
+          class="eu.baltrad.dex.util.MessageDigestUtil"/>
 
-    <!--
-        Application security manager.
-    -->
-    <bean name="applicationSecurityManager" class="eu.baltrad.dex.auth.util.SecurityManager"/>
+    <!-- Application security manager -->
+    <bean id="applicationSecurityManager" 
+          class="eu.baltrad.dex.auth.manager.SecurityManager"/>
     
     <!-- Configuration manager -->
+    <bean id="configurationManager" 
+          class="eu.baltrad.dex.config.manager.impl.ConfigurationManager"/>
 
-    <bean name="configurationManager" class="eu.baltrad.dex.config.model.ConfigurationManager"/>
+    <!-- Web addresses validator -->      
+    <bean id="webValidator" class="eu.baltrad.dex.util.WebValidator"/>
+    
+    <!-- Node configuration validator -->
+    <bean id="nodeConfigurationValidator"
+          class="eu.baltrad.dex.config.validator.NodeConfigurationValidator"
+          autowire="byType"/>  
 
+    <!-- Save configuration controller -->
+    <bean id="nodeConfigurationController"
+          class="eu.baltrad.dex.config.controller.NodeConfigurationController"
+          autowire="byType"/>
 
-    <bean name="webValidator" class="eu.baltrad.dex.util.WebValidator"/>
-    <!--
-        Save configuration validator
-    -->
-    <bean name="saveConfigurationValidator"
-            class="eu.baltrad.dex.config.util.SaveConfigurationValidator">
-        <property name="webValidator">
-            <ref bean="webValidator"/>
-        </property>        
-    </bean>
+    <!-- Data processor -->
+    <bean id="bltDataProcessor"
+          class="eu.baltrad.dex.bltdata.util.DataProcessor"/>
 
-    <!--
-        Save configuration controller.
-    -->
-    <bean name="saveConfigurationController"
-            class="eu.baltrad.dex.config.controller.SaveConfigurationController">
-        <property name="configurationManager">
-            <ref bean="configurationManager"/>
-        </property>
-        <property name="successView">
-            <value>redirect:node_settings.htm</value>
-        </property>
-        <property name="commandClass">
-            <value>eu.baltrad.dex.config.model.AppConfiguration</value>
-        </property>
-        <property name="validator">
-            <ref bean="saveConfigurationValidator"/>
-        </property>
-        <property name="sessionForm">
-            <value>false</value>
-        </property>
-        <property name="formView">
-            <value>node_settings</value>
-        </property>
-    </bean>
+    <!-- Data projector -->
+    <bean id="bltDataProjector" 
+          class="eu.baltrad.dex.bltdata.util.DataProjector"/>
 
-    <!--
-        Node connection controller.
-    -->
-    <bean name="nodeConnectionController"
-        class="eu.baltrad.dex.net.controller.NodeConnectionController">
-        <property name="nodeConnectionManager">
-            <ref bean="nodeConnectionManager" />
-        </property>
-    </bean>
-
-    <!--
-        Data processor model.
-    -->
-    <bean name="bltDataProcessor"
-        class="eu.baltrad.dex.bltdata.model.BltDataProcessor">
-    </bean>
-
-    <!--
-        Data projector model.
-    -->
-    <bean name="bltDataProjector" class="eu.baltrad.dex.bltdata.model.BltDataProjector"/>
-
-    <!--
-        Data processor controller.
-    -->
-    <bean name="bltDataProcessorController"
-            class="eu.baltrad.dex.bltdata.controller.BltDataProcessorController">
-        <property name="bltDataProcessor">
-            <ref bean="bltDataProcessor"/>
-        </property>
-    </bean>
-
-    <!--
-        Image preview controller.
-    -->
-    <bean name="bltImagePreviewController"
-            class="eu.baltrad.dex.bltdata.controller.BltImagePreviewController">
-        <property name="successView">
-            <value>data_preview</value>
-        </property>
-        <property name="bltDataProcessor">
-            <ref bean="bltDataProcessor"/>
-        </property>
-        <property name="bltDataProcessorController">
-            <ref bean="bltDataProcessorController"/>
-        </property>
-	<property name="fileCatalog">
-	    <ref bean="fileCatalog" />
-	</property>
-    </bean>
+    <!-- Image preview controller -->
+    <bean id="imagePreviewController"
+          class="eu.baltrad.dex.bltdata.controller.ImagePreviewController"
+          autowire="byType"/>
 
     <!-- DataSourceManager -->
-    <bean name="dataSourceManager" 
-          class="eu.baltrad.dex.datasource.model.DataSourceManager"
+    <bean id="dataSourceManager" 
+          class="eu.baltrad.dex.datasource.manager.impl.DataSourceManager"
           autowire="byType"/>
           
     <!-- DataSourceValidator -->
-    <bean name="dataSourceValidator" 
+    <bean id="dataSourceValidator" 
           class="eu.baltrad.dex.datasource.util.DataSourceValidator" 
           autowire="byType"/>      
 
@@ -761,47 +351,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           autowire="byType"/>
 
     <!-- ShowDataSourcesController -->
-    <bean name="showDataSourcesController"
-            class="eu.baltrad.dex.datasource.controller.ShowDataSourcesController">
-        <property name="successView">
-            <value>datasources</value>
-        </property>
-        <property name="dataSourceManager">
-            <ref bean="dataSourceManager"/>
-        </property>
-    </bean>
+    <bean id="showDataSourcesController"
+          class="eu.baltrad.dex.datasource.controller.ShowDataSourcesController"
+          autowire="byType"/>
 
     <!-- RemoveDataSourceController -->
-    <bean name="removeDataSourceController" 
-            class="eu.baltrad.dex.datasource.controller.RemoveDataSourceController">
-        <property name="dataSourceManager">
-            <ref bean="dataSourceManager"/>
-        </property>
-        <property name="coreFilterManager">
-            <ref bean="coreFilterManager"/>
-        </property>
-    </bean>
-
-    <!-- EditDataSourceController -->
-    <bean name="editDataSourceController"
-            class="eu.baltrad.dex.datasource.controller.EditDataSourceController">
-        <property name="successView">
-            <value>edit_datasource</value>
-        </property>
-        <property name="dataSourceManager">
-            <ref bean="dataSourceManager"/>
-        </property>
-    </bean>
-  
-    <!-- Message source -->
-    <bean id="messageSource"
-        class="org.springframework.context.support.ResourceBundleMessageSource">
-	<property name="basenames">
-            <list>
-		<value>messages</value>
-            </list>
-	</property>
-    </bean>
+    <bean id="removeDataSourceController" 
+          class="eu.baltrad.dex.datasource.controller.RemoveDataSourceController"
+          autowire="byType"/>
 
     <!-- Integrate beast into BaltradDex -->
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -827,7 +384,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
  
     <!-- Enable transaction management -->
-    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    <bean id="txManager" 
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
     </bean>
   
@@ -900,13 +458,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="bltmanager" class="eu.baltrad.beast.manager.BltMessageManager" autowire="byType"/>
     
     <!-- beastui uses Controller annotations -->
-    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
-        <!--property name="interceptors">
-            <list>
-                <ref bean="operatorHttpRequestInterceptor"/>
-            </list>
-        </property-->
-    </bean>
+    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
 
     <!-- We need to have a timeout manager so that we can initiate timeout requests from anywhere -->
     <bean id="timeoutfactory" class="eu.baltrad.beast.rules.timer.TimeoutTaskFactory"/>  

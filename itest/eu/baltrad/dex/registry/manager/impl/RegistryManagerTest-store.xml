@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+ 
+    <dex_roles id="1" name="peer"/>
+ 
+    <dex_users id="1" name="User1" password="passw0rd" org_name="org" 
+               org_unit="unit" locality="locality " state="state" 
+               country_code="XX"/>
+    <dex_users id="2" name="User2" password="passw0rd" org_name="org" 
+               org_unit="unit" locality="locality " state="state" 
+               country_code="XX"/>
+               
+    <dex_users_roles id="1" user_id="1" role_id="1"/>
+    <dex_users_roles id="2" user_id="2" role_id="1"/>            
+ 
+    <dex_delivery_registry time_stamp="1345796400000" 
+                           uuid="111111111111" status="SUCCESS"/>
+    <dex_delivery_registry time_stamp="1345797000000" 
+                           uuid="222222222222" status="SUCCESS"/>
+    <dex_delivery_registry time_stamp="1345797600000" 
+                           uuid="333333333333" status="SUCCESS"/>
+    <dex_delivery_registry time_stamp="1345798200000" 
+                           uuid="444444444444" status="FAILURE"/>
+    <dex_delivery_registry time_stamp="1345798800000" 
+                           uuid="555555555555" status="SUCCESS"/>
+    <dex_delivery_registry time_stamp="1345799400000" 
+                           uuid="666666666666" status="SUCCESS"/>
+    <dex_delivery_registry time_stamp="1345800000000" 
+                           uuid="777777777777" status="SUCCESS"/>
+    <dex_delivery_registry time_stamp="1345800600000" 
+                           uuid="888888888888" status="FAILURE"/>
+    <dex_delivery_registry time_stamp="1345801200000" 
+                           uuid="999999999999" status="SUCCESS"/>                           
+    <dex_delivery_registry time_stamp="1345801800000" 
+                           uuid="101010101010" status="SUCCESS"/>
+    <dex_delivery_registry time_stamp="1345802400000" 
+                           uuid="101010101010" status="SUCCESS"/>
+    <dex_delivery_registry time_stamp="1345803000000"     
+                           uuid="121212121212" status="SUCCESS"/>                         
+        
+</dataset>

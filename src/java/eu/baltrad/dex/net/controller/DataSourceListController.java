@@ -21,18 +21,33 @@
 
 package eu.baltrad.dex.net.controller;
 
-import eu.baltrad.dex.net.util.*;
+import eu.baltrad.dex.net.controller.exception.InternalControllerException;
+import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
+import eu.baltrad.dex.net.request.factory.RequestFactory;
+import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
+import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
+import eu.baltrad.dex.net.util.json.IJsonUtil;
+import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
+import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.controller.util.MessageSetter;
+import eu.baltrad.dex.net.model.impl.Node;
+import eu.baltrad.dex.net.util.UrlValidatorUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.net.manager.INodeManager;
+import eu.baltrad.dex.user.manager.IAccountManager;
+
+import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.net.model.*;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import org.springframework.ui.Model;
+
+import org.keyczar.exceptions.KeyczarException;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.HttpResponse;
@@ -44,9 +59,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.io.InputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import org.keyczar.exceptions.KeyczarException;
+
 
 /**
  * Controls access to data sources available at the peer node for subscription.
@@ -65,7 +82,7 @@ public class DataSourceListController implements MessageSetter {
     private static final String DS_SELECTED_VIEW = "selected_datasource";
     
     /** List of available connections */
-    private final static String CONNECTIONS_KEY = "connections";
+    private final static String NODES_KEY = "nodes";
     /** Data sources object used to render the view */
     private static final String DATA_SOURCES_KEY = "data_sources";
     /** Peer node name key */
@@ -90,7 +107,8 @@ public class DataSourceListController implements MessageSetter {
     private static final String DS_GENERIC_CONN_ERROR_KEY = 
             "datasource.controller.generic_connection_error"; 
     
-    private INodeConnectionManager nodeConnectionManager; 
+    private IAccountManager accountManager;
+    private INodeManager nodeManager; 
     private Authenticator authenticator;
     private UrlValidatorUtil urlValidator;
     private RequestFactory requestFactory;
@@ -98,12 +116,10 @@ public class DataSourceListController implements MessageSetter {
     private IJsonUtil jsonUtil;
     private MessageResourceUtil messages;
     private Logger log;
-    protected String nodeName;
-    protected String nodeAddress;
     
-    /** These variables are shared between methods */
+    protected Account localNode;
+    
     private String peerNodeName;
-    private String peerNodeAddress;
     private Set<DataSource> peerDataSources;
     
     /**
@@ -122,8 +138,13 @@ public class DataSourceListController implements MessageSetter {
         this.httpClient = new HttpClientUtil(
                 InitAppUtil.getConf().getConnTimeout(), 
                 InitAppUtil.getConf().getSoTimeout());
-        this.nodeName = InitAppUtil.getConf().getNodeName();
-        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        this.localNode = new Account(InitAppUtil.getConf().getNodeName(),
+                InitAppUtil.getConf().getNodeAddress(),
+                InitAppUtil.getConf().getOrgName(),
+                InitAppUtil.getConf().getOrgUnit(),
+                InitAppUtil.getConf().getLocality(),
+                InitAppUtil.getConf().getState(),
+                InitAppUtil.getConf().getCountryCode());
     }
     
     /**
@@ -152,26 +173,42 @@ public class DataSourceListController implements MessageSetter {
     }
     
     /**
-     * Reads data sources from http response.
+     * Read http response body
      * @param response Http response
-     * @return Data source string
-     * @throws IOException 
+     * @return Response body
+     * @throws InternalControllerException 
      */
-    private Set<DataSource> readDataSources(HttpResponse response) 
+    protected String readResponse(HttpResponse response) 
             throws InternalControllerException {
         try {
             InputStream is = null;
             try {
                 is = response.getEntity().getContent();
-                return jsonUtil.jsonToDataSources(IOUtils.toString(is));
+                return IOUtils.toString(is);
             } finally {
                 is.close();
             }
-        } catch (IOException e) {
-            throw new InternalControllerException(e.getMessage());
+        } catch (IOException e) {            
+            throw new InternalControllerException("Failed to read server "
+                    + "response");
         } catch (RuntimeException e) {
-            throw new InternalControllerException(e.getMessage());
+            throw new InternalControllerException("Failed to read server "
+                    + "response");
         }
+    }
+    
+    /**
+     * Get peer node's list.
+     * @return Peer node's list
+     */
+    private List<Node> getPeerNodes() {
+        List<Node> peers = new ArrayList<Node>();
+        for (Node node : nodeManager.load()) {
+            if (!node.getAddress().equals(Node.LOCAL_NODE_ADDRESS)) {
+                peers.add(node);
+            }
+        }
+        return peers;
     }
     
     /**
@@ -180,8 +217,8 @@ public class DataSourceListController implements MessageSetter {
      * @return View name
      */
     @RequestMapping("/connect_to_node.htm")
-    public String connect2Node(Model model) { 
-        model.addAttribute(CONNECTIONS_KEY, nodeConnectionManager.load());
+    public String connect2Node(Model model) {
+        model.addAttribute(NODES_KEY, getPeerNodes());
         return DS_CONNECT_VIEW;
     }
     
@@ -202,8 +239,8 @@ public class DataSourceListController implements MessageSetter {
         // Validate node's URL address 
         String urlSelect = null;
         if (InitAppUtil.validate(nodeSelect)) {
-            NodeConnection conn = nodeConnectionManager.load(nodeSelect);
-            urlSelect = conn.getNodeAddress();
+            Node node = nodeManager.load(nodeSelect);
+            urlSelect = node.getAddress();
         }
         String url = urlValidator.validate(urlInput) ? urlInput : urlSelect;
         if (!urlValidator.validate(url)) {
@@ -214,30 +251,42 @@ public class DataSourceListController implements MessageSetter {
             // Post request if URL was successfully validated 
             requestFactory = new DefaultRequestFactory(URI.create(url));
             HttpUriRequest req = requestFactory
-                .createGetDataSourceListingRequest(nodeName, nodeAddress);
+                .createDataSourceListingRequest(localNode);
             try {
-                authenticator.addCredentials(req, nodeName);
+                authenticator.addCredentials(req, localNode.getName());
                 HttpResponse res = httpClient.post(req);
-                // Server reponse is OK, process data source list 
                 if (res.getStatusLine().getStatusCode() == 
                         HttpServletResponse.SC_OK) {
-                    // Make peer node name available for other methods
+                    // alright, read data sources
                     peerNodeName = res.getFirstHeader("Node-Name").getValue();
-                    peerNodeAddress = 
-                            res.getFirstHeader("Node-Address").getValue();
                     model.addAttribute(PEER_NAME_KEY, peerNodeName);
-                    // Add connection to the list
-                    if (nodeConnectionManager.load(peerNodeName) == null) {
-                        NodeConnection conn = new NodeConnection(peerNodeName, 
-                                peerNodeAddress);
-                        nodeConnectionManager.storeNoId(conn);
-                    }    
-                    // Make data sources available for other methods
-                    peerDataSources = readDataSources(res);
+                    String json = readResponse(res);
+                    peerDataSources = jsonUtil.jsonToDataSources(json);
                     viewName = DS_CONNECTED_VIEW;
                     model.addAttribute(DATA_SOURCES_KEY, peerDataSources);
-                // Server failed to respond correctly, retrieve error message      
+                 
+                } else if (res.getStatusLine().getStatusCode() ==
+                        HttpServletResponse.SC_CREATED) {
+                    // user account established on server, create local account
+                    peerNodeName = res.getFirstHeader("Node-Name").getValue();
+                    model.addAttribute(PEER_NAME_KEY, peerNodeName);
+                    String json = readResponse(res);
+                    Account peer = jsonUtil.jsonToUserAccount(json);
+                    
+                    if (accountManager.load(peer.getName()) == null) {
+                        peer.setRoleName(Role.PEER);
+                        try {
+                            accountManager.store(peer);
+                            log.warn("New peer account created: " + 
+                                    peer.getName());
+                        } catch (Exception e) {
+                            throw e;
+                        }   
+                    }       
+                    viewName = DS_CONNECTED_VIEW;        
+                    
                 } else {
+                    // server error     
                     viewName = DS_CONNECT_VIEW;
                     String errorMsg = messages.getMessage(
                         DS_SERVER_ERROR_KEY);
@@ -277,7 +326,7 @@ public class DataSourceListController implements MessageSetter {
                 log.error(errorMsg + ": " + e.getMessage());
             }
         }
-        model.addAttribute(CONNECTIONS_KEY, nodeConnectionManager.load());
+        model.addAttribute(NODES_KEY, getPeerNodes());
         return viewName;
     }
     
@@ -309,13 +358,20 @@ public class DataSourceListController implements MessageSetter {
         return viewName;
     }
     
-     /**
+    /**
+     * @param accountManager the accountManager to set
+     */
+    @Autowired
+    public void setAccountManager(IAccountManager accountManager) {
+        this.accountManager = accountManager;
+    }
+    
+    /**
      * @param nodeConnectionManager the nodeConnectionManager to set
      */
     @Autowired
-    public void setNodeConnectionManager(
-            INodeConnectionManager nodeConnectionManager) {
-        this.nodeConnectionManager = nodeConnectionManager;
+    public void setNodeManager(INodeManager nodeManager) {
+        this.nodeManager = nodeManager;
     }
 
     /**

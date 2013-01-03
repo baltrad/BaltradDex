@@ -22,15 +22,15 @@
 package eu.baltrad.dex.datasource.controller;
 
 import eu.baltrad.dex.radar.model.Radar;
-import eu.baltrad.dex.radar.model.RadarManager;
+import eu.baltrad.dex.radar.manager.impl.RadarManager;
 import eu.baltrad.dex.datasource.model.FileObject;
-import eu.baltrad.dex.datasource.model.FileObjectManager;
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.net.model.Subscription;
-import eu.baltrad.dex.net.model.SubscriptionManager;
+import eu.baltrad.dex.datasource.manager.impl.FileObjectManager;
+import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.impl.AccountManager;
+import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.net.manager.impl.SubscriptionManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.datasource.model.IDataSourceManager;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.util.DataSourceValidator;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
@@ -39,7 +39,6 @@ import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.AttributeFilter;
 import eu.baltrad.beast.db.CombinedFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
-import java.util.ArrayList;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,12 +49,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.validation.BindingResult;
 import org.springframework.ui.ModelMap;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Allows to configure new data source or to modify an existing one.
@@ -88,9 +92,10 @@ public class SaveDataSourceController {
     private static final String ERROR_MSG_KEY = "error";
     private static final String OK_MSG_KEY = "message";
     
+    private PlatformTransactionManager transactionManager;
     private RadarManager radarManager;
     private FileObjectManager fileObjectManager;
-    private UserManager userManager;
+    private AccountManager userManager;
     private IDataSourceManager dataSourceManager;
     private CoreFilterManager coreFilterManager;
     private SubscriptionManager subscriptionManager;
@@ -154,18 +159,18 @@ public class SaveDataSourceController {
             }
             return FORM_VIEW;
         } else {
+            // begin transaction
+            TransactionDefinition def = new DefaultTransactionDefinition();
+            TransactionStatus status = transactionManager.getTransaction(def);
             try {
                 int dataSourceId = 0;
-                int store = 0;
                 if (dataSource.getId() > 0) {
-                    store = dataSourceManager.update(dataSource);
+                    dataSourceManager.update(dataSource);
                     dataSourceId = dataSource.getId();
                 } else {
-                    store = dataSourceManager.storeNoId(dataSource);
-                    dataSourceId = dataSourceManager.load(dataSource.getName())
-                            .getId();
+                    dataSourceId = dataSourceManager.store(dataSource);
                 }
-                if (store > 0) {
+                if (dataSourceId > 0) {
                     // Remove filter parameter
                     int filterId = dataSourceManager.loadFilterId(dataSourceId);
                     if (filterId > 0) {
@@ -177,14 +182,13 @@ public class SaveDataSourceController {
                     String wmoAttrValue = "";
                     if (selectedRadars != null) {    
                         for (int i = 0; i < selectedRadars.length; i++) {
-                            int radarId = (radarManager
-                                    .load(selectedRadars[i])).getId();
-                            String wmoNumber = (radarManager
-                                    .load(selectedRadars[i])).getWmoNumber();
-
-                            dataSourceManager.saveRadar(dataSourceId, radarId);
+                            String[] radarParms = selectedRadars[i].split("/");
+                            Radar radar = radarManager
+                                    .load(radarParms[0].trim());
+                            dataSourceManager.storeRadar(dataSourceId, 
+                                    radar.getId());
                             // Set filter value
-                            wmoAttrValue += wmoNumber + ",";
+                            wmoAttrValue += radar.getRadarWmo() + ",";
                         }
                     }
                     // Save file object parameter
@@ -194,7 +198,7 @@ public class SaveDataSourceController {
                         for (int i = 0; i < selectedFileObjects.length; i++) {
                             int fileObjectId = (fileObjectManager
                                 .load(selectedFileObjects[i])).getId();
-                            dataSourceManager.saveFileObject(dataSourceId, 
+                            dataSourceManager.storeFileObject(dataSourceId, 
                                     fileObjectId);
                             // Set filter value
                             fileObjectAttrValue += selectedFileObjects[i] + ",";
@@ -206,69 +210,38 @@ public class SaveDataSourceController {
                         fileObjectAttrValue = fileObjectAttrValue
                             .substring( 0, fileObjectAttrValue.lastIndexOf(","));
                     }
-                    
-                    
-                    
-                    List<User> oldUsers = dataSourceManager.loadUser(dataSourceId);
-                    List<User> removedUsers = new ArrayList<User>();
-                    System.out.println("________ old users size: " + oldUsers.size());
-                    
-                    
-                    // Save user parameter
+                    /* 
+                     * Save user parameter. Remove respective subscriptions 
+                     * in case when data source access right was revoked
+                     * for a given user
+                     */
+                    List<Subscription> uploads = subscriptionManager
+                                .load(Subscription.UPLOAD);
                     dataSourceManager.deleteUser(dataSourceId);
                     if (selectedUsers != null) {
-                        
+                        List<Account> selectedAccounts = 
+                                new ArrayList<Account>();
                         for (int i = 0; i < selectedUsers.length; i++) {
-                            int userId = (userManager
-                                    .load(selectedUsers[i])).getId();
-                            dataSourceManager.saveUser(dataSourceId, userId);
+                            Account account = userManager.load(selectedUsers[i]);
+                            selectedAccounts.add(account);    
+                            dataSourceManager.storeUser(dataSourceId, 
+                                    account.getId());
                         }
-                        
-                        // remove subscriptions if data source access right 
-                        // was revoked
-
-                        
-                        /*List<User> newUsers = dataSourceManager.loadUser(dataSourceId);
-                        
-                        System.out.println("________ new users size: " + newUsers.size());
-                        
-                        
-                        
-                        for (User old : oldUsers) {
-                            if (!containsUser(newUsers, old)) {
-                                removedUsers.add(old);
+                        for (Subscription s : uploads) {
+                            if (s.getDataSource().equals(dataSource.getName())
+                                    && !containsUser(selectedAccounts, 
+                                        s.getUser())) {
+                                subscriptionManager.delete(s.getId());
                             }
-                        }*/
-                        
-                        
-                    } else {
-                        /*System.out.println("___________ no users selected");
-                        
-                        for (User old : oldUsers) {
-                            removedUsers.add(old);
-                        }*/
-                    }
-                    
-                    /*for (User rem : removedUsers) {
-                            
-                        System.out.println("_____ user to remove: " + rem.getName());
-                        System.out.println("_____ data source name: " + dataSource.getName());
-
-                        Subscription s = null;
-                        if ((s = subscriptionManager.load(rem.getName(), 
-                                dataSource.getName(),
-                                Subscription.SUBSCRIPTION_UPLOAD)) != null) 
-                        {
-                            // remove subscription
                         }
-                    }*/
-                    
-                    
-                    
-                    
-                    
-                    
-                    
+                    } else {
+                        for (Subscription s : uploads) {
+                            if (s.getDataSource().equals(dataSource.getName()))
+                            {
+                                subscriptionManager.delete(s.getId());
+                            }
+                        }
+                    }
                     // Configure filters
                     CombinedFilter combinedFilter = new CombinedFilter();
                     combinedFilter.setMatchType(CombinedFilter.MatchType.ALL);
@@ -294,7 +267,7 @@ public class SaveDataSourceController {
                     // Save filter parameter
                     coreFilterManager.store(combinedFilter);
                     dataSourceManager.deleteFilter(dataSourceId);
-                    dataSourceManager.saveFilter(dataSourceId, 
+                    dataSourceManager.storeFilter(dataSourceId, 
                             combinedFilter.getId());
                     String msg = messages
                             .getMessage(SAVE_DATASOURCE_OK_MSG_KEY, 
@@ -307,8 +280,10 @@ public class SaveDataSourceController {
                             new Object[] {dataSource.getName()});
                     model.addAttribute(ERROR_MSG_KEY, msg);
                     log.error(msg);
-                }   
+                }
+                transactionManager.commit(status);
             } catch (Exception e) {
+                transactionManager.rollback(status);
                 String msg = messages
                             .getMessage(SAVE_DATASOURCE_ERROR_MSG_KEY, 
                             new Object[] {dataSource.getName()});
@@ -402,15 +377,15 @@ public class SaveDataSourceController {
      * @return List of available users
      */
     @ModelAttribute("all_users")
-    public List<User> getAllUsers(
+    public List<Account> getAllUsers(
             @RequestParam(value="ds_id", required=false) String dsId) {
         if (dsId != null) {
-            List<User> selectedUsers = dataSourceManager
+            List<Account> selectedUsers = dataSourceManager
                     .loadUser(Integer.parseInt(dsId));
-            List<User> allButSelectedUsers = new ArrayList<User>();
-            for (User user : userManager.load()) {
-                if (!containsUser(selectedUsers, user)) {
-                    allButSelectedUsers.add(user);
+            List<Account> allButSelectedUsers = new ArrayList<Account>();
+            for (Account account : userManager.load()) {
+                if (!containsUser(selectedUsers, account.getName())) {
+                    allButSelectedUsers.add(account);
                 }
             }
             return allButSelectedUsers;
@@ -425,10 +400,10 @@ public class SaveDataSourceController {
      * @param user User to look for
      * @return True in case user is present 
      */
-    private boolean containsUser(List<User> users, User user) {
+    private boolean containsUser(List<Account> accounts, String userName) {
         boolean result = false;
-        for (User availableUser : users) {
-            if (availableUser.getName().equals(user.getName())) {
+        for (Account availableUser : accounts) {
+            if (availableUser.getName().equals(userName)) {
                 result = true;
                 break;
             }
@@ -442,7 +417,7 @@ public class SaveDataSourceController {
      * @return List of selected users
      */
     @ModelAttribute("selected_users")
-    public List<User> getSelectedUsers(
+    public List<Account> getSelectedUsers(
             @RequestParam(value="ds_id", required=false) String dsId) {
         if (dsId != null) {
             return dataSourceManager.loadUser(Integer.parseInt(dsId));
@@ -450,7 +425,16 @@ public class SaveDataSourceController {
             return null;
         }
     }
-
+    
+    /**
+     * @param transactionManager the transactionManager to set
+     */
+    @Autowired
+    public void setTransactionManager(
+            PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+    
     /**
      * @param radarManager the radarManager to set
      */
@@ -471,7 +455,7 @@ public class SaveDataSourceController {
      * @param userManager the userManager to set
      */
     @Autowired
-    public void setUserManager(UserManager userManager) {
+    public void setUserManager(AccountManager userManager) {
         this.userManager = userManager;
     }
 
@@ -515,4 +499,5 @@ public class SaveDataSourceController {
     {
         this.subscriptionManager = subscriptionManager;
     }
+
 }

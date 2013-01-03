@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.bltdata.controller;
 
-import eu.baltrad.dex.bltdata.model.BltDataProcessor;
+import eu.baltrad.dex.bltdata.util.DataProcessor;
 
 import junit.framework.TestCase;
 
@@ -40,8 +40,8 @@ import java.awt.image.BufferedImage;
  */
 public class BltDataProcessorControllerTest extends TestCase {
 //---------------------------------------------------------------------------------------- Variables
-    private static BltDataProcessor dataProcessor;
-    private static BltDataProcessorController dataProcessorController;
+    private static DataProcessor dataProcessor;
+    //private static DataProcessorController dataProcessorController;
     private static H5File h5File;
     private static Group root;
 

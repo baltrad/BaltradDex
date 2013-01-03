@@ -21,7 +21,9 @@
 
 package eu.baltrad.dex.auth.util;
 
-import eu.baltrad.dex.user.model.UserManager;
+import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.Role;
+import eu.baltrad.dex.user.manager.impl.AccountManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.GrantedAuthority;
@@ -42,8 +44,8 @@ public class SimpleUserDetailsService implements UserDetailsService  {
     private GrantedAuthority authAdmin;
     private GrantedAuthority authOperator;
     private GrantedAuthority authUser;
-    /** User manager */
-    private UserManager userManager;
+    
+    private AccountManager accountManager;
     
     /**
      * Constructor.
@@ -60,33 +62,33 @@ public class SimpleUserDetailsService implements UserDetailsService  {
      * @return User details 
      */
     public UserDetails loadUserByUsername(String name) {
-        eu.baltrad.dex.user.model.User dbUser = userManager.load(name);
-        if (dbUser == null) {
+        Account account = accountManager.load(name);
+        if (account == null) {
             return null;
         } else {
             GrantedAuthority[] authorities = null;
-            if (dbUser.getRoleName().equals("admin")) {
+            if (account.getRoleName().equals(Role.ADMIN)) {
                 authorities = new GrantedAuthority[] {authAdmin, authOperator, 
                     authUser};
             }
-            if (dbUser.getRoleName().equals("operator")) {
+            if (account.getRoleName().equals(Role.OPERATOR)) {
                 authorities = new GrantedAuthority[] {authOperator, authUser};
             }
-            if (dbUser.getRoleName().equals("user")) {
+            if (account.getRoleName().equals(Role.USER)) {
                 authorities = new GrantedAuthority[] {authUser};
             }
-            UserDetails user = new User(dbUser.getName(), dbUser.getPassword(), 
+            UserDetails user = new User(account.getName(), account.getPassword(), 
                     true, authorities);
             return user;
         }
     }
 
     /**
-     * @param userManager the userManager to set
+     * @param accountManager the userManager to set
      */
     @Autowired
-    public void setUserManager(UserManager userManager) {
-        this.userManager = userManager;
+    public void setAccountManager(AccountManager accountManager) {
+        this.accountManager = accountManager;
     }
    
 }

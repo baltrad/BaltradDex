@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,104 +17,137 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.user.controller;
 
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.Password;
-import eu.baltrad.dex.user.model.UserManager;
+import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.impl.AccountManager;
+import eu.baltrad.dex.user.validator.PasswordValidator;
+import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageDigestUtil;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.servlet.mvc.SimpleFormController;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.validation.BindException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.validation.BindingResult;
+import org.springframework.ui.ModelMap;
 
 import org.apache.log4j.Logger;
 
 /**
- * Controller class allows to modify password associated with a given account / user ID.
+ * Modify password for a given user account.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 0.7.1
+ * @version 1.2.2
  * @since 0.7.1
  */
-public class ChangePasswordController extends SimpleFormController {
-//---------------------------------------------------------------------------------------- Constants
-    /* User ID key */
-    public static final String USER_ID = "userId";
-    /* Success message key */
+@Controller
+@RequestMapping("/change_user_password.htm")
+@SessionAttributes("user_account")
+public class ChangePasswordController {
+
+    private static final String FORM_VIEW = "change_user_password";
+    private static final String SUCCESS_VIEW = "change_user_password_status";
+    
+    private static final String USER_ACCOUNT_MODEL_KEY = "user_account";
+    private static final String CHANGE_PASSWORD_ERROR_MSG_KEY = 
+            "changepassword.failure";
+    private static final String CHANGE_PASSWORD_OK_MSG_KEY = 
+            "changepassword.success";
     private static final String OK_MSG_KEY = "message";
-    /* Error message key */
     private static final String ERROR_MSG_KEY = "error";
-//---------------------------------------------------------------------------------------- Variables
-    /* Reference to user manager object */
-    private UserManager userManager;
-    /* Message logger */
-    private Logger log;
-    /* Stores user object */
-    private User user;
-//------------------------------------------------------------------------------------------ Methods
+    
+    private AccountManager accountManager;
+    private PasswordValidator validator;
+    private MessageResourceUtil messages;
+    private Logger log;    
+
     /**
      * Constructor.
      */
     public ChangePasswordController() {
         this.log = Logger.getLogger("DEX");
     }
+    
     /**
-     * Constructs password objects matching a given user identified by ID.
-     *
-     * @param request HttpServletRequest
-     * @return Password class object
+     * Load form backing object.
+     * @param userId User id
+     * @param model Model map
+     * @return Form view name
      */
-    @Override
-    protected Object formBackingObject( HttpServletRequest request ) {
-        user = userManager.load(Integer.parseInt(request.getParameter(USER_ID)));
-        Password passwd = new Password(user.getName());
-        return passwd;
+    @RequestMapping(method = RequestMethod.GET)
+    public String setupForm(@RequestParam(value="user_id", required=false) 
+            String userId, ModelMap model) {
+        Account account;
+        if (InitAppUtil.validate(userId)) {
+            account = accountManager.load(Integer.parseInt(userId));
+        } else {
+            account = new Account();
+        } 
+        model.addAttribute(USER_ACCOUNT_MODEL_KEY, account);
+        return FORM_VIEW;
     }
+    
     /**
-     * Saves user's password..
-     *
-     * @param request HttpServletRequest
-     * @param response HttpServletResponse
-     * @param command Command object
-     * @param errors Errors object
-     * @return ModelAndView object
+     * Update user password
+     * @param account User account 
+     * @param result Form binding result
+     * @param model Model map
+     * @return View name
      */
-    @Override
-    protected ModelAndView onSubmit( HttpServletRequest request, HttpServletResponse response,
-            Object command, BindException errors) {
-        Password passwd = ( Password )command;
-        try {
-            userManager.updatePassword(user.getId(), 
-                    MessageDigestUtil.createHash("MD5", 16, 
-                    passwd.getNewPasswd()));
-            String msg = "Password successfully changed for user " + user.getName();
-            request.getSession().setAttribute( OK_MSG_KEY, msg );
-            log.warn( msg );
-        } catch( Exception e ) {
-            String msg = "Failed to change password for user " + user.getName();
-            request.getSession().removeAttribute( OK_MSG_KEY );
-            request.getSession().setAttribute( ERROR_MSG_KEY, msg );
-            log.error( msg, e );
+    @RequestMapping(method = RequestMethod.POST)
+    public String processSubmit(@ModelAttribute("user_account") Account account,
+                BindingResult result, ModelMap model) {
+        validator.validate(account, result);
+        if (result.hasErrors()) {
+            return FORM_VIEW;
         }
-        return new ModelAndView( getSuccessView() );
+        try {
+            accountManager.updatePassword(account.getId(), 
+                    MessageDigestUtil.createHash(
+                        "MD5", 16, account.getPassword()));
+            String msg = messages.getMessage(CHANGE_PASSWORD_OK_MSG_KEY, 
+                            new Object[] {account.getName()});
+            model.addAttribute(OK_MSG_KEY, msg);
+            log.warn(msg);        
+        } catch (Exception e) {
+            String msg = messages.getMessage(CHANGE_PASSWORD_ERROR_MSG_KEY, 
+                            new Object[] {account.getName()});
+            model.addAttribute(ERROR_MSG_KEY, msg);
+            log.error(msg, e);   
+        }
+        return SUCCESS_VIEW;
     }
+    
     /**
-     * Method gets reference to user manager object.
-     *
-     * @return Reference to user manager object
+     * @param accountManager 
      */
-    public UserManager getUserManager() { return userManager; }
+    @Autowired
+    public void setAccountManager(AccountManager accountManager) { 
+        this.accountManager = accountManager;
+    }
+
     /**
-     * Method sets reference to user manager object.
-     *
-     * @param userManager Reference to user manager object
+     * @param validator the validator to set
      */
-    public void setUserManager( UserManager userManager ) { this.userManager = userManager; }
+    @Autowired
+    public void setValidator(PasswordValidator validator) {
+        this.validator = validator;
+    }
+
+    /**
+     * @param messages the messages to set
+     */
+    @Autowired
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
+    }
+    
 }
-//--------------------------------------------------------------------------------------------------
+

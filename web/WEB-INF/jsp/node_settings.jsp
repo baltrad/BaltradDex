@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,17 +15,16 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Local node settings page
 Created on : Jun 6, 2011, 10:02 AM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@page import="eu.baltrad.dex.util.InitAppUtil"%>
 
 <t:page_tabbed pageTitle="Node settings" activeTab="settings">
     <jsp:body>
@@ -38,19 +37,22 @@ Author     : szewczenko
                 Local node settings
             </div>
             <div class="blttext">
-                Local node configuration. Use the button below to save modified
+                Local node configuration. Click save button to store modified
                 settings.
             </div>
             <div class="table">
                 <div class="props">
-                    <form method="post">
-                        <%@include file="/WEB-INF/jsp/form_messages.jsp"%>
+                    <form:form method="POST" commandName="config">
+                        <%@include file="/WEB-INF/jsp/form_messages.jsp" %>
                         <div class="leftcol">
                             <div class="row">Node name</div>
                             <div class="row">Node type</div>
                             <div class="row">Node address</div>
-                            <div class="row">Organization</div>
-                            <div class="row">Address</div>
+                            <div class="row">Organization name</div>
+                            <div class="row">Unit name</div>
+                            <div class="row">Locality name (City)</div>
+                            <div class="row">State name (Country)</div>
+                            <div class="row">Country code</div>
                             <div class="row">Local time zone</div>
                             <div class="row">Work directory</div>
                             <div class="row">Administrator's email</div>
@@ -58,104 +60,117 @@ Author     : szewczenko
                         <div class="rightcol">
                             <div class="row">
                                 <div class="nodename">
-                                    <form:input path="command.nodeName" 
+                                    <form:input path="nodeName" 
                                         title="Enter node name"/>
                                     <div class="hint">
                                         Unique node identifier
                                     </div>
                                 </div>
-                                <form:errors path="command.nodeName" cssClass="error"/>
+                                <form:errors path="nodeName" cssClass="error"/>
                             </div>
                             <div class="row">
                                 <div class="nodetype">
-                                    <spring:bind path="command.nodeType">
-                                        <select name='<c:out value="${status.expression}"/>'
-                                                title="Select node type">
-                                            <c:forEach items="${node_types}" var="type">
-                                                <option value='<c:out value="${type}"/>'
-                                                    <c:if test="${type == status.value}">
-                                                            SELECTED</c:if>>
-                                                        <c:out value="${type}"/>
-                                                </option>
-                                            </c:forEach>
-                                        </select>
-                                    </spring:bind>
+                                    <form:select path="nodeType" 
+                                                 title="Select node type">
+                                        <form:options items="${node_types}"/>
+                                    </form:select>    
                                     <div class="hint">
                                         Primary or backup node
                                     </div>
                                 </div>
-                                <form:errors path="command.nodeType" cssClass="error"/>
+                                <form:errors path="nodeType" cssClass="error"/>
                             </div>
                             <div class="row">
                                 <div class="fulladdress">
-                                    <form:input path="command.nodeAddress"
+                                    <form:input path="nodeAddress"
                                         title="Enter fully qualified node address"/>
                                     <div class="hint">
                                         Node address, e.g. http://baltrad.eu:8084
                                     </div>
                                 </div>
-                                <form:errors path="command.nodeAddress" cssClass="error"/>
+                                <form:errors path="nodeAddress" cssClass="error"/>
+                            </div>        
+                            <div class="row">
+                                <div class="orgname">
+                                    <form:input path="orgName"
+                                                title="Enter organization name"/>
+                                    <div class="hint">
+                                        Name of organization
+                                    </div>
+                                </div>
+                                <form:errors path="orgName" cssClass="error"/>
                             </div>
                             <div class="row">
                                 <div class="orgname">
-                                    <form:input path="command.organization"
-                                        title="Enter organization name"/>
+                                    <form:input path="orgUnit"
+                                                title="Enter unit name"/>
                                     <div class="hint">
-                                        Name of organization hosting Baltrad node
+                                        Unit name, e.g. Forecast Department
                                     </div>
                                 </div>
-                                <form:errors path="command.organization" cssClass="error"/>
+                                <form:errors path="orgUnit" cssClass="error"/>
                             </div>
                             <div class="row">
-                                <div class="orgaddress">
-                                    <form:input path="command.address"
-                                        title="Enter organization's address"/>
+                                <div class="city">
+                                    <form:input path="locality"
+                                                title="Enter address"/>
                                     <div class="hint">
-                                        Organization's address
+                                        Address
                                     </div>
                                 </div>
-                                <form:errors path="command.address" cssClass="error"/>
+                                <form:errors path="locality" cssClass="error"/>
                             </div>
+                            <div class="row">
+                                <div class="country">
+                                    <form:input path="state"
+                                                title="State name"/>
+                                    <div class="hint">
+                                        State name (Country)
+                                    </div>
+                                </div>
+                                <form:errors path="state" cssClass="error"/>
+                            </div>
+                            <div class="row">
+                                <div class="zipcode">
+                                    <form:input path="countryCode"
+                                                title="Enter two-letter country code"/>
+                                    <div class="hint">
+                                        Two-letter country code
+                                    </div>
+                                </div>
+                                <form:errors path="countryCode" cssClass="error"/>
+                            </div>                 
                             <div class="row">
                                 <div class="timezone">
-                                    <spring:bind path="command.timeZone">
-                                        <select name='<c:out value=
-                                            "${status.expression}"/>'
-                                            title="Select time zone">
-                                            <c:forEach items="${time_zones}" var="zone">
-                                                <option value='<c:out value="${zone}"/>'
-                                                    <c:if test="${zone == status.value}">
-                                                            SELECTED</c:if>>
-                                                        <c:out value="${zone}"/>
-                                                </option>
-                                            </c:forEach>
-                                        </select>
-                                    </spring:bind>
+                                    <form:select path="timeZone" 
+                                                 title="Select time zone">
+                                        <form:options items="${time_zones}"/>
+                                    </form:select> 
                                     <div class="hint">
                                         UTC time zone 
                                     </div>
                                 </div>
-                                <form:errors path="command.timeZone" cssClass="error"/>
+                                <form:errors path="timeZone" cssClass="error"/>
                             </div>
                             <div class="row">
                                 <div class="workdir">
-                                    <form:input path="command.workDir"
+                                    <form:input path="workDir"
                                         title="Enter work directory path"/>
                                     <div class="hint">
                                         Storage for temporary files & images 
                                     </div>
                                 </div>
-                                <form:errors path="command.workDir" cssClass="error"/>
+                                <form:errors path="workDir" cssClass="error"/>
                             </div>
                             <div class="row">
                                 <div class="adminmail">
-                                    <form:input path="command.email"
+                                    <form:input path="email"
                                         title="Enter administrator's e-mail"/>
                                     <div class="hint">
                                         Node administrator's e-mail
                                     </div>
                                 </div>
-                                <form:errors path="command.email" cssClass="error"/>
+                                <form:errors path="email" cssClass="error"/>
                             </div>
                         </div>
                         <div class="tablefooter">
@@ -165,7 +180,7 @@ Author     : szewczenko
                                 </button>
                             </div>
                         </div>
-                    </form>
+                    </form:form>
                 </div>
             </div>
         </div>

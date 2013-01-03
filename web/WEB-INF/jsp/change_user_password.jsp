@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,11 +15,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Change user password page
 Created on : Jul 13, 2010, 11:58 AM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
@@ -40,8 +40,7 @@ Author     : szewczenko
             </div>
             <div class="table">
                 <div class="changepasswd">
-                    <%@include file="/WEB-INF/jsp/form_messages.jsp"%>
-                    <form method="post">
+                    <form:form method="POST" commandName="user_account">
                         <div class="leftcol">
                             <div class="row">User name</div>
                             <div class="row">New password</div>
@@ -50,39 +49,39 @@ Author     : szewczenko
                         <div class="rightcol">
                             <div class="row">
                                 <div class="username">
-                                    <form:input path="command.userName" readonly="true"/>
+                                    <form:input path="name" readonly="true"/>
                                     <div class="hint">
                                         User name
                                     </div>
                                 </div>
-                                <form:errors path="command.userName" cssClass="error"/>
+                                <form:errors path="name" cssClass="error"/>
                             </div>
                             <div class="row">
                                 <div class="password">
-                                    <form:password path="command.newPasswd"
-                                        title="Enter new password"/>
+                                    <form:password path="password"
+                                                   title="Enter new password"/>
                                     <div class="hint">
                                         New password
                                     </div>
                                 </div>
-                                <form:errors path="command.newPasswd" cssClass="error"/>
+                                <form:errors path="password" cssClass="error"/>
                             </div>
                             <div class="row">
                                 <div class="password">
-                                    <form:password path="command.confirmNewPasswd"
-                                        title="Repeat new password"/>
+                                    <form:password path="repeatPassword"
+                                                   title="Repeat new password"/>
                                     <div class="hint">
                                         Repeat new password here
                                     </div>
                                 </div>
-                                <form:errors path="command.confirmNewPasswd"
-                                                cssClass="error"/>
+                                <form:errors path="repeatPassword"
+                                             cssClass="error"/>
                             </div>
                         </div>
                         <div class="tablefooter">
                             <div class="buttons">
                                 <button class="rounded" type="button"
-                                    onclick="window.location.href='edit_user_account.htm'">
+                                        onclick="window.location.href='edit_user_account.htm'">
                                     <span>Back</span>
                                 </button>
                                 <button class="rounded" type="submit">
@@ -90,7 +89,7 @@ Author     : szewczenko
                                 </button>
                             </div>
                         </div>
-                    </form>
+                    </form:form>
                 </div>
             </div>
         </div>

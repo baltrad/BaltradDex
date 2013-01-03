@@ -2,24 +2,24 @@
 
 <%@ attribute name="activeTab" required="true" description="name of the active tab"%>
 
-<%@ tag import="eu.baltrad.dex.user.model.User" %>
+<%@ tag import="eu.baltrad.dex.user.model.Role" %>
 
 <jsp:useBean id="securityManager"
              scope="session"
-             class="eu.baltrad.dex.auth.util.SecurityManager">
+             class="eu.baltrad.dex.auth.manager.SecurityManager">
 </jsp:useBean>
 
 <%
-    User sessionUser = (User) securityManager.getSessionUser(session);
-    if (sessionUser.getRoleName().equals(User.ROLE_ADMIN)) {
+    Role sessionRole = (Role) securityManager.getSessionRole(session);
+    if (sessionRole.getName().equals(Role.ADMIN)) {
         request.getSession().setAttribute("userRole", 0);
     }
-    if (sessionUser.getRoleName().equals(User.ROLE_OPERATOR)) {
+    if (sessionRole.getName().equals(Role.OPERATOR)) {
         request.getSession().setAttribute("userRole", 1);
     }
-    if (sessionUser.getRoleName().equals(User.ROLE_USER)) {
+    if (sessionRole.getName().equals(Role.USER)) {
         request.getSession().setAttribute("userRole", 2);
-    }    
+    }
 %>
 
 <div id="tab" class="${activeTab == 'home' ? 'active' : ''}">

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+ 
+    <dex_file_objects id="1" name="PVOL" description="Polar volume"/>
+    <dex_file_objects id="2" name="SCAN" description="Polar scan"/>
+    <dex_file_objects id="3" name="RAY" description="Single polar ray"/>
+    <dex_file_objects id="4" name="AZIM" description="Azimuthal object"/>
+    <dex_file_objects id="5" name="COMP" description="Composite map"/>
+        
+</dataset>

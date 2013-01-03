@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,11 +15,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Radar image preview page using Google Maps API
 Created on : Dec 10, 2010, 10:14 AM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -29,14 +29,13 @@ Author     : szewczenko
 <%@page import="java.util.HashMap"%>
 
 <%
-    HashMap model = ( HashMap )request.getAttribute( "model" );
-    String lat0 = ( String )model.get( "lat0" );
-    String lon0 = ( String )model.get( "lon0" );
-    String llLat = ( String )model.get( "llLat" );
-    String llLon = ( String )model.get( "llLon" );
-    String urLat = ( String )model.get( "urLat" );
-    String urLon = ( String )model.get( "urLon" );
-    String radarImageURL = ( String )model.get( "image_url" );
+    String lat0 = (String) request.getAttribute("lat0");
+    String lon0 = (String) request.getAttribute("lon0");
+    String llLat = (String) request.getAttribute("llLat");
+    String llLon = (String) request.getAttribute("llLon");
+    String urLat = (String) request.getAttribute("urLat");
+    String urLon = (String) request.getAttribute("urLon");
+    String radarImageURL = (String) request.getAttribute("image_url");
 %>
 
 <html>

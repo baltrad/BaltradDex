@@ -21,12 +21,12 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.net.util.Authenticator;
-import eu.baltrad.dex.net.util.IHttpClientUtil;
-import eu.baltrad.dex.net.model.ISubscriptionManager;
-import eu.baltrad.dex.net.model.Subscription;
+import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
+import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.db.model.IBltFileManager;
+import eu.baltrad.dex.db.manager.IBltFileManager;
 
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.bdb.db.DuplicateEntry;
@@ -41,10 +41,10 @@ import eu.baltrad.beast.message.IBltMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.dex.net.util.FramePublisherManager;
-import eu.baltrad.dex.registry.model.IRegistryManager;
-import eu.baltrad.dex.registry.model.RegistryEntry;
-import eu.baltrad.dex.user.model.IUserManager;
-import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.registry.manager.IRegistryManager;
+import eu.baltrad.dex.registry.model.impl.RegistryEntry;
+import eu.baltrad.dex.user.manager.IAccountManager;
+import eu.baltrad.dex.user.model.Account;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -72,6 +72,7 @@ import org.junit.Test;
 
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -105,8 +106,8 @@ public class PostFileServletTest {
     
     protected class PFServlet extends PostFileServlet {
         public PFServlet() {
-            this.nodeName = "test.baltrad.eu";
-            this.nodeAddress = "http://test.baltrad.eu";
+            this.localNode = new Account(1, "test", "s3cret", "org", "unit", 
+                    "locality", "state", "XX", "user", "http://localhost:8084");
         }
         @Override
         public void initConfiguration() {}
@@ -173,18 +174,19 @@ public class PostFileServletTest {
         mocks = new ArrayList();
         classUnderTest = new PFServlet();
         classUnderTest.setLog(Logger.getLogger("DEX"));
-        messages = new MessageResourceUtil("resources/messages");
+        messages = new MessageResourceUtil();
+        messages.setBasename("resources/messages");
         classUnderTest.setMessages(messages);
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         format = new SimpleDateFormat(DATE_FORMAT);
         long time = 1340189763867L;
         subscriptions = new ArrayList<Subscription>();
-        s1 = new Subscription(1, time, "User1", "DS1", "test.batrad.eu", 
-                "upload", true, true, "http://test.baltrad.eu");
+        s1 = new Subscription(1, time, "upload", "test.baltrad.eu", "User1", 
+                "S1", true, true);
         subscriptions.add(s1);
-        s2 = new Subscription(2, time, "User2", "DS2", "test.baltrad.eu", 
-                "upload", true, true, "http://test.baltrad.eu");
+        s2 = new Subscription(2, time, "upload", "test.baltrad.eu", "User2", 
+                "DS2", true, true);
         subscriptions.add(s2);
         setAttributes(request);
     }
@@ -334,7 +336,7 @@ public class PostFileServletTest {
         
         ISubscriptionManager subscriptionManagerMock = 
                 (ISubscriptionManager) createMock(ISubscriptionManager.class);
-        expect(subscriptionManagerMock.load(Subscription.SUBSCRIPTION_UPLOAD)).
+        expect(subscriptionManagerMock.load(Subscription.UPLOAD)).
                 andReturn(subscriptions);
         IFilter filterMock = (IFilter) createMock(IFilter.class);
         expect(filterMock.getExpression()).andReturn(null).anyTimes();
@@ -342,24 +344,23 @@ public class PostFileServletTest {
         
         IBltFileManager fileManagerMock = 
                 (IBltFileManager) createMock(IBltFileManager.class);
-        expect(fileManagerMock.getFilter(s1.getDataSourceName()))
+        expect(fileManagerMock.loadFilter(s1.getDataSource()))
                 .andReturn(filterMock);
-        expect(fileManagerMock.getFilter(s2.getDataSourceName()))
+        expect(fileManagerMock.loadFilter(s2.getDataSource()))
                 .andReturn(filterMock);
         
-        IUserManager userManagerMock = 
-                (IUserManager) createMock(IUserManager.class);
-        User user = new User(1, "user", "user", "passwd", "passwd", "org", 
-                "locality", "state", "PL", "http://test.baltrad.eu");
+        IAccountManager userManagerMock = 
+                (IAccountManager) createMock(IAccountManager.class);
+        Account account = new Account(1, "user", "s3cret", "org", "unit", 
+                "locality", "state", "PL", "user", "http://test.baltrad.eu");
         expect(userManagerMock.load(isA(String.class)))
-                .andReturn(user).anyTimes();
+                .andReturn(account).anyTimes();
         
         IRegistryManager deliveryRegistryManagerMock =
           (IRegistryManager) createMock(IRegistryManager.class);
-        expect(deliveryRegistryManagerMock.load(1, ENTRY_UUID))
-                .andReturn(new RegistryEntry()).anyTimes();
-        expect(deliveryRegistryManagerMock
-                .storeNoId(isA(RegistryEntry.class))).andReturn(1).anyTimes();
+        
+        expect(deliveryRegistryManagerMock.store(isA(RegistryEntry.class)))
+                .andReturn(Integer.SIZE).anyTimes();
         
         HttpResponse res = createResponse(HttpServletResponse.SC_OK, null);
         IHttpClientUtil httpClientMock = 
@@ -384,6 +385,6 @@ public class PostFileServletTest {
         verifyAll();
         
         assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-    }  
+    }
     
 }

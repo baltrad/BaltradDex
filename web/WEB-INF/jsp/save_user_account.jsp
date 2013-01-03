@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,233 +15,295 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Save user account page
-Created on : Oct 4, 2010, 2:42 PM
+Created on : Oct 4, 2012, 2:42 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%
-    String userId = request.getParameter("userId");
-%>
-<c:set var="user_id" value="<%=userId%>" scope="session"/>
 <t:page_tabbed pageTitle="Save user account" activeTab="settings">
     <jsp:body>
         <div class="left">
             <t:menu_settings/>
         </div>
         <div class="right">
-            <div class="blttitle">
-                Save user account
-            </div>
-            <div class="blttext">
-                Save new user account or modify an existing one. 
-            </div>
-            <div class="blttext">
-                <c:if test="${command.roleName == 'peer'}">
-                    Note: Peer account is read-only.
-                </c:if>
-            </div>
-            <div class="table">
-                <div class="addaccount">
-                    <%@include file="/WEB-INF/jsp/form_messages.jsp"%>
-                    <form method="post">
-                        <div class="leftcol">
-                            <div class="row">User name</div>        
-                                <c:if test="${empty user_id}">
-                                    <div class="row">Password</div>
-                                    <div class="row">Confirm password</div>
-                                </c:if>
-                                <div class="row">Role</div>
-                                <c:if test="${command.roleName != 'peer'}">
+            <c:choose>
+                <c:when test="${user_account.roleName == 'peer'}">
+                    <div class="blttitle">
+                        Peer account details
+                    </div>
+                    <div class="blttext">
+                        Peer account settings are read-only.  
+                    </div>
+                    <form:form method="POST" commandName="user_account">
+                        <div class="table">
+                            <div class="addaccount">
+                                <div class="leftcol">        
+                                    <div class="row">User name</div>
+                                    <div class="row">Role</div>
+                                    <div class="row">Node address</div>
                                     <div class="row">Organization name</div>
                                     <div class="row">Unit name</div>
                                     <div class="row">Locality name (City)</div>
                                     <div class="row">State name (Country)</div>
                                     <div class="row">Country code</div>
-                                </c:if>
-                            <div class="row">Node address</div>
-                        </div>
-                        <div class="rightcol">
-                            <div class="row">
-                                <div class="username">
-                                    <c:choose>
-                                        <c:when test="${command.roleName != 'peer'}">
-                                            <form:input path="command.name"
-                                                title="Enter unique user name"/>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <input type="text" value="${command.name}"
-                                                    readonly="true">
-                                        </c:otherwise>
-                                    </c:choose>
-                                    <div class="hint">
-                                        Unique user name
-                                    </div>
                                 </div>
-                                <form:errors path="command.name" cssClass="error"/>
-                            </div>                       
-                            <c:if test="${empty user_id}">
-                                <div class="row">
-                                    <div class="password">
-                                        <form:password path="command.password"
-                                            title="Enter password"/>
-                                        <div class="hint">
-                                            Password
+                                <div class="rightcol">
+                                    <div class="row">
+                                        <div class="username">
+                                            <form:input path="name"
+                                                        title="User name"
+                                                        readonly="true"/>
+                                            <div class="hint">
+                                                Unique user name
+                                            </div>
                                         </div>
+                                        <form:errors path="name" cssClass="error"/>   
                                     </div>
-                                    <form:errors path="command.password"
-                                                    cssClass="error"/>
-                                </div>
-                                <div class="row">
-                                    <div class="password">
-                                        <form:password path="command.confirmPassword"
-                                            title="Repeat password"/>
-                                        <div class="hint">
-                                            Retype password here
+                                    <div class="row">
+                                        <div class="rolename">
+                                            <form:input path="roleName"
+                                                        title="User's role"
+                                                        readonly="true"/>  
+                                            <div class="hint">
+                                                User's role 
+                                            </div>
+                                        </div>    
+                                        <form:errors path="roleName" cssClass="error"/>
+                                    </div>
+                                    <div class="row">
+                                        <div class="address">
+                                            <form:input path="nodeAddress"
+                                                        title="Node address"
+                                                        readonly="true"/> 
+                                            <div class="hint">
+                                                Node address
+                                            </div>
+                                        </div>    
+                                        <form:errors path="nodeAddress" cssClass="error"/>
+                                    </div>
+                                    <div class="row">
+                                        <div class="orgname">
+                                            <form:input path="orgName"
+                                                        title="Organization name"
+                                                        readonly="true"/>
+                                            <div class="hint">
+                                                Name of organization
+                                            </div>
                                         </div>
+                                        <form:errors path="orgName" cssClass="error"/>
                                     </div>
-                                    <form:errors path="command.confirmPassword"
-                                                    cssClass="error"/>
-                                </div>
-                            </c:if>
-                            <div class="row">
-                                <div class="rolename">
-                                    <c:choose>
-                                        <c:when test="${command.roleName != 'peer'}">
-                                            <spring:bind path="command.roleName">
-                                                <select name='<c:out value="${status.expression}"/>'
-                                                        title="Select user's role">
-                                                    <c:forEach items="${roles}" var="role">
-                                                        <option value='<c:out value="${role.role}"/>'
-                                                            <c:if test="${role.role == status.value}">
-                                                                SELECTED</c:if>>
-                                                                <c:out value="${role.role}"/>
-                                                        </option>
-                                                    </c:forEach>
-                                                </select>
-                                            </spring:bind>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <input type="text" 
-                                                    value="${command.roleName}"
-                                                    readonly="true">
-                                        </c:otherwise>
-                                    </c:choose>
-                                    <div class="hint">
-                                        User role
+                                    <div class="row">
+                                        <div class="orgname">
+                                            <form:input path="orgUnit"
+                                                        title="Unit name"
+                                                        readonly="true"/>
+                                            <div class="hint">
+                                                Unit name, e.g. Forecast Department
+                                            </div>
+                                        </div>
+                                        <form:errors path="orgUnit" cssClass="error"/>
                                     </div>
-                                </div>
-                                <form:errors path="command.roleName" cssClass="error"/>
-                            </div>
-                            <c:if test="${command.roleName != 'peer'}">
-
-                            <div class="row">
-                                <div class="orgname">
-                                    <form:input path="command.organizationName"
-                                        title="Enter organization name"/>
-                                    <div class="hint">
-                                        Name of organization
+                                    <div class="row">
+                                        <div class="city">
+                                            <form:input path="locality"
+                                                        title="Address"
+                                                        readonly="true"/>
+                                            <div class="hint">
+                                                Address
+                                            </div>
+                                        </div>
+                                        <form:errors path="locality" cssClass="error"/>
                                     </div>
-                                </div>
-                                <form:errors path="command.organizationName" 
-                                                cssClass="error"/>
-                            </div>
-                            <div class="row">
-                                <div class="orgname">
-                                    <form:input path="command.organizationUnit"
-                                        title="Enter unit name"/>
-                                    <div class="hint">
-                                        Unit name, e.g. Forecast Department
+                                    <div class="row">
+                                        <div class="country">
+                                            <form:input path="state"
+                                                        title="State name"
+                                                        readonly="true"/>
+                                            <div class="hint">
+                                                State name (Country)
+                                            </div>
+                                        </div>
+                                        <form:errors path="state" cssClass="error"/>
+                                    </div>
+                                    <div class="row">
+                                        <div class="zipcode">
+                                            <form:input path="countryCode"
+                                                        title="Country code"
+                                                        readonly="true"/>
+                                            <div class="hint">
+                                                Two-letter country code
+                                            </div>
+                                        </div>
+                                        <form:errors path="countryCode" cssClass="error"/>
                                     </div>
                                 </div>
-                                <form:errors path="command.organizationUnit" 
-                                                cssClass="error"/>
-                            </div>
-                            <div class="row">
-                                <div class="city">
-                                    <form:input path="command.localityName"
-                                        title="Enter locality name (City)"/>
-                                    <div class="hint">
-                                        Locality name (City)
-                                    </div>
-                                </div>
-                                <form:errors path="command.localityName" 
-                                                cssClass="error"/>
-                            </div>
-                            <div class="row">
-                                <div class="country">
-                                    <form:input path="command.stateName"
-                                        title="Enter state name (Country)"/>
-                                    <div class="hint">
-                                        State name (Country)
-                                    </div>
-                                </div>
-                                <form:errors path="command.stateName" 
-                                                cssClass="error"/>
-                            </div>
-                            <div class="row">
-                                <div class="zipcode">
-                                    <form:input path="command.countryCode"
-                                        title="Enter two-letter country code"/>
-                                    <div class="hint">
-                                        Two-letter country code
-                                    </div>
-                                </div>
-                                <form:errors path="command.countryCode" 
-                                                cssClass="error"/>
-                            </div>
-                            </c:if>          
-                            <div class="row">
-                                <div class="nodeaddress">
-                                    <c:choose>
-                                        <c:when test="${command.roleName != 'peer'}">
-                                            <form:input path="command.nodeAddress"
-                                                title="Enter user node's address"/>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <input type="text" 
-                                                    value="${command.nodeAddress}"
-                                                    readonly="true">
-                                        </c:otherwise>
-                                    </c:choose>
-                                    <div class="hint">
-                                        Node address, 
-                                        e.g. http://baltrad.eu:8084
-                                    </div>
-                                </div>
-                                <form:errors path="command.nodeAddress" cssClass="error"/>
-                            </div>                    
-                        </div>
-                        <div class="tablefooter">
-                            <div class="buttons">
-                                <button class="rounded" type="button"
-                                    onclick="window.location.href='settings.htm'">
-                                    <span>Back</span>
-                                </button>
-                                <c:choose>
-                                    <c:when test="${command.roleName == 'peer'}">
+                                <div class="tablefooter">
+                                    <div class="buttons">
                                         <button class="rounded" type="button"
-                                                onclick="window.location.href='edit_user_account.htm'">
+                                            onclick="window.location.href='edit_user_account.htm'">
                                             <span>OK</span>
                                         </button>
-                                    </c:when>
-                                    <c:otherwise>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>    
+                    </form:form>
+                </c:when>
+                <c:otherwise>
+                    <c:choose>
+                        <c:when test="${user_account.id == 0}">
+                            <div class="blttitle">
+                                Add user account
+                            </div>
+                            <div class="blttext">
+                                Configure new user account.  
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="blttitle">
+                                Edit user account
+                            </div>
+                            <div class="blttext">
+                                Edit selected user account.  
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+                    <form:form method="POST" commandName="user_account">
+                        <div class="table">
+                            <div class="addaccount">
+                                <div class="leftcol">        
+                                    <div class="row">User name</div>
+                                    <c:if test="${user_account.id == 0}">
+                                        <div class="row">Password</div>
+                                        <div class="row">Repeat password</div>
+                                    </c:if>
+                                    <div class="row">Role</div>
+                                    <div class="row">Organization name</div>
+                                    <div class="row">Unit name</div>
+                                    <div class="row">Locality name (City)</div>
+                                    <div class="row">State name (Country)</div>
+                                    <div class="row">Country code</div>
+                                </div>
+                                <div class="rightcol">
+                                    <%@include file="/WEB-INF/jsp/form_messages.jsp"%>
+                                    <div class="row">
+                                        <div class="username">
+                                            <form:input path="name"
+                                                        title="Enter unique user name"/>
+                                            <div class="hint">
+                                                Unique user name
+                                            </div>
+                                        </div>
+                                        <form:errors path="name" cssClass="error"/>   
+                                    </div>
+                                    <c:if test="${user_account.id == 0}">
+                                        <div class="row">
+                                            <div class="password">
+                                                <form:password path="password"
+                                                            title="Enter password"/>
+                                                <div class="hint">
+                                                    User's password
+                                                </div>
+                                            </div>
+                                            <form:errors path="password" cssClass="error"/>   
+                                        </div>
+                                        <div class="row">
+                                            <div class="password">
+                                                <form:password path="repeatPassword"
+                                                    title="Repeat password"/>
+                                                <div class="hint">
+                                                    Repeat password
+                                                </div>
+                                            </div>
+                                            <form:errors path="repeatPassword" 
+                                                        cssClass="error"/>   
+                                        </div>
+                                    </c:if>
+                                    <div class="row">
+                                        <div class="rolename">
+                                            <form:select path="roleName" 
+                                                        title="Select user's role">
+                                                <form:options items="${roles}"/>
+                                            </form:select>    
+                                            <div class="hint">
+                                                User's role 
+                                            </div>
+                                        </div>    
+                                        <form:errors path="roleName" cssClass="error"/>
+                                    </div>
+                                    <div class="row">
+                                        <div class="orgname">
+                                            <form:input path="orgName"
+                                                        title="Enter organization name"/>
+                                            <div class="hint">
+                                                Name of organization
+                                            </div>
+                                        </div>
+                                        <form:errors path="orgName" cssClass="error"/>
+                                    </div>
+                                    <div class="row">
+                                        <div class="orgname">
+                                            <form:input path="orgUnit"
+                                                        title="Enter unit name"/>
+                                            <div class="hint">
+                                                Unit name, e.g. Forecast Department
+                                            </div>
+                                        </div>
+                                        <form:errors path="orgUnit" cssClass="error"/>
+                                    </div>
+                                    <div class="row">
+                                        <div class="city">
+                                            <form:input path="locality"
+                                                        title="Enter address"/>
+                                            <div class="hint">
+                                                Address
+                                            </div>
+                                        </div>
+                                        <form:errors path="locality" cssClass="error"/>
+                                    </div>
+                                    <div class="row">
+                                        <div class="country">
+                                            <form:input path="state"
+                                                        title="State name"/>
+                                            <div class="hint">
+                                                State name (Country)
+                                            </div>
+                                        </div>
+                                        <form:errors path="state" cssClass="error"/>
+                                    </div>
+                                    <div class="row">
+                                        <div class="zipcode">
+                                            <form:input path="countryCode"
+                                                        title="Enter two-letter country code"/>
+                                            <div class="hint">
+                                                Two-letter country code
+                                            </div>
+                                        </div>
+                                        <form:errors path="countryCode" cssClass="error"/>
+                                    </div> 
+                                </div>
+                                <div class="tablefooter">
+                                    <div class="buttons">
+                                        <button class="rounded" type="button"
+                                            onclick="history.back()">
+                                            <span>Back</span>
+                                        </button>
                                         <button class="rounded" type="submit">
                                             <span>Save</span>
                                         </button>
-                                    </c:otherwise>
-                                </c:choose>
+                                    </div>
+                                </div>    
                             </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>        
+                        </div>    
+                    </form:form>        
+                </c:otherwise>
+            </c:choose>
+        </div>                                    
     </jsp:body>
 </t:page_tabbed>

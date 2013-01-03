@@ -1,4 +1,4 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
 * Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.util;
 
@@ -25,16 +25,16 @@ package eu.baltrad.dex.util;
  * Implements URL and email address validators.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.0.0
+ * @version 1.2.2
  * @since 1.0.0
  */
 public class WebValidator {
-//---------------------------------------------------------------------------------------- Constants
+
     private static final String ET = "@";
     private static final String DOT = "\\.";
     private static final String HTTP_PREFIX = "http://";
     private static final String HTTPS_PREFIX = "https://";
-//------------------------------------------------------------------------------------------ Methods    
+
     /**
      * Validates URL address.
      * 
@@ -138,4 +138,4 @@ public class WebValidator {
         return result;
     }
 }
-//--------------------------------------------------------------------------------------------------
+

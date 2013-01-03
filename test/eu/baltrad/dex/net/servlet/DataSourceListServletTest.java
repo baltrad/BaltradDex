@@ -21,13 +21,13 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.net.util.Authenticator;
-import eu.baltrad.dex.net.util.IJsonUtil;
-import eu.baltrad.dex.net.util.JsonUtil;
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.IUserManager;
+import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.util.json.IJsonUtil;
+import eu.baltrad.dex.net.util.json.impl.JsonUtil;
+import eu.baltrad.dex.user.manager.IAccountManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.datasource.model.IDataSourceManager;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.user.model.Account;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -63,6 +63,14 @@ import java.text.SimpleDateFormat;
  * @since 1.1.0
  */
 public class DataSourceListServletTest {
+    
+    private static final String JSON_ACCOUNT = "{\"nodeAddress\":\"" +
+            "http://localhost:8084\",\"repeatPassword\":\"s3cret\",\"" +
+            "roleName\":\"user\",\"name\":\"test\",\"id\":1,\"state\":\"" + 
+            "state\",\"orgName\":\"org\",\"orgUnit\":\"unit\",\"locality\":\"" +
+            "locality\",\"countryCode\":\"XX\",\"password\":\"s3cret\"}";
+    
+    
     private static final String JSON_SOURCES = 
             "[{\"name\":\"DS1\",\"id\":1,\"description\":\"A test "
             + "data source\"},{\"name\":\"DS2\",\"id\":2,\"description\":\"One "
@@ -78,11 +86,12 @@ public class DataSourceListServletTest {
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
     private Authenticator authenticatorMock;
+    private Account account;
     
     class DSLServlet extends DataSourceListServlet {
         public DSLServlet() {
-            this.nodeName = "test.baltrad.eu";
-            this.nodeAddress = "http://test.baltrad.eu";
+            this.localNode = new Account(1, "test", "s3cret", "org", "unit", 
+                    "locality", "state", "XX", "user", "http://localhost:8084");
         }
         @Override
         public void initConfiguration() {}
@@ -119,8 +128,11 @@ public class DataSourceListServletTest {
         
         classUnderTest = new DSLServlet();
         classUnderTest.setLog(Logger.getLogger("DEX"));
-        messages = new MessageResourceUtil("resources/messages");
+        messages = new MessageResourceUtil();
+        messages.setBasename("resources/messages");
         classUnderTest.setMessages(messages);
+        account = new Account(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", "http://localhost:8084");
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         format = new SimpleDateFormat(DATE_FORMAT);
@@ -187,28 +199,24 @@ public class DataSourceListServletTest {
         expect(authenticatorMock.authenticate(isA(String.class), 
                 isA(String.class), isA(String.class)))
                 .andReturn(Boolean.TRUE).anyTimes();
-        IUserManager userManagerMock = 
-                (IUserManager) createMock(IUserManager.class);
+        IAccountManager userManagerMock = 
+                (IAccountManager) createMock(IAccountManager.class);
         expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
                 .anyTimes();
-        expect(userManagerMock.storeNoId(isA(User.class)))
-                .andReturn(1).anyTimes();
+        expect(userManagerMock.store(isA(Account.class)))
+                .andReturn(Integer.SIZE).anyTimes();
+        
         IJsonUtil jsonUtilMock = 
                 (IJsonUtil) createMock(IJsonUtil.class);
-        expect(jsonUtilMock.dataSourcesToJson(isA(HashSet.class)))
-                .andThrow(new RuntimeException("Internal server error"))
-                .anyTimes();
-        IDataSourceManager dataSourceManagerMock = 
-                (IDataSourceManager) createMock(IDataSourceManager.class);
-        expect(dataSourceManagerMock.loadByUser(0))
-                .andReturn(new ArrayList<DataSource>()).anyTimes();
+        expect(jsonUtilMock.jsonToUserAccount(JSON_ACCOUNT))
+                .andThrow(new RuntimeException("Internal server error"));
         
         replayAll();
         
         classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setUserManager(userManagerMock);
+        classUnderTest.setAccountManager(userManagerMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
-        classUnderTest.setDataSourceManager(dataSourceManagerMock);
+        request.setContent(JSON_ACCOUNT.getBytes());
         classUnderTest.handleRequest(request, response);
         
         verifyAll();
@@ -222,33 +230,67 @@ public class DataSourceListServletTest {
     }
     
     @Test 
+    public void handleRequest_CreatedAccount() throws Exception {
+        expect(authenticatorMock.authenticate(isA(String.class), 
+                isA(String.class), isA(String.class)))
+                .andReturn(Boolean.TRUE).anyTimes();
+        
+        IAccountManager userManagerMock = 
+                (IAccountManager) createMock(IAccountManager.class);
+        expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
+                .anyTimes();
+        expect(userManagerMock.store(isA(Account.class)))
+                .andReturn(Integer.SIZE).anyTimes();
+        
+        IJsonUtil jsonUtilMock = (IJsonUtil) createMock(IJsonUtil.class);
+        expect(jsonUtilMock.jsonToUserAccount(JSON_ACCOUNT))
+                .andReturn(account);
+        expect(jsonUtilMock.userAccountToJson(account)).andReturn(JSON_ACCOUNT);
+        
+        replayAll();
+        
+        classUnderTest.setAuthenticator(authenticatorMock);
+        classUnderTest.setAccountManager(userManagerMock);
+        classUnderTest.setJsonUtil(jsonUtilMock);
+        request.setContent(JSON_ACCOUNT.getBytes());
+        classUnderTest.handleRequest(request, response);
+        
+        verifyAll();
+        
+        assertEquals(HttpServletResponse.SC_CREATED, response.getStatus());
+    }
+    
+    @Test 
     public void handleRequest_OK() throws Exception {
         expect(authenticatorMock.authenticate(isA(String.class), 
                 isA(String.class), isA(String.class)))
                 .andReturn(Boolean.TRUE).anyTimes();
         
-        IUserManager userManagerMock = 
-                (IUserManager) createMock(IUserManager.class);
-        expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
-                .anyTimes();
-        expect(userManagerMock.storeNoId(isA(User.class)))
-                .andReturn(1).anyTimes();
+        IAccountManager userManagerMock = 
+                (IAccountManager) createMock(IAccountManager.class);
+        expect(userManagerMock.load("test.baltrad.eu"))
+                .andReturn(account).anyTimes();
+        expect(userManagerMock.store(isA(Account.class)))
+                .andReturn(Integer.SIZE).anyTimes();
         
         IJsonUtil jsonUtilMock = (IJsonUtil) createMock(IJsonUtil.class);
+        expect(jsonUtilMock.jsonToUserAccount(JSON_ACCOUNT))
+                .andReturn(account);
         expect(jsonUtilMock.dataSourcesToJson(isA(HashSet.class)))
-                .andReturn(JSON_SOURCES).anyTimes();
+                .andReturn(JSON_SOURCES);
         
         IDataSourceManager dataSourceManagerMock = 
                 (IDataSourceManager) createMock(IDataSourceManager.class);
-        expect(dataSourceManagerMock.loadByUser(0))
+        expect(dataSourceManagerMock.loadByUser(1))
                 .andReturn(new ArrayList<DataSource>()).anyTimes();
         
         replayAll();
         
         classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setUserManager(userManagerMock);
+        classUnderTest.setAccountManager(userManagerMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
+        request.setContent(JSON_ACCOUNT.getBytes());
         classUnderTest.handleRequest(request, response);
         
         verifyAll();

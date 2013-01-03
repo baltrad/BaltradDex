@@ -21,8 +21,9 @@
 
 package eu.baltrad.dex.net.util;
 
-import eu.baltrad.dex.registry.model.IRegistryManager;
-import eu.baltrad.dex.registry.model.RegistryEntry;
+import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
+import eu.baltrad.dex.registry.manager.IRegistryManager;
+import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.user.model.User;
 
 import org.apache.log4j.Logger;
@@ -75,11 +76,11 @@ public class PostFileTask implements Runnable {
             HttpResponse response = httpClient.post(request);
             if (response.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_OK) {
-                RegistryEntry entry = new RegistryEntry(user.getId(), uuid, 
-                        user.getName(), new Date(), 
-                        RegistryEntry.MSG_SUCCESS);
+                RegistryEntry entry = new RegistryEntry(
+                        System.currentTimeMillis(), uuid, RegistryEntry.SUCCESS,
+                        user.getName());
                 log.info("File " + uuid + " sent to user " + user.getName());
-                manager.storeNoId(entry);
+                manager.store(entry);
             } else {
                 // don't retry if file is already delivered 
                 if (response.getStatusLine().getStatusCode() 
@@ -94,19 +95,19 @@ public class PostFileTask implements Runnable {
                         }
                     }
                     if (success) {
-                        RegistryEntry entry = new RegistryEntry(user.getId(), 
-                                uuid, user.getName(), new Date(), 
-                                RegistryEntry.MSG_SUCCESS);
+                        RegistryEntry entry = new RegistryEntry(
+                            System.currentTimeMillis(), uuid, 
+                            RegistryEntry.SUCCESS, user.getName());
                         log.info("File " + uuid + " sent to user " 
                                 + user.getName());
-                        manager.storeNoId(entry);
+                        manager.store(entry);
                     } else {
-                        RegistryEntry entry = new RegistryEntry(user.getId(), 
-                                uuid, user.getName(), new Date(), 
-                                RegistryEntry.MSG_FAILURE);
+                        RegistryEntry entry = new RegistryEntry(
+                            System.currentTimeMillis(), uuid, 
+                                RegistryEntry.FAILURE, user.getName());
                         log.error("Failed to deliver file " + uuid + " to user " 
                                 + user.getName());
-                        manager.storeNoId(entry);
+                        manager.store(entry);
                     }
                 }    
             }    

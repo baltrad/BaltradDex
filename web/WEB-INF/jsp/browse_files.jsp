@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,67 +15,13 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
-Document   : Home page
+--------------------------------------------------------------------------------
+Document   : Browse files
 Created on : Aug 8, 2010, 2:13 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-
-<%@page import="java.util.List" %>
-<%@page import="eu.baltrad.dex.db.model.BltFile" %>
-<%@page import="eu.baltrad.dex.db.model.BltFileManager" %>
-<%@page import="eu.baltrad.dex.db.controller.BltFileBrowserController" %>
-
-<%
-    // Check if file's list is not empty
-    List fileEntries = ( List )request.getAttribute( "fileEntries" );
-    if( fileEntries == null || fileEntries.size() <= 0 ) {
-        request.getSession().setAttribute( "dataStatus", 0 );
-    } else {
-        request.getSession().setAttribute( "dataStatus", 1 );
-    }
-    long numEntries = BltFileBrowserController.getNumEntries();
-    int numPages = ( int )Math.ceil( numEntries / BltFileManager.ENTRIES_PER_PAGE );
-    if( ( numPages * BltFileManager.ENTRIES_PER_PAGE ) < numEntries ) {
-        ++numPages;
-    }
-    if( numPages < 1 ) {
-        numPages = 1;
-    }
-    int currentPage = BltFileBrowserController.getCurPage();
-    int scrollStart = ( BltFileManager.SCROLL_RANGE - 1 ) / 2;
-    int firstPage = 1;
-    int lastPage = BltFileManager.SCROLL_RANGE;
-    if( numPages <= BltFileManager.SCROLL_RANGE && currentPage <= BltFileManager.SCROLL_RANGE ) {
-        firstPage = 1;
-        lastPage = numPages;
-    }
-    if( numPages > BltFileManager.SCROLL_RANGE && currentPage > scrollStart &&
-            currentPage < numPages - scrollStart ) {
-        firstPage = currentPage - scrollStart;
-        lastPage = currentPage + scrollStart;
-    }
-    if( numPages > BltFileManager.SCROLL_RANGE && currentPage > scrollStart &&
-            currentPage >= numPages - ( BltFileManager.SCROLL_RANGE - 1 ) ) {
-        firstPage = numPages - ( BltFileManager.SCROLL_RANGE - 1 );
-        lastPage = numPages;
-    }
-    request.getSession().setAttribute( "firstPage", firstPage );
-    request.getSession().setAttribute( "lastPage", lastPage );
-    request.getSession().setAttribute( "curPage", currentPage );
-    request.getSession().setAttribute( "radarStation", BltFileBrowserController.getRadarStation() );
-    request.getSession().setAttribute( "fileObject", BltFileBrowserController.getFileObject() );
-    request.getSession().setAttribute( "startDate", BltFileBrowserController.getStartDate() );
-    request.getSession().setAttribute( "endDate", BltFileBrowserController.getEndDate() );
-    request.getSession().setAttribute( "startHour", BltFileBrowserController.getStartHour() );
-    request.getSession().setAttribute( "startMinute", BltFileBrowserController.getStartMinute() );
-    request.getSession().setAttribute( "startSecond", BltFileBrowserController.getStartSecond() );
-    request.getSession().setAttribute( "endHour", BltFileBrowserController.getEndHour() );
-    request.getSession().setAttribute( "endMinute", BltFileBrowserController.getEndMinute() );
-    request.getSession().setAttribute( "endSecond", BltFileBrowserController.getEndSecond() );
-%>
 
 <t:page_tabbed pageTitle="Browse files" activeTab="home">
   <jsp:body>
@@ -104,66 +50,56 @@ Author     : szewczenko
                 <div class="blttext">
                     Use the following options to search and browse data files.
                 </div>
-                <form method="post" name="fileBrowser">
+                <form:form method="POST" commandName="query_param">
                     <div class="filebrowser">
                         <div class="row">
                             <div class="leftcol">
-                                <select name="radarsList" title="Select source radar station name">
-                                    <option value="select">
-                                        <c:out value="-- Select radar --"/>
-                                    </option>
-                                    <c:forEach items="${radar_stations}" var="station">
-                                        <option value="${station}" <c:if test="${station == radarStation}">
-                                                SELECTED</c:if>>
-                                            <c:out value="${station}"/>
-                                        </option>
-                                    </c:forEach>
-                                </select>
+                                <form:select path="radar" 
+                                             title="Select source radar">
+                                    <form:option value="" 
+                                                 label="-- Select radar --"/>
+                                    <form:options items="${radars}"/>
+                                </form:select>  
                                 <div class="hint">
-                                    Radar station name
+                                    Source radar station 
                                 </div>
                             </div>
                             <div class="midcol">
-                                <select name="fileObjectsList" title="Select type of file object">
-                                    <option value="select">
-                                        <c:out value="-- Select file object --"/>
-                                    </option>
-                                    <c:forEach items="${file_objects}" var="fobject">
-                                        <option value="${fobject.fileObject}"
-                                            <c:if test="${fobject.fileObject == fileObject}">
-                                                SELECTED</c:if>>
-                                            <c:out value="${fobject.description}"/>
-                                        </option>
-                                    </c:forEach>
-                                </select>
+                                <form:select path="fileObject"
+                                             title="Select file object type">
+                                    <form:option value="" 
+                                                 label="-- Select file object --"/>
+                                    <form:options items="${file_objects}" 
+                                                  itemValue="name"
+                                                  itemLabel="description"/>
+                                </form:select>  
                                 <div class="hint">
-                                    File object type
+                                    File object type 
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="leftcol">
-                                <input type="text" name="startDate" id="startDate"
-                                    title="Start date of dataset's timespan" value="${startDate}">
-                                <img src="includes/images/cal.gif" onclick="javascript:NewCssCal(
-                                    'startDate','yyyyMMdd','arrow',false,'24',false)" style="cursor:pointer"/>
+                                <form:input path="startDate" id="startDate"
+                                            title="Start date of dataset's timespan"/>
+                                <img src="includes/images/cal.gif" 
+                                     onclick="javascript:NewCssCal('startDate',
+                                         'yyyyMMdd','arrow',false,'24',false)" 
+                                     style="cursor:pointer"/>
                                 <div class="hint">
                                     Start date
                                 </div>
                             </div>
                             <div class="midcol">
-                                <input type="text" name="startHour" id="start_hour"
-                                    title="Start hour (24 hour format)"
-                                    value="${startHour}" 
-                                    onchange="validateHour('start_hour')">: 
-                                <input type="text" name="startMinute" 
-                                    id="start_minutes" title="Start minutes"
-                                    value="${startMinute}" 
-                                    onchange="validateMinSec('start_minutes')">: 
-                                <input type="text" name="startSecond" 
-                                    id="start_seconds" title="Start seconds"
-                                    value="${startSecond}" 
-                                    onchange="validateMinSec('start_seconds')">
+                                <form:input path="startHour" id="start_hour"
+                                            title="Start hour (24 hour format)" 
+                                            onchange="validateHour('start_hour')"/>: 
+                                <form:input path="startMinute" 
+                                            id="start_minutes" title="Start minutes"
+                                            onchange="validateMinSec('start_minutes')"/>: 
+                                <form:input path="startSecond" 
+                                            id="start_seconds" title="Start seconds" 
+                                            onchange="validateMinSec('start_seconds')"/>
                                 <div class="hint">
                                     Start time
                                 </div>
@@ -171,25 +107,26 @@ Author     : szewczenko
                         </div>
                         <div class="row">
                             <div class="leftcol">
-                                <input type="text" name="endDate" id="endDate"
-                                    title="End date of dataset's timespan" value="${endDate}">
-                                <img src="includes/images/cal.gif" onclick="javascript:NewCssCal(
-                                    'endDate','yyyyMMdd','arrow',false,'24',false)" style="cursor:pointer"/>
+                                <form:input path="endDate" id="endDate"
+                                    title="End date of dataset's timespan"/>
+                                <img src="includes/images/cal.gif" 
+                                     onclick="javascript:NewCssCal('endDate',
+                                         'yyyyMMdd','arrow',false,'24',false)" 
+                                     style="cursor:pointer"/>
                                 <div class="hint">
                                     End date
                                 </div>
                             </div>
                             <div class="midcol">
-                                <input type="text" name="endHour" id="end_hour"
-                                    title="End hour (24 hour format)"
-                                    value="${endHour}" 
-                                    onchange="validateHour('end_hour')">: 
-                                <input type="text" name="endMinute" id="end_minutes"
-                                    title="End minutes" value="${endMinute}" 
-                                    onchange="validateMinSec('end_minutes')">: 
-                                <input type="text" name="endSecond" id="end_seconds"
-                                    title="End seconds" value="${endSecond}" 
-                                    onchange="validateMinSec('end_seconds')">
+                                <form:input path="endHour" id="end_hour"
+                                            title="End hour (24 hour format)" 
+                                            onchange="validateHour('end_hour')"/>: 
+                                <form:input path="endMinute" id="end_minutes"
+                                            title="End minutes"
+                                            onchange="validateMinSec('end_minutes')"/>: 
+                                <form:input path="endSecond" id="end_seconds"
+                                            title="End seconds"
+                                            onchange="validateMinSec('end_seconds')"/>
                                 <div class="hint">
                                     End time
                                 </div>
@@ -205,56 +142,56 @@ Author     : szewczenko
                     </div>
                     <div class="bltseparator"></div>
                     <c:choose>
-                        <c:when test="${dataStatus == 1}">
+                        <c:when test="${not empty file_entries}">
                             <div class="table">
                                 <div class="dsfiles">
                                     <div id="tablecontrol">
-                                        <input type="submit" name="pagenum" value="<<"
-                                            title="First page">
+                                        <input type="submit" name="selected_page" value="<<"
+                                               title="First page">
                                         <span></span>
-                                        <input type="submit" name="pagenum" value="<"
-                                            title="Previous page">
+                                        <input type="submit" name="selected_page" value="<"
+                                               title="Previous page">
                                         <span></span>
-                                        <c:forEach var="i" begin="${firstPage}" end="${lastPage}"
+                                        <c:forEach var="i" begin="${first_page}" end="${last_page}"
                                             step="1" varStatus ="status">
                                             <c:choose>
-                                                <c:when test="${curPage == i}">
+                                                <c:when test="${current_page == i}">
                                                     <input style="background:#FFFFFF" type="submit"
-                                                        name="pagenum" value="${i}">
+                                                           name="selected_page" value="${i}">
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <input type="submit" name="pagenum" value="${i}">
+                                                    <input type="submit" name="selected_page" value="${i}">
                                                 </c:otherwise>
                                             </c:choose>
                                         </c:forEach>
                                         <span></span>
-                                        <input type="submit" name="pagenum" value=">"
-                                            title="Next page">
+                                        <input type="submit" name="selected_page" value=">"
+                                               title="Next page">
                                         <span></span>
-                                        <input type="submit" name="pagenum" value=">>"
-                                            title="Last page">
+                                        <input type="submit" name="selected_page" value=">>"
+                                               title="Last page">
                                     </div>
                                     <div class="tableheader">
                                         <div id="cell" class="date">
                                             <input name="sortByDate" type="submit" value="Date"
-                                                title="Sort result set by date">
+                                                   title="Sort result set by date">
                                         </div>
                                         <div id="cell" class="time">
                                             <input name="sortByTime" type="submit" value="Time"
-                                                title="Sort result set by time">
+                                                   title="Sort result set by time">
                                         </div>
                                         <div id="cell" class="source">
                                             <input name="sortBySource" type="submit" value="Source"
-                                                title="Sort result set by data source">
+                                                   title="Sort result set by data source">
                                         </div>
                                         <div id="cell" class="type">
-                                            <input name="sortByType" type="submit" value="Type"
-                                                title="Sort result set by file object type">
+                                            <input name="sortByObject" type="submit" value="Type"
+                                                   title="Sort result set by file object type">
                                         </div>
                                         <div id="cell" class="details">&nbsp;</div>
                                         <div id="cell" class="download">&nbsp;</div>
                                     </div>
-                                    <c:forEach var="entry" items="${fileEntries}">
+                                    <c:forEach var="entry" items="${file_entries}">
                                         <div class="entry">
                                             <div id="cell" class="date">
                                                 <fmt:formatDate pattern="yyyy-MM-dd"
@@ -291,7 +228,7 @@ Author     : szewczenko
                             </div>
                         </c:otherwise>
                     </c:choose>                      
-                </form>                    
+                </form:form>                    
             </c:otherwise>            
         </c:choose>                    
         </div>

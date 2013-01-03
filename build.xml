@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -59,7 +59,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property environment="env"/>
 
   <property name="install.prefix" value="/opt/baltrad"/>
-  <!--<property name="jksfile" value="" /> --> <!-- Specify jksfile on command line and we will use that file -->
+  <property name="bdb.sources.file" 
+            value="/opt/baltrad/rave/config/odim_source.xml"/>
+  <!--<property name="jksfile" value="" /> --> 
+  <!-- Specify jksfile on command line and we will use that file -->
 
   <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
   <property name="beast.path" value="/opt/baltrad/beast" />
@@ -273,6 +276,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="includes/**/*.gif" />
         <include name="includes/**/*.jpg" />
         <include name="includes/**/*.txt" />
+        <include name="includes/**/*.xml" />
       	<include name="help/**/*.html" />
       </fileset>
       <fileset dir="${etc.dir}">
@@ -310,6 +314,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="${src.dir}/java">
         <include name="**/*.xml"/>
         <include name="**/*.properties"/>
+        <include name="**/*.txt"/>
       </fileset>
     </copy>
 
@@ -495,7 +500,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <arg value="${basedir}/${build.itest.dir}/baltrad-bdb-server.pid"/>
       <arg value="${basedir}/${build.itest.dir}/baltrad-bdb-server.log"/>
       <arg value="${baltrad.bdb.server.uri}"/>
-      <arg value="${basedir}/${etc.dir}/odim_source.xml"/>
+      <arg value="${bdb.sources.file}"/>
     </exec> 
   </target>
   <!-- Stop baltrad-bdb server -->
@@ -598,7 +603,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </sql>
   </target>
   
-  <!-- deploy on tomcat @@@ insert-data -->
+  <!-- deploy on tomcat @@@ insert-data-->
   <target name="deploy" depends="dist, insert-data, context-status"
     	if="context.deployable">
     <echo message="Deploying ${mgr.path} to ${mgr.url}"/>

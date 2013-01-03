@@ -31,7 +31,7 @@ package eu.baltrad.dex.log.model;
 public class LogParameter {
     
     private String logger;
-    private String flag;
+    private String level;
     private String startDate;
     private String startHour;
     private String startMinutes;
@@ -59,17 +59,17 @@ public class LogParameter {
     }
 
     /**
-     * @return the flag
+     * @return Message level
      */
-    public String getFlag() {
-        return flag;
+    public String getLevel() {
+        return level;
     }
 
     /**
-     * @param flags the flags to set
+     * @param level Level to set
      */
-    public void setFlag(String flag) {
-        this.flag = flag;
+    public void setLevel(String level) {
+        this.level = level;
     }
 
     /**
@@ -97,7 +97,11 @@ public class LogParameter {
      * @param startHour the startHour to set
      */
     public void setStartHour(String startHour) {
-        this.startHour = startHour;
+        if (startHour.trim().length() == 1) { 
+            this.startHour = "0" + startHour;
+        } else {
+            this.startHour = startHour;
+        }    
     }
 
     /**
@@ -111,7 +115,11 @@ public class LogParameter {
      * @param startMinutes the startMinutes to set
      */
     public void setStartMinutes(String startMinutes) {
-        this.startMinutes = startMinutes;
+        if (startMinutes.trim().length() == 1) { 
+            this.startMinutes = "0" + startMinutes;
+        } else {
+            this.startMinutes = startMinutes;
+        }
     }
 
     /**
@@ -125,7 +133,11 @@ public class LogParameter {
      * @param startSeconds the startSeconds to set
      */
     public void setStartSeconds(String startSeconds) {
-        this.startSeconds = startSeconds;
+        if (startSeconds.trim().length() == 1) { 
+            this.startSeconds = "0" + startSeconds;
+        } else {
+            this.startSeconds = startSeconds;
+        }
     }
 
     /**
@@ -153,7 +165,11 @@ public class LogParameter {
      * @param endHour the endHour to set
      */
     public void setEndHour(String endHour) {
-        this.endHour = endHour;
+        if (endHour.trim().length() == 1) { 
+            this.endHour = "0" + endHour;
+        } else {
+            this.endHour = endHour;
+        }
     }
 
     /**
@@ -167,7 +183,11 @@ public class LogParameter {
      * @param endMinutes the endMinutes to set
      */
     public void setEndMinutes(String endMinutes) {
-        this.endMinutes = endMinutes;
+        if (endMinutes.trim().length() == 1) { 
+            this.endMinutes = "0" + endMinutes;
+        } else {
+            this.endMinutes = endMinutes;
+        }
     }
 
     /**
@@ -181,7 +201,11 @@ public class LogParameter {
      * @param endSeconds the endSeconds to set
      */
     public void setEndSeconds(String endSeconds) {
-        this.endSeconds = endSeconds;
+        if (endSeconds.trim().length() == 1) { 
+            this.endSeconds = "0" + endSeconds;
+        } else {
+            this.endSeconds = endSeconds;
+        }
     }
     
     /**

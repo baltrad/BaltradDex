@@ -220,19 +220,25 @@ public class DexDBITestHelper extends TestCase {
      */
     private void deleteFromDB() {
         SimpleJdbcTemplate template = new SimpleJdbcTemplate(dataSource);
-        template.update("DELETE FROM dex_subscriptions");
-        template.update("DELETE FROM dex_data_sources");
-        template.update("DELETE FROM dex_data_source_users");
-        template.update("DELETE FROM dex_data_source_filters");
         template.update("DELETE FROM dex_data_source_radars");
+        template.update("DELETE FROM dex_data_source_filters");
         template.update("DELETE FROM dex_data_source_file_objects");
+        template.update("DELETE FROM dex_data_source_users");
+        template.update("DELETE FROM dex_data_sources");
+        template.update("DELETE FROM dex_users_roles");
+        template.update("DELETE FROM dex_users_nodes");
         template.update("DELETE FROM dex_users");
         template.update("DELETE FROM dex_roles");
-        template.update("DELETE FROM dex_radars");
-        template.update("DELETE FROM dex_delivery_registry");
-        template.update("DELETE FROM dex_messages");
-        template.update("DELETE FROM dex_node_connections");
+        template.update("DELETE FROM dex_nodes");
         template.update("DELETE FROM dex_file_objects");
+        template.update("DELETE FROM dex_radars");
+        template.update("DELETE FROM dex_subscriptions");
+        template.update("DELETE FROM dex_subscriptions_nodes");
+        template.update("DELETE FROM dex_subscriptions_users");
+        template.update("DELETE FROM dex_subscriptions_data_sources");
+        template.update("DELETE FROM dex_messages");
+        template.update("DELETE FROM dex_delivery_registry_users");
+        template.update("DELETE FROM dex_delivery_registry");
     }
     
     /**
@@ -240,13 +246,14 @@ public class DexDBITestHelper extends TestCase {
      * @param tc
      * @throws Exception 
      */
-    public void cleanInsert(Object tc) throws Exception {
+    public void cleanInsert(Object tc, String suffix) throws Exception {
         Connection conn = dataSource.getConnection();
         try {
             deleteFromDB();
             IDatabaseConnection connection = getConnection(conn);
             DatabaseOperation.CLEAN_INSERT.execute(connection, 
-                    getXMLDataset(tc, null));
+                    getXMLDataset(tc, suffix));
+            
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

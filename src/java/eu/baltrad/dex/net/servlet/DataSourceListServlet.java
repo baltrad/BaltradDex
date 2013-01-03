@@ -21,15 +21,19 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.net.model.NodeRequest;
-import eu.baltrad.dex.net.model.NodeResponse;
-import eu.baltrad.dex.net.util.*;
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.IUserManager;
+import eu.baltrad.dex.net.util.json.IJsonUtil;
+import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
+import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.request.impl.NodeRequest;
+import eu.baltrad.dex.net.response.impl.NodeResponse;
+import eu.baltrad.dex.user.manager.IAccountManager;
+import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.datasource.model.IDataSourceManager;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
+import java.io.IOException;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,10 +47,15 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
 
+import org.keyczar.exceptions.KeyczarException;
+
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.HashSet;
-import org.keyczar.exceptions.KeyczarException;
+import javax.servlet.ServletInputStream;
+import org.apache.commons.io.IOUtils;
+
 
 /**
  * Receives and handles data source listing requests.
@@ -67,14 +76,13 @@ public class DataSourceListServlet extends HttpServlet {
             "datasource.server.internal_server_error";
     
     private Authenticator authenticator;
-    private IUserManager userManager;
+    private IAccountManager accountManager;
     private IDataSourceManager dataSourceManager;
     private IJsonUtil jsonUtil;
     private MessageResourceUtil messages;
     private Logger log;
     
-    protected String nodeName;
-    protected String nodeAddress;
+    protected Account localNode;
     
     /**
      * Default constructor.
@@ -89,8 +97,53 @@ public class DataSourceListServlet extends HttpServlet {
     protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
                 InitAppUtil.getConf().getKeystoreDir());
-        this.nodeName = InitAppUtil.getConf().getNodeName();
-        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        this.localNode = new Account(InitAppUtil.getConf().getNodeName(),
+                InitAppUtil.getConf().getNodeAddress(),
+                InitAppUtil.getConf().getOrgName(),
+                InitAppUtil.getConf().getOrgUnit(),
+                InitAppUtil.getConf().getLocality(),
+                InitAppUtil.getConf().getState(),
+                InitAppUtil.getConf().getCountryCode());   
+    }
+    
+    /**
+     * Read http request body.
+     * @param request Http request
+     * @return JSON string
+     * @throws IOException 
+     */
+    private String readRequest(HttpServletRequest request) 
+            throws IOException {
+        ServletInputStream sis = request.getInputStream();
+        StringWriter writer = new StringWriter();
+        String json = "";
+        try {
+            IOUtils.copy(sis, writer);
+            json = writer.toString();
+        } finally {
+            writer.close();
+            sis.close();
+        }
+        return json;
+    }
+    
+    /**
+     * Write to http response output stream.
+     * @param response Http response 
+     * @param body Response body
+     * @param status Status code
+     * @throws IOException 
+     */
+    private void writeResponse(NodeResponse response, String body, int status) 
+            throws IOException {
+        PrintWriter writer = new PrintWriter(response.getOutputStream());
+        try {
+            writer.print(body);
+            response.setStatus(status);
+            response.setNodeName(localNode.getName());
+        } finally {
+            writer.close();
+        }
     }
     
     /**
@@ -99,12 +152,12 @@ public class DataSourceListServlet extends HttpServlet {
      * @param response Http servlet response
      * @return Model and view
      */
-    @RequestMapping("/get_datasource_listing.htm")
+    @RequestMapping("/datasource_listing.htm")
     public ModelAndView handleRequest(HttpServletRequest request, 
             HttpServletResponse response) {
         initConfiguration();
         HttpSession session = request.getSession(true);
-        doGet(request, response);
+        doPost(request, response);
         return new ModelAndView();
     }
     
@@ -114,7 +167,7 @@ public class DataSourceListServlet extends HttpServlet {
      * @param response Http servlet response 
      */
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) 
+    public void doPost(HttpServletRequest request, HttpServletResponse response) 
     {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
@@ -123,30 +176,28 @@ public class DataSourceListServlet extends HttpServlet {
                     req.getNodeName())) {
                 // TODO User account will be created when 
                 // keys are exchanged
-                User user = userManager.load(req.getNodeName());
-                if (user == null) {
-                    user = new User(req.getNodeName(), 
-                        User.ROLE_PEER, req.getNodeAddress());
-                    if (user.getId() > 0) {
-                        userManager.update(user);
-                        log.warn("Peer account updated: " + user.getName());
-                    } else {
-                        userManager.storeNoId(user);
-                        log.warn("New peer account created: " + user.getName());
+                String json = readRequest(request);
+                Account peer = jsonUtil.jsonToUserAccount(json);
+                // account not found
+                if (accountManager.load(peer.getName()) == null) {
+                    peer.setRoleName(Role.PEER);
+                    try {
+                        accountManager.store(peer);
+                        log.warn("New peer account created: " + peer.getName());
+                    } catch (Exception e) {
+                        throw e;
                     }
-                }
-                // Get data sources available for the user
-                List<DataSource> userDataSources = dataSourceManager
-                        .loadByUser(user.getId());
-                PrintWriter writer = new PrintWriter(res.getOutputStream());
-                try {
-                    writer.print(jsonUtil.dataSourcesToJson(
-                            new HashSet<DataSource>(userDataSources))); 
-                    res.setStatus(HttpServletResponse.SC_OK);
-                    res.setNodeName(nodeName);
-                    res.setNodeAddress(nodeAddress);
-                } finally {
-                    writer.close();
+                    writeResponse(res, jsonUtil.userAccountToJson(peer),
+                            HttpServletResponse.SC_CREATED);
+                } else {
+                    // account exists
+                    Account account = accountManager.load(peer.getName());
+                    List<DataSource> userDataSources = dataSourceManager
+                            .loadByUser(account.getId());
+
+                    writeResponse(res, jsonUtil.dataSourcesToJson(
+                            new HashSet<DataSource>(userDataSources)),
+                            HttpServletResponse.SC_OK);
                 }
             } else {
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
@@ -163,11 +214,11 @@ public class DataSourceListServlet extends HttpServlet {
     }
 
     /**
-     * @param userManager the userManager to set
+     * @param accountManager the accountManager to set
      */
     @Autowired
-    public void setUserManager(IUserManager userManager) {
-        this.userManager = userManager;
+    public void setAccountManager(IAccountManager accountManager) {
+        this.accountManager = accountManager;
     }
     
     /**

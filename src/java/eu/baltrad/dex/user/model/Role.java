@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,59 +17,59 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.user.model;
 
 /**
- * Class implements role object.
+ * User role used for setting system access level.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.0
- * @since 1.0
+ * @version 1.2.2
+ * @since 0.1.0
  */
 public class Role {
-//---------------------------------------------------------------------------------------- Variables
+    
+    public final static String ADMIN = "admin";
+    public final static String OPERATOR = "operator";
+    public final static String PEER = "peer";
+    public final static String USER = "user";
+    
     private int id;
-    private String role;
-//------------------------------------------------------------------------------------------ Methods
+    private String name;
+    
     /**
-     * Default constructor.
-     */
-    public Role() {}
-    /**
-     * Creates new role object with given field values.
+     * Constructor.
      *
      * @param id Role ID
-     * @param role Role name
+     * @param name Role name
      */
-    public Role( int id, String role ) {
+    public Role(int id, String name) {
         this.id = id;
-        this.role = role;
+        this.name = name;
     }
+    
     /**
      * Gets role ID.
-     *
      * @return Role ID
      */
     public int getId() { return id; }
+    
     /**
      * Method sets role ID.
-     *
      * @param id Role ID
      */
-    public void setId( int id ) { this.id = id; }
+    public void setId(int id) { this.id = id; }
+    
     /**
      * Gets role name.
-     *
      * @return Role name
      */
-    public String getRole() { return role; }
+    public String getName() { return name; }
+    
     /**
      * Sets role name.
-     *
-     * @param role Role name
+     * @param name Role name
      */
-    public void setRole( String role ) { this.role = role; }
+    public void setName(String name) { this.name = name; }
 }
-//--------------------------------------------------------------------------------------------------

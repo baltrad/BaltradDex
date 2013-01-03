@@ -23,11 +23,11 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@page import="eu.baltrad.dex.util.InitAppUtil"%>
-<%@page import="eu.baltrad.dex.user.model.User" %>
+<%@ page import="eu.baltrad.dex.util.InitAppUtil"%>
+<%@ page import="eu.baltrad.dex.user.model.User" %>
 
 <jsp:useBean id="securityManager" scope="session"
-             class="eu.baltrad.dex.auth.util.SecurityManager">
+             class="eu.baltrad.dex.auth.manager.SecurityManager">
 </jsp:useBean>
 
 <%
@@ -36,10 +36,13 @@ Author     : szewczenko
     String userName = user.getName();
     sess.setAttribute("userName", userName);
     sess.setAttribute("nodeName", InitAppUtil.getConf().getNodeName());
-    sess.setAttribute("operator", InitAppUtil.getConf().getOrganization());
     sess.setAttribute("nodeVersion", InitAppUtil.getConf().getVersion());
     sess.setAttribute("nodeType", InitAppUtil.getConf().getNodeType());
-    sess.setAttribute("address", InitAppUtil.getConf().getAddress());
+    sess.setAttribute("orgName", InitAppUtil.getConf().getOrgName());
+    sess.setAttribute("orgUnit", InitAppUtil.getConf().getOrgUnit());
+    sess.setAttribute("locality", InitAppUtil.getConf().getLocality());
+    sess.setAttribute("state", InitAppUtil.getConf().getState());
+    sess.setAttribute("countryCode", InitAppUtil.getConf().getCountryCode());
     sess.setAttribute("timeZone", InitAppUtil.getConf().getTimeZone());
     sess.setAttribute("adminEmail", InitAppUtil.getConf().getEmail());
 %>

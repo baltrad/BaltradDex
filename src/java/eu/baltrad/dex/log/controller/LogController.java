@@ -22,7 +22,7 @@
 package eu.baltrad.dex.log.controller;
 
 import eu.baltrad.dex.log.model.LogEntry;
-import eu.baltrad.dex.log.model.LogManager;
+import eu.baltrad.dex.log.manager.impl.LogManager;
 import eu.baltrad.dex.log.model.LogParameter;
 
 import org.springframework.stereotype.Controller;
@@ -50,7 +50,7 @@ import java.util.Arrays;
 public class LogController {
 
     /** Drop down lists */ 
-    private static final String[] FLAGS = {"INFO", "WARN", "ERROR"};
+    private static final String[] LEVELS = {"INFO", "WARN", "ERROR"};
     private static final String[] LOGGERS = {"DEX", "BEAST", "PGF"};
     /** Form view */
     private static final String FORM_VIEW = "system_messages";
@@ -82,7 +82,7 @@ public class LogController {
      * @return View name
      */
     @RequestMapping(method = RequestMethod.GET)
-    public String setupForm(ModelMap model) {
+    public String setupForm(ModelMap model) throws Exception {
         setCurrentPage(1);
         LogParameter param = new LogParameter();
         int[] pages = getPages(param);
@@ -100,7 +100,7 @@ public class LogController {
      * @param model Model map
      * @param selectedPage Selected page
      * @param logger Logger name
-     * @param flag Flag name
+     * @param level Message level
      * @param startDate Start date
      * @param startHour Start hour 
      * @param startMinutes Start minutes
@@ -117,7 +117,7 @@ public class LogController {
             @RequestParam(value="selected_page", required=false) 
                     String selectedPage,
             @RequestParam(value="logger", required=false) String logger,
-            @RequestParam(value="flag", required=false) String flag,
+            @RequestParam(value="level", required=false) String level,
             @RequestParam(value="startDate", required=false) String startDate,
             @RequestParam(value="startHour", required=false) String startHour,
             @RequestParam(value="startMinutes", required=false) 
@@ -130,14 +130,15 @@ public class LogController {
                     String endMinutes,
             @RequestParam(value="endSeconds", required=false)
                     String endSeconds,
-            @RequestParam(value="phrase", required=false) String phrase) {
+            @RequestParam(value="phrase", required=false) String phrase)
+                throws Exception {
         
         LogParameter logParameter = new LogParameter();
         if (logger != null) {
             logParameter.setLogger(logger);
         }
-        if (flag != null) {
-            logParameter.setFlag(flag);
+        if (level != null) {
+            logParameter.setLevel(level);
         }
         if (startDate != null) {
             logParameter.setStartDate(startDate);
@@ -208,12 +209,12 @@ public class LogController {
     }
     
     /**
-     * Creates list of flags.
-     * @return List of flags
+     * Creates list of levels.
+     * @return List of levels
      */
-    @ModelAttribute("flags")
-    public List<String> getFlags() {
-        return Arrays.asList(FLAGS);
+    @ModelAttribute("levels")
+    public List<String> getLevels() {
+        return Arrays.asList(LEVELS);
     }
     
     /**
@@ -230,7 +231,7 @@ public class LogController {
      * @param param Log parameter
      * @return Numbers of first, last and current page for a log parameter 
      */
-    private int[] getPages(LogParameter param) {
+    private int[] getPages(LogParameter param) throws Exception {
         long numEntries = logManager.count(logManager.createQuery(param, true));
         int numPages = (int) Math.ceil(numEntries / LogManager.ENTRIES_PER_PAGE);
         if ((numPages * LogManager.ENTRIES_PER_PAGE) < numEntries) {
@@ -276,7 +277,7 @@ public class LogController {
      * Sets page number to the next page number.
      * @param param Log parameter
      */
-    public void nextPage(LogParameter param) {
+    public void nextPage(LogParameter param) throws Exception {
         int lastPage = (int) Math.ceil(logManager.count(
             logManager.createQuery(param, true)) / LogManager.ENTRIES_PER_PAGE);
         if ((lastPage * LogManager.ENTRIES_PER_PAGE) 
@@ -309,7 +310,7 @@ public class LogController {
      * Sets page number to the last page.
      * @param param Log parameter
      */
-    public void lastPage(LogParameter param) {
+    public void lastPage(LogParameter param) throws Exception {
         long numEntries = logManager.count(logManager.createQuery(param, true));
         int lastPage = (int) Math.ceil(numEntries / LogManager.ENTRIES_PER_PAGE);
         if ((lastPage * LogManager.ENTRIES_PER_PAGE) 

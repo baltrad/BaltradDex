@@ -2,7 +2,7 @@
     Welcome to BALTRAD!
 </div>
 <div class="blttext">
-    <p>BALTRAD is running on ${nodeName} operated by ${operator}.</p>
+    <p>BALTRAD is running on ${nodeName} operated by ${orgName}.</p>
     <p>You have signed in as user ${userName}.</p>
     <p>Information on this BALTRAD node:</p>
 </div>
@@ -18,8 +18,8 @@
         <div class="row">Admin e-mail:</div>
     </div>
     <div class="rightcol">
-        <div class="row">${operator}</div>
-        <div class="row">${address}</div>
+        <div class="row">${orgName}</div>
+        <div class="row">${locality}, ${state}</div>
         <div class="row">${nodeName}</div>
         <div class="row">${nodeVersion}</div>
         <div class="row">${nodeType}</div>

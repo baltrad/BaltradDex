@@ -44,7 +44,7 @@ Author     : szewczenko
                     <div class="tablefooter">
                         <div class="buttons">
                             <button class="rounded" type="button"
-                                onclick="window.location.href='edit_radar.htm'">
+                                onclick="window.location.href='show_radar.htm'">
                                 <span>OK</span>
                             </button>
                         </div>

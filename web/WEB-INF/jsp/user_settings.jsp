@@ -61,7 +61,7 @@ Author     : szewczenko
                         </div>
                     </div>
                 </c:if>                
-                <form:form method="POST" commandName="password">
+                <form:form method="POST" commandName="user_account">
                     <div class="leftcol">
                         <div class="row">User name</div>
                         <div class="row">New password</div>
@@ -70,33 +70,33 @@ Author     : szewczenko
                     <div class="rightcol">
                         <div class="row">
                             <div class="username">
-                                <form:input path="userName" readonly="true"
+                                <form:input path="name" readonly="true"
                                             title="Current user name"/>
                                 <div class="hint">
                                     User name
                                 </div>
                             </div>
-                            <form:errors path="userName" cssClass="error"/>
+                            <form:errors path="name" cssClass="error"/>
                         </div>
                         <div class="row">
                             <div class="password">
-                                <form:password path="newPasswd"
+                                <form:password path="password"
                                                title="Enter new password"/>
                                 <div class="hint">
                                     New password
                                 </div>
                             </div>
-                            <form:errors path="newPasswd" cssClass="error"/>
+                            <form:errors path="password" cssClass="error"/>
                         </div>
                         <div class="row">
                             <div class="password">
-                                <form:password path="confirmNewPasswd"
+                                <form:password path="repeatPassword"
                                                title="Repeat new password"/>
                                 <div class="hint">
                                     Repeat new password here
                                 </div>
                             </div>
-                            <form:errors path="confirmNewPasswd"
+                            <form:errors path="repeatPassword" 
                                          cssClass="error"/>
                         </div>
                     </div>

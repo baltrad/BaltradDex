@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    
+    <dex_radars id="2" country_code="XX" center_code="SOWR" center_number="220" 
+                rad_place="Nowhere" rad_code="XX22" rad_wmo="22222" />
+    <dex_radars id="4" country_code="XX" center_code="SOWR" center_number="220" 
+                rad_place="Anywhere" rad_code="XX44" rad_wmo="44444" />            
+    
+</dataset>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+                
+    <dex_radars id="1" country_code="XX" center_code="SOWR" center_number="220" 
+                rad_place="Neverhood" rad_code="XX11" rad_wmo="11111" />
+    <dex_radars id="2" country_code="XX" center_code="SOWR" center_number="220" 
+                rad_place="Nowhere" rad_code="XX22" rad_wmo="22222" />
+    <dex_radars id="3" country_code="XX" center_code="SOWR" center_number="220" 
+                rad_place="Somewhere" rad_code="XX33" rad_wmo="33333" />
+    <dex_radars id="4" country_code="XX" center_code="SOWR" center_number="220" 
+                rad_place="Anywhere" rad_code="XX44" rad_wmo="44444" />              
+    
+</dataset>

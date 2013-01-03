@@ -21,18 +21,23 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.net.model.NodeRequest;
-import eu.baltrad.dex.net.model.NodeResponse;
+import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
+import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
+import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
+import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
+import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.request.impl.NodeRequest;
+import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.net.model.Subscription;
-import eu.baltrad.dex.net.model.ISubscriptionManager;
-import eu.baltrad.dex.db.model.IBltFileManager;
-import eu.baltrad.dex.registry.model.IRegistryManager;
-import eu.baltrad.dex.user.model.IUserManager;
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.net.util.RequestFactory;
+import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.db.manager.IBltFileManager;
+import eu.baltrad.dex.registry.manager.IRegistryManager;
+import eu.baltrad.dex.user.manager.IAccountManager;
+import eu.baltrad.dex.net.request.factory.RequestFactory;
+import eu.baltrad.dex.user.model.Account;
 
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.bdb.db.FileEntry;
@@ -60,8 +65,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import java.util.List;
+import java.io.InputStream;
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -93,15 +99,14 @@ public class PostFileServlet extends HttpServlet {
     private IBltMessageManager messageManager;
     private IBltFileManager fileManager;
     private IRegistryManager registryManager;
-    private IUserManager userManager;
+    private IAccountManager userManager;
     private IHttpClientUtil httpClient;
     private FramePublisherManager framePublisherManager;
     private ISubscriptionManager subscriptionManager;
     private MessageResourceUtil messages;
     private Logger log;
     
-    protected String nodeName;
-    protected String nodeAddress;
+    protected Account localNode;
     
     /**
      * Default constructor.
@@ -119,8 +124,13 @@ public class PostFileServlet extends HttpServlet {
         this.setHttpClient(new HttpClientUtil(
                  InitAppUtil.getConf().getConnTimeout(), 
                  InitAppUtil.getConf().getSoTimeout()));
-        this.nodeName = InitAppUtil.getConf().getNodeName();
-        this.nodeAddress = InitAppUtil.getConf().getNodeAddress();
+        this.localNode = new Account(InitAppUtil.getConf().getNodeName(),
+                InitAppUtil.getConf().getNodeAddress(),
+                InitAppUtil.getConf().getOrgName(),
+                InitAppUtil.getConf().getOrgUnit(),
+                InitAppUtil.getConf().getLocality(),
+                InitAppUtil.getConf().getState(),
+                InitAppUtil.getConf().getCountryCode());
     }
     
     /**
@@ -152,7 +162,16 @@ public class PostFileServlet extends HttpServlet {
             if (authenticator.authenticate(req.getMessage(), 
                     req.getSignature(), req.getNodeName())) {
                 log.info("New data file received from " + req.getNodeName());
-                FileEntry entry = catalog.store(req.getInputStream());
+                
+                FileEntry entry = null;   
+                InputStream is = null;
+                try {
+                    is = req.getInputStream();
+                    entry = catalog.store(is);
+                } finally {
+                    is.close();
+                }
+                
                 if (entry != null) {
                     String name = namer.name(entry);
                     UUID uuid = entry.getUuid();
@@ -161,21 +180,21 @@ public class PostFileServlet extends HttpServlet {
                     msg.setFileEntry(entry);
                     messageManager.manage(msg);
                     List<Subscription> uploads = subscriptionManager.load(
-                            Subscription.SUBSCRIPTION_UPLOAD);
+                            Subscription.UPLOAD);
                     for (Subscription s : uploads) {
                         IFilter filter = fileManager
-                                .getFilter(s.getDataSourceName());
-                        User receiver = userManager.load(s.getUserName());
+                                .loadFilter(s.getDataSource());
+                        Account receiver = userManager.load(s.getUser());
                         if (matcher.match(entry.getMetadata(), 
                                 filter.getExpression())) {
                             RequestFactory requestFactory = 
                                 new DefaultRequestFactory(
                                     URI.create(receiver.getNodeAddress()));
                             HttpUriRequest deliveryRequest = requestFactory
-                                .createPostFileRequest(nodeName, 
-                                        nodeAddress, entry.getContentStream());
+                                .createPostFileRequest(localNode, 
+                                    entry.getContentStream());
                             authenticator.addCredentials(deliveryRequest, 
-                                    nodeName);
+                                    localNode.getName());
                             PostFileTask task = new PostFileTask(httpClient, 
                                     registryManager, deliveryRequest, 
                                     entry.getUuid().toString(), 
@@ -290,7 +309,7 @@ public class PostFileServlet extends HttpServlet {
      * @param userManager the userManager to set
      */
     @Autowired
-    public void setUserManager(IUserManager userManager) {
+    public void setUserManager(IAccountManager userManager) {
         this.userManager = userManager;
     }
 

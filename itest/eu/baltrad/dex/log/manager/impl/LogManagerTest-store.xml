@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+ 
+    <dex_messages id="1" time_stamp="134579640000" logger="DEX"
+                  level="INFO" message="DEX message"/>
+    <dex_messages id="2" time_stamp="1345797000000" logger="DEX"
+                  level="INFO" message="DEX message"/>
+    <dex_messages id="3" time_stamp="1345797600000" logger="DEX"
+                  level="INFO" message="DEX message"/>
+    <dex_messages id="4" time_stamp="1345798200000" logger="BEAST"
+                  level="INFO" message="BEAST message"/>
+    <dex_messages id="5" time_stamp="1345798800000" logger="BEAST"
+                  level="WARN" message="BEAST message"/>
+    <dex_messages id="6" time_stamp="1345799400000" logger="DEX"
+                  level="WARN" message="DEX message"/>
+    <dex_messages id="7" time_stamp="1345800000000" logger="BEAST"
+                  level="INFO" message="BEAST message"/>
+    <dex_messages id="8" time_stamp="1345800600000" logger="DEX"
+                  level="INFO" message="DEX message"/>
+    <dex_messages id="9" time_stamp="1345801200000" logger="DEX"
+                  level="INFO" message="DEX message"/>
+    <dex_messages id="10" time_stamp="1345801800000" logger="PGF"
+                  level="ERROR" message="PGF message"/>
+    <dex_messages id="11" time_stamp="1345802400000" logger="PGF"
+                  level="ERROR" message="PGF message"/>
+    <dex_messages id="12" time_stamp="1345803000000" logger="DEX"
+                  level="INFO" message="DEX message"/> 
+    <dex_messages id="13" time_stamp="1345803600000" logger="DEX"
+                  level="ERROR" message="DEX message"/>      
+                  
+</dataset>

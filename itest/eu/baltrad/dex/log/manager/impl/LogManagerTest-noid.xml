@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+                  
+    <dex_messages time_stamp="134579640000" logger="DEX"
+                  level="INFO" message="DEX message"/>
+    <dex_messages time_stamp="1345797000000" logger="DEX"
+                  level="INFO" message="DEX message"/>
+    <dex_messages time_stamp="1345797600000" logger="DEX"
+                  level="INFO" message="DEX message"/>
+    <dex_messages time_stamp="1345798200000" logger="BEAST"
+                  level="INFO" message="BEAST message"/>
+    <dex_messages time_stamp="1345798800000" logger="BEAST"
+                  level="WARN" message="BEAST message"/>
+    <dex_messages time_stamp="1345799400000" logger="DEX"
+                  level="WARN" message="DEX message"/>
+    <dex_messages time_stamp="1345800000000" logger="BEAST"
+                  level="INFO" message="BEAST message"/>
+    <dex_messages time_stamp="1345800600000" logger="DEX"
+                  level="INFO" message="DEX message"/>
+    <dex_messages time_stamp="1345801200000" logger="DEX"
+                  level="INFO" message="DEX message"/>
+    <dex_messages time_stamp="1345801800000" logger="PGF"
+                  level="ERROR" message="PGF message"/>
+    <dex_messages time_stamp="1345802400000" logger="PGF"
+                  level="ERROR" message="PGF message"/>
+    <dex_messages time_stamp="1345803000000" logger="DEX"
+                  level="INFO" message="DEX message"/>  
+        
+</dataset>

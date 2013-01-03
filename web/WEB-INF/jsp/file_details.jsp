@@ -26,41 +26,6 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@ page import="eu.baltrad.dex.db.model.BltFile" %>
-<%@ page import="eu.baltrad.dex.db.model.BltDataset" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.io.File" %>
-<%@ page import="java.text.SimpleDateFormat" %>
-
-<%
-    HashMap model = ( HashMap )request.getAttribute( "file_details" );
-    BltFile bltFile = ( BltFile )model.get( "blt_file" );
-    List<BltDataset> bltDatasets = ( List )model.get( "blt_datasets" );
-    request.setAttribute( "blt_datasets", bltDatasets );
-
-    String uuid = bltFile.getUuid();
-    String fileName = bltFile.getPath().substring( bltFile.getPath().lastIndexOf( File.separator )
-            + 1, bltFile.getPath().length() );
-    String source = bltFile.getSource();
-    SimpleDateFormat dateTimeFormat = new SimpleDateFormat( "MMM d, yyyy HH:mm:ss" );
-    String storageTime = dateTimeFormat.format( bltFile.getStorageTime() );
-    SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd" );
-    SimpleDateFormat timeFormat = new SimpleDateFormat( "HH:mm:ss" );
-    String dateStr = dateFormat.format( bltFile.getTimeStamp() );
-    String timeStr = timeFormat.format( bltFile.getTimeStamp() );
-    String type = bltFile.getType();
-    
-    request.setAttribute("uuid", uuid);
-    request.setAttribute("fileName", fileName);
-    request.setAttribute("dateStr", dateStr);
-    request.setAttribute("timeStr", timeStr);
-    request.setAttribute("source", source);
-    request.setAttribute("type", type);
-    request.setAttribute("storageTime", storageTime);
-%>
-
 <t:page_tabbed pageTitle="File details" activeTab="home">
   <jsp:body>
     <div class="left">
@@ -96,13 +61,13 @@ Author     : szewczenko
                 </div>
                 <div class="rightcol">
                     <div class="row">
-                        ${fileName}
+                        ${file_name}
                     </div>
                     <div class="row">
-                        ${dateStr}
+                        ${date_str}
                     </div>
                     <div class="row">
-                        ${timeStr}
+                        ${time_str}
                     </div>
                     <div class="row">
                         ${source}
@@ -111,7 +76,7 @@ Author     : szewczenko
                         ${type}
                     </div>
                     <div class="row">
-                        ${storageTime}
+                        ${storage_time}
                     </div>
                 </div>
             </div>

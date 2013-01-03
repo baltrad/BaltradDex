@@ -1,4 +1,4 @@
-<%--------------------------------------------------------------------------------------------------
+<%------------------------------------------------------------------------------
 Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
@@ -15,11 +15,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Data download status page
 Created on : Apr 1, 2011, 12:23 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -37,16 +37,16 @@ Author     : szewczenko
             Data download status
         </div>
         <div class="blttext">
-            Data incoming from subscribed data sources.
+            Data downloaded from subscribed data sources.
         </div>
         <c:choose>
-            <c:when test="${not empty operators}">
+            <c:when test="${not empty nodes}">
                 <div class="blttext">
                     Click on node name to view detailed information
                     on subscribed data sources.
                 </div>
-                <c:forEach var="operator" items="${operators}">
-                <c:set var="op" scope="page" value="${operator}"></c:set>
+                <c:forEach var="node" items="${nodes}">
+                <c:set var="operator_name" scope="page" value="${node.name}"></c:set>
                 <div class="expandable">
                     <div class="save">
                         <div class="item">
@@ -57,14 +57,14 @@ Author     : szewczenko
                                             alt="+" title="Show">
                                 </span>
                                 <div class="operator">
-                                    <c:out value="${operator}"/>
+                                    <c:out value="${node.name}"/>
                                 </div>
                             </a>
                         </div>
                         <div class="dspcont">
                             <div class="statustable">
                             <c:choose>
-                                <c:when test="${not empty local}">
+                                <c:when test="${not empty subscriptions}">
                                     <div class="header">
                                         <div id="cell" class="station">
                                             Data source
@@ -76,14 +76,14 @@ Author     : szewczenko
                                             Status
                                         </div>
                                     </div>
-                                    <c:forEach var="sub" items="${local}">
-                                        <c:if test="${sub.operatorName == op}">
+                                    <c:forEach var="sub" items="${subscriptions}">
+                                        <c:if test="${sub.operator == operator_name}">
                                             <div class="entry">
                                                 <div id="cell" class="station">
-                                                    <c:out value="${sub.dataSourceName}"/>
+                                                    <c:out value="${sub.dataSource}"/>
                                                 </div>
                                                 <div id="cell" class="timestamp">
-                                                    <fmt:formatDate value="${sub.timeStamp}" 
+                                                    <fmt:formatDate value="${sub.timestamp}" 
                                                                     pattern="yyyy/dd/MM HH:mm:ss"/>
                                                 </div>
                                                 <div id="cell" class="active">
@@ -119,12 +119,6 @@ Author     : szewczenko
   </jsp:body>
 </t:page_tabbed>
 
-<%-- 
-        <!--meta name="save" content="history" /-->
-        <noscript>
-            <style type="text/css"><!--.dspcont{display:block;}--></style>
-        </noscript>
---%>
                    
         
    

@@ -22,7 +22,7 @@ Author     : szewczenko
 ------------------------------------------------------------------------------%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-                                                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <!html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-GB"/>
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
@@ -50,17 +50,17 @@ Author     : szewczenko
         <c:forEach var="entry" items="${log_entry_list}">
             <% String style = ""; %>
             <c:choose>
-                <c:when test="${entry.type == 'INFO'}">
+                <c:when test="${entry.level == 'INFO'}">
                     <%
                         style = "info-entry";
                     %>
                 </c:when>
-                <c:when test="${entry.type == 'WARN'}">
+                <c:when test="${entry.level == 'WARN'}">
                     <%
                         style = "warning-entry";
                     %>
                 </c:when>
-                <c:when test="${entry.type == 'ERROR'}">
+                <c:when test="${entry.level == 'ERROR'}">
                     <%
                         style = "error-entry";
                     %>
@@ -69,22 +69,22 @@ Author     : szewczenko
             <div class="entry">
                 <div id="cell" class="logdate">
                     <div class="<%=style%>">
-                        <c:out value="${fn:substring(entry.timeStamp, 0, 10)}"/>
+                        <c:out value="${fn:substring(entry.dateTime, 0, 10)}"/>
                     </div>
                 </div>
                 <div id="cell" class="logtime">
                     <div class="<%=style%>">
-                        <c:out value="${fn:substring(entry.timeStamp, 10, 19)}"/>
+                        <c:out value="${fn:substring(entry.dateTime, 10, 19)}"/>
                     </div>
                 </div>
                 <c:choose>
-                    <c:when test="${entry.type == 'ERROR'}">
+                    <c:when test="${entry.level == 'ERROR'}">
                         <div id="cell" class="logflag">
                             <img src="includes/images/icons/error.png"
                                  alt="error"/>
                         </div>
                     </c:when>
-                    <c:when test="${entry.type == 'WARN'}">
+                    <c:when test="${entry.level == 'WARN'}">
                         <div id="cell" class="logflag">
                             <img src="includes/images/icons/warning.png"
                                  alt="warn"/>

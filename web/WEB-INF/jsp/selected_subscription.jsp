@@ -62,10 +62,10 @@ Author     : szewczenko
                                     <c:set var="count" value="${count + 1}"/>
                                 </div>
                                 <div id="cell" class="name">
-                                    <c:out value="${sub.dataSourceName}"/>
+                                    <c:out value="${sub.dataSource}"/>
                                 </div>
                                 <div id="cell" class="operator">
-                                    <c:out value="${sub.operatorName}"/>
+                                    <c:out value="${sub.operator}"/>
                                 </div>
                                 <div id="cell" class="active">
                                     <c:choose>

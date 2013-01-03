@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.bltdata.controller;
 
-import eu.baltrad.dex.bltdata.model.BltDataProjector;
+import eu.baltrad.dex.bltdata.util.DataProjector;
 
 import junit.framework.TestCase;
 
@@ -34,11 +34,11 @@ import junit.framework.TestCase;
  */
 public class BltDataProjectorControllerTest extends TestCase {
 //---------------------------------------------------------------------------------------- Variables
-    private static BltDataProjector bltDataProjector;
+    private static DataProjector bltDataProjector;
 //------------------------------------------------------------------------------------------ Methods
 
     public void testInit() {
-        bltDataProjector = new BltDataProjector();
+        bltDataProjector = new DataProjector();
         assertNotNull( bltDataProjector );
     }
 

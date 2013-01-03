@@ -21,9 +21,10 @@
 
 package eu.baltrad.dex.auth.controller;
 
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.UserManager;
-import eu.baltrad.dex.auth.util.SecurityManager;
+import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.impl.AccountManager;
+import eu.baltrad.dex.auth.manager.SecurityManager;
+import eu.baltrad.dex.user.manager.impl.RoleManager;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +47,8 @@ import java.security.Principal;
 @Controller
 public class LoginController {
 
-    private UserManager userManager;
+    private AccountManager accountManager;
+    private RoleManager roleManager;
     private Logger log;
     
     /**
@@ -90,9 +92,11 @@ public class LoginController {
     public String welcome(Model model, Principal principal, HttpSession session) 
     {
         if (SecurityManager.getSessionUser(session) == null) {
-            User user = userManager.load(principal.getName());
-            SecurityManager.setSessionUser(session, user);
-            log.info("User " + user.getName() + " signed in");
+            Account account = accountManager.load(principal.getName());
+            SecurityManager.setSessionUser(session, account);
+            SecurityManager.setSessionRole(session, 
+                    roleManager.load(account.getRoleName()));
+            log.info("User " + account.getName() + " signed in");
         }
         return "home";
     }  
@@ -106,17 +110,26 @@ public class LoginController {
     @RequestMapping("/logout.htm")
     public String logout(Model model, HttpSession session) {
         SecurityManager.resetSessionUser(session);
+        SecurityManager.resetSessionRole(session);
         model.addAttribute("logout_message", "true");
         return "login";
     }
     
     /**
-     * Sets reference to user manager object.
-     * @param userManager User manager object.
+     * Sets reference to account manager object.
+     * @param accountManager Account manager object.
      */
     @Autowired
-    public void setUserManager(UserManager userManager ) { 
-        this.userManager = userManager; 
+    public void setAccountManager(AccountManager accountManager ) { 
+        this.accountManager = accountManager; 
+    }
+
+    /**
+     * @param roleManager the roleManager to set
+     */
+    @Autowired
+    public void setRoleManager(RoleManager roleManager) {
+        this.roleManager = roleManager;
     }
     
 }
