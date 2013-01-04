@@ -240,7 +240,6 @@ public class SaveDataSourceController {
                             {
                                 subscriptionManager.delete(s.getId());
                             }
-
                         }
                     }
                     // Configure filters
@@ -308,7 +307,7 @@ public class SaveDataSourceController {
                     .loadRadar(Integer.parseInt(dsId));
             List<Radar> allButSelectedRadars = new ArrayList<Radar>();
             for (Radar radar : radarManager.load()) {
-                if (!selectedRadars.contains(radar)) {
+                if (!selectedRadars.contains(radar)) {       
                     allButSelectedRadars.add(radar);
                 }
             }
@@ -385,13 +384,28 @@ public class SaveDataSourceController {
                     .loadUser(Integer.parseInt(dsId));
             List<Account> allButSelectedUsers = new ArrayList<Account>();
             for (Account account : userManager.load()) {
-                if (!containsUser(selectedUsers, account.getName())) {
+                if (!selectedUsers.contains(account)) {
                     allButSelectedUsers.add(account);
                 }
             }
             return allButSelectedUsers;
         } else {
             return userManager.load();
+        }
+    }
+    
+    /**
+     * Get selected users.
+     * @param dsId Data source id
+     * @return List of selected users
+     */
+    @ModelAttribute("selected_users")
+    public List<Account> getSelectedUsers(
+            @RequestParam(value="ds_id", required=false) String dsId) {
+        if (dsId != null) {
+            return dataSourceManager.loadUser(Integer.parseInt(dsId));
+        } else {
+            return null;
         }
     }
     
@@ -410,21 +424,6 @@ public class SaveDataSourceController {
             }
         }
         return result;
-    }
-    
-    /**
-     * Get selected users.
-     * @param dsId Data source id
-     * @return List of selected users
-     */
-    @ModelAttribute("selected_users")
-    public List<Account> getSelectedUsers(
-            @RequestParam(value="ds_id", required=false) String dsId) {
-        if (dsId != null) {
-            return dataSourceManager.loadUser(Integer.parseInt(dsId));
-        } else {
-            return null;
-        }
     }
     
     /**

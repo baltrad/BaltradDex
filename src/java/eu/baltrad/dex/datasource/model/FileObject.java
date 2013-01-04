@@ -67,29 +67,36 @@ public class FileObject implements Serializable {
     }
     
     /**
-     * Compares file object with another object.
-     * @param o Object to compare with
-     * @return True if objects are equal, false otherwise
+     * Compares this object with another.
+     * @param obj Object to compare with
+     * @return True is tested parameters are equal
      */
     @Override
-    public boolean equals(Object o) {
-        boolean res = false;
-        if (getClass() == o.getClass()) {
-            if (this.getName().equals(((FileObject) o).getName())) {
-                res = true;
-            }
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if(obj == null || this.getClass() != obj.getClass()) {
+            return false;
         }
-        return res;
+        FileObject fileObject = (FileObject) obj; 
+        return this.getName() != null && 
+               this.getName().equals(fileObject.getName()) && 
+               this.getDescription() != null &&
+               this.getDescription().equals(fileObject.getDescription());
     }
     
     /**
-     * Creates file object identifier hash code.
-     *
-     * @return File object identifier hash code or 0 if identifier is null
+     * Generate hash code.
+     * @return Hash code
      */
     @Override
     public int hashCode() {
-        return (name != null ? name.hashCode() : 0);
+        int prime = 7;
+        int result = 1;
+        result = prime * result + ((this.getName() == null) ? 
+                0 : this.getName().hashCode());
+        result = prime * result + ((this.getDescription() == null) ? 
+                0 : this.getDescription().hashCode());
+        return result;
     }
     
     /**

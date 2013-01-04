@@ -79,6 +79,69 @@ public class User implements Comparable<User> {
     }
     
     /**
+     * Compare objects based on user name.
+     * @param user User object to compare with
+     * @return 0 if objects are equal
+     */
+    public int compareTo(User user) { 
+        return getName().compareTo(user.getName()); 
+    }
+    
+    /**
+     * Compares this object with another.
+     * @param obj Object to compare with
+     * @return True is tested parameters are equal
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if(obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+        User user = (User) obj; 
+        return this.getName() != null && 
+               this.getName().equals(user.getName()) && 
+               this.getPassword() != null &&
+               this.getPassword().equals(user.getPassword()) &&
+               this.getOrgName() != null && 
+               this.getOrgName().equals(user.getOrgName()) &&
+               this.getOrgUnit() != null && 
+               this.getOrgUnit().equals(user.getOrgUnit()) &&
+               this.getLocality() != null &&
+               this.getLocality().equals(user.getLocality()) &&
+               this.getState() != null &&
+               this.getState().equals(user.getState()) &&
+               this.getCountryCode() != null &&
+               this.getCountryCode().equals(user.getCountryCode());
+    }
+    
+    /**
+     * Generate hash code.
+     * @return Hash code
+     */
+    @Override
+    public int hashCode() {
+        int prime = 7;
+        int result = 1;
+        result = prime * result + ((this.getName() == null) ? 
+                0 : this.getName().hashCode());
+        result = prime * result + ((this.getPassword() == null) ? 
+                0 : this.getPassword().hashCode());
+        result = prime * result + ((this.getOrgName() == null) ? 
+                0 : this.getOrgName().hashCode());
+        result = prime * result + ((this.getOrgUnit() == null) ? 
+                0 : this.getOrgUnit().hashCode());
+        result = prime * result + ((this.getLocality() == null) ? 
+                0 : this.getLocality().hashCode());
+        result = prime * result + ((this.getState() == null) ? 
+                0 : this.getState().hashCode());
+        result = prime * result + ((this.getCountryCode() == null) ? 
+                0 : this.getCountryCode().hashCode());
+        return result;
+    }
+    
+    
+    /**
      * Gets user id.
      *
      * @return User id
@@ -192,12 +255,4 @@ public class User implements Comparable<User> {
         this.countryCode = countryCode;
     }
     
-    /**
-     * Compare objects based on user name.
-     * @param user User object to compare with
-     * @return 0 if objects are equal
-     */
-    public int compareTo(User user) { 
-        return getName().compareTo(user.getName()); 
-    }
 }

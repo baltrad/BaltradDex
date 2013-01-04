@@ -86,6 +86,52 @@ public class Radar implements Serializable {
         this.radarWmo = radarWmo;
     }
     
+    /**
+     * Compares this object with another.
+     * @param obj Object to compare with
+     * @return True is tested parameters are equal
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if(obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+        Radar radar = (Radar) obj; 
+        return this.getCountryCode() != null && 
+               this.getCountryCode().equals(radar.getCountryCode()) && 
+               this.getCenterCode() != null &&
+               this.getCenterCode().equals(radar.getCenterCode()) &&
+               this.getCenterNumber() == radar.getCenterNumber() &&
+               this.getRadarPlace() != null && 
+               this.getRadarPlace().equals(radar.getRadarPlace()) &&
+               this.getRadarCode() != null && 
+               this.getRadarCode().equals(radar.getRadarCode()) &&
+               this.getRadarWmo() != null &&
+               this.getRadarWmo().equals(radar.getRadarWmo());
+    }
+    
+    /**
+     * Generate hash code.
+     * @return Hash code
+     */
+    @Override
+    public int hashCode() {
+        int prime = 7;
+        int result = 1;
+        result = prime * result + ((this.getCountryCode() == null) ? 
+                0 : this.getCountryCode().hashCode());
+        result = prime * result + ((this.getCenterCode() == null) ? 
+                0 : this.getCenterCode().hashCode());
+        result = prime * result + this.getCenterNumber();
+        result = prime * result + ((this.getRadarPlace() == null) ? 
+                0 : this.getRadarPlace().hashCode());
+        result = prime * result + ((this.getRadarCode() == null) ? 
+                0 : this.getRadarCode().hashCode());
+        result = prime * result + ((this.getRadarWmo() == null) ? 
+                0 : this.getRadarWmo().hashCode());
+        return result;
+    }
     
     /**
      * @return the id
