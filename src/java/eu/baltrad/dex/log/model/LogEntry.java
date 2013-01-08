@@ -23,9 +23,6 @@ package eu.baltrad.dex.log.model;
 
 import java.io.Serializable;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import java.util.Date;
 
 /**
@@ -37,22 +34,18 @@ import java.util.Date;
  */
 public class LogEntry implements Serializable {
     
-    private final static String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
-    
     /** Log entry ID */
     private int id;
     /** Current time in milliseconds */
     private long timeStamp;
-    /** Date and time in a given format */
-    private String dateTime;
+    /** Date */
+    private Date date;
     /** Logger that generated the message */
     private String logger;
     /** Message level: INFO, WARN, ERROR */
     private String level;
     /** Message body */
     private String message;
-    /** Date format */
-    private DateFormat format = new SimpleDateFormat(DATE_FORMAT);
     
     /**
      * Constructor.
@@ -66,7 +59,7 @@ public class LogEntry implements Serializable {
             String message) {
         this.id = id;
         this.timeStamp = timeStamp;
-        this.dateTime = format.format(new Date(timeStamp));
+        this.date = new Date(timeStamp);
         this.logger = logger;
         this.level = level;
         this.message = message;
@@ -81,7 +74,7 @@ public class LogEntry implements Serializable {
      */
     public LogEntry(long timeStamp, String logger, String level, String message) {
         this.timeStamp = timeStamp;
-        this.dateTime = format.format(new Date(timeStamp));
+        this.date = new Date(timeStamp);
         this.logger = logger;
         this.level = level;
         this.message = message;
@@ -112,19 +105,19 @@ public class LogEntry implements Serializable {
     public void setTimeStamp(long timeStamp ) { this.timeStamp = timeStamp; }
     
     /**
-     * Get formatted date and time.
-     * @return Formatted date and time
+     * Get date.
+     * @return Date
      */
-    public String getDateTime() {
-        return dateTime;
+    public Date getDate() {
+        return date;
     }
 
     /**
-     * Set formatted date and time.
-     * @param dateTime Formatted date and time
+     * Set date.
+     * @param date Date to set
      */
-    public void setDateTime(String dateTime) {
-        this.dateTime = dateTime;
+    public void setDate(Date date) {
+        this.date = date;
     }
     
     /**

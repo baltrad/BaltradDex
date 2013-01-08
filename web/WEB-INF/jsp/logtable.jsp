@@ -69,12 +69,14 @@ Author     : szewczenko
             <div class="entry">
                 <div id="cell" class="logdate">
                     <div class="<%=style%>">
-                        <c:out value="${fn:substring(entry.dateTime, 0, 10)}"/>
+                        <fmt:formatDate value="${entry.date}" 
+                                        pattern="yyyy/dd/MM"/>
                     </div>
                 </div>
                 <div id="cell" class="logtime">
                     <div class="<%=style%>">
-                        <c:out value="${fn:substring(entry.dateTime, 10, 19)}"/>
+                        <fmt:formatDate value="${entry.date}" 
+                                        pattern="HH:mm:ss"/>
                     </div>
                 </div>
                 <c:choose>

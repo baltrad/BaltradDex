@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.net.model;
 
+import java.util.Date;
+
 /**
  * Baltrad subscription interface.
  *
@@ -40,6 +42,10 @@ public interface ISubscription {
     public long getTimeStamp();
     
     public void setTimeStamp(long timeStamp);
+    
+    public Date getDate();
+    
+    public void setDate(Date date);
     
     public String getType();
     

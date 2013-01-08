@@ -80,7 +80,7 @@ Author     : szewczenko
                                             <c:out value="${sub.dataSource}"/>
                                         </div>
                                         <div id="cell" class="timestamp">
-                                            <fmt:formatDate value="${sub.timestamp}" 
+                                            <fmt:formatDate value="${sub.date}" 
                                                             pattern="yyyy/dd/MM HH:mm:ss"/>
                                         </div>
                                         <div id="cell" class="active">

@@ -100,9 +100,7 @@ public class User implements Comparable<User> {
         }
         User user = (User) obj; 
         return this.getName() != null && 
-               this.getName().equals(user.getName()) && 
-               this.getPassword() != null &&
-               this.getPassword().equals(user.getPassword()) &&
+               this.getName().equals(user.getName()) &&
                this.getOrgName() != null && 
                this.getOrgName().equals(user.getOrgName()) &&
                this.getOrgUnit() != null && 
