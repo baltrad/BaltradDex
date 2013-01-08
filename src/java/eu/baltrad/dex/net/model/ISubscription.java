@@ -39,10 +39,6 @@ public interface ISubscription {
     
     public void setId(int id);
     
-    public long getTimeStamp();
-    
-    public void setTimeStamp(long timeStamp);
-    
     public Date getDate();
     
     public void setDate(Date date);

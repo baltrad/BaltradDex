@@ -25,15 +25,12 @@ import eu.baltrad.dex.net.util.json.impl.JsonUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.user.model.Account;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Json utility test.
@@ -56,13 +53,13 @@ public class JsonUtilTest {
             + "description\":\"Yet another test data source\"}]";
         
     private static final String JSON_SUBSCRIPTIONS = "[{\"id\":1,\"type\":\"" + 
-            "download\",\"timeStamp\":1340189763867,\"active\":true,\"user\":" +
+            "download\",\"date\":1340189763867,\"active\":true,\"user\":" +
             "\"User1\",\"dataSource\":\"DataSource1\",\"operator\":\"" + 
             "Operator1\",\"syncronized\":true},{\"id\":2,\"type\":\"download" + 
-            "\",\"timeStamp\":1340189763867,\"active\":true,\"user\":\"" + 
+            "\",\"date\":1340189763867,\"active\":true,\"user\":\"" + 
             "User2\",\"dataSource\":\"DataSource2\",\"operator\":\"Operator2" + 
             "\",\"syncronized\":false},{\"id\":3,\"type\":\"upload\",\"" +
-            "timeStamp\":1340189763867,\"active\":false,\"user\":\"User3\",\"" +
+            "date\":1340189763867,\"active\":false,\"user\":\"User3\",\"" +
             "dataSource\":\"DataSource3\",\"operator\":\"Operator3\",\"" + 
             "syncronized\":true}]"; 
             
@@ -153,6 +150,7 @@ public class JsonUtilTest {
     @Test
     public void subscriptionsToJson() {
         String s = classUnderTest.subscriptionsToJson(subscriptions);
+        
         assertNotNull(s);
         assertEquals(JSON_SUBSCRIPTIONS.length(), s.length());
     }
@@ -166,8 +164,8 @@ public class JsonUtilTest {
         
         for (int i = 0; i < subs.size(); i++) {
             assertEquals(subscriptions.get(i).getId(), subs.get(i).getId());
-            assertEquals(subscriptions.get(i).getTimeStamp(), 
-                    subs.get(i).getTimeStamp());
+            assertEquals(subscriptions.get(i).getDate(), 
+                    subs.get(i).getDate());
             assertEquals(subscriptions.get(i).getType(), 
                     subs.get(i).getType());
             assertEquals(subscriptions.get(i).getOperator(), 

@@ -29,8 +29,6 @@ import eu.baltrad.dex.net.model.impl.Node;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.manager.INodeManager;
-import eu.baltrad.dex.net.util.*;
-import eu.baltrad.dex.net.model.*;
 import eu.baltrad.dex.user.model.Account;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
@@ -77,22 +75,22 @@ public class UpdateSubscriptionControllerTest {
     
     private static final String JSON_SUBSCRIPTIONS_OK = 
             "[{\"id\":1,\"type\":\"" + 
-            "download\",\"timeStamp\":1340189763867,\"active\":true,\"user\":" +
+            "download\",\"date\":1340189763867,\"active\":true,\"user\":" +
             "\"User1\",\"dataSource\":\"DataSource1\",\"operator\":\"" + 
             "Operator1\",\"syncronized\":true},{\"id\":2,\"type\":\"download" + 
-            "\",\"timeStamp\":1340189763867,\"active\":true,\"user\":\"" + 
+            "\",\"date\":1340189763867,\"active\":true,\"user\":\"" + 
             "User2\",\"dataSource\":\"DataSource2\",\"operator\":\"Operator2" + 
             "\",\"syncronized\":false},{\"id\":3,\"type\":\"upload\",\"" +
-            "timeStamp\":1340189763867,\"active\":false,\"user\":\"User3\",\"" +
+            "date\":1340189763867,\"active\":false,\"user\":\"User3\",\"" +
             "dataSource\":\"DataSource3\",\"operator\":\"Operator3\",\"" + 
             "syncronized\":true}]";
             
     private static final String JSON_SUBSCRIPTIONS_PARTIAL =
             "[{\"id\":1,\"type\":\"" + 
-            "download\",\"timeStamp\":1340189763867,\"active\":true,\"user\":" +
+            "download\",\"date\":1340189763867,\"active\":true,\"user\":" +
             "\"User1\",\"dataSource\":\"DataSource1\",\"operator\":\"" + 
             "Operator1\",\"syncronized\":true},{\"id\":3,\"type\":\"upload\"" +
-            ",\"timeStamp\":1340189763867,\"active\":false,\"user\":\"User3\"" +
+            ",\"date\":1340189763867,\"active\":false,\"user\":\"User3\"" +
             ",\"dataSource\":\"DataSource3\",\"operator\":\"Operator3\",\"" + 
             "syncronized\":true}]";
     

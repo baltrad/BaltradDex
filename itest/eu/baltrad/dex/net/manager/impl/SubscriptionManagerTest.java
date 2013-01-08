@@ -113,7 +113,7 @@ public class SubscriptionManagerTest extends TestCase {
     
     private boolean compare(Subscription s1, Subscription s2) {
         return s1.getId() == s2.getId() &&
-               s1.getTimeStamp() == s2.getTimeStamp() &&
+               s1.getDate().equals(s2.getDate()) &&
                s1.getType().equals(s2.getType()) && 
                s1.getOperator().equals(s2.getOperator()) &&
                s1.getUser().equals(s2.getUser()) &&
@@ -125,7 +125,7 @@ public class SubscriptionManagerTest extends TestCase {
     public void testLoadById() throws Exception {
         Subscription expected = new Subscription();
         expected.setId(2);
-        expected.setTimeStamp(format.parse("2012-04-24 14:10:00").getTime());
+        expected.setDate(format.parse("2012-04-24 14:10:00"));
         expected.setUser("User2");
         expected.setDataSource("DataSource2");
         expected.setOperator("TestNode1");
@@ -156,7 +156,7 @@ public class SubscriptionManagerTest extends TestCase {
     public void testLoadByUser() throws Exception {
         Subscription expected = new Subscription();
         expected.setId(3);
-        expected.setTimeStamp(format.parse("2012-04-24 14:20:00").getTime());
+        expected.setDate(format.parse("2012-04-24 14:20:00"));
         expected.setUser("User2");
         expected.setDataSource("DataSource3");
         expected.setOperator("TestNode2");
@@ -186,7 +186,7 @@ public class SubscriptionManagerTest extends TestCase {
     public void testUpdate() throws Exception {
         Subscription expected = new Subscription();
         expected.setId(3);
-        expected.setTimeStamp(format.parse("2012-04-24 15:20:00").getTime());
+        expected.setDate(format.parse("2012-04-24 15:20:00"));
         expected.setUser("User2");
         expected.setDataSource("DataSource3");
         expected.setOperator("TestNode2");

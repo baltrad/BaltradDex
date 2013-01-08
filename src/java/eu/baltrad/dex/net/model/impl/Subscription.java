@@ -25,9 +25,6 @@ import eu.baltrad.dex.net.model.ISubscription;
 
 import java.io.Serializable;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import java.util.Date;
 
 /**
@@ -40,7 +37,6 @@ import java.util.Date;
 public class Subscription implements ISubscription, Serializable {
     
     private int id;
-    private long timeStamp;
     private Date date;
     private String type;
     private String operator;
@@ -69,7 +65,6 @@ public class Subscription implements ISubscription, Serializable {
             String operator, String user, String dataSource, 
             boolean active, boolean sync) {
         this.id = id;
-        this.timeStamp = timeStamp;
         this.date = new Date(timeStamp);
         this.type = type;
         this.operator = operator;
@@ -91,7 +86,6 @@ public class Subscription implements ISubscription, Serializable {
      */
     public Subscription(long timeStamp, String type, String operator, 
             String user, String dataSource, boolean active, boolean sync) {
-        this.timeStamp = timeStamp;
         this.date = new Date(timeStamp);
         this.type = type;
         this.operator = operator;
@@ -113,20 +107,6 @@ public class Subscription implements ISubscription, Serializable {
      */
     public void setId(int id) {
         this.id = id;
-    }
-
-    /**
-     * @return the timeStamp
-     */
-    public long getTimeStamp() {
-        return timeStamp;
-    }
-
-    /**
-     * @param timeStamp the timeStamp to set
-     */
-    public void setTimeStamp(long timeStamp) {
-        this.timeStamp = timeStamp;
     }
     
     /**

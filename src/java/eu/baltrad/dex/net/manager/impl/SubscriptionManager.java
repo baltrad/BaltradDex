@@ -233,7 +233,7 @@ public class SubscriptionManager implements ISubscriptionManager {
                             Connection conn) throws SQLException {
                         PreparedStatement ps = conn.prepareStatement(sql,
                                 new String[] {"id"});
-                        ps.setLong(1, s.getTimeStamp());
+                        ps.setLong(1, s.getDate().getTime());
                         ps.setString(2, s.getType());
                         ps.setBoolean(3, s.isActive());
                         ps.setBoolean(4, s.isSyncronized());
@@ -271,7 +271,7 @@ public class SubscriptionManager implements ISubscriptionManager {
             jdbcTemplate.update(
                     "UPDATE dex_subscriptions SET time_stamp = ?, type = ?, " + 
                     "active = ?, sync = ? WHERE id = ?",
-                s.getTimeStamp(),
+                s.getDate().getTime(),
                 s.getType(),
                 s.isActive(),
                 s.isSyncronized(),
