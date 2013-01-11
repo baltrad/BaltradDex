@@ -49,7 +49,6 @@ import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
-import java.io.InputStream;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -160,7 +159,7 @@ public class PostFileServlet extends HttpServlet {
     {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
-        try {            
+        try {
             if (authenticator.authenticate(req.getMessage(), 
                     req.getSignature(), req.getNodeName())) {
                 log.info("New data file received from " + req.getNodeName());
@@ -212,7 +211,7 @@ public class PostFileServlet extends HttpServlet {
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
                     messages.getMessage(PF_UNAUTHORIZED_REQUEST_KEY));
             }
-        } catch (KeyczarException e) {   
+        } catch (KeyczarException e) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
                     messages.getMessage(PF_MESSAGE_VERIFIER_ERROR_KEY));    
         } catch (DuplicateEntry e) {

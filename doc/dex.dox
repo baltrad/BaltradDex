@@ -49,7 +49,6 @@
 		-# \ref data_sources
 		-# \ref subscription_settings
 		-# \ref registry_settings
-		-# \ref exchange_settings
 		-# \ref messages_settings
 		-# \ref accounts	
 		-# \ref node_settings
@@ -62,9 +61,9 @@
 	-# \ref exchange_auth 
 		-# \ref exchange_hdr
 		-# \ref exchange_sign
-	-# \ref exchange_get_datasource
-	-# \ref exchange_post_subscription
-	-# \ref exchange_get_subscription
+	-# \ref exchange_datasource_listing
+	-# \ref exchange_start_subscription
+	-# \ref exchange_update_subscription
 	-# \ref exchange_post_file
 	-# \ref exchange_post_message
 
@@ -454,17 +453,18 @@ BaltradDex provides radar interface which allows to access data from  a given
 radar station. Radar interface is not used directly - it is selected as a 
 basic parameter of data source (see the next section). In order to configure 
 radar, go to \p Settings tab and click <tt>Radars</tt> and \p Add.
-In the text boxes type radar station name and WMO identification number. Make
-sure that radar parameters are correct and Click \p Save button to save 
-configuration. 
+Select desired center from the list on the left by clicking on the center 
+identifier. Identifiers have the following form: Country code - GTS code - 
+center number. Once clicked, the box on the right reveals the list of 
+radar stations available for a given center. Radar station names are 
+presented in the following form: Place - radar code - WMO number.    
+Click \p Save button to save radar configuration. 
 
 \image html save_radar.png
 
 \note
-Use \p Edit and \p Remove options available in <tt>Radars</tt> menu in 
-order to modify radar parameters or delete radar from the system.
-Note that in case when name of existing radar is modified, it will
-be saved as a new radar.      
+Use \p Show option from \p Radars menu to display the list of currently 
+configured radar stations. \p Remove option will delete selected radars.
 \endnote
 
 \subsection quick_data_sources Data sources  
@@ -843,43 +843,40 @@ subscribes data source X on node B. Then subscription status on node A is erased
 due to some kind of error or faulty database operation. In such case information
 about subscribed data source X still exists on node B, but no longer on node A.
 To get rid of invalid subscription, user at node B should click \p Subscriptions 
-item to expand menu. Here are two options: \p Download and \p Upload, by analogy
-to subscription types described in \ref subscription_status. In this particular 
-case there is invalid subscription of data source X at node B. User should 
-click \p Upload item. The following page will be displayed.     
+item to expand menu. Two options are available: <tt>Remove downloads</tt> and 
+<tt>Remove uploads</tt>, by analogy to subscription types described in 
+\ref subscription_status. Let's say there invalid subscription of data source 
+X at node B was discovered. User should click <tt>Remove uploads</tt> item. 
+The following page will be displayed.     
 
-\image html subscription_upload_settings.png
+\image html subscriptions_remove_upload.png
 
 The page presents information about local data sources and respective 
 subscribers. Click \p Select checkbox next to the desired subscription entry
-and \p OK to remove. Invalid subscription entry will be deleted.   
+and \p OK to remove. User will be asked to confirm subscription removal with 
+the following warning.
+
+\image html subscriptions_remove_upload_warn.png
+
+Click \p OK to confirm. Invalid subscription entries will be deleted.   
 \n
 \n
 The same operation can be performed on data downloads, that is subscriptions of
-data sources at peer nodes. User can remove subscriptions selecting \p 
-Download option from the menu. The following page presents information 
-about data downloads.   
+data sources at peer nodes. User can remove subscriptions selecting 
+<tt>Remove downloads</tt> option from the menu. The following page presents 
+information about data downloads.   
 
-\image html subscription_download_settings.png
+\image html subscriptions_remove_download.png
 
 The page contains information about subscribed data sources and respective
 operators (peer nodes), as well as about subscription status (active /inactive).
 In order to remove subscription, click \p Select checkbox next to the desired 
-subscription entry and \p OK to remove. Selected subscription entry will be
-deleted     
+subscription entry and \p OK to remove. User will be asked to confirm 
+subscription removal with the following warning.     
 
-\note
-System will prevent user from removing active subscription. In case of an 
-attempt to remove active subscription, the following message will be shown.
-\n
-\n
-\image html subscription_download_settings_warning.png
-\n
-The assumption behind this design is to prevent situations where subscription 
-status between the nodes becomes unsynchronized due to improper usage of 
-subscription management functionality. Nevertheless this concept will probably 
-be modified or dropped due to negative users' feedback.       
-\endnote
+\image html subscriptions_remove_download_warn.png
+
+Click \p OK to confirm. Invalid subscription entries will be deleted.   
 
 \subsection registry_settings Delivery registry settings
 
@@ -901,21 +898,6 @@ This option should be used with care. It is recommended to set limit on either
 number or age of delivery registry entries instead, as described above.     
 
 \image html registry_clear.png
-
-\subsection exchange_settings Exchange settings
-
-When user connects to a peer node, connection parameters are stored, so the 
-next time user connects to the same node, node address doesn't have to be typed,
-but instead it is available in the drop-down list (see \ref conn section for 
-details). In some situations it may be necessary to get rid of outdated 
-connections (e.g. when stored peer node address is no longer valid). In such 
-case, click \p Exchange option and select \p Connections item. 
-
-\image html exchange_settings.png
-
-The page contains list of all stored node connections. To remove invalid node 
-connection, click a checkbox next to a given node name. Click \p OK. Selected
-connection will be removed from the system.  
 
 \subsection messages_settings Messages settings 
 
@@ -1008,6 +990,25 @@ Refer to \ref quick_node_settings section.
 This section will be gradually updated, as the list of known problems is build
 based on users' feedback.
 
+\par
+<b>Q:</b> Can't sing in to application locally with a given user name and password.
+\par
+<b>A:</b> Make sure that user credentials are valid. In case user account is correct,
+verify that PostgreSQL server process is running on the node: 
+\code
+ps -ef |grep postgres
+\endcode
+In case PostgreSQL is not present, run server control script in order to launch 
+the process.
+\code
+/opt/PostgreSQL/9.1/scripts/serverctl.sh start
+\endcode 
+Note that PostgreSQL executables might be located elswhere depending on the type
+of installation.
+
+
+
+
 \page exchange_format Data exchange format
 
 \section exchange_general General information
@@ -1054,6 +1055,7 @@ from the following request elements:
 	- Request URI
 	- Content-Type request header
 	- Content-MD5 request header
+	- Date
   
 Typical input message will look like the following:
 \code
@@ -1061,6 +1063,7 @@ GET
 http://example.baltrad.eu:8084/BaltradDex/get_datasource_listing.htm
 text/html
 aHR0cDovLzE ...
+Fri, 6 Jul 2012 13:00:26 CEST
 \endcode
 
 \attention
@@ -1081,7 +1084,7 @@ authenticate the request on server side, the server will response with
 to find a public key matching user name provided in \p Authorization header, 
 <tt>HTTP 500 Internal Server Error</tt> response is returned.
 
-\section exchange_get_datasource Get data source listing request
+\section exchange_datasource_listing Data source listing request
 
 \par
 \b Description
@@ -1093,21 +1096,29 @@ available for a given user to subscribe.
 \b Request
 
 \par
-- Request URI: <tt>get_datasource_listing.htm</tt>
-- Method: <tt>GET</tt>
-- Headers: <tt>Node-Name, Node-Address, Content-Type, Content-MD5, Date, 
-				Authorization</tt>
-- Body: <tt>No content</tt>
+- Request URI: <tt>datasource_listing.htm</tt>
+- Method: <tt>POST</tt>
+- Headers: <tt>Node-Name, Content-Type, Content-MD5, Date, Authorization</tt>
+- Body: <tt>Subscriber node's credentials</tt>
 \n
-\n <b>Example:</b>
+\n
+- <b>Example:</b>
 \code
-GET http://example.baltrad.eu:8084/BaltradDex/get_datasource_listing.htm HTTP/1.1
-Node-Name: test.baltrad.eu
-Node-Address: http://test.baltrad.eu
-Content-Type: text/html
+POST http://baltrad.imgw.pl:8084/BaltradDex/datasource_listing.htm HTTP/1.1
+Node-Name: baltrad.imgw.pl
+Content-Type: application/json
 Content-MD5: aHR0cDovLzE ...
 Date: Fri, 6 Jul 2012 13:00:26 CEST
-Authorization: test.baltrad.eu:APa7608wLQI ...
+Authorization: baltrad.imgw.pl:APa7608wLQI ...
+{
+  "name":"baltrad.imgw.pl",
+  "nodeAddress":"http://baltrad.imgw.pl:8084",
+  "orgName":"Institute of Meteorology and Water Management",
+  "orgUnit":"Remote Sensing Department",
+  "locality":"Warsaw",
+  "state":"Poland",
+  "countryCode":"PL"
+}
 \endcode
 \par
 \note
@@ -1117,32 +1128,53 @@ Content-MD5 header value consists of Base64-encoded request URI.
 \b Response
 
 \par
-- Headers: <tt>Node-Name, Node-Address</tt>
+- Headers: <tt>Node-Name</tt>
 - Status: 
-     - <tt>200 OK</tt> : Success
+     - <tt>200 OK</tt> : Success - data sources subscribed
+	 - <tt>201 Created</tt> : Success - user account established
      - <tt>401 Unauthorized</tt> : Server failed to authenticate request
      - <tt>500 Internal server error</tt> : Server error			
-- Body: <tt>List of data sources</tt>
+- Body: 
+	- <tt>201</tt> : User account credentials
+	- <tt>200</tt> : List of subscribed data sources
 \n
-\n <b>Example:</b>
+\n
+- <b>Example 201 response:</b>
 \code
-Node-Name: example.baltrad.eu
-Node-Address: http://example.baltrad.eu
+Node-Name: baltrad-backup.imgw.pl
+{
+  "name":"baltrad.imgw.pl",
+  "nodeAddress":"http://baltrad.imgw.pl:8084",
+  "orgName":"Institute of Meteorology and Water Management",
+  "orgUnit":"Remote Sensing Department",
+  "locality":"Warsaw",
+  "state":"Poland",
+  "countryCode":"PL"
+}
+\endcode
+- <b>Example 200 response:</b>
+\code
+Node-Name: baltrad-backup.imgw.pl
 [
   {
-    "name":"PastewnikPVOL",
-    "id":2,
-    "description":"Polar volumes from Pastewnik"
-  },			               
+    "name":"PoznańSCAN",
+    "id":12,
+    "description":"Polar scans from Poznań"
+  },
   {
     "name":"LegionowoPVOL",
-    "id":1,
+    "id":11,
     "description":"Polar volumes from Legionowo"
+  },
+  {
+    "name":"PastewnikALL",
+    "id":13,
+    "description":"Polar scans and volumes from Pastewnik"
   }
 ]
 \endcode
 
-\section exchange_post_subscription Post subscription request
+\section exchange_start_subscription Start subscription request
 
 \par
 \b Description
@@ -1154,35 +1186,32 @@ subscribed data sources.
 \b Request
 
 \par
-- Request URI: <tt>post_subscription.htm</tt>
+- Request URI: <tt>start_subscription.htm</tt>
 - Method: <tt>POST</tt>
-- Headers: <tt>Node-Name, Node-Address, Content-Type, Content-MD5, Date, 
-				Authorization</tt>
+- Headers: <tt>Node-Name, Content-Type, Content-MD5, Date, Authorization</tt>
 - Body: <tt>List of data sources selected for subscription</tt>
 \n
-\n <b>Example:</b>
+\n
+- <b>Example:</b>
 \code
-POST http://example.baltrad.eu:8084/BaltradDex/post_subscription.htm HTTP/1.1
-Node-Name: test.baltrad.eu
-Node-Address: http://test.baltrad.eu
+POST http://baltrad.imgw.pl:8084/BaltradDex/start_subscription.htm HTTP/1.1
+Node-Name: baltrad.imgw.pl
 Content-Type: application/json
 Content-MD5: aHR0cDovLzE ...
 Date: Fri, 6 Jul 2012 13:00:26 CEST
-Authorization: test.baltrad.eu:APa7608wLQI ...
+Authorization: baltrad.imgw.pl:APa7608wLQI ...
 [
   {
-    "name":"PastewnikPVOL",
-    "id":2,
-    "description":"Polar volumes from Pastewnik"
+    "name":"PoznańSCAN",
+    "id":12,
+    "description":"Polar scans from Poznań"
   },
   {
     "name":"LegionowoPVOL",
-    "id":1,
+    "id":11,
     "description":"Polar volumes from Legionowo"
   }
 ]
-
-
 \endcode
 \par
 \note
@@ -1193,7 +1222,7 @@ selected for subscription.
 \b Response
 
 \par
-- Headers: <tt>Node-Name, Node-Address</tt>
+- Headers: <tt>Node-Name</tt>
 - Status: 
      - <tt>200 OK</tt> : Success
      - <tt>206 Partial Content</tt> : Subscription request was completed partially
@@ -1202,16 +1231,16 @@ selected for subscription.
      - <tt>500 Internal server error</tt> : Server error 					
 - Body: <tt>List of successfully subscribed data sources</tt>
 \n
-\n <b>Example:</b>
+\n
+- <b>Example:</b>
 \code
-Node-Name: example.baltrad.eu
-Node-Address: http://example.baltrad.eu
+Node-Name: baltrad-backup.imgw.pl
 [
   {
-    "name":"PastewnikPVOL",
+    "name":"PoznańSCAN",
     "id":0,
-    "description":"Polar volumes from Pastewnik"
-  },			               
+    "description":"Polar scans from Poznań"
+  },
   {
     "name":"LegionowoPVOL",
     "id":0,
@@ -1220,7 +1249,7 @@ Node-Address: http://example.baltrad.eu
 ]
 \endcode
 
-\section exchange_get_subscription Get subscription request
+\section exchange_update_subscription Update subscription request
 
 \par
 \b Description
@@ -1232,43 +1261,40 @@ subscriptions.
 \b Request
 
 \par
-- Request URI: <tt>get_subscription.htm</tt>
+- Request URI: <tt>update_subscription.htm</tt>
 - Method: <tt>POST</tt>
-- Headers: <tt>Node-Name, Node-Address, Content-Type, Content-MD5, Date, 
-				Authorization</tt>
+- Headers: <tt>Node-Name, Content-Type, Content-MD5, Date, Authorization</tt>
 - Body: <tt>List of subscriptions</tt>
 \n
-\n <b>Example:</b>
+\n 
+- <b>Example:</b>
 \code
-POST http://example.baltrad.eu:8084/BaltradDex/get_subscription.htm HTTP/1.1
-Node-Name: test.baltrad.eu
-Node-Address: http://test.baltrad.eu
+POST http://baltrad.imgw.pl:8084/BaltradDex/update_subscription.htm HTTP/1.1
+Node-Name: baltrad.imgw.pl
 Content-Type: application/json
 Content-MD5: aHR0cDovLzE ...
 Date: Fri, 6 Jul 2012 13:00:26 CEST
-Authorization: test.baltrad.eu:APa7608wLQI ...
+Authorization: baltrad.imgw.pl:APa7608wLQI ...
 [
-  { 
-    "id":11,
-    "type":"download",
-    "timeStamp":1341836838130,
-    "userName":"test.baltrad.eu",
-    "operatorName":"example.baltrad.eu",
-    "active":true,
-    "nodeAddress":"http://test.baltrad.eu:8084",
-    "dataSourceName":"PastewnikPVOL",
-    "synkronized":true
-  },
   {
-    "id":12,
+    "id":19,
     "type":"download",
-    "timeStamp":1341836838162,
-    "userName":"test.baltrad.eu",
-    "operatorName":"example.baltrad.eu",
-    "active":false,
-    "nodeAddress":"http://test.baltrad.eu:8084",
-    "dataSourceName":"LegionowoPVOL",
-    "synkronized":true
+    "date":1357909585672,
+    "active":true,
+    "dataSource":"LegionowoPVOL",
+    "operator":"baltrad-backup.imgw.pl",
+    "user":"baltrad.imgw.pl",
+    "syncronized":true
+  },  
+  {
+    "id":18,
+    "type":"download",
+    "date":1357909585757,
+    "active":true,
+    "dataSource":"PoznańSCAN",
+    "operator":"baltrad-backup.imgw.pl",
+    "user":"baltrad.imgw.pl",
+    "syncronized":true
   }
 ]
 \endcode
@@ -1280,7 +1306,7 @@ Content-MD5 header value consists of Base64-encoded list of subscriptions.
 \b Response
 
 \par
-- Headers: <tt>Node-Name, Node-Address</tt>
+- Headers: <tt>Node-Name</tt>
 - Status: 
      - <tt>200 OK</tt> : Success
      - <tt>206 Partial Content</tt> : Subscription request was completed partially 
@@ -1289,32 +1315,30 @@ Content-MD5 header value consists of Base64-encoded list of subscriptions.
      - <tt>500 Internal server error</tt> : Server error 
 - Body: <tt>List of successfully updated subscriptions</tt>
 \n
-\n <b>Example:</b>
+\n 
+- <b>Example:</b>
 \code
-Node-Name: example.baltrad.eu
-Node-Address: http://example.baltrad.eu
+Node-Name: baltrad-backup.imgw.pl
 [
   {
-    "id":9,
+    "id":0,
     "type":"upload",
-    "timeStamp":1341836838078,
-    "userName":"test.baltrad.eu",
-    "operatorName":"example.baltrad.eu",
+    "date":1357909625659,
     "active":true,
-    "nodeAddress":"http://example.baltrad.eu:8084",
-    "dataSourceName":"PastewnikPVOL",
-    "synkronized":true
+    "dataSource":"LegionowoPVOL",
+    "operator":"baltrad-backup.imgw.pl",
+    "user":"baltrad.imgw.pl",
+    "syncronized":true
   },
   {
-    "id":10,
+    "id":0,
     "type":"upload",
-    "timeStamp":1341836838112,
-    "userName":"test.baltrad.eu",
-    "operatorName":"example.baltrad.eu",
-    "active":false,
-    "nodeAddress":"http://example.baltrad.eu:8084",
-    "dataSourceName":"LegionowoPVOL",
-    "synkronized":true
+    "date":1357909625706,
+    "active":true,
+    "dataSource":"PoznańSCAN",
+    "operator":"baltrad-backup.imgw.pl",
+    "user":"baltrad.imgw.pl",
+    "syncronized":true
   }
 ]
 \endcode
@@ -1332,19 +1356,18 @@ Node-Address: http://example.baltrad.eu
 \par
 - Request URI: <tt>post_file.htm</tt>
 - Method: <tt>POST</tt>
-- Headers: <tt>Node-Name, Node-Address, Content-Type, Content-MD5, Date, 
-				Authorization</tt>
+- Headers: <tt>Node-Name, Content-Type, Content-MD5, Date, Authorization</tt>
 - Body: <tt>File content</tt>
 \n
-\n <b>Example:</b>
+\n 
+- <b>Example:</b>
 \code
-POST http://example.baltrad.eu:8084/BaltradDex/post_file.htm HTTP/1.1
-Node-Name: test.baltrad.eu
-Node-Address: http://test.baltrad.eu
+POST http://baltrad.imgw.pl:8084/BaltradDex/post_file.htm HTTP/1.1
+Node-Name: baltrad.imgw.pl
 Content-Type: application/x-hdf5
 Content-MD5: aHR0cDovLzE ...
 Date: Fri, 6 Jul 2012 13:00:26 CEST
-Authorization: test.baltrad.eu:APa7608wLQI ...
+Authorization: baltrad.imgw.pl:APa7608wLQI ...
 <file content>
 \endcode
 \par
@@ -1355,7 +1378,7 @@ Content-MD5 header value consists of Base64-encoded request URI.
 \b Response
 
 \par
-- Headers: <tt>Node-Name, Node-Address</tt>
+- Headers: <tt>Node-Name</tt>
 - Status: 
      - <tt>200 OK</tt> : Success
      - <tt>401 Unauthorized</tt> : Server failed to authenticate request
@@ -1364,10 +1387,10 @@ Content-MD5 header value consists of Base64-encoded request URI.
      - <tt>500 Internal server error</tt> : Server error 		
 - Body: <tt>No content</tt>
 \n
-\n <b>Example:</b>
+\n 
+- <b>Example:</b>
 \code
-Node-Name: example.baltrad.eu
-Node-Address: http://example.baltrad.eu
+Node-Name: baltrad-backup.imgw.pl
 \endcode
 
 
@@ -1384,19 +1407,18 @@ interface. Reponse indicates post message operation result.
 \par
 - Request URI: <tt>post_message.htm</tt>
 - Method: <tt>POST</tt>
-- Headers: <tt>Node-Name, Node-Address, Content-Type, Content-MD5, Date, 
-				Authorization</tt>
+- Headers: <tt>Node-Name, Content-Type, Content-MD5, Date, Authorization</tt>
 - Body: <tt>Message string</tt>
 \n
-\n <b>Example:</b>
+\n 
+- <b>Example:</b>
 \code
-POST http://example.baltrad.eu:8084/BaltradDex/post_message.htm HTTP/1.1
-Node-Name: test.baltrad.eu
-Node-Address: http://test.baltrad.eu
+POST http://baltrad.imgw.pl:8084/BaltradDex/post_message.htm HTTP/1.1
+Node-Name: baltrad.imgw.pl
 Content-Type: text/html
 Content-MD5: aHR0cDovLzE ...
 Date: Fri, 6 Jul 2012 13:00:26 CEST
-Authorization: test.baltrad.eu:APa7608wLQI ...
+Authorization: baltrad.imgw.pl:APa7608wLQI ...
 <Message body>
 \endcode
 \par
@@ -1407,7 +1429,7 @@ Content-MD5 header value consists of Base64-encoded message body.
 \b Response
 
 \par
-- Headers: <tt>Node-Name, Node-Address</tt>
+- Headers: <tt>Node-Name</tt>
 - Status: 
      - <tt>200 OK</tt> : Success
      - <tt>401 Unauthorized</tt> : Server failed to authenticate request
@@ -1415,10 +1437,10 @@ Content-MD5 header value consists of Base64-encoded message body.
 											format  		
 - Body: <tt>No content</tt>
 \n
-\n <b>Example:</b>
+\n 
+- <b>Example:</b>
 \code
-Node-Name: example.baltrad.eu
-Node-Address: http://example.baltrad.eu
+Node-Name: baltrad-backup.imgw.pl
 \endcode
 
 \attention

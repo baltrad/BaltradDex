@@ -272,7 +272,6 @@ public class DataSourceListController implements MessageSetter {
                     model.addAttribute(PEER_NAME_KEY, peerNodeName);
                     String json = readResponse(res);
                     Account peer = jsonUtil.jsonToUserAccount(json);
-                    
                     if (accountManager.load(peer.getName()) == null) {
                         peer.setRoleName(Role.PEER);
                         try {
