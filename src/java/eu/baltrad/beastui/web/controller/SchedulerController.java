@@ -129,7 +129,6 @@ public class SchedulerController {
   @RequestMapping("/showschedule.htm")
   public String showSchedule(Model model,
       @RequestParam(value="emessage", required=false) String emessage) {
-    logger.debug("showSchedule");
     model.addAttribute("schedule", scheduler.getSchedule());
     model.addAttribute("emessage", emessage);
     return "showschedule";
@@ -155,7 +154,6 @@ public class SchedulerController {
     if (jobname != null) {
       try {
         String expression = cronutilities.createExpression(seconds, minutes, hours, daysOfMonth, months, daysOfWeek);
-        logger.debug("Cron Expression = " + expression);
         scheduler.register(expression, jobname);
         result = "redirect:showschedule.htm";
       } catch (Throwable t) {
@@ -203,7 +201,6 @@ public class SchedulerController {
         try {
           if (operation.equals("Modify")) {
             String expression = cronutilities.createExpression(seconds, minutes, hours, daysOfMonth, months, daysOfWeek);
-            logger.debug("Updating cron expression = " + expression);
             scheduler.reregister(entry.getId(), expression, jobname);
           } else if (operation.equals("Delete")) {
             scheduler.unregister(entry.getId());

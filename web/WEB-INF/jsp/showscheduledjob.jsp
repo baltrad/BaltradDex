@@ -26,229 +26,117 @@ Shows a scheduled job
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@page import="java.util.List"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="eu.baltrad.beastui.web.pojo.CronEntryMapping"%>
-
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>BALTRAD | Modify job</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
-            </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/processing_tab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/processing_menu.jsp"%>
-                    </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            Modify job
-                        </div>
-                        <div class="blttext">
-                            Modify or delete a scheduled job.
-                        </div>
-                        <div class="table">
-                            <%if (request.getAttribute("emessage") != null) {%>
-                                <div class="systemerror">
-                                    <div class="header">
-                                        Problems encountered.
-                                    </div>
-                                    <div class="message">
-                                        <%=request.getAttribute("emessage")%>
-                                    </div>
-                                </div>
-                            <%}%>
-                            <div class="modifyjob">
-                                <form name="showScheduledJobForm" action="showscheduledjob.htm">
-                                    <div class="leftcol">
-                                        <%
-                                          Integer iid = (Integer)request.getAttribute("id");
-                                          List<String> jobnames = (List<String>)request.getAttribute("jobnames");
-                                          List<CronEntryMapping> selectableSeconds = (List<CronEntryMapping>)request.getAttribute("selectableSeconds");
-                                          List<CronEntryMapping> selectableMinutes = (List<CronEntryMapping>)request.getAttribute("selectableMinutes");
-                                          List<CronEntryMapping> selectableHours = (List<CronEntryMapping>)request.getAttribute("selectableHours");
-                                          List<CronEntryMapping> selectableDaysOfMonth = (List<CronEntryMapping>)request.getAttribute("selectableDaysOfMonth");
-                                          List<CronEntryMapping> selectableMonths = (List<CronEntryMapping>)request.getAttribute("selectableMonths");
-                                          List<CronEntryMapping> selectableDaysOfWeek = (List<CronEntryMapping>)request.getAttribute("selectableDaysOfWeek");
-                                          List<String> seconds = (List<String>)request.getAttribute("seconds");
-                                          List<String> minutes = (List<String>)request.getAttribute("minutes");
-                                          List<String> hours = (List<String>)request.getAttribute("hours");
-                                          List<String> daysOfMonth = (List<String>)request.getAttribute("daysOfMonth");
-                                          List<String> months = (List<String>)request.getAttribute("months");
-                                          List<String> daysOfWeek = (List<String>)request.getAttribute("daysOfWeek");
-                                          String jobname = (String)request.getAttribute("jobname");
-
-                                          int id = (iid == null)?0:iid.intValue();
-                                          jobnames = (jobnames == null)?new ArrayList<String>():jobnames;
-                                          jobname = (jobname == null)?"":jobname;
-                                        %>
-                                        <div class="row4">Seconds</div>
-                                        <div class="row4">Minutes</div>
-                                        <div class="row4">Hours</div>
-                                        <div class="row4">Days of month</div>
-                                        <div class="row4">Months</div>
-                                        <div class="row4">Days of week</div>
-                                        <div class="row">Job name</div>
-                                    </div>
-                                    <div class="rightcol">
-                                        <div class="row4">
-                                            <select multiple size="4" name="seconds">
-                                              <%
-                                              for (CronEntryMapping entry : selectableSeconds) {
-                                                String selectstr = "";
-                                                if (seconds.contains(entry.getValue())) {
-                                                  selectstr = "selected";
-                                                }
-                                              %>
-                                              <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
-                                              <%
-                                              }
-                                              %>
-                                            </select>
-                                            <div class="hint">
-                                               Seconds
-                                            </div>
-                                          </div>
-                                          <div class="row4">
-                                            <select multiple size="4" name="minutes">
-                                              <%
-                                              for (CronEntryMapping entry : selectableMinutes) {
-                                                String selectstr = "";
-                                                if (minutes.contains(entry.getValue())) {
-                                                  selectstr = "selected";
-                                                }
-                                              %>
-                                              <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
-                                              <%
-                                              }
-                                              %>
-                                            </select>
-                                            <div class="hint">
-                                               Minutes
-                                            </div>
-                                          </div>
-                                          <div class="row4">
-                                            <select multiple size="4" name="hours">
-                                              <%
-                                              for (CronEntryMapping entry : selectableHours) {
-                                                String selectstr = "";
-                                                if (hours.contains(entry.getValue())) {
-                                                  selectstr = "selected";
-                                                }
-                                              %>
-                                              <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
-                                              <%
-                                              }
-                                              %>
-                                            </select>
-                                            <div class="hint">
-                                               Hours
-                                            </div>
-                                          </div>
-                                          <div class="row4">
-                                            <select multiple size="4" name="daysOfMonth">
-                                              <%
-                                              for (CronEntryMapping entry : selectableDaysOfMonth) {
-                                                String selectstr = "";
-                                                if (daysOfMonth.contains(entry.getValue())) {
-                                                  selectstr = "selected";
-                                                }
-                                              %>
-                                              <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
-                                              <%
-                                              }
-                                              %>
-                                            </select>
-                                            <div class="hint">
-                                               Days of month
-                                            </div>
-                                          </div>
-                                          <div class="row4">
-                                            <select multiple size="4" name="months">
-                                              <%
-                                              for (CronEntryMapping entry : selectableMonths) {
-                                                String selectstr = "";
-                                                if (months.contains(entry.getValue())) {
-                                                  selectstr = "selected";
-                                                }
-                                              %>
-                                              <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
-                                              <%
-                                              }
-                                              %>
-                                            </select>
-                                            <div class="hint">
-                                               Months
-                                            </div>
-                                          </div>
-                                          <div class="row4">
-                                            <select multiple size="4" name="daysOfWeek">
-                                              <%
-                                              for (CronEntryMapping entry : selectableDaysOfWeek) {
-                                                String selectstr = "";
-                                                if (daysOfWeek.contains(entry.getValue())) {
-                                                  selectstr = "selected";
-                                                }
-                                              %>
-                                              <option value="<%=entry.getValue()%>" <%=selectstr%>><%=entry.getName()%></option>
-                                              <%
-                                              }
-                                              %>
-                                            </select>
-                                            <div class="hint">
-                                               Days of week
-                                            </div>
-                                          </div>
-                                          <div class="row">
-                                            <select name="jobname">
-                                              <%
-                                              for (String job : jobnames) {
-                                                String selected = "";
-                                                if (job.equals(jobname)) {
-                                                  selected = "selected";
-                                                }
-                                              %>
-                                              <option value="<%=job%>" <%=selected%>><%=job%></option>
-                                              <%
-                                              }
-                                              %>
-                                            </select>
-                                            <input type="hidden" value="<%=id%>" name="id"/>
-                                            <div class="hint">
-                                               Select a job to execute
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tablefooter">
-                                       <div class="buttons">
-                                           <button class="rounded" name="submitButton" type="submit"
-                                                   value="Modify">
-                                               <span>Modify</span>
-                                           </button>
-                                           <button class="rounded" name="submitButton" type="submit"
-                                                   value="Delete">
-                                               <span>Delete</span>
-                                           </button>
-                                       </div>
-                                   </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<t:page_tabbed pageTitle="Modify job" activeTab="processing">
+    <jsp:body>
+        <div class="left">
+            <t:menu_processing/>
         </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
+        <div class="right">
+            <div class="blttitle">
+                Modify job
+            </div>
+            <div class="blttext">
+                Modify or delete a scheduled job.
+            </div>
+            <div class="table">
+              <t:error_message message="${emessage}"/>
+              <div class="modifyjob">
+                <form name="showScheduledJobForm" action="showscheduledjob.htm">
+                  <div class="leftcol">
+                    <div class="row4">Seconds</div>
+                    <div class="row4">Minutes</div>
+                    <div class="row4">Hours</div>
+                    <div class="row4">Days of month</div>
+                    <div class="row4">Months</div>
+                    <div class="row4">Days of week</div>
+                    <div class="row">Job name</div>                  
+                  </div>
+                  <div class="rightcol">
+                    <div class="row4">
+                      <select multiple size="4" name="seconds">
+                        <c:forEach var="entry" items="${selectableSeconds}">
+                          <option value="${entry.value}" <c:if test="${ fn:contains(seconds, entry.value) }">selected</c:if> >${entry.name}</option>
+                        </c:forEach>
+                      </select>
+                      <div class="hint">
+                        Seconds
+                      </div>
+                    </div>
+                    <div class="row4">
+                      <select multiple size="4" name="minutes">
+                        <c:forEach var="entry" items="${selectableMinutes}">
+                          <option value="${entry.value}" <c:if test="${ fn:contains(minutes, entry.value) }">selected</c:if> >${entry.name}</option>
+                        </c:forEach>
+                      </select>
+                      <div class="hint">
+                        Minutes
+                      </div>
+                    </div>
+                    <div class="row4">
+                      <select multiple size="4" name="hours">
+                        <c:forEach var="entry" items="${selectableHours}">
+                          <option value="${entry.value}" <c:if test="${ fn:contains(hours, entry.value) }">selected</c:if> >${entry.name}</option>
+                        </c:forEach>
+                      </select>
+                      <div class="hint">
+                        Hours
+                      </div>
+                    </div>
+                    <div class="row4">
+                      <select multiple size="4" name="daysOfMonth">
+                        <c:forEach var="entry" items="${selectableDaysOfMonth}">
+                          <option value="${entry.value}" <c:if test="${ fn:contains(daysOfMonth, entry.value) }">selected</c:if> >${entry.name}</option>
+                        </c:forEach>
+                      </select>
+                      <div class="hint">
+                        Days of month
+                      </div>
+                    </div>
+                    <div class="row4">
+                      <select multiple size="4" name="months">
+                        <c:forEach var="entry" items="${selectableMonths}">
+                          <option value="${entry.value}" <c:if test="${ fn:contains(months, entry.value) }">selected</c:if> >${entry.name}</option>
+                        </c:forEach>
+                      </select>
+                      <div class="hint">
+                        Months
+                      </div>
+                    </div>   
+                    <div class="row4">
+                      <select multiple size="4" name="daysOfWeek">
+                        <c:forEach var="entry" items="${selectableDaysOfWeek}">
+                          <option value="${entry.value}" <c:if test="${ fn:contains(daysOfWeek, entry.value) }">selected</c:if> >${entry.name}</option>
+                        </c:forEach>
+                      </select>
+                      <div class="hint">
+                        Days of week
+                      </div>
+                    </div>   
+                    <div class="row">
+                      <select name="jobname">
+                        <c:forEach var="job" items="${jobnames}">
+                          <option value="${job}" <c:if test="${job == jobname}">selected</c:if> >${job}</option>
+                        </c:forEach>
+                      </select>
+                      <div class="hint">
+                        Select a job to execute
+                      </div>
+                    </div>   
+                    <input type="hidden" value="${id}" name="id"/>
+                 </div>
+                 <div class="tablefooter">
+                   <div class="buttons">
+                     <button class="rounded" name="submitButton" type="submit" value="Modify">
+                       <span>Modify</span>
+                     </button>
+                     <button class="rounded" name="submitButton" type="submit" value="Delete">
+                       <span>Delete</span>
+                     </button>
+                   </div>
+                 </div>
+                </form>
+              </div>
+            </div>      
         </div>
-    </body>
-</html>
+    </jsp:body>
+</t:page_tabbed>

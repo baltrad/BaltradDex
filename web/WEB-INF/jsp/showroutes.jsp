@@ -38,139 +38,100 @@ List of routes
     }
 %>
 
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>BALTRAD | Routes</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
-            </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/processing_tab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/processing_menu.jsp"%>
-                    </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            Routes
-                        </div>
-                        <div class="blttext">
-                            List of routes. Click on route name in order to modify route settings.
-                        </div>
-                        <div class="table">
-                            <%if (request.getAttribute("emessage") != null) {%>
-                                <div class="systemerror">
-                                    <div class="header">
-                                        Problems encountered.
-                                    </div>
-                                    <div class="message">
-                                        <%=request.getAttribute("emessage")%>
-                                    </div>
-                                </div>
-                            <%}%>
-                            <form name="createRouteForm" action="createroute.htm">
-                                <c:choose>
-                                    <c:when test="${routes_status == 1}">
-                                        <div class="showroutes">
-                                            <div class="tableheader">
-                                                <div id="cell" class="count">&nbsp;</div>
-                                                <div id="cell" class="name">
-                                                    Name
-                                                </div>
-                                                <div id="cell" class="description">
-                                                    Description
-                                                </div>
-                                                <div id="cell" class="type">
-                                                    Type
-                                                </div>
-                                                <div id ="cell" class="active">
-                                                    Active
-                                                </div>
-                                            </div>
-                                            <c:set var="count" scope="page" value="1"/>
-                                            <c:forEach var="route" items="${routes}">
-                                                <div class="entry">
-                                                    <div id="cell" class="count">
-                                                        <c:out value="${count}"/>
-                                                        <c:set var="count" value="${count + 1}"/>
-                                                    </div>
-                                                    <div id="cell" class="name">
-                                                        <a href="showroute.htm?name=${route.name}">
-                                                            <c:out value="${route.name}"/>
-                                                        </a>
-                                                    </div>
-                                                    <div id="cell" class="description">
-                                                        <c:out value="${route.description}"/>
-                                                    </div>
-                                                    <div id="cell" class="type">
-                                                        <c:choose>
-                                                            <c:when test="${route.ruleType == 'groovy'}">
-                                                                <c:out value="Script"/>
-                                                            </c:when>
-                                                            <c:when test="${route.ruleType == 'blt_volume'}">
-                                                                <c:out value="Volume"/>
-                                                            </c:when>
-                                                            <c:when test="${route.ruleType == 'composite'}">
-                                                              <c:out value="Composite"/>
-                                                            </c:when>
-                                                            <c:when test="${route.ruleType == 'bdb_trim_age'}">
-                                                                <c:out value="BdbTrimAge"/>
-                                                            </c:when>
-                                                            <c:when test="${route.ruleType == 'bdb_trim_count'}">
-                                                                <c:out value="BdbTrimCount"/>
-                                                            </c:when>
-                                                            <c:when test="${route.ruleType == 'bdb_gmap'}">
-                                                                <c:out value="GoogleMap"/>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <c:out value="${route.ruleType}"/>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </div>
-                                                    <div id="cell" class="active">
-                                                        <c:choose>
-                                                            <c:when test="${route.ruleValid == false}">
-                                                              <img src="includes/images/icons/routes-warning.png"
-                                                                       alt="Invalid">
-                                                            </c:when>
-                                                            <c:when test="${route.active == true}">
-                                                                <img src="includes/images/icons/success.png"
-                                                                     alt="Active">
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <img src="includes/images/icons/stop.png"
-                                                                     alt="Inactive"/>
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </div>
-                                                </div>
-                                            </c:forEach>
-                                        </div>
-                                    </c:when>
-                                </c:choose>
-                                <div class="tablefooter">
-                                   <div class="buttons">
-                                       <button class="rounded" type="button"
-                                           onclick="window.location.href='processing.htm'">
-                                           <span>Back</span>
-                                       </button>
-                                   </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<t:page_tabbed pageTitle="Routes" activeTab="processing">
+    <jsp:body>
+        <div class="left">
+            <t:menu_processing/>
         </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
+        <div class="right">
+            <div class="blttitle">
+                Routes
+            </div>
+            <div class="blttext">
+                List of routes. Click on route name in order to modify route settings.
+            </div>
+            <div class="table">
+                <t:error_message message="${emessage}"/>
+                <form name="createRouteForm" action="createroute.htm">
+                    <c:choose>
+                        <c:when test="${routes_status == 1}">
+                            <div class="showroutes">
+                                <div class="tableheader">
+                                  <div id="cell" class="count">&nbsp;</div>
+                                  <div id="cell" class="name">Name</div>
+                                  <div id="cell" class="description">Description</div>
+                                  <div id="cell" class="type">Type</div>
+                                  <div id ="cell" class="active">Active</div>
+                                </div>
+                                <c:set var="count" scope="page" value="1"/>
+                                <c:forEach var="route" items="${routes}">
+                                  <div class="entry">
+                                    <div id="cell" class="count">
+                                      <c:out value="${count}"/>
+                                      <c:set var="count" value="${count + 1}"/>
+                                    </div>
+                                    <div id="cell" class="name">
+                                      <a href="showroute.htm?name=${route.name}">
+                                        <c:out value="${route.name}"/>
+                                      </a>
+                                    </div>
+                                    <div id="cell" class="description">
+                                      <c:out value="${route.description}"/>
+                                    </div>
+                                    <div id="cell" class="type">
+                                      <c:choose>
+                                        <c:when test="${route.ruleType == 'groovy'}">
+                                          <c:out value="Script"/>
+                                        </c:when>
+                                        <c:when test="${route.ruleType == 'blt_volume'}">
+                                          <c:out value="Volume"/>
+                                        </c:when>
+                                        <c:when test="${route.ruleType == 'composite'}">
+                                          <c:out value="Composite"/>
+                                        </c:when>
+                                        <c:when test="${route.ruleType == 'bdb_trim_age'}">
+                                          <c:out value="BdbTrimAge"/>
+                                        </c:when>
+                                        <c:when test="${route.ruleType == 'bdb_trim_count'}">
+                                          <c:out value="BdbTrimCount"/>
+                                        </c:when>
+                                        <c:when test="${route.ruleType == 'bdb_gmap'}">
+                                          <c:out value="GoogleMap"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                          <c:out value="${route.ruleType}"/>
+                                        </c:otherwise>
+                                      </c:choose>
+                                    </div>
+                                    <div id="cell" class="active">
+                                      <c:choose>
+                                        <c:when test="${route.ruleValid == false}">
+                                          <img src="includes/images/icons/routes-warning.png" alt="Invalid">
+                                        </c:when>
+                                        <c:when test="${route.active == true}">
+                                          <img src="includes/images/icons/success.png" alt="Active">
+                                        </c:when>
+                                        <c:otherwise>
+                                          <img src="includes/images/icons/stop.png" alt="Inactive"/>
+                                        </c:otherwise>
+                                      </c:choose>
+                                    </div>
+                                  </div>
+                                </c:forEach>
+                            </div>
+                        </c:when>
+                    </c:choose>
+                    <br>
+                    <div class="tablefooter">
+                      <div class="buttons">
+                        <button class="rounded" type="button"
+                                onclick="window.location.href='processing.htm'">
+                          <span>Back</span>
+                        </button>
+                      </div>
+                    </div>
+                </form>
+            </div>      
         </div>
-    </body>
-</html>
+    </jsp:body>
+</t:page_tabbed>

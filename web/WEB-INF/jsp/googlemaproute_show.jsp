@@ -26,152 +26,93 @@ Modifies a google map route
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@page import="java.util.List"%>
-<%@page import="java.util.ArrayList"%>
-
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>BALTRAD | Modify google map route</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
-            </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/processing_tab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/processing_menu.jsp"%>
-                    </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            Modify google map route
-                        </div>
-                        <div class="blttext">
-                            Modify a google map routing rule.
-                        </div>
-                        <div class="table">
-                            <%if (request.getAttribute("emessage") != null) {%>
-                                <div class="systemerror">
-                                    <div class="header">
-                                        Problems encountered.
-                                    </div>
-                                    <div class="message">
-                                        <%=request.getAttribute("emessage")%>
-                                    </div>
-                                </div>
-                            <%}%>
-                            <div class="modifyroute">
-                                 <form name="showRouteForm" action="googlemaproute_show.htm">
-                                    <div class="leftcol">
-                                        <%
-                                            List<String> adaptors = (List<String>)request.getAttribute("adaptors");
-                                            String name = (String)request.getAttribute("name");
-                                            String author = (String)request.getAttribute("author");
-                                            Boolean active = (Boolean)request.getAttribute("active");
-                                            String description = (String)request.getAttribute("description");
-                                            String area = (String)request.getAttribute("area");
-                                            String path = (String)request.getAttribute("path");
-                                            List<String> recipients = (List<String>)request.getAttribute("recipients");                                            
-                                            if (area == null) {
-                                              area = "";
-                                            }
-                                            if (path == null) {
-                                              path = "";
-                                            }
-                                            String activestr = (active == true)?"checked":"";                                            
-                                        %>
-                                        <div class="row">Name</div>
-                                        <div class="row">Author</div>
-                                        <div class="row">Active</div>
-                                        <div class="row">Description</div>
-                                        <div class="row">Area</div>
-                                        <div class="row">Path</div>
-                                        <div class="row4">Recipients</div>                                        
-                                    </div>
-                                    <div class="rightcol">
-                                        <div class="row">
-                                            <input type="text" name="name" value="<%=name%>" disabled/>
-                                            <input type="hidden" name="name" value="<%=name%>"/>
-                                            <div class="hint">
-                                               Route name
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="text" name="author" value="<%=author%>"/>
-                                            <div class="hint">
-                                               Route author's name
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="checkbox" name="active" <%=activestr%>/>
-                                            <div class="hint">
-                                               Check to activate route
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="text" name="description" value="<%=description%>"/>
-                                            <div class="hint">
-                                               Verbose description
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="text" name="area" value="<%=area%>"/>
-                                            <div class="hint">
-                                               An area defining the region for which this route should be triggered.
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="text" name="path" value="<%=path%>"/>
-                                            <div class="hint">
-                                               The base path (e.g. /var/www/html/data) where the generated png should be placed.
-                                            </div>
-                                        </div>
-                                        <div class="row4">
-                                            <select multiple size="4" name="recipients">
-                                            <%
-                                              for (String adaptor : adaptors) {
-                                                String selectstr = "";
-                                                if (recipients.contains(adaptor)) {
-                                                  selectstr = "selected";
-                                                }
-                                            %>
-                                                <option value="<%=adaptor%>" <%=selectstr%>><%=adaptor%></option>
-                                            <%
-                                              }
-                                            %>
-                                            </select>
-                                            <div class="hint">
-                                               Select target adaptors
-                                            </div>
-                                        </div>                                        
-                                    </div>
-                                    <div class="tablefooter">
-                                       <div class="buttons">
-                                           <button class="rounded" name="submitButton" type="submit"
-                                                   value="Modify">
-                                               <span>Modify</span>
-                                           </button>
-                                           <button class="rounded" name="submitButton" type="submit"
-                                                   value="Delete">
-                                               <span>Delete</span>
-                                           </button>
-                                       </div>
-                                   </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<t:page_tabbed pageTitle="Modify google map route" activeTab="processing">
+    <jsp:body>
+        <div class="left">
+            <t:menu_processing/>
         </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
+        <div class="right">
+            <div class="blttitle">
+                Modify google map route
+            </div>
+            <div class="blttext">
+                Create a google map routing rule.
+            </div>
+            <div class="table">
+              <t:error_message message="${emessage}"/>
+              <div class="modifyroute">
+                <form name="showRouteForm" action="googlemaproute_show.htm">
+                  <div class="leftcol">
+                    <div class="row">Name</div>
+                    <div class="row">Author</div>
+                    <div class="row">Active</div>
+                    <div class="row">Description</div>
+                    <div class="row">Area</div>
+                    <div class="row">Path</div>
+                    <div class="row4">Recipients</div>                    
+                  </div>
+                  <div class="rightcol">
+                    <div class="row">
+                      <input type="text" name="name" value="${name}"/ disabled>
+                      <input type="hidden" name="name" value="${name}"/>
+                      <div class="hint">
+                        Route name
+                      </div>
+                    </div>
+                    <div class="row">
+                      <input type="text" name="author" value="${author}"/>
+                      <div class="hint">
+                        Route author's name
+                      </div>
+                    </div>
+                    <div class="row">
+                      <input type="checkbox" name="active" <c:if test="${active == true}">checked</c:if> />
+                      <div class="hint">
+                        Check to activate route
+                      </div>
+                    </div>
+                   <div class="row">
+                     <input type="text" name="description" value="${description}"/>
+                     <div class="hint">
+                       Verbose description
+                     </div>
+                   </div>
+                   <div class="row">
+                     <input type="text" name="area" value="${area}"/>
+                     <div class="hint">
+                       An area defining the region for which this route should be triggered.
+                     </div>
+                   </div>  
+                   <div class="row">
+                     <input type="text" name="path" value="${path}"/>
+                     <div class="hint">
+                       The base path (e.g. /var/www/html/data) where the generated png should be placed.
+                     </div>
+                   </div>
+                   <div class="row4">
+                     <select multiple size="4" name="recipients">
+                       <c:forEach var="adaptor" items="${adaptors}">
+                         <option value="${adaptor}" <c:if test="${ fn:contains(recipients, adaptor) }">selected</c:if> >${adaptor}</option>
+                       </c:forEach>
+                     </select>
+                     <div class="hint">
+                       Select target adaptors
+                     </div>
+                   </div>
+                 </div>
+                 <div class="tablefooter">
+                   <div class="buttons">
+                     <button class="rounded" name="submitButton" type="submit" value="Modify">
+                       <span>Modify</span>
+                     </button>
+                     <button class="rounded" name="submitButton" type="submit" value="Delete">
+                       <span>Delete</span>
+                     </button>
+                   </div>
+                 </div>
+                </form>
+              </div>
+            </div>      
         </div>
-    </body>
-</html>
+    </jsp:body>
+</t:page_tabbed>

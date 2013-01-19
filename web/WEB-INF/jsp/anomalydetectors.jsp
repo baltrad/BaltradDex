@@ -36,96 +36,64 @@ List of anomaly detectors
     }
 %>
 
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>BALTRAD | Quality controls</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
+<t:page_tabbed pageTitle="Quality controls" activeTab="processing">
+    <jsp:body>
+        <div class="left">
+            <t:menu_processing/>
+        </div>
+        <div class="right">
+            <div class="blttitle">
+                Quality controls
             </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/processing_tab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/processing_menu.jsp"%>
-                    </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            Quality controls
-                        </div>
-                        <div class="blttext">
-                            List of quality controls. Click on name to modify or delete or click
-                            create to create a new quality control.
-                        </div>
-                        <div class="table">
-                            <%if (request.getAttribute("emessage") != null) {%>
-                                <div class="systemerror">
-                                    <div class="header">
-                                        Problems encountered.
-                                    </div>
-                                    <div class="message">
-                                        <%=request.getAttribute("emessage")%>
-                                    </div>
+            <div class="blttext">
+              List of quality controls. Click on name to modify or delete or click
+              create to create a new quality control.
+            </div>
+            <div class="table">
+                <t:error_message message="${emessage}"/>
+                <form name="createAnomalyDetectorForm" action="create_anomaly_detector.htm">
+                    <c:choose>
+                        <c:when test="${detectors_status == 1}">
+                            <div class="anomalydetectors">
+                                <div class="tableheader">
+                                  <div id="cell" class="count">&nbsp;</div>
+                                  <div id="cell" class="name">Name</div>
+                                  <div id="cell" class="description">Description</div>
                                 </div>
-                            <%}%>
-                            <form name="createAnomalyDetectorForm" action="create_anomaly_detector.htm">
-                                <c:choose>
-                                    <c:when test="${detectors_status == 1}">
-                                        <div class="anomalydetectors">
-                                            <div class="tableheader">
-                                                <div id="cell" class="count">&nbsp;</div>
-                                                <div id="cell" class="name">
-                                                    Name
-                                                </div>
-                                                <div id="cell" class="description">
-                                                    Description
-                                                </div>
-                                            </div>
-                                            <c:set var="count" scope="page" value="1"/>
-                                            <c:forEach var="detector" items="${anomaly_detectors}">
-                                                <div class="entry">
-                                                    <div id="cell" class="count">
-                                                        <c:out value="${count}"/>
-                                                        <c:set var="count" value="${count + 1}"/>
-                                                    </div>
-                                                    <div id="cell" class="name">
-                                                        <a href="show_anomaly_detector.htm?name=${detector.name}">
-                                                            <c:out value="${detector.name}"/>
-                                                        </a>
-                                                    </div>
-                                                    <div id="cell" class="description">
-                                                        <c:out value="${detector.description}"/>
-                                                    </div>
-                                                </div>
-                                            </c:forEach>
+                                <c:set var="count" scope="page" value="1"/>
+                                <c:forEach var="detector" items="${anomaly_detectors}">
+                                    <div class="entry">
+                                        <div id="cell" class="count">
+                                            <c:out value="${count}"/>
+                                            <c:set var="count" value="${count + 1}"/>
                                         </div>
-                                    </c:when>
-                                </c:choose>
-                                <div class="tablefooter">
-                                   <div class="buttons">
-                                       <button class="rounded" type="button"
-                                           onclick="window.location.href='processing.htm'">
-                                           <span>Back</span>
-                                       </button>
-                                       <button class="rounded" type="submit">
-                                           <span>Create</span>
-                                       </button>
-                                   </div>
-                               </div>
-                            </form>
+                                        <div id="cell" class="name">
+                                            <a href="show_anomaly_detector.htm?name=${detector.name}">
+                                                <c:out value="${detector.name}"/>
+                                            </a>
+                                        </div>
+                                        <div id="cell" class="description">
+                                          <c:out value="${detector.description}"/>
+                                        </div>
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </c:when>
+                    </c:choose>
+                    <br>
+                    <div class="tablefooter">
+                        <div class="buttons">
+                            <button class="rounded" type="button"
+                                    onclick="window.location.href='processing.htm'">
+                                <span>Back</span>
+                            </button>
+                            <button class="rounded" type="submit">
+                                <span>Create</span>
+                            </button>
                         </div>
                     </div>
-                </div>
-            </div>
+                </form>
+            </div>      
         </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
-        </div>
-    </body>
-</html>
+    </jsp:body>
+</t:page_tabbed>

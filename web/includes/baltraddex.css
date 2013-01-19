@@ -1066,6 +1066,7 @@ input:focus, textarea:focus {
     width:100%;
 }
 /* Adaptors page -------------------------------------------------------------*/
+
 .adaptors .name {
     width:30%;
 }
@@ -1139,6 +1140,25 @@ input:focus, textarea:focus {
 .schedules .id {
     text-align:center;
 }
+
+/* Supervisor page -------------------------------------------------------------*/
+
+.supervisor .supervisorfilter {
+    width:260px;
+}
+
+.supervisor input, .supervisor select {
+    width:260px;
+}
+
+.supervisor .supervisorfilter_space {
+    width:30%;
+}
+
+.filters .supervisor_button {
+  text-align:center;
+}
+
 /* File details page ---------------------------------------------------------*/
 .break {
     width:100%;

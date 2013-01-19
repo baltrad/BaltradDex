@@ -26,99 +26,59 @@ Create anomaly detectors
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@page import="java.util.List"%>
-<%@page import="java.util.ArrayList"%>
-
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>BALTRAD | Modify quality control</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
-            </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/processing_tab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/processing_menu.jsp"%>
-                    </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            Modify quality control
-                        </div>
-                        <div class="blttext">
-                            Modify or delete quality control. The description should explain what
-                            the quality control is doing.
-                        </div>
-                        <div class="table">
-                            <%if (request.getAttribute("emessage") != null) {%>
-                                <div class="systemerror">
-                                    <div class="header">
-                                        Problems encountered.
-                                    </div>
-                                    <div class="message">
-                                        <%=request.getAttribute("emessage")%>
-                                    </div>
-                                </div>
-                            <%}%>
-                            <div class="modify_anomaly_detector">
-                                 <form name="modifyAnomalyDetectorForm" action="modify_anomaly_detector.htm">
-                                    <div class="leftcol">
-                                        <%
-                                            String name = (String)request.getAttribute("name");
-                                            String description = (String)request.getAttribute("description");
-                                            name = (name == null)?"":name;
-                                            description = (description == null)?"":description;
-                                        %>
-                                        <div class="row">Name</div>
-                                        <div class="row">Description</div>
-                                    </div>
-                                    <div class="rightcol">
-                                        <div class="row">
-                                            <div class="name">
-                                                <input type="text" name="name" value="<%=name%>" disabled/>
-                                                <input type="hidden" name="name" value="<%=name%>"/>
-                                                <div class="hint">
-                                                   Quality controls name
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="description">
-                                                <input type="text" name="description" value="<%=description%>"/>
-                                                <div class="hint">
-                                                   Description of the quality control
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="tablefooter">
-                                       <div class="buttons">
-                                           <button class="rounded" name="submitButton" type="submit"
-                                                   value="Modify">
-                                               <span>Modify</span>
-                                           </button>
-                                           <button class="rounded" name="submitButton" type="submit"
-                                                   value="Delete">
-                                               <span>Delete</span>
-                                           </button>
-                                       </div>
-                                   </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<t:page_tabbed pageTitle="Modify quality control" activeTab="processing">
+    <jsp:body>
+        <div class="left">
+            <t:menu_processing/>
         </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
+        <div class="right">
+            <div class="blttitle">
+                Modify quality control
+            </div>
+            <div class="blttext">
+              Modify or delete quality control. The description should explain what
+              the quality control is doing.
+            </div>
+            <div class="table">
+              <t:error_message message="${emessage}"/>
+              <div class="modify_anomaly_detector">
+                <form name="modifyAnomalyDetectorForm" action="modify_anomaly_detector.htm">
+                  <div class="leftcol">
+                    <div class="row">Name</div>
+                    <div class="row">Description</div>
+                  </div>
+                  <div class="rightcol">
+                    <div class="row">
+                      <div class="name">
+                        <input type="text" name="name" value="${name}" disabled/>
+                        <input type="hidden" name="name" value="${name}" />
+                        <div class="hint">
+                          Quality controls name
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="description">
+                        <input type="text" name="description" value="${description}"/>
+                        <div class="hint">
+                          Description of the quality control
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tablefooter">
+                    <div class="buttons">
+                      <button class="rounded" name="submitButton" type="submit" value="Modify">
+                        <span>Modify</span>
+                      </button>
+                      <button class="rounded" name="submitButton" type="submit" value="Delete">
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+             </div>
+            </div>      
         </div>
-    </body>
-</html>
+    </jsp:body>
+</t:page_tabbed>

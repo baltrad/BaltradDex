@@ -26,5 +26,9 @@
             <img src="includes/images/icons/schedule.png" alt="">
             <a href="showschedule.htm">Schedule</a>
         </li>
+        <li>
+            <img src="includes/images/icons/settings.png" alt="">
+            <a href="supervisorsettings.htm">Supervisor</a>        
+        </li>
     </ul>
 </div>

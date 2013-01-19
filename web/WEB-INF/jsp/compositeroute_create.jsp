@@ -26,252 +26,157 @@ Creates a composite route
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@page import="java.util.List"%>
-<%@page import="java.util.ArrayList"%>
-<%@page import="eu.baltrad.beast.qc.AnomalyDetector"%>
-
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
-        <title>BALTRAD | Create route</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header.js"></script>
-            </div>
-            <div id="bltmain">
-                <div id="tabs">
-                    <%@include file="/WEB-INF/jsp/processing_tab.jsp"%>
-                </div>
-                <div id="tabcontent">
-                    <div class="left">
-                        <%@include file="/WEB-INF/jsp/processing_menu.jsp"%>
-                    </div>
-                    <div class="right">
-                        <div class="blttitle">
-                            Create route
-                        </div>
-                        <div class="blttext">
-                            Create a Composite routing rule.
-                        </div>
-                        <div class="table">
-                            <%if (request.getAttribute("emessage") != null) {%>
-                                <div class="systemerror">
-                                    <div class="header">
-                                        Problems encountered.
-                                    </div>
-                                    <div class="message">
-                                        <%=request.getAttribute("emessage")%>
-                                    </div>
-                                </div>
-                            <%}%>
-                            <div class="modifyroute">
-                                 <form name="createRouteForm" action="compositeroute_create.htm">
-                                    <div class="leftcol">
-                                        <%
-                                            List<String> adaptors = (List<String>)request.getAttribute("adaptors");
-                                            List<String> sourceids = (List<String>)request.getAttribute("sourceids");
-                                            List<Integer> intervals = (List<Integer>)request.getAttribute("intervals");
-                                            List<AnomalyDetector> anomaly_detectors = (List<AnomalyDetector>)request.getAttribute("anomaly_detectors");
-											
-                                            String name = (String)request.getAttribute("name");
-                                            String author = (String)request.getAttribute("author");
-                                            Boolean active = (Boolean)request.getAttribute("active");
-                                            String description = (String)request.getAttribute("description");
-                                            Boolean byscan = (Boolean)request.getAttribute("byscan");
-                                            String method = (String)request.getAttribute("method");
-                                            String prodpar = (String)request.getAttribute("prodpar");
-                                            Integer selection_method = (Integer)request.getAttribute("selection_method");
-                                            List<String> recipients = (List<String>)request.getAttribute("recipients");
-                                            String areaid = (String)request.getAttribute("areaid");
-                                            Integer interval = (Integer)request.getAttribute("interval");
-                                            Integer timeout = (Integer)request.getAttribute("timeout");
-                                            List<String> sources = (List<String>)request.getAttribute("sources");
-                                            List<String> detectors = (List<String>)request.getAttribute("detectors");
-                                            if (method == null || method.equals("")) {
-                                              method = "pcappi";
-                                            }
-                                            if (prodpar == null) {
-                                              prodpar = "";
-                                            }
-                                            String activestr = (active == true)?"checked":"";
-                                            String byscanstr = (byscan == true)?"checked":"";
-                                        %>
-                                        <div class="row">Name</div>
-                                        <div class="row">Author</div>
-                                        <div class="row">Active</div>
-                                        <div class="row">Description</div>
-                                        <div class="row">Scan based</div>
-                                        <div class="row">Method</div>
-                                        <div class="row">Product parameter</div>
-                                        <div class="row">Selection method</div>
-                                        <div class="row4">Recipients</div>
-                                        <div class="row">Areaid</div>
-                                        <div class="row">Interval</div>
-                                        <div class="row">Timeout</div>
-                                        <div class="row6">Sources</div>
-                                        <div class="row6">Quality controls</div>
-                                    </div>
-                                    <div class="rightcol">
-                                        <div class="row">
-                                            <input type="text" name="name" value="<%=name%>"/>
-                                            <div class="hint">
-                                               Route name
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="text" name="author" value="<%=author%>"/>
-                                            <div class="hint">
-                                               Route author's name
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="checkbox" name="active" <%=activestr%>/>
-                                            <div class="hint">
-                                               Check to activate route
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="text" name="description" value="<%=description%>"/>
-                                            <div class="hint">
-                                               Verbose description
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="checkbox" name="byscan" <%=byscanstr%>/>
-                                            <div class="hint">
-                                               Check to select scan-based route
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <select name="method">
-                                              <option value="pcappi" <%="pcappi".equals(method)?"selected":""%>>PCAPPI</option>
-                                              <option value="ppi" <%="ppi".equals(method)?"selected":""%>>PPI</option>
-                                              <option value="cappi" <%="cappi".equals(method)?"selected":""%>>CAPPI</option>
-                                            </select>
-                                            <div class="hint">
-                                              Choose a method to use for generating the composite.
-                                            </div>
-                                        </div>                                        
-                                        <div class="row">
-                                            <input type="text" name="prodpar" value="<%=prodpar%>"/>
-                                            <div class="hint">
-                                               Product parameter associated with the method. E.g. for PPI, specify elevation angle.
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <select name="selection_method">
-                                              <option value="0" <%=selection_method==0?"selected":""%>>Nearest radar</option>
-                                              <option value="1" <%=selection_method==1?"selected":""%>>Nearest sea level</option>
-                                            </select>
-                                            <div class="hint">
-                                              Choose a selection method
-                                            </div>
-                                        </div>
-                                        <div class="row4">
-                                            <select multiple size="4" name="recipients">
-                                            <%
-                                              for (String adaptor : adaptors) {
-                                                String selectstr = "";
-                                                if (recipients.contains(adaptor)) {
-                                                  selectstr = "selected";
-                                                }
-                                            %>
-                                                <option value="<%=adaptor%>" <%=selectstr%>><%=adaptor%></option>
-                                            <%
-                                              }
-                                            %>
-                                            </select>
-                                            <div class="hint">
-                                               Select target adaptors
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="text" name="areaid" value="<%=areaid%>"/>
-                                            <div class="hint">
-                                               Select area ID
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <select name="interval">
-                                            <%
-                                              for (Integer iv : intervals) {
-                                                String selectstr = "";
-                                                if (iv.equals(interval)) {
-                                                  selectstr = "selected";
-                                                }
-                                            %>
-                                                <option value="<%=iv%>" <%=selectstr%>><%=iv%></option>
-                                            <%
-                                              }
-                                            %>
-                                            </select>
-                                            <div class="hint">
-                                               Define interval
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <input type="text" name="timeout" value="<%=timeout%>"/>
-                                            <div class="hint">
-                                               Timeout in seconds
-                                            </div>
-                                        </div>
-                                        <div class="row6">
-                                            <select multiple size="6" name="sources">
-                                            <%
-                                              for (String id : sourceids) {
-                                                String selectstr = "";
-                                                if (sources.contains(id)) {
-                                                  selectstr = "selected";
-                                                }
-                                            %>
-                                                <option value="<%=id%>" <%=selectstr%>><%=id%></option>
-                                            <%
-                                              }
-                                            %>
-                                            </select>
-                                            <div class="hint">
-                                               Select source radars
-                                            </div>
-                                        </div>
-                                        <div class="row6">
-                                            <select multiple size="6" name="detectors">
-                                            <%
-                                              for (AnomalyDetector detector : anomaly_detectors) {
-                                                String selectstr = "";
-                                                String detectorname = detector.getName();
-                                                if (detectors.contains(detectorname)) {
-                                                  selectstr = "selected";
-                                                }
-                                            %>
-                                                <option value="<%=detectorname%>" <%=selectstr%>><%=detectorname%></option>
-                                            <%
-                                              }
-                                            %>
-                                            </select>
-                                            <div class="hint">
-                                               Select quality controls to be used
-                                            </div>
-                                        </div>                                        
-                                    </div>
-                                    <div class="tablefooter">
-                                       <div class="buttons">
-                                           <button class="rounded" type="submit">
-                                               <span>Add</span>
-                                           </button>
-                                       </div>
-                                   </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<t:page_tabbed pageTitle="Create route" activeTab="processing">
+    <jsp:body>
+        <div class="left">
+            <t:menu_processing/>
         </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
+        <div class="right">
+            <div class="blttitle">
+                Create route
+            </div>
+            <div class="blttext">
+                Create a Composite routing rule.
+            </div>
+            <div class="table">
+              <t:error_message message="${emessage}"/>
+              <div class="modifyroute">
+                <form name="createRouteForm" action="compositeroute_create.htm">
+                  <div class="leftcol">
+                    <div class="row">Name</div>
+                    <div class="row">Author</div>
+                    <div class="row">Active</div>
+                    <div class="row">Description</div>
+                    <div class="row">Scan based</div>
+                    <div class="row">Method</div>
+                    <div class="row">Product parameter</div>
+                    <div class="row">Selection method</div>
+                    <div class="row4">Recipients</div>
+                    <div class="row">Areaid</div>
+                    <div class="row">Interval</div>
+                    <div class="row">Timeout</div>
+                    <div class="row6">Sources</div>
+                    <div class="row6">Quality controls</div>
+                  </div>
+                  <div class="rightcol">
+                    <div class="row">
+                      <input type="text" name="name" value="${name}"/>
+                      <div class="hint">
+                        Route name
+                      </div>
+                    </div>
+                    <div class="row">
+                      <input type="text" name="author" value="${author}"/>
+                      <div class="hint">
+                        Route author's name
+                      </div>
+                    </div>
+                    <div class="row">
+                      <input type="checkbox" name="active" <c:if test="${active == true}">checked</c:if> />
+                      <div class="hint">
+                        Check to activate route
+                      </div>
+                    </div>
+                   <div class="row">
+                     <input type="text" name="description" value="${description}"/>
+                     <div class="hint">
+                       Verbose description
+                     </div>
+                   </div>
+                   <div class="row">
+                     <input type="checkbox" name="byscan" <c:if test="${byscan == true}">checked</c:if> />
+                     <div class="hint">
+                       Check to select scan-based route
+                     </div>
+                   </div>
+                   <div class="row">
+                     <select name="method">
+                       <option value="pcappi" <c:if test="${method == 'pcappi'}">selected</c:if> >PCAPPI</option>
+                       <option value="ppi" <c:if test="${method == 'ppi'}">selected</c:if> >PPI</option>
+                       <option value="cappi" <c:if test="${method == 'cappi'}">selected</c:if> >CAPPI</option>
+                     </select>
+                     <div class="hint">
+                       Choose a method to use for generating the composite.
+                     </div>
+                   </div>                                        
+                   <div class="row">
+                     <input type="text" name="prodpar" value="${prodpar}"/>
+                     <div class="hint">
+                       Product parameter associated with the method. E.g. for PPI, specify elevation angle.
+                     </div>
+                   </div>
+                   <div class="row">
+                     <select name="selection_method">
+                       <option value="0" <c:if test="${selection_method == 0}">selected</c:if> >Nearest radar</option>
+                       <option value="1" <c:if test="${selection_method == 1}">selected</c:if> >Nearest sea level</option>
+                     </select>
+                     <div class="hint">
+                       Choose a selection method
+                     </div>
+                   </div>
+                   <div class="row4">
+                     <select multiple size="4" name="recipients">
+                       <c:forEach var="adaptor" items="${adaptors}">
+                         <option value="${adaptor}" <c:if test="${ fn:contains(recipients, adaptor) }">selected</c:if> >${adaptor}</option>
+                       </c:forEach>
+                     </select>
+                     <div class="hint">
+                       Select target adaptors
+                     </div>
+                   </div>
+                   <div class="row">
+                     <input type="text" name="areaid" value="${areaid}"/>
+                     <div class="hint">
+                       Select area ID
+                     </div>
+                   </div>
+                   <div class="row">
+                     <select name="interval">
+                       <c:forEach var="iv" items="${intervals}">
+                         <option value="${iv}" <c:if test="${interval == iv}">selected</c:if> >${iv}</option>
+                       </c:forEach>
+                     </select>
+                     <div class="hint">
+                       Define interval
+                     </div>
+                   </div>
+                   <div class="row">
+                     <input type="text" name="timeout" value="${timeout}"/>
+                     <div class="hint">
+                       Timeout in seconds
+                     </div>
+                   </div>
+                   <div class="row6">
+                     <select multiple size="6" name="sources">
+                       <c:forEach var="id" items="${sourceids}">
+                         <option value="${id}" <c:if test="${ fn:contains(sources, id) }">selected</c:if> >${id}</option>
+                       </c:forEach>
+                     </select>
+                     <div class="hint">
+                       Select source radars
+                     </div>
+                   </div>
+                   <div class="row6">
+                     <select multiple size="6" name="detectors">
+                       <c:forEach var="detector" items="${anomaly_detectors}">
+                         <option value="${detector.name}" <c:if test="${ fn:contains(detectors, detector.name) }">selected</c:if> >${detector.name}</option>
+                       </c:forEach>
+                     </select>
+                     <div class="hint">
+                       Select quality controls to be used
+                     </div>
+                   </div>                                        
+                 </div>
+                 <div class="tablefooter">
+                   <div class="buttons">
+                     <button class="rounded" type="submit">
+                       <span>Add</span>
+                     </button>
+                   </div>
+                 </div>
+                </form>
+              </div>
+            </div>      
         </div>
-    </body>
-</html>
+    </jsp:body>
+</t:page_tabbed>

@@ -65,7 +65,15 @@
         <security:intercept-url pattern="/showschedule.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/showscheduledjob.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/volumeroute_create.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/volumeroute_show.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/supervisorsettings.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/addsupervisorsetting.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/removesupervisorsetting.htm" access="ROLE_OPERATOR" />
+        <!-- DO NOT ACTIVATE interceptor for supervisor.htm since that is using
+             host filter checks
+          <security:intercept-url pattern="/supervisor.htm" access="ROLE_OPERATOR" />
+        -->
+        
+        
         <!-- 
             Admin pages 
         -->

@@ -411,7 +411,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="rulepropertymanager" class="eu.baltrad.beast.rules.PropertyManager" autowire="byType"/>
 
     <!-- The log message repository -->
-    <bean id="logmessagerepository" class="eu.baltrad.beast.log.LogMessageRepository" autowire="byType">
+    <bean id="logmessagerepository" class="eu.baltrad.beast.log.message.LogMessageRepository" autowire="byType">
       <property name="filenames">
         <list>
           <value>classpath:beast-log-messages.xml</value>
@@ -497,6 +497,30 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </property>
     </bean>
  
+    <bean id="bdbConnectionStatusReporter" class="eu.baltrad.beast.system.BdbConnectionStatusReporter" autowire="byType" />
+    <bean id="dbConnectionStatusReporter" class="eu.baltrad.beast.system.DbConnectionStatusReporter" autowire="byType" />
+    <bean id="radarStatusReporter" class="eu.baltrad.beast.system.RadarConnectionStatusReporter" autowire="byType" />
+    <bean id="systemStatusReporter" class="eu.baltrad.beast.system.GroupedStatusReporter">
+      <constructor-arg><value>system</value></constructor-arg>
+      <property name="reporters">
+        <map>
+          <entry key="bdb" value-ref="bdbConnectionStatusReporter"/>
+          <entry key="db" value-ref="dbConnectionStatusReporter"/>
+        </map>     
+      </property>
+    </bean>
+ 
+    <bean id="hostManager" class="eu.baltrad.beast.system.host.HostFilterManager" autowire="byType"/>
+ 
+    <bean id="supervisor" class="eu.baltrad.beast.system.SystemSupervisor">
+      <property name="reporters">
+        <map>
+          <entry key="system" value-ref="systemStatusReporter"/>
+          <entry key="radar" value-ref="radarStatusReporter"/>
+        </map>     
+      </property>
+    </bean>
+ 
     <bean id="adaptorsController" class="eu.baltrad.beastui.web.controller.AdaptorsController" autowire="byType" />
     <bean id="anomalyDetectorsController" class="eu.baltrad.beastui.web.controller.AnomalyDetectorController" autowire="byType" />
     <bean id="groovyRoutesController" class="eu.baltrad.beastui.web.controller.GroovyRoutesController" autowire="byType" />
@@ -510,6 +534,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="filterController" class="eu.baltrad.beastui.web.controller.FilterController" autowire="byType" />
     
     <bean id="schedulerController" class="eu.baltrad.beastui.web.controller.SchedulerController" autowire="byType" />
+    
+    <bean id="supervisorController" class="eu.baltrad.beastui.web.controller.SupervisorController" autowire="byType" />
 
     <!-- Filter managers -->
     <bean id="attributeFilterManager" class="eu.baltrad.beast.db.AttributeFilterManager"
