@@ -21,6 +21,8 @@ package eu.baltrad.beastui.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -62,6 +64,8 @@ public class CompositeRoutesController {
    * The anomaly detector manager
    */
   private IAnomalyDetectorManager anomalymanager = null;
+  
+  private static Logger logger = LogManager.getLogger(CompositeRoutesController.class); 
   
   /**
    * Default constructor
@@ -160,10 +164,27 @@ public class CompositeRoutesController {
       emessage = "Must specify at least one source.";
     }
     if (prodpar != null) {
-      try {
-        Double.parseDouble(prodpar);
-      } catch (NumberFormatException e) {
-        emessage = "Product parameter must be a floating point value for " + method;
+      logger.info("prodpar != null");
+      if (method != null && method.equals(CompositingRule.PMAX)) {
+        logger.info("method == pmax, trying to split prodpar");
+        String[] values = prodpar.split(",");
+        if (values.length >= 1) {
+          try {
+            Double.parseDouble(values[0].trim());
+            if (values.length > 1) {
+              Double.parseDouble(values[1].trim());
+            }
+          } catch (NumberFormatException e) {
+            emessage = "Product parameter must be <height>,<range> value for pmax.";
+          }
+        }
+      } else {
+        try { 
+          Double.parseDouble(prodpar);
+        } catch (NumberFormatException e) {
+          e.printStackTrace();
+          emessage = "Product parameter must be a floating point value for " + method;
+        }
       }
     }
     
@@ -403,10 +424,27 @@ public class CompositeRoutesController {
       emessage = "You must specify at least one source.";
     }
     if (prodpar != null) {
-      try {
-        Double.parseDouble(prodpar);
-      } catch (NumberFormatException e) {
-        emessage = "Product parameter must be a floating point value for " + method;
+      logger.info("prodpar != null");
+      if (method != null && method.equals(CompositingRule.PMAX)) {
+        logger.info("method == pmax, trying to split prodpar");
+        String[] values = prodpar.split(",");
+        if (values.length >= 1) {
+          try {
+            Double.parseDouble(values[0].trim());
+            if (values.length > 1) {
+              Double.parseDouble(values[1].trim());
+            }
+          } catch (NumberFormatException e) {
+            emessage = "Product parameter must be <height>,<range> value for pmax.";
+          }
+        }
+      } else {
+        try { 
+          Double.parseDouble(prodpar);
+        } catch (NumberFormatException e) {
+          e.printStackTrace();
+          emessage = "Product parameter must be a floating point value for " + method;
+        }
       }
     }
     if (emessage == null) {

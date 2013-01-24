@@ -281,6 +281,109 @@ public class CompositeRoutesControllerTest extends TestCase {
     assertEquals("somestring", result);
   }
   
+  public void testCreateRoute_pmax() throws Exception {
+    CompositingRule rule = new CompositingRule(){};
+    RouteDefinition def = new RouteDefinition();
+    
+    List<String> adaptors = new ArrayList<String>();
+    adaptors.add("A");
+    List<String> recipients = new ArrayList<String>();
+    List<String> sources = new ArrayList<String>();
+    sources.add("A");
+    List<String> detectors = new ArrayList<String>();
+    
+    adaptorManager.getAdaptorNames();
+    adaptorControl.setReturnValue(adaptors);
+
+    method.createRule("areaid", 30, sources, detectors, 40, true, CompositingRule.PMAX, "500, 70000.0", 0);
+    methodControl.setReturnValue(rule);
+    manager.create("aname", "author", true, "a description", recipients, rule);
+    managerControl.setReturnValue(def);
+    manager.storeDefinition(def);
+    
+    classUnderTest = new CompositeRoutesController() {
+      protected CompositingRule createRule(String areaid, int interval,
+          List<String> sources, List<String> detectors, int timeout, boolean byscan, String pmethod, String prodpar, int selection_method) {
+        return method.createRule(areaid, interval, sources, detectors, timeout, byscan, pmethod, prodpar, selection_method);
+      }
+    };
+    classUnderTest.setAdaptorManager(adaptorManager);
+    classUnderTest.setManager(manager);
+    classUnderTest.setAnomalyDetectorManager(anomalyManager);
+    
+    replay();
+    
+    String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.PMAX, "500, 70000.0", 0, "areaid", 30, 40, sources, detectors);
+    
+    verify();
+    assertEquals("redirect:showroutes.htm", result);
+    
+  }
+
+  public void testCreateRoute_pmax_2() throws Exception {
+    CompositingRule rule = new CompositingRule(){};
+    RouteDefinition def = new RouteDefinition();
+    
+    List<String> adaptors = new ArrayList<String>();
+    adaptors.add("A");
+    List<String> recipients = new ArrayList<String>();
+    List<String> sources = new ArrayList<String>();
+    sources.add("A");
+    List<String> detectors = new ArrayList<String>();
+    
+    adaptorManager.getAdaptorNames();
+    adaptorControl.setReturnValue(adaptors);
+
+    method.createRule("areaid", 30, sources, detectors, 40, true, CompositingRule.PMAX, "0,1", 0);
+    methodControl.setReturnValue(rule);
+    manager.create("aname", "author", true, "a description", recipients, rule);
+    managerControl.setReturnValue(def);
+    manager.storeDefinition(def);
+    
+    classUnderTest = new CompositeRoutesController() {
+      protected CompositingRule createRule(String areaid, int interval,
+          List<String> sources, List<String> detectors, int timeout, boolean byscan, String pmethod, String prodpar, int selection_method) {
+        return method.createRule(areaid, interval, sources, detectors, timeout, byscan, pmethod, prodpar, selection_method);
+      }
+    };
+    classUnderTest.setAdaptorManager(adaptorManager);
+    classUnderTest.setManager(manager);
+    classUnderTest.setAnomalyDetectorManager(anomalyManager);
+    
+    replay();
+    
+    String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.PMAX, "0,1", 0, "areaid", 30, 40, sources, detectors);
+    
+    verify();
+    assertEquals("redirect:showroutes.htm", result);
+    
+  }
+
+  public void testCreateRoute_pmax_badprodpar() throws Exception {
+    CompositingRule rule = new CompositingRule(){};
+    RouteDefinition def = new RouteDefinition();
+    String emessage = "Product parameter must be <height>,<range> value for pmax.";
+    
+    List<String> adaptors = new ArrayList<String>();
+    adaptors.add("A");
+    List<String> recipients = new ArrayList<String>();
+    List<String> sources = new ArrayList<String>();
+    sources.add("A");
+    List<String> detectors = new ArrayList<String>();
+    
+    adaptorManager.getAdaptorNames();
+    adaptorControl.setReturnValue(adaptors);
+    
+    method.viewCreateRoute(model, "name", "author", true, "description", recipients, false, "pmax", ",500000", 0, "areaid", 30, 40, sources, detectors, emessage);
+    methodControl.setReturnValue("somestring");
+    
+    replay();
+    String result = classUnderTest.createRoute(model, "name", "author", true, "description", recipients, false, CompositingRule.PMAX, ",500000", 0, "areaid", 30, 40, sources, detectors);
+    
+    verify();
+    assertEquals("somestring", result);
+  }
+
   public void testViewCreateRoute() throws Exception {
     List<String> adaptornames = new ArrayList<String>();
     List<String> sourceids = new ArrayList<String>();
@@ -480,14 +583,5 @@ public class CompositeRoutesControllerTest extends TestCase {
     verify();
     cruleControl.verify();
     assertSame(crule, result);
-  }
-  
-  public void testParseDouble() throws Exception {
-    try {
-      Double.parseDouble("abc");
-      fail("Expected NumberFormatException");
-    } catch (NumberFormatException e) {
-      System.out.println("Caught NFE");
-    }
   }
 }
