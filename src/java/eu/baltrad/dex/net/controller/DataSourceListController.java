@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.net.controller;
 
+import eu.baltrad.dex.config.manager.IConfigurationManager;
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.net.controller.exception.InternalControllerException;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.request.factory.RequestFactory;
@@ -38,7 +40,7 @@ import eu.baltrad.dex.user.manager.IAccountManager;
 
 import eu.baltrad.dex.user.model.Account;
 import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.util.InitAppUtil;
+import eu.baltrad.dex.util.WebValidator;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.stereotype.Controller;
@@ -107,6 +109,7 @@ public class DataSourceListController implements MessageSetter {
     private static final String DS_GENERIC_CONN_ERROR_KEY = 
             "datasource.controller.generic_connection_error"; 
     
+    private IConfigurationManager confManager;
     private IAccountManager accountManager;
     private INodeManager nodeManager; 
     private Authenticator authenticator;
@@ -134,17 +137,17 @@ public class DataSourceListController implements MessageSetter {
      */
     protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
-                InitAppUtil.getConf().getKeystoreDir());
+                confManager.getAppConf().getKeystoreDir());
         this.httpClient = new HttpClientUtil(
-                InitAppUtil.getConf().getConnTimeout(), 
-                InitAppUtil.getConf().getSoTimeout());
-        this.localNode = new Account(InitAppUtil.getConf().getNodeName(),
-                InitAppUtil.getConf().getNodeAddress(),
-                InitAppUtil.getConf().getOrgName(),
-                InitAppUtil.getConf().getOrgUnit(),
-                InitAppUtil.getConf().getLocality(),
-                InitAppUtil.getConf().getState(),
-                InitAppUtil.getConf().getCountryCode());
+                Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
+                Integer.parseInt(confManager.getAppConf().getSoTimeout()));
+        this.localNode = new Account(confManager.getAppConf().getNodeName(),
+                confManager.getAppConf().getNodeAddress(),
+                confManager.getAppConf().getOrgName(),
+                confManager.getAppConf().getOrgUnit(),
+                confManager.getAppConf().getLocality(),
+                confManager.getAppConf().getState(),
+                confManager.getAppConf().getCountryCode());
     }
     
     /**
@@ -238,7 +241,7 @@ public class DataSourceListController implements MessageSetter {
         String viewName = null;
         // Validate node's URL address 
         String urlSelect = null;
-        if (InitAppUtil.validate(nodeSelect)) {
+        if (WebValidator.validate(nodeSelect)) {
             Node node = nodeManager.load(nodeSelect);
             urlSelect = node.getAddress();
         }
@@ -355,6 +358,14 @@ public class DataSourceListController implements MessageSetter {
         }
         model.addAttribute(PEER_NAME_KEY, peerNodeName);
         return viewName;
+    }
+    
+    /**
+     * @param configurationManager 
+     */
+    @Autowired
+    public void setConfigurationManager(IConfigurationManager confManager) {
+        this.confManager = confManager;
     }
     
     /**

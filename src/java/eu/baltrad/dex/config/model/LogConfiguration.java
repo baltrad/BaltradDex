@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,126 +17,190 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.config.model;
 
+import java.util.Properties;
+
 /**
- * Class implements log table configuration object.
+ * System log configuration object.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 0.7.3
+ * @version 1.7.1
  * @since 0.7.3
  */
 public class LogConfiguration {
-//---------------------------------------------------------------------------------------- Variables
+
+    public static final String TRIM_BY_NUMBER = "messages.trim_by_number";
+    public static final String TRIM_BY_AGE = "messages.trim_by_age";
+    public static final String REC_LIMIT = "messages.rec_limit";
+    public static final String MAX_DAYS = "messages.max_age_days";
+    public static final String MAX_HOURS = "messages.max_age_hours";
+    public static final String MAX_MINUTES = "messages.max_age_minutes";
+    
     /** Trim by number toggle */
-    private boolean trimByNumber;
+    private String msgTrimByNumber;
     /** Trim by age toggle */
-    private boolean trimByAge;
+    private String msgTrimByAge;
     /** Record limit */
-    private int recordLimit;
+    private String msgRecordLimit;
     /** Age limit - number of days */
-    private int maxAgeDays;
+    private String msgMaxAgeDays;
     /** Age limit - number of hours */
-    private int maxAgeHours;
+    private String msgMaxAgeHours;
     /** Age limit - number of minutes */
-    private int maxAgeMinutes;
-//------------------------------------------------------------------------------------------ Methods
+    private String msgMaxAgeMinutes;
+
     /**
      * Constructor.
      */
     public LogConfiguration() {}
+    
     /**
      * Constructor.
-     *
-     * @param trimByNumber Trim by number toggle
-     * @param trimByAge Trim by age toggle
-     * @param recordLimit Maximum number of records limit
-     * @param maxAgeDays Age limit - number of days
-     * @param maxAgeHours Age limit - number of hours
-     * @param maxAgeMinutes Age limit - number of minutes
+     * @param props Properties to read
      */
-    public LogConfiguration( boolean trimByNumber, boolean trimByDate, int recordLimit,
-            int maxAgeDays, int maxAgeHours, int maxAgeMinutes ) {
-        this.trimByNumber = trimByNumber;
-        this.trimByAge = trimByDate;
-        this.recordLimit = recordLimit;
-        this.maxAgeDays = maxAgeDays;
-        this.maxAgeHours = maxAgeHours;
-        this.maxAgeMinutes = maxAgeMinutes;
+    public LogConfiguration(Properties props) {
+        this.msgTrimByNumber = props.getProperty(TRIM_BY_NUMBER);
+        this.msgTrimByAge = props.getProperty(TRIM_BY_AGE);
+        this.msgRecordLimit = props.getProperty(REC_LIMIT);
+        this.msgMaxAgeDays = props.getProperty(MAX_DAYS);
+        this.msgMaxAgeHours = props.getProperty(MAX_HOURS);
+        this.msgMaxAgeMinutes = props.getProperty(MAX_MINUTES);
     }
+    
     /**
-     * Gets trim by number toggle.
-     *
-     * @return trimByNumber Trim by number toggle
+     * Compares current object with another.
+     * @param obj Object to compare with
+     * @return True if tested parameters are equal
      */
-    public boolean getTrimByNumber() { return trimByNumber; }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if(obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+        LogConfiguration conf = (LogConfiguration) obj;
+        return this.getMsgTrimByNumber() != null && 
+                this.getMsgTrimByNumber().equals(conf.getMsgTrimByNumber()) &&
+                this.getMsgTrimByAge() != null &&
+                this.getMsgTrimByAge().equals(conf.getMsgTrimByAge()) &&
+                this.getMsgRecordLimit() != null &&
+                this.getMsgRecordLimit().equals(conf.getMsgRecordLimit()) &&
+                this.getMsgMaxAgeDays() != null &&
+                this.getMsgMaxAgeDays().equals(conf.getMsgMaxAgeDays()) &&
+                this.getMsgMaxAgeHours() != null && 
+                this.getMsgMaxAgeHours().equals(conf.getMsgMaxAgeHours()) &&
+                this.getMsgMaxAgeMinutes() != null &&
+                this.getMsgMaxAgeMinutes().equals(conf.getMsgMaxAgeMinutes());
+    }
+    
     /**
-     * Sets trim by number toggle.
-     *
-     * @param trimByNumber Trim by number toggle to set
+     * Generate hash code.
+     * @return Hash code
      */
-    public void setTrimByNumber( boolean trimByNumber ) { this.trimByNumber = trimByNumber; }
+    @Override
+    public int hashCode() {
+        int prime = 7;
+        int result = 1;
+        result = prime * result + (this.getMsgTrimByNumber() == null ? 
+                0 : this.getMsgTrimByNumber().hashCode());
+        result = prime * result + (this.getMsgTrimByAge() == null ? 
+                0 : this.getMsgTrimByAge().hashCode());
+        result = prime * result + (this.getMsgRecordLimit() == null ? 
+                0 : this.getMsgRecordLimit().hashCode());
+        result = prime * result + (this.getMsgMaxAgeDays() == null ? 
+                0 : this.getMsgMaxAgeDays().hashCode());
+        result = prime * result + (this.getMsgMaxAgeHours() == null ? 
+                0 : this.getMsgMaxAgeHours().hashCode());
+        result = prime * result + (this.getMsgMaxAgeMinutes() == null ? 
+                0 : this.getMsgMaxAgeMinutes().hashCode());
+        return result;
+    }
+
     /**
-     * Gets trim by age toggle.
-     *
-     * @return trimByAge Trim by age toggle
+     * @return the msgTrimByNumber
      */
-    public boolean getTrimByAge() { return trimByAge; }
+    public String getMsgTrimByNumber() {
+        return msgTrimByNumber;
+    }
+
     /**
-     * Sets trim by age toggle.
-     *
-     * @param trimByAge Trim by age toggle to set
+     * @param msgTrimByNumber the msgTrimByNumber to set
      */
-    public void setTrimByAge( boolean trimByAge ) { this.trimByAge = trimByAge; }
+    public void setMsgTrimByNumber(String msgTrimByNumber) {
+        this.msgTrimByNumber = msgTrimByNumber;
+    }
+
     /**
-     * Gets number of records limit.
-     *
-     * @return recordLimit Number of records limit
+     * @return the msgTrimByAge
      */
-    public int getRecordLimit() { return recordLimit; }
+    public String getMsgTrimByAge() {
+        return msgTrimByAge;
+    }
+
     /**
-     * Sets number of records limit.
-     *
-     * @param recordLimit Number of records limit to set
+     * @param msgTrimByAge the msgTrimByAge to set
      */
-    public void setRecordLimit( int recordLimit ) { this.recordLimit = recordLimit; }
+    public void setMsgTrimByAge(String msgTrimByAge) {
+        this.msgTrimByAge = msgTrimByAge;
+    }
+
     /**
-     * Get number of days in age limit.
-     *
-     * @return maxAgeDays Number of days
+     * @return the msgRecordLimit
      */
-    public int getMaxAgeDays() { return maxAgeDays; }
+    public String getMsgRecordLimit() {
+        return msgRecordLimit;
+    }
+
     /**
-     * Set number of days in age limit.
-     *
-     * @param maxAgeDays Number of days to set
+     * @param msgRecordLimit the msgRecordLimit to set
      */
-    public void setMaxAgeDays( int maxAgeDays ) { this.maxAgeDays = maxAgeDays; }
+    public void setMsgRecordLimit(String msgRecordLimit) {
+        this.msgRecordLimit = msgRecordLimit;
+    }
+
     /**
-     * Get number of hours in age limit.
-     *
-     * @return maxAgeHours Number of hours
+     * @return the msgMaxAgeDays
      */
-    public int getMaxAgeHours() { return maxAgeHours; }
+    public String getMsgMaxAgeDays() {
+        return msgMaxAgeDays;
+    }
+
     /**
-     * Set number of hours in age limit.
-     *
-     * @param maxAgeHours Number of hours to set
+     * @param msgMaxAgeDays the msgMaxAgeDays to set
      */
-    public void setMaxAgeHours( int maxAgeHours ) { this.maxAgeHours = maxAgeHours; }
+    public void setMsgMaxAgeDays(String msgMaxAgeDays) {
+        this.msgMaxAgeDays = msgMaxAgeDays;
+    }
+
     /**
-     * Get number of minutes in age limit.
-     *
-     * @return maxAgeMinutes Number of minutes
+     * @return the msgMaxAgeHours
      */
-    public int getMaxAgeMinutes() { return maxAgeMinutes; }
+    public String getMsgMaxAgeHours() {
+        return msgMaxAgeHours;
+    }
+
     /**
-     * Set number of minutes in age limit.
-     *
-     * @param maxAgeMinutes Number of minutes to set
+     * @param msgMaxAgeHours the msgMaxAgeHours to set
      */
-    public void setMaxAgeMinutes( int maxAgeMinutes ) { this.maxAgeMinutes = maxAgeMinutes; }
+    public void setMsgMaxAgeHours(String msgMaxAgeHours) {
+        this.msgMaxAgeHours = msgMaxAgeHours;
+    }
+
+    /**
+     * @return the msgMaxAgeMinutes
+     */
+    public String getMsgMaxAgeMinutes() {
+        return msgMaxAgeMinutes;
+    }
+
+    /**
+     * @param msgMaxMinutes the msgMaxMinutes to set
+     */
+    public void setMsgMaxAgeMinutes(String msgMaxAgeMinutes) {
+        this.msgMaxAgeMinutes = msgMaxAgeMinutes;
+    }
+    
 }
-//--------------------------------------------------------------------------------------------------

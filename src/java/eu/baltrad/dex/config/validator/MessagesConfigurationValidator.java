@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -54,38 +54,29 @@ public class MessagesConfigurationValidator implements Validator {
         
         if (conf == null) return;
         
-        if (conf.getTrimByNumber() && conf.getRecordLimit() <= 0) {
-            errors.rejectValue("recordLimit", 
+        if (!conf.getMsgRecordLimit().matches("[1-9][0-9]*")) {
+            errors.rejectValue("msgRecordLimit", 
                     "savemsgconf.invalid.record_limit");
         }
-        
-        if (conf.getTrimByAge()) {
-            if (conf.getMaxAgeDays() < 0) {
-                errors.rejectValue("maxAgeDays", 
-                        "savemsgconf.invalid.days_limit");
-            }
-            if (conf.getMaxAgeHours() < 0) {
-                errors.rejectValue("maxAgeHours", 
-                        "savemsgconf.invalid.hours_limit");
-            }
-            if (conf.getMaxAgeHours() > 23) {
-                errors.rejectValue("maxAgeHours", 
-                        "savemsgconf.invalid.hours_limit");
-            }
-            if (conf.getMaxAgeMinutes() < 0) {
-                errors.rejectValue("maxAgeMinutes", 
-                        "savemsgconf.invalid.minutes_limit");
-            }
-            if (conf.getMaxAgeMinutes() > 59) {
-                errors.rejectValue("maxAgeMinutes", 
-                        "savemsgconf.invalid.minutes_limit");
-            }
-            if (conf.getMaxAgeDays() == 0 && conf.getMaxAgeHours() == 0 &&
-                    conf.getMaxAgeMinutes() == 0) {
-                errors.rejectValue("maxAgeDays", 
+        if (!conf.getMsgMaxAgeDays().matches("0|[1-9]{1}[0-9]*")) {
+            errors.rejectValue("msgMaxAgeDays", 
+                    "savemsgconf.invalid.days_limit");
+        }
+        if (!conf.getMsgMaxAgeHours().matches("[0-9]|[1-2][0-3]")) {
+            errors.rejectValue("msgMaxAgeHours", 
+                    "savemsgconf.invalid.hours_limit");
+        }
+        if (!conf.getMsgMaxAgeMinutes().matches("[0-5]|[1-5][0-9]")) {
+            errors.rejectValue("msgMaxAgeMinutes", 
+                    "savemsgconf.invalid.minutes_limit");
+        }
+        if (conf.getMsgMaxAgeDays().matches("0") &&
+                    conf.getMsgMaxAgeHours().matches("0") &&
+                    conf.getMsgMaxAgeMinutes().matches("0")) {
+                errors.rejectValue("msgMaxAgeDays", 
                         "savemsgconf.invalid.age_limit");
-            }
         }
     }
+    
 }
 

@@ -25,12 +25,12 @@ import eu.baltrad.dex.net.request.impl.NodeRequest;
 import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
-import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.IBltXmlMessage;
 import eu.baltrad.beast.parser.IXmlMessageParser;
+import eu.baltrad.dex.config.manager.IConfigurationManager;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,6 +69,7 @@ public class PostMessageServlet extends HttpServlet {
             "postmessage.server.internal_server_error";
     
     private Logger log;
+    private IConfigurationManager confManager;
     private Authenticator authenticator;
     private MessageResourceUtil messages;
     
@@ -87,7 +88,7 @@ public class PostMessageServlet extends HttpServlet {
      */
     protected void initConfiguration() {
         this.setAuthenticator(new KeyczarAuthenticator(
-                 InitAppUtil.getConf().getKeystoreDir()));
+                 confManager.getAppConf().getKeystoreDir()));
     }
     
     /**
@@ -155,6 +156,14 @@ public class PostMessageServlet extends HttpServlet {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(PM_INTERNAL_SERVER_ERROR_KEY));
         }    
+    }
+    
+    /**
+     * @param configurationManager 
+     */
+    @Autowired
+    public void setConfigurationManager(IConfigurationManager confManager) {
+        this.confManager = confManager;
     }
 
     /**

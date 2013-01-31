@@ -32,7 +32,7 @@ import eu.baltrad.dex.net.manager.impl.SubscriptionManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.util.DataSourceValidator;
-import eu.baltrad.dex.util.InitAppUtil;
+import eu.baltrad.dex.util.WebValidator;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import eu.baltrad.beast.db.IFilter;
@@ -120,7 +120,7 @@ public class SaveDataSourceController {
     public String setupForm(@RequestParam(value="ds_id", required=false) 
             String dsId, ModelMap model) {
         DataSource dataSource;
-        if (InitAppUtil.validate(dsId)) {
+        if (WebValidator.validate(dsId)) {
             dataSource = dataSourceManager.load(Integer.parseInt(dsId));
         } else {
             dataSource = new DataSource();

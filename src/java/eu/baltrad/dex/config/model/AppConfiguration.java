@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,204 +21,205 @@
 
 package eu.baltrad.dex.config.model;
 
+import java.util.Properties;
+
 /**
- * Class implements system configuration object.
+ * System configuration object.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.2.2
- * @since 1.0
+ * @version 1.7.0
+ * @since 1.0.1
  */
 public class AppConfiguration {
 
-    /** Node name, e.g. baltrad.imgw.pl */
+    public static final String NODE_NAME = "node.name";
+    public static final String NODE_ADDRESS = "node.address";
+    public static final String NODE_TYPE = "node.type"; 
+    public static final String ORG_NAME = "organization.name";
+    public static final String ORG_UNIT = "organization.unit";
+    public static final String LOCALITY = "organization.locality";
+    public static final String STATE = "organization.state";
+    public static final String COUNTRY_CODE = "organization.country_code";
+    public static final String TIME_ZONE = "time.zone";
+    public static final String ADMIN_EMAIL = "admin.email";
+    public static final String WORK_DIR = "work.directory";
+    public static final String IMAGES_DIR = "images.directory";
+    public static final String THUMBS_DIR = "thumbnails.directory";
+    public static final String KEYSTORE_DIR = "keystore.directory";
+    public static final String VERSION = "software.version";
+    public static final String SO_TIMEOUT = "socket.timeout";
+    public static final String CONN_TIMEOUT = "connection.timeout";
+    
     private String nodeName;
-    /** Fully qualified node address */
     private String nodeAddress;
-    /** Node type - primary / backup */
     private String nodeType;
-    /** Software version */
-    private String version;
-    /** Socket timeout */
-    private int soTimeout;
-    /** Connection timeout */
-    private int connTimeout;
-    /** Organization's name */
     private String orgName;
-    /** Organization's unit */
     private String orgUnit;
-    /** Locality / city */
     private String locality;
-    /** State */
     private String state;
-    /** Country code*/
     private String countryCode;
-    /** Host time zone */
     private String timeZone;
-    /** Work directory */
+    private String adminEmail;
     private String workDir;
-    /** Image storage directory */
     private String imagesDir;
-    /** Thumbnails storage directory */
     private String thumbsDir;
-    /** Node administrator's email */
-    private String email;
-    /** Keystore directory */
     private String keystoreDir;
+    private String version;
+    private String soTimeout;
+    private String connTimeout;
+    
+    /**
+     * Default constructor.
+     */
+    public AppConfiguration() {}
+    
+    /**
+     * Constructor.
+     * @param props Properties to read 
+     */
+    public AppConfiguration(Properties props) {
+        this.nodeName = props.getProperty(NODE_NAME);
+        this.nodeAddress = props.getProperty(NODE_ADDRESS);
+        this.nodeType = props.getProperty(NODE_TYPE);
+        this.orgName = props.getProperty(ORG_NAME);
+        this.orgUnit = props.getProperty(ORG_UNIT);
+        this.locality = props.getProperty(LOCALITY);
+        this.state = props.getProperty(STATE);
+        this.countryCode = props.getProperty(COUNTRY_CODE);
+        this.timeZone = props.getProperty(TIME_ZONE);
+        this.adminEmail = props.getProperty(ADMIN_EMAIL);
+        this.workDir = props.getProperty(WORK_DIR);
+        this.imagesDir = props.getProperty(IMAGES_DIR);
+        this.thumbsDir = props.getProperty(THUMBS_DIR);
+        this.keystoreDir = props.getProperty(KEYSTORE_DIR);
+        this.version = props.getProperty(VERSION);
+        this.soTimeout = props.getProperty(SO_TIMEOUT);
+        this.connTimeout = props.getProperty(CONN_TIMEOUT);
+    }
 
     /**
-     * Constructor
-     *
-     * @param nodeName Node name
-     * @param nodeAddress Fully qualified node address
-     * @param nodeType Node type
-     * @param version Software version
-     * @param soTimeout Socket timeout
-     * @param connTimeout Connection timeout
-     * @param workDir Work directory
-     * @param imagesDir Images storage directory
-     * @param thumbsDir Thumbnails storage directory
-     * @param orgName Organization's name
-     * @param orgUnit Organization's unit
-     * @param locality Locality / city
-     * @param state State / country
-     * @param countryCode Country code
-     * @param timeZone Time zone
-     * @param email Node admin's email
-     * @param keystorePass Keystore password  
-     * @param keystoreDir Keystore directory
-     */
-    public AppConfiguration( String nodeName, String nodeAddress, 
-            String nodeType, String version, int soTimeout, int connTimeout, 
-            String workDir, String imagesDir, String thumbsDir, 
-            String orgName, String orgUnit, String locality, String state,
-            String countryCode, String timeZone, String email, 
-            String keystoreDir) {
-        this.nodeName = nodeName;
-        this.nodeAddress = nodeAddress;
-        this.nodeType = nodeType;
-        this.version = version;
-        this.soTimeout = soTimeout;
-        this.connTimeout = connTimeout;
-        this.workDir = workDir;
-        this.imagesDir = imagesDir;
-        this.thumbsDir = thumbsDir;
-        this.orgName = orgName;
-        this.orgUnit = orgUnit;
-        this.locality = locality;
-        this.state = state;
-        this.countryCode = countryCode;
-        this.timeZone = timeZone;
-        this.email = email;
-        this.keystoreDir = keystoreDir;
-    }
-    /**
-     * Used to compare application configuration objects.
-     * 
-     * @param obj Application configuration object
-     * @return True if all fields are equal, false otherwise 
+     * Compares current object with another.
+     * @param obj Object to compare with
+     * @return True if tested parameters are equal
      */
     @Override
-    public boolean equals( Object obj ) {
-        if( this == obj ) return true;
-        if( obj instanceof AppConfiguration ) {
-            AppConfiguration appConf = ( AppConfiguration )obj;
-            return appConf.getNodeName().equals( this.getNodeName() ) &&
-                appConf.getNodeAddress().equals( this.getNodeAddress() ) &&    
-                appConf.getNodeType().equals( this.getNodeType() ) &&
-                appConf.getVersion().equals( this.getVersion() ) &&
-                appConf.getSoTimeout() == this.getSoTimeout() &&
-                appConf.getConnTimeout() == this.getConnTimeout() &&
-                appConf.getWorkDir().equals( this.getWorkDir() ) &&
-                appConf.getImagesDir().equals( this.getImagesDir() ) &&
-                appConf.getThumbsDir().equals( this.getThumbsDir() ) &&
-                appConf.getOrgName().equals( this.getOrgName() ) &&
-                appConf.getOrgUnit().equals( this.getOrgUnit() ) &&    
-                appConf.getLocality().equals( this.getLocality() ) &&
-                appConf.getState().equals( this.getState() ) &&
-                appConf.getCountryCode().equals( this.getCountryCode() ) &&
-                appConf.getTimeZone().equals( this.getTimeZone() ) &&
-                appConf.getEmail().equals( this.getEmail() ) &&
-                appConf.getKeystoreDir().equals(this.getKeystoreDir());
-        } else {
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if(obj == null || this.getClass() != obj.getClass()) {
             return false;
         }
+        AppConfiguration conf = (AppConfiguration) obj;
+        return this.getNodeName() != null && 
+                this.getNodeName().equals(conf.getNodeName()) &&
+                this.getNodeAddress() != null &&
+                this.getNodeAddress().equals(conf.getNodeAddress()) &&
+                this.getNodeType() != null &&
+                this.getNodeType().equals(conf.getNodeType()) &&
+                this.getOrgName() != null &&
+                this.getOrgName().equals(conf.getOrgName()) &&
+                this.getOrgUnit() != null &&
+                this.getOrgUnit().equals(conf.getOrgUnit()) &&
+                this.getLocality() != null &&
+                this.getLocality().equals(conf.getLocality()) &&
+                this.getState() != null &&
+                this.getState().equals(conf.getState()) &&
+                this.getCountryCode() != null &&
+                this.getCountryCode().equals(conf.getCountryCode()) &&
+                this.getTimeZone() != null &&
+                this.getTimeZone().equals(conf.getTimeZone()) &&
+                this.getAdminEmail() != null &&
+                this.getAdminEmail().equals(conf.getAdminEmail()) &&
+                this.getWorkDir() != null &&
+                this.getWorkDir().equals(conf.getWorkDir());
     }
+    
     /**
-     * Gets node name.
-     *
-     * @return node name
+     * Generate hash code.
+     * @return Hash code
      */
-    public String getNodeName() { return nodeName; }
-    /**
-     * Sets short node name.
-     *
-     * @param nodeName Short node name
-     */
-    public void setNodeName( String nodeName ) { this.nodeName = nodeName; }
-    /**
-     * Gets node address.
-     * 
-     * @return nodeAddress Fully qualified node address
-     */
-    public String getNodeAddress() { return nodeAddress; }
-    /**
-     * Sets node address.
-     * 
-     * @param nodeAddress Fully qualified node address
-     */
-    public void setNodeAddress(String nodeAddress) { 
-        this.nodeAddress = nodeAddress; 
+    @Override
+    public int hashCode() {
+        int prime = 7;
+        int result = 1;
+        result = prime * result + ((this.getNodeName() == null) ? 
+                0 : this.getNodeName().hashCode());
+        result = prime * result + ((this.getNodeAddress() == null) ? 
+                0 : this.getNodeAddress().hashCode());
+        result = prime * result + ((this.getNodeType() == null) ? 
+                0 : this.getNodeType().hashCode());
+        result = prime * result + ((this.getOrgName() == null) ? 
+                0 : this.getOrgName().hashCode());
+        result = prime * result + ((this.getOrgUnit() == null) ? 
+                0 : this.getOrgUnit().hashCode());
+        result = prime * result + ((this.getLocality() == null) ? 
+                0 : this.getLocality().hashCode());
+        result = prime * result + ((this.getState() == null) ? 
+                0 : this.getState().hashCode());
+        result = prime * result + ((this.getCountryCode() == null) ? 
+                0 : this.getCountryCode().hashCode());
+        result = prime * result + ((this.getTimeZone() == null) ? 
+                0 : this.getTimeZone().hashCode());
+        result = prime * result + ((this.getAdminEmail() == null) ? 
+                0 : this.getAdminEmail().hashCode());
+        result = prime * result + ((this.getWorkDir() == null) ? 
+                0 : this.getWorkDir().hashCode());
+        result = prime * result + ((this.getImagesDir() == null) ? 
+                0 : this.getImagesDir().hashCode());
+        result = prime * result + ((this.getThumbsDir() == null) ? 
+                0 : this.getThumbsDir().hashCode());
+        result = prime * result + ((this.getKeystoreDir() == null) ? 
+                0 : this.getKeystoreDir().hashCode());
+        result = prime * result + ((this.getVersion() == null) ? 
+                0 : this.getVersion().hashCode());
+        result = prime * result + ((this.getSoTimeout() == null) ? 
+                0 : this.getSoTimeout().hashCode());
+        result = prime * result + ((this.getConnTimeout() == null) ? 
+                0 : this.getConnTimeout().hashCode());
+        return result;
     }
+    
     /**
-     * Gets node type.
-     *
-     * @return Type of a node
+     * @return the nodeName
      */
-    public String getNodeType() { return nodeType; }
-    /**
-     * Sets node type.
-     *
-     * @param nodeType Type of a node
-     */
-    public void setNodeType( String nodeType ) { this.nodeType = nodeType; }
-    /**
-     * Gets software version
-     *
-     * @return version Software version
-     */
-    public String getVersion() { return version; }
-    /**
-     * Sets software version
-     *
-     * @param version Software version to set
-     */
-    public void setVersion( String version ) { this.version = version; }
-    /**
-     * Gets socket timeout
-     *
-     * @return soTimeout Socket timeout
-     */
-    public int getSoTimeout() { return soTimeout; }
-    /**
-     * Sets socket timeout
-     *
-     * @param soTimeout Socket timeout to set
-     */
-    public void setSoTimeout( int soTimeout ) { this.soTimeout = soTimeout; }
-    /**
-     * Gets connection timeout
-     *
-     * @return connTimeout Connection timeout
-     */
-    public int getConnTimeout() { return connTimeout; }
-    /**
-     * Sets connection timeout
-     *
-     * @param connTimeout Connection timeout to set
-     */
-    public void setConnTimeout( int connTimeout ) { 
-        this.connTimeout = connTimeout; 
+    public String getNodeName() {
+        return nodeName;
     }
+
+    /**
+     * @param nodeName the nodeName to set
+     */
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
+    }
+
+    /**
+     * @return the nodeAddress
+     */
+    public String getNodeAddress() {
+        return nodeAddress;
+    }
+
+    /**
+     * @param nodeAddress the nodeAddress to set
+     */
+    public void setNodeAddress(String nodeAddress) {
+        this.nodeAddress = nodeAddress;
+    }
+
+    /**
+     * @return the nodeType
+     */
+    public String getNodeType() {
+        return nodeType;
+    }
+
+    /**
+     * @param nodeType the nodeType to set
+     */
+    public void setNodeType(String nodeType) {
+        this.nodeType = nodeType;
+    }
+
     /**
      * @return the orgName
      */
@@ -288,66 +289,77 @@ public class AppConfiguration {
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
     }
+
     /**
-     * Gets local time zone.
-     *
-     * @return Local time zone
+     * @return the timeZone
      */
-    public String getTimeZone() { return timeZone; }
+    public String getTimeZone() {
+        return timeZone;
+    }
+
     /**
-     * Sets local time zone.
-     *
      * @param timeZone the timeZone to set
      */
-    public void setTimeZone( String timeZone ) { this.timeZone = timeZone; }
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
     /**
-     * Gets work directory.
-     *
-     * @return Work directory
+     * @return the adminEmail
      */
-    public String getWorkDir() { return workDir; }
+    public String getAdminEmail() {
+        return adminEmail;
+    }
+
     /**
-     * Sets work directory.
-     *
-     * @param workDir Work directory
+     * @param adminEmail the adminEmail to set
      */
-    public void setWorkDir( String workDir ) { this.workDir = workDir; }
+    public void setAdminEmail(String adminEmail) {
+        this.adminEmail = adminEmail;
+    }
+
     /**
-     * Gets images storage directory
-     *
-     * @return imagesDir Images storage directory
+     * @return the workDir
      */
-    public String getImagesDir() { return imagesDir; }
+    public String getWorkDir() {
+        return workDir;
+    }
+
     /**
-     * Sets images storage directory
-     *
-     * @param imagesDir Images storage directory to set
+     * @param workDir the workDir to set
      */
-    public void setImagesDir( String imagesDir ) { this.imagesDir = imagesDir; }
+    public void setWorkDir(String workDir) {
+        this.workDir = workDir;
+    }
+
     /**
-     * Gets thumbnails storage directory
-     *
-     * @return thumbsDir Thumbnails storage directory
+     * @return the imagesDir
      */
-    public String getThumbsDir() { return thumbsDir; }
+    public String getImagesDir() {
+        return imagesDir;
+    }
+
     /**
-     * Sets thumbnails storage directory
-     *
-     * @param thumbsDir Thumbnails storage directory to set
+     * @param imagesDir the imagesDir to set
      */
-    public void setThumbsDir( String thumbsDir ) { this.thumbsDir = thumbsDir; }
+    public void setImagesDir(String imagesDir) {
+        this.imagesDir = imagesDir;
+    }
+
     /**
-     * Gets node administrator's email.
-     *
-     * @return Node administrator's email
+     * @return the thumbsDir
      */
-    public String getEmail() { return email; }
+    public String getThumbsDir() {
+        return thumbsDir;
+    }
+
     /**
-     * Sets node administrator's email.
-     * 
-     * @param email Node administrator's email
+     * @param thumbsDir the thumbsDir to set
      */
-    public void setEmail( String email ) { this.email = email; }
+    public void setThumbsDir(String thumbsDir) {
+        this.thumbsDir = thumbsDir;
+    }
+
     /**
      * @return the keystoreDir
      */
@@ -361,5 +373,48 @@ public class AppConfiguration {
     public void setKeystoreDir(String keystoreDir) {
         this.keystoreDir = keystoreDir;
     }
+
+    /**
+     * @return the version
+     */
+    public String getVersion() {
+        return version;
+    }
+
+    /**
+     * @param version the version to set
+     */
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    /**
+     * @return the soTimeout
+     */
+    public String getSoTimeout() {
+        return soTimeout;
+    }
+
+    /**
+     * @param soTimeout the soTimeout to set
+     */
+    public void setSoTimeout(String soTimeout) {
+        this.soTimeout = soTimeout;
+    }
+
+    /**
+     * @return the connTimeout
+     */
+    public String getConnTimeout() {
+        return connTimeout;
+    }
+
+    /**
+     * @param connTimeout the connTimeout to set
+     */
+    public void setConnTimeout(String connTimeout) {
+        this.connTimeout = connTimeout;
+    }
+  
 }
 

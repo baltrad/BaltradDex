@@ -22,8 +22,7 @@
 package eu.baltrad.dex.db.manager.impl;
 
 import eu.baltrad.dex.db.manager.IBltFileManager;
-import eu.baltrad.dex.util.InitAppUtil;
-import static eu.baltrad.dex.util.InitAppUtil.validate;
+import static eu.baltrad.dex.util.WebValidator.validate;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.manager.impl.DataSourceManager;
 import eu.baltrad.dex.db.model.BltFile;
@@ -41,6 +40,7 @@ import eu.baltrad.bdb.db.FileResult;
 import eu.baltrad.bdb.expr.ExpressionFactory;
 import eu.baltrad.bdb.expr.Expression;
 import eu.baltrad.bdb.oh5.Metadata;
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.db.model.BltQueryParameter;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,6 +84,8 @@ public class BltFileManager implements IBltFileManager {
     private DataSourceManager dataSourceManager;
     /** References CoreFilterManager */
     private CoreFilterManager coreFilterManager;
+    
+    private ConfigurationManager configurationManager;
     /** Logger */
     private Logger log;
 
@@ -191,8 +193,9 @@ public class BltFileManager implements IBltFileManager {
                 ),
                 metadata.getWhatSource(),
                 metadata.getWhatObject(),
-                InitAppUtil.getConf().getThumbsDir() + File.separator + 
-                    entry.getUuid().toString() + IMAGE_FILE_EXT);
+                configurationManager.getAppConf().getThumbsDir() + 
+                    File.separator + entry.getUuid().toString() + 
+                    IMAGE_FILE_EXT);
         } catch (ParseException e) {
             log.error("Failed to parse file's timestamp", e);
         } catch (Exception e) {
@@ -509,6 +512,15 @@ public class BltFileManager implements IBltFileManager {
     @Autowired
     public void setCoreFilterManager(CoreFilterManager coreFilterManager) {
         this.coreFilterManager = coreFilterManager;
+    }
+    
+    /**
+     * @param configurationManager 
+     */
+    @Autowired
+    public void setConfigurationManager(
+            ConfigurationManager configurationManager) {
+        this.configurationManager = configurationManager;
     }
     
 }

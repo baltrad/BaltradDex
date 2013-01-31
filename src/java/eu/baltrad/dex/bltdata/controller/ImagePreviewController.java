@@ -22,9 +22,9 @@
 package eu.baltrad.dex.bltdata.controller;
 
 import eu.baltrad.dex.bltdata.util.DataProcessor;
-import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.bdb.FileCatalog;
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -73,6 +73,7 @@ public class ImagePreviewController {
     
     private DataProcessor bltDataProcessor;
     private FileCatalog fileCatalog;
+    private ConfigurationManager configurationManager;
 
     /**
      * Creates image based on parameters retrieved from request.
@@ -97,7 +98,8 @@ public class ImagePreviewController {
         String urLon = request.getParameter( "urLon" );
 
         // try to load image from disk before creating a new one
-        String filePath = InitAppUtil.getImagesDir() + File.separator + fileUuid
+        String filePath = configurationManager.getAppConf().getImagesDir() + 
+                File.separator + fileUuid
             + datasetPath.replaceAll( DataProcessor.H5_PATH_SEPARATOR, "_" ) +
             DataProcessor.IMAGE_FILE_EXT;
         File imageFile = new File( filePath );
@@ -122,13 +124,14 @@ public class ImagePreviewController {
         // reconstruct image URL
         StringBuffer requestURL = request.getRequestURL();
         String imageURL = requestURL.substring( 0, 
-                requestURL.lastIndexOf( URL_PATH_SEPARATOR )
-            + 1 ) + InitAppUtil.getConf().getWorkDir() + URL_PATH_SEPARATOR + 
-            InitAppUtil.getConf().getImagesDir() + URL_PATH_SEPARATOR + 
+            requestURL.lastIndexOf( URL_PATH_SEPARATOR ) + 1 ) + 
+                configurationManager.getAppConf().getWorkDir() + 
+                URL_PATH_SEPARATOR + 
+                configurationManager.getAppConf().getImagesDir() + 
+                URL_PATH_SEPARATOR + 
                 fileUuid + datasetPath.replaceAll( 
                 DataProcessor.H5_PATH_SEPARATOR, "_" ) +
-            DataProcessor.IMAGE_FILE_EXT;
-        
+                DataProcessor.IMAGE_FILE_EXT;
         // create model
         model.addAttribute(RADAR_LAT_0_KEY, lat0);
         model.addAttribute(RADAR_LON_0_KEY, lon0);
@@ -154,6 +157,15 @@ public class ImagePreviewController {
     @Autowired
     public void setFileCatalog(FileCatalog fileCatalog) {
         this.fileCatalog = fileCatalog;
+    }
+    
+    /**
+     * @param configurationManager 
+     */
+    @Autowired
+    public void setConfigurationManager(
+            ConfigurationManager configurationManager) {
+        this.configurationManager = configurationManager;
     }
     
 }

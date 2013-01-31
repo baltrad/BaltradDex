@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.config.controller;
 
-import eu.baltrad.dex.config.model.LogConfiguration;
+import eu.baltrad.dex.config.model.RegistryConfiguration;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.config.validator.RegistryConfigurationValidator;
 import eu.baltrad.dex.registry.manager.impl.RegistryManager;
@@ -82,9 +82,9 @@ public class RegistryConfigurationController {
      */
     @RequestMapping(method = RequestMethod.GET)
     protected String setupForm(ModelMap model) {
-        LogConfiguration conf = configManager.loadRegConf();
+        RegistryConfiguration conf = configManager.getRegistryConf();
         if (conf == null) {
-            conf = new LogConfiguration();
+            conf = new RegistryConfiguration();
         }
         model.addAttribute(CONF_KEY, conf);
         return FORM_VIEW;
@@ -99,7 +99,7 @@ public class RegistryConfigurationController {
      */
     @RequestMapping(method = RequestMethod.POST)
     protected String processSubmit(
-            @ModelAttribute("config") LogConfiguration conf, 
+            @ModelAttribute("config") RegistryConfiguration conf, 
                 BindingResult result, ModelMap model) {
         
         validator.validate(conf, result);
@@ -107,21 +107,24 @@ public class RegistryConfigurationController {
             return FORM_VIEW;
         }
         try {
-            if (conf.getTrimByNumber()) {
-                registryManager.setTrimmer(conf.getRecordLimit());
-                configManager.saveRegConf(conf);
+            if (Boolean.parseBoolean(conf.getRegTrimByNumber())) {
+                registryManager.setTrimmer(Integer.parseInt(conf.getRegRecordLimit()));
             } else {
                 registryManager.removeTrimmer(
                         RegistryManager.TRIM_REG_BY_NUMBER_TG);
+                conf.setRegTrimByNumber("false");   
             }
-            if (conf.getTrimByAge()) {
-                registryManager.setTrimmer(conf.getMaxAgeDays(), 
-                        conf.getMaxAgeHours(), conf.getMaxAgeMinutes());
-                configManager.saveRegConf(conf);
+            if (Boolean.parseBoolean(conf.getRegTrimByAge())) {
+                registryManager.setTrimmer(
+                        Integer.parseInt(conf.getRegMaxAgeDays()), 
+                        Integer.parseInt(conf.getRegMaxAgeHours()), 
+                        Integer.parseInt(conf.getRegMaxAgeMinutes()));
             } else {
                 registryManager.removeTrimmer(
                         RegistryManager.TRIM_REG_BY_AGE_TG);
+                conf.setRegTrimByAge("false");   
             }
+            configManager.saveRegistryConf(conf);
             String msg = messages.getMessage(SAVE_REGISTRY_CONF_OK);
             model.addAttribute(OK_MSG_KEY, msg);
             log.warn(msg);

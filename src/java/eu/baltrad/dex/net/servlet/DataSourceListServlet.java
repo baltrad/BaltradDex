@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.net.servlet;
 
+import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.net.util.json.IJsonUtil;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
@@ -31,7 +32,6 @@ import eu.baltrad.dex.user.model.Account;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
-import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import java.io.IOException;
 
@@ -75,6 +75,7 @@ public class DataSourceListServlet extends HttpServlet {
     private static final String DS_INTERNAL_SERVER_ERROR_KEY = 
             "datasource.server.internal_server_error";
     
+    private IConfigurationManager confManager;
     private Authenticator authenticator;
     private IAccountManager accountManager;
     private IDataSourceManager dataSourceManager;
@@ -96,14 +97,14 @@ public class DataSourceListServlet extends HttpServlet {
      */
     protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
-                InitAppUtil.getConf().getKeystoreDir());
-        this.localNode = new Account(InitAppUtil.getConf().getNodeName(),
-                InitAppUtil.getConf().getNodeAddress(),
-                InitAppUtil.getConf().getOrgName(),
-                InitAppUtil.getConf().getOrgUnit(),
-                InitAppUtil.getConf().getLocality(),
-                InitAppUtil.getConf().getState(),
-                InitAppUtil.getConf().getCountryCode());   
+                confManager.getAppConf().getKeystoreDir());
+        this.localNode = new Account(confManager.getAppConf().getNodeName(),
+                confManager.getAppConf().getNodeAddress(),
+                confManager.getAppConf().getOrgName(),
+                confManager.getAppConf().getOrgUnit(),
+                confManager.getAppConf().getLocality(),
+                confManager.getAppConf().getState(),
+                confManager.getAppConf().getCountryCode());   
     }
     
     /**
@@ -211,6 +212,14 @@ public class DataSourceListServlet extends HttpServlet {
                     messages.getMessage(DS_INTERNAL_SERVER_ERROR_KEY,
                         new String[] {e.getMessage()}));
         }
+    }
+    
+    /**
+     * @param configurationManager 
+     */
+    @Autowired
+    public void setConfigurationManager(IConfigurationManager confManager) {
+        this.confManager = confManager;
     }
 
     /**

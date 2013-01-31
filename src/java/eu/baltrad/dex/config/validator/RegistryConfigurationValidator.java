@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.config.validator;
 
-import eu.baltrad.dex.config.model.LogConfiguration;
+import eu.baltrad.dex.config.model.RegistryConfiguration;
 
 import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
@@ -41,7 +41,7 @@ public class RegistryConfigurationValidator implements Validator {
      * @return True if class is supported, false otherwise
      */
     public boolean supports(Class clazz) {
-        return LogConfiguration.class.equals(clazz);
+        return RegistryConfiguration.class.equals(clazz);
     }
     /**
      * Validates form object.
@@ -50,41 +50,31 @@ public class RegistryConfigurationValidator implements Validator {
      * @param errors Errors object
      */
     public void validate(Object command, Errors errors) {
-        LogConfiguration conf = (LogConfiguration) command;
+        RegistryConfiguration conf = (RegistryConfiguration) command;
         
         if (conf == null) return;
         
-        if (conf.getTrimByNumber() && conf.getRecordLimit() <= 0) {
-            errors.rejectValue("recordLimit", 
+        if (!conf.getRegRecordLimit().matches("[1-9][0-9]*")) {
+            errors.rejectValue("regRecordLimit", 
                     "saveregistryconf.invalid.record_limit");
         }
-        
-        if (conf.getTrimByAge()) {
-            if (conf.getMaxAgeDays() < 0) {
-                errors.rejectValue("maxAgeDays", 
-                        "saveregistryconf.invalid.days_limit");
-            }
-            if (conf.getMaxAgeHours() < 0) {
-                errors.rejectValue("maxAgeHours", 
-                        "saveregistryconf.invalid.hours_limit");
-            }
-            if (conf.getMaxAgeHours() > 23) {
-                errors.rejectValue("maxAgeHours", 
-                        "saveregistryconf.invalid.hours_limit");
-            }
-            if (conf.getMaxAgeMinutes() < 0) {
-                errors.rejectValue("maxAgeMinutes", 
-                        "saveregistryconf.invalid.minutes_limit");
-            }
-            if (conf.getMaxAgeMinutes() > 59) {
-                errors.rejectValue("maxAgeMinutes", 
-                        "saveregistryconf.invalid.minutes_limit");
-            }
-            if (conf.getMaxAgeDays() == 0 && conf.getMaxAgeHours() == 0 &&
-                    conf.getMaxAgeMinutes() == 0) {
-                errors.rejectValue("maxAgeDays", 
+        if (!conf.getRegMaxAgeDays().matches("0|[1-9]{1}[0-9]*")) {
+            errors.rejectValue("regMaxAgeDays", 
+                    "saveregistryconf.invalid.days_limit");
+        }
+        if (!conf.getRegMaxAgeHours().matches("[0-9]|[1-2][0-3]")) {
+            errors.rejectValue("regMaxAgeHours", 
+                    "saveregistryconf.invalid.hours_limit");
+        }
+        if (!conf.getRegMaxAgeMinutes().matches("[0-5]|[1-5][0-9]")) {
+            errors.rejectValue("regMaxAgeMinutes", 
+                    "saveregistryconf.invalid.minutes_limit");
+        }
+        if (conf.getRegMaxAgeDays().matches("0") &&
+                    conf.getRegMaxAgeHours().matches("0") &&
+                    conf.getRegMaxAgeMinutes().matches("0")) {
+                errors.rejectValue("regMaxAgeDays", 
                         "saveregistryconf.invalid.age_limit");
-            }
         }
     }
     

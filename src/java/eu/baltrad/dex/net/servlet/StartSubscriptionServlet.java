@@ -21,12 +21,12 @@
 
 package eu.baltrad.dex.net.servlet;
 
+import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.net.util.json.IJsonUtil;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.request.impl.NodeRequest;
 import eu.baltrad.dex.net.response.impl.NodeResponse;
-import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
@@ -79,6 +79,7 @@ public class StartSubscriptionServlet extends HttpServlet {
     private static final String PS_GENERIC_SUBSCRIPTION_ERROR = 
             "postsubscription.server.generic_subscription_error";
     
+    private IConfigurationManager confManager;
     private Authenticator authenticator;
     private IJsonUtil jsonUtil;
     private ISubscriptionManager subscriptionManager;
@@ -99,14 +100,14 @@ public class StartSubscriptionServlet extends HttpServlet {
      */
     protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
-                InitAppUtil.getConf().getKeystoreDir());
-        this.localNode = new Account(InitAppUtil.getConf().getNodeName(),
-                InitAppUtil.getConf().getNodeAddress(),
-                InitAppUtil.getConf().getOrgName(),
-                InitAppUtil.getConf().getOrgUnit(),
-                InitAppUtil.getConf().getLocality(),
-                InitAppUtil.getConf().getState(),
-                InitAppUtil.getConf().getCountryCode());
+                confManager.getAppConf().getKeystoreDir());
+        this.localNode = new Account(confManager.getAppConf().getNodeName(),
+                confManager.getAppConf().getNodeAddress(),
+                confManager.getAppConf().getOrgName(),
+                confManager.getAppConf().getOrgUnit(),
+                confManager.getAppConf().getLocality(),
+                confManager.getAppConf().getState(),
+                confManager.getAppConf().getCountryCode());
     }
     
     /**
@@ -245,6 +246,14 @@ public class StartSubscriptionServlet extends HttpServlet {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(PS_INTERNAL_SERVER_ERROR_KEY));
         }
+    }
+    
+    /**
+     * @param configurationManager 
+     */
+    @Autowired
+    public void setConfigurationManager(IConfigurationManager confManager) {
+        this.confManager = confManager;
     }
 
     /**

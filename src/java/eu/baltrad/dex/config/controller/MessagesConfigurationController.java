@@ -82,7 +82,7 @@ public class MessagesConfigurationController {
      */
     @RequestMapping(method = RequestMethod.GET)
     protected String setupForm(ModelMap model) {
-        LogConfiguration conf = configManager.loadMsgConf();
+        LogConfiguration conf = configManager.getLogConf();
         if (conf == null) {
             conf = new LogConfiguration();
         }
@@ -107,19 +107,23 @@ public class MessagesConfigurationController {
             return FORM_VIEW;
         }
         try {
-            if (conf.getTrimByNumber()) {
-                logManager.setTrimmer(conf.getRecordLimit());
-                configManager.saveMsgConf(conf);
+            if (Boolean.parseBoolean(conf.getMsgTrimByNumber())) {
+                logManager.setTrimmer(Integer.parseInt(conf.getMsgRecordLimit()));
             } else {
                 logManager.removeTrimmer(LogManager.TRIM_MSG_BY_NUMBER_TG);
+                conf.setMsgTrimByNumber("false");   
             }
-            if (conf.getTrimByAge()) {
-                logManager.setTrimmer(conf.getMaxAgeDays(), 
-                        conf.getMaxAgeHours(), conf.getMaxAgeMinutes());
-                configManager.saveMsgConf(conf);
+            if (Boolean.parseBoolean(conf.getMsgTrimByAge())) {
+                logManager.setTrimmer(
+                        Integer.parseInt(conf.getMsgMaxAgeDays()),
+                        Integer.parseInt(conf.getMsgMaxAgeHours()),
+                        Integer.parseInt(conf.getMsgMaxAgeMinutes()));
             } else {
                 logManager.removeTrimmer(LogManager.TRIM_MSG_BY_AGE_TG);
+                conf.setMsgTrimByAge("false");
+                
             }
+            configManager.saveLogConf(conf);
             String msg = messages.getMessage(SAVE_MESSAGES_CONF_OK);
             model.addAttribute(OK_MSG_KEY, msg);
             log.warn(msg);

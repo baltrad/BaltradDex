@@ -26,9 +26,9 @@ import eu.baltrad.dex.db.manager.impl.BltFileManager;
 import eu.baltrad.dex.db.model.BltFile;
 import eu.baltrad.dex.db.model.BltDataset;
 import eu.baltrad.dex.bltdata.util.DataProjector;
-import eu.baltrad.dex.util.InitAppUtil;
 
 import eu.baltrad.bdb.FileCatalog;
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -96,6 +96,7 @@ public class BltFileDetailsController {
     private DataProcessor bltDataProcessor;
     private BltFileManager bltFileManager;
     private FileCatalog fileCatalog;
+    private ConfigurationManager configurationManager;
     private Logger log;
     
     private SimpleDateFormat dateTimeFormat;
@@ -235,8 +236,8 @@ public class BltFileDetailsController {
                 BltDataset bltDataset = new BltDataset( datasetFullNames.get( i ),
                     whereGroup, quantity_val, nbins_val * 2, nbins_val * 2,
                     lat0_val, lon0_val, llLatLon.getY(), llLatLon.getX(), urLatLon.getY(),
-                    urLatLon.getX(), elangle_val, InitAppUtil.getConf().getWorkDir() +
-                    File.separator + InitAppUtil.getConf().getThumbsDir() + File.separator +
+                    urLatLon.getX(), elangle_val, configurationManager.getAppConf().getWorkDir() +
+                    File.separator + configurationManager.getAppConf().getThumbsDir() + File.separator +
                     uuid + datasetFullNames.get( i ).replaceAll( DataProcessor.H5_PATH_SEPARATOR,
                     "_" ) + DataProcessor.IMAGE_FILE_EXT );
 
@@ -244,7 +245,7 @@ public class BltFileDetailsController {
                 bltDatasets.add( bltDataset );
 
                 // try to load thumb from disk before creating a new one
-                String thumbPath = InitAppUtil.getThumbsDir() + File.separator
+                String thumbPath = configurationManager.getAppConf().getThumbsDir() + File.separator
                     + uuid + datasetFullNames.get( i ).replaceAll(
                         DataProcessor.H5_PATH_SEPARATOR, "_" )  + DataProcessor.IMAGE_FILE_EXT;
 
@@ -302,6 +303,15 @@ public class BltFileDetailsController {
     @Autowired
     public void setFileCatalog(FileCatalog fileCatalog) {
         this.fileCatalog = fileCatalog;
+    }
+    
+    /**
+     * @param configurationManager 
+     */
+    @Autowired
+    public void setConfigurationManager(
+            ConfigurationManager configurationManager) {
+        this.configurationManager = configurationManager;
     }
     
 }

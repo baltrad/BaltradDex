@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,11 +15,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Log in page
 Created on : Sep 22, 2010, 1:51 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -28,21 +28,23 @@ Author     : szewczenko
 
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
-<%@page import="eu.baltrad.dex.util.InitAppUtil"%>
-<%@page import="eu.baltrad.dex.config.model.AppConfiguration"%>
+<%@page import="eu.baltrad.dex.config.manager.impl.ConfigurationManager"%> 
+
+<jsp:useBean id="configurationManager" scope="request"
+             class="eu.baltrad.dex.config.manager.impl.ConfigurationManager">
+</jsp:useBean>
 
 <%
     Date now = new Date();
-    SimpleDateFormat format = new SimpleDateFormat( "dd MMMM yyyy, h:mm aa" );
-    String dateAndTime = format.format( now );
+    SimpleDateFormat format = new SimpleDateFormat("dd MMMM yyyy, h:mm aa");
+    String dateAndTime = format.format(now); 
     
-    AppConfiguration appConf = InitAppUtil.loadAppConf();
-    if( appConf == null ) {
-        request.getSession().setAttribute( "init_status", 1 );
+    if (configurationManager.getAppConf() == null ) {
+        request.getSession().setAttribute("init_status", 1);
     } else {
-        request.getSession().setAttribute( "init_status", 0 );
+        request.getSession().setAttribute("init_status", 0);
     }
-    String adminEmail = appConf.getEmail();
+    String adminEmail = configurationManager.getAppConf().getAdminEmail();
 %>
 
 <html>

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -23,31 +23,27 @@ package eu.baltrad.dex.config.manager;
 
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.LogConfiguration;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Properties;
+import eu.baltrad.dex.config.model.RegistryConfiguration;
 
 /**
  * Configuration manager interface.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.2.2
+ * @version 1.7.1
  * @since 1.2.2
  */
 public interface IConfigurationManager {
     
-    public HashMap<String, Properties> loadProperties() throws IOException;
+    public AppConfiguration getAppConf();
+   
+    public LogConfiguration getLogConf();
+     
+    public RegistryConfiguration getRegistryConf();
     
-    public AppConfiguration loadAppConf();
+    public void saveAppConf(AppConfiguration conf);
     
-    public void saveAppConf(AppConfiguration appConf) throws Exception;
+    public void saveLogConf(LogConfiguration conf);
     
-    public LogConfiguration loadMsgConf();
-    
-    public void saveMsgConf(LogConfiguration msgConf) throws Exception;
-    
-    public LogConfiguration loadRegConf(); 
-    
-    public void saveRegConf( LogConfiguration regConf ) throws Exception;
+    public void saveRegistryConf(RegistryConfiguration conf);
     
 }

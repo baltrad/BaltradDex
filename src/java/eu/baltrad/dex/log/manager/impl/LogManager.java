@@ -25,7 +25,7 @@ import eu.baltrad.dex.log.manager.ILogManager;
 import eu.baltrad.dex.log.model.mapper.LogEntryMapper;
 import eu.baltrad.dex.log.model.LogEntry;
 import eu.baltrad.dex.log.model.LogParameter;
-import static eu.baltrad.dex.util.InitAppUtil.validate;
+import static eu.baltrad.dex.util.WebValidator.validate;
 
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.dao.EmptyResultDataAccessException;
