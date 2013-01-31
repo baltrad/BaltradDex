@@ -95,6 +95,8 @@ Modify a composite route
                        <option value="pcappi" <c:if test="${method == 'pcappi'}">selected</c:if> >PCAPPI</option>
                        <option value="ppi" <c:if test="${method == 'ppi'}">selected</c:if> >PPI</option>
                        <option value="cappi" <c:if test="${method == 'cappi'}">selected</c:if> >CAPPI</option>
+                       <option value="max" <c:if test="${method == 'max'}">selected</c:if> >MAX</option>
+                       <option value="pmax" <c:if test="${method == 'pmax'}">selected</c:if> >PMAX</option>
                      </select>
                      <div class="hint">
                        Choose a method to use for generating the composite.
