@@ -32,7 +32,6 @@ import java.security.MessageDigest;
  * @since 1.0
  */
 public class MessageDigestUtil {
-//---------------------------------------------------------------------- Methods
     /**
      * Method returns hash for a given message.
      * 
@@ -59,4 +58,4 @@ public class MessageDigestUtil {
         return hashString;
     }
 }
-//------------------------------------------------------------------------------
+

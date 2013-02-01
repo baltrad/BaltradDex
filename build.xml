@@ -54,7 +54,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property file="${etc.dir}/db.properties"/>
   <property file="${etc.dir}/appserver.properties"/>
   <property file="${etc.dir}/testdb.properties" />
-  <property file="${etc.dir}/dex.user.properties" />
+  <property file="${etc.dir}/dex.properties" />
 
   <property environment="env"/>
 
@@ -282,8 +282,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="${etc.dir}">
         <include name="db.properties" />
         <include name="dex.log4j.properties" />
-        <include name="dex.user.properties" />
-        <include name="dex.default.properties" />
+        <include name="dex.properties" />
       </fileset>
     </copy>
 
@@ -419,9 +418,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </copy>
     <copy todir="${test.conf.dir}">
       <fileset dir="${etc.dir}">
-        <include name="dex.default.properties"/>
-        <include name="dex.user.properties"/>
-        <include name="dex.version.properties"/>
+        <include name="dex.properties"/>
       </fileset>
     </copy>
   </target>

@@ -25,7 +25,7 @@ import eu.baltrad.dex.user.model.Account;
 import eu.baltrad.dex.user.manager.impl.AccountManager;
 import eu.baltrad.dex.user.validator.PasswordValidator;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.util.InitAppUtil;
+import eu.baltrad.dex.util.WebValidator;
 import eu.baltrad.dex.util.MessageDigestUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +85,7 @@ public class ChangePasswordController {
     public String setupForm(@RequestParam(value="user_id", required=false) 
             String userId, ModelMap model) {
         Account account;
-        if (InitAppUtil.validate(userId)) {
+        if (WebValidator.validate(userId)) {
             account = accountManager.load(Integer.parseInt(userId));
         } else {
             account = new Account();

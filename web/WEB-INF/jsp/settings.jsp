@@ -26,11 +26,14 @@ Author     : szewczenko
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
-<%@page import="eu.baltrad.dex.util.InitAppUtil"%>
+<%@page import="eu.baltrad.dex.config.manager.impl.ConfigurationManager"%> 
 <%@page import="eu.baltrad.dex.user.model.User" %>
 
 <jsp:useBean id="securityManager" scope="session"
              class="eu.baltrad.dex.auth.manager.SecurityManager">
+</jsp:useBean>
+<jsp:useBean id="configManager" scope="session"
+             class="eu.baltrad.dex.config.manager.impl.ConfigurationManager">
 </jsp:useBean>
 
 <%
@@ -38,16 +41,16 @@ Author     : szewczenko
     HttpSession sess = request.getSession();
     String userName = user.getName();
     sess.setAttribute("userName", userName);
-    sess.setAttribute("nodeName", InitAppUtil.getConf().getNodeName());
-    sess.setAttribute("nodeVersion", InitAppUtil.getConf().getVersion());
-    sess.setAttribute("nodeType", InitAppUtil.getConf().getNodeType());
-    sess.setAttribute("orgName", InitAppUtil.getConf().getOrgName());
-    sess.setAttribute("orgUnit", InitAppUtil.getConf().getOrgUnit());
-    sess.setAttribute("locality", InitAppUtil.getConf().getLocality());
-    sess.setAttribute("state", InitAppUtil.getConf().getState());
-    sess.setAttribute("countryCode", InitAppUtil.getConf().getCountryCode());
-    sess.setAttribute("timeZone", InitAppUtil.getConf().getTimeZone());
-    sess.setAttribute("adminEmail", InitAppUtil.getConf().getEmail());
+    sess.setAttribute("nodeName", configManager.getAppConf().getNodeName());
+    sess.setAttribute("nodeVersion", configManager.getAppConf().getVersion());
+    sess.setAttribute("nodeType", configManager.getAppConf().getNodeType());
+    sess.setAttribute("orgName", configManager.getAppConf().getOrgName());
+    sess.setAttribute("orgUnit", configManager.getAppConf().getOrgUnit());
+    sess.setAttribute("locality", configManager.getAppConf().getLocality());
+    sess.setAttribute("state", configManager.getAppConf().getState());
+    sess.setAttribute("countryCode", configManager.getAppConf().getCountryCode());
+    sess.setAttribute("timeZone", configManager.getAppConf().getTimeZone());
+    sess.setAttribute("adminEmail", configManager.getAppConf().getAdminEmail());
 %>
 
 <t:page_tabbed pageTitle="System settings" activeTab="settings">

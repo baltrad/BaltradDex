@@ -48,12 +48,12 @@ Author     : szewczenko
                                     Limit
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="recordLimit"
+                                    <form:input path="regRecordLimit"
                                                 title="Maximum number of registry entries"/>
                                     <div class="hint">
                                         Max number of registry entries
                                     </div>
-                                    <form:errors path="recordLimit" 
+                                    <form:errors path="regRecordLimit" 
                                                  cssClass="error"/>
                                 </div>
                             </div>
@@ -62,8 +62,9 @@ Author     : szewczenko
                                     Set active
                                 </div>
                                 <div class="col">
-                                    <form:checkbox path="trimByNumber"
-                                                   title="Set active/inactive"/>
+                                    <form:checkbox path="regTrimByNumber"
+                                                   title="Set active/inactive"
+                                                   value="true"/>
                                 </div>
                             </div>
                         </div>
@@ -77,12 +78,12 @@ Author     : szewczenko
                                     Days
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="maxAgeDays" 
+                                    <form:input path="regMaxAgeDays" 
                                                 title="Set number of days"/>
                                     <div class="hint">
                                         Number of days
                                     </div>
-                                    <form:errors path="maxAgeDays" 
+                                    <form:errors path="regMaxAgeDays" 
                                                  cssClass="error"/>
                                 </div>
                             </div>
@@ -91,8 +92,9 @@ Author     : szewczenko
                                     Set active
                                 </div>
                                 <div class="col">
-                                    <form:checkbox path="trimByAge"
-                                                   title="Set active/inactive"/>
+                                    <form:checkbox path="regTrimByAge"
+                                                   title="Set active/inactive"
+                                                   value="true"/>
                                 </div>
                             </div>
                         </div>
@@ -102,12 +104,12 @@ Author     : szewczenko
                                     Hours
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="maxAgeHours"
+                                    <form:input path="regMaxAgeHours"
                                                 title="Set number of hours"/>
                                     <div class="hint">
                                         Number of hours
                                     </div>
-                                    <form:errors path="maxAgeHours" 
+                                    <form:errors path="regMaxAgeHours" 
                                                  cssClass="error"/>
                                 </div>
                             </div>
@@ -118,12 +120,12 @@ Author     : szewczenko
                                     Minutes
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="maxAgeMinutes"
+                                    <form:input path="regMaxAgeMinutes"
                                                 title="Set number of minutes"/>
                                     <div class="hint">
                                         Number of minutes
                                     </div>
-                                    <form:errors path="maxAgeMinutes" 
+                                    <form:errors path="regMaxAgeMinutes" 
                                                  cssClass="error"/>
                                 </div>
                             </div>

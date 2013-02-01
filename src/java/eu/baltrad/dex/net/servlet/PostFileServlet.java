@@ -29,7 +29,6 @@ import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.request.impl.NodeRequest;
 import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.net.util.*;
-import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
@@ -49,6 +48,7 @@ import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
+import eu.baltrad.dex.config.manager.IConfigurationManager;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -69,7 +69,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
-//import org.apache.commons.io.IOUtils;
 
 /**
  * Receives and handles post file requests.
@@ -93,6 +92,7 @@ public class PostFileServlet extends HttpServlet {
     private static final String PF_GENERIC_POST_FILE_ERROR_KEY = 
             "postfile.server.generic_post_file_error";
     
+    private IConfigurationManager confManager;
     private Authenticator authenticator;
     private FileCatalog catalog;
     private FileEntryNamer namer;
@@ -121,17 +121,17 @@ public class PostFileServlet extends HttpServlet {
      */
     protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
-                InitAppUtil.getConf().getKeystoreDir());
-        this.setHttpClient(new HttpClientUtil(
-                 InitAppUtil.getConf().getConnTimeout(), 
-                 InitAppUtil.getConf().getSoTimeout()));
-        this.localNode = new Account(InitAppUtil.getConf().getNodeName(),
-                InitAppUtil.getConf().getNodeAddress(),
-                InitAppUtil.getConf().getOrgName(),
-                InitAppUtil.getConf().getOrgUnit(),
-                InitAppUtil.getConf().getLocality(),
-                InitAppUtil.getConf().getState(),
-                InitAppUtil.getConf().getCountryCode());
+                confManager.getAppConf().getKeystoreDir());
+        this.httpClient = new HttpClientUtil(
+                 Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
+                 Integer.parseInt(confManager.getAppConf().getSoTimeout()));
+        this.localNode = new Account(confManager.getAppConf().getNodeName(),
+                confManager.getAppConf().getNodeAddress(),
+                confManager.getAppConf().getOrgName(),
+                confManager.getAppConf().getOrgUnit(),
+                confManager.getAppConf().getLocality(),
+                confManager.getAppConf().getState(),
+                confManager.getAppConf().getCountryCode());
     }
     
     /**
@@ -224,6 +224,14 @@ public class PostFileServlet extends HttpServlet {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(PF_INTERNAL_SERVER_ERROR_KEY));
         }
+    }
+    
+    /**
+     * @param configurationManager 
+     */
+    @Autowired
+    public void setConfigurationManager(IConfigurationManager confManager) {
+        this.confManager = confManager;
     }
 
      /**

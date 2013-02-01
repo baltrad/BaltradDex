@@ -1,4 +1,6 @@
 <%------------------------------------------------------------------------------
+<%------------------------------------------------------------------------------
+<%------------------------------------------------------------------------------
 Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
@@ -48,12 +50,12 @@ Author     : szewczenko
                                     Limit
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="recordLimit"
+                                    <form:input path="msgRecordLimit"
                                                 title="Maximum number of log entries"/>
                                     <div class="hint">
                                         Max number of log entries
                                     </div>
-                                    <form:errors path="recordLimit" cssClass="error"/>
+                                    <form:errors path="msgRecordLimit" cssClass="error"/>
                                 </div>
                             </div>
                             <div class="rightcol">
@@ -61,8 +63,9 @@ Author     : szewczenko
                                     Set active
                                 </div>
                                 <div class="col">
-                                    <form:checkbox path="trimByNumber"
-                                                   title="Set active/inactive"/>
+                                    <form:checkbox path="msgTrimByNumber" 
+                                                   title="Set active/inactive" 
+                                                   value="true"/>
                                 </div>
                             </div>
                         </div>
@@ -76,12 +79,12 @@ Author     : szewczenko
                                     Days
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="maxAgeDays" 
+                                    <form:input path="msgMaxAgeDays" 
                                                 title="Set number of days"/>
                                     <div class="hint">
                                         Number of days
                                     </div>
-                                    <form:errors path="maxAgeDays" cssClass="error"/>
+                                    <form:errors path="msgMaxAgeDays" cssClass="error"/>
                                 </div>
                             </div>
                             <div class="rightcol">
@@ -89,8 +92,9 @@ Author     : szewczenko
                                     Set active
                                 </div>
                                 <div class="col">
-                                    <form:checkbox path="trimByAge"
-                                                   title="Set active/inactive"/>
+                                    <form:checkbox path="msgTrimByAge"
+                                                   title="Set active/inactive"
+                                                   value="true"/>
                                 </div>
                             </div>
                         </div>
@@ -100,12 +104,12 @@ Author     : szewczenko
                                     Hours
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="maxAgeHours"
+                                    <form:input path="msgMaxAgeHours"
                                                 title="Set number of hours"/>
                                     <div class="hint">
                                         Number of hours
                                     </div>
-                                    <form:errors path="maxAgeHours" cssClass="error"/>
+                                    <form:errors path="msgMaxAgeHours" cssClass="error"/>
                                 </div>
                             </div>
                         </div>
@@ -115,12 +119,12 @@ Author     : szewczenko
                                     Minutes
                                 </div>
                                 <div class="inner-rightcol">
-                                    <form:input path="maxAgeMinutes"
+                                    <form:input path="msgMaxAgeMinutes"
                                                 title="Set number of minutes"/>
                                     <div class="hint">
                                         Number of minutes
                                     </div>
-                                    <form:errors path="maxAgeMinutes" cssClass="error"/>
+                                    <form:errors path="msgMaxAgeMinutes" cssClass="error"/>
                                 </div>
                             </div>
                         </div>

@@ -35,7 +35,7 @@
   </div>
   <div id="bltfooter">
        <div class="projectref">
-          &#169 2009-2012 <a href="http://baltrad.eu/">baltrad.eu</a>
+          &#169 2009-2013 <a href="http://baltrad.eu/">baltrad.eu</a>
        </div>
        <div class="info">
          <a href="feedback.htm">Feedback</a> |

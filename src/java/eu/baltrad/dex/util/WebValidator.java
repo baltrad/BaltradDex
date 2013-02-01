@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.util;
 
+import java.util.List;
+
 /**
  * Implements URL and email address validators.
  *
@@ -137,5 +139,22 @@ public class WebValidator {
         }
         return result;
     }
+    
+    /**
+     * Validates a list parameter.
+     * 
+     * @param param List parameter
+     * @return True upon successful validation
+     */
+    public static boolean validate(List list) {
+        boolean result = false;
+        if (list != null) {
+            if (list.size() > 0) {
+                result = true;
+            }
+        }
+        return result;
+    }
+    
 }
 

@@ -29,7 +29,7 @@ import eu.baltrad.dex.user.model.Account;
 import eu.baltrad.dex.net.model.impl.Node;
 import eu.baltrad.dex.user.validator.AccountValidator;
 import eu.baltrad.dex.util.MessageDigestUtil;
-import eu.baltrad.dex.util.InitAppUtil;
+import eu.baltrad.dex.util.WebValidator;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.stereotype.Controller;
@@ -93,7 +93,7 @@ public class SaveAccountController  {
     public String setupForm(@RequestParam(value="user_id", required=false) 
             String userId, ModelMap model) {
         Account account;
-        if (InitAppUtil.validate(userId)) {
+        if (WebValidator.validate(userId)) {
             account = accountManager.load(Integer.parseInt(userId));
         } else {
             account = new Account();

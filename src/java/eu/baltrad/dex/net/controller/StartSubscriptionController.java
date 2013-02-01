@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.net.controller;
 
+import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.net.controller.exception.InternalControllerException;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.request.factory.RequestFactory;
@@ -36,7 +37,6 @@ import eu.baltrad.dex.net.manager.INodeManager;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.model.impl.Node;
-import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.stereotype.Controller;
@@ -97,6 +97,7 @@ public class StartSubscriptionController implements MessageSetter {
     /** Peer node name key */
     private static final String PEER_NAME_KEY = "peer_name";
     
+    private IConfigurationManager confManager;
     private Authenticator authenticator;
     private IHttpClientUtil httpClient;
     private IJsonUtil jsonUtil;
@@ -120,17 +121,17 @@ public class StartSubscriptionController implements MessageSetter {
      */
     protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
-                InitAppUtil.getConf().getKeystoreDir());
+                confManager.getAppConf().getKeystoreDir());
         this.httpClient = new HttpClientUtil(
-                InitAppUtil.getConf().getConnTimeout(), 
-                InitAppUtil.getConf().getSoTimeout());
-        this.localNode = new Account(InitAppUtil.getConf().getNodeName(),
-                InitAppUtil.getConf().getNodeAddress(),
-                InitAppUtil.getConf().getOrgName(),
-                InitAppUtil.getConf().getOrgUnit(),
-                InitAppUtil.getConf().getLocality(),
-                InitAppUtil.getConf().getState(),
-                InitAppUtil.getConf().getCountryCode());
+                Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
+                Integer.parseInt(confManager.getAppConf().getSoTimeout()));
+        this.localNode = new Account(confManager.getAppConf().getNodeName(),
+                confManager.getAppConf().getNodeAddress(),
+                confManager.getAppConf().getOrgName(),
+                confManager.getAppConf().getOrgUnit(),
+                confManager.getAppConf().getLocality(),
+                confManager.getAppConf().getState(),
+                confManager.getAppConf().getCountryCode());
     }
     
     /**
@@ -297,6 +298,14 @@ public class StartSubscriptionController implements MessageSetter {
         }
         model.addAttribute(PEER_NAME_KEY, peerName);
         return SUBSCRIBE_VIEW;
+    }
+    
+    /**
+     * @param configurationManager 
+     */
+    @Autowired
+    public void setConfigurationManager(IConfigurationManager confManager) {
+        this.confManager = confManager;
     }
 
     /**

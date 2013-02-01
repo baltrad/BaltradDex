@@ -89,7 +89,7 @@ public class NodeConfigurationValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "workDir", 
                 "saveconf.missing.work_directory",
                 messages.getMessage("saveconf.missing.work_directory"));
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", 
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "adminEmail", 
                 "saveconf.missing.admin_email",
                 messages.getMessage("saveconf.missing.admin_email"));
         if (conf.getNodeName().trim().length() > 0 
@@ -101,8 +101,8 @@ public class NodeConfigurationValidator implements Validator {
             errors.rejectValue("nodeAddress", "saveconf.invalid.node_address",
                     messages.getMessage("saveconf.invalid.node_address"));
         }
-        if (!webValidator.validateEmail(conf.getEmail())) {
-            errors.rejectValue("email", "saveconf.invalid.admin_email",
+        if (!webValidator.validateEmail(conf.getAdminEmail())) {
+            errors.rejectValue("adminEmail", "saveconf.invalid.admin_email",
                     messages.getMessage("saveconf.invalid.admin_email"));
         }
         if (conf.getCountryCode().length() > 0 &&

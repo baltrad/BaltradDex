@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.net.controller;
 
+import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.net.controller.exception.InternalControllerException;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.request.factory.RequestFactory;
@@ -35,7 +36,6 @@ import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.INodeManager;
 import eu.baltrad.dex.net.model.impl.Node;
 import eu.baltrad.dex.user.model.Account;
-import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.stereotype.Controller;
@@ -122,6 +122,7 @@ public class UpdateSubscriptionController implements MessageSetter {
     private static final String GS_GENERIC_CONN_ERROR_KEY = 
             "getsubscription.controller.generic_connection_error";
     
+    private IConfigurationManager confManager;
     private ISubscriptionManager subscriptionManager;
     private INodeManager nodeManager;
     private MessageResourceUtil messages;
@@ -145,17 +146,17 @@ public class UpdateSubscriptionController implements MessageSetter {
      */
     protected void initConfiguration() {
         this.setAuthenticator(new KeyczarAuthenticator(
-                 InitAppUtil.getConf().getKeystoreDir()));
+                 confManager.getAppConf().getKeystoreDir()));
         this.httpClient = new HttpClientUtil(
-                InitAppUtil.getConf().getConnTimeout(), 
-                InitAppUtil.getConf().getSoTimeout());
-        this.localNode = new Account(InitAppUtil.getConf().getNodeName(),
-                InitAppUtil.getConf().getNodeAddress(),
-                InitAppUtil.getConf().getOrgName(),
-                InitAppUtil.getConf().getOrgUnit(),
-                InitAppUtil.getConf().getLocality(),
-                InitAppUtil.getConf().getState(),
-                InitAppUtil.getConf().getCountryCode());
+                Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
+                Integer.parseInt(confManager.getAppConf().getSoTimeout()));
+        this.localNode = new Account(confManager.getAppConf().getNodeName(),
+                confManager.getAppConf().getNodeAddress(),
+                confManager.getAppConf().getOrgName(),
+                confManager.getAppConf().getOrgUnit(),
+                confManager.getAppConf().getLocality(),
+                confManager.getAppConf().getState(),
+                confManager.getAppConf().getCountryCode());
     }
     
     /**
@@ -473,6 +474,14 @@ public class UpdateSubscriptionController implements MessageSetter {
         }
         model.addAttribute(PEER_NAME_KEY, peerName);
         return SUBSCRIPTION_STATUS_VIEW;
+    }
+    
+    /**
+     * @param configurationManager 
+     */
+    @Autowired
+    public void setConfigurationManager(IConfigurationManager confManager) {
+        this.confManager = confManager;
     }
     
     /**

@@ -164,13 +164,13 @@ Author     : szewczenko
                             </div>
                             <div class="row">
                                 <div class="adminmail">
-                                    <form:input path="email"
+                                    <form:input path="adminEmail"
                                         title="Enter administrator's e-mail"/>
                                     <div class="hint">
                                         Node administrator's e-mail
                                     </div>
                                 </div>
-                                <form:errors path="email" cssClass="error"/>
+                                <form:errors path="adminEmail" cssClass="error"/>
                             </div>
                         </div>
                         <div class="tablefooter">

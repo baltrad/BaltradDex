@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -24,7 +24,6 @@ package eu.baltrad.dex.config.controller;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.config.validator.NodeConfigurationValidator;
-import eu.baltrad.dex.util.InitAppUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +55,6 @@ import java.io.IOException;
  */
 @Controller
 @RequestMapping("/node_settings.htm")
-@SessionAttributes("config")
 public class NodeConfigurationController {
 
     private static final String FORM_VIEW = "node_settings";
@@ -91,14 +89,7 @@ public class NodeConfigurationController {
      */
     @RequestMapping(method = RequestMethod.GET)
     protected String setupForm(ModelMap model) {
-        AppConfiguration conf = configurationManager.loadAppConf();
-        if (conf == null) {
-            conf = new AppConfiguration("Node name", "http://127.0.0.1:8084",
-                "Primary", "1.2.1", 60000, 60000, "work", "images", "thumbs", 
-                    "Organization", "Unit", "City", "State", "XX", "Time zone", 
-                    "Email", "/opt/baltrad/etc/bltnode-keys");
-        }
-        model.addAttribute(CONF_KEY, conf);
+        model.addAttribute(CONF_KEY, configurationManager.getAppConf());
         return FORM_VIEW;
     }
     
@@ -118,9 +109,9 @@ public class NodeConfigurationController {
             return FORM_VIEW;
         }
         try {
-            configurationManager.saveAppConf(conf);
-            InitAppUtil.saveAppConf(conf);
-            
+            if (!configurationManager.getAppConf().equals(conf)) {
+                configurationManager.saveAppConf(conf);
+            }
             String msg = messages.getMessage(SAVE_CONF_OK_MSG_KEY);
             model.addAttribute(OK_MSG_KEY, msg);
             log.warn(msg);
