@@ -18,7 +18,10 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 ------------------------------------------------------------------------*/
 package eu.baltrad.beastui.web.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,7 +34,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.system.ISystemSupervisor;
 import eu.baltrad.beast.system.XmlSystemStatusGenerator;
 import eu.baltrad.beast.system.host.IHostFilterManager;
@@ -47,46 +49,47 @@ public class SupervisorController {
    * The system supervisor
    */
   private ISystemSupervisor supervisor = null;
-  
+
   /**
    * The host manager
    */
   private IHostFilterManager hostManager = null;
-  
+
   /**
    * The logger
    */
-	private static Logger logger = LogManager.getLogger(SupervisorController.class);
+  private static Logger logger = LogManager
+      .getLogger(SupervisorController.class);
 
-	/**
-	 * Default constructor
-	 */
-	public SupervisorController() {
-	}
-	
-	@Autowired
-	public void setSupervisor(ISystemSupervisor supervisor) {
-	  this.supervisor = supervisor;
-	}
-	
-	@Autowired
-	public void setHostManager(IHostFilterManager hostManager) {
-	  this.hostManager = hostManager;
-	}
-	
-	@RequestMapping(value="/supervisorsettings.htm")
-	public String supervisorSettings(Model model) {
-	  logger.debug("supervisorSettings(Model)");
+  /**
+   * Default constructor
+   */
+  public SupervisorController() {
+  }
+
+  @Autowired
+  public void setSupervisor(ISystemSupervisor supervisor) {
+    this.supervisor = supervisor;
+  }
+
+  @Autowired
+  public void setHostManager(IHostFilterManager hostManager) {
+    this.hostManager = hostManager;
+  }
+
+  @RequestMapping(value = "/supervisorsettings.htm")
+  public String supervisorSettings(Model model) {
+    logger.debug("supervisorSettings(Model)");
     List<String> filters = hostManager.getPatterns();
     model.addAttribute("filters", filters);
     return "supervisorsettings";
-	}
-	
-	@RequestMapping(value="/addsupervisorsetting.htm")
-	public String addSupervisorSetting(Model model,
-	    @RequestParam(value = "filter", required = false) String filter) {
-	  String emessage = null;
-	  String nfilter = filter;
+  }
+
+  @RequestMapping(value = "/addsupervisorsetting.htm")
+  public String addSupervisorSetting(Model model,
+      @RequestParam(value = "filter", required = false) String filter) {
+    String emessage = null;
+    String nfilter = filter;
     logger.debug("createSupervisor(Model)");
     if (filter != null) {
       if (!hostManager.isRegistered(filter)) {
@@ -109,13 +112,13 @@ public class SupervisorController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-	  return "supervisorsettings";
-	}
-	
-	@RequestMapping(value="/removesupervisorsetting.htm")
+    return "supervisorsettings";
+  }
+
+  @RequestMapping(value = "/removesupervisorsetting.htm")
   public String removeSupervisorSetting(Model model,
       @RequestParam(value = "filter", required = false) String filter) {
-	  String emessage = null;
+    String emessage = null;
     logger.debug("removeSupervisorSetting");
     if (filter != null) {
       try {
@@ -131,69 +134,141 @@ public class SupervisorController {
     }
     return "supervisorsettings";
   }
-	
-	/**
-	 * The actual supervisor.htm interface for producing information to the user
-	 * @param format
-	 * @param system
-	 * @param radars
-	 * @param request
-	 * @param response
-	 */
-	@RequestMapping(value="/supervisor.htm")
-	public void supervisorStatus(
+
+  /**
+   * The actual supervisor.htm interface for producing information to the user
+   * 
+   * @param format
+   * @param system
+   * @param radars
+   * @param request
+   * @param response
+   */
+  @RequestMapping(value = "/supervisor.htm")
+  public void supervisorStatus(
       @RequestParam(value = "format", required = false) String format,
-      @RequestParam(value = "system", required = false) String system,
-	    @RequestParam(value = "radars", required = false) String radars,
-	    HttpServletRequest request, 
-	    HttpServletResponse response) {
-    logger.info("supervisorStatus(format, radars, request, response): format = '"+
-	    format+"', radars = '" + radars + "'");
+      @RequestParam(value = "reporters", required = false) String reportersstr,
+      @RequestParam(value = "sources", required = false) String sources,
+      @RequestParam(value = "areas", required = false) String areas,
+      @RequestParam(value = "objects", required = false) String objects,
+      @RequestParam(value = "minutes", required = false) String minutes,
+      HttpServletRequest request, HttpServletResponse response) {
+    logger.info("supervisor: format='" + format + "', reporters='"
+        + reportersstr + "', sources='" + sources + "', areas='" + areas
+        + "', objects='" + objects + "', minutes='" + minutes);
+
     XmlSystemStatusGenerator generator = getXmlGenerator();
     
     if (isAuthorized(request)) {
-      if (system == null && radars == null) {
-        system = "bdb,db";
+      if (reportersstr == null) {
+        reportersstr = "bdb.status,db.status"; // The minimum information the user should get
+      }
+      String[] reporters = reportersstr.split(",");
+      Map<String, Object> values = createMap(sources, areas, objects, minutes);
+      
+      for (String s : reporters) {
+        String str = s.trim();
+        String statusvalue = createValueString(str, sources, areas, objects, minutes);
+        generator.add(str, statusvalue, supervisor.getStatus(str, values));
       }
       
-      if (system != null) {
-        generator.add("system", system, supervisor.getStatus("system", system));
-      }
-      
-      if (radars != null) {
-        generator.add("radar", radars, supervisor.getStatus("radar", radars));
-      }
-
       try {
         byte[] bytes = generator.getXmlString().getBytes("UTF-8");
         response.getOutputStream().write(bytes);
-        response.setStatus(HttpServletResponse.SC_OK);
+        response.setStatus(HttpServletResponse.SC_OK); 
       } catch (Exception e) {
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); 
       }
     } else {
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
-	}
+  }
 
-	/**
-	 * @return a fresh xml generator instance
-	 */
-	protected XmlSystemStatusGenerator getXmlGenerator() {
-	  return new XmlSystemStatusGenerator();
-	}
-	
-	/**
-	 * Returns if this request is allowed to be processed.
-	 * @param request the request
-	 * @return true if this request can be handled.
-	 */
-	protected boolean isAuthorized(HttpServletRequest request) {
+  /**
+   * Creates a hash map to be used for passing values to the supervisor
+   * @param sources the sources
+   * @param areas the areas
+   * @param objects the objects
+   * @param minutes the minutes
+   * @return the map
+   */
+  protected Map<String, Object> createMap(String sources, String areas,
+      String objects, String minutes) {
+    Map<String, Object> values = new HashMap<String, Object>();
+    if (sources != null) {
+      values.put("sources", sources);
+    }
+    if (areas != null) {
+      values.put("areas", areas);
+    }
+    if (objects != null) {
+      values.put("objects", objects);
+    }
+    if (minutes != null) {
+      values.put("minutes", minutes);
+    }
+    return values;
+  }
+
+  /**
+   * Creates the value string that should exist in the xml report
+   * @param reporter the reporter
+   * @param sources the sources if any
+   * @param areas the areas if any
+   * @param objects the objects if any
+   * @param minutes the minutes if any
+   * @return the string
+   */
+  protected String createValueString(String reporter, String sources, String areas, String objects, String minutes) {
+    StringBuffer vbuf = new StringBuffer();
+    Set<String> attrs = supervisor.getSupportedAttributes(reporter);
+    if (attrs != null) {
+      if (sources != null && attrs.contains("sources")) {
+        vbuf.append("sources=").append(sources);
+      }
+      if (areas != null && attrs.contains("areas")) {
+        if (vbuf.length()>0) {
+          vbuf.append("&");
+        }
+        vbuf.append("areas=").append(areas);
+      }
+      if (objects != null && attrs.contains("objects")) {
+        if (vbuf.length()>0) {
+          vbuf.append("&");
+        }
+        vbuf.append("objects=").append(objects);
+      }
+      if (minutes != null && attrs.contains("minutes")) {
+        if (vbuf.length()>0) {
+          vbuf.append("&");
+        }
+        vbuf.append("minutes=").append(minutes);
+      }
+    }
+    return vbuf.toString();
+  }
+  
+  /**
+   * @return a fresh xml generator instance
+   */
+  protected XmlSystemStatusGenerator getXmlGenerator() {
+    return new XmlSystemStatusGenerator();
+  }
+
+  /**
+   * Returns if this request is allowed to be processed.
+   * 
+   * @param request
+   *          the request
+   * @return true if this request can be handled.
+   */
+  protected boolean isAuthorized(HttpServletRequest request) {
     String remote = request.getRemoteAddr();
     logger.info("Got request from " + remote);
-    if (remote != null && (remote.equals("127.0.0.1") || hostManager.accepted(remote))) {
+    if (remote != null
+        && (remote.equals("127.0.0.1") || hostManager.accepted(remote))) {
       return true;
     }
     return false;
-	}
+  }
 }

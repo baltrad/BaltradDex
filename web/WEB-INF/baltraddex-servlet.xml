@@ -500,23 +500,17 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="bdbConnectionStatusReporter" class="eu.baltrad.beast.system.BdbConnectionStatusReporter" autowire="byType" />
     <bean id="dbConnectionStatusReporter" class="eu.baltrad.beast.system.DbConnectionStatusReporter" autowire="byType" />
     <bean id="radarStatusReporter" class="eu.baltrad.beast.system.RadarConnectionStatusReporter" autowire="byType" />
-    <bean id="systemStatusReporter" class="eu.baltrad.beast.system.GroupedStatusReporter">
-      <constructor-arg><value>system</value></constructor-arg>
-      <property name="reporters">
-        <map>
-          <entry key="bdb" value-ref="bdbConnectionStatusReporter"/>
-          <entry key="db" value-ref="dbConnectionStatusReporter"/>
-        </map>     
-      </property>
-    </bean>
+    <bean id="bdbObjectStatusReporter" class="eu.baltrad.beast.system.BdbObjectStatusReporter" autowire="byType" />
  
     <bean id="hostManager" class="eu.baltrad.beast.system.host.HostFilterManager" autowire="byType"/>
  
     <bean id="supervisor" class="eu.baltrad.beast.system.SystemSupervisor">
       <property name="reporters">
         <map>
-          <entry key="system" value-ref="systemStatusReporter"/>
-          <entry key="radar" value-ref="radarStatusReporter"/>
+          <entry key="db.status" value-ref="dbConnectionStatusReporter"/>
+          <entry key="bdb.status" value-ref="bdbConnectionStatusReporter"/>
+          <entry key="radar.connection.status" value-ref="radarStatusReporter"/>
+          <entry key="bdb.object.status" value-ref="bdbObjectStatusReporter"/>
         </map>     
       </property>
     </bean>
