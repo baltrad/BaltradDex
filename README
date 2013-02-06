@@ -18,7 +18,7 @@
 # along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.#
 #                                                                              # 
 ################################################################################
-
+ 
 NOTE: Baltrad Data Exchange System (BaltradDex) constitutes an integral part of 
 baltrad-node software package. As such, it provides full functionality only
 if installed from baltrad-node software bundle. However it is possible to deploy 
