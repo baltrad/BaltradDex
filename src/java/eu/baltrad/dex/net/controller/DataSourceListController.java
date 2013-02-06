@@ -187,7 +187,7 @@ public class DataSourceListController implements MessageSetter {
             InputStream is = null;
             try {
                 is = response.getEntity().getContent();
-                return IOUtils.toString(is);
+                return IOUtils.toString(is, "UTF-8");
             } finally {
                 is.close();
             }

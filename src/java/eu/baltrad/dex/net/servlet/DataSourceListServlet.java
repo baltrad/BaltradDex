@@ -119,7 +119,7 @@ public class DataSourceListServlet extends HttpServlet {
         StringWriter writer = new StringWriter();
         String json = "";
         try {
-            IOUtils.copy(sis, writer);
+            IOUtils.copy(sis, writer, "UTF-8");
             json = writer.toString();
         } finally {
             writer.close();
