@@ -106,10 +106,11 @@ public class SupervisorControllerTest extends TestCase {
     
     expect(hostManager.getPatterns()).andReturn(filters);
     expect(model.addAttribute("filters", filters)).andReturn(null);
-    
+    expect(request.getRemoteAddr()).andReturn("123.123.123.123");
+    expect(model.addAttribute("currentip", "123.123.123.123")).andReturn(null);
     replayAll();
     
-    String result = classUnderTest.supervisorSettings(model);
+    String result = classUnderTest.supervisorSettings(model, request);
     
     verifyAll();
     Assert.assertEquals("supervisorsettings", result);
@@ -123,10 +124,12 @@ public class SupervisorControllerTest extends TestCase {
     expect(hostManager.getPatterns()).andReturn(filters);
     expect(model.addAttribute("filter", "")).andReturn(null);
     expect(model.addAttribute("filters", filters)).andReturn(null);
-    
+    expect(request.getRemoteAddr()).andReturn("123.123.123.123");
+    expect(model.addAttribute("currentip", "123.123.123.123")).andReturn(null);
+
     replayAll();
     
-    String result = classUnderTest.addSupervisorSetting(model, "192.168.1.1");
+    String result = classUnderTest.addSupervisorSetting(model, "192.168.1.1", request);
     
     verifyAll();
     Assert.assertEquals("supervisorsettings", result);
@@ -139,10 +142,13 @@ public class SupervisorControllerTest extends TestCase {
     expect(hostManager.getPatterns()).andReturn(filters);
     expect(model.addAttribute("filter", "192.168.1.1")).andReturn(null);
     expect(model.addAttribute("filters", filters)).andReturn(null);
+    expect(request.getRemoteAddr()).andReturn("123.123.123.123");
+    expect(model.addAttribute("currentip", "123.123.123.123")).andReturn(null);
     expect(model.addAttribute("emessage", "Filter already registered")).andReturn(null);
+    
     replayAll();
     
-    String result = classUnderTest.addSupervisorSetting(model, "192.168.1.1");
+    String result = classUnderTest.addSupervisorSetting(model, "192.168.1.1", request);
     
     verifyAll();
     Assert.assertEquals("supervisorsettings", result);
@@ -155,10 +161,12 @@ public class SupervisorControllerTest extends TestCase {
     expectLastCall().andThrow(new RuntimeException("bad"));
     expect(hostManager.getPatterns()).andReturn(filters);
     expect(model.addAttribute("filters", filters)).andReturn(null);
+    expect(request.getRemoteAddr()).andReturn("123.123.123.123");
+    expect(model.addAttribute("currentip", "123.123.123.123")).andReturn(null);
     expect(model.addAttribute("emessage", "Failed to remove filter: bad")).andReturn(null);
     replayAll();
     
-    String result = classUnderTest.removeSupervisorSetting(model, "192.168.1.1");
+    String result = classUnderTest.removeSupervisorSetting(model, "192.168.1.1",request);
     
     verifyAll();
     Assert.assertEquals("supervisorsettings", result);
@@ -172,10 +180,12 @@ public class SupervisorControllerTest extends TestCase {
     
     expect(hostManager.getPatterns()).andReturn(filters);
     expect(model.addAttribute("filters", filters)).andReturn(null);
+    expect(request.getRemoteAddr()).andReturn("123.123.123.123");
+    expect(model.addAttribute("currentip", "123.123.123.123")).andReturn(null);
 
     replayAll();
     
-    String result = classUnderTest.removeSupervisorSetting(model, "192.168.1.1");
+    String result = classUnderTest.removeSupervisorSetting(model, "192.168.1.1",request);
     
     verifyAll();
     Assert.assertEquals("supervisorsettings", result);

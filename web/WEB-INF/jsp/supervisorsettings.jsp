@@ -50,6 +50,8 @@ List of adaptors
                 allow connection atempts from localhost (127.0.0.1) so there is no reason to add that
                 filter. The format of the filter should <b>always</b> be N.N.N.N where N either can be *
                 or a value between 0-255.
+                <br/><br/>
+                Your current ip address is <b>${currentip}</b>.
                 <br/>
             </div>
             <div class="table">

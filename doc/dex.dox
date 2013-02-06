@@ -1475,6 +1475,9 @@ in this administration GUI. The format of the ip-address should always be N.N.N.
 There is actually not a test if the number is &gt; 255 but it will make the filter useless. Also, remember that if you are using a
 proxy, the ip-package might contain an ip-address different than what you expect.
 
+The supervisor GUI shows the ip-address from where you are connecting so if you are in doubt, you can always login
+to the supervisor GUI and see what ip-address you should put in the filter.
+
 \section supervisor_qinterface Query interface
 Basic usage is to send a http-get query towards the supervisor and parse, check the response. The following query
 
@@ -1494,8 +1497,10 @@ would result in the following response
 
 which says that the bdb.object.status reporter determined that a seang SCAN has arrived within the last 5 minutes.
 
-Each reporter supports different attributes and these combinations has been described in ....
-It is possible to add more than one reporter in the same query and that is controlled by the reporters attribute.
+Each reporter supports different attributes and these combinations is described by each reporter.
+It is possible to add more than one reporter in the same query and that is controlled by the reporters attribute. This means that if
+you for example combine two different reporters you should consider that the reporters might use the same attribute which might not be
+the wanted behaviour.
 Each reporter will produce a separate &lt;reporter /&gt; entry that can be parsed separately.
 
 As an example, if you want to know the db, bdb and bdb object status, this query
@@ -1550,6 +1555,26 @@ or similar.
  </tr>
 </table>
 
+\section supervisor_formatting Formatting of responses
+Currently, the only supported formatter is the xml formatter. In the future we hope that you will have access to various kinds
+of formatters that is more suitable for your use. The formatter is specified by a separate attribute called named \b format and
+the value would be \b xml. However, this is default behaviour so it can be omitted.
+
+If you want to manually specify the formatter, then the request url would be:
+\code
+  http://..../BaltradDex/supervisor.htm?format=xml&reporter=......
+\endcode
+
+The format of the returned xml message will always be in the format:
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+
+<system-status>
+[<reporter name="..." value="..." status="..."/>]*
+</system-status>
+\endcode
+
+
 \section supervisor_reporters Reporters API
 There are several reporters delivered with the system and this list will probably grow with time. 
 
@@ -1601,7 +1626,7 @@ Response:
 This reporter can be used to control if a radar has been able to provide the composites and volumes
 with data without causing a timeout. If, for example, a composite is expecting a scan from searl
 and this scan does not arrive within the timeout. Then, this reporter will know about that. This reporter is
-a faster version of 
+a faster version of a product tester but not as accurate as the \ref supervisor_reporters_bdb_object_status "bdb object status reporter".
 
 \subsection supervisor_reporters_radar_connection_args Arguments
 <table>
@@ -1637,8 +1662,9 @@ This reporter is currently the most advanced reporter mechanism. It queries the 
 for availability of objects (SCAN,PVOL,COMP,...) for sources (searl, seang, ...) and areas (swegmaps_2000, ...)
 within a specific time limit in minutes.
 This means that you are able to query for almost anything within the database and verify if you have got it in
-time. However, the caveat to this is that it is a quite expensive version of reporter so verify that it does not
-affect performance drastically.
+time. However, the caveat to this is that it is a quite expensive version of reporter so make sure that you don't
+affect perforance drastically by calling this reporter too frequently. You might notice that the performance for
+handling incomming data will decrease if you continuously call this reporter.
 
 \subsection supervisor_reporters_bdb_object_args Arguments
 <table>

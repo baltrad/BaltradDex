@@ -78,16 +78,19 @@ public class SupervisorController {
   }
 
   @RequestMapping(value = "/supervisorsettings.htm")
-  public String supervisorSettings(Model model) {
+  public String supervisorSettings(Model model,
+      HttpServletRequest request) {
     logger.debug("supervisorSettings(Model)");
     List<String> filters = hostManager.getPatterns();
     model.addAttribute("filters", filters);
+    model.addAttribute("currentip", request.getRemoteAddr());
     return "supervisorsettings";
   }
 
   @RequestMapping(value = "/addsupervisorsetting.htm")
   public String addSupervisorSetting(Model model,
-      @RequestParam(value = "filter", required = false) String filter) {
+      @RequestParam(value = "filter", required = false) String filter,
+      HttpServletRequest request) {
     String emessage = null;
     String nfilter = filter;
     logger.debug("createSupervisor(Model)");
@@ -109,6 +112,7 @@ public class SupervisorController {
     List<String> filters = hostManager.getPatterns();
     model.addAttribute("filter", nfilter);
     model.addAttribute("filters", filters);
+    model.addAttribute("currentip", request.getRemoteAddr());
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
@@ -117,7 +121,8 @@ public class SupervisorController {
 
   @RequestMapping(value = "/removesupervisorsetting.htm")
   public String removeSupervisorSetting(Model model,
-      @RequestParam(value = "filter", required = false) String filter) {
+      @RequestParam(value = "filter", required = false) String filter,
+      HttpServletRequest request) {
     String emessage = null;
     logger.debug("removeSupervisorSetting");
     if (filter != null) {
@@ -129,6 +134,7 @@ public class SupervisorController {
     }
     List<String> filters = hostManager.getPatterns();
     model.addAttribute("filters", filters);
+    model.addAttribute("currentip", request.getRemoteAddr());
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
