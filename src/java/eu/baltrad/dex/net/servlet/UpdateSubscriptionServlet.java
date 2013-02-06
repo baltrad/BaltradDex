@@ -121,7 +121,7 @@ public class UpdateSubscriptionServlet extends HttpServlet {
         StringWriter writer = new StringWriter();
         String subscriptions = "";
         try {
-            IOUtils.copy(sis, writer);
+            IOUtils.copy(sis, writer, "UTF-8");
             subscriptions = writer.toString();
         } finally {
             writer.close();

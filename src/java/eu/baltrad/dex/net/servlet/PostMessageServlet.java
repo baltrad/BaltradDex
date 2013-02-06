@@ -103,7 +103,7 @@ public class PostMessageServlet extends HttpServlet {
         StringWriter writer = new StringWriter();
         String message = "";
         try {
-            IOUtils.copy(sis, writer);
+            IOUtils.copy(sis, writer, "UTF-8");
             message = writer.toString();
         } finally {
             writer.close();

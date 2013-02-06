@@ -61,10 +61,6 @@
                     <file>${file.reference.baltrad-bdb-client.jar}</file>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.baltrad-frame-0.1.6.jar-1}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library dirs="200">
                     <file>${file.reference.commons-io-2.1.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>

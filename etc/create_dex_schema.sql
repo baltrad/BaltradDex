@@ -295,7 +295,7 @@ CREATE OR REPLACE FUNCTION dex_trim_messages_by_age() RETURNS trigger AS $$
 	hours INT;
 	minutes INT;	
     BEGIN
-	SELECT now() INTO now_date;
+        SELECT now() INTO now_date;
         SELECT (EXTRACT (epoch FROM now_date)::BIGINT) * 1000 INTO now_epoch;
         SELECT TG_ARGV[0]::BIGINT INTO days;
         SELECT TG_ARGV[1]::BIGINT INTO hours;
@@ -335,7 +335,7 @@ CREATE OR REPLACE FUNCTION dex_trim_registry_by_age() RETURNS trigger AS $$
 	hours INT;
 	minutes INT;	
     BEGIN
-	SELECT now() INTO now_date;
+        SELECT now() INTO now_date;
         SELECT (EXTRACT (epoch FROM now_date)::BIGINT) * 1000 INTO now_epoch;
         SELECT TG_ARGV[0]::BIGINT INTO days;
         SELECT TG_ARGV[1]::BIGINT INTO hours;

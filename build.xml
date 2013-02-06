@@ -213,9 +213,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="lib/catalina-ant">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="lib/baltrad-frame">
-        <include name="*.jar"/>
-      </fileset>
       <fileset dir="lib/proj4">
         <include name="*.jar"/>
       </fileset>
