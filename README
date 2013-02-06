@@ -24,7 +24,7 @@ baltrad-node software package. As such, it provides full functionality only
 if installed from baltrad-node software bundle. However it is possible to deploy 
 BaltradDex provided that the following two baltrad-node libraries are installed
 in the system:
-
+ 
 baltrad-db - Baltrad database management component
 beast - Baltrad message management interface
 
