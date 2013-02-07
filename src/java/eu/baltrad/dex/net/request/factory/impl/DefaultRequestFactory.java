@@ -35,6 +35,7 @@ import org.apache.http.entity.ByteArrayEntity;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.net.URI;
 import java.util.Date;
@@ -274,5 +275,28 @@ public class DefaultRequestFactory implements RequestFactory {
                     e);
         }
     }
+    
+    /**
+     * Creates post public key request.
+     * @param account Requesting user's account
+     * @param keyContent Key content as stream
+     * @return HTTP POST request
+     * @throws RuntimeException
+     */
+    public HttpPost createPostKeyRequest(Account account, 
+            InputStream keyContent) throws RuntimeException {
+        try {
+            HttpPost httpPost = new HttpPost(getRequestUri("post_key.htm"));
+            String json = jsonUtil.userAccountToJson(account); 
+            httpPost.setEntity(new StringEntity(json, "UTF-8"));
+            httpPost.addHeader("Node-Name", account.getName());
+            httpPost.addHeader("Content-Type", "application/zip");
+            httpPost.addHeader("Content-MD5", DigestUtils.md5Hex(keyContent));
+            httpPost.addHeader("Date", dateFormat.format(new Date()));
+            return httpPost;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create post key request", e);
+        }
+    } 
     
 }

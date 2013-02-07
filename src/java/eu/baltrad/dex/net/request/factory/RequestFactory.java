@@ -52,4 +52,8 @@ public interface RequestFactory {
     
     public HttpUriRequest createPostMessageRequest(Account account, 
             String message);
+    
+    public HttpUriRequest createPostKeyRequest(Account account, 
+            InputStream keyContent);
+    
 }

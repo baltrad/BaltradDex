@@ -23,13 +23,14 @@ package eu.baltrad.dex.net.request.factory.impl;
 
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.user.model.Account;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpUriRequest;
+
+
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -153,6 +154,10 @@ public class DefaultRequestFactoryTest {
         assertNotNull(getHeader(request, "Date"));
     }
     
+    @Test
+    public void createPostKeyRequest() {
+        
+    }
     
     @Test
     public void getRequestUri_ServerWithoutSlash() {

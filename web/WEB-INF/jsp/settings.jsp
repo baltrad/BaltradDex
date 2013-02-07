@@ -32,7 +32,7 @@ Author     : szewczenko
 <jsp:useBean id="securityManager" scope="session"
              class="eu.baltrad.dex.auth.manager.SecurityManager">
 </jsp:useBean>
-<jsp:useBean id="configManager" scope="session"
+<jsp:useBean id="configManager" scope="request"
              class="eu.baltrad.dex.config.manager.impl.ConfigurationManager">
 </jsp:useBean>
 
