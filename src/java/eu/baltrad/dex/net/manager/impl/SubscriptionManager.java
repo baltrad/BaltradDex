@@ -23,6 +23,7 @@ package eu.baltrad.dex.net.manager.impl;
 
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.user.manager.IAccountManager;
 import eu.baltrad.dex.net.manager.INodeManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
@@ -265,6 +266,20 @@ public class SubscriptionManager implements ISubscriptionManager {
             
             log.error("SubscriptionManager::store() updated subscriptions");
             
+            // ------- everything fucks up from now on
+            
+            if (dataSourceManager == null) {
+                log.error("SubscriptionManager::store() dataSourceManager is null!");
+            } 
+            
+            log.error("SubscriptionManager::store() subscription data source" + s.getDataSource());
+            
+            DataSource dd = dataSourceManager.load(s.getDataSource());
+            if (dd == null) {
+                log.error("SubscriptionManager::store() data source is null");
+            } else {
+                log.error("SubscriptionManager::store() data source id = " + dd.getId());
+            }
             int dataSourceId = dataSourceManager.load(
                     s.getDataSource()).getId();
             
@@ -290,6 +305,9 @@ public class SubscriptionManager implements ISubscriptionManager {
             
             return subId;
         } catch (DataAccessException e) {
+            
+            log.error("SubscriptionManager::store() exception caught: " + e.getMessage());
+            
             throw new Exception(e.getMessage());
         }
     }
