@@ -157,7 +157,17 @@ public class StartSubscriptionServlet extends HttpServlet {
     private Set<DataSource> storePeerSubscriptions(NodeRequest req,
             Set<DataSource> requestedDataSources) {
         Set<DataSource> subscribedDataSources = new HashSet<DataSource>();
+        
+        
+        log.error("storePeerSubscriptios() data sources size: " + subscribedDataSources.size()); 
+        
+        
+        
         for (DataSource ds : requestedDataSources) {
+            
+            
+            log.error("storePeerSubscriptios() storing subscription: " + ds.getName()); 
+            
             // Save or update depending on whether subscription exists
             Subscription requested = new Subscription(
                     System.currentTimeMillis(), Subscription.UPLOAD, 
@@ -169,12 +179,20 @@ public class StartSubscriptionServlet extends HttpServlet {
                     req.getNodeName()};
             try {
                 if (existing == null) {    
+                    
+                    log.error("storePeerSubscriptios() subscription not found: " + ds.getName()); 
+                    
+                    
                     subscriptionManager.store(requested);
                     subscribedDataSources.add(new DataSource(
                             ds.getName(), ds.getDescription()));
                     log.warn(messages.getMessage(PS_SUBSCRIPTION_SUCCESS_KEY, 
                             msgArgs));
                 } else {
+                    
+                    log.error("storePeerSubscriptios() subscription exists: " + ds.getName()); 
+                    
+                    
                     requested.setId(existing.getId());
                     subscriptionManager.update(requested);
                     subscribedDataSources.add(new DataSource(
@@ -221,17 +239,31 @@ public class StartSubscriptionServlet extends HttpServlet {
                 String jsonRequested = readDataSources(request);
                 Set<DataSource> requestedDataSources = jsonUtil
                             .jsonToDataSources(jsonRequested);
+                
+                log.error("doPost() requested data sources size: " + requestedDataSources.size()); 
+                
+                
                 Set<DataSource> subscribedDataSources = 
                         storePeerSubscriptions(req, requestedDataSources);
                 String jsonSubscribed = jsonUtil.dataSourcesToJson(
                         subscribedDataSources);
                 if (subscribedDataSources.equals(requestedDataSources)) {
                     writeDataSources(res, jsonSubscribed);
+                    
+                    log.error("doPost() OK, writing data sources to response: " + jsonSubscribed); 
+                    
                     res.setStatus(HttpServletResponse.SC_OK);
                 } else if (subscribedDataSources.size() > 0) {
                     writeDataSources(res, jsonSubscribed);
+                    
+                    log.error("doPost() SC_PARTIAL_CONTENT, writing data sources to response: " + jsonSubscribed);
+                    
+                    
                     res.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
                 } else {
+                    
+                    log.error("doPost() SC_NOT_FOUND: " + jsonSubscribed);
+                    
                     res.setStatus(HttpServletResponse.SC_NOT_FOUND,
                         messages.getMessage(PS_GENERIC_SUBSCRIPTION_ERROR));
                 }

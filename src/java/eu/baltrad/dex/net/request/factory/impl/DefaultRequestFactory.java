@@ -227,7 +227,6 @@ public class DefaultRequestFactory implements RequestFactory {
         }
     }
     
-    
     /**
      * Creates post data file request.
      * @param @param account Requesting user's account
@@ -287,8 +286,8 @@ public class DefaultRequestFactory implements RequestFactory {
             InputStream keyContent) throws RuntimeException {
         try {
             HttpPost httpPost = new HttpPost(getRequestUri("post_key.htm"));
-            String json = jsonUtil.userAccountToJson(account); 
-            httpPost.setEntity(new StringEntity(json, "UTF-8"));
+            httpPost.setEntity(new ByteArrayEntity(
+                    IOUtils.toByteArray(keyContent)));
             httpPost.addHeader("Node-Name", account.getName());
             httpPost.addHeader("Content-Type", "application/zip");
             httpPost.addHeader("Content-MD5", DigestUtils.md5Hex(keyContent));

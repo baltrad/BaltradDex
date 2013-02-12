@@ -24,13 +24,12 @@ package eu.baltrad.dex.net.request.factory.impl;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.util.CompressDataUtil;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpUriRequest;
-
-
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -42,7 +41,6 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-
 /**
  * Request factory test.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
@@ -52,6 +50,7 @@ import java.util.HashSet;
 public class DefaultRequestFactoryTest {
     
     private DefaultRequestFactory classUnderTest;
+    private CompressDataUtil compressDataUtil;
     private Account account;
     
     @Before
@@ -59,6 +58,7 @@ public class DefaultRequestFactoryTest {
         classUnderTest = new DefaultRequestFactory(
                 URI.create("http://example.com/")
         );
+        compressDataUtil = new CompressDataUtil("keystore/localhost.pub");
         account = new Account(1, "localnode", "s3cret", "org", "unit", "locality", 
                 "state", "XX", "user", "http://localhost");
     }
@@ -155,8 +155,18 @@ public class DefaultRequestFactoryTest {
     }
     
     @Test
-    public void createPostKeyRequest() {
-        
+    public void createPostKeyRequest() throws Exception {
+        InputStream is = new ByteArrayInputStream(compressDataUtil.zip());
+        HttpUriRequest request = classUnderTest
+                .createPostKeyRequest(account, is);
+        assertEquals("POST", request.getMethod());
+        assertEquals(URI.create(
+            "http://example.com/BaltradDex/post_key.htm"), 
+            request.getURI());
+        assertEquals("localnode", getHeader(request, "Node-Name"));
+        assertEquals("application/zip", getHeader(request, "Content-Type"));
+        assertNotNull(getHeader(request, "Content-MD5"));
+        assertNotNull(getHeader(request, "Date"));
     }
     
     @Test
