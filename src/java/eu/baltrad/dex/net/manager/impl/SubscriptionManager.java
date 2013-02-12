@@ -249,10 +249,17 @@ public class SubscriptionManager implements ISubscriptionManager {
                     }
                 }, keyHolder);
             
+            
+            
+            
+            
             int subId = keyHolder.getKey().intValue();
             
             log.error("SubscriptionManager::store() subscription id = " + subId);
-            
+            log.error("SubscriptionManager::store() subscription user = " + s.getUser());
+            log.error("SubscriptionManager::store() subscription type = " + s.getType());
+            log.error("SubscriptionManager::store() subscription operator = " + s.getOperator());
+            log.error("SubscriptionManager::store() subscription data source = " + s.getDataSource());
             
             int userId = accountManager.load(s.getUser()).getId();
             
@@ -272,7 +279,7 @@ public class SubscriptionManager implements ISubscriptionManager {
                 log.error("SubscriptionManager::store() dataSourceManager is null!");
             } 
             
-            log.error("SubscriptionManager::store() subscription data source" + s.getDataSource());
+            log.error("SubscriptionManager::store() subscription data source " + s.getDataSource());
             
             DataSource dd = dataSourceManager.load(s.getDataSource());
             if (dd == null) {
