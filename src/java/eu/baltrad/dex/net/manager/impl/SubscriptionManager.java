@@ -42,6 +42,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  * Subscription manager implementing subscription handling functionality.
@@ -221,6 +222,12 @@ public class SubscriptionManager implements ISubscriptionManager {
             rollbackFor=Exception.class)
     public int store(Subscription subscription) throws Exception {
         
+        
+        Logger log = Logger.getLogger("DEX");
+        log.error("SubscriptionManager::store()");
+        
+        
+        
         final String sql = "INSERT INTO dex_subscriptions (time_stamp, " + 
                     "type, active, sync) VALUES (?,?,?,?)";
         final Subscription s = subscription;
@@ -240,20 +247,46 @@ public class SubscriptionManager implements ISubscriptionManager {
                         return ps;
                     }
                 }, keyHolder);
+            
             int subId = keyHolder.getKey().intValue();
+            
+            log.error("SubscriptionManager::store() subscription id = " + subId);
+            
+            
             int userId = accountManager.load(s.getUser()).getId();
+            
+            
+            log.error("SubscriptionManager::store() user id = " + userId);
+            
+            
             jdbcTemplate.update("INSERT INTO dex_subscriptions_users " +
                     "(subscription_id, user_id) VALUES (?,?)", 
                     subId, userId);
+            
+            log.error("SubscriptionManager::store() updated subscriptions");
+            
             int dataSourceId = dataSourceManager.load(
                     s.getDataSource()).getId();
+            
+            log.error("SubscriptionManager::store() data source id = " + dataSourceId);
+            
+            
             jdbcTemplate.update("INSERT INTO dex_subscriptions_data_sources " +
                     "(subscription_id, data_source_id) VALUES (?,?)", 
                     subId, dataSourceId);
+            
+            log.error("SubscriptionManager::store() updated data sources");
+            
             int nodeId = nodeManager.load(s.getOperator()).getId();
+            
+            
+            log.error("SubscriptionManager::store() node id = " + nodeId);
+            
             jdbcTemplate.update("INSERT INTO dex_subscriptions_nodes " +
                     "(subscription_id, node_id) VALUES (?,?)", 
                     subId, nodeId);
+            
+            log.error("SubscriptionManager::store() updated nodes");
             
             return subId;
         } catch (DataAccessException e) {
