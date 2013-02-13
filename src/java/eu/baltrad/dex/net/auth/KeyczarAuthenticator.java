@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
+import org.apache.log4j.Logger;
 import org.keyczar.exceptions.KeyczarException;
 
 /**
@@ -68,7 +69,15 @@ public class KeyczarAuthenticator implements Authenticator {
                 throws KeyczarException {
         String message = getMessage(request);
         Signer signer = cryptoFactory.createSigner(keyName);
-        request.addHeader(AUTH_HDR, keyName + ":" + signer.sign(message));   
+        
+        String s = signer.sign(message);
+        
+        
+        request.addHeader(AUTH_HDR, keyName + ":" + /*signer.sign(message)*/s);
+        
+        Logger log = Logger.getLogger("DEX");
+        log.error("addCredentials() " + keyName + ":" + s);
+        
     }
     
     /**

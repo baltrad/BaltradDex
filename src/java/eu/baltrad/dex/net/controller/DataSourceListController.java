@@ -256,7 +256,15 @@ public class DataSourceListController implements MessageSetter {
             HttpUriRequest req = requestFactory
                 .createDataSourceListingRequest(localNode);
             try {
+                
+                log.error("nodeConnected() adding credentials");
+                
+                
                 authenticator.addCredentials(req, localNode.getName());
+                
+                
+                
+                
                 HttpResponse res = httpClient.post(req);
                 if (res.getStatusLine().getStatusCode() == 
                         HttpServletResponse.SC_OK) {
@@ -289,6 +297,11 @@ public class DataSourceListController implements MessageSetter {
                     
                 } else {
                     // server error     
+                    
+                    log.error("nodeConnected() Response from server: " + res.getStatusLine().getStatusCode());
+                    
+                    
+                    
                     viewName = DS_CONNECT_VIEW;
                     String errorMsg = messages.getMessage(
                         DS_SERVER_ERROR_KEY);
