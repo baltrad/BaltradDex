@@ -24,6 +24,7 @@ package eu.baltrad.dex.config.controller;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.config.validator.NodeConfigurationValidator;
+import eu.baltrad.dex.user.manager.IAccountManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,7 @@ public class NodeConfigurationController {
     private static final String ERROR_MSG_KEY = "error";
 
     private ConfigurationManager configurationManager;
+    private IAccountManager accountManager;
     private NodeConfigurationValidator validator;
     private MessageResourceUtil messages;
     private Logger log;
@@ -110,6 +112,10 @@ public class NodeConfigurationController {
         try {
             if (!configurationManager.getAppConf().equals(conf)) {
                 configurationManager.saveAppConf(conf);
+                
+                
+                
+                
             }
             String msg = messages.getMessage(SAVE_CONF_OK_MSG_KEY);
             model.addAttribute(OK_MSG_KEY, msg);
@@ -161,6 +167,14 @@ public class NodeConfigurationController {
             ConfigurationManager configurationManager) {
         this.configurationManager = configurationManager;
     }
+    
+    /**
+     * @param accountManager the accountManager to set
+     */
+    @Autowired
+    public void setAccountManager(IAccountManager accountManager) {
+        this.accountManager = accountManager;
+    }
 
     /**
      * @param validator the validator to set
@@ -177,5 +191,6 @@ public class NodeConfigurationController {
     public void setMessages(MessageResourceUtil messages) {
         this.messages = messages;
     }
+    
 }
 

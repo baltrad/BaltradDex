@@ -89,6 +89,12 @@ public class KeyczarAuthenticator implements Authenticator {
      */
     public boolean authenticate(String message, String signature, 
             String keyName) throws KeyczarException {
+        
+        Logger log = Logger.getLogger("DEX");
+        log.error("authenticate(): message :" + message);
+        log.error("authenticate(): key name :" + keyName);
+        log.error("authenticate(): signature :" + signature);
+        
         Verifier verifier = cryptoFactory.createVerifier(keyName);
         return verifier.verify(message, signature);
     }

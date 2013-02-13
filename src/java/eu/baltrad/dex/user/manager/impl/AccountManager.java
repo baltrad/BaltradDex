@@ -154,11 +154,11 @@ public class AccountManager implements IAccountManager {
     /**
      * Load id of the last stored user account.
      * @return id of the last stored user account
-     */
+     *
     private int loadId() {
         return jdbcTemplate.queryForInt(
                 "SELECT currval(pg_get_serial_sequence('dex_users', 'id'))");
-    }
+    }*/
     
     /**
      * Store account object in the db.
