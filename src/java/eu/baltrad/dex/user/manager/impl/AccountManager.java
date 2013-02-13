@@ -26,7 +26,6 @@ import eu.baltrad.dex.net.model.impl.Node;
 import eu.baltrad.dex.user.manager.IRoleManager;
 import eu.baltrad.dex.user.manager.IAccountManager;
 import eu.baltrad.dex.user.model.Account;
-import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.mapper.AccountMapper;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

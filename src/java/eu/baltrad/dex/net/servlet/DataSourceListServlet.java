@@ -172,9 +172,19 @@ public class DataSourceListServlet extends HttpServlet {
     {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
+        
+        log.error("Incoming request from : " + req.getNodeName());
+        log.error("Message : " + req.getMessage());
+        log.error("Signature : " + req.getSignature());
+        
         try {
             if (authenticator.authenticate(req.getMessage(), req.getSignature(),
                     req.getNodeName())) {
+                
+                
+                log.error("Authentication OK");
+                
+                
                 // TODO User account will be created when 
                 // keys are exchanged
                 String json = readRequest(request);
@@ -201,13 +211,27 @@ public class DataSourceListServlet extends HttpServlet {
                             HttpServletResponse.SC_OK);
                 }
             } else {
+                
+                log.error("Authentication failed!");
+                
+                
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
                         messages.getMessage(DS_UNAUTHORIZED_REQUEST_KEY));
+                
+                
+                
             }
         } catch (KeyczarException e) {
+            
+            log.error("Keyczar exception: " + e.getMessage());
+            
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
                     messages.getMessage(DS_MESSAGE_VERIFIER_ERROR_KEY));
         } catch (Exception e) {
+            
+            log.error("Generic exception: " + e.getMessage());
+            
+            
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(DS_INTERNAL_SERVER_ERROR_KEY,
                         new String[] {e.getMessage()}));
