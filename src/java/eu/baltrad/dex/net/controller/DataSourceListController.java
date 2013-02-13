@@ -246,6 +246,10 @@ public class DataSourceListController implements MessageSetter {
             urlSelect = node.getAddress();
         }
         String url = urlValidator.validate(urlInput) ? urlInput : urlSelect;
+        
+        log.error("nodeConnected():: validating url: " + url);
+        
+        
         if (!urlValidator.validate(url)) {
             setMessage(model, ERROR_MSG_KEY,
                        messages.getMessage(DS_INVALID_NODE_URL_KEY));
@@ -253,19 +257,30 @@ public class DataSourceListController implements MessageSetter {
         } else {
             // Post request if URL was successfully validated 
             requestFactory = new DefaultRequestFactory(URI.create(url));
+            
+            log.error("nodeConnected():: creating request factory: " + URI.create(url).toASCIIString());
+            
+            
+            
             HttpUriRequest req = requestFactory
                 .createDataSourceListingRequest(localNode);
+            
             try {
                 
-                log.error("nodeConnected() adding credentials");
+                log.error("nodeConnected():: adding credentials");
                 
                 
                 authenticator.addCredentials(req, localNode.getName());
                 
                 
-                
+                log.error("nodeConnected():: request uri: " + req.getURI().toASCIIString());
+                log.error("nodeConnected():: posting... ");
                 
                 HttpResponse res = httpClient.post(req);
+                
+                log.error("nodeConnected():: server response: " + res.getStatusLine().getStatusCode()
+                        + " " + res.getStatusLine().getReasonPhrase());
+                
                 if (res.getStatusLine().getStatusCode() == 
                         HttpServletResponse.SC_OK) {
                     // alright, read data sources
@@ -296,12 +311,6 @@ public class DataSourceListController implements MessageSetter {
                     viewName = DS_CONNECTED_VIEW;        
                     
                 } else {
-                    // server error     
-                    
-                    log.error("nodeConnected() Response from server: " + res.getStatusLine().getStatusCode());
-                    
-                    
-                    
                     viewName = DS_CONNECT_VIEW;
                     String errorMsg = messages.getMessage(
                         DS_SERVER_ERROR_KEY);

@@ -67,17 +67,23 @@ public class KeyczarAuthenticator implements Authenticator {
      */
     public void addCredentials(HttpUriRequest request, String keyName) 
                 throws KeyczarException {
+        Logger l = Logger.getLogger("DEX");
+        l.error("addCredentials():: key name: " + keyName);
+        
+        
+        
         String message = getMessage(request);
+        
+        
+        l.error("addCredentials():: message: " + message);
+        
+        
         Signer signer = cryptoFactory.createSigner(keyName);
         
-        String s = signer.sign(message);
+        String signature = signer.sign(message);
         
-        
-        request.addHeader(AUTH_HDR, keyName + ":" + /*signer.sign(message)*/s);
-        
-        Logger log = Logger.getLogger("DEX");
-        log.error("addCredentials() " + keyName + ":" + s);
-        
+        l.error("addCredentials():: signature: " + signature);
+        request.addHeader(AUTH_HDR, keyName + ":" + /*signer.sign(message)*/signature);
     }
     
     /**
@@ -91,12 +97,19 @@ public class KeyczarAuthenticator implements Authenticator {
             String keyName) throws KeyczarException {
         
         Logger log = Logger.getLogger("DEX");
-        log.error("authenticate(): message :" + message);
-        log.error("authenticate(): key name :" + keyName);
-        log.error("authenticate(): signature :" + signature);
+        log.error("authenticate():: message :" + message);
+        log.error("authenticate():: key name :" + keyName);
+        log.error("authenticate():: signature :" + signature);
         
         Verifier verifier = cryptoFactory.createVerifier(keyName);
-        return verifier.verify(message, signature);
+        
+        boolean result = verifier.verify(message, signature);
+        
+        log.error("authenticate():: result : " + result);
+        
+        return result;
+        
+        //return verifier.verify(message, signature);
     }
     
     /**

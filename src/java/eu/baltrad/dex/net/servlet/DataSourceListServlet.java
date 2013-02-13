@@ -173,16 +173,17 @@ public class DataSourceListServlet extends HttpServlet {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
         
-        log.error("Incoming request from : " + req.getNodeName());
-        log.error("Message : " + req.getMessage());
-        log.error("Signature : " + req.getSignature());
+        log.error("doPost():: received message from: " + req.getNodeName());
+        log.error("doPost():: message body: " + req.getMessage());
+        log.error("doPost():: signature: " + req.getSignature());
         
+        log.error("doPost():: authenticating...");
         try {
             if (authenticator.authenticate(req.getMessage(), req.getSignature(),
                     req.getNodeName())) {
                 
                 
-                log.error("Authentication OK");
+                log.error("doPost():: authentication SUCCESS");
                 
                 
                 // TODO User account will be created when 
@@ -212,7 +213,7 @@ public class DataSourceListServlet extends HttpServlet {
                 }
             } else {
                 
-                log.error("Authentication failed!");
+                log.error("doPost():: authentication FAILED");
                 
                 
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
@@ -223,13 +224,13 @@ public class DataSourceListServlet extends HttpServlet {
             }
         } catch (KeyczarException e) {
             
-            log.error("Keyczar exception: " + e.getMessage());
+            log.error("doPost():: keyczar exception: " + e.getMessage());
             
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
                     messages.getMessage(DS_MESSAGE_VERIFIER_ERROR_KEY));
         } catch (Exception e) {
             
-            log.error("Generic exception: " + e.getMessage());
+            log.error("doPost():: generic exception: " + e.getMessage());
             
             
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
