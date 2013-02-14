@@ -24,6 +24,9 @@ package eu.baltrad.dex.config.controller;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.config.validator.NodeConfigurationValidator;
+import eu.baltrad.dex.user.manager.IAccountManager;
+import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +72,7 @@ public class NodeConfigurationController {
     private static final String ERROR_MSG_KEY = "error";
 
     private ConfigurationManager configurationManager;
+    private IAccountManager accountManager;
     private NodeConfigurationValidator validator;
     private MessageResourceUtil messages;
     private Logger log;
@@ -109,6 +113,15 @@ public class NodeConfigurationController {
         }
         try {
             if (!configurationManager.getAppConf().equals(conf)) {
+                // save local peer account
+                int id = accountManager.load(configurationManager.getAppConf()
+                        .getNodeName()).getId();
+                Account account = new Account(id, conf.getNodeName(), null, 
+                        conf.getOrgName(), conf.getOrgUnit(), 
+                        conf.getLocality(), conf.getState(), 
+                        conf.getCountryCode(), Role.PEER, "http://localhost");
+                accountManager.update(account);
+                // save configuration
                 configurationManager.saveAppConf(conf);
             }
             String msg = messages.getMessage(SAVE_CONF_OK_MSG_KEY);
@@ -160,6 +173,14 @@ public class NodeConfigurationController {
     public void setConfigurationManager(
             ConfigurationManager configurationManager) {
         this.configurationManager = configurationManager;
+    }
+    
+    /**
+     * @param accountManager the accountManager to set
+     */
+    @Autowired
+    public void setAccountManager(IAccountManager accountManager) {
+        this.accountManager = accountManager;
     }
 
     /**

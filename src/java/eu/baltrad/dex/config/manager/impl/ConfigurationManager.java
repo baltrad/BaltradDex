@@ -25,7 +25,13 @@ import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.config.model.RegistryConfiguration;
+import eu.baltrad.dex.user.manager.IAccountManager;
+import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.ServletContextUtil;
+
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import org.apache.log4j.Logger;
 
@@ -42,13 +48,16 @@ import java.util.Properties;
  * @version 1.7.1
  * @since 1.0.1
  */
-public class ConfigurationManager implements IConfigurationManager {
+public class ConfigurationManager implements IConfigurationManager, 
+        InitializingBean {
     
     static final String DEX_PROPS_FILE = "dex.properties";
     
     private AppConfiguration appConf;
     private LogConfiguration logConf;
     private RegistryConfiguration registryConf;
+    
+    private IAccountManager accountManager;
     
     private Logger log;
     
@@ -62,6 +71,26 @@ public class ConfigurationManager implements IConfigurationManager {
         this.logConf = new LogConfiguration(props);
         this.registryConf = new RegistryConfiguration(props);
         createDirs();
+    }
+    
+    /**
+     * Create local peer account.
+     */
+    public void afterPropertiesSet() {
+        Account account = new Account(appConf.getNodeName(), "http://localhost",
+                appConf.getOrgName(), appConf.getOrgUnit(), 
+                appConf.getLocality(), appConf.getState(), 
+                appConf.getCountryCode());
+        account.setRoleName(Role.PEER);
+        try {
+            if (accountManager.load(appConf.getNodeName()) == null) {
+                accountManager.store(account);
+                log.warn("Created local peer account: " 
+                        + appConf.getNodeName());
+            }
+        } catch (Exception e) {
+            log.error("Failed to create local peer account", e);
+        }
     }
     
     /**
@@ -261,18 +290,26 @@ public class ConfigurationManager implements IConfigurationManager {
      */
     private void createDirs() {
         if (createDir(appConf.getWorkDir())) {
-            log.warn("New work folder created: " + appConf.getWorkDir());
+            log.warn("Created new work folder: " + appConf.getWorkDir());
         }
         if (createDir(appConf.getWorkDir() + File.separator 
                 + appConf.getImagesDir())) {
-            log.warn("New image folder created: " + appConf.getWorkDir() 
+            log.warn("Created new image folder: " + appConf.getWorkDir() 
                     + File.separator + appConf.getImagesDir());
         }
         if (createDir(appConf.getWorkDir() + File.separator 
                 + appConf.getThumbsDir())) {
-            log.warn("New thumbnails folder created: " + appConf.getWorkDir() 
+            log.warn("Created new thumbnails folder: " + appConf.getWorkDir() 
                     + File.separator + appConf.getThumbsDir());
         }        
+    }
+
+    /**
+     * @param accountManager the accountManager to set
+     */
+    @Autowired
+    public void setAccountManager(IAccountManager accountManager) {
+        this.accountManager = accountManager;
     }
     
 }

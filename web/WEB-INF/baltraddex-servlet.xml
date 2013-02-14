@@ -54,14 +54,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     
     <!-- Configuration manager -->
     <bean id="configurationManager" 
-          class="eu.baltrad.dex.config.manager.impl.ConfigurationManager"/>
+          class="eu.baltrad.dex.config.manager.impl.ConfigurationManager"
+          autowire="byType"/>
     
     <!-- Message source -->
     <bean id="messageSource"
           class="eu.baltrad.dex.util.MessageResourceUtil">  
-	<property name="basename">
+        <property name="basename">
             <value>resources/messages</value>
-	</property>
+        </property>
     </bean>      
           
     <!-- URL filename view controller -->
