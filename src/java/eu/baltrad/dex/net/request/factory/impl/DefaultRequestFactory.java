@@ -166,7 +166,7 @@ public class DefaultRequestFactory implements RequestFactory {
             String json = jsonUtil.userAccountToJson(account);
             httpPost.setEntity(new StringEntity(json, "UTF-8"));
             httpPost.addHeader("Node-Name", account.getName());
-            httpPost.addHeader("Content-Type", "application/json;");  
+            httpPost.addHeader("Content-Type", "application/json");  
             httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
                 json.getBytes()));
             httpPost.addHeader("Date", dateFormat.format(new Date()));
