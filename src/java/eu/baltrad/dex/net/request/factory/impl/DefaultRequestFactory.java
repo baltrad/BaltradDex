@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -41,9 +41,9 @@ import java.net.URI;
 import java.util.Date;
 import java.util.Set;
 import java.util.List;
+import java.util.Locale;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import org.apache.log4j.Logger;
 
 /**
  * Implements default request factory.
@@ -83,7 +83,8 @@ public class DefaultRequestFactory implements RequestFactory {
             throw new IllegalArgumentException("Invalid server URI: " 
                     + serverUri);
         }
-        this.dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        // Set universal locale to eliminate non-ascii characters
+        this.dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.US);
     }
     
     /**
@@ -162,26 +163,13 @@ public class DefaultRequestFactory implements RequestFactory {
         try {
             HttpPost httpPost = new HttpPost(
                 getRequestUri("datasource_listing.htm"));
-            String json = jsonUtil.userAccountToJson(account); 
-            
-            Logger l = Logger.getLogger("DEX");
-            
-            l.error("createDataSourceListingRequest :: json account: " + json);
-            
+            String json = jsonUtil.userAccountToJson(account);
             httpPost.setEntity(new StringEntity(json, "UTF-8"));
             httpPost.addHeader("Node-Name", account.getName());
-            httpPost.addHeader("Content-Type", "application/json");  
+            httpPost.addHeader("Content-Type", "application/json;");  
             httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
                 json.getBytes()));
             httpPost.addHeader("Date", dateFormat.format(new Date()));
-            
-            
-            l.error("createDataSourceListingRequest :: node name: " + httpPost.getFirstHeader("Node-Name").getValue());
-            l.error("createDataSourceListingRequest :: content type: " + httpPost.getFirstHeader("Content-Type").getValue());
-            l.error("createDataSourceListingRequest :: content MD5: " + httpPost.getFirstHeader("Content-MD5").getValue());
-            l.error("createDataSourceListingRequest :: node name: " + httpPost.getFirstHeader("Date").getValue());
-            
-            
             return httpPost;
         } catch (Exception e) {
             throw new RuntimeException("Failed to create data source listing " +

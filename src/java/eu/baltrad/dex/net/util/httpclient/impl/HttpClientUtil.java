@@ -31,7 +31,9 @@ import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -67,15 +69,20 @@ public class HttpClientUtil implements IHttpClientUtil {
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         registerHttpScheme(schemeRegistry);
         registerHttpsScheme(schemeRegistry);
+        
         ThreadSafeClientConnManager connMgr = new ThreadSafeClientConnManager(
                 schemeRegistry);
         connMgr.setMaxTotal(MAX_TOTAL_CONNS);
         connMgr.setDefaultMaxPerRoute(MAX_PER_ROUTE_CONNS);
-        client = new DefaultHttpClient(connMgr);
-        HttpParams httpParams = client.getParams();
+        
+        HttpParams httpParams = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(httpParams, connTimeout);
         HttpConnectionParams.setSoTimeout(httpParams, soTimeout);
         HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
+        HttpProtocolParams.setContentCharset(httpParams, HTTP.UTF_8);
+        HttpProtocolParams.setHttpElementCharset(httpParams, HTTP.UTF_8);
+        
+        client = new DefaultHttpClient(connMgr, httpParams);
     }
     
     /**

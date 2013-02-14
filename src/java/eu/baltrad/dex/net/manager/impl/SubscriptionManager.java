@@ -23,7 +23,6 @@ package eu.baltrad.dex.net.manager.impl;
 
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
-import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.user.manager.IAccountManager;
 import eu.baltrad.dex.net.manager.INodeManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
@@ -43,7 +42,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import java.util.List;
-import org.apache.log4j.Logger;
 
 /**
  * Subscription manager implementing subscription handling functionality.
@@ -222,13 +220,6 @@ public class SubscriptionManager implements ISubscriptionManager {
     @Transactional(propagation=Propagation.REQUIRED, 
             rollbackFor=Exception.class)
     public int store(Subscription subscription) throws Exception {
-        
-        
-        Logger log = Logger.getLogger("DEX");
-        log.error("SubscriptionManager::store()");
-        
-        
-        
         final String sql = "INSERT INTO dex_subscriptions (time_stamp, " + 
                     "type, active, sync) VALUES (?,?,?,?)";
         final Subscription s = subscription;
@@ -248,73 +239,22 @@ public class SubscriptionManager implements ISubscriptionManager {
                         return ps;
                     }
                 }, keyHolder);
-            
-            
-            
-            
-            
             int subId = keyHolder.getKey().intValue();
-            
-            log.error("SubscriptionManager::store() subscription id = " + subId);
-            log.error("SubscriptionManager::store() subscription user = " + s.getUser());
-            log.error("SubscriptionManager::store() subscription type = " + s.getType());
-            log.error("SubscriptionManager::store() subscription operator = " + s.getOperator());
-            log.error("SubscriptionManager::store() subscription data source = " + s.getDataSource());
-            
             int userId = accountManager.load(s.getUser()).getId();
-            
-            
-            log.error("SubscriptionManager::store() user id = " + userId);
-            
-            
             jdbcTemplate.update("INSERT INTO dex_subscriptions_users " +
                     "(subscription_id, user_id) VALUES (?,?)", 
                     subId, userId);
-            
-            log.error("SubscriptionManager::store() updated subscriptions");
-            
-            // ------- everything fucks up from now on
-            
-            if (dataSourceManager == null) {
-                log.error("SubscriptionManager::store() dataSourceManager is null!");
-            } 
-            
-            log.error("SubscriptionManager::store() subscription data source " + s.getDataSource());
-            
-            DataSource dd = dataSourceManager.load(s.getDataSource());
-            if (dd == null) {
-                log.error("SubscriptionManager::store() data source is null");
-            } else {
-                log.error("SubscriptionManager::store() data source id = " + dd.getId());
-            }
             int dataSourceId = dataSourceManager.load(
                     s.getDataSource()).getId();
-            
-            log.error("SubscriptionManager::store() data source id = " + dataSourceId);
-            
-            
             jdbcTemplate.update("INSERT INTO dex_subscriptions_data_sources " +
                     "(subscription_id, data_source_id) VALUES (?,?)", 
                     subId, dataSourceId);
-            
-            log.error("SubscriptionManager::store() updated data sources");
-            
             int nodeId = nodeManager.load(s.getOperator()).getId();
-            
-            
-            log.error("SubscriptionManager::store() node id = " + nodeId);
-            
             jdbcTemplate.update("INSERT INTO dex_subscriptions_nodes " +
                     "(subscription_id, node_id) VALUES (?,?)", 
                     subId, nodeId);
-            
-            log.error("SubscriptionManager::store() updated nodes");
-            
             return subId;
         } catch (DataAccessException e) {
-            
-            log.error("SubscriptionManager::store() exception caught: " + e.getMessage());
-            
             throw new Exception(e.getMessage());
         }
     }

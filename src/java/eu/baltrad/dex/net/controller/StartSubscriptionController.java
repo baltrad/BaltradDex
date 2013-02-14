@@ -190,19 +190,9 @@ public class StartSubscriptionController implements MessageSetter {
     private void storeLocalSubscriptions(HttpResponse response, 
             String dataSourceString) throws InternalControllerException{
         try {
-            
-            log.error("storeLocalSubscriptions() dataSourceString: " + dataSourceString);
-            
             Set<DataSource> dataSources = jsonUtil
                     .jsonToDataSources(dataSourceString);
-            
-            log.error("storeLocalSubscriptions() data sources size: " + dataSources.size());
-            
             for (DataSource ds : dataSources) {
-                
-                
-                log.error("storeLocalSubscriptions() storing subscription: " + ds.getName());
-                
                 Subscription requested = new Subscription(
                         System.currentTimeMillis(), Subscription.DOWNLOAD,
                         response.getFirstHeader("Node-Name").getValue(), 
@@ -210,22 +200,13 @@ public class StartSubscriptionController implements MessageSetter {
                 Subscription existing = subscriptionManager.load(
                     Subscription.DOWNLOAD, localNode.getName(), ds.getName());
                 if (existing == null) {
-                    
-                    log.error("storeLocalSubscriptions() subscription not found: " + ds.getName());
-                    
                     subscriptionManager.store(requested);
                 } else {
                     requested.setId(existing.getId());
-                    
-                    log.error("storeLocalSubscriptions() subscription exists: " + ds.getName());
-                    
                     subscriptionManager.update(requested);
                 }
             }
         } catch (Exception e) {
-            
-            log.error("storeLocalSubscriptions() error message: " + e.getMessage());
-            
             throw new InternalControllerException("Failed to read server "
                     + "response");
         }
@@ -250,12 +231,6 @@ public class StartSubscriptionController implements MessageSetter {
             selectedPeerDataSources.add(new DataSource(
                     Integer.parseInt(parms[0]), parms[1], parms[2]));
         }
-        
-        
-        //String json = jsonUtil
-        //        .dataSourcesToJson(selectedPeerDataSources);
-        
-        
         Node node = nodeManager.load(peerName);
         requestFactory = new DefaultRequestFactory(
                 URI.create(node.getAddress()));
@@ -263,17 +238,8 @@ public class StartSubscriptionController implements MessageSetter {
                 .createStartSubscriptionRequest(localNode, 
                                                 selectedPeerDataSources);
         try {
-            
-            log.error("postSubscription(): sending request");
-            
             authenticator.addCredentials(req, localNode.getName());
-            
             HttpResponse res = httpClient.post(req);
-            
-            log.error("postSubscription() reading response");
-            log.error("postSubscription() response code: " + res.getStatusLine().getStatusCode());
-            log.error("postSubscription() response reason phrase: " + res.getStatusLine().getReasonPhrase());
-            
             if (res.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_OK) {
                 String okMsg = messages.getMessage(PS_SERVER_SUCCESS_KEY,
@@ -309,34 +275,19 @@ public class StartSubscriptionController implements MessageSetter {
             setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
                     e.getMessage());
             log.error(errorMsg + ": " + e.getMessage());
-            
-            
-            
-            
         } catch (InternalControllerException e) {
-            
-            
-            log.error("postSubscription() caught InternalControllerException: " + e.getMessage());
-            
             String errorMsg = messages.getMessage(
                     PS_INTERNAL_CONTROLLER_ERROR_KEY, new String[] {peerName});
             setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
                     e.getMessage());
             log.error(errorMsg + ": " + e.getMessage());
         } catch (IOException e) {
-            
-            
-            log.error("postSubscription() caught IOException: " + e.getMessage());
-            
             String errorMsg = messages.getMessage(
                     PS_HTTP_CONN_ERROR_KEY, new String[] {peerName});
             setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
                     e.getMessage());
             log.error(errorMsg + ": " + e.getMessage());
         } catch (Exception e) {
-            
-            log.error("postSubscription() caught Exception: " + e.getMessage());
-            
             String errorMsg = messages.getMessage(
                     PS_GENERIC_CONN_ERROR_KEY, new String[] {peerName});
             setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
