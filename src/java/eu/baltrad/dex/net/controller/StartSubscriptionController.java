@@ -22,6 +22,7 @@
 package eu.baltrad.dex.net.controller;
 
 import eu.baltrad.dex.config.manager.IConfigurationManager;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.net.controller.exception.InternalControllerException;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.request.factory.RequestFactory;
@@ -102,6 +103,7 @@ public class StartSubscriptionController implements MessageSetter {
     private IHttpClientUtil httpClient;
     private IJsonUtil jsonUtil;
     private INodeManager nodeManager;
+    private IDataSourceManager dataSourceManager;
     private ISubscriptionManager subscriptionManager;    
     private RequestFactory requestFactory;
     private MessageResourceUtil messages;
@@ -193,6 +195,9 @@ public class StartSubscriptionController implements MessageSetter {
             Set<DataSource> dataSources = jsonUtil
                     .jsonToDataSources(dataSourceString);
             for (DataSource ds : dataSources) {
+                // save peer data sources
+                dataSourceManager.store(ds);
+                // save subscriptions
                 Subscription requested = new Subscription(
                         System.currentTimeMillis(), Subscription.DOWNLOAD,
                         response.getFirstHeader("Node-Name").getValue(), 
@@ -232,8 +237,11 @@ public class StartSubscriptionController implements MessageSetter {
                     Integer.parseInt(parms[0]), parms[1], parms[2]));
         }
         Node node = nodeManager.load(peerName);
+        
         requestFactory = new DefaultRequestFactory(
                 URI.create(node.getAddress()));
+        
+        
         HttpUriRequest req = requestFactory
                 .createStartSubscriptionRequest(localNode, 
                                                 selectedPeerDataSources);
@@ -330,6 +338,14 @@ public class StartSubscriptionController implements MessageSetter {
         this.messages = messages;
     }
 
+    /**
+     * @param dataSourceManager the dataSourceManager to set
+     */
+    @Autowired
+    public void setDataSourceManager(IDataSourceManager dataSourceManager) {
+        this.dataSourceManager = dataSourceManager;
+    }
+    
     /**
      * @param subscriptionManager the subscriptionManager to set
      */

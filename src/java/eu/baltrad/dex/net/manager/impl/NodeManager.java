@@ -186,6 +186,19 @@ public class NodeManager implements INodeManager {
     }
     
     /**
+     * Update node object.
+     * @param node Node object
+     * @return Number of updated records
+     */
+    public int update(Node node) {
+        return jdbcTemplate.update(
+                "UPDATE dex_nodes SET name = ?, address = ? WHERE id = ?",
+                node.getName(),
+                node.getAddress(),
+                node.getId());
+    } 
+    
+    /**
      * Store record in dex_users_nodes table.
      * @param userId User id
      * @param nodeId Role id

@@ -49,6 +49,8 @@ public interface INodeManager {
     
     public int store(int userId, int nodeId);
     
+    public int update(Node node);
+    
     public int update(int userId, int nodeId);
     
     public int delete(int id);
