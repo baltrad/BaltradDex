@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.net.controller;
 
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.util.json.impl.JsonUtil;
 import eu.baltrad.dex.net.auth.Authenticator;
@@ -61,6 +62,7 @@ import java.util.ArrayList;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import org.keyczar.exceptions.KeyczarException;
 
 /**
@@ -94,6 +96,7 @@ public class StartSubscriptionControllerTest {
     private INodeManager nodeManagerMock;
     private Authenticator authenticatorMock;
     private ISubscriptionManager subscriptionManagerMock;
+    private IDataSourceManager dataSourceManagerMock;
     private MessageResourceUtil messages;
     private Logger log;
     private JsonUtil jsonUtil;
@@ -147,6 +150,9 @@ public class StartSubscriptionControllerTest {
         subscriptionManagerMock = (ISubscriptionManager)
                 createMock(ISubscriptionManager.class);
         authenticatorMock = (Authenticator) createMock(Authenticator.class);
+        dataSourceManagerMock = (IDataSourceManager) 
+                    createMock(IDataSourceManager.class);
+        
     }
     
     @After
@@ -436,13 +442,12 @@ public class StartSubscriptionControllerTest {
         
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andReturn(response);
-        
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
-        
+        expect(dataSourceManagerMock.store(isA(DataSource.class)))
+                .andReturn(Integer.SIZE).anyTimes();
         expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
                 isA(String.class))).andReturn(null).anyTimes();
-        
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
                 .andReturn(Integer.SIZE).anyTimes();
         
@@ -452,6 +457,8 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setDataSourceManager(dataSourceManagerMock);
+        
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.postSubscription(model, "test.baltrad.eu",
                 SELECTED_DATA_SOURCES);
@@ -483,6 +490,8 @@ public class StartSubscriptionControllerTest {
                 .andReturn(response);
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
+        expect(dataSourceManagerMock.store(isA(DataSource.class)))
+                .andReturn(Integer.SIZE).anyTimes();
         expect(subscriptionManagerMock.load(isA(String.class), 
             isA(String.class), isA(String.class))).andReturn(null).anyTimes();
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
@@ -494,6 +503,7 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setDataSourceManager(dataSourceManagerMock);
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.postSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
