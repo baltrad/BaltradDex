@@ -22,6 +22,7 @@
 package eu.baltrad.dex.net.manager;
 
 import eu.baltrad.dex.net.model.impl.Node;
+import eu.baltrad.dex.user.model.User;
 import java.util.List;
 
 /**
@@ -35,15 +36,13 @@ public interface INodeManager {
     
     public List<Node> load();
     
-    public List<Node> loadOperators();
-    
-    public List<Node> loadPeers();
-    
     public Node load(int id);
     
     public Node load(String name);
     
     public Node loadByUser(int id);
+    
+    public List<Node> loadOperators();
     
     public int store(Node node);
     

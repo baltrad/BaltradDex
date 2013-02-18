@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -43,8 +43,8 @@ public class DownloadStatusController {
     /** View name */
     private static final String DATA_DOWNLOAD_VIEW = "data_download";
     
-    /** Nodes model key */
-    private static final String NODES = "nodes";
+     /** Peers model key */
+    private static final String OPERATORS = "operators";
     /** Subscriptions model key */
     private static final String SUBSCRIPTIONS = "subscriptions";
     
@@ -58,7 +58,7 @@ public class DownloadStatusController {
      */
     @RequestMapping("/data_download.htm")
     public String dataDownload(ModelMap model) {
-        model.addAttribute(NODES, nodeManager.loadOperators());
+        model.addAttribute(OPERATORS, nodeManager.loadOperators());
         model.addAttribute(SUBSCRIPTIONS, 
                 subscriptionManager.load(Subscription.DOWNLOAD));
         return DATA_DOWNLOAD_VIEW;
@@ -71,6 +71,7 @@ public class DownloadStatusController {
     public void setNodeManager(NodeManager nodeManager) {
         this.nodeManager = nodeManager;
     }
+    
 
     /**
      * @param subscriptionManager the subscriptionManager to set

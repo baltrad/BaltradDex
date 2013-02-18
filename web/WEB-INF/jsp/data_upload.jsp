@@ -40,13 +40,12 @@ Author     : szewczenko
             Data uploaded to subscribers.
         </div>
         <c:choose>
-            <c:when test="${not empty peers}">
+            <c:when test="${not empty users}">
                 <div class="blttext">
                     Click on user name to view detailed information
                     on subscriber.
                 </div>
-                <c:forEach var="peer" items="${peers}">
-                <c:set var="peer_name" scope="page" value="${peer.name}"></c:set>
+                <c:forEach var="user" items="${users}">
                 <div class="expandable">
                     <div class="save">
                         <div class="item">
@@ -57,7 +56,7 @@ Author     : szewczenko
                                         alt="+" title="Show">
                                 </span>
                                 <div class="user">
-                                    <c:out value="${peer.name}"/>
+                                    <c:out value="${user}"/>
                                 </div>
                             </a>
                         </div>
@@ -74,7 +73,7 @@ Author     : szewczenko
                                             </div>
                                         </div>
                                         <c:forEach var="sub" items="${subscriptions}">
-                                            <c:if test="${sub.user == peer_name}">
+                                            <c:if test="${sub.user == user}">    
                                                 <div class="entry">
                                                     <div id="cell" class="station">
                                                         <c:out value="${sub.dataSource}"/>

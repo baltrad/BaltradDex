@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,9 +21,9 @@
 
 package eu.baltrad.dex.net.controller;
 
-import eu.baltrad.dex.net.manager.impl.NodeManager;
 import eu.baltrad.dex.net.manager.impl.SubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.user.manager.impl.AccountManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,13 +43,13 @@ public class UploadStatusController {
     /** View name */
     private static final String DATA_UPLOAD_VIEW = "data_upload";
     
-    /** Peers model key */
-    private static final String PEERS = "peers";
+    /** Users model key */
+    private static final String USERS = "users";
     /** Subscriptions model key */
     private static final String SUBSCRIPTIONS = "subscriptions";
     
-    private NodeManager nodeManager;
-    private SubscriptionManager subscriptionManager;
+    private AccountManager accountManager;
+    private SubscriptionManager subscriptionManager; 
     
     /**
      * Get peers and subscribed data sources.
@@ -58,18 +58,18 @@ public class UploadStatusController {
      */
     @RequestMapping("/data_upload.htm")
     public String dataUpload(ModelMap model) {
-        model.addAttribute(PEERS, nodeManager.loadPeers());
+        model.addAttribute(USERS, accountManager.loadUsers());
         model.addAttribute(SUBSCRIPTIONS, 
                 subscriptionManager.load(Subscription.UPLOAD));
         return DATA_UPLOAD_VIEW;
     }
     
     /**
-     * @param nodeManager the nodeManager to set
+     * @param accountManager the accountManager to set
      */
     @Autowired
-    public void setNodeManager(NodeManager nodeManager) {
-        this.nodeManager = nodeManager;
+    public void setAccountManager(AccountManager accountManager) {
+        this.accountManager = accountManager;
     }
 
     /**

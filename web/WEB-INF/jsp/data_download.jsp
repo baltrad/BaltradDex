@@ -40,13 +40,12 @@ Author     : szewczenko
             Data downloaded from subscribed data sources.
         </div>
         <c:choose>
-            <c:when test="${not empty nodes}">
+            <c:when test="${not empty operators}">
                 <div class="blttext">
                     Click on node name to view detailed information
                     on subscribed data sources.
                 </div>
-                <c:forEach var="node" items="${nodes}">
-                <c:set var="operator_name" scope="page" value="${node.name}"></c:set>
+                <c:forEach var="operator" items="${operators}">
                 <div class="expandable">
                     <div class="save">
                         <div class="item">
@@ -57,7 +56,7 @@ Author     : szewczenko
                                             alt="+" title="Show">
                                 </span>
                                 <div class="operator">
-                                    <c:out value="${node.name}"/>
+                                    <c:out value="${operator.name}"/>
                                 </div>
                             </a>
                         </div>
@@ -77,7 +76,7 @@ Author     : szewczenko
                                         </div>
                                     </div>
                                     <c:forEach var="sub" items="${subscriptions}">
-                                        <c:if test="${sub.operator == operator_name}">
+                                        <c:if test="${sub.operator == operator.name}">
                                             <div class="entry">
                                                 <div id="cell" class="station">
                                                     <c:out value="${sub.dataSource}"/>

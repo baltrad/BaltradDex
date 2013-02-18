@@ -126,13 +126,6 @@ public class NodeManagerTest extends TestCase {
         verifyAll();
     }
     
-    public void testLoadPeers() throws Exception {
-        List<Node> peers = classUnderTest.loadPeers();
-        assertNotNull(peers);
-        assertEquals(3, peers.size());
-        verifyAll();
-    }
-    
     public void testStore() throws Exception {
         helper.cleanInsert(this, "noid");
         Node node = new Node("TestNode6", "http://test6.eu");

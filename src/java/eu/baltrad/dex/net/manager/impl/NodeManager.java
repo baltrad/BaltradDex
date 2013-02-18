@@ -79,43 +79,7 @@ public class NodeManager implements INodeManager {
         } catch (DataAccessException e) {
             return null;
         }    
-    }
-    
-    /**
-     * Load operators.
-     * @return List of operators
-     */
-    public List<Node> loadOperators() {
-        String sql = "SELECT DISTINCT dex_nodes.name, dex_nodes.address, " + 
-            "dex_nodes.id FROM dex_nodes, dex_subscriptions, " + 
-            "dex_subscriptions_nodes WHERE " + 
-            "dex_subscriptions_nodes.subscription_id = dex_subscriptions.id " + 
-            "AND dex_subscriptions_nodes.node_id = dex_nodes.id AND " + 
-            "dex_subscriptions.type = 'download';";
-        try {
-            return jdbcTemplate.query(sql, mapper);
-        } catch (DataAccessException e) {
-            return null;
-        }    
-    }
-    
-    /**
-     * Load peers.
-     * @return List of peer nodes
-     */
-    public List<Node> loadPeers() {
-        String sql = "SELECT DISTINCT dex_nodes.name, dex_nodes.address, " + 
-            "dex_nodes.id FROM dex_nodes, dex_subscriptions, " + 
-            "dex_subscriptions_nodes WHERE " + 
-            "dex_subscriptions_nodes.subscription_id = dex_subscriptions.id " + 
-            "AND dex_subscriptions_nodes.node_id = dex_nodes.id AND " + 
-            "dex_subscriptions.type = 'upload';";
-        try {
-            return jdbcTemplate.query(sql, mapper);
-        } catch (DataAccessException e) {
-            return null;
-        }    
-    }
+    } 
     
     /**
      * Load node by id.
@@ -143,8 +107,25 @@ public class NodeManager implements INodeManager {
             return jdbcTemplate.queryForObject(sql, mapper, id);
         } catch (DataAccessException e) {
             return null;
-        }
-        
+        }   
+    }
+    
+    /**
+     * Load operators.
+     * @return List of operators
+     */
+    public List<Node> loadOperators() {
+        String sql = "SELECT DISTINCT dex_nodes.name, dex_nodes.address, " + 
+            "dex_nodes.id FROM dex_nodes, dex_subscriptions, " + 
+            "dex_subscriptions_nodes WHERE " + 
+            "dex_subscriptions_nodes.subscription_id = dex_subscriptions.id " + 
+            "AND dex_subscriptions_nodes.node_id = dex_nodes.id AND " + 
+            "dex_subscriptions.type = 'download';";
+        try {
+            return jdbcTemplate.query(sql, mapper);
+        } catch (DataAccessException e) {
+            return null;
+        }    
     }
     
     /**

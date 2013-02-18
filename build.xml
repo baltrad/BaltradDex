@@ -668,7 +668,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   </target>
   
     <!-- Test deployment -->
-    <target name="test-deploy" depends="dist, insert-data, test-context-status"
+    <target name="test-deploy" depends="dist, test-context-status"
             if="test.context.deployable">
         <echo message="Deploying ${test.mgr.path} to ${test.mgr.url}"/>
         <deploy url="${test.mgr.url}"

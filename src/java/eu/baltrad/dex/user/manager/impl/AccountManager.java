@@ -29,6 +29,7 @@ import eu.baltrad.dex.user.model.Account;
 import eu.baltrad.dex.user.model.mapper.AccountMapper;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
@@ -40,6 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
@@ -149,6 +152,24 @@ public class AccountManager implements IAccountManager {
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
+    }
+    
+    /**
+     * Returns distinct names of users.
+     * @return List containing distinct user names
+     */
+    public List<String> loadUsers() {
+        String sql = "SELECT DISTINCT dex_users.name AS user_name FROM " + 
+                "dex_users, dex_subscriptions, dex_subscriptions_users " +
+                "WHERE dex_subscriptions_users.subscription_id = " + 
+                "dex_subscriptions.id AND dex_subscriptions_users.user_id = " +
+                "dex_users.id AND dex_subscriptions.type = 'upload';";			
+
+        return jdbcTemplate.query(sql, new ParameterizedRowMapper<String>() {
+                public String mapRow(ResultSet rs, int i) throws SQLException {
+                    return rs.getString("user_name");
+                }
+            });
     }
     
     /**

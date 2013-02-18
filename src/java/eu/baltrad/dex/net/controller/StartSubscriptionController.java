@@ -237,11 +237,8 @@ public class StartSubscriptionController implements MessageSetter {
                     Integer.parseInt(parms[0]), parms[1], parms[2]));
         }
         Node node = nodeManager.load(peerName);
-        
         requestFactory = new DefaultRequestFactory(
                 URI.create(node.getAddress()));
-        
-        
         HttpUriRequest req = requestFactory
                 .createStartSubscriptionRequest(localNode, 
                                                 selectedPeerDataSources);

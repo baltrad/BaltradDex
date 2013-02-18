@@ -40,6 +40,8 @@ public interface IAccountManager {
     
     public Account load(String name);
     
+    public List<String> loadUsers(); 
+    
     public int store(Account account) throws Exception;
     
     public void update(Account account) throws Exception;
