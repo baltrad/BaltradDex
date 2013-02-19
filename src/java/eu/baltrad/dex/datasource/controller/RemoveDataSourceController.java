@@ -101,7 +101,7 @@ public class RemoveDataSourceController {
      */
     @RequestMapping("/remove_datasource.htm")
     public String removeDatasources(ModelMap model) {
-        List<DataSource> dataSources = dataSourceManager.load();
+        List<DataSource> dataSources = dataSourceManager.load(DataSource.LOCAL);
         Collections.sort(dataSources);
         model.addAttribute(DS_KEY, dataSources);
         return DS_REMOVE_VIEW;
@@ -146,7 +146,7 @@ public class RemoveDataSourceController {
         try {
             String[] dataSourceIds = request.getParameterValues(DS_SELECTED_KEY);
             List<Subscription> uploads = 
-                        subscriptionManager.load(Subscription.UPLOAD);
+                        subscriptionManager.load(Subscription.PEER);
             for (int i = 0; i < dataSourceIds.length; i++) {
                 int dsId = Integer.parseInt(dataSourceIds[i]);
                 String dsName = dataSourceManager.load(dsId).getName();

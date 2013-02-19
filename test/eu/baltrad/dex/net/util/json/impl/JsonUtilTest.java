@@ -47,18 +47,19 @@ public class JsonUtilTest {
             "locality\",\"countryCode\":\"XX\",\"password\":\"s3cret\"}";
     
     private static final String JSON_SOURCES = 
-              "[{\"name\":\"DS1\",\"id\":1,\"description\":\"A test "
-            + "data source\"},{\"name\":\"DS2\",\"id\":2,\"description\":\"One "
-            + "more test data source\"},{\"name\":\"DS3\",\"id\":3,\"" 
-            + "description\":\"Yet another test data source\"}]";
+            "[{\"name\":\"DS1\",\"type\":\"local\",\"id\":1,\"description\"" +
+            ":\"A test data source\"},{\"name\":\"DS2\",\"type\":\"local\"," +
+            "\"id\":2,\"description\":\"One more test data source\"},{\"" + 
+            "name\":\"DS3\",\"type\":\"local\",\"id\":3,\"description\":\"" + 
+            "Yet another test data source\"}]";
         
     private static final String JSON_SUBSCRIPTIONS = "[{\"id\":1,\"type\":\"" + 
-            "download\",\"date\":1340189763867,\"active\":true,\"user\":" +
+            "local\",\"date\":1340189763867,\"active\":true,\"user\":" +
             "\"User1\",\"dataSource\":\"DataSource1\",\"operator\":\"" + 
-            "Operator1\",\"syncronized\":true},{\"id\":2,\"type\":\"download" + 
+            "Operator1\",\"syncronized\":true},{\"id\":2,\"type\":\"local" + 
             "\",\"date\":1340189763867,\"active\":true,\"user\":\"" + 
             "User2\",\"dataSource\":\"DataSource2\",\"operator\":\"Operator2" + 
-            "\",\"syncronized\":false},{\"id\":3,\"type\":\"upload\",\"" +
+            "\",\"syncronized\":false},{\"id\":3,\"type\":\"peer\",\"" +
             "date\":1340189763867,\"active\":false,\"user\":\"User3\",\"" +
             "dataSource\":\"DataSource3\",\"operator\":\"Operator3\",\"" + 
             "syncronized\":true}]"; 
@@ -77,25 +78,27 @@ public class JsonUtilTest {
         account.setRepeatPassword("s3cret");
         
         dataSources = new HashSet<DataSource>();
-        DataSource ds1 = new DataSource(1, "DS1", "A test data source");
+        DataSource ds1 = new DataSource(1, "DS1", "local", 
+                "A test data source");
         dataSources.add(ds1);
-        DataSource ds2 = new DataSource(2, "DS2", "One more test data source");
+        DataSource ds2 = new DataSource(2, "DS2", "local", 
+                "One more test data source");
         dataSources.add(ds2);
-        DataSource ds3 = new DataSource(3, "DS3", 
-                                                "Yet another test data source");
+        DataSource ds3 = new DataSource(3, "DS3", "local",
+                "Yet another test data source");
         dataSources.add(ds3);
         assertEquals(3, dataSources.size());
         
         long time = 1340189763867L;
         subscriptions = new ArrayList<Subscription>();
         
-        Subscription s1 = new Subscription(1, time, "download", "Operator1", 
+        Subscription s1 = new Subscription(1, time, "local", "Operator1", 
                 "User1", "DataSource1", true, true);
         subscriptions.add(s1);
-        Subscription s2 = new Subscription(2, time, "download", "Operator2", 
+        Subscription s2 = new Subscription(2, time, "local", "Operator2", 
                 "User2", "DataSource2", true, false);
         subscriptions.add(s2);
-        Subscription s3 = new Subscription(3, time, "upload", "Operator3", 
+        Subscription s3 = new Subscription(3, time, "peer", "Operator3", 
                 "User3", "DataSource3", false, true);
         subscriptions.add(s3);
         
@@ -143,6 +146,7 @@ public class JsonUtilTest {
             assertNotNull(ds);
             assertNotNull(ds.getId());
             assertNotNull(ds.getName());
+            assertNotNull(ds.getType());
             assertNotNull(ds.getDescription());
         }
     }

@@ -37,11 +37,11 @@ import java.util.List;
  */
 public interface IDataSourceManager {
     
-    public List<DataSource> load();
-    
     public DataSource load(int id);
     
-    public DataSource load(String name);
+    public List<DataSource> load(String type);
+    
+    public DataSource load(String name, String type);
     
     public List<DataSource> loadByUser(int id);
     

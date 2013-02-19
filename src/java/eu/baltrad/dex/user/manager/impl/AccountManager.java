@@ -163,7 +163,7 @@ public class AccountManager implements IAccountManager {
                 "dex_users, dex_subscriptions, dex_subscriptions_users " +
                 "WHERE dex_subscriptions_users.subscription_id = " + 
                 "dex_subscriptions.id AND dex_subscriptions_users.user_id = " +
-                "dex_users.id AND dex_subscriptions.type = 'upload';";			
+                "dex_users.id AND dex_subscriptions.type = 'peer';";			
 
         return jdbcTemplate.query(sql, new ParameterizedRowMapper<String>() {
                 public String mapRow(ResultSet rs, int i) throws SQLException {

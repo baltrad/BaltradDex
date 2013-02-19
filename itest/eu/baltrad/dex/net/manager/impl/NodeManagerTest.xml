@@ -35,15 +35,15 @@
     <dex_users_nodes id="5" user_id="5" node_id="5"/>
         
     <dex_subscriptions id="1" time_stamp="1335268800000"
-                       type="download" active="true" sync="true"/>
+                       type="local" active="true" sync="true"/>
     <dex_subscriptions id="2" time_stamp="1335269400000" 
-                       type="download" active="true" sync="true"/>
+                       type="local" active="true" sync="true"/>
     <dex_subscriptions id="3" time_stamp="1335270000000" 
-                       type="upload" active="false" sync="true"/>
+                       type="peer" active="false" sync="true"/>
     <dex_subscriptions id="4" time_stamp="1335270600000" 
-                       type="upload" active="false" sync="true"/>              
+                       type="peer" active="false" sync="true"/>              
     <dex_subscriptions id="5" time_stamp="1335271200000" 
-                       type="upload" active="false" sync="true"/>              
+                       type="peer" active="false" sync="true"/>              
         
     <dex_subscriptions_nodes id="1" subscription_id="1" node_id="1"/>   
     <dex_subscriptions_nodes id="2" subscription_id="2" node_id="2"/>

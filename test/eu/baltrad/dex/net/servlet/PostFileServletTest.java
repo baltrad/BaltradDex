@@ -336,7 +336,7 @@ public class PostFileServletTest {
         
         ISubscriptionManager subscriptionManagerMock = 
                 (ISubscriptionManager) createMock(ISubscriptionManager.class);
-        expect(subscriptionManagerMock.load(Subscription.UPLOAD)).
+        expect(subscriptionManagerMock.load(Subscription.PEER)).
                 andReturn(subscriptions);
         IFilter filterMock = (IFilter) createMock(IFilter.class);
         expect(filterMock.getExpression()).andReturn(null).anyTimes();

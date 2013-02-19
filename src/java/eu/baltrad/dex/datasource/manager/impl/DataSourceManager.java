@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -80,16 +80,6 @@ public class DataSourceManager implements IDataSourceManager {
     }
     
     /**
-     * Load all data sources.
-     * @return List of data sources
-     */
-    public List<DataSource> load() {
-	String sql = "SELECT * FROM dex_data_sources";
-	List<DataSource> dataSources = jdbcTemplate.query(sql, dataSourceMapper);
-	return dataSources;
-    }
-    
-    /**
      * Load data source by id.
      * @param id Record id
      * @return Data source with a given id
@@ -104,14 +94,30 @@ public class DataSourceManager implements IDataSourceManager {
     }
     
     /**
-     * Load data source by name.
-     * @param id Data source name
-     * @return Data source with a given name
+     * Load data sources by type.
+     * @return List of data sources of a given type
      */
-    public DataSource load(String name) {
-        String sql = "SELECT * FROM dex_data_sources WHERE name = ?";
+    public List<DataSource> load(String type) {
+        String sql = "SELECT * FROM dex_data_sources WHERE type = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, dataSourceMapper, name);
+            return jdbcTemplate.query(sql, dataSourceMapper, type);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Load data source by name and type.
+     * @param id Data source name
+     * @param type Data source type
+     * @return Data source with a matching name and type
+     */
+    public DataSource load(String name, String type) {
+        String sql = "SELECT * FROM dex_data_sources WHERE name = ? " + 
+                "AND type = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, dataSourceMapper, name, 
+                    type);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -135,7 +141,7 @@ public class DataSourceManager implements IDataSourceManager {
      */
     public int store(DataSource dataSource) {
         final String sql = "INSERT INTO dex_data_sources " +
-            "(name, description) VALUES (?,?)";
+            "(name, type, description) VALUES (?,?,?)";
         final DataSource ds = dataSource;
         
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -146,7 +152,8 @@ public class DataSourceManager implements IDataSourceManager {
                     PreparedStatement ps = conn.prepareStatement(sql,
                             new String[] {"id"});
                     ps.setString(1, ds.getName());
-                    ps.setString(2, ds.getDescription());
+                    ps.setString(2, ds.getType());
+                    ps.setString(3, ds.getDescription());
                     return ps;
                 }
             }, keyHolder);

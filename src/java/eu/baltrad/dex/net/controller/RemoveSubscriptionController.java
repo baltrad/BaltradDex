@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -102,7 +102,7 @@ public class RemoveSubscriptionController {
     @RequestMapping("/remove_downloads.htm")
     public String removeDownloads(ModelMap model) {
         model.addAttribute(DOWNLOADS_KEY, 
-                subscriptionManager.load(Subscription.DOWNLOAD));
+                subscriptionManager.load(Subscription.LOCAL));
         return REMOVE_DOWNLOADS_VIEW;
     }
     
@@ -118,7 +118,7 @@ public class RemoveSubscriptionController {
         String[] downloadIds = request.getParameterValues(DOWNLOAD_IDS);
         if (downloadIds == null) {
             model.addAttribute(DOWNLOADS_KEY, 
-                subscriptionManager.load(Subscription.DOWNLOAD));
+                subscriptionManager.load(Subscription.LOCAL));
             return REMOVE_DOWNLOADS_VIEW;
         } else {
             selectedDownloads.clear();
@@ -165,7 +165,7 @@ public class RemoveSubscriptionController {
     @RequestMapping("/remove_uploads.htm")
     public String removeUploads(ModelMap model) {
         model.addAttribute(UPLOADS_KEY, 
-                subscriptionManager.load(Subscription.UPLOAD));
+                subscriptionManager.load(Subscription.PEER));
         return REMOVE_UPLOADS_VIEW;
     }
     
@@ -181,7 +181,7 @@ public class RemoveSubscriptionController {
         String[] uploadIds = request.getParameterValues(UPLOAD_IDS);
         if (uploadIds == null) {
             model.addAttribute(UPLOADS_KEY, 
-                subscriptionManager.load(Subscription.UPLOAD));
+                subscriptionManager.load(Subscription.PEER));
             return REMOVE_UPLOADS_VIEW;
         } else {
             selectedUploads.clear();

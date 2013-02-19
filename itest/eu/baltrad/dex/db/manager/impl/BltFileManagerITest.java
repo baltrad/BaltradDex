@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -97,8 +97,9 @@ public class BltFileManagerITest extends TestCase {
         jdbcHelper.deleteDataSources();
         jdbcHelper.deleteCombinedFilters();
         // Polar volumes - Legionowo
-        DataSource dsLeg = new DataSource("LegionowoPVOLs", "Polar volumes " +
-                                                              "from Legionowo");
+        DataSource dsLeg = new DataSource("LegionowoPVOLs", DataSource.LOCAL,
+                "Polar volumes from Legionowo");
+        
         assertNotNull(dsLeg);
         dsLegId = jdbcHelper.saveDataSource(dsLeg);
         assertTrue(dsLegId > 0);
@@ -126,8 +127,9 @@ public class BltFileManagerITest extends TestCase {
         jdbcHelper.saveCombinedFilter(dsLegId, combinedFilter.getId());
         
         // polar volumes - Gdańsk
-        DataSource dsBrz = new DataSource("BrzuchaniaPVOLs", "Polar volumes " +
-                                                             "from Brzuchania");
+        DataSource dsBrz = new DataSource("BrzuchaniaPVOLs", DataSource.LOCAL,
+                "Polar volumes from Brzuchania");
+        
         assertNotNull(dsBrz);
         dsBrzId = jdbcHelper.saveDataSource(dsBrz);
         assertTrue(dsBrzId > 0);

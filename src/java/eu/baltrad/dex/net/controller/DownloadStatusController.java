@@ -60,7 +60,7 @@ public class DownloadStatusController {
     public String dataDownload(ModelMap model) {
         model.addAttribute(OPERATORS, nodeManager.loadOperators());
         model.addAttribute(SUBSCRIPTIONS, 
-                subscriptionManager.load(Subscription.DOWNLOAD));
+                subscriptionManager.load(Subscription.LOCAL));
         return DATA_DOWNLOAD_VIEW;
     }
 

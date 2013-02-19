@@ -235,7 +235,7 @@ public class UpdateSubscriptionControllerTest {
     
     @Test
     public void subscriptionByPeer() {
-        expect(subscriptionManagerMock.load(Subscription.DOWNLOAD,
+        expect(subscriptionManagerMock.load(Subscription.LOCAL,
                 "test.baltrad.eu")).andReturn(subscriptionByPeer);
         replayAll();
         
@@ -255,7 +255,7 @@ public class UpdateSubscriptionControllerTest {
     
     @Test
     public void selectedSubscription_NotChanged() {
-        expect(subscriptionManagerMock.load(Subscription.DOWNLOAD,
+        expect(subscriptionManagerMock.load(Subscription.LOCAL,
                 "test.baltrad.eu")).andReturn(subscriptions)
                 .anyTimes();
         expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();
@@ -282,7 +282,7 @@ public class UpdateSubscriptionControllerTest {
     
     @Test
     public void selectedSubscription_OK() {
-        expect(subscriptionManagerMock.load(Subscription.DOWNLOAD,
+        expect(subscriptionManagerMock.load(Subscription.LOCAL,
                 "test.baltrad.eu")).andReturn(subscriptions)
                 .anyTimes();
         expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();

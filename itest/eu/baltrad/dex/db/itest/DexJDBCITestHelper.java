@@ -59,6 +59,7 @@ public class DexJDBCITestHelper {
     {
         Map<String, Object> parms = new HashMap<String, Object>(2);
         parms.put("name", ds.getName());
+        parms.put("type", ds.getType());
         parms.put("description", ds.getDescription());
         return insertDs.executeAndReturnKey(parms).intValue();
     }

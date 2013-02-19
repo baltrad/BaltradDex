@@ -104,7 +104,7 @@ public class SaveDataSourceControllerTest {
         dataSourceManagerMock = (IDataSourceManager) 
                                         createMock(IDataSourceManager.class);
         expect(dataSourceManagerMock.load(101))
-                .andReturn(new DataSource(101, "TestDataSource", 
+                .andReturn(new DataSource(101, "TestDataSource", "local",
                 "A test data source"));
         replayAll();
         classUnderTest.setDataSourceManager(dataSourceManagerMock);

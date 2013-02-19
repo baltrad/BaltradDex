@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -58,7 +58,7 @@ public class ShowDataSourcesController {
      */
     @RequestMapping("/show_datasources.htm")
     public String showDataSources(ModelMap model) {
-        List<DataSource> dataSources = dataSourceManager.load();
+        List<DataSource> dataSources = dataSourceManager.load(DataSource.LOCAL);
         Collections.sort(dataSources);
         model.addAttribute(DATA_SOURCES_KEY, dataSources);
         return SHOW_DATA_SOURCES_VIEW;
@@ -71,7 +71,7 @@ public class ShowDataSourcesController {
      */
     @RequestMapping("/edit_datasources.htm")
     public String editDataSources(ModelMap model) {
-        List<DataSource> dataSources = dataSourceManager.load();
+        List<DataSource> dataSources = dataSourceManager.load(DataSource.LOCAL);
         Collections.sort(dataSources);
         model.addAttribute(DATA_SOURCES_KEY, dataSources);
         return EDIT_DATA_SOURCES_VIEW;

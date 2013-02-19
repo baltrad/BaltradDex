@@ -160,25 +160,25 @@ public class StartSubscriptionServlet extends HttpServlet {
         for (DataSource ds : requestedDataSources) {
             // Save or update depending on whether subscription exists
             Subscription requested = new Subscription(
-                    System.currentTimeMillis(), Subscription.UPLOAD, 
+                    System.currentTimeMillis(), Subscription.PEER, 
                     localNode.getName(), req.getNodeName(), ds.getName(), 
                     true, true);
             Subscription existing = subscriptionManager.load(
-                    Subscription.UPLOAD, req.getNodeName(), ds.getName());
+                    Subscription.PEER, req.getNodeName(), ds.getName());
             String[] msgArgs = {ds.getName(), localNode.getName(), 
                     req.getNodeName()};
             try {
                 if (existing == null) {
                     subscriptionManager.store(requested);
                     subscribedDataSources.add(new DataSource(
-                            ds.getName(), ds.getDescription()));
+                            ds.getName(), ds.getType(), ds.getDescription()));
                     log.warn(messages.getMessage(PS_SUBSCRIPTION_SUCCESS_KEY, 
                             msgArgs));
                 } else {
                     requested.setId(existing.getId());
                     subscriptionManager.update(requested);
                     subscribedDataSources.add(new DataSource(
-                            ds.getName(), ds.getDescription()));
+                            ds.getName(), ds.getType(), ds.getDescription()));
                     log.warn(messages.getMessage(PS_SUBSCRIPTION_SUCCESS_KEY, 
                             msgArgs));
                 }

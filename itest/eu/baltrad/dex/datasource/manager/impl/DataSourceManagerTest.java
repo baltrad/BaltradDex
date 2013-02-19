@@ -95,10 +95,17 @@ public class DataSourceManagerTest extends TestCase {
         verifyDBTables(null, "dex_data_source_filters", null);
     }
     
-    public void testLoadAll() throws Exception {
-        List<DataSource> dataSources = classUnderTest.load();
+    public void testLoadLocal() throws Exception {
+        List<DataSource> dataSources = classUnderTest.load(DataSource.LOCAL);
         assertNotNull(dataSources);
-        assertTrue(dataSources.size() == 3);
+        assertTrue(dataSources.size() == 2);
+        verifyAll();
+    }
+    
+    public void testLoadPeer() throws Exception {
+        List<DataSource> dataSources = classUnderTest.load(DataSource.PEER);
+        assertNotNull(dataSources);
+        assertTrue(dataSources.size() == 1);
         verifyAll();
     }
     
@@ -106,14 +113,17 @@ public class DataSourceManagerTest extends TestCase {
         DataSource dataSource = classUnderTest.load(2);
         assertEquals(2, dataSource.getId());
         assertEquals("DataSource2", dataSource.getName());
+        assertEquals("local", dataSource.getType());
         assertEquals("Another test data source", dataSource.getDescription());
         verifyAll();
     }
     
     public void testLoadByName() throws Exception {
-        DataSource dataSource = classUnderTest.load("DataSource3");
+        DataSource dataSource = classUnderTest.load("DataSource3", 
+                DataSource.PEER);
         assertEquals(3, dataSource.getId());
         assertEquals("DataSource3", dataSource.getName());
+        assertEquals("peer", dataSource.getType());
         assertEquals("Yet one more test data source", 
                 dataSource.getDescription());
         verifyAll();
@@ -129,7 +139,7 @@ public class DataSourceManagerTest extends TestCase {
     public void testStore() throws Exception {
         helper.cleanInsert(this, "noid");
         DataSource dataSource = new DataSource("DataSource4", 
-                "Stored data source");
+                DataSource.PEER, "Stored data source");
         
         assertEquals(4, classUnderTest.store(dataSource));
         assertEquals("DataSource4", dataSource.getName());
@@ -139,10 +149,11 @@ public class DataSourceManagerTest extends TestCase {
     
     public void testUpdate() throws Exception {
         DataSource dataSource = new DataSource("DataSource3", 
-                "Updated data source");
+                DataSource.PEER, "Updated data source");
         dataSource.setId(3);
         assertEquals(1, classUnderTest.update(dataSource));
         assertEquals("DataSource3", dataSource.getName());
+        assertEquals("peer", dataSource.getType());
         assertEquals("Updated data source", dataSource.getDescription());
         verifyDBTables("update", "dex_data_sources", null);
     }

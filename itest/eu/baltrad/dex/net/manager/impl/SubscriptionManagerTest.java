@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -129,7 +129,7 @@ public class SubscriptionManagerTest extends TestCase {
         expected.setUser("User2");
         expected.setDataSource("DataSource2");
         expected.setOperator("TestNode1");
-        expected.setType("download");
+        expected.setType("local");
         expected.setActive(true);
         expected.setSyncronized(true);
         verifyAll();
@@ -139,14 +139,14 @@ public class SubscriptionManagerTest extends TestCase {
     }
     
     public void testLoadByType() throws Exception {
-        List<Subscription> subs = classUnderTest.load("download");
+        List<Subscription> subs = classUnderTest.load(Subscription.LOCAL);
         verifyAll();
         assertNotNull(subs);
         assertEquals(2, subs.size());
     }
     
     public void testLoadByOperator() throws Exception {
-        List<Subscription> subs = classUnderTest.load(Subscription.DOWNLOAD, 
+        List<Subscription> subs = classUnderTest.load(Subscription.LOCAL, 
                 "TestNode1");
         verifyAll();
         assertNotNull(subs);
@@ -160,12 +160,12 @@ public class SubscriptionManagerTest extends TestCase {
         expected.setUser("User2");
         expected.setDataSource("DataSource3");
         expected.setOperator("TestNode2");
-        expected.setType("upload");
+        expected.setType("peer");
         expected.setActive(false);
         expected.setSyncronized(true);
         
         verifyAll();
-        Subscription actual = classUnderTest.load(Subscription.UPLOAD, 
+        Subscription actual = classUnderTest.load(Subscription.PEER, 
                 "User2", "DataSource3");
         assertNotNull(actual);
         assertTrue(compare(expected, actual));
@@ -176,7 +176,7 @@ public class SubscriptionManagerTest extends TestCase {
         helper.cleanInsert(this, "noid");
         Subscription s = new Subscription(
                 format.parse("2012-04-24 14:30:00").getTime(),
-                Subscription.DOWNLOAD, "TestNode1", "User1", "DataSource1",
+                Subscription.PEER, "TestNode1", "User1", "DataSource1",
                 true, true);
         
         assertEquals(4, classUnderTest.store(s));
@@ -190,7 +190,7 @@ public class SubscriptionManagerTest extends TestCase {
         expected.setUser("User2");
         expected.setDataSource("DataSource3");
         expected.setOperator("TestNode2");
-        expected.setType("download");
+        expected.setType("local");
         expected.setActive(true);
         expected.setSyncronized(false); 
         

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -180,7 +180,7 @@ public class PostFileServlet extends HttpServlet {
                     msg.setFileEntry(entry);
                     messageManager.manage(msg);
                     List<Subscription> uploads = subscriptionManager.load(
-                            Subscription.UPLOAD);
+                            Subscription.PEER);
                     for (Subscription s : uploads) {
                         IFilter filter = fileManager
                                 .loadFilter(s.getDataSource());

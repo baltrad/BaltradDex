@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -164,6 +164,8 @@ public class SaveDataSourceController {
             TransactionStatus status = transactionManager.getTransaction(def);
             try {
                 int dataSourceId = 0;
+                // set data source type
+                dataSource.setType(DataSource.LOCAL);
                 if (dataSource.getId() > 0) {
                     dataSourceManager.update(dataSource);
                     dataSourceId = dataSource.getId();
@@ -216,7 +218,7 @@ public class SaveDataSourceController {
                      * for a given user
                      */
                     List<Subscription> uploads = subscriptionManager
-                                .load(Subscription.UPLOAD);
+                                .load(Subscription.PEER);
                     dataSourceManager.deleteUser(dataSourceId);
                     if (selectedUsers != null) {
                         List<Account> selectedAccounts = 

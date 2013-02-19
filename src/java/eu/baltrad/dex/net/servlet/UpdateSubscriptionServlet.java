@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -157,7 +157,7 @@ public class UpdateSubscriptionServlet extends HttpServlet {
                 List<Subscription> requestedSubscription) {
         List<Subscription> subscriptions = new ArrayList<Subscription>();
         for (Subscription requested : requestedSubscription) {
-            Subscription current = subscriptionManager.load(Subscription.UPLOAD,
+            Subscription current = subscriptionManager.load(Subscription.PEER,
                     requested.getUser(), requested.getDataSource());
             if (current != null) {
                 String[] messageArgs = {current.getDataSource(), 
@@ -190,7 +190,7 @@ public class UpdateSubscriptionServlet extends HttpServlet {
             } else {
                 if (requested.isActive()) {
                     current = new Subscription(System.currentTimeMillis(), 
-                            Subscription.UPLOAD, localNode.getName(), 
+                            Subscription.PEER, localNode.getName(), 
                             requested.getUser(), requested.getDataSource(), 
                             requested.isActive(), true);
                     String[] messageArgs = {current.getDataSource(),

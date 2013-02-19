@@ -23,6 +23,7 @@ package eu.baltrad.dex.net.manager.impl;
 
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.user.manager.IAccountManager;
 import eu.baltrad.dex.net.manager.INodeManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
@@ -219,7 +220,8 @@ public class SubscriptionManager implements ISubscriptionManager {
      */
     @Transactional(propagation=Propagation.REQUIRED, 
             rollbackFor=Exception.class)
-    public int store(Subscription subscription) throws Exception {
+    public int store(Subscription subscription) 
+            throws Exception {
         final String sql = "INSERT INTO dex_subscriptions (time_stamp, " + 
                     "type, active, sync) VALUES (?,?,?,?)";
         final Subscription s = subscription;
@@ -244,8 +246,12 @@ public class SubscriptionManager implements ISubscriptionManager {
             jdbcTemplate.update("INSERT INTO dex_subscriptions_users " +
                     "(subscription_id, user_id) VALUES (?,?)", 
                     subId, userId);
+            
             int dataSourceId = dataSourceManager.load(
-                    s.getDataSource()).getId();
+                    s.getDataSource(), 
+                    s.getType().equals(Subscription.LOCAL) ? 
+                        DataSource.PEER : DataSource.LOCAL).getId();
+            
             jdbcTemplate.update("INSERT INTO dex_subscriptions_data_sources " +
                     "(subscription_id, data_source_id) VALUES (?,?)", 
                     subId, dataSourceId);

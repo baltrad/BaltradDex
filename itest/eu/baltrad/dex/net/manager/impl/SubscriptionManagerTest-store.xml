@@ -1,13 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
     
+    <dex_data_sources id="1" name="DataSource1" type="local"
+                      description="A test data source"/>
+    <dex_data_sources id="2" name="DataSource2" type="local"
+                      description="Another test data source"/>
+    <dex_data_sources id="3" name="DataSource3" type="peer"
+                      description="Yet one more test data source"/>
+    
     <dex_subscriptions time_stamp="1335268800000" 
-                       type="download" active="true" sync="true"/>
+                       type="local" active="true" sync="true"/>
     <dex_subscriptions time_stamp="1335269400000" 
-                       type="download" active="true" sync="true"/>
+                       type="local" active="true" sync="true"/>
     <dex_subscriptions time_stamp="1335270000000" 
-                       type="upload" active="false" sync="true"/>      
+                       type="peer" active="false" sync="true"/>      
     <dex_subscriptions time_stamp="1335270600000"
-                       type="download" active="true" sync="true"/>  
+                       type="peer" active="true" sync="true"/>  
+    
+    <dex_subscriptions_data_sources id="1" subscription_id="1" 
+                                    data_source_id="1"/>
+    <dex_subscriptions_data_sources id="2" subscription_id="2" 
+                                    data_source_id="2"/>
+    <dex_subscriptions_data_sources id="3" subscription_id="3" 
+                                    data_source_id="3"/>
+    
        
 </dataset>

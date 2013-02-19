@@ -104,7 +104,8 @@ public class BltFileManager implements IBltFileManager {
     public IFilter loadFilter(String dsName) {
         IFilter attributeFilter = null;
         try {
-            DataSource dataSource = dataSourceManager.load(dsName);
+            DataSource dataSource = dataSourceManager.load(dsName, 
+                    DataSource.LOCAL);
             attributeFilter = coreFilterManager.load(
                     dataSourceManager.loadFilterId(dataSource.getId()));
         } catch (Exception e) {

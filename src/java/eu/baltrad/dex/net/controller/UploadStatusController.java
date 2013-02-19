@@ -60,7 +60,7 @@ public class UploadStatusController {
     public String dataUpload(ModelMap model) {
         model.addAttribute(USERS, accountManager.loadUsers());
         model.addAttribute(SUBSCRIPTIONS, 
-                subscriptionManager.load(Subscription.UPLOAD));
+                subscriptionManager.load(Subscription.PEER));
         return DATA_UPLOAD_VIEW;
     }
     

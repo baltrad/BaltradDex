@@ -199,11 +199,11 @@ public class StartSubscriptionController implements MessageSetter {
                 dataSourceManager.store(ds);
                 // save subscriptions
                 Subscription requested = new Subscription(
-                        System.currentTimeMillis(), Subscription.DOWNLOAD,
+                        System.currentTimeMillis(), Subscription.LOCAL,
                         response.getFirstHeader("Node-Name").getValue(), 
                         localNode.getName(), ds.getName(), true, true);
                 Subscription existing = subscriptionManager.load(
-                    Subscription.DOWNLOAD, localNode.getName(), ds.getName());
+                    Subscription.LOCAL, localNode.getName(), ds.getName());
                 if (existing == null) {
                     subscriptionManager.store(requested);
                 } else {
@@ -234,7 +234,8 @@ public class StartSubscriptionController implements MessageSetter {
         for (int i = 0; i < selectedDataSources.length; i++) {
             String[] parms = selectedDataSources[i].split("_");
             selectedPeerDataSources.add(new DataSource(
-                    Integer.parseInt(parms[0]), parms[1], parms[2]));
+                    Integer.parseInt(parms[0]), parms[1], DataSource.PEER,
+                    parms[2]));
         }
         Node node = nodeManager.load(peerName);
         requestFactory = new DefaultRequestFactory(

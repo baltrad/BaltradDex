@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -282,12 +282,12 @@ public class UpdateSubscriptionController implements MessageSetter {
                     .jsonToSubscriptions(subscriptionString);
             for (Subscription s : subscriptions) {
                 Subscription requested = new Subscription(
-                    System.currentTimeMillis(), Subscription.DOWNLOAD, 
+                    System.currentTimeMillis(), Subscription.LOCAL, 
                     response.getFirstHeader("Node-Name").getValue(),
                     localNode.getName(), s.getDataSource(), s.isActive(),
                     s.isSyncronized());
                 Subscription existing = subscriptionManager.load(
-                        Subscription.DOWNLOAD, localNode.getName(), 
+                        Subscription.LOCAL, localNode.getName(), 
                         s.getDataSource());
                 if (existing == null) {
                     subscriptionManager.store(requested);
@@ -325,7 +325,7 @@ public class UpdateSubscriptionController implements MessageSetter {
     public String subscriptionByPeer(Model model,
             @RequestParam(value="peer_name", required=true) String peerName) {
         List<Subscription> subscriptionByPeer = subscriptionManager.load(
-                Subscription.DOWNLOAD, peerName);
+                Subscription.LOCAL, peerName);
         model.addAttribute(SUBSCRIPTION_BY_PEER_KEY, subscriptionByPeer);
         model.addAttribute(PEER_NAME_KEY, peerName);
         return SUBSCRIPTION_BY_PEER_VIEW;
@@ -349,7 +349,7 @@ public class UpdateSubscriptionController implements MessageSetter {
                 String[] selectedSubscriptionIds) {
         
         List<Subscription> currentSubscription = subscriptionManager.load(
-                Subscription.DOWNLOAD, peerName);
+                Subscription.LOCAL, peerName);
         Map currentSubscriptionMap = new HashMap<Integer, Subscription>();
         for (Subscription s : currentSubscription) {
             currentSubscriptionMap.put(s.getId(), s);
@@ -381,7 +381,7 @@ public class UpdateSubscriptionController implements MessageSetter {
             return SELECTED_SUBSCRIPTION_VIEW;
         } else {
             List<Subscription> subscriptionByPeer = subscriptionManager.load(
-                Subscription.DOWNLOAD, peerName);
+                Subscription.LOCAL, peerName);
             model.addAttribute(SUBSCRIPTION_BY_PEER_KEY, subscriptionByPeer);
             model.addAttribute(STATUS_NOT_CHANGED_KEY, "unchanged");
             return SUBSCRIPTION_BY_PEER_VIEW;

@@ -128,6 +128,7 @@ CREATE TABLE dex_data_sources
 (
     id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR(128) UNIQUE NOT NULL,
+    type VARCHAR(16) NOT NULL,
     description TEXT
 );
 

@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.datasource.model;
 
@@ -32,10 +32,17 @@ import java.io.Serializable;
  */
 public class DataSource implements Serializable, Comparable<DataSource> {
 
+    /** Local data source */
+    public static final String LOCAL = "local";
+    /** Peer data source */
+    public static final String PEER = "peer";
+    
     /** Data source ID */
     private int id;
     /** Data source name */
     private String name;
+    /** Data source type */
+    private String type;
     /** Description */
     private String description;
 
@@ -45,27 +52,30 @@ public class DataSource implements Serializable, Comparable<DataSource> {
     public DataSource() {}
     /**
      * Constructor.
-     *
      * @param name Data source name
+     * @param type Data source type
      * @param description Description
      */
-    public DataSource( String name, String description ) {
+    public DataSource(String name, String type, String description) {
         this.name = name;
+        this.type = type;
         this.description = description;
     }
     
     /**
      * Constructor.
-     *
      * @param id Data source ID
      * @param name Data source name
+     * @param type Data source type
      * @param description Description
      */
-    public DataSource( int id, String name, String description ) {
+    public DataSource(int id, String name, String type, String description) {
         this.id = id;
         this.name = name;
+        this.type = type;
         this.description = description;
     }
+    
     /**
      * Compares data source with another object.
      *
@@ -115,6 +125,21 @@ public class DataSource implements Serializable, Comparable<DataSource> {
      * @param name Data source name to set
      */
     public void setName( String name ) { this.name = name; }
+    
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+    
     /**
      * Gets data source description.
      *
@@ -140,4 +165,4 @@ public class DataSource implements Serializable, Comparable<DataSource> {
         return getName().compareTo( ds.getName() ); 
     }
 }
-//--------------------------------------------------------------------------------------------------
+

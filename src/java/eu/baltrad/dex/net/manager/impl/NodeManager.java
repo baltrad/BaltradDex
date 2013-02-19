@@ -120,7 +120,7 @@ public class NodeManager implements INodeManager {
             "dex_subscriptions_nodes WHERE " + 
             "dex_subscriptions_nodes.subscription_id = dex_subscriptions.id " + 
             "AND dex_subscriptions_nodes.node_id = dex_nodes.id AND " + 
-            "dex_subscriptions.type = 'download';";
+            "dex_subscriptions.type = 'local';";
         try {
             return jdbcTemplate.query(sql, mapper);
         } catch (DataAccessException e) {

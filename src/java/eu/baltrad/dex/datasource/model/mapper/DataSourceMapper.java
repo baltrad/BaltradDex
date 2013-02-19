@@ -48,6 +48,7 @@ public class DataSourceMapper implements ParameterizedRowMapper<DataSource> {
         DataSource ds = new DataSource();
         ds.setId(rs.getInt("id"));
         ds.setName(rs.getString("name"));
+        ds.setType(rs.getString("type"));
         ds.setDescription(rs.getString("description"));
         return ds;
     }

@@ -32,8 +32,9 @@ import java.util.Date;
  */
 public interface ISubscription {
     
-    public static final String DOWNLOAD = "download";
-    public static final String UPLOAD = "upload";
+    /** Subscription types */
+    public static final String LOCAL = "local";
+    public static final String PEER = "peer";
     
     public int getId();
     

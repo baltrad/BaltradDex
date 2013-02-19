@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
     
-    <dex_data_sources name="DataSource1" description="A test data source"/>
-    <dex_data_sources name="DataSource2" 
+    <dex_data_sources name="DataSource1" type="local"
+                      description="A test data source"/>
+    <dex_data_sources name="DataSource2" type="local"
                       description="Another test data source"/>
-    <dex_data_sources name="DataSource3" 
+    <dex_data_sources name="DataSource3" type="peer"
                       description="Yet one more test data source"/>
           
     <dex_roles id="1" name="peer"/>     
