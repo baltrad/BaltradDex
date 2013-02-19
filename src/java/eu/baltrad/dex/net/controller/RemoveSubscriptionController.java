@@ -23,9 +23,15 @@ package eu.baltrad.dex.net.controller;
 
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.impl.SubscriptionManager;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.ui.ModelMap;
@@ -79,6 +85,8 @@ public class RemoveSubscriptionController {
             "removesubscription.completed_failure";
 
     private SubscriptionManager subscriptionManager;
+    private IDataSourceManager dataSourceManager;
+    private PlatformTransactionManager txManager;
     private MessageResourceUtil messages;
     private Logger log;
     
@@ -138,18 +146,27 @@ public class RemoveSubscriptionController {
      */
     @RequestMapping("/remove_downloads_status.htm")
     public String removeDownloadsStatus(ModelMap model) {
+        TransactionDefinition def = new DefaultTransactionDefinition();
+        TransactionStatus status = txManager.getTransaction(def);
         try {
             for (Subscription s : selectedDownloads) {
                 String[] msgArgs = {s.getOperator(), s.getDataSource()};
+                // remove peer data sources
+                int dataSourceId = dataSourceManager.load(s.getDataSource(), 
+                        DataSource.PEER).getId();
+                dataSourceManager.delete(dataSourceId);
+                // remove subscriptions
                 subscriptionManager.delete(s.getId());
                 String msg = messages.getMessage(
                     REMOVE_SUBSCRIPTION_SUCCESS_MSG_KEY, msgArgs);
                 log.warn(msg);
             }
+            txManager.commit(status);
             model.addAttribute(OK_MSG_KEY, 
                     messages.getMessage(COMPLETED_OK_MSG_KEY));
             log.warn(messages.getMessage(COMPLETED_OK_MSG_KEY));
         } catch (Exception e) {
+            txManager.rollback(status);
             model.addAttribute(ERROR_MSG_KEY,
                     messages.getMessage(COMPLETED_FAILURE_MSG_KEY));
             log.error(messages.getMessage(COMPLETED_FAILURE_MSG_KEY));
@@ -230,12 +247,28 @@ public class RemoveSubscriptionController {
     }
 
     /**
+     * @param dataSourceManager the dataSourceManager to set
+     */
+    @Autowired
+    public void setDataSourceManager(IDataSourceManager dataSourceManager) {
+        this.dataSourceManager = dataSourceManager;
+    }
+    
+    /**
+     * @param txManager the txManager to set
+     */
+    @Autowired
+    public void setTxManager(PlatformTransactionManager txManager) {
+        this.txManager = txManager;
+    }
+    
+    /**
      * @param messages the messages to set
      */
     @Autowired
     public void setMessages(MessageResourceUtil messages) {
         this.messages = messages;
-    } 
+    }
     
 }
 

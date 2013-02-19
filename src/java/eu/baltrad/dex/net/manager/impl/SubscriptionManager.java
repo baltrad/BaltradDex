@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -290,10 +290,12 @@ public class SubscriptionManager implements ISubscriptionManager {
      * @param id Subscription id
      * @throws Exception
      */
+    @Transactional(propagation=Propagation.REQUIRED, 
+            rollbackFor=Exception.class)
     public void delete(int id) throws Exception {
         try {
             jdbcTemplate.update("DELETE FROM dex_subscriptions WHERE id = ?", 
-                id);
+                    id);
         } catch (DataAccessException e) {
             throw new Exception(e.getMessage());
         }    
