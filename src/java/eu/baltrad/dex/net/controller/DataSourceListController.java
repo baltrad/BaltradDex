@@ -22,7 +22,6 @@
 package eu.baltrad.dex.net.controller;
 
 import eu.baltrad.dex.config.manager.IConfigurationManager;
-import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.net.controller.exception.InternalControllerException;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.request.factory.RequestFactory;
@@ -32,13 +31,11 @@ import eu.baltrad.dex.net.util.json.IJsonUtil;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.controller.util.MessageSetter;
-import eu.baltrad.dex.net.model.impl.Node;
 import eu.baltrad.dex.net.util.UrlValidatorUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.net.manager.INodeManager;
-import eu.baltrad.dex.user.manager.IAccountManager;
+import eu.baltrad.dex.user.manager.IUserManager;
 
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.WebValidator;
 import eu.baltrad.dex.util.MessageResourceUtil;
@@ -61,8 +58,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.io.InputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -110,8 +105,7 @@ public class DataSourceListController implements MessageSetter {
             "datasource.controller.generic_connection_error"; 
     
     private IConfigurationManager confManager;
-    private IAccountManager accountManager;
-    private INodeManager nodeManager; 
+    private IUserManager userManager;
     private Authenticator authenticator;
     private UrlValidatorUtil urlValidator;
     private RequestFactory requestFactory;
@@ -120,7 +114,7 @@ public class DataSourceListController implements MessageSetter {
     private MessageResourceUtil messages;
     private Logger log;
     
-    protected Account localNode;
+    protected User localNode;
     
     private String peerNodeName;
     private Set<DataSource> peerDataSources;
@@ -141,13 +135,13 @@ public class DataSourceListController implements MessageSetter {
         this.httpClient = new HttpClientUtil(
                 Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
                 Integer.parseInt(confManager.getAppConf().getSoTimeout()));
-        this.localNode = new Account(confManager.getAppConf().getNodeName(),
-                confManager.getAppConf().getNodeAddress(),
-                confManager.getAppConf().getOrgName(),
+        this.localNode = new User(confManager.getAppConf().getNodeName(),
+                Role.NODE, null, confManager.getAppConf().getOrgName(),
                 confManager.getAppConf().getOrgUnit(),
                 confManager.getAppConf().getLocality(),
                 confManager.getAppConf().getState(),
-                confManager.getAppConf().getCountryCode());
+                confManager.getAppConf().getCountryCode(),
+                confManager.getAppConf().getNodeAddress());
     }
     
     /**
@@ -201,27 +195,13 @@ public class DataSourceListController implements MessageSetter {
     }
     
     /**
-     * Get peer node's list.
-     * @return Peer node's list
-     */
-    private List<Node> getPeerNodes() {
-        List<Node> peers = new ArrayList<Node>();
-        for (Node node : nodeManager.load()) {
-            if (!node.getAddress().equals(Node.LOCAL_NODE_ADDRESS)) {
-                peers.add(node);
-            }
-        }
-        return peers;
-    }
-    
-    /**
      * Renders initial connect view.
      * @param model Model
      * @return View name
      */
     @RequestMapping("/connect_to_node.htm")
     public String connect2Node(Model model) {
-        model.addAttribute(NODES_KEY, getPeerNodes());
+        model.addAttribute(NODES_KEY, userManager.loadPeers());
         return DS_CONNECT_VIEW;
     }
     
@@ -242,8 +222,8 @@ public class DataSourceListController implements MessageSetter {
         // Validate node's URL address 
         String urlSelect = null;
         if (WebValidator.validate(nodeSelect)) {
-            Node node = nodeManager.load(nodeSelect);
-            urlSelect = node.getAddress();
+            User user = userManager.load(nodeSelect);
+            urlSelect = user.getNodeAddress();
         }
         String url = urlValidator.validate(urlInput) ? urlInput : urlSelect;
         if (!urlValidator.validate(url)) {
@@ -267,26 +247,24 @@ public class DataSourceListController implements MessageSetter {
                     peerDataSources = jsonUtil.jsonToDataSources(json);
                     viewName = DS_CONNECTED_VIEW;
                     model.addAttribute(DATA_SOURCES_KEY, peerDataSources);
-                 
                 } else if (res.getStatusLine().getStatusCode() ==
                         HttpServletResponse.SC_CREATED) {
                     // user account established on server, create local account
                     peerNodeName = res.getFirstHeader("Node-Name").getValue();
                     model.addAttribute(PEER_NAME_KEY, peerNodeName);
                     String json = readResponse(res);
-                    Account peer = jsonUtil.jsonToUserAccount(json);
-                    if (accountManager.load(peer.getName()) == null) {
-                        peer.setRoleName(Role.PEER);
+                    User peer = jsonUtil.jsonToUserAccount(json);
+                    if (userManager.load(peer.getName()) == null) {
+                        peer.setRole(Role.PEER);
                         try {
-                            accountManager.store(peer);
+                            userManager.store(peer);
                             log.warn("New peer account created: " + 
                                     peer.getName());
                         } catch (Exception e) {
                             throw e;
                         }   
                     }       
-                    viewName = DS_CONNECTED_VIEW;        
-                    
+                    viewName = DS_CONNECTED_VIEW;
                 } else {
                     viewName = DS_CONNECT_VIEW;
                     String errorMsg = messages.getMessage(
@@ -327,7 +305,7 @@ public class DataSourceListController implements MessageSetter {
                 log.error(errorMsg + ": " + e.getMessage());
             }
         }
-        model.addAttribute(NODES_KEY, getPeerNodes());
+        model.addAttribute(NODES_KEY, userManager.loadPeers());
         return viewName;
     }
     
@@ -369,19 +347,11 @@ public class DataSourceListController implements MessageSetter {
     }
     
     /**
-     * @param accountManager the accountManager to set
+     * @param userManager the userManager to set
      */
     @Autowired
-    public void setAccountManager(IAccountManager accountManager) {
-        this.accountManager = accountManager;
-    }
-    
-    /**
-     * @param nodeConnectionManager the nodeConnectionManager to set
-     */
-    @Autowired
-    public void setNodeManager(INodeManager nodeManager) {
-        this.nodeManager = nodeManager;
+    public void setUserManager(IUserManager userManager) {
+        this.userManager = userManager;
     }
 
     /**

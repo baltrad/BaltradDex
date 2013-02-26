@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -39,7 +39,6 @@ public class Subscription implements ISubscription, Serializable {
     private int id;
     private Date date;
     private String type;
-    private String operator;
     private String user;
     private String dataSource;
     private boolean active;
@@ -54,20 +53,17 @@ public class Subscription implements ISubscription, Serializable {
      * Constructor.
      * @param id Record id
      * @param timestamp Timestamp
-     * @param type Subscription type
-     * @param operator Operator's name 
+     * @param type Subscription type 
      * @param user User's name 
      * @param dataSource Data source name
      * @param active Active toggle
      * @param sync Synchronized toggle 
      */
-    public Subscription(int id, long timeStamp, String type, 
-            String operator, String user, String dataSource, 
-            boolean active, boolean sync) {
+    public Subscription(int id, long timeStamp, String type, String user, 
+            String dataSource, boolean active, boolean sync) {
         this.id = id;
         this.date = new Date(timeStamp);
         this.type = type;
-        this.operator = operator;
         this.user = user;
         this.dataSource = dataSource;
         this.active = active;
@@ -78,17 +74,15 @@ public class Subscription implements ISubscription, Serializable {
      * Constructor.
      * @param timeStamp Timestamp
      * @param type Subscription type
-     * @param operator Operator's name
      * @param user User's name 
      * @param dataSource Data source name
      * @param active Active toggle
      * @param sync Synchronized toggle 
      */
-    public Subscription(long timeStamp, String type, String operator, 
-            String user, String dataSource, boolean active, boolean sync) {
+    public Subscription(long timeStamp, String type, String user, 
+            String dataSource, boolean active, boolean sync) {
         this.date = new Date(timeStamp);
         this.type = type;
-        this.operator = operator;
         this.user = user;
         this.dataSource = dataSource;
         this.active = active;
@@ -135,20 +129,6 @@ public class Subscription implements ISubscription, Serializable {
      */
     public void setType(String type) {
         this.type = type;
-    }
-    
-    /**
-     * @return the operator
-     */
-    public String getOperator() {
-        return operator;
-    }
-
-    /**
-     * @param operator the operator to set
-     */
-    public void setOperator(String operator) {
-        this.operator = operator;
     }
 
     /**

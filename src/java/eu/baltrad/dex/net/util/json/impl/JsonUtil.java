@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -22,7 +22,7 @@
 package eu.baltrad.dex.net.util.json.impl;
 
 import eu.baltrad.dex.net.util.json.IJsonUtil;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
 
@@ -61,11 +61,11 @@ public class JsonUtil implements IJsonUtil {
      * @return JSON string
      * @throws RuntimeException 
      */
-    public String userAccountToJson(Account account) throws RuntimeException {
+    public String userAccountToJson(User user) throws RuntimeException {
         StringWriter writer = new StringWriter();
         String json = null;
         try {
-            mapper.writeValue(writer, account);
+            mapper.writeValue(writer, user);
             json = writer.toString();
             writer.close();
         } catch (IOException e) {
@@ -81,15 +81,15 @@ public class JsonUtil implements IJsonUtil {
      * @return User account object
      * @throws RuntimeException 
      */
-    public Account jsonToUserAccount(String json) throws RuntimeException {
-        Account account = null;
+    public User jsonToUserAccount(String json) throws RuntimeException {
+        User user = null;
         try {
-            account = mapper.readValue(json, new TypeReference<Account>(){});
+            user = mapper.readValue(json, new TypeReference<User>(){});
         } catch(IOException e) {
             throw new RuntimeException(
                     "Failed to convert JSON to user account", e);
         }
-        return account;
+        return user;
     }
     
     /**

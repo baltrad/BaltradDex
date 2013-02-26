@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.user.controller;
 
-import eu.baltrad.dex.user.manager.impl.AccountManager;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.impl.UserManager;
+import eu.baltrad.dex.user.model.User;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +45,7 @@ public class EditAccountController {
     private static final String SUCCESS_VIEW = "edit_user_account";
     private static final String ACCOUNTS_KEY = "accounts";
     
-    private AccountManager accountManager;
+    private UserManager accountManager;
 
     /**
      * Creates list of user accounts.
@@ -54,9 +54,9 @@ public class EditAccountController {
      */
     @RequestMapping("/edit_user_account.htm")
     public String handleRequest(ModelMap model) {
-         List<Account> accounts = accountManager.load();
-         Collections.sort(accounts);
-         model.addAttribute(ACCOUNTS_KEY, accounts);
+         List<User> users = accountManager.load();
+         Collections.sort(users);
+         model.addAttribute(ACCOUNTS_KEY, users);
          return SUCCESS_VIEW;
     }
     
@@ -64,7 +64,7 @@ public class EditAccountController {
      * @param accountManager 
      */
     @Autowired
-    public void setAccountManager(AccountManager accountManager) { 
+    public void setAccountManager(UserManager accountManager) { 
         this.accountManager = accountManager; 
     }
 }

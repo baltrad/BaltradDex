@@ -30,12 +30,15 @@ import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.Role;
+import eu.baltrad.dex.user.model.User;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.apache.commons.io.IOUtils;
 
@@ -47,13 +50,15 @@ import javax.servlet.ServletInputStream;
 
 import org.apache.log4j.Logger;
 
+import org.keyczar.exceptions.KeyczarException;
+
+
 import java.io.StringWriter;
 import java.io.PrintWriter;
 
 import java.util.List;
 import java.util.ArrayList;
 import java.io.IOException;
-import org.keyczar.exceptions.KeyczarException;
 
 /**
  * Receives and handles subscription requests.
@@ -85,7 +90,7 @@ public class UpdateSubscriptionServlet extends HttpServlet {
     private MessageResourceUtil messages;
     private Logger log;
     
-    protected Account localNode;
+    protected User localNode;
     
     /**
      * Default constructor.
@@ -100,13 +105,13 @@ public class UpdateSubscriptionServlet extends HttpServlet {
     protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
                 confManager.getAppConf().getKeystoreDir());
-        this.localNode = new Account(confManager.getAppConf().getNodeName(),
-                confManager.getAppConf().getNodeAddress(),
-                confManager.getAppConf().getOrgName(),
+        this.localNode = new User(confManager.getAppConf().getNodeName(),
+                Role.NODE, null, confManager.getAppConf().getOrgName(),
                 confManager.getAppConf().getOrgUnit(),
                 confManager.getAppConf().getLocality(),
                 confManager.getAppConf().getState(),
-                confManager.getAppConf().getCountryCode());
+                confManager.getAppConf().getCountryCode(),
+                confManager.getAppConf().getNodeAddress());
     }
     
     /**
@@ -153,59 +158,50 @@ public class UpdateSubscriptionServlet extends HttpServlet {
      * @param requestedSubscription Requested subscriptions
      * @return Updated peer subscriptions
      */
+    @Transactional(propagation=Propagation.REQUIRED, 
+            rollbackFor=Exception.class)
     private List<Subscription> storePeerSubscriptions(NodeRequest req,
                 List<Subscription> requestedSubscription) {
         List<Subscription> subscriptions = new ArrayList<Subscription>();
-        for (Subscription requested : requestedSubscription) {
-            Subscription current = subscriptionManager.load(Subscription.PEER,
-                    requested.getUser(), requested.getDataSource());
-            if (current != null) {
-                String[] messageArgs = {current.getDataSource(), 
-                        localNode.getName(), current.getUser()};
-                if (requested.isActive()) {
-                    current.setActive(requested.isActive());
-                    current.setSyncronized(true);
-                    try {
+        try {
+            for (Subscription requested : requestedSubscription) {
+                Subscription current = subscriptionManager.load(Subscription.PEER,
+                        req.getNodeName(), requested.getDataSource());
+                if (current != null) {
+                    String[] messageArgs = {current.getDataSource(), 
+                            localNode.getName(), current.getUser()};
+                    if (requested.isActive()) {
+                        current.setActive(requested.isActive());
+                        current.setSyncronized(true);
                         subscriptionManager.update(current);
                         subscriptions.add(current);
                         log.warn(messages.getMessage(
-                                GS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
-                    } catch (Exception e) {
-                        log.error(messages.getMessage(
-                                GS_SUBSCRIPTION_FAILURE_KEY, messageArgs));
-                    }
-                } else {
-                    current.setActive(requested.isActive());
-                    current.setSyncronized(true);
-                    try {
+                                    GS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
+                    } else {
+                        current.setActive(requested.isActive());
+                        current.setSyncronized(true);
                         subscriptionManager.delete(current.getId());
                         subscriptions.add(current);
                         log.warn(messages.getMessage(
-                                GS_SUBSCRIPTION_SUCCESS_KEY, messageArgs)); 
-                    } catch (Exception e) {
-                        log.error(messages.getMessage(
-                                GS_SUBSCRIPTION_FAILURE_KEY, messageArgs));
+                                GS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
                     }
-                }
-            } else {
-                if (requested.isActive()) {
-                    current = new Subscription(System.currentTimeMillis(), 
-                            Subscription.PEER, localNode.getName(), 
-                            requested.getUser(), requested.getDataSource(), 
-                            requested.isActive(), true);
-                    String[] messageArgs = {current.getDataSource(),
-                        localNode.getName(), current.getUser()};
-                    try {
+                } else {
+                    if (requested.isActive()) {
+                        current = new Subscription(System.currentTimeMillis(), 
+                                Subscription.PEER, req.getNodeName(), 
+                                requested.getDataSource(), requested.isActive(), 
+                                true);
+                        String[] messageArgs = {current.getDataSource(),
+                            localNode.getName(), current.getUser()};
                         subscriptionManager.store(current);
                         subscriptions.add(current);
                         log.warn(messages.getMessage(
                                 GS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
-                    } catch (Exception e) {
-                        log.error(messages.getMessage(
-                                GS_SUBSCRIPTION_FAILURE_KEY, messageArgs));
                     }
                 }
             }
+        } catch (Exception e) {
+            log.error(messages.getMessage(GS_SUBSCRIPTION_FAILURE_KEY));
         }
         return subscriptions;
     }

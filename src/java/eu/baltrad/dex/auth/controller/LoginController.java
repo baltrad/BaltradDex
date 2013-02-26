@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.auth.controller;
 
-import eu.baltrad.dex.user.model.Account;
-import eu.baltrad.dex.user.manager.impl.AccountManager;
+import eu.baltrad.dex.user.manager.impl.UserManager;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.auth.manager.SecurityManager;
 import eu.baltrad.dex.user.manager.impl.RoleManager;
 
@@ -47,7 +47,7 @@ import java.security.Principal;
 @Controller
 public class LoginController {
 
-    private AccountManager accountManager;
+    private UserManager accountManager;
     private RoleManager roleManager;
     private Logger log;
     
@@ -92,11 +92,11 @@ public class LoginController {
     public String welcome(Model model, Principal principal, HttpSession session) 
     {
         if (SecurityManager.getSessionUser(session) == null) {
-            Account account = accountManager.load(principal.getName());
-            SecurityManager.setSessionUser(session, account);
+            User user = accountManager.load(principal.getName());
+            SecurityManager.setSessionUser(session, user);
             SecurityManager.setSessionRole(session, 
-                    roleManager.load(account.getRoleName()));
-            log.info("User " + account.getName() + " signed in");
+                    roleManager.load(user.getRole()));
+            log.info("User " + user.getName() + " signed in");
         }
         return "home";
     }  
@@ -120,7 +120,7 @@ public class LoginController {
      * @param accountManager Account manager object.
      */
     @Autowired
-    public void setAccountManager(AccountManager accountManager ) { 
+    public void setAccountManager(UserManager accountManager ) { 
         this.accountManager = accountManager; 
     }
 

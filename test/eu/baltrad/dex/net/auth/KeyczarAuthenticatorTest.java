@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -23,11 +23,10 @@ package eu.baltrad.dex.net.auth;
 
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.request.factory.RequestFactory;
-import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.request.impl.NodeRequest;
 import eu.baltrad.dex.auth.util.Signer;
 import eu.baltrad.dex.auth.util.KeyczarCryptoFactory;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 
 import org.keyczar.exceptions.KeyczarException;
 
@@ -63,7 +62,7 @@ public class KeyczarAuthenticatorTest {
     private KeyczarCryptoFactory cryptoFactory;
     private RequestFactory requestFactory;
     private KeyczarAuthenticator classUnderTest;
-    private Account account;
+    private User user;
     private DateFormat format;
     
     @Before
@@ -73,9 +72,9 @@ public class KeyczarAuthenticatorTest {
                 URI.create("http://example.com"));
         classUnderTest = new KeyczarAuthenticator("keystore");
         assertNotNull(classUnderTest);
-        account = new Account(1, "test", "s3cret", "org", "unit", "locality", 
+        user = new User(1, "test", "s3cret", "org", "unit", "locality", 
                 "state", "XX", "user", "http://localhost:8084");
-        assertNotNull(account);
+        assertNotNull(user);
         format = new SimpleDateFormat(DATE_FORMAT);
     }
     
@@ -90,7 +89,7 @@ public class KeyczarAuthenticatorTest {
     public void addCredentials_InvalidKeystore() throws Exception {
         classUnderTest = new KeyczarAuthenticator("invalid_keystore");
         HttpUriRequest request = requestFactory
-                .createUpdateSubscriptionRequest(account, null);
+                .createUpdateSubscriptionRequest(user, null);
         classUnderTest.addCredentials(request, "localhost");
     } 
     
@@ -98,14 +97,14 @@ public class KeyczarAuthenticatorTest {
     @Test(expected = KeyczarException.class)
     public void addCredentials_InvalidKey() throws Exception {
         HttpUriRequest request = requestFactory
-                .createUpdateSubscriptionRequest(account, null);
+                .createUpdateSubscriptionRequest(user, null);
         classUnderTest.addCredentials(request, "invalid_key");
     } 
     
     @Test
     public void addCredentials_OK() throws Exception {
         HttpUriRequest request = requestFactory
-                .createUpdateSubscriptionRequest(account, null);
+                .createUpdateSubscriptionRequest(user, null);
         classUnderTest.addCredentials(request, "localhost");
         Header header = request.getFirstHeader("Authorization");
         assertNotNull(header);

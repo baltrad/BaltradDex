@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -19,9 +19,9 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.net.model.mapper;
+package eu.baltrad.dex.user.model.mapper;
 
-import eu.baltrad.dex.net.model.impl.Node;
+import eu.baltrad.dex.user.model.User;
 
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
@@ -29,13 +29,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Node object mapper.
+ * Row mapper for user account object.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.2.2
  * @since 1.2.2
  */
-public class NodeMapper implements ParameterizedRowMapper<Node> {
+public class UserMapper implements ParameterizedRowMapper<User> { 
    /**
     * Maps records to result set. 
     * @param rs Result set 
@@ -43,10 +43,18 @@ public class NodeMapper implements ParameterizedRowMapper<Node> {
     * @return User object
     * @throws SQLException 
     */
-    public Node mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new Node(
+    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return new User(
                 rs.getInt("id"),
                 rs.getString("name"),
-                rs.getString("address"));
-    } 
+                rs.getString("role"),
+                rs.getString("password"),
+                rs.getString("org_name"),
+                rs.getString("org_unit"),
+                rs.getString("locality"),
+                rs.getString("state"),
+                rs.getString("country_code"),
+                rs.getString("node_address"));
+    }
+    
 }

@@ -22,16 +22,13 @@ Author     : szewczenko
 *******************************************************************************/
 
 DROP TABLE IF EXISTS dex_roles CASCADE;
-DROP TABLE IF EXISTS dex_nodes CASCADE;
 DROP TABLE IF EXISTS dex_users CASCADE;
 DROP TABLE IF EXISTS dex_users_roles;
-DROP TABLE IF EXISTS dex_users_nodes;
 DROP TABLE IF EXISTS dex_messages;
 DROP TABLE IF EXISTS dex_radars CASCADE;
 DROP TABLE IF EXISTS dex_subscriptions CASCADE;
 DROP TABLE IF EXISTS dex_subscriptions_users;
 DROP TABLE IF EXISTS dex_subscriptions_data_sources;
-DROP TABLE IF EXISTS dex_subscriptions_nodes;
 DROP TABLE IF EXISTS dex_delivery_registry CASCADE;
 DROP TABLE IF EXISTS dex_delivery_registry_users;
 DROP TABLE IF EXISTS dex_data_sources CASCADE;
@@ -64,6 +61,7 @@ CREATE TABLE dex_users
 (
     id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR (64) NOT NULL UNIQUE,
+    node_address VARCHAR (256),
     password VARCHAR (32),
     org_name VARCHAR (256),
     org_unit VARCHAR (256),
@@ -72,25 +70,11 @@ CREATE TABLE dex_users
     country_code VARCHAR (2)
 );
 
-CREATE TABLE dex_nodes
-(
-    id SERIAL NOT NULL PRIMARY KEY,
-    name VARCHAR (128) NOT NULL UNIQUE,
-    address VARCHAR (256) NOT NULL
-);
-
 CREATE TABLE dex_users_roles
 (
     id SERIAL NOT NULL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE,
     role_id INT NOT NULL REFERENCES dex_roles (id) ON DELETE CASCADE
-);
-
-CREATE TABLE dex_users_nodes
-(
-    id SERIAL NOT NULL PRIMARY KEY,
-    user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE,
-    node_id INT NOT NULL REFERENCES dex_nodes (id) ON DELETE CASCADE
 );
 
 CREATE TABLE dex_messages
@@ -144,13 +128,6 @@ CREATE TABLE dex_subscriptions_data_sources
     id SERIAL NOT NULL PRIMARY KEY,
     subscription_id INT NOT NULL REFERENCES dex_subscriptions (id) ON DELETE CASCADE,
     data_source_id INT NOT NULL REFERENCES dex_data_sources (id) ON DELETE CASCADE
-);
-
-CREATE TABLE dex_subscriptions_nodes
-(
-    id SERIAL NOT NULL PRIMARY KEY,
-    subscription_id INT NOT NULL REFERENCES dex_subscriptions (id) ON DELETE CASCADE,
-    node_id INT NOT NULL REFERENCES dex_nodes (id) ON DELETE CASCADE
 );
 
 CREATE TABLE dex_delivery_registry

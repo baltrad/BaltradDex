@@ -69,7 +69,7 @@ Author     : szewczenko
                                             <c:out value="${account.name}"/>
                                         </div>
                                         <div id="cell" class="rolename">
-                                            <c:out value="${account.roleName}"/>
+                                            <c:out value="${account.role}"/>
                                         </div>
                                         <div id="cell" class="orgname">
                                             <c:out value="${account.orgName}"/>

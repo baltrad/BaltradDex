@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -31,12 +31,15 @@ import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.Role;
+import eu.baltrad.dex.user.model.User;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.keyczar.exceptions.KeyczarException;
 
@@ -86,7 +89,7 @@ public class StartSubscriptionServlet extends HttpServlet {
     private MessageResourceUtil messages;
     private Logger log;
     
-    protected Account localNode;;
+    protected User localNode;;
     
     /**
      * Default constructor.
@@ -101,13 +104,13 @@ public class StartSubscriptionServlet extends HttpServlet {
     protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
                 confManager.getAppConf().getKeystoreDir());
-        this.localNode = new Account(confManager.getAppConf().getNodeName(),
-                confManager.getAppConf().getNodeAddress(),
-                confManager.getAppConf().getOrgName(),
+        this.localNode = new User(confManager.getAppConf().getNodeName(),
+                Role.NODE, null, confManager.getAppConf().getOrgName(),
                 confManager.getAppConf().getOrgUnit(),
                 confManager.getAppConf().getLocality(),
                 confManager.getAppConf().getState(),
-                confManager.getAppConf().getCountryCode());
+                confManager.getAppConf().getCountryCode(),
+                confManager.getAppConf().getNodeAddress());
     }
     
     /**
@@ -154,20 +157,21 @@ public class StartSubscriptionServlet extends HttpServlet {
      * @param requestedDataSources Requested data sources
      * @return Subscribed data sources
      */
+    @Transactional(propagation=Propagation.REQUIRED, 
+            rollbackFor=Exception.class)
     private Set<DataSource> storePeerSubscriptions(NodeRequest req,
             Set<DataSource> requestedDataSources) {
         Set<DataSource> subscribedDataSources = new HashSet<DataSource>();
-        for (DataSource ds : requestedDataSources) {
-            // Save or update depending on whether subscription exists
-            Subscription requested = new Subscription(
-                    System.currentTimeMillis(), Subscription.PEER, 
-                    localNode.getName(), req.getNodeName(), ds.getName(), 
-                    true, true);
-            Subscription existing = subscriptionManager.load(
-                    Subscription.PEER, req.getNodeName(), ds.getName());
-            String[] msgArgs = {ds.getName(), localNode.getName(), 
-                    req.getNodeName()};
-            try {
+        try {
+            for (DataSource ds : requestedDataSources) {
+                // Save or update depending on whether subscription exists
+                Subscription requested = new Subscription(
+                        System.currentTimeMillis(), Subscription.PEER, 
+                        req.getNodeName(), ds.getName(), true, true);
+                Subscription existing = subscriptionManager.load(
+                        Subscription.PEER, req.getNodeName(), ds.getName());
+                String[] msgArgs = {ds.getName(), localNode.getName(), 
+                        req.getNodeName()};
                 if (existing == null) {
                     subscriptionManager.store(requested);
                     subscribedDataSources.add(new DataSource(
@@ -182,11 +186,10 @@ public class StartSubscriptionServlet extends HttpServlet {
                     log.warn(messages.getMessage(PS_SUBSCRIPTION_SUCCESS_KEY, 
                             msgArgs));
                 }
-            } catch (Exception e) {
-                log.error(messages.getMessage(PS_SUBSCRIPTION_FAILURE_KEY, 
-                            msgArgs));
             }
-        }
+        } catch (Exception e) {
+            log.error(messages.getMessage(PS_SUBSCRIPTION_FAILURE_KEY));
+        }    
         return subscribedDataSources;
     }
     
@@ -271,7 +274,7 @@ public class StartSubscriptionServlet extends HttpServlet {
     public void setJsonUtil(IJsonUtil jsonUtil) {
         this.jsonUtil = jsonUtil;
     }
-
+    
     /**
      * @param subscriptionManager the subscriptionManager to set
      */

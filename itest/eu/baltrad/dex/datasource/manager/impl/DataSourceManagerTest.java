@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -26,7 +26,6 @@ import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.FileObject;
 import eu.baltrad.dex.db.itest.DexDBITestHelper;
 import eu.baltrad.dex.radar.model.Radar;
-import eu.baltrad.dex.user.model.Account;
 import eu.baltrad.dex.user.model.User;
 
 import org.springframework.context.support.AbstractApplicationContext;
@@ -188,7 +187,7 @@ public class DataSourceManagerTest extends TestCase {
     }
     
     public void testLoadUser() throws Exception {
-        List<Account> users = classUnderTest.loadUser(3);
+        List<User> users = classUnderTest.loadUser(3);
         assertNotNull(users);
         assertEquals(2, users.size());
         verifyAll();

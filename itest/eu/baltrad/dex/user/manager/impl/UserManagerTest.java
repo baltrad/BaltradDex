@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,10 +21,9 @@
 
 package eu.baltrad.dex.user.manager.impl;
 
-import eu.baltrad.dex.user.manager.impl.AccountManager;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.impl.UserManager;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.db.itest.DexDBITestHelper;
-import eu.baltrad.dex.net.manager.impl.NodeManager;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.MessageDigestUtil;
 
@@ -45,10 +44,9 @@ import java.util.List;
  * @version 1.2.1
  * @since 1.2.1
  */
-public class AccountManagerTest extends TestCase{
+public class UserManagerTest extends TestCase{
     
-    private AccountManager classUnderTest;
-    private NodeManager nodeManager;
+    private UserManager classUnderTest;
     private RoleManager roleManager;
     private AbstractApplicationContext context;
     private DexDBITestHelper helper;
@@ -58,13 +56,10 @@ public class AccountManagerTest extends TestCase{
         context = DexDBITestHelper.loadContext(this);
         helper = (DexDBITestHelper) context.getBean("helper");
         helper.cleanInsert(this, null);
-        classUnderTest = new AccountManager();
+        classUnderTest = new UserManager();
         SimpleJdbcOperations jdbcTemplate = (SimpleJdbcOperations) context
                 .getBean("jdbcTemplate");
         classUnderTest.setJdbcTemplate(jdbcTemplate);
-        nodeManager = new NodeManager();
-        nodeManager.setJdbcTemplate(jdbcTemplate);
-        classUnderTest.setNodeManager(nodeManager);
         roleManager = new RoleManager();
         roleManager.setJdbcTemplate(jdbcTemplate);
         classUnderTest.setRoleManager(roleManager);
@@ -98,62 +93,71 @@ public class AccountManagerTest extends TestCase{
     }
     
     public void testLoadAll() throws Exception {
-        List<Account> users = classUnderTest.load();
+        List<User> users = classUnderTest.load();
         assertNotNull(users);
         assertTrue(users.size() == 3);
         verifyAll();
     }
     
     public void testLoadById() throws Exception {
-        Account account = classUnderTest.load(3);
-        assertNotNull(account);
-        assertEquals(3, account.getId());
-        assertEquals("User3", account.getName());
-        assertEquals("passw0rd", account.getPassword());
-        assertEquals("org3", account.getOrgName());
-        assertEquals("unit3", account.getOrgUnit());
-        assertEquals("locality3", account.getLocality());
-        assertEquals("state3", account.getState());
-        assertEquals("ZZ", account.getCountryCode());
-        assertEquals(Role.USER, account.getRoleName());
-        assertEquals("http://test3.eu", account.getNodeAddress());
+        User user = classUnderTest.load(3);
+        assertNotNull(user);
+        assertEquals(3, user.getId());
+        assertEquals("User3", user.getName());
+        assertEquals("passw0rd", user.getPassword());
+        assertEquals("org3", user.getOrgName());
+        assertEquals("unit3", user.getOrgUnit());
+        assertEquals("locality3", user.getLocality());
+        assertEquals("state3", user.getState());
+        assertEquals("ZZ", user.getCountryCode());
+        assertEquals(Role.USER, user.getRole());
+        assertEquals("http://test3.eu", user.getNodeAddress());
         verifyAll();
     }
     
     public void testLoadByName() throws Exception {
-        Account account = classUnderTest.load("User2");
-        assertNotNull(account);
-        assertEquals(2, account.getId());
-        assertEquals("User2", account.getName());
-        assertEquals("passw0rd", account.getPassword());
-        assertEquals("org2", account.getOrgName());
-        assertEquals("unit2", account.getOrgUnit());
-        assertEquals("locality2", account.getLocality());
-        assertEquals("state2", account.getState());
-        assertEquals("YY", account.getCountryCode());
-        assertEquals(Role.OPERATOR, account.getRoleName());
-        assertEquals("http://test2.eu", account.getNodeAddress());
+        User user = classUnderTest.load("User2");
+        assertNotNull(user);
+        assertEquals(2, user.getId());
+        assertEquals("User2", user.getName());
+        assertEquals("passw0rd", user.getPassword());
+        assertEquals("org2", user.getOrgName());
+        assertEquals("unit2", user.getOrgUnit());
+        assertEquals("locality2", user.getLocality());
+        assertEquals("state2", user.getState());
+        assertEquals("YY", user.getCountryCode());
+        assertEquals(Role.OPERATOR, user.getRole());
+        assertEquals("http://test2.eu", user.getNodeAddress());
         verifyAll();
     }
     
+    public void testLoadPeers() {
+        
+    } 
+    
+    public void testLoadUsers() {
+        
+    }
+    
+    public void testLoadOperators() {
+        
+    }
+    
+    
     public void testStore() throws Exception {
         helper.cleanInsert(this, "noid");
-        Account account = new Account("User4", "http://test4.eu", "org4", 
-                "unit4", "locality4", "state4", "VV");
-        account.setPassword("passw0rd");
-        account.setRoleName(Role.OPERATOR);
+        User user = new User("User4", "operator", "passw0rd", "org4", 
+                "unit4", "locality4", "state4", "VV", "http://test4.eu");
         
-        assertEquals(4, classUnderTest.store(account));
+        assertEquals(4, classUnderTest.store(user));
         verifyDBTables("store", "dex_users", "id");
     }
     
     public void testUpdate() throws Exception {
-        Account account = new Account(3, "User4", "passw0rd", "org4", 
-                "unit4", "locality4", "state4", "VV", Role.USER,
-                "http://test4.eu");
+        User user = new User(3, "User4", "user", "passw0rd", "org4", 
+                "unit4", "locality4", "state4", "VV", "http://test4.eu");
         
-        classUnderTest.update(account);
-        
+        classUnderTest.update(user);
         verifyDBTables("update", "dex_users", null);
     }
     

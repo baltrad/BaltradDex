@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -25,12 +25,11 @@ import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.util.json.impl.JsonUtil;
 import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.model.impl.Node;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
-import eu.baltrad.dex.net.manager.INodeManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import javax.servlet.http.HttpServletResponse;
@@ -93,7 +92,7 @@ public class StartSubscriptionControllerTest {
     private List<Object> mocks;
     private PSController classUnderTest;
     private IHttpClientUtil httpClientMock;
-    private INodeManager nodeManagerMock;
+    private IUserManager userManagerMock;
     private Authenticator authenticatorMock;
     private ISubscriptionManager subscriptionManagerMock;
     private IDataSourceManager dataSourceManagerMock;
@@ -103,8 +102,8 @@ public class StartSubscriptionControllerTest {
     
     class PSController extends StartSubscriptionController {
         public PSController() {
-            this.localNode = new Account(1, "test", "s3cret", "org", "unit", 
-                    "locality", "state", "XX", "user", "http://localhost:8084");
+            this.localNode = new User(1, "test", "user", "s3cret", "org", 
+                    "unit", "locality", "state", "XX", "http://localhost:8084");
         }
         @Override
         public void initConfiguration() {}
@@ -146,7 +145,7 @@ public class StartSubscriptionControllerTest {
         log = Logger.getLogger("DEX");
         classUnderTest.setLog(log);
         httpClientMock = (IHttpClientUtil) createMock(IHttpClientUtil.class);
-        nodeManagerMock = (INodeManager) createMock(INodeManager.class);
+        userManagerMock = (IUserManager) createMock(IUserManager.class);
         subscriptionManagerMock = (ISubscriptionManager)
                 createMock(ISubscriptionManager.class);
         authenticatorMock = (Authenticator) createMock(Authenticator.class);
@@ -167,7 +166,6 @@ public class StartSubscriptionControllerTest {
         StatusLine statusLine = new BasicStatusLine(version, code, reason);
         HttpResponse response = new BasicHttpResponse(statusLine);
         response.addHeader("Node-Name", "test.baltrad.eu");
-        response.addHeader("Node-Address", "http://test.baltrad.eu");
         response.setEntity(new StringEntity(jsonSources));
         return response;
     } 
@@ -183,10 +181,11 @@ public class StartSubscriptionControllerTest {
     }
     
     @Test
-    public void postSubscription_AddCredentialsError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu",
-                "http://test.baltrad.eu")).anyTimes();
+    public void startSubscription_AddCredentialsError() throws Exception {
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
+                "unit", "locality", "state", "XX", 
+                "http://test.baltrad.eu:8084")).anyTimes();
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -195,10 +194,10 @@ public class StartSubscriptionControllerTest {
         
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.postSubscription(model, 
+        String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("error_message"));
@@ -214,10 +213,11 @@ public class StartSubscriptionControllerTest {
     }
     
     @Test
-    public void postSubscription_MessageVerificationError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu")).anyTimes();
+    public void startSubscription_MessageVerificationError() throws Exception {
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
+                "unit", "locality", "state", "XX", 
+                "http://test.baltrad.eu:8084")).anyTimes();
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -231,11 +231,11 @@ public class StartSubscriptionControllerTest {
         
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.postSubscription(model, 
+        String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         
         verifyAll();
@@ -253,10 +253,11 @@ public class StartSubscriptionControllerTest {
     }
     
     @Test
-    public void postSubscription_HttpConnectionError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu",
-                "http://test.baltrad.eu")).anyTimes();
+    public void startSubscription_HttpConnectionError() throws Exception {
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
+                "unit", "locality", "state", "XX", 
+                "http://test.baltrad.eu:8084")).anyTimes();
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -266,11 +267,11 @@ public class StartSubscriptionControllerTest {
         
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.postSubscription(model, 
+        String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         
         assertEquals("subscribe", viewName);
@@ -287,10 +288,11 @@ public class StartSubscriptionControllerTest {
     }
     
     @Test
-    public void postSubscription_GenericConnectionError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu",
-                "http://test.baltrad.eu")).anyTimes();
+    public void startSubscription_GenericConnectionError() throws Exception {
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
+                "unit", "locality", "state", "XX", 
+                "http://test.baltrad.eu:8084")).anyTimes();
         
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andThrow(new Exception("Generic connection error"));
@@ -300,11 +302,11 @@ public class StartSubscriptionControllerTest {
         
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.postSubscription(model, 
+        String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         
         assertEquals("subscribe", viewName);
@@ -321,10 +323,11 @@ public class StartSubscriptionControllerTest {
     }
     
     @Test
-    public void postSubscription_InternalServerError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu",
-                "http://test.baltrad.eu")).anyTimes();
+    public void startSubscription_InternalServerError() throws Exception {
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
+                "unit", "locality", "state", "XX", 
+                "http://test.baltrad.eu:8084")).anyTimes();
         
         HttpResponse response = createResponse(
             HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
@@ -337,11 +340,11 @@ public class StartSubscriptionControllerTest {
         
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.postSubscription(model, 
+        String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         
         assertEquals("subscribe", viewName);
@@ -358,13 +361,14 @@ public class StartSubscriptionControllerTest {
     }
     
     @Test
-    public void postSubscription_InternalControllerError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu",
-                "http://test.baltrad.eu")).anyTimes();
+    public void startSubscription_InternalControllerError() throws Exception {
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
+                "unit", "locality", "state", "XX", 
+                "http://test.baltrad.eu:8084")).anyTimes();
         
         HttpResponse response = createResponse(HttpServletResponse.SC_OK, 
-                null, "");
+                null, "09345923475823948759038745");
         
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andReturn(response);
@@ -374,12 +378,12 @@ public class StartSubscriptionControllerTest {
         
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.postSubscription(model, 
+        String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("error_message"));
@@ -395,10 +399,11 @@ public class StartSubscriptionControllerTest {
     }
     
     @Test
-    public void postSubscription_SubscriptionFailedError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu",
-                "http://test.baltrad.eu")).anyTimes();
+    public void startSubscription_SubscriptionFailedError() throws Exception {
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
+                "unit", "locality", "state", "XX", 
+                "http://test.baltrad.eu:8084")).anyTimes();
         
         HttpResponse response = createResponse(
             HttpServletResponse.SC_NOT_FOUND, "Subscription error", "");
@@ -411,12 +416,12 @@ public class StartSubscriptionControllerTest {
         
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.postSubscription(model, 
+        String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         
         assertEquals("subscribe", viewName);
@@ -432,10 +437,11 @@ public class StartSubscriptionControllerTest {
     }
     
     @Test
-    public void postSubscription_PartialSubscriptionError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu",
-                "http://test.baltrad.eu")).anyTimes();
+    public void startSubscription_PartialSubscriptionError() throws Exception {
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
+                "unit", "locality", "state", "XX", 
+                "http://test.baltrad.eu:8084")).anyTimes();
         
         HttpResponse response = createResponse(
             HttpServletResponse.SC_PARTIAL_CONTENT, null, JSON_SOURCES_PARTIAL);
@@ -444,6 +450,8 @@ public class StartSubscriptionControllerTest {
                 .andReturn(response);
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
+        expect(dataSourceManagerMock.load(isA(String.class), isA(String.class)))
+                .andReturn(null).anyTimes();
         expect(dataSourceManagerMock.store(isA(DataSource.class)))
                 .andReturn(Integer.SIZE).anyTimes();
         expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
@@ -453,14 +461,14 @@ public class StartSubscriptionControllerTest {
         
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.postSubscription(model, "test.baltrad.eu",
+        String viewName = classUnderTest.startSubscription(model, "test.baltrad.eu",
                 SELECTED_DATA_SOURCES);
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("error_message"));
@@ -479,10 +487,11 @@ public class StartSubscriptionControllerTest {
     }
     
     @Test
-    public void postSubscription_OK() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu",
-                "http://test.baltrad.eu")).anyTimes();
+    public void startSubscription_OK() throws Exception {
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
+                "unit", "locality", "state", "XX", 
+                "http://test.baltrad.eu:8084")).anyTimes();
         
         HttpResponse response = createResponse(HttpServletResponse.SC_OK, 
                 null, JSON_SOURCES_OK);
@@ -490,6 +499,8 @@ public class StartSubscriptionControllerTest {
                 .andReturn(response);
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
+        expect(dataSourceManagerMock.load(isA(String.class), isA(String.class)))
+                .andReturn(null).anyTimes();
         expect(dataSourceManagerMock.store(isA(DataSource.class)))
                 .andReturn(Integer.SIZE).anyTimes();
         expect(subscriptionManagerMock.load(isA(String.class), 
@@ -499,13 +510,13 @@ public class StartSubscriptionControllerTest {
         
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.postSubscription(model, 
+        String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         assertEquals("subscribe", viewName);
         assertTrue(model.containsAttribute("success_message"));

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,12 +21,10 @@
 
 package eu.baltrad.dex.user.controller;
 
-import eu.baltrad.dex.net.manager.INodeManager;
-import eu.baltrad.dex.user.manager.IAccountManager;
+import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.manager.IRoleManager;
 import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.user.model.Account;
-import eu.baltrad.dex.net.model.impl.Node;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.validator.AccountValidator;
 import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.WebValidator;
@@ -46,6 +44,7 @@ import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Allows to configure new user account or to modify an existing one.
@@ -69,9 +68,8 @@ public class SaveAccountController  {
     private static final String ERROR_MSG_KEY = "error";
     private static final String OK_MSG_KEY = "message";
     
-    private IAccountManager accountManager;
+    private IUserManager userManager;
     private IRoleManager roleManager;
-    private INodeManager nodeManager;
     private AccountValidator validator;
     private MessageResourceUtil messages;
     private Logger log;
@@ -92,47 +90,46 @@ public class SaveAccountController  {
     @RequestMapping(method = RequestMethod.GET)
     public String setupForm(@RequestParam(value="user_id", required=false) 
             String userId, ModelMap model) {
-        Account account;
+        User user;
         if (WebValidator.validate(userId)) {
-            account = accountManager.load(Integer.parseInt(userId));
+            user = userManager.load(Integer.parseInt(userId));
         } else {
-            account = new Account();
+            user = new User();
         } 
-        model.addAttribute(USER_ACCOUNT_MODEL_KEY, account);
+        model.addAttribute(USER_ACCOUNT_MODEL_KEY, user);
         return FORM_VIEW;
     }
     
     /**
      * Save user account.
      * @param account User account
+     * @param request HTTP servlet request
      * @param result Form binding result
      * @param model Model map
      * @return View name
      */
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("user_account") Account account,
-                BindingResult result, ModelMap model) {
-        
-        validator.validate(account, result);
+    public String processSubmit(HttpServletRequest request, ModelMap model, 
+            @ModelAttribute("user_account") User user, BindingResult result) {
+        validator.validate(request, user, result);
         if (result.hasErrors()) {
             return FORM_VIEW;
         }
-        account.setPassword(MessageDigestUtil.createHash("MD5", 16, 
-                            account.getPassword()));
-        account.setNodeAddress(Node.LOCAL_NODE_ADDRESS);
+        user.setPassword(MessageDigestUtil.createHash("MD5", 16, 
+                            user.getPassword()));
         try {
-            if (account.getId() > 0) {
-                accountManager.update(account);
+            if (user.getId() > 0) {
+                userManager.update(user);
             } else {
-                accountManager.store(account);
+                userManager.store(user);
             }
             String msg = messages.getMessage(SAVE_ACCOUNT_OK_MSG_KEY, 
-                            new Object[] {account.getName()});
+                            new Object[] {user.getName()});
             model.addAttribute(OK_MSG_KEY, msg);
             log.warn(msg);
         } catch (Exception e) {
             String msg = messages.getMessage(SAVE_ACCOUNT_ERROR_MSG_KEY, 
-                            new Object[] {account.getName()});
+                            new Object[] {user.getName()});
             model.addAttribute(ERROR_MSG_KEY, msg);
             log.error(msg, e);
         }
@@ -148,7 +145,8 @@ public class SaveAccountController  {
         List<Role> roles = roleManager.load();
         List<String> roleNames = new ArrayList<String>();
         for (Role role : roles) {
-            if (!role.getName().equals(Role.PEER)) {
+            if (!role.getName().equals(Role.PEER) 
+                    && !role.getName().equals(Role.NODE)) {
                 roleNames.add(role.getName());
             }
         }
@@ -156,11 +154,11 @@ public class SaveAccountController  {
     }
     
     /**
-     * @param accountManager 
+     * @param userManager 
      */
     @Autowired
-    public void setAccountManager(IAccountManager accountManager) { 
-        this.accountManager = accountManager; 
+    public void setUserManager(IUserManager userManager) { 
+        this.userManager = userManager; 
     }
 
     /**
@@ -169,14 +167,6 @@ public class SaveAccountController  {
     @Autowired
     public void setRoleManager(IRoleManager roleManager) {
         this.roleManager = roleManager;
-    }
-    
-    /**
-     * @param nodeManager the nodeManager to set
-     */
-    @Autowired
-    public void setNodeManager(INodeManager nodeManager) {
-        this.nodeManager = nodeManager;
     }
 
     /**

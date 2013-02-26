@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,14 +21,13 @@
 
 package eu.baltrad.dex.auth.util;
 
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.impl.UserManager;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.user.manager.impl.AccountManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.GrantedAuthority;
 import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.userdetails.User;
 import org.springframework.security.userdetails.UserDetailsService;
 import org.springframework.security.userdetails.UserDetails;
 
@@ -45,7 +44,7 @@ public class SimpleUserDetailsService implements UserDetailsService  {
     private GrantedAuthority authOperator;
     private GrantedAuthority authUser;
     
-    private AccountManager accountManager;
+    private UserManager userManager;
     
     /**
      * Constructor.
@@ -62,33 +61,34 @@ public class SimpleUserDetailsService implements UserDetailsService  {
      * @return User details 
      */
     public UserDetails loadUserByUsername(String name) {
-        Account account = accountManager.load(name);
-        if (account == null) {
+        User user = userManager.load(name);
+        if (user == null) {
             return null;
         } else {
             GrantedAuthority[] authorities = null;
-            if (account.getRoleName().equals(Role.ADMIN)) {
+            if (user.getRole().equals(Role.ADMIN)) {
                 authorities = new GrantedAuthority[] {authAdmin, authOperator, 
                     authUser};
             }
-            if (account.getRoleName().equals(Role.OPERATOR)) {
+            if (user.getRole().equals(Role.OPERATOR)) {
                 authorities = new GrantedAuthority[] {authOperator, authUser};
             }
-            if (account.getRoleName().equals(Role.USER)) {
+            if (user.getRole().equals(Role.USER)) {
                 authorities = new GrantedAuthority[] {authUser};
             }
-            UserDetails user = new User(account.getName(), account.getPassword(), 
-                    true, authorities);
-            return user;
+            org.springframework.security.userdetails.UserDetails userDetails = 
+                    new org.springframework.security.userdetails.User(
+                        user.getName(), user.getPassword(), true, authorities);
+            return userDetails;
         }
     }
 
     /**
-     * @param accountManager the userManager to set
+     * @param userManager the userManager to set
      */
     @Autowired
-    public void setAccountManager(AccountManager accountManager) {
-        this.accountManager = accountManager;
+    public void setUserManager(UserManager userManager) {
+        this.userManager = userManager;
     }
    
 }

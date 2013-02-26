@@ -1,5 +1,5 @@
 <%------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -61,30 +61,32 @@ Author     : szewczenko
                             </div>
                             <c:set var="count" scope="page" value="1"/>
                             <c:forEach var="account" items="${accounts}">
-                                <div class="entry">
-                                    <div id="cell" class="count">
-                                        <c:out value="${count}"/>
-                                        <c:set var="count" value="${count + 1}"/>
-                                    </div>
-                                    <div id="cell" class="username">
-                                        <a href="save_user_account.htm?user_id=${account.id}">
-                                            <c:out value="${account.name}"/>
-                                        </a>
-                                    </div>
-                                    <div id="cell" class="rolename">
-                                        <c:out value="${account.roleName}"/>
-                                    </div>
-                                    <div id="cell" class="orgname">
-                                        <c:out value="${account.orgName}"/>
-                                    </div>
-                                    <c:if test="${account.roleName != 'peer'}">
-                                        <div id="cell" class="passwdchange">
-                                            <a href="change_user_password.htm?user_id=${account.id}">
-                                                Change
+                                <c:if test="${account.role != 'node'}">
+                                    <div class="entry">
+                                        <div id="cell" class="count">
+                                            <c:out value="${count}"/>
+                                            <c:set var="count" value="${count + 1}"/>
+                                        </div>
+                                        <div id="cell" class="username">
+                                            <a href="save_user_account.htm?user_id=${account.id}">
+                                                <c:out value="${account.name}"/>
                                             </a>
                                         </div>
-                                    </c:if>        
-                                </div>
+                                        <div id="cell" class="rolename">
+                                            <c:out value="${account.role}"/>
+                                        </div>
+                                        <div id="cell" class="orgname">
+                                            <c:out value="${account.orgName}"/>
+                                        </div>
+                                        <c:if test="${account.role != 'peer'}">
+                                            <div id="cell" class="passwdchange">
+                                                <a href="change_user_password.htm?user_id=${account.id}">
+                                                    Change
+                                                </a>
+                                            </div>
+                                        </c:if>                      
+                                    </div>
+                                </c:if>                     
                             </c:forEach>
                             <div class="tablefooter">
                                 <div class="buttons">

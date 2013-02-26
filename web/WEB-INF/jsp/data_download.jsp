@@ -76,7 +76,7 @@ Author     : szewczenko
                                         </div>
                                     </div>
                                     <c:forEach var="sub" items="${subscriptions}">
-                                        <c:if test="${sub.operator == operator.name}">
+                                        <c:if test="${sub.user == operator.name}">
                                             <div class="entry">
                                                 <div id="cell" class="station">
                                                     <c:out value="${sub.dataSource}"/>

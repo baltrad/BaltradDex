@@ -24,10 +24,8 @@ package eu.baltrad.dex.config.controller;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.config.validator.NodeConfigurationValidator;
-import eu.baltrad.dex.net.manager.INodeManager;
-import eu.baltrad.dex.net.model.impl.Node;
-import eu.baltrad.dex.user.manager.IAccountManager;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
@@ -73,8 +71,7 @@ public class NodeConfigurationController {
     private static final String ERROR_MSG_KEY = "error";
 
     private ConfigurationManager configurationManager;
-    private IAccountManager accountManager;
-    private INodeManager nodeManager;
+    private IUserManager userManager;
     private NodeConfigurationValidator validator;
     private MessageResourceUtil messages;
     private Logger log;
@@ -115,22 +112,15 @@ public class NodeConfigurationController {
         }
         try {
             if (!configurationManager.getAppConf().equals(conf)) {
-                // save local peer account
-                int accountId = accountManager
+                // save local node account
+                int accountId = userManager
                         .load(configurationManager.getAppConf()
                         .getNodeName()).getId();
-                Account account = new Account(accountId, conf.getNodeName(), 
+                User user = new User(accountId, conf.getNodeName(), Role.NODE, 
                         null, conf.getOrgName(), conf.getOrgUnit(), 
                         conf.getLocality(), conf.getState(), 
-                        conf.getCountryCode(), Role.PEER, "http://localhost");
-                accountManager.update(account);
-                
-                int nodeId = nodeManager.load(configurationManager.getAppConf()
-                        .getNodeName()).getId();
-                Node node = new Node(nodeId, conf.getNodeName(), 
-                        "http://localhost");
-                // update node's table
-                nodeManager.update(node);
+                        conf.getCountryCode(), conf.getNodeAddress());
+                userManager.update(user);
                 // save configuration
                 configurationManager.saveAppConf(conf);
             }
@@ -186,21 +176,13 @@ public class NodeConfigurationController {
     }
     
     /**
-     * @param accountManager the accountManager to set
+     * @param userManager the userManager to set
      */
     @Autowired
-    public void setAccountManager(IAccountManager accountManager) {
-        this.accountManager = accountManager;
+    public void setUserManager(IUserManager userManager) {
+        this.userManager = userManager;
     }
     
-    /**
-     * @param nodeManager the nodeManager to set
-     */
-    @Autowired
-    public void setNodeManager(INodeManager nodeManager) {
-        this.nodeManager = nodeManager;
-    }
-
     /**
      * @param validator the validator to set
      */

@@ -66,7 +66,7 @@ Author     : szewczenko
                                         </a>
                                     </div>
                                     <div id="cell" class="nodeaddress">
-                                        <c:out value="${node.address}"/>
+                                        <c:out value="${node.nodeAddress}"/>
                                     </div>
                                 </div>
                             </c:forEach>

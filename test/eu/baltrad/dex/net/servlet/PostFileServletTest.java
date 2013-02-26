@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -43,8 +43,8 @@ import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.dex.net.util.FramePublisherManager;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
 import eu.baltrad.dex.registry.model.impl.RegistryEntry;
-import eu.baltrad.dex.user.manager.IAccountManager;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.User;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -106,8 +106,8 @@ public class PostFileServletTest {
     
     protected class PFServlet extends PostFileServlet {
         public PFServlet() {
-            this.localNode = new Account(1, "test", "s3cret", "org", "unit", 
-                    "locality", "state", "XX", "user", "http://localhost:8084");
+            this.localNode = new User(1, "test", "user", "s3cret", "org", 
+                    "unit", "locality", "state", "XX", "http://localhost:8084");
         }
         @Override
         public void initConfiguration() {}
@@ -182,11 +182,9 @@ public class PostFileServletTest {
         format = new SimpleDateFormat(DATE_FORMAT);
         long time = 1340189763867L;
         subscriptions = new ArrayList<Subscription>();
-        s1 = new Subscription(1, time, "upload", "test.baltrad.eu", "User1", 
-                "S1", true, true);
+        s1 = new Subscription(1, time, "upload", "User1", "S1", true, true);
         subscriptions.add(s1);
-        s2 = new Subscription(2, time, "upload", "test.baltrad.eu", "User2", 
-                "DS2", true, true);
+        s2 = new Subscription(2, time, "upload", "User2", "DS2", true, true);
         subscriptions.add(s2);
         setAttributes(request);
     }
@@ -349,10 +347,10 @@ public class PostFileServletTest {
         expect(fileManagerMock.loadFilter(s2.getDataSource()))
                 .andReturn(filterMock);
         
-        IAccountManager userManagerMock = 
-                (IAccountManager) createMock(IAccountManager.class);
-        Account account = new Account(1, "user", "s3cret", "org", "unit", 
-                "locality", "state", "PL", "user", "http://test.baltrad.eu");
+        IUserManager userManagerMock = 
+                (IUserManager) createMock(IUserManager.class);
+        User account = new User(1, "user", "user", "s3cret", "org", "unit", 
+                "locality", "state", "PL", "http://test.baltrad.eu");
         expect(userManagerMock.load(isA(String.class)))
                 .andReturn(account).anyTimes();
         

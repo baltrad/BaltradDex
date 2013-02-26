@@ -24,8 +24,7 @@ package eu.baltrad.dex.net.manager.impl;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.user.manager.IAccountManager;
-import eu.baltrad.dex.net.manager.INodeManager;
+import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.model.mapper.SubscriptionMapper;
 
@@ -56,9 +55,8 @@ public class SubscriptionManager implements ISubscriptionManager {
     /** JDBC template */
     private SimpleJdbcOperations jdbcTemplate;
     /** Dependent managers */
-    private IAccountManager accountManager;
+    private IUserManager accountManager;
     private IDataSourceManager dataSourceManager;
-    private INodeManager nodeManager;
     
     /** Row mapper */
     private SubscriptionMapper mapper;
@@ -82,7 +80,7 @@ public class SubscriptionManager implements ISubscriptionManager {
      * @param accountManager the accountManager to set
      */
     @Autowired
-    public void setAccountManager(IAccountManager accountManager) {
+    public void setAccountManager(IUserManager accountManager) {
         this.accountManager = accountManager;
     }
 
@@ -93,14 +91,6 @@ public class SubscriptionManager implements ISubscriptionManager {
     public void setDataSourceManager(IDataSourceManager dataSourceManager) {
         this.dataSourceManager = dataSourceManager;
     }
-
-    /**
-     * @param nodeManager the nodeManager to set
-     */
-    @Autowired
-    public void setNodeManager(INodeManager nodeManager) {
-        this.nodeManager = nodeManager;
-    }
     
     /**
      * Load subscription.
@@ -108,19 +98,12 @@ public class SubscriptionManager implements ISubscriptionManager {
      * @return Subscription matching given id
      */
     public Subscription load(int id) {
-        String sql = "SELECT dex_subscriptions.*, dex_users.name " + 
-            "AS user_name, dex_nodes.name AS operator_name, " +
-            "dex_data_sources.name AS datasource FROM dex_subscriptions, " + 
-            "dex_users, dex_nodes, dex_data_sources, dex_subscriptions_users," +
-            " dex_subscriptions_nodes, dex_subscriptions_data_sources WHERE " + 
-            "dex_subscriptions_users.subscription_id = dex_subscriptions.id " +
-            "AND dex_subscriptions_users.user_id = dex_users.id AND " + 
-            "dex_subscriptions_nodes.subscription_id = dex_subscriptions.id " + 
-            "AND dex_subscriptions_nodes.node_id = dex_nodes.id AND " +
-            "dex_subscriptions_data_sources.subscription_id = " + 
-            "dex_subscriptions.id " + 
-            "AND dex_subscriptions_data_sources.data_source_id = " + 
-            "dex_data_sources.id AND dex_subscriptions.id = ?";
+        String sql = "SELECT s.*, u.name AS user, ds.name AS datasource " + 
+            "FROM dex_subscriptions s, dex_users u, dex_data_sources ds, " + 
+            "dex_subscriptions_users su, dex_subscriptions_data_sources sds " + 
+            "WHERE su.subscription_id = s.id AND su.user_id = u.id AND " + 
+            "sds.subscription_id = s.id AND sds.data_source_id = " + 
+            "ds.id AND s.id = ?";
         try {
             return jdbcTemplate.queryForObject(sql, mapper, id);
         } catch (DataAccessException e) {
@@ -134,19 +117,12 @@ public class SubscriptionManager implements ISubscriptionManager {
      * @return List of subscriptions matching given type
      */
     public List<Subscription> load(String type) {
-        String sql = "SELECT dex_subscriptions.*, dex_users.name " + 
-            "AS user_name, dex_nodes.name AS operator_name, " +
-            "dex_data_sources.name AS datasource FROM dex_subscriptions, " + 
-            "dex_users, dex_nodes, dex_data_sources, dex_subscriptions_users," +
-            " dex_subscriptions_nodes, dex_subscriptions_data_sources WHERE " + 
-            "dex_subscriptions_users.subscription_id = dex_subscriptions.id " +
-            "AND dex_subscriptions_users.user_id = dex_users.id AND " + 
-            "dex_subscriptions_nodes.subscription_id = dex_subscriptions.id " + 
-            "AND dex_subscriptions_nodes.node_id = dex_nodes.id AND " +
-            "dex_subscriptions_data_sources.subscription_id = " + 
-            "dex_subscriptions.id " + 
-            "AND dex_subscriptions_data_sources.data_source_id = " + 
-            "dex_data_sources.id AND dex_subscriptions.type = ?";
+        String sql = "SELECT s.*, u.name AS user, ds.name AS datasource " + 
+            "FROM dex_subscriptions s, dex_users u, dex_data_sources ds, " + 
+            "dex_subscriptions_users su, dex_subscriptions_data_sources sds " +
+            "WHERE su.subscription_id = s.id AND su.user_id = u.id AND " + 
+            "sds.subscription_id = s.id AND sds.data_source_id = " + 
+            "ds.id AND s.type = ?";
         try {
             return jdbcTemplate.query(sql, mapper, type);
         } catch (DataAccessException e) {
@@ -161,20 +137,12 @@ public class SubscriptionManager implements ISubscriptionManager {
      * @return List of subscriptions matching given parameters 
      */
     public List<Subscription> load(String type, String operator) {
-        String sql = "SELECT dex_subscriptions.*, dex_users.name " + 
-            "AS user_name, dex_nodes.name AS operator_name, " +
-            "dex_data_sources.name AS datasource FROM dex_subscriptions, " + 
-            "dex_users, dex_nodes, dex_data_sources, dex_subscriptions_users," +
-            " dex_subscriptions_nodes, dex_subscriptions_data_sources WHERE " + 
-            "dex_subscriptions_users.subscription_id = dex_subscriptions.id " +
-            "AND dex_subscriptions_users.user_id = dex_users.id AND " + 
-            "dex_subscriptions_nodes.subscription_id = dex_subscriptions.id " + 
-            "AND dex_subscriptions_nodes.node_id = dex_nodes.id AND " +
-            "dex_subscriptions_data_sources.subscription_id = " + 
-            "dex_subscriptions.id " + 
-            "AND dex_subscriptions_data_sources.data_source_id = " + 
-            "dex_data_sources.id AND dex_subscriptions.type = ? AND " +
-            "dex_nodes.name = ?";
+        String sql = "SELECT s.*, u.name AS user, ds.name AS datasource " + 
+            "FROM dex_subscriptions s, dex_users u, dex_data_sources ds, " + 
+            "dex_subscriptions_users su, dex_subscriptions_data_sources sds " +
+            "WHERE su.subscription_id = s.id AND su.user_id = u.id AND " + 
+            "sds.subscription_id = s.id AND sds.data_source_id = " + 
+            "ds.id AND s.type = ? AND u.name = ?";
         try {
             return jdbcTemplate.query(sql, mapper, type, operator);
         } catch (DataAccessException e) {
@@ -190,20 +158,12 @@ public class SubscriptionManager implements ISubscriptionManager {
      * @return List of subscriptions matching given parameters
      */
     public Subscription load(String type, String user, String dataSource) {
-        String sql = "SELECT dex_subscriptions.*, dex_users.name " + 
-            "AS user_name, dex_nodes.name AS operator_name, " +
-            "dex_data_sources.name AS datasource FROM dex_subscriptions, " + 
-            "dex_users, dex_nodes, dex_data_sources, dex_subscriptions_users," +
-            " dex_subscriptions_nodes, dex_subscriptions_data_sources WHERE " + 
-            "dex_subscriptions_users.subscription_id = dex_subscriptions.id " +
-            "AND dex_subscriptions_users.user_id = dex_users.id AND " + 
-            "dex_subscriptions_nodes.subscription_id = dex_subscriptions.id " + 
-            "AND dex_subscriptions_nodes.node_id = dex_nodes.id AND " +
-            "dex_subscriptions_data_sources.subscription_id = " + 
-            "dex_subscriptions.id " + 
-            "AND dex_subscriptions_data_sources.data_source_id = " + 
-            "dex_data_sources.id AND dex_subscriptions.type = ? AND " + 
-            "dex_users.name = ? AND dex_data_sources.name = ?";
+        String sql = "SELECT s.*, u.name AS user, ds.name AS datasource " + 
+            "FROM dex_subscriptions s, dex_users u, dex_data_sources ds, " + 
+            "dex_subscriptions_users su, dex_subscriptions_data_sources sds " + 
+            "WHERE su.subscription_id = s.id AND su.user_id = u.id AND " + 
+            "sds.subscription_id = s.id AND sds.data_source_id = ds.id AND " +
+            "s.type = ? AND u.name = ? AND ds.name = ?;";
         try {
             return jdbcTemplate.queryForObject(sql, mapper, type, user, 
                     dataSource);
@@ -255,10 +215,6 @@ public class SubscriptionManager implements ISubscriptionManager {
             jdbcTemplate.update("INSERT INTO dex_subscriptions_data_sources " +
                     "(subscription_id, data_source_id) VALUES (?,?)", 
                     subId, dataSourceId);
-            int nodeId = nodeManager.load(s.getOperator()).getId();
-            jdbcTemplate.update("INSERT INTO dex_subscriptions_nodes " +
-                    "(subscription_id, node_id) VALUES (?,?)", 
-                    subId, nodeId);
             return subId;
         } catch (DataAccessException e) {
             throw new Exception(e.getMessage());

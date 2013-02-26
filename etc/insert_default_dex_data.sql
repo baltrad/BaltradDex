@@ -1,5 +1,5 @@
 /*******************************************************************************
-Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -21,7 +21,8 @@ Created on : Aug 19, 2010, 10:36:42 AM
 Author     : szewczenko
 *******************************************************************************/
 
-INSERT INTO dex_roles (name) VALUES ('admin'), ('operator'), ('peer'), ('user');
+INSERT INTO dex_roles (name) VALUES ('admin'), ('operator'), ('peer'), ('user'),
+                                    ('node');
 
 INSERT INTO dex_users (name, password, org_name, org_unit, locality, state, 
                        country_code)
@@ -29,10 +30,6 @@ INSERT INTO dex_users (name, password, org_name, org_unit, locality, state,
                     'Country', 'XX');
 
 INSERT INTO dex_users_roles (user_id, role_id) VALUES (1, 1);
-
-INSERT INTO dex_nodes (name, address) VALUES ('admin', 'http://localhost');
-
-INSERT INTO dex_users_nodes (user_id, node_id) VALUES (1, 1);
 
 INSERT INTO dex_data_quantities (name, unit, description) VALUES
     ('TH', 'Th [dBZ]', 'Logged horizontally-polarized total (uncorrected) reflectivity factor'),

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -24,9 +24,9 @@ package eu.baltrad.dex.net.controller;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.net.controller.exception.InternalControllerException;
-import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.request.factory.RequestFactory;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.util.json.IJsonUtil;
@@ -34,16 +34,18 @@ import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.controller.util.MessageSetter;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.net.manager.INodeManager;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.net.model.impl.Node;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 
 import org.keyczar.exceptions.KeyczarException;
@@ -102,14 +104,15 @@ public class StartSubscriptionController implements MessageSetter {
     private Authenticator authenticator;
     private IHttpClientUtil httpClient;
     private IJsonUtil jsonUtil;
-    private INodeManager nodeManager;
+    
     private IDataSourceManager dataSourceManager;
-    private ISubscriptionManager subscriptionManager;    
+    private ISubscriptionManager subscriptionManager;
+    private IUserManager userManager;
     private RequestFactory requestFactory;
     private MessageResourceUtil messages;
     private Logger log;
     
-    protected Account localNode;
+    protected User localNode;
     
     /**
      * Default constructor.
@@ -127,13 +130,13 @@ public class StartSubscriptionController implements MessageSetter {
         this.httpClient = new HttpClientUtil(
                 Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
                 Integer.parseInt(confManager.getAppConf().getSoTimeout()));
-        this.localNode = new Account(confManager.getAppConf().getNodeName(),
-                confManager.getAppConf().getNodeAddress(),
-                confManager.getAppConf().getOrgName(),
+        this.localNode = new User(confManager.getAppConf().getNodeName(),
+                Role.NODE, null, confManager.getAppConf().getOrgName(),
                 confManager.getAppConf().getOrgUnit(),
                 confManager.getAppConf().getLocality(),
                 confManager.getAppConf().getState(),
-                confManager.getAppConf().getCountryCode());
+                confManager.getAppConf().getCountryCode(),
+                confManager.getAppConf().getNodeAddress());
     }
     
     /**
@@ -171,13 +174,14 @@ public class StartSubscriptionController implements MessageSetter {
             throws InternalControllerException {
         try {
             InputStream is = null;
-        try {
-            is = response.getEntity().getContent();
-            return IOUtils.toString(is, "UTF-8");
-        } finally {
-            is.close();
-        }
-        }catch(IOException e) {
+            try {
+                is = response.getEntity().getContent();
+                return IOUtils.toString(is, "UTF-8");
+                
+            } finally {
+                is.close();
+            }
+        } catch (IOException e) {
             throw new InternalControllerException("Failed to read server "
                     + "response");
         }
@@ -187,27 +191,38 @@ public class StartSubscriptionController implements MessageSetter {
      * Stores local subscriptions.
      * @param res Http response
      * @param dataSourceString Data sources Json string
+     * @param peerName Peer node name
      * @return True if subscriptions are successfully saved 
      */
+    @Transactional(propagation=Propagation.REQUIRED, 
+            rollbackFor=Exception.class)
     private void storeLocalSubscriptions(HttpResponse response, 
-            String dataSourceString) throws InternalControllerException{
+            String dataSourceString, String peerName) 
+                throws InternalControllerException {
         try {
             Set<DataSource> dataSources = jsonUtil
                     .jsonToDataSources(dataSourceString);
             for (DataSource ds : dataSources) {
                 // save peer data sources
-                dataSourceManager.store(ds);
+                DataSource dataSource = dataSourceManager.load(ds.getName(), 
+                        DataSource.PEER);
+                if (dataSource == null) {
+                    dataSourceManager.store(ds);
+                } else {
+                    ds.setId(dataSource.getId());
+                    dataSourceManager.update(ds);
+                }
                 // save subscriptions
                 Subscription requested = new Subscription(
                         System.currentTimeMillis(), Subscription.LOCAL,
                         response.getFirstHeader("Node-Name").getValue(), 
-                        localNode.getName(), ds.getName(), true, true);
+                        ds.getName(), true, true);
                 Subscription existing = subscriptionManager.load(
-                    Subscription.LOCAL, localNode.getName(), ds.getName());
+                    Subscription.LOCAL, peerName, ds.getName());
                 if (existing == null) {
                     subscriptionManager.store(requested);
                 } else {
-                    requested.setId(existing.getId());
+                    requested.setId(existing.getId());       
                     subscriptionManager.update(requested);
                 }
             }
@@ -225,7 +240,7 @@ public class StartSubscriptionController implements MessageSetter {
      * @return View name
      */
     @RequestMapping("/subscribe.htm")
-    public String postSubscription(Model model,
+    public String startSubscription(Model model,
             @RequestParam(value="peer_name", required=true) String peerName,
             @RequestParam(value="selected_data_sources", required=true) 
             String[] selectedDataSources) {
@@ -237,9 +252,9 @@ public class StartSubscriptionController implements MessageSetter {
                     Integer.parseInt(parms[0]), parms[1], DataSource.PEER,
                     parms[2]));
         }
-        Node node = nodeManager.load(peerName);
+        User node = userManager.load(peerName);
         requestFactory = new DefaultRequestFactory(
-                URI.create(node.getAddress()));
+                URI.create(node.getNodeAddress()));
         HttpUriRequest req = requestFactory
                 .createStartSubscriptionRequest(localNode, 
                                                 selectedPeerDataSources);
@@ -250,14 +265,14 @@ public class StartSubscriptionController implements MessageSetter {
                     HttpServletResponse.SC_OK) {
                 String okMsg = messages.getMessage(PS_SERVER_SUCCESS_KEY,
                         new String[] {peerName});
-                storeLocalSubscriptions(res, readDataSources(res));
+                storeLocalSubscriptions(res, readDataSources(res), peerName);
                 setMessage(model, SUCCESS_MSG_KEY, okMsg);
                 log.warn(okMsg);
             } else if (res.getStatusLine().getStatusCode() == 
                     HttpServletResponse.SC_PARTIAL_CONTENT) {
                 String errorMsg = messages.getMessage(
                     PS_SERVER_PARTIAL_SUBSCRIPTION, new String[] {peerName});
-                storeLocalSubscriptions(res, readDataSources(res));
+                storeLocalSubscriptions(res, readDataSources(res), peerName);
                 setMessage(model, ERROR_MSG_KEY, errorMsg);
                 log.error(errorMsg);
             } else if (res.getStatusLine().getStatusCode() == 
@@ -321,14 +336,6 @@ public class StartSubscriptionController implements MessageSetter {
     }
 
     /**
-     * @param nodeManager the nodeManager to set
-     */
-    @Autowired
-    public void setNodeManager(INodeManager nodeManager) {
-        this.nodeManager = nodeManager;
-    }
-
-    /**
      * @param messages the messages to set
      */
     @Autowired
@@ -351,6 +358,14 @@ public class StartSubscriptionController implements MessageSetter {
     public void setSubscriptionManager(ISubscriptionManager subscriptionManager) 
     {
         this.subscriptionManager = subscriptionManager;
+    }
+    
+    /**
+     * @param userManager the userManager to set
+     */
+    @Autowired
+    public void setUserManager(IUserManager userManager) {
+        this.userManager = userManager;
     }
 
     /**

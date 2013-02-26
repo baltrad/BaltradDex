@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -27,7 +27,7 @@ import eu.baltrad.dex.net.util.json.IJsonUtil;
 import eu.baltrad.dex.net.util.json.impl.JsonUtil;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -90,8 +90,8 @@ public class StartSubscriptionServletTest {
     
     class PSServlet extends StartSubscriptionServlet {
         public PSServlet() {
-            this.localNode = new Account(1, "test", "s3cret", "org", "unit", 
-                    "locality", "state", "XX", "user", "http://localhost:8084");
+            this.localNode = new User(1, "test", "user", "s3cret", "org", 
+                    "unit", "locality", "state", "XX", "http://localhost:8084");
         }
         @Override
         public void initConfiguration() {}
@@ -153,7 +153,6 @@ public class StartSubscriptionServletTest {
         request.addHeader("Authorization", "test.baltrad.eu" + ":" + 
             "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_");   
         request.addHeader("Node-Name", "test.baltrad.eu");
-        request.addHeader("Node-Address", "http://test.baltrad.eu");
     }
     
     @Test

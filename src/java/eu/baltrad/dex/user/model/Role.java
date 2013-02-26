@@ -34,6 +34,7 @@ public class Role {
     public final static String OPERATOR = "operator";
     public final static String PEER = "peer";
     public final static String USER = "user";
+    public final static String NODE = "node";
     
     private int id;
     private String name;

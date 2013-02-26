@@ -1,5 +1,5 @@
 <%------------------------------------------------------------------------------
-Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -33,7 +33,7 @@ Author     : szewczenko
         </div>
         <div class="right">
             <c:choose>
-                <c:when test="${user_account.roleName == 'peer'}">
+                <c:when test="${user_account.role == 'peer'}">
                     <div class="blttitle">
                         Peer account details
                     </div>
@@ -67,14 +67,14 @@ Author     : szewczenko
                                     </div>
                                     <div class="row">
                                         <div class="rolename">
-                                            <form:input path="roleName"
+                                            <form:input path="role"
                                                         title="User's role"
                                                         readonly="true"/>  
                                             <div class="hint">
                                                 User's role 
                                             </div>
                                         </div>    
-                                        <form:errors path="roleName" cssClass="error"/>
+                                        <form:errors path="role" cssClass="error"/>
                                     </div>
                                     <div class="row">
                                         <div class="address">
@@ -215,19 +215,18 @@ Author     : szewczenko
                                         </div>
                                         <div class="row">
                                             <div class="password">
-                                                <form:password path="repeatPassword"
-                                                    title="Repeat password"/>
+                                                <input type="password" 
+                                                       name="repeat_password"
+                                                       title="Repeat password"/>
                                                 <div class="hint">
                                                     Repeat password
                                                 </div>
                                             </div>
-                                            <form:errors path="repeatPassword" 
-                                                        cssClass="error"/>   
                                         </div>
                                     </c:if>
                                     <div class="row">
                                         <div class="rolename">
-                                            <form:select path="roleName" 
+                                            <form:select path="role" 
                                                         title="Select user's role">
                                                 <form:options items="${roles}"/>
                                             </form:select>    
@@ -235,7 +234,7 @@ Author     : szewczenko
                                                 User's role 
                                             </div>
                                         </div>    
-                                        <form:errors path="roleName" cssClass="error"/>
+                                        <form:errors path="role" cssClass="error"/>
                                     </div>
                                     <div class="row">
                                         <div class="orgname">

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -24,7 +24,7 @@ package eu.baltrad.dex.datasource.manager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.FileObject;
 import eu.baltrad.dex.radar.model.Radar;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public interface IDataSourceManager {
     
     public int deleteFileObject(int dataSopurceId);
     
-    public List<Account> loadUser(int dataSourceId);
+    public List<User> loadUser(int dataSourceId);
     
     public int storeUser(int dataSourceId, int userId);
     

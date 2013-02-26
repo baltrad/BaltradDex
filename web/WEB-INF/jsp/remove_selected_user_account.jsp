@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,11 +15,11 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 Document   : Remove user account page
 Created on : Oct 4, 2010, 2:27 PM
 Author     : szewczenko
---------------------------------------------------------------------------------------------------%>
+------------------------------------------------------------------------------%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
     "http://www.w3.org/TR/html4/loose.dtd">
@@ -64,7 +64,7 @@ Author     : szewczenko
                                     <c:out value="${account.name}"/>
                                 </div>
                                 <div id="cell" class="rolename">
-                                    <c:out value="${account.roleName}"/>
+                                    <c:out value="${account.role}"/>
                                 </div>
                                 <div id="cell" class="orgname">
                                     <c:out value="${account.orgName}"/>

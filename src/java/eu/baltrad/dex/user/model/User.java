@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -32,12 +32,14 @@ public class User implements Comparable<User> {
 
     private int id;
     private String name;
+    private String role;
     private String password;
     private String orgName;
     private String orgUnit;
     private String locality;
     private String state;
     private String countryCode;
+    private String nodeAddress;
     
     /**
      * Default constructor.
@@ -45,8 +47,7 @@ public class User implements Comparable<User> {
     public User() {}
     
     /**
-     * Constructor supporting login mechanism.
-     * 
+     * Constructor supporting login controller.
      * @param name User name
      * @param password User password
      */
@@ -57,25 +58,54 @@ public class User implements Comparable<User> {
     
     /**
      * Constructor.
-     * @param id
-     * @param name
-     * @param password
-     * @param orgName
-     * @param orgUnit
-     * @param locality
-     * @param state
-     * @param countryCode
+     * @param name User name
+     * @param password Password
+     * @param orgName Organization name
+     * @param orgUnit Unit name
+     * @param locality Locality (city)
+     * @param state State (country)
+     * @param countryCode 2-letter country code
+     * @param nodeAddress HTTP address 
      */
-    public User(int id, String name, String password, String orgName, 
-            String orgUnit, String locality, String state, String countryCode) {
-        this.id = id;
+    public User(String name, String role, String password, 
+            String orgName, String orgUnit, String locality, String state, 
+            String countryCode, String nodeAddress) {
         this.name = name;
+        this.role = role;
         this.password = password;
         this.orgName = orgName;
         this.orgUnit = orgUnit;
         this.locality = locality;
         this.state = state;
         this.countryCode = countryCode;
+        this.nodeAddress = nodeAddress;
+    }
+    
+    /**
+     * Constructor.
+     * @param id Record id
+     * @param name User name
+     * @param password Password
+     * @param orgName Organization name
+     * @param orgUnit Unit name
+     * @param locality Locality (city)
+     * @param state State (country)
+     * @param countryCode 2-letter country code
+     * @param nodeAddress HTTP address 
+     */
+    public User(int id, String name, String role, String password, 
+            String orgName, String orgUnit, String locality, String state, 
+            String countryCode, String nodeAddress) {
+        this.id = id;
+        this.name = name;
+        this.role = role;
+        this.password = password;
+        this.orgName = orgName;
+        this.orgUnit = orgUnit;
+        this.locality = locality;
+        this.state = state;
+        this.countryCode = countryCode;
+        this.nodeAddress = nodeAddress;
     }
     
     /**
@@ -101,7 +131,11 @@ public class User implements Comparable<User> {
         User user = (User) obj; 
         return this.getName() != null && 
                this.getName().equals(user.getName()) &&
-               this.getOrgName() != null && 
+               this.getRole() != null && 
+               this.getRole().equals(user.getRole()) && 
+               //this.getPassword() != null && 
+               //this.getPassword().equals(user.getPassword()) && 
+               this.getOrgName() != null &&
                this.getOrgName().equals(user.getOrgName()) &&
                this.getOrgUnit() != null && 
                this.getOrgUnit().equals(user.getOrgUnit()) &&
@@ -110,7 +144,9 @@ public class User implements Comparable<User> {
                this.getState() != null &&
                this.getState().equals(user.getState()) &&
                this.getCountryCode() != null &&
-               this.getCountryCode().equals(user.getCountryCode());
+               this.getCountryCode().equals(user.getCountryCode()) &&
+               this.getNodeAddress() != null && 
+               this.getNodeAddress().equals(user.getNodeAddress());
     }
     
     /**
@@ -123,6 +159,8 @@ public class User implements Comparable<User> {
         int result = 1;
         result = prime * result + ((this.getName() == null) ? 
                 0 : this.getName().hashCode());
+        result = prime * result + ((this.getRole() == null) ? 
+                0 : this.getRole().hashCode());
         result = prime * result + ((this.getPassword() == null) ? 
                 0 : this.getPassword().hashCode());
         result = prime * result + ((this.getOrgName() == null) ? 
@@ -135,48 +173,51 @@ public class User implements Comparable<User> {
                 0 : this.getState().hashCode());
         result = prime * result + ((this.getCountryCode() == null) ? 
                 0 : this.getCountryCode().hashCode());
+        result = prime * result + ((this.getNodeAddress() == null) ? 
+                0 : this.getNodeAddress().hashCode());
         return result;
     }
     
-    
     /**
-     * Gets user id.
-     *
      * @return User id
      */
     public int getId() { return id; }
     
     /**
-     * Sets user id.
-     *
      * @param id User id
      */
     public void setId( int id ) { this.id = id; }
     
     /**
-     * Method gets user name.
-     *
      * @return User name
      */
     public String getName() { return name; }
     
     /**
-     * Method sets user name.
-     *
      * @param name User name
      */
     public void setName( String name ) { this.name = name; }
     
     /**
-     * Gets password.
-     * 
+     * @return the roleName
+     */
+    public String getRole() {
+        return role;
+    }
+
+    /**
+     * @param roleName the roleName to set
+     */
+    public final void setRole(String role) {
+        this.role = role;
+    }
+    
+    /**
      * @return Password
      */
     public String getPassword() { return password; }
     
     /**
-     * Sets password as hash.
-     * 
      * @param password Password to set
      */
     public void setPassword( String password ) {
@@ -251,6 +292,20 @@ public class User implements Comparable<User> {
      */
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
+    }
+
+    /**
+     * @return the nodeAddress
+     */
+    public String getNodeAddress() {
+        return nodeAddress;
+    }
+
+    /**
+     * @param nodeAddress the nodeAddress to set
+     */
+    public final void setNodeAddress(String nodeAddress) {
+        this.nodeAddress = nodeAddress;
     }
     
 }

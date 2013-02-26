@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -22,12 +22,12 @@
 package eu.baltrad.dex.user.controller;
 
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.Account;
-import eu.baltrad.dex.user.manager.IAccountManager;
+import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.validator.PasswordValidator;
 import eu.baltrad.dex.auth.manager.SecurityManager;
 import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +41,7 @@ import org.springframework.ui.ModelMap;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.springframework.validation.FieldError;
 
 /**
  * Enables password change functionality for non-admin users.
@@ -64,7 +65,7 @@ public class ChangeUserPasswordController {
     private static final String OK_MSG_KEY = "message";
     private static final String ERROR_MSG_KEY = "error";
     
-    private IAccountManager accountManager;
+    private IUserManager userManager;
     private PasswordValidator validator;
     private MessageResourceUtil messages;
     private Logger log;
@@ -84,9 +85,9 @@ public class ChangeUserPasswordController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public String setupForm(ModelMap model, HttpServletRequest request) {
-        User user = SecurityManager.getSessionUser(request.getSession());
-        Account account = accountManager.load(user.getId()); 
-        model.addAttribute(USER_ACCOUNT_MODEL_KEY, account);
+        User user = userManager.load(SecurityManager
+                .getSessionUser(request.getSession()).getId()); 
+        model.addAttribute(USER_ACCOUNT_MODEL_KEY, user);
         return FORM_VIEW;
     }
     
@@ -98,23 +99,23 @@ public class ChangeUserPasswordController {
      * @return Form view name
      */
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(ModelMap model, @ModelAttribute("user_account") 
-            Account account, BindingResult result) {
-        validator.validate(account, result);
+    public String processSubmit(HttpServletRequest request, ModelMap model, 
+            @ModelAttribute("user_account") User user, BindingResult result) {
+        validator.validate(request, user, result);
         if (result.hasErrors()) {
             return FORM_VIEW;
         }
         try {
-            accountManager.updatePassword(account.getId(), 
+            userManager.updatePassword(user.getId(), 
                     MessageDigestUtil.createHash(
-                        "MD5", 16, account.getPassword()));
+                        "MD5", 16, user.getPassword()));
             String msg = messages.getMessage(CHANGE_PASSWORD_OK_MSG_KEY, 
-                            new Object[] {account.getName()});
+                            new Object[] {user.getName()});
             model.addAttribute(OK_MSG_KEY, msg);
             log.warn(msg);        
         } catch (Exception e) {
             String msg = messages.getMessage(CHANGE_PASSWORD_ERROR_MSG_KEY, 
-                            new Object[] {account.getName()});
+                            new Object[] {user.getName()});
             model.addAttribute(ERROR_MSG_KEY, msg);
             log.error(msg, e);   
         }
@@ -125,8 +126,8 @@ public class ChangeUserPasswordController {
      * @param userManager the userManager to set
      */
     @Autowired
-    public void setAccountManager(IAccountManager accountManager) {
-        this.accountManager = accountManager;
+    public void setUserManager(IUserManager userManager) {
+        this.userManager = userManager;
     }
     
     /**

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,16 +21,10 @@
 
 package eu.baltrad.dex.user.manager.impl;
 
-import eu.baltrad.dex.net.manager.INodeManager;
-import eu.baltrad.dex.net.model.impl.Node;
+import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.manager.IRoleManager;
-import eu.baltrad.dex.user.manager.IAccountManager;
-import eu.baltrad.dex.user.model.Account;
-import eu.baltrad.dex.user.model.mapper.AccountMapper;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.model.mapper.UserMapper;
 
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +32,17 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import java.util.List;
 
 /**
  * User manager.
@@ -53,23 +51,22 @@ import org.springframework.jdbc.support.KeyHolder;
  * @version 1.2.1
  * @since 1.2.1
  */
-public class AccountManager implements IAccountManager {
+public class UserManager implements IUserManager {
 
     /** JDBC template */
     private SimpleJdbcOperations jdbcTemplate;
     
-    /** Dependent managers */
+    /** Dependent manager */
     private IRoleManager roleManager;
-    private INodeManager nodeManager;
     
     /** Row mapper */
-    private AccountMapper mapper;
+    private UserMapper mapper;
     
     /**
      * Constructor.
      */
-    public AccountManager() {
-        this.mapper = new AccountMapper();
+    public UserManager() {
+        this.mapper = new UserMapper();
     }
     
     /**
@@ -87,45 +84,28 @@ public class AccountManager implements IAccountManager {
     public void setRoleManager(IRoleManager roleManager) {
         this.roleManager = roleManager;
     }
-
-    /**
-     * @param nodeManager the nodeManager to set
-     */
-    @Autowired
-    public void setNodeManager(INodeManager nodeManager) {
-        this.nodeManager = nodeManager;
-    }
     
     /**
      * Load all user accounts.
      * @return List of all registered user accounts.
      */
-    public List<Account> load() {
-        String sql = "SELECT dex_users.*, dex_roles.name AS role_name, " + 
-                "dex_nodes.address AS node_address FROM dex_users, " + 
-                "dex_roles, dex_nodes, dex_users_roles, dex_users_nodes " + 
-                "WHERE dex_users_roles.user_id = dex_users.id AND " +
-                "dex_users_roles.role_id = dex_roles.id AND " + 
-                "dex_users_nodes.user_id = dex_users.id AND " + 
-                "dex_users_nodes.node_id = dex_nodes.id;";
-        List<Account> accounts = jdbcTemplate.query(sql, mapper);
-	return accounts;
+    public List<User> load() {
+        String sql = "SELECT u.*, r.name AS role " +
+                "FROM dex_users u, dex_roles r, dex_users_roles ur " +
+                "WHERE ur.user_id = u.id AND ur.role_id = r.id;";
+        return jdbcTemplate.query(sql, mapper);
     }
     
     /**
-     * Load account by id.
+     * Load user account by id.
      * @param id Account id
      * @return Account with a given id.
      */
-    public Account load(int id) {
-        String sql = "SELECT dex_users.*, dex_roles.name AS role_name, " +
-                "dex_nodes.address AS node_address FROM dex_users, " + 
-                "dex_roles, dex_nodes, dex_users_roles, dex_users_nodes " + 
-                "WHERE dex_users_roles.user_id = dex_users.id AND " + 
-                "dex_users_roles.role_id = dex_roles.id AND " + 
-                "dex_users_nodes.user_id = dex_users.id AND " + 
-                "dex_users_nodes.node_id = dex_nodes.id AND " + 
-                "dex_users.id = ?";
+    public User load(int id) {
+        String sql = "SELECT dex_users.*, dex_roles.name AS role " + 
+                "FROM dex_users u, dex_roles r, dex_users_roles ur " + 
+                "WHERE ur.user_id = u.id AND ur.role_id = r.id " +
+                "AND u.id = ?;";
         try {
             return jdbcTemplate.queryForObject(sql, mapper, id);
         } catch (EmptyResultDataAccessException e) {
@@ -134,19 +114,15 @@ public class AccountManager implements IAccountManager {
     }
     
     /**
-     * Load account by name.
+     * Load user account by name.
      * @param name Account name
      * @return Account with a given user name
      */
-    public Account load(String name) {
-        String sql = "SELECT dex_users.*, dex_roles.name AS role_name, " +
-                "dex_nodes.address AS node_address FROM dex_users, " + 
-                "dex_roles, dex_nodes, dex_users_roles, dex_users_nodes " + 
-                "WHERE dex_users_roles.user_id = dex_users.id AND " + 
-                "dex_users_roles.role_id = dex_roles.id AND " + 
-                "dex_users_nodes.user_id = dex_users.id AND " + 
-                "dex_users_nodes.node_id = dex_nodes.id AND " +
-                "dex_users.name = ?";
+    public User load(String name) {
+        String sql = "SELECT u.*, r.name AS role " + 
+                "FROM dex_users u, dex_roles r, dex_users_roles ur " + 
+                "WHERE ur.user_id = u.id AND ur.role_id = r.id " +
+                "AND u.name = ?;";
         try {
             return jdbcTemplate.queryForObject(sql, mapper, name);
         } catch (EmptyResultDataAccessException e) {
@@ -155,15 +131,14 @@ public class AccountManager implements IAccountManager {
     }
     
     /**
-     * Returns distinct names of users.
+     * Returns distinct users.
      * @return List containing distinct user names
      */
-    public List<String> loadUsers() {
-        String sql = "SELECT DISTINCT dex_users.name AS user_name FROM " + 
-                "dex_users, dex_subscriptions, dex_subscriptions_users " +
-                "WHERE dex_subscriptions_users.subscription_id = " + 
-                "dex_subscriptions.id AND dex_subscriptions_users.user_id = " +
-                "dex_users.id AND dex_subscriptions.type = 'peer';";			
+    public List<String> loadPeers() {
+        String sql = "SELECT DISTINCT u.name AS user_name, r.name AS role " +
+                "FROM dex_users u, dex_roles r, dex_users_roles ur " + 
+                "WHERE ur.user_id = u.id AND ur.role_id = r.id " + 
+                "AND r.name = 'peer';";			
 
         return jdbcTemplate.query(sql, new ParameterizedRowMapper<String>() {
                 public String mapRow(ResultSet rs, int i) throws SQLException {
@@ -173,19 +148,48 @@ public class AccountManager implements IAccountManager {
     }
     
     /**
-     * Store account object in the db.
-     * @param account User to store
+     * Returns distinct operators.
+     * @return List containing distinct operators.
+     */
+    public List<User> loadOperators() {
+        String sql = "SELECT DISTINCT u.*, r.name AS role " + 
+                "FROM dex_users u, dex_roles r, dex_users_roles ur, " + 
+                "dex_subscriptions s, dex_subscriptions_users su " + 
+                "WHERE ur.user_id = u.id AND ur.role_id = r.id AND " + 
+                "su.subscription_id = s.id AND su.user_id = u.id AND " + 
+                "s.type = 'local';";
+        return jdbcTemplate.query(sql, mapper);
+    }
+    
+    /**
+     * Returns distinct users.
+     * @return List containing distinct users.
+     */
+    public List<User> loadUsers() {
+        String sql = "SELECT DISTINCT u.*, r.name AS role " + 
+                "FROM dex_users u, dex_roles r, dex_users_roles ur, " + 
+                "dex_subscriptions s, dex_subscriptions_users su " + 
+                "WHERE ur.user_id = u.id AND ur.role_id = r.id AND " + 
+                "su.subscription_id = s.id AND su.user_id = u.id AND " + 
+                "s.type = 'peer';";
+        return jdbcTemplate.query(sql, mapper);
+    }
+    
+    
+    /**
+     * Store user account object in the db.
+     * @param user User account to store
      * @return Auto-generated record id
      * @throw Exception
      */
     @Transactional(propagation= Propagation.REQUIRED,
             rollbackFor=Exception.class)
-    public int store(Account account) throws Exception {
+    public int store(User user) throws Exception {
         
         final String sql = "INSERT INTO dex_users (name, password, " +
-                    "org_name, org_unit, locality, state, country_code) "
-                    + "VALUES (?,?,?,?,?,?,?)";
-        final Account accnt = account;
+                    "org_name, org_unit, locality, state, country_code, " + 
+                    "node_address) VALUES (?,?,?,?,?,?,?,?)";
+        final User usr = user;
         
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -195,22 +199,20 @@ public class AccountManager implements IAccountManager {
                             Connection conn) throws SQLException {
                         PreparedStatement ps = conn.prepareStatement(sql,
                                 new String[] {"id"});
-                        ps.setString(1, accnt.getName());
-                        ps.setString(2, accnt.getPassword());
-                        ps.setString(3, accnt.getOrgName());
-                        ps.setString(4, accnt.getOrgUnit());
-                        ps.setString(5, accnt.getLocality());
-                        ps.setString(6, accnt.getState());
-                        ps.setString(7, accnt.getCountryCode());
+                        ps.setString(1, usr.getName());
+                        ps.setString(2, usr.getPassword());
+                        ps.setString(3, usr.getOrgName());
+                        ps.setString(4, usr.getOrgUnit());
+                        ps.setString(5, usr.getLocality());
+                        ps.setString(6, usr.getState());
+                        ps.setString(7, usr.getCountryCode());
+                        ps.setString(8, usr.getNodeAddress());
                         return ps;
                     }
                 }, keyHolder);
             int accountId = keyHolder.getKey().intValue();
-            int roleId = roleManager.load(account.getRoleName()).getId();
+            int roleId = roleManager.load(user.getRole()).getId();
             roleManager.store(accountId, roleId);
-            int nodeId = nodeManager.store(new Node(account.getName(), 
-                    account.getNodeAddress()));
-            nodeManager.store(accountId, nodeId);
             return accountId;
         } catch (DataAccessException e) {
             throw new Exception(e.getMessage());
@@ -218,28 +220,28 @@ public class AccountManager implements IAccountManager {
     }
     
     /**
-     * Update user object in the db. 
-     * @param user User to store
+     * Update user account object in the db. 
+     * @param user User account to store
      * @throws Exception 
      */
     @Transactional(propagation= Propagation.REQUIRED,
             rollbackFor=Exception.class)
-    public void update(Account account) throws Exception { 
+    public void update(User user) throws Exception { 
         try {
             jdbcTemplate.update("UPDATE dex_users SET name = ?, " + 
-                    "org_name = ?, org_unit = ?, locality = ?,"
-                    + "state = ?, country_code = ? WHERE id = ?",
-                account.getName(),
-                account.getOrgName(),
-                account.getOrgUnit(),
-                account.getLocality(),
-                account.getState(),
-                account.getCountryCode(),
-                account.getId());
-            int roleId = roleManager.load(account.getRoleName()).getId();
-            roleManager.update(roleId, account.getId());
-            int nodeId = nodeManager.loadByUser(account.getId()).getId();
-            nodeManager.update(account.getId(), nodeId);
+                    "org_name = ?, org_unit = ?, locality = ?, "
+                    + "state = ?, country_code = ?, node_address = ? "
+                    + "WHERE id = ?",
+                user.getName(),
+                user.getOrgName(),
+                user.getOrgUnit(),
+                user.getLocality(),
+                user.getState(),
+                user.getCountryCode(),
+                user.getNodeAddress(),
+                user.getId());
+            int roleId = roleManager.load(user.getRole()).getId();
+            roleManager.update(roleId, user.getId());
         } catch (DataAccessException e) {
             throw new Exception(e.getMessage());
         }

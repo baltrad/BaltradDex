@@ -26,7 +26,7 @@ import eu.baltrad.dex.net.util.UrlValidatorUtil;
 import eu.baltrad.dex.net.util.json.IJsonUtil;
 import eu.baltrad.dex.net.util.json.impl.JsonUtil;
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.datasource.model.DataSource;
 
 import org.apache.http.client.methods.HttpPost;
@@ -154,18 +154,18 @@ public class DefaultRequestFactory implements RequestFactory {
     
     /**
      * Creates data source listing request.
-     * @param account Requesting user's account
+     * @param user Requesting user's account
      * @return Http POST request
      * @throws RuntimeException
      */
-    public HttpPost createDataSourceListingRequest(Account account) throws 
+    public HttpPost createDataSourceListingRequest(User user) throws 
             RuntimeException {
         try {
             HttpPost httpPost = new HttpPost(
                 getRequestUri("datasource_listing.htm"));
-            String json = jsonUtil.userAccountToJson(account);
+            String json = jsonUtil.userAccountToJson(user);
             httpPost.setEntity(new StringEntity(json, "UTF-8"));
-            httpPost.addHeader("Node-Name", account.getName());
+            httpPost.addHeader("Node-Name", user.getName());
             httpPost.addHeader("Content-Type", "application/json");  
             httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
                 json.getBytes()));
@@ -179,19 +179,19 @@ public class DefaultRequestFactory implements RequestFactory {
     
     /**
      * Creates start subscription request.
-     * @param account Requesting user's account
+     * @param user Requesting user's account
      * @param dataSources List of requested data sources  
      * @return Http POST request
      * @throws RuntimeException
      */
-    public HttpPost createStartSubscriptionRequest(Account account, 
+    public HttpPost createStartSubscriptionRequest(User user, 
             Set<DataSource> dataSources) throws RuntimeException {
         try {
             HttpPost httpPost = new HttpPost(
                 getRequestUri("start_subscription.htm"));
             String json = jsonUtil.dataSourcesToJson(dataSources);
             httpPost.setEntity(new StringEntity(json, "UTF-8"));
-            httpPost.addHeader("Node-Name", account.getName());
+            httpPost.addHeader("Node-Name", user.getName());
             httpPost.addHeader("Content-Type", "application/json");
             httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
                 json.getBytes()));
@@ -205,19 +205,19 @@ public class DefaultRequestFactory implements RequestFactory {
     
     /**
      * Creates update subscription request.
-     * @param account Requesting user's account
+     * @param user Requesting user's account
      * @param subscriptions List of requested subscriptions
      * @return Http POST request
      * @throws RuntimeException
      */
-    public HttpPost createUpdateSubscriptionRequest(Account account, 
+    public HttpPost createUpdateSubscriptionRequest(User user, 
             List<Subscription> subscriptions) throws RuntimeException {
         try {
             HttpPost httpPost = new HttpPost(
                 getRequestUri("update_subscription.htm"));
             String json = jsonUtil.subscriptionsToJson(subscriptions);
             httpPost.setEntity(new StringEntity(json, "UTF-8"));
-            httpPost.addHeader("Node-Name", account.getName());
+            httpPost.addHeader("Node-Name", user.getName());
             httpPost.addHeader("Content-Type", "application/json");
             httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
                 json.getBytes()));
@@ -231,18 +231,18 @@ public class DefaultRequestFactory implements RequestFactory {
     
     /**
      * Creates post data file request.
-     * @param @param account Requesting user's account
+     * @param user Requesting user's account
      * @param fileContent File content as stream
      * @return Http POST request
      * @throws RuntimeException
      */
-    public HttpPost createPostFileRequest(Account account, 
+    public HttpPost createPostFileRequest(User user, 
             InputStream fileContent) throws RuntimeException {
         try {
             HttpPost httpPost = new HttpPost(getRequestUri("post_file.htm"));
             httpPost.setEntity(new ByteArrayEntity(
                     IOUtils.toByteArray(fileContent)));
-            httpPost.addHeader("Node-Name", account.getName());
+            httpPost.addHeader("Node-Name", user.getName());
             httpPost.addHeader("Content-Type", "application/x-hdf5");
             httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
                 httpPost.getURI().toString().getBytes()));
@@ -255,17 +255,17 @@ public class DefaultRequestFactory implements RequestFactory {
     
     /**
      * Creates post message request.
-     * @param account Requesting user's account
+     * @param user Requesting user's account
      * @param message Message to post
      * @return Http POST request 
      * @throws RuntimeException
      */
-    public HttpPost createPostMessageRequest(Account account, String message) 
+    public HttpPost createPostMessageRequest(User user, String message) 
             throws RuntimeException {
         try {
             HttpPost httpPost = new HttpPost(getRequestUri("post_message.htm"));
             httpPost.setEntity(new StringEntity(message, "UTF-8"));
-            httpPost.addHeader("Node-Name", account.getName());
+            httpPost.addHeader("Node-Name", user.getName());
             httpPost.addHeader("Content-Type", "text/html");
             httpPost.addHeader("Content-MD5", Base64.encodeBase64String(
                 message.getBytes()));
@@ -279,18 +279,18 @@ public class DefaultRequestFactory implements RequestFactory {
     
     /**
      * Creates post public key request.
-     * @param account Requesting user's account
+     * @param user Requesting user's account
      * @param keyContent Key content as stream
      * @return HTTP POST request
      * @throws RuntimeException
      */
-    public HttpPost createPostKeyRequest(Account account, 
+    public HttpPost createPostKeyRequest(User user, 
             InputStream keyContent) throws RuntimeException {
         try {
             HttpPost httpPost = new HttpPost(getRequestUri("post_key.htm"));
             httpPost.setEntity(new ByteArrayEntity(
                     IOUtils.toByteArray(keyContent)));
-            httpPost.addHeader("Node-Name", account.getName());
+            httpPost.addHeader("Node-Name", user.getName());
             httpPost.addHeader("Content-Type", "application/zip");
             httpPost.addHeader("Content-MD5", DigestUtils.md5Hex(keyContent));
             httpPost.addHeader("Date", dateFormat.format(new Date()));

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -48,9 +48,8 @@ public class SubscriptionMapper implements ParameterizedRowMapper<Subscription>
         return new Subscription(
                 rs.getInt("id"),
                 rs.getLong("time_stamp"),
-                rs.getString("type"), 
-                rs.getString("operator_name"),
-                rs.getString("user_name"),
+                rs.getString("type"),
+                rs.getString("user"),
                 rs.getString("datasource"),
                 rs.getBoolean("active"),
                 rs.getBoolean("sync"));

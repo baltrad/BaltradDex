@@ -150,7 +150,7 @@ public class RemoveSubscriptionController {
         TransactionStatus status = txManager.getTransaction(def);
         try {
             for (Subscription s : selectedDownloads) {
-                String[] msgArgs = {s.getOperator(), s.getDataSource()};
+                String[] msgArgs = {s.getUser(), s.getDataSource()};
                 // remove peer data sources
                 int dataSourceId = dataSourceManager.load(s.getDataSource(), 
                         DataSource.PEER).getId();

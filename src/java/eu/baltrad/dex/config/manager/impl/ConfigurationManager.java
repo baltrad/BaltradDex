@@ -25,8 +25,8 @@ import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.config.model.RegistryConfiguration;
-import eu.baltrad.dex.user.manager.IAccountManager;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.ServletContextUtil;
 
@@ -57,7 +57,7 @@ public class ConfigurationManager implements IConfigurationManager,
     private LogConfiguration logConf;
     private RegistryConfiguration registryConf;
     
-    private IAccountManager accountManager;
+    private IUserManager userManager;
     
     private Logger log;
     
@@ -77,14 +77,13 @@ public class ConfigurationManager implements IConfigurationManager,
      * Create local peer account.
      */
     public void afterPropertiesSet() {
-        Account account = new Account(appConf.getNodeName(), "http://localhost",
+        User user = new User(appConf.getNodeName(), Role.NODE, null,
                 appConf.getOrgName(), appConf.getOrgUnit(), 
                 appConf.getLocality(), appConf.getState(), 
-                appConf.getCountryCode());
-        account.setRoleName(Role.PEER);
+                appConf.getCountryCode(), appConf.getNodeAddress());
         try {
-            if (accountManager.load(appConf.getNodeName()) == null) {
-                accountManager.store(account);
+            if (userManager.load(appConf.getNodeName()) == null) {
+                userManager.store(user);
                 log.warn("Created local peer account: " 
                         + appConf.getNodeName());
             }
@@ -305,11 +304,11 @@ public class ConfigurationManager implements IConfigurationManager,
     }
 
     /**
-     * @param accountManager the accountManager to set
+     * @param userManager the userManager to set
      */
     @Autowired
-    public void setAccountManager(IAccountManager accountManager) {
-        this.accountManager = accountManager;
+    public void setUserManager(IUserManager userManager) {
+        this.userManager = userManager;
     }
     
 }

@@ -19,38 +19,38 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.net.manager;
+package eu.baltrad.dex.user.manager;
 
-import eu.baltrad.dex.net.model.impl.Node;
 import eu.baltrad.dex.user.model.User;
+
 import java.util.List;
 
 /**
- * Node manager interface.
+ * User manager interface.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.2.2
- * @since 1.2.2
+ * @version 1.2.1
+ * @since 1.2.1
  */
-public interface INodeManager {
+public interface IUserManager {
     
-    public List<Node> load();
+    public List<User> load();
     
-    public Node load(int id);
+    public User load(int id);
     
-    public Node load(String name);
+    public User load(String name);
     
-    public Node loadByUser(int id);
+    public List<String> loadPeers(); 
     
-    public List<Node> loadOperators();
+    public List<User> loadUsers();
     
-    public int store(Node node);
+    public List<User> loadOperators();
     
-    public int store(int userId, int nodeId);
+    public int store(User user) throws Exception;
     
-    public int update(Node node);
+    public void update(User user) throws Exception;
     
-    public int update(int userId, int nodeId);
+    public int updatePassword(int id, String password) throws Exception;
     
     public int delete(int id);
     

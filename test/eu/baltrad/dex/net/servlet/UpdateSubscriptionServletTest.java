@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -26,7 +26,7 @@ import eu.baltrad.dex.net.util.json.IJsonUtil;
 import eu.baltrad.dex.net.util.json.impl.JsonUtil;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -64,14 +64,12 @@ public class UpdateSubscriptionServletTest {
     
     private static final String JSON_SUBSCRIPTIONS = "[{\"id\":1,\"type\":\"" + 
             "download\",\"date\":1340189763867,\"active\":true,\"user\":" +
-            "\"User1\",\"dataSource\":\"DataSource1\",\"operator\":\"" + 
-            "Operator1\",\"syncronized\":true},{\"id\":2,\"type\":\"download" + 
-            "\",\"date\":1340189763867,\"active\":true,\"user\":\"" + 
-            "User2\",\"dataSource\":\"DataSource2\",\"operator\":\"Operator2" + 
-            "\",\"syncronized\":false},{\"id\":3,\"type\":\"upload\",\"" +
-            "date\":1340189763867,\"active\":true,\"user\":\"User3\",\"" +
-            "dataSource\":\"DataSource3\",\"operator\":\"Operator3\",\"" + 
-            "syncronized\":true}]";
+            "\"User1\",\"dataSource\":\"DataSource1\",\"syncronized\":true}," +
+            "{\"id\":2,\"type\":\"download\",\"date\":1340189763867," + 
+            "\"active\":true,\"user\":\"User2\",\"dataSource\":" + 
+            "\"DataSource2\",\"syncronized\":false},{\"id\":3,\"type\":" + 
+            "\"upload\",\"date\":1340189763867,\"active\":true,\"user\":" + 
+            "\"User3\",\"dataSource\":\"DataSource3\",\"syncronized\":true}]";
     
     private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
     
@@ -86,8 +84,8 @@ public class UpdateSubscriptionServletTest {
     
     class GSServlet extends UpdateSubscriptionServlet {
         public GSServlet() {
-            this.localNode = new Account(1, "test", "s3cret", "org", "unit", 
-                    "locality", "state", "XX", "user", "http://localhost:8084");
+            this.localNode = new User(1, "test", "user", "s3cret", "org", "unit", 
+                    "locality", "state", "XX", "http://localhost:8084");
         }
         @Override
         public void initConfiguration() {}
@@ -149,7 +147,6 @@ public class UpdateSubscriptionServletTest {
         request.addHeader("Authorization", "test.baltrad.eu" + ":" + 
             "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_");   
         request.addHeader("Node-Name", "test.baltrad.eu");
-        request.addHeader("Node-Address", "http://test.baltrad.eu");
     }
     
     @Test
@@ -310,6 +307,5 @@ public class UpdateSubscriptionServletTest {
         List<Subscription> subs = 
                 jsonUtil.jsonToSubscriptions(response.getContentAsString()); 
         assertEquals(3, subs.size());
-    }   
-    
+    }
 }

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -27,8 +27,8 @@ import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.request.impl.NodeRequest;
 import eu.baltrad.dex.net.response.impl.NodeResponse;
-import eu.baltrad.dex.user.manager.IAccountManager;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
@@ -77,13 +77,13 @@ public class DataSourceListServlet extends HttpServlet {
     
     private IConfigurationManager confManager;
     private Authenticator authenticator;
-    private IAccountManager accountManager;
+    private IUserManager userManager;
     private IDataSourceManager dataSourceManager;
     private IJsonUtil jsonUtil;
     private MessageResourceUtil messages;
     private Logger log;
     
-    protected Account localNode;
+    protected User localNode;
     
     /**
      * Default constructor.
@@ -98,13 +98,13 @@ public class DataSourceListServlet extends HttpServlet {
     protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
                 confManager.getAppConf().getKeystoreDir());
-        this.localNode = new Account(confManager.getAppConf().getNodeName(),
-                confManager.getAppConf().getNodeAddress(),
-                confManager.getAppConf().getOrgName(),
+        this.localNode = new User(confManager.getAppConf().getNodeName(),
+                Role.NODE, null, confManager.getAppConf().getOrgName(),
                 confManager.getAppConf().getOrgUnit(),
                 confManager.getAppConf().getLocality(),
                 confManager.getAppConf().getState(),
-                confManager.getAppConf().getCountryCode());   
+                confManager.getAppConf().getCountryCode(),
+                confManager.getAppConf().getNodeAddress());   
     }
     
     /**
@@ -178,24 +178,23 @@ public class DataSourceListServlet extends HttpServlet {
                 // TODO User account will be created when 
                 // keys are exchanged
                 String json = readRequest(request);
-                Account peer = jsonUtil.jsonToUserAccount(json);
+                User peer = jsonUtil.jsonToUserAccount(json);
                 // account not found
-                if (accountManager.load(peer.getName()) == null) {
-                    peer.setRoleName(Role.PEER);
+                if (userManager.load(peer.getName()) == null) {
+                    peer.setRole(Role.PEER);
                     try {
-                        accountManager.store(peer);
+                        userManager.store(peer);
                         log.warn("New peer account created: " + peer.getName());
                     } catch (Exception e) {
                         throw e;
                     }
-                    writeResponse(res, jsonUtil.userAccountToJson(peer),
+                    writeResponse(res, jsonUtil.userAccountToJson(localNode),
                             HttpServletResponse.SC_CREATED);
                 } else {
                     // account exists
-                    Account account = accountManager.load(peer.getName());
+                    User user = userManager.load(peer.getName());
                     List<DataSource> userDataSources = dataSourceManager
-                            .loadByUser(account.getId());
-
+                            .loadByUser(user.getId());
                     writeResponse(res, jsonUtil.dataSourcesToJson(
                             new HashSet<DataSource>(userDataSources)),
                             HttpServletResponse.SC_OK);
@@ -223,11 +222,11 @@ public class DataSourceListServlet extends HttpServlet {
     }
 
     /**
-     * @param accountManager the accountManager to set
+     * @param userManager the userManager to set
      */
     @Autowired
-    public void setAccountManager(IAccountManager accountManager) {
-        this.accountManager = accountManager;
+    public void setUserManager(IUserManager userManager) {
+        this.userManager = userManager;
     }
     
     /**

@@ -130,8 +130,8 @@
                 autowire="byType">          
     </beans:bean>
     
-    <beans:bean id="accountManager" 
-                class="eu.baltrad.dex.user.manager.impl.AccountManager"
+    <beans:bean id="userManager" 
+                class="eu.baltrad.dex.user.manager.impl.UserManager"
                 autowire="byType">          
     </beans:bean>
     

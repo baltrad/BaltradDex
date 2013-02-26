@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.user.controller;
 
-import eu.baltrad.dex.user.model.Account;
-import eu.baltrad.dex.user.manager.impl.AccountManager;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.manager.impl.UserManager;
 import eu.baltrad.dex.user.validator.PasswordValidator;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.util.WebValidator;
@@ -39,6 +39,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.ui.ModelMap;
 
 import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Modify password for a given user account.
@@ -63,7 +65,7 @@ public class ChangePasswordController {
     private static final String OK_MSG_KEY = "message";
     private static final String ERROR_MSG_KEY = "error";
     
-    private AccountManager accountManager;
+    private UserManager userManager;
     private PasswordValidator validator;
     private MessageResourceUtil messages;
     private Logger log;    
@@ -84,41 +86,43 @@ public class ChangePasswordController {
     @RequestMapping(method = RequestMethod.GET)
     public String setupForm(@RequestParam(value="user_id", required=false) 
             String userId, ModelMap model) {
-        Account account;
+        User user;
         if (WebValidator.validate(userId)) {
-            account = accountManager.load(Integer.parseInt(userId));
+            user = userManager.load(Integer.parseInt(userId));
         } else {
-            account = new Account();
+            user = new User();
         } 
-        model.addAttribute(USER_ACCOUNT_MODEL_KEY, account);
+        model.addAttribute(USER_ACCOUNT_MODEL_KEY, user);
         return FORM_VIEW;
     }
     
     /**
      * Update user password
-     * @param account User account 
+     * @param user User account 
+     * @param request HTTP servlet request
      * @param result Form binding result
      * @param model Model map
      * @return View name
      */
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("user_account") Account account,
-                BindingResult result, ModelMap model) {
-        validator.validate(account, result);
+    public String processSubmit(@ModelAttribute("user_account") User user,
+                HttpServletRequest request, BindingResult result, 
+                ModelMap model) {
+        validator.validate(request, user, result);
         if (result.hasErrors()) {
             return FORM_VIEW;
         }
         try {
-            accountManager.updatePassword(account.getId(), 
+            userManager.updatePassword(user.getId(), 
                     MessageDigestUtil.createHash(
-                        "MD5", 16, account.getPassword()));
+                        "MD5", 16, user.getPassword()));
             String msg = messages.getMessage(CHANGE_PASSWORD_OK_MSG_KEY, 
-                            new Object[] {account.getName()});
+                            new Object[] {user.getName()});
             model.addAttribute(OK_MSG_KEY, msg);
             log.warn(msg);        
         } catch (Exception e) {
             String msg = messages.getMessage(CHANGE_PASSWORD_ERROR_MSG_KEY, 
-                            new Object[] {account.getName()});
+                            new Object[] {user.getName()});
             model.addAttribute(ERROR_MSG_KEY, msg);
             log.error(msg, e);   
         }
@@ -126,11 +130,11 @@ public class ChangePasswordController {
     }
     
     /**
-     * @param accountManager 
+     * @param userManager 
      */
     @Autowired
-    public void setAccountManager(AccountManager accountManager) { 
-        this.accountManager = accountManager;
+    public void setUserManager(UserManager userManager) { 
+        this.userManager = userManager;
     }
 
     /**

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,13 +21,14 @@
 
 package eu.baltrad.dex.user.validator;
 
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
-import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Validates user account settings.
@@ -36,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @version 1.2.2
  * @since 1.0
  */
-public class AccountValidator implements Validator {
+public class AccountValidator {
 
     private static final int MIN_PASSWD_LENGTH = 8;
     private static final int COUNTRY_CODE_LENGTH = 2;
@@ -49,40 +50,47 @@ public class AccountValidator implements Validator {
      * @return True if class is supported, false otherwise
      */
     public boolean supports(Class clazz) {
-        return Account.class.equals(clazz);
+        return User.class.equals(clazz);
     }
     
     /**
      * Validates form object.
      *
+     * @param request HTTP servlet request
      * @param obj Form object
      * @param errors Errors object
      */
-    public void validate(Object command, Errors errors) {
-        Account account = (Account) command;
-        if (account == null) {
+    public void validate(HttpServletRequest request, Object command, 
+            Errors errors) {
+        User user = (User) command;
+        if (user == null) {
             return;
-        }    
+        }
+        
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", 
                 "saveaccount.missing.name",
                 messages.getMessage("saveaccount.missing.name"));
         // Password is only validated for new accounts
-        if (account.getId() == 0) {
+        if (user.getId() == 0) {
             ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password",
                     "saveaccount.missing.password",
                     messages.getMessage("saveaccount.missing.password"));
-            ValidationUtils.rejectIfEmptyOrWhitespace(errors, "repeatPassword",
-                    "saveaccount.missing.repeat_password",
-                    messages.getMessage("saveaccount.missing.repeat_password"));
-            if (account.getPassword().length() > 0 && 
-                    account.getPassword().length() < MIN_PASSWD_LENGTH) {
+            if (user.getPassword().length() > 0 && 
+                    user.getPassword().length() < MIN_PASSWD_LENGTH) {
                         errors.rejectValue("password", 
                         "saveaccount.invalid.password",
                         messages.getMessage("saveaccount.invalid.password"));
             }
-            if (account.getRepeatPassword().length() > 0 && 
-                !account.getPassword().equals(account.getRepeatPassword())) {
-                    errors.rejectValue("repeatPassword", 
+            String repeatPassword = request.getParameter("repeat_password");
+            if (user.getPassword().length() > MIN_PASSWD_LENGTH 
+                    && repeatPassword.isEmpty()) {
+                errors.rejectValue("password", 
+                    "saveaccount.missing.repeat_password",
+                    messages.getMessage("saveaccount.missing.repeat_password"));
+            }
+            if (repeatPassword.length() > 0 && 
+                !user.getPassword().equals(repeatPassword)) {
+                    errors.rejectValue("password", 
                         "saveaccount.mismatch.password",
                         messages.getMessage("saveaccount.mismatch.password"));
             }
@@ -102,8 +110,8 @@ public class AccountValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "countryCode",
                 "saveaccount.missing.country_code",
                 messages.getMessage("saveaccount.missing.country_code"));
-        if (account.getCountryCode().length() > 0 &&
-                account.getCountryCode().length() != COUNTRY_CODE_LENGTH) {
+        if (user.getCountryCode().length() > 0 &&
+                user.getCountryCode().length() != COUNTRY_CODE_LENGTH) {
             errors.rejectValue("countryCode", 
                     "saveaccount.invalid.country_code",
                     messages.getMessage("saveaccount.invalid.country_code"));

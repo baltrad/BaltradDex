@@ -22,16 +22,13 @@ Author     : szewczenko
 *******************************************************************************/
 
 DROP TABLE IF EXISTS dex_roles CASCADE;
-DROP TABLE IF EXISTS dex_nodes CASCADE;
 DROP TABLE IF EXISTS dex_users CASCADE;
 DROP TABLE IF EXISTS dex_users_roles;
-DROP TABLE IF EXISTS dex_users_nodes;
 DROP TABLE IF EXISTS dex_messages;
 DROP TABLE IF EXISTS dex_radars CASCADE;
 DROP TABLE IF EXISTS dex_subscriptions CASCADE;
 DROP TABLE IF EXISTS dex_subscriptions_users;
 DROP TABLE IF EXISTS dex_subscriptions_data_sources;
-DROP TABLE IF EXISTS dex_subscriptions_nodes;
 DROP TABLE IF EXISTS dex_delivery_registry CASCADE;
 DROP TABLE IF EXISTS dex_delivery_registry_users;
 DROP TABLE IF EXISTS dex_data_sources CASCADE;

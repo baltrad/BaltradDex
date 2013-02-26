@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -25,13 +25,12 @@ import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.util.json.impl.JsonUtil;
 import eu.baltrad.dex.net.util.json.IJsonUtil;
 import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.model.impl.Node;
-import eu.baltrad.dex.net.manager.INodeManager;
 import eu.baltrad.dex.net.util.*;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.net.controller.exception.InternalControllerException;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.net.controller.exception.InternalControllerException;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -65,6 +64,7 @@ import java.util.ArrayList;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 
 /**
  * Data source list controller test.
@@ -88,7 +88,7 @@ public class DataSourceListControllerTest {
     private IJsonUtil jsonUtilMock;
     private MessageResourceUtil messages;
     private DSLController classUnderTest;
-    private INodeManager nodeManagerMock;
+    private IUserManager  userManagerMock;
     private Authenticator authenticatorMock;
     private IHttpClientUtil httpClientMock;
     private Logger log;
@@ -96,7 +96,7 @@ public class DataSourceListControllerTest {
     
     class DSLController extends DataSourceListController {
         public DSLController() {
-            this.localNode = new Account(1, "test", "s3cret", "org", "unit", 
+            this.localNode = new User(1, "test", "s3cret", "org", "unit", 
                     "locality", "state", "XX", "user", "http://localhost:8084");
         }
         @Override
@@ -130,7 +130,7 @@ public class DataSourceListControllerTest {
     @Before
     public void setUp() throws Exception {
         mocks = new ArrayList<Object>();
-        nodeManagerMock = (INodeManager) createMock(INodeManager.class);
+        userManagerMock = (IUserManager) createMock(IUserManager.class);
         authenticatorMock = (Authenticator) 
                 createMock(Authenticator.class);
         httpClientMock = (IHttpClientUtil) createMock(IHttpClientUtil.class);
@@ -167,30 +167,34 @@ public class DataSourceListControllerTest {
     
     @Test
     public void connect2Node() {
-        nodeManagerMock = (INodeManager) createMock(INodeManager.class);
+        userManagerMock = (IUserManager) createMock(IUserManager.class);
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
         
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu"));
-        expect(nodeManagerMock.load()).andReturn(new ArrayList<Node>());
+        expect(userManagerMock.loadPeers()).andReturn(peers);
         replayAll();
         
         Model model = new ExtendedModelMap();
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         String viewName = classUnderTest.connect2Node(model);
         assertEquals("connect_to_node", viewName);
     }
     
     @Test
     public void nodeConnected_InvalidURL() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu"));
-        expect(nodeManagerMock.load()).andReturn(new ArrayList<Node>());
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", 
+                "http://test.baltrad.eu:8084"));
+        
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
         replayAll();
         
         Model model = new ExtendedModelMap();
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         String viewName = classUnderTest.nodeConnected(model, null, 
                 "http://invalid");
         assertEquals("connect_to_node", viewName);
@@ -202,10 +206,15 @@ public class DataSourceListControllerTest {
     
     @Test
     public void nodeConnected_AddCredentialsError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu")).anyTimes();
-        expect(nodeManagerMock.load()).andReturn(new ArrayList<Node>());
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", 
+                "http://test.baltrad.eu:8084")).anyTimes();
+        
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -214,7 +223,7 @@ public class DataSourceListControllerTest {
                 "Failed to sign message"));
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.nodeConnected(model, null, 
@@ -234,10 +243,15 @@ public class DataSourceListControllerTest {
     
     @Test
     public void nodeConnected_MessageVerificationError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu")).anyTimes();
-        expect(nodeManagerMock.load()).andReturn(new ArrayList<Node>());
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", 
+                "http://test.baltrad.eu:8084")).anyTimes();
+        
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -252,7 +266,7 @@ public class DataSourceListControllerTest {
         expectLastCall();
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         
@@ -274,10 +288,15 @@ public class DataSourceListControllerTest {
     
     @Test
     public void nodeConnected_InternalServerError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu")).anyTimes();
-        expect(nodeManagerMock.load()).andReturn(new ArrayList<Node>());
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", 
+                "http://test.baltrad.eu:8084")).anyTimes();
+        
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -292,7 +311,7 @@ public class DataSourceListControllerTest {
         expectLastCall();
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         
@@ -315,10 +334,15 @@ public class DataSourceListControllerTest {
     
     @Test
     public void nodeConnected_HttpConnectionError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu")).anyTimes();
-        expect(nodeManagerMock.load()).andReturn(new ArrayList<Node>());
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", 
+                "http://test.baltrad.eu:8084")).anyTimes();
+        
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
         
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andThrow(new IOException("Http connection exception"));
@@ -329,7 +353,7 @@ public class DataSourceListControllerTest {
         expectLastCall();
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
             
@@ -351,10 +375,15 @@ public class DataSourceListControllerTest {
     
     @Test
     public void nodeConnected_GenericConnectionError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu")).anyTimes();
-        expect(nodeManagerMock.load()).andReturn(new ArrayList<Node>());
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", 
+                "http://test.baltrad.eu:8084")).anyTimes();
+        
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andThrow(new Exception("Generic connection exception"));
         
@@ -364,7 +393,7 @@ public class DataSourceListControllerTest {
         expectLastCall();
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
             
@@ -386,10 +415,15 @@ public class DataSourceListControllerTest {
 
     @Test
     public void nodeConnected_InternalControllerError() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu")).anyTimes();
-        expect(nodeManagerMock.load()).andReturn(new ArrayList<Node>());
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", 
+                "http://test.baltrad.eu:8084")).anyTimes();
+        
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -401,7 +435,7 @@ public class DataSourceListControllerTest {
         
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
@@ -426,10 +460,15 @@ public class DataSourceListControllerTest {
     
     @Test
     public void nodeConnected_URLInput() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu")).anyTimes();
-        expect(nodeManagerMock.load()).andReturn(new ArrayList<Node>());
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", 
+                "http://test.baltrad.eu:8084")).anyTimes();
+        
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -447,7 +486,7 @@ public class DataSourceListControllerTest {
         expectLastCall();
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
@@ -468,10 +507,15 @@ public class DataSourceListControllerTest {
     
     @Test
     public void nodeConnected_NodeSelect() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu")).anyTimes();
-        expect(nodeManagerMock.load()).andReturn(new ArrayList<Node>());
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", 
+                "http://test.baltrad.eu:8084")).anyTimes();
+        
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -489,7 +533,7 @@ public class DataSourceListControllerTest {
         expectLastCall();
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
@@ -510,10 +554,15 @@ public class DataSourceListControllerTest {
     
     @Test
     public void nodeConnected_URLInputAndNodeSelect() throws Exception {
-        expect(nodeManagerMock.load("test.baltrad.eu"))
-            .andReturn(new Node("test.baltrad.eu", 
-                "http://test.baltrad.eu")).anyTimes();
-        expect(nodeManagerMock.load()).andReturn(new ArrayList<Node>());
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", 
+                "http://test.baltrad.eu:8084")).anyTimes();
+        
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -531,7 +580,7 @@ public class DataSourceListControllerTest {
         expectLastCall();
         replayAll();
         
-        classUnderTest.setNodeManager(nodeManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setJsonUtil(jsonUtilMock);

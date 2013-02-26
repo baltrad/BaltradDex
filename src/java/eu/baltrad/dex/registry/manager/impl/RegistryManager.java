@@ -24,7 +24,7 @@ package eu.baltrad.dex.registry.manager.impl;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
 import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.registry.model.mapper.RegistryEntryMapper;
-import eu.baltrad.dex.user.manager.impl.AccountManager;
+import eu.baltrad.dex.user.manager.impl.UserManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -52,7 +52,7 @@ public class RegistryManager implements IRegistryManager {
     /** JDBC template */
     private SimpleJdbcOperations jdbcTemplate;
     /** User account manager */
-    private AccountManager accountManager;
+    private UserManager accountManager;
     /** Row mapper */
     private RegistryEntryMapper mapper;
     
@@ -75,7 +75,7 @@ public class RegistryManager implements IRegistryManager {
      * @param accountManager the accountManager to set
      */
     @Autowired
-    public void setAccountManager(AccountManager accountManager) {
+    public void setAccountManager(UserManager accountManager) {
         this.accountManager = accountManager;
     }
     

@@ -56,7 +56,7 @@ Author     : szewczenko
                                         alt="+" title="Show">
                                 </span>
                                 <div class="user">
-                                    <c:out value="${user}"/>
+                                    <c:out value="${user.name}"/>
                                 </div>
                             </a>
                         </div>
@@ -73,7 +73,7 @@ Author     : szewczenko
                                             </div>
                                         </div>
                                         <c:forEach var="sub" items="${subscriptions}">
-                                            <c:if test="${sub.user == user}">    
+                                            <c:if test="${sub.user == user.name}">    
                                                 <div class="entry">
                                                     <div id="cell" class="station">
                                                         <c:out value="${sub.dataSource}"/>

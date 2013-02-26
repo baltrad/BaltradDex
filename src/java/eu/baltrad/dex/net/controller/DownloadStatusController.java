@@ -21,9 +21,9 @@
 
 package eu.baltrad.dex.net.controller;
 
-import eu.baltrad.dex.net.manager.impl.NodeManager;
 import eu.baltrad.dex.net.manager.impl.SubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.user.manager.IUserManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +48,7 @@ public class DownloadStatusController {
     /** Subscriptions model key */
     private static final String SUBSCRIPTIONS = "subscriptions";
     
-    private NodeManager nodeManager;
+    private IUserManager userManager;
     private SubscriptionManager subscriptionManager;
     
     /**
@@ -58,20 +58,11 @@ public class DownloadStatusController {
      */
     @RequestMapping("/data_download.htm")
     public String dataDownload(ModelMap model) {
-        model.addAttribute(OPERATORS, nodeManager.loadOperators());
+        model.addAttribute(OPERATORS, userManager.loadOperators());
         model.addAttribute(SUBSCRIPTIONS, 
                 subscriptionManager.load(Subscription.LOCAL));
         return DATA_DOWNLOAD_VIEW;
-    }
-
-    /**
-     * @param nodeManager the nodeManager to set
-     */
-    @Autowired
-    public void setNodeManager(NodeManager nodeManager) {
-        this.nodeManager = nodeManager;
-    }
-    
+    }    
 
     /**
      * @param subscriptionManager the subscriptionManager to set
@@ -80,6 +71,14 @@ public class DownloadStatusController {
     public void setSubscriptionManager(SubscriptionManager subscriptionManager) 
     {
         this.subscriptionManager = subscriptionManager;
+    }
+
+    /**
+     * @param userManager the userManager to set
+     */
+    @Autowired
+    public void setUserManager(IUserManager userManager) {
+        this.userManager = userManager;
     }
     
 }

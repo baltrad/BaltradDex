@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,13 +21,14 @@
 
 package eu.baltrad.dex.user.validator;
 
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.validation.Validator;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Validator class used to validate password modification form.
@@ -36,7 +37,7 @@ import org.springframework.validation.ValidationUtils;
  * @version 0.7.1
  * @since 0.7.1
  */
-public class PasswordValidator implements Validator {
+public class PasswordValidator {
 
     /* Minimum password length */
     private static final int MIN_PASSWD_LENGTH = 8;
@@ -50,7 +51,7 @@ public class PasswordValidator implements Validator {
      * @return True if class is supported, false otherwise
      */
     public boolean supports(Class clazz) {
-        return Account.class.equals(clazz);
+        return User.class.equals(clazz);
     }
     /**
      * Validates form object.
@@ -58,20 +59,18 @@ public class PasswordValidator implements Validator {
      * @param obj Form object
      * @param errors Errors object
      */
-    public void validate(Object command, Errors errors) {
-        Account account = (Account) command;
+    public void validate(HttpServletRequest request, Object command, 
+            Errors errors) {
+        User user = (User) command;
         // Account object is null
-        if (account == null) return; 
+        if (user == null) return; 
         // User submits empty fields
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", 
                 "changepassword.missing.password",
                 messages.getMessage("changepassword.missing.password"));
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "repeatPassword",
-                "changepassword.missing.repeat_password",
-                messages.getMessage("changepassword.missing.repeat_password"));
         // New password is too short
         if (!errors.hasFieldErrors("password")) {
-            if (account.getPassword().trim().length() < MIN_PASSWD_LENGTH) 
+            if (user.getPassword().trim().length() < MIN_PASSWD_LENGTH) 
             {
                 errors.rejectValue("password", 
                         "changepassword.invalid.password",
@@ -79,13 +78,18 @@ public class PasswordValidator implements Validator {
             }
         }
         // New password and confirmed password don't match
-        if (!errors.hasFieldErrors("password") &&
-                !errors.hasFieldErrors("repeatPassword")) {
-            if (!account.getPassword().equals(account.getRepeatPassword())) {
-                errors.rejectValue("repeatPassword",
-                        "changepassword.mismatch.password",
-                        messages.getMessage("changepassword.mismatch.password"));
-            }
+        String repeatPassword = request.getParameter("repeat_password");
+        if (user.getPassword().length() > MIN_PASSWD_LENGTH 
+                    && repeatPassword.isEmpty()) {
+                errors.rejectValue("password", 
+                    "saveaccount.missing.repeat_password",
+                    messages.getMessage("saveaccount.missing.repeat_password"));
+        }
+        if (repeatPassword.length() > 0 && 
+            !user.getPassword().equals(repeatPassword)) {
+                errors.rejectValue("password",
+                    "changepassword.mismatch.password",
+                    messages.getMessage("changepassword.mismatch.password"));
         }
     }
 

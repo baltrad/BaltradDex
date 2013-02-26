@@ -33,16 +33,18 @@ import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.controller.util.MessageSetter;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.net.manager.INodeManager;
-import eu.baltrad.dex.net.model.impl.Node;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.Role;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
+import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.ui.Model;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.keyczar.exceptions.KeyczarException;
 
@@ -124,7 +126,7 @@ public class UpdateSubscriptionController implements MessageSetter {
     
     private IConfigurationManager confManager;
     private ISubscriptionManager subscriptionManager;
-    private INodeManager nodeManager;
+    private IUserManager userManager;
     private MessageResourceUtil messages;
     private Authenticator authenticator;
     private RequestFactory requestFactory;
@@ -132,7 +134,7 @@ public class UpdateSubscriptionController implements MessageSetter {
     private IJsonUtil jsonUtil;
     private Logger log;
     
-    protected Account localNode;
+    protected User localNode;
     
     /**
      * Default constructor.
@@ -150,13 +152,13 @@ public class UpdateSubscriptionController implements MessageSetter {
         this.httpClient = new HttpClientUtil(
                 Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
                 Integer.parseInt(confManager.getAppConf().getSoTimeout()));
-        this.localNode = new Account(confManager.getAppConf().getNodeName(),
-                confManager.getAppConf().getNodeAddress(),
-                confManager.getAppConf().getOrgName(),
+        this.localNode = new User(confManager.getAppConf().getNodeName(),
+                Role.NODE, null, confManager.getAppConf().getOrgName(),
                 confManager.getAppConf().getOrgUnit(),
                 confManager.getAppConf().getLocality(),
                 confManager.getAppConf().getState(),
-                confManager.getAppConf().getCountryCode());
+                confManager.getAppConf().getCountryCode(),
+                confManager.getAppConf().getNodeAddress());
     }
     
     /**
@@ -275,6 +277,8 @@ public class UpdateSubscriptionController implements MessageSetter {
      * @param subscriptionString Subscriptions Json string
      * @return True if subscriptions are successfully saved 
      */
+    @Transactional(propagation=Propagation.REQUIRED, 
+            rollbackFor=Exception.class)
     private void storeLocalSubscriptions(HttpResponse response,
             String subscriptionString) throws InternalControllerException {
         try {
@@ -284,10 +288,10 @@ public class UpdateSubscriptionController implements MessageSetter {
                 Subscription requested = new Subscription(
                     System.currentTimeMillis(), Subscription.LOCAL, 
                     response.getFirstHeader("Node-Name").getValue(),
-                    localNode.getName(), s.getDataSource(), s.isActive(),
-                    s.isSyncronized());
+                    s.getDataSource(), s.isActive(), s.isSyncronized());
                 Subscription existing = subscriptionManager.load(
-                        Subscription.LOCAL, localNode.getName(), 
+                        Subscription.LOCAL, 
+                        response.getFirstHeader("Node-Name").getValue(), 
                         s.getDataSource());
                 if (existing == null) {
                     subscriptionManager.store(requested);
@@ -309,10 +313,8 @@ public class UpdateSubscriptionController implements MessageSetter {
      */
     @RequestMapping("/subscribed_peers.htm")
     public String subscribedPeers(Model model) {
-        List<Node> subscribedPeers = nodeManager.loadOperators();
-        model.addAttribute(SUBSCRIBED_PEERS_KEY, subscribedPeers);
+        model.addAttribute(SUBSCRIBED_PEERS_KEY, userManager.loadOperators());
         return SUBSCRIBED_PEERS_VIEW;
-        
     }
     
     /**
@@ -398,16 +400,16 @@ public class UpdateSubscriptionController implements MessageSetter {
      * @return Subscription status view
      */
     @RequestMapping("/subscription_status.htm")
-    public String getSubscription(Model model,
+    public String updateSubscription(Model model,
             @RequestParam(value="peer_name", required=true) String peerName,
             @RequestParam(value="active_subscription_ids", required=false) 
                 String[] activeSubscriptionIds,
             @RequestParam(value="inactive_subscription_ids", required=false)
                 String[] inactiveSubscriptionIds) {
         initConfiguration();
-        Node node = nodeManager.load(peerName);
+        User node = userManager.load(peerName);
         requestFactory = new DefaultRequestFactory(URI.create(
-                node.getAddress()));
+                node.getNodeAddress()));
         HttpUriRequest req = requestFactory.createUpdateSubscriptionRequest(
                 localNode, createSubscriptionRequest(activeSubscriptionIds, 
                     inactiveSubscriptionIds));
@@ -424,13 +426,12 @@ public class UpdateSubscriptionController implements MessageSetter {
             } else if (res.getStatusLine().getStatusCode() 
                     == HttpServletResponse.SC_PARTIAL_CONTENT) {
                 String errorMsg = messages.getMessage(
-                    GS_SERVER_PARTIAL_SUBSCRIPTION, new String[] {peerName});    
+                    GS_SERVER_PARTIAL_SUBSCRIPTION, new String[] {peerName});
                 storeLocalSubscriptions(res, readSubscriptions(res));
                 setMessage(model, ERROR_MSG_KEY, errorMsg);
                 log.error(errorMsg);
             } else if (res.getStatusLine().getStatusCode() 
                     == HttpServletResponse.SC_NOT_FOUND) {
-                
                 String errorMsg = messages.getMessage(GS_SERVER_ERROR_KEY,
                         new String[] {peerName});
                 String errorDetails = res.getStatusLine().getReasonPhrase();
@@ -491,14 +492,6 @@ public class UpdateSubscriptionController implements MessageSetter {
     public void setJsonUtil(IJsonUtil jsonUtil) {
         this.jsonUtil = jsonUtil;
     }
-    
-    /**
-     * @param nodeManager the nodeManager to set
-     */
-    @Autowired
-    public void setNodeManager(INodeManager nodeManager) {
-        this.nodeManager = nodeManager;
-    }
 
     /**
      * @param subscriptionManager the subscriptionManager to set
@@ -507,6 +500,14 @@ public class UpdateSubscriptionController implements MessageSetter {
     public void setSubscriptionManager(ISubscriptionManager subscriptionManager) 
     {
         this.subscriptionManager = subscriptionManager;
+    }
+    
+    /**
+     * @param userManager the userManager to set
+     */
+    @Autowired
+    public void setUserManager(IUserManager userManager) {
+        this.userManager = userManager;
     }
     
     /**

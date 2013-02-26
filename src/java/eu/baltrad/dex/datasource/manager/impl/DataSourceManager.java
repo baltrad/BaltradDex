@@ -27,8 +27,8 @@ import eu.baltrad.dex.datasource.model.mapper.FileObjectMapper;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.model.FileObject;
 import eu.baltrad.dex.radar.model.Radar;
-import eu.baltrad.dex.user.model.Account;
-import eu.baltrad.dex.user.model.mapper.AccountMapper;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.model.mapper.UserMapper;
 import eu.baltrad.dex.radar.model.mapper.RadarMapper;
 
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
@@ -59,7 +59,7 @@ public class DataSourceManager implements IDataSourceManager {
     private DataSourceMapper dataSourceMapper;
     private RadarMapper radarMapper;
     private FileObjectMapper fileObjectMapper;
-    private AccountMapper accountMapper;
+    private UserMapper userMapper;
     
     /**
      * Constructor.
@@ -68,7 +68,7 @@ public class DataSourceManager implements IDataSourceManager {
         this.dataSourceMapper = new DataSourceMapper();
         this.radarMapper = new RadarMapper();
         this.fileObjectMapper = new FileObjectMapper();
-        this.accountMapper = new AccountMapper();
+        this.userMapper = new UserMapper();
     }
     
     /**
@@ -259,22 +259,18 @@ public class DataSourceManager implements IDataSourceManager {
     }
     
     /**
-     * Get list of users for a given data source id.
+     * Get list of user accounts for a given data source id.
      * @param DataSourceId Data source id
      * @return List of users
      */
-    public List<Account> loadUser(int DataSourceId) {
-        String sql = "SELECT dex_users.*, dex_roles.name AS role_name, " +
-                "dex_nodes.address AS node_address FROM dex_users, " + 
-                "dex_roles, dex_nodes, dex_users_roles, dex_users_nodes " + 
-                "WHERE dex_users_roles.user_id = dex_users.id AND " + 
-                "dex_users_roles.role_id = dex_roles.id AND " + 
-                "dex_users_nodes.user_id = dex_users.id AND " + 
-                "dex_users_nodes.node_id = dex_nodes.id AND " + 
-                "dex_users.id IN (SELECT user_id FROM dex_data_source_users " +
-                "WHERE data_source_id = ?)";
+    public List<User> loadUser(int DataSourceId) {
+        String sql = "SELECT u.*, r.name AS role " +
+                "FROM dex_users u, dex_roles r, dex_users_roles ur " + 
+                "WHERE ur.user_id = u.id AND ur.role_id = r.id " + 
+                "AND u.id IN (SELECT user_id FROM " + 
+                "dex_data_source_users WHERE data_source_id = ?)";
         try {
-            return jdbcTemplate.query(sql, accountMapper, DataSourceId);
+            return jdbcTemplate.query(sql, userMapper, DataSourceId);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }

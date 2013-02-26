@@ -24,7 +24,7 @@ package eu.baltrad.dex.net.manager.impl;
 import eu.baltrad.dex.datasource.manager.impl.DataSourceManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.db.itest.DexDBITestHelper;
-import eu.baltrad.dex.user.manager.impl.AccountManager;
+import eu.baltrad.dex.user.manager.impl.UserManager;
 
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
@@ -49,9 +49,8 @@ public class SubscriptionManagerTest extends TestCase {
 
     private SubscriptionManager classUnderTest;
     
-    private AccountManager accountManager;
+    private UserManager accountManager;
     private DataSourceManager dataSourceManager;
-    private NodeManager nodeManager;
     
     private AbstractApplicationContext context;
     private DexDBITestHelper helper;
@@ -68,17 +67,13 @@ public class SubscriptionManagerTest extends TestCase {
                 .getBean("jdbcTemplate");
         classUnderTest.setJdbcTemplate(jdbcTemplate);
         
-        accountManager = new AccountManager();
+        accountManager = new UserManager();
         accountManager.setJdbcTemplate(jdbcTemplate);
         classUnderTest.setAccountManager(accountManager);
         
         dataSourceManager = new DataSourceManager();
         dataSourceManager.setJdbcTemplate(jdbcTemplate);
         classUnderTest.setDataSourceManager(dataSourceManager);
-        
-        nodeManager = new NodeManager();
-        nodeManager.setJdbcTemplate(jdbcTemplate);
-        classUnderTest.setNodeManager(nodeManager);
     }
     
     @Override
@@ -114,8 +109,7 @@ public class SubscriptionManagerTest extends TestCase {
     private boolean compare(Subscription s1, Subscription s2) {
         return s1.getId() == s2.getId() &&
                s1.getDate().equals(s2.getDate()) &&
-               s1.getType().equals(s2.getType()) && 
-               s1.getOperator().equals(s2.getOperator()) &&
+               s1.getType().equals(s2.getType()) &&
                s1.getUser().equals(s2.getUser()) &&
                s1.getDataSource().equals(s2.getDataSource()) &&
                s1.isSyncronized() == s2.isSyncronized() && 
@@ -128,7 +122,6 @@ public class SubscriptionManagerTest extends TestCase {
         expected.setDate(format.parse("2012-04-24 14:10:00"));
         expected.setUser("User2");
         expected.setDataSource("DataSource2");
-        expected.setOperator("TestNode1");
         expected.setType("local");
         expected.setActive(true);
         expected.setSyncronized(true);
@@ -159,7 +152,6 @@ public class SubscriptionManagerTest extends TestCase {
         expected.setDate(format.parse("2012-04-24 14:20:00"));
         expected.setUser("User2");
         expected.setDataSource("DataSource3");
-        expected.setOperator("TestNode2");
         expected.setType("peer");
         expected.setActive(false);
         expected.setSyncronized(true);
@@ -176,8 +168,7 @@ public class SubscriptionManagerTest extends TestCase {
         helper.cleanInsert(this, "noid");
         Subscription s = new Subscription(
                 format.parse("2012-04-24 14:30:00").getTime(),
-                Subscription.PEER, "TestNode1", "User1", "DataSource1",
-                true, true);
+                Subscription.PEER, "User1", "DataSource1", true, true);
         
         assertEquals(4, classUnderTest.store(s));
         verifyDBTables("store", "dex_subscriptions", "id");
@@ -189,7 +180,6 @@ public class SubscriptionManagerTest extends TestCase {
         expected.setDate(format.parse("2012-04-24 15:20:00"));
         expected.setUser("User2");
         expected.setDataSource("DataSource3");
-        expected.setOperator("TestNode2");
         expected.setType("local");
         expected.setActive(true);
         expected.setSyncronized(false); 

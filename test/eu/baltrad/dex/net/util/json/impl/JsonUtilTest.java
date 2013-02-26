@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -24,27 +24,26 @@ package eu.baltrad.dex.net.util.json.impl;
 import eu.baltrad.dex.net.util.json.impl.JsonUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 import java.util.*;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-
 /**
  * Json utility test.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.1.0
+ * @version 1.7.0
  * @since 1.1.0
  */
 public class JsonUtilTest {
     
-    private static final String JSON_ACCOUNT = "{\"nodeAddress\":\"" +
-            "http://localhost:8084\",\"repeatPassword\":\"s3cret\",\"" +
-            "roleName\":\"user\",\"name\":\"test\",\"id\":1,\"state\":\"" + 
-            "state\",\"orgName\":\"org\",\"orgUnit\":\"unit\",\"locality\":\"" +
-            "locality\",\"countryCode\":\"XX\",\"password\":\"s3cret\"}";
+    private static final String JSON_ACCOUNT = 
+            "{\"name\":\"test\",\"id\":1,\"state\":\"state\",\"nodeAddress\"" +
+            ":\"http://localhost:8084\",\"orgName\":\"org\",\"orgUnit\":" +
+            "\"unit\",\"locality\":\"locality\",\"countryCode\":\"XX\"," +
+            "\"role\":\"user\",\"password\":\"s3cret\"}";
     
     private static final String JSON_SOURCES = 
             "[{\"name\":\"DS1\",\"type\":\"local\",\"id\":1,\"description\"" +
@@ -53,19 +52,17 @@ public class JsonUtilTest {
             "name\":\"DS3\",\"type\":\"local\",\"id\":3,\"description\":\"" + 
             "Yet another test data source\"}]";
         
-    private static final String JSON_SUBSCRIPTIONS = "[{\"id\":1,\"type\":\"" + 
-            "local\",\"date\":1340189763867,\"active\":true,\"user\":" +
-            "\"User1\",\"dataSource\":\"DataSource1\",\"operator\":\"" + 
-            "Operator1\",\"syncronized\":true},{\"id\":2,\"type\":\"local" + 
-            "\",\"date\":1340189763867,\"active\":true,\"user\":\"" + 
-            "User2\",\"dataSource\":\"DataSource2\",\"operator\":\"Operator2" + 
-            "\",\"syncronized\":false},{\"id\":3,\"type\":\"peer\",\"" +
-            "date\":1340189763867,\"active\":false,\"user\":\"User3\",\"" +
-            "dataSource\":\"DataSource3\",\"operator\":\"Operator3\",\"" + 
-            "syncronized\":true}]"; 
+    private static final String JSON_SUBSCRIPTIONS = 
+            "[{\"id\":1,\"type\":\"local\",\"date\":1340189763867,\"active\":" + 
+            "true,\"dataSource\":\"DataSource1\",\"user\":\"User1\"," +
+            "\"syncronized\":true},{\"id\":2,\"type\":\"local\",\"date\":" +
+            "1340189763867,\"active\":true,\"dataSource\":\"DataSource2\"," +
+            "\"user\":\"User2\",\"syncronized\":false},{\"id\":3,\"type\":" +
+            "\"peer\",\"date\":1340189763867,\"active\":false,\"dataSource\":" +
+            "\"DataSource3\",\"user\":\"User3\",\"syncronized\":true}]"; 
             
     private JsonUtil classUnderTest;
-    private Account account;
+    private User user;
     private Set<DataSource> dataSources;
     private List<Subscription> subscriptions;
     
@@ -73,9 +70,8 @@ public class JsonUtilTest {
     public void setUp() {
         classUnderTest = new JsonUtil();
         
-        account = new Account(1, "test", "s3cret", "org", "unit", "locality", 
-                "state", "XX", "user", "http://localhost:8084");
-        account.setRepeatPassword("s3cret");
+        user = new User(1, "test", "user", "s3cret", "org", "unit", "locality", 
+                "state", "XX", "http://localhost:8084");
         
         dataSources = new HashSet<DataSource>();
         DataSource ds1 = new DataSource(1, "DS1", "local", 
@@ -92,14 +88,14 @@ public class JsonUtilTest {
         long time = 1340189763867L;
         subscriptions = new ArrayList<Subscription>();
         
-        Subscription s1 = new Subscription(1, time, "local", "Operator1", 
-                "User1", "DataSource1", true, true);
+        Subscription s1 = new Subscription(1, time, "local", "User1", 
+                "DataSource1", true, true);
         subscriptions.add(s1);
-        Subscription s2 = new Subscription(2, time, "local", "Operator2", 
-                "User2", "DataSource2", true, false);
+        Subscription s2 = new Subscription(2, time, "local", "User2", 
+                "DataSource2", true, false);
         subscriptions.add(s2);
-        Subscription s3 = new Subscription(3, time, "peer", "Operator3", 
-                "User3", "DataSource3", false, true);
+        Subscription s3 = new Subscription(3, time, "peer", "User3", 
+                "DataSource3", false, true);
         subscriptions.add(s3);
         
         assertEquals(3, subscriptions.size());
@@ -107,32 +103,30 @@ public class JsonUtilTest {
     
     @Test
     public void userAccountToJson() {
-        String s = classUnderTest.userAccountToJson(account);
+        String s = classUnderTest.userAccountToJson(user);
         assertNotNull(s);
         assertEquals(JSON_ACCOUNT.length(), s.length());
     }
     
     @Test
     public void jsonToUserAccount() {
-        Account _account= classUnderTest.jsonToUserAccount(JSON_ACCOUNT);
-        assertNotNull(_account);
-        assertEquals(account.getId(), _account.getId());
-        assertEquals(account.getName(), _account.getName());
-        assertEquals(account.getPassword(), _account.getPassword());
-        assertEquals(account.getRepeatPassword(), _account.getRepeatPassword());
-        assertEquals(account.getOrgName(), _account.getOrgName());
-        assertEquals(account.getOrgUnit(), _account.getOrgUnit());
-        assertEquals(account.getLocality(), _account.getLocality());
-        assertEquals(account.getState(), _account.getState());
-        assertEquals(account.getCountryCode(), _account.getCountryCode());
-        assertEquals(account.getRoleName(), _account.getRoleName());
-        assertEquals(account.getNodeAddress(), _account.getNodeAddress());
+        User _user = classUnderTest.jsonToUserAccount(JSON_ACCOUNT);
+        assertNotNull(_user);
+        assertEquals(user.getId(), _user.getId());
+        assertEquals(user.getName(), _user.getName());
+        assertEquals(user.getPassword(), _user.getPassword());
+        assertEquals(user.getOrgName(), _user.getOrgName());
+        assertEquals(user.getOrgUnit(), _user.getOrgUnit());
+        assertEquals(user.getLocality(), _user.getLocality());
+        assertEquals(user.getState(), _user.getState());
+        assertEquals(user.getCountryCode(), _user.getCountryCode());
+        assertEquals(user.getRole(), _user.getRole());
+        assertEquals(user.getNodeAddress(), _user.getNodeAddress());
     }
     
     @Test
     public void dataSourcesToJson() {
         String s = classUnderTest.dataSourcesToJson(dataSources);
-        assertNotNull(s);
         assertEquals(JSON_SOURCES.length(), s.length());
     }
     
@@ -154,7 +148,6 @@ public class JsonUtilTest {
     @Test
     public void subscriptionsToJson() {
         String s = classUnderTest.subscriptionsToJson(subscriptions);
-        
         assertNotNull(s);
         assertEquals(JSON_SUBSCRIPTIONS.length(), s.length());
     }
@@ -172,8 +165,6 @@ public class JsonUtilTest {
                     subs.get(i).getDate());
             assertEquals(subscriptions.get(i).getType(), 
                     subs.get(i).getType());
-            assertEquals(subscriptions.get(i).getOperator(), 
-                    subs.get(i).getOperator());
             assertEquals(subscriptions.get(i).getUser(), subs.get(i).getUser());
             assertEquals(subscriptions.get(i).getDataSource(), 
                     subs.get(i).getDataSource());

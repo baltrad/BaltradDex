@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -23,8 +23,7 @@ package eu.baltrad.dex.registry.manager.impl;
 
 import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.db.itest.DexDBITestHelper;
-import eu.baltrad.dex.net.manager.impl.NodeManager;
-import eu.baltrad.dex.user.manager.impl.AccountManager;
+import eu.baltrad.dex.user.manager.impl.UserManager;
 import eu.baltrad.dex.user.manager.impl.RoleManager;
 
 import org.springframework.context.support.AbstractApplicationContext;
@@ -56,8 +55,7 @@ public class RegistryManagerTest extends TestCase {
     private final static long MILLIS_PER_MINUTE = 60 * 1000;
     
     private RegistryManager classUnderTest;
-    private AccountManager accountManager;
-    private NodeManager nodeManager;
+    private UserManager accountManager;
     private RoleManager roleManager;
     private AbstractApplicationContext context;
     private DexDBITestHelper helper;
@@ -72,12 +70,8 @@ public class RegistryManagerTest extends TestCase {
         SimpleJdbcOperations jdbcTemplate = (SimpleJdbcOperations) context
                 .getBean("jdbcTemplate");
         classUnderTest.setJdbcTemplate(jdbcTemplate);
-        accountManager = new AccountManager();
+        accountManager = new UserManager();
         accountManager.setJdbcTemplate(jdbcTemplate);
-        
-        nodeManager = new NodeManager();
-        nodeManager.setJdbcTemplate(jdbcTemplate);
-        accountManager.setNodeManager(nodeManager);
         
         roleManager = new RoleManager();
         roleManager.setJdbcTemplate(jdbcTemplate);

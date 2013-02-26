@@ -23,7 +23,7 @@ package eu.baltrad.dex.net.controller;
 
 import eu.baltrad.dex.net.manager.impl.SubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.user.manager.impl.AccountManager;
+import eu.baltrad.dex.user.manager.impl.UserManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,7 +48,7 @@ public class UploadStatusController {
     /** Subscriptions model key */
     private static final String SUBSCRIPTIONS = "subscriptions";
     
-    private AccountManager accountManager;
+    private UserManager accountManager;
     private SubscriptionManager subscriptionManager; 
     
     /**
@@ -68,7 +68,7 @@ public class UploadStatusController {
      * @param accountManager the accountManager to set
      */
     @Autowired
-    public void setAccountManager(AccountManager accountManager) {
+    public void setAccountManager(UserManager accountManager) {
         this.accountManager = accountManager;
     }
 

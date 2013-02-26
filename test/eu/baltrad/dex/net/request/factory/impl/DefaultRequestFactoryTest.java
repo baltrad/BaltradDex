@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -23,7 +23,7 @@ package eu.baltrad.dex.net.request.factory.impl;
 
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.CompressDataUtil;
 
 import org.apache.http.HttpEntity;
@@ -44,14 +44,14 @@ import java.util.HashSet;
 /**
  * Request factory test.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.1.0
+ * @version 1.7.0
  * @since 1.1.0
  */
 public class DefaultRequestFactoryTest {
     
     private DefaultRequestFactory classUnderTest;
     private CompressDataUtil compressDataUtil;
-    private Account account;
+    private User user;
     
     @Before
     public void setUp() {
@@ -59,7 +59,7 @@ public class DefaultRequestFactoryTest {
                 URI.create("http://example.com/")
         );
         compressDataUtil = new CompressDataUtil("keystore/localhost.pub");
-        account = new Account(1, "localnode", "s3cret", "org", "unit", "locality", 
+        user = new User(1, "localnode", "s3cret", "org", "unit", "locality", 
                 "state", "XX", "user", "http://localhost");
     }
     
@@ -85,7 +85,7 @@ public class DefaultRequestFactoryTest {
     @Test
     public void createDataSourceListingRequest() {
         HttpUriRequest request = classUnderTest
-                .createDataSourceListingRequest(account);
+                .createDataSourceListingRequest(user);
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/datasource_listing.htm"), 
@@ -99,7 +99,7 @@ public class DefaultRequestFactoryTest {
     @Test
     public void createStartSubscriptionRequest() {
         HttpUriRequest request = classUnderTest
-                .createStartSubscriptionRequest(account, 
+                .createStartSubscriptionRequest(user, 
                     new HashSet<DataSource>());
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
@@ -114,7 +114,7 @@ public class DefaultRequestFactoryTest {
     @Test
     public void createUpdateSubscriptionRequest() {
         HttpUriRequest request = classUnderTest
-                .createUpdateSubscriptionRequest(account, 
+                .createUpdateSubscriptionRequest(user, 
                     new ArrayList<Subscription>());
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
@@ -130,7 +130,7 @@ public class DefaultRequestFactoryTest {
     public void createPostFileRequest() {
         InputStream is = new ByteArrayInputStream("datafilecontent".getBytes());
         HttpUriRequest request = classUnderTest
-                .createPostFileRequest(account, is);
+                .createPostFileRequest(user, is);
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/post_file.htm"), request.getURI());
@@ -143,7 +143,7 @@ public class DefaultRequestFactoryTest {
     @Test
     public void createPostMessageRequest() {
         HttpUriRequest request = classUnderTest
-                .createPostMessageRequest(account, "Hello world!");
+                .createPostMessageRequest(user, "Hello world!");
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/post_message.htm"), 
@@ -158,7 +158,7 @@ public class DefaultRequestFactoryTest {
     public void createPostKeyRequest() throws Exception {
         InputStream is = new ByteArrayInputStream(compressDataUtil.zip());
         HttpUriRequest request = classUnderTest
-                .createPostKeyRequest(account, is);
+                .createPostKeyRequest(user, is);
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/post_key.htm"), 

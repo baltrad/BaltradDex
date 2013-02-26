@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.net.servlet;
 
+import eu.baltrad.dex.net.request.factory.RequestFactory;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
@@ -34,9 +35,8 @@ import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.db.manager.IBltFileManager;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
-import eu.baltrad.dex.user.manager.IAccountManager;
-import eu.baltrad.dex.net.request.factory.RequestFactory;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.User;
 
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.bdb.db.FileEntry;
@@ -49,6 +49,7 @@ import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
+import eu.baltrad.dex.user.model.Role;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -100,14 +101,14 @@ public class PostFileServlet extends HttpServlet {
     private IBltMessageManager messageManager;
     private IBltFileManager fileManager;
     private IRegistryManager registryManager;
-    private IAccountManager userManager;
+    private IUserManager userManager;
     private IHttpClientUtil httpClient;
     private FramePublisherManager framePublisherManager;
     private ISubscriptionManager subscriptionManager;
     private MessageResourceUtil messages;
     private Logger log;
     
-    protected Account localNode;
+    protected User localNode;
     
     /**
      * Default constructor.
@@ -125,13 +126,13 @@ public class PostFileServlet extends HttpServlet {
         this.httpClient = new HttpClientUtil(
                  Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
                  Integer.parseInt(confManager.getAppConf().getSoTimeout()));
-        this.localNode = new Account(confManager.getAppConf().getNodeName(),
-                confManager.getAppConf().getNodeAddress(),
-                confManager.getAppConf().getOrgName(),
+        this.localNode = new User(confManager.getAppConf().getNodeName(),
+                Role.NODE, null, confManager.getAppConf().getOrgName(),
                 confManager.getAppConf().getOrgUnit(),
                 confManager.getAppConf().getLocality(),
                 confManager.getAppConf().getState(),
-                confManager.getAppConf().getCountryCode());
+                confManager.getAppConf().getCountryCode(),
+                confManager.getAppConf().getNodeAddress());
     }
     
     /**
@@ -184,7 +185,7 @@ public class PostFileServlet extends HttpServlet {
                     for (Subscription s : uploads) {
                         IFilter filter = fileManager
                                 .loadFilter(s.getDataSource());
-                        Account receiver = userManager.load(s.getUser());
+                        User receiver = userManager.load(s.getUser());
                         if (matcher.match(entry.getMetadata(), 
                                 filter.getExpression())) {
                             RequestFactory requestFactory = 
@@ -317,7 +318,7 @@ public class PostFileServlet extends HttpServlet {
      * @param userManager the userManager to set
      */
     @Autowired
-    public void setUserManager(IAccountManager userManager) {
+    public void setUserManager(IUserManager userManager) {
         this.userManager = userManager;
     }
 

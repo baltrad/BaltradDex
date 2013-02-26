@@ -145,9 +145,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           class="eu.baltrad.dex.user.controller.ChangeUserPasswordController"
           autowire="byType"/>
 
-    <!-- Account manager -->
-    <bean id="accountManager" 
-          class="eu.baltrad.dex.user.manager.impl.AccountManager"
+    <!-- User manager -->
+    <bean id="userManager" 
+          class="eu.baltrad.dex.user.manager.impl.UserManager"
           autowire="byType"/>      
 
     <!-- Role manager -->
@@ -244,10 +244,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- Data source list servlet -->
     <bean id="dataSourceListServlet" 
           class="eu.baltrad.dex.net.servlet.DataSourceListServlet"
-          autowire="byType"/>
-          
-    <!-- Node manager -->
-    <bean id="nodeManager" class="eu.baltrad.dex.net.manager.impl.NodeManager" 
           autowire="byType"/>
           
     <!-- URL address validator -->

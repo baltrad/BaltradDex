@@ -1,5 +1,5 @@
 <%------------------------------------------------------------------------------
-Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -90,14 +90,15 @@ Author     : szewczenko
                         </div>
                         <div class="row">
                             <div class="password">
-                                <form:password path="repeatPassword"
-                                               title="Repeat new password"/>
-                                <div class="hint">
-                                    Repeat new password here
+                                <div class="password">
+                                    <input type="password" 
+                                           name="repeat_password"
+                                           title="Repeat password"/>
+                                    <div class="hint">
+                                        Repeat password
+                                    </div>
                                 </div>
                             </div>
-                            <form:errors path="repeatPassword" 
-                                         cssClass="error"/>
                         </div>
                     </div>
                     <div class="tablefooter">

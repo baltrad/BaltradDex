@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.net.util.json;
 
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
 
@@ -37,9 +37,9 @@ import java.util.List;
  */
 public interface IJsonUtil {
     
-    public String userAccountToJson(Account account) throws RuntimeException;
+    public String userAccountToJson(User user) throws RuntimeException;
     
-    public Account jsonToUserAccount(String json) throws RuntimeException;
+    public User jsonToUserAccount(String json) throws RuntimeException;
     
     public String dataSourcesToJson(Set<DataSource> dataSources)
             throws RuntimeException;

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -24,10 +24,10 @@ package eu.baltrad.dex.net.servlet;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.util.json.IJsonUtil;
 import eu.baltrad.dex.net.util.json.impl.JsonUtil;
-import eu.baltrad.dex.user.manager.IAccountManager;
+import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
-import eu.baltrad.dex.user.model.Account;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -64,12 +64,11 @@ import java.text.SimpleDateFormat;
  */
 public class DataSourceListServletTest {
     
-    private static final String JSON_ACCOUNT = "{\"nodeAddress\":\"" +
-            "http://localhost:8084\",\"repeatPassword\":\"s3cret\",\"" +
-            "roleName\":\"user\",\"name\":\"test\",\"id\":1,\"state\":\"" + 
-            "state\",\"orgName\":\"org\",\"orgUnit\":\"unit\",\"locality\":\"" +
-            "locality\",\"countryCode\":\"XX\",\"password\":\"s3cret\"}";
-    
+    private static final String JSON_ACCOUNT = 
+            "{\"name\":\"test.baltrad.eu\",\"id\":1,\"state\":\"state\"," + 
+            "\"nodeAddress\":\"http://localhost:8084\",\"orgName\":\"org\"," + 
+            "\"orgUnit\":\"unit\",\"locality\":\"locality\",\"countryCode\":" + 
+            "\"XX\",\"role\":\"user\",\"password\":\"s3cret\"}";
     
     private static final String JSON_SOURCES = 
             "[{\"name\":\"DS1\",\"id\":1,\"description\":\"A test "
@@ -86,12 +85,12 @@ public class DataSourceListServletTest {
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
     private Authenticator authenticatorMock;
-    private Account account;
+    private User user;
     
     class DSLServlet extends DataSourceListServlet {
         public DSLServlet() {
-            this.localNode = new Account(1, "test", "s3cret", "org", "unit", 
-                    "locality", "state", "XX", "user", "http://localhost:8084");
+            this.localNode = new User(1, "test", "user", "s3cret", "org", 
+                    "unit", "locality", "state", "XX", "http://localhost:8084");
         }
         @Override
         public void initConfiguration() {}
@@ -131,8 +130,8 @@ public class DataSourceListServletTest {
         messages = new MessageResourceUtil();
         messages.setBasename("resources/messages");
         classUnderTest.setMessages(messages);
-        account = new Account(1, "test.baltrad.eu", "s3cret", "org", "unit", 
-                "locality", "state", "XX", "user", "http://localhost:8084");
+        user = new User(1, "test.baltrad.eu", "user", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "http://localhost:8084");
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         format = new SimpleDateFormat(DATE_FORMAT);
@@ -199,11 +198,11 @@ public class DataSourceListServletTest {
         expect(authenticatorMock.authenticate(isA(String.class), 
                 isA(String.class), isA(String.class)))
                 .andReturn(Boolean.TRUE).anyTimes();
-        IAccountManager userManagerMock = 
-                (IAccountManager) createMock(IAccountManager.class);
+        IUserManager userManagerMock = 
+                (IUserManager) createMock(IUserManager.class);
         expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
                 .anyTimes();
-        expect(userManagerMock.store(isA(Account.class)))
+        expect(userManagerMock.store(isA(User.class)))
                 .andReturn(Integer.SIZE).anyTimes();
         
         IJsonUtil jsonUtilMock = 
@@ -214,7 +213,7 @@ public class DataSourceListServletTest {
         replayAll();
         
         classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setAccountManager(userManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
         request.setContent(JSON_ACCOUNT.getBytes());
         classUnderTest.handleRequest(request, response);
@@ -235,22 +234,25 @@ public class DataSourceListServletTest {
                 isA(String.class), isA(String.class)))
                 .andReturn(Boolean.TRUE).anyTimes();
         
-        IAccountManager userManagerMock = 
-                (IAccountManager) createMock(IAccountManager.class);
+        IUserManager userManagerMock = 
+                (IUserManager) createMock(IUserManager.class);
         expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
                 .anyTimes();
-        expect(userManagerMock.store(isA(Account.class)))
+        expect(userManagerMock.store(isA(User.class)))
                 .andReturn(Integer.SIZE).anyTimes();
         
         IJsonUtil jsonUtilMock = (IJsonUtil) createMock(IJsonUtil.class);
         expect(jsonUtilMock.jsonToUserAccount(JSON_ACCOUNT))
-                .andReturn(account);
-        expect(jsonUtilMock.userAccountToJson(account)).andReturn(JSON_ACCOUNT);
+                .andReturn(user);
+        
+        expect(jsonUtilMock.userAccountToJson(new User(1, "test", "user", 
+                "s3cret", "org", "unit", "locality", "state", "XX", 
+                "http://localhost:8084") )).andReturn(JSON_ACCOUNT);
         
         replayAll();
         
         classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setAccountManager(userManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
         request.setContent(JSON_ACCOUNT.getBytes());
         classUnderTest.handleRequest(request, response);
@@ -266,16 +268,16 @@ public class DataSourceListServletTest {
                 isA(String.class), isA(String.class)))
                 .andReturn(Boolean.TRUE).anyTimes();
         
-        IAccountManager userManagerMock = 
-                (IAccountManager) createMock(IAccountManager.class);
+        IUserManager userManagerMock = 
+                (IUserManager) createMock(IUserManager.class);
         expect(userManagerMock.load("test.baltrad.eu"))
-                .andReturn(account).anyTimes();
-        expect(userManagerMock.store(isA(Account.class)))
+                .andReturn(user).anyTimes();
+        expect(userManagerMock.store(isA(User.class)))
                 .andReturn(Integer.SIZE).anyTimes();
         
         IJsonUtil jsonUtilMock = (IJsonUtil) createMock(IJsonUtil.class);
         expect(jsonUtilMock.jsonToUserAccount(JSON_ACCOUNT))
-                .andReturn(account);
+                .andReturn(user);
         expect(jsonUtilMock.dataSourcesToJson(isA(HashSet.class)))
                 .andReturn(JSON_SOURCES);
         
@@ -287,7 +289,7 @@ public class DataSourceListServletTest {
         replayAll();
         
         classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setAccountManager(userManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setJsonUtil(jsonUtilMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         request.setContent(JSON_ACCOUNT.getBytes());

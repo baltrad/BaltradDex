@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -47,10 +47,6 @@ public interface ISubscription {
     public String getType();
     
     public void setType(String type);
-    
-    public String getOperator();
-
-    public void setOperator(String operator);
     
     public String getUser();
 

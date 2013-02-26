@@ -25,8 +25,8 @@ import eu.baltrad.dex.radar.model.Radar;
 import eu.baltrad.dex.radar.manager.impl.RadarManager;
 import eu.baltrad.dex.datasource.model.FileObject;
 import eu.baltrad.dex.datasource.manager.impl.FileObjectManager;
-import eu.baltrad.dex.user.model.Account;
-import eu.baltrad.dex.user.manager.impl.AccountManager;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.manager.impl.UserManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.impl.SubscriptionManager;
 import eu.baltrad.dex.datasource.model.DataSource;
@@ -39,6 +39,7 @@ import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.AttributeFilter;
 import eu.baltrad.beast.db.CombinedFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
+import eu.baltrad.dex.user.model.Role;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,7 +96,7 @@ public class SaveDataSourceController {
     private PlatformTransactionManager transactionManager;
     private RadarManager radarManager;
     private FileObjectManager fileObjectManager;
-    private AccountManager userManager;
+    private UserManager userManager;
     private IDataSourceManager dataSourceManager;
     private CoreFilterManager coreFilterManager;
     private SubscriptionManager subscriptionManager;
@@ -221,17 +222,17 @@ public class SaveDataSourceController {
                                 .load(Subscription.PEER);
                     dataSourceManager.deleteUser(dataSourceId);
                     if (selectedUsers != null) {
-                        List<Account> selectedAccounts = 
-                                new ArrayList<Account>();
+                        List<User> selectedUsrs = 
+                                new ArrayList<User>();
                         for (int i = 0; i < selectedUsers.length; i++) {
-                            Account account = userManager.load(selectedUsers[i]);
-                            selectedAccounts.add(account);    
+                            User usr = userManager.load(selectedUsers[i]);
+                            selectedUsrs.add(usr);    
                             dataSourceManager.storeUser(dataSourceId, 
-                                    account.getId());
+                                    usr.getId());
                         }
                         for (Subscription s : uploads) {
                             if (s.getDataSource().equals(dataSource.getName())
-                                    && !containsUser(selectedAccounts, 
+                                    && !containsUser(selectedUsrs, 
                                         s.getUser())) {
                                 subscriptionManager.delete(s.getId());
                             }
@@ -374,25 +375,33 @@ public class SaveDataSourceController {
     }
     
     /**
-     * Get users available for selection.
+     * Get user accounts available for selection.
      * @param dsId Data source id
      * @return List of available users
      */
     @ModelAttribute("all_users")
-    public List<Account> getAllUsers(
+    public List<User> getAllUsers(
             @RequestParam(value="ds_id", required=false) String dsId) {
         if (dsId != null) {
-            List<Account> selectedUsers = dataSourceManager
+            List<User> selectedUsers = dataSourceManager
                     .loadUser(Integer.parseInt(dsId));
-            List<Account> allButSelectedUsers = new ArrayList<Account>();
-            for (Account account : userManager.load()) {
-                if (!selectedUsers.contains(account)) {
-                    allButSelectedUsers.add(account);
+            List<User> allButSelectedUsers = new ArrayList<User>();
+            for (User usr : userManager.load()) {
+                if (!selectedUsers.contains(usr) 
+                        && usr.getRole().equals(Role.PEER)) {
+                    allButSelectedUsers.add(usr);
                 }
             }
             return allButSelectedUsers;
         } else {
-            return userManager.load();
+            List<User> allUsers = userManager.load();
+            List<User> peers = new ArrayList<User>();
+            for (User usr : allUsers) {
+                if (usr.getRole().equals(Role.PEER)) {
+                    peers.add(usr);
+                }
+            }
+            return peers;
         }
     }
     
@@ -402,7 +411,7 @@ public class SaveDataSourceController {
      * @return List of selected users
      */
     @ModelAttribute("selected_users")
-    public List<Account> getSelectedUsers(
+    public List<User> getSelectedUsers(
             @RequestParam(value="ds_id", required=false) String dsId) {
         if (dsId != null) {
             return dataSourceManager.loadUser(Integer.parseInt(dsId));
@@ -417,9 +426,9 @@ public class SaveDataSourceController {
      * @param user User to look for
      * @return True in case user is present 
      */
-    private boolean containsUser(List<Account> accounts, String userName) {
+    private boolean containsUser(List<User> users, String userName) {
         boolean result = false;
-        for (Account availableUser : accounts) {
+        for (User availableUser : users) {
             if (availableUser.getName().equals(userName)) {
                 result = true;
                 break;
@@ -457,7 +466,7 @@ public class SaveDataSourceController {
      * @param userManager the userManager to set
      */
     @Autowired
-    public void setUserManager(AccountManager userManager) {
+    public void setUserManager(UserManager userManager) {
         this.userManager = userManager;
     }
 

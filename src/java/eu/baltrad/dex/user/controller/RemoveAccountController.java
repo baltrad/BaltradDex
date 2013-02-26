@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,9 +21,10 @@
 
 package eu.baltrad.dex.user.controller;
 
-import eu.baltrad.dex.user.model.Account;
-import eu.baltrad.dex.user.manager.impl.AccountManager;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.manager.impl.UserManager;
 import eu.baltrad.dex.auth.manager.SecurityManager;
+import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.stereotype.Controller;
@@ -74,7 +75,7 @@ public class RemoveAccountController {
     private static final String OK_MSG_KEY = "message";
     private static final String ERROR_MSG_KEY = "error";
     
-    private AccountManager accountManager;
+    private UserManager accountManager;
     private PlatformTransactionManager transactionManager;
     private MessageResourceUtil messages;
     private Logger log;
@@ -95,16 +96,17 @@ public class RemoveAccountController {
     @RequestMapping("/remove_user_account.htm")
     public String removeUserAccount(HttpServletRequest request, ModelMap model) 
     {
-        List<Account> all = accountManager.load();
-        List<Account> accounts = new ArrayList<Account>();
-        for (Account account : all) {
-            if (!account.getName().equals(SecurityManager.getSessionUser(
-                    request.getSession()).getName())) {
-                accounts.add(account);
+        List<User> all = accountManager.load();
+        List<User> users = new ArrayList<User>();
+        for (User user : all) {
+            if (!user.getName().equals(SecurityManager.getSessionUser(
+                    request.getSession()).getName()) 
+                    && !user.getRole().equals(Role.NODE)) {
+                users.add(user);
             }
         }
-        Collections.sort(accounts);
-        model.addAttribute(ACCOUNTS_KEY, accounts);
+        Collections.sort(users);
+        model.addAttribute(ACCOUNTS_KEY, users);
         return REMOVE_USER_ACCOUNT_VIEW;
     }
     
@@ -121,12 +123,12 @@ public class RemoveAccountController {
             HttpServletResponse response, ModelMap model) throws IOException {
         String[] userIds = request.getParameterValues(ACCOUNTS_KEY);
         if (userIds != null) {
-            List<Account> accounts = new ArrayList<Account>();
+            List<User> users = new ArrayList<User>();
             for (int i = 0; i < userIds.length; i++) {
-                accounts.add(accountManager.load(Integer.parseInt(userIds[i])));
+                users.add(accountManager.load(Integer.parseInt(userIds[i])));
             }
-            Collections.sort(accounts);
-            model.addAttribute(ACCOUNTS_KEY, accounts);
+            Collections.sort(users);
+            model.addAttribute(ACCOUNTS_KEY, users);
         } else {
             response.sendRedirect("remove_user_account.htm");
         }
@@ -148,11 +150,11 @@ public class RemoveAccountController {
         TransactionStatus status = transactionManager.getTransaction(def);
         try {
             for (int i = 0; i < userIds.length; i++) {
-                Account account = accountManager.load(
+                User user = accountManager.load(
                         Integer.parseInt(userIds[i]));
                 accountManager.delete(Integer.parseInt(userIds[i]));
                 String msg = messages.getMessage(REMOVE_ACCOUNT_OK_MSG_KEY, 
-                                new Object[] {account.getName()});
+                                new Object[] {user.getName()});
                 log.warn(msg);
             }    
             transactionManager.commit(status);
@@ -170,7 +172,7 @@ public class RemoveAccountController {
      * @param userManager Reference to user manager object
      */
     @Autowired
-    public void setAccountManager(AccountManager accountManager) { 
+    public void setAccountManager(UserManager accountManager) { 
         this.accountManager = accountManager; 
     }
 
