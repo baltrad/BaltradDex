@@ -97,12 +97,9 @@ public class SubscriptionManagerTest extends TestCase {
         verifyDBTables(null, "dex_roles", null);
         verifyDBTables(null, "dex_users", null);
         verifyDBTables(null, "dex_users_roles", null);
-        verifyDBTables(null, "dex_nodes", null);
-        verifyDBTables(null, "dex_users_nodes", null);
         verifyDBTables(null, "dex_data_sources", null);
         verifyDBTables(null, "dex_subscriptions", null);
         verifyDBTables(null, "dex_subscriptions_users", null);
-        verifyDBTables(null, "dex_subscriptions_nodes", null);
         verifyDBTables(null, "dex_subscriptions_data_sources", null);
     }
     
@@ -133,14 +130,6 @@ public class SubscriptionManagerTest extends TestCase {
     
     public void testLoadByType() throws Exception {
         List<Subscription> subs = classUnderTest.load(Subscription.LOCAL);
-        verifyAll();
-        assertNotNull(subs);
-        assertEquals(2, subs.size());
-    }
-    
-    public void testLoadByOperator() throws Exception {
-        List<Subscription> subs = classUnderTest.load(Subscription.LOCAL, 
-                "TestNode1");
         verifyAll();
         assertNotNull(subs);
         assertEquals(2, subs.size());
@@ -195,7 +184,6 @@ public class SubscriptionManagerTest extends TestCase {
         
         verifyDBTables("delete", "dex_subscriptions", null);
         verifyDBTables("delete", "dex_subscriptions_users", null);
-        verifyDBTables("delete", "dex_subscriptions_nodes", null);
         verifyDBTables("delete", "dex_subscriptions_data_sources", null);   
     }
     

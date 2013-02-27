@@ -87,15 +87,15 @@ public class UserManagerTest extends TestCase{
     private void verifyAll() throws Exception {
         verifyDBTables(null, "dex_users", null);
         verifyDBTables(null, "dex_roles", null);
-        verifyDBTables(null, "dex_nodes", null);
         verifyDBTables(null, "dex_users_roles", null);
-        verifyDBTables(null, "dex_users_nodes", null);
+        verifyDBTables(null, "dex_subscriptions", null);
+        verifyDBTables(null, "dex_subscriptions_users", null);
     }
     
     public void testLoadAll() throws Exception {
         List<User> users = classUnderTest.load();
         assertNotNull(users);
-        assertTrue(users.size() == 3);
+        assertEquals(5, users.size());
         verifyAll();
     }
     
@@ -111,7 +111,7 @@ public class UserManagerTest extends TestCase{
         assertEquals("state3", user.getState());
         assertEquals("ZZ", user.getCountryCode());
         assertEquals(Role.USER, user.getRole());
-        assertEquals("http://test3.eu", user.getNodeAddress());
+        assertEquals("http://test3.baltrad.eu", user.getNodeAddress());
         verifyAll();
     }
     
@@ -127,35 +127,53 @@ public class UserManagerTest extends TestCase{
         assertEquals("state2", user.getState());
         assertEquals("YY", user.getCountryCode());
         assertEquals(Role.OPERATOR, user.getRole());
-        assertEquals("http://test2.eu", user.getNodeAddress());
+        assertEquals("http://test2.baltrad.eu", user.getNodeAddress());
         verifyAll();
     }
     
-    public void testLoadPeers() {
-        
+    public void testLoadPeers() throws Exception {
+        List<String> users = classUnderTest.loadPeers();
+        assertNotNull(users);
+        assertTrue(users.size() == 2);
+        assertTrue(users.contains("User4"));
+        assertTrue(users.contains("User5"));
+        verifyAll();
     } 
     
-    public void testLoadUsers() {
-        
+    public void testLoadUsers() throws Exception {
+        List<User> users = classUnderTest.loadUsers();
+        assertNotNull(users);
+        assertEquals(2, users.size());
+        assertTrue(users.contains(new User("User4", "peer", "passw0rd", "org4",
+            "unit4", "locality4", "state4", "XY", "http://test4.baltrad.eu")));
+        assertTrue(users.contains(new User("User5", "peer", "passw0rd", "org5",
+            "unit5", "locality5", "state5", "XZ", "http://test5.baltrad.eu")));
+        verifyAll();
     }
     
-    public void testLoadOperators() {
-        
+    public void testLoadOperators() throws Exception {
+        List<User> users = classUnderTest.loadOperators();
+        assertNotNull(users);
+        assertEquals(2, users.size());
+        assertTrue(users.contains(new User("User1", "admin", "passw0rd", "org1",
+            "unit1", "locality1", "state1", "XX", "http://test1.baltrad.eu")));
+        assertTrue(users.contains(new User("User2", "operator", "passw0rd", 
+            "org2", "unit2", "locality2", "state2", "YY", 
+                "http://test2.baltrad.eu")));
+        verifyAll();
     }
-    
-    
+        
     public void testStore() throws Exception {
         helper.cleanInsert(this, "noid");
-        User user = new User("User4", "operator", "passw0rd", "org4", 
-                "unit4", "locality4", "state4", "VV", "http://test4.eu");
-        
-        assertEquals(4, classUnderTest.store(user));
+        User user = new User("User6", "operator", "passw0rd", "org6", "unit6", 
+                "locality6", "state6", "VV", "http://test6.baltrad.eu");
+        assertEquals(6, classUnderTest.store(user));
         verifyDBTables("store", "dex_users", "id");
     }
     
     public void testUpdate() throws Exception {
-        User user = new User(3, "User4", "user", "passw0rd", "org4", 
-                "unit4", "locality4", "state4", "VV", "http://test4.eu");
+        User user = new User(3, "User3", "user", "passw0rd", "org4", "unit4", 
+                "locality4", "state4", "VV", "http://test4.baltrad.eu");
         
         classUnderTest.update(user);
         verifyDBTables("update", "dex_users", null);

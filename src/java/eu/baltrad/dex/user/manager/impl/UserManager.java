@@ -102,7 +102,7 @@ public class UserManager implements IUserManager {
      * @return Account with a given id.
      */
     public User load(int id) {
-        String sql = "SELECT dex_users.*, dex_roles.name AS role " + 
+        String sql = "SELECT u.*, r.name AS role " + 
                 "FROM dex_users u, dex_roles r, dex_users_roles ur " + 
                 "WHERE ur.user_id = u.id AND ur.role_id = r.id " +
                 "AND u.id = ?;";

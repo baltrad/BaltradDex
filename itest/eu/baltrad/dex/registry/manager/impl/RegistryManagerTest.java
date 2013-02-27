@@ -195,6 +195,7 @@ public class RegistryManagerTest extends TestCase {
         
         classUnderTest.setTrimmer(deltaDays, deltaHours, deltaMinutes);
         helper.cleanInsert(this, "noid");
+        
         RegistryEntry entry = new RegistryEntry(
                 format.parse("2012-08-24 12:10:00").getTime(), "121212121212", 
                 "SUCCESS", "User1");

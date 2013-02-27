@@ -7,23 +7,5 @@
                       description="Another test data source"/>
     <dex_data_sources name="DataSource3" type="peer"
                       description="Yet one more test data source"/>
-          
-    <dex_roles id="1" name="peer"/>     
-        
-    <dex_users id="1" name="User1" password="passw0rd" org_name="org" 
-               org_unit="unit" locality="locality " state="state" 
-               country_code="XX"/>
-    <dex_users id="2" name="User2" password="passw0rd" org_name="org" 
-               org_unit="unit" locality="locality " state="state" 
-               country_code="XX"/>      
-               
-    <dex_users_roles id="1" user_id="1" role_id="1"/>
-    <dex_users_roles id="2" user_id="2" role_id="1"/>
-    
-    <dex_nodes id="1" name="TestNode1" address="http://test1.eu"/>    
-    <dex_nodes id="2" name="TestNode2" address="http://test2.eu"/>
-    
-    <dex_users_nodes id="1" user_id="1" node_id="1"/>
-    <dex_users_nodes id="2" user_id="2" node_id="2"/>
     
 </dataset>

@@ -4,19 +4,13 @@
         
     <dex_users id="1" name="User1" password="passw0rd" org_name="org" 
                org_unit="unit" locality="locality " state="state" 
-               country_code="XX"/>
+               country_code="XX" node_address="http://test1.baltrad.eu"/>
     <dex_users id="2" name="User2" password="passw0rd" org_name="org" 
                org_unit="unit" locality="locality " state="state" 
-               country_code="XX"/>      
+               country_code="XX" node_address="http://test2.baltrad.eu"/>      
                
     <dex_users_roles id="1" user_id="1" role_id="1"/>
     <dex_users_roles id="2" user_id="2" role_id="1"/>
-    
-    <dex_nodes id="1" name="TestNode1" address="http://test1.eu"/>
-    <dex_nodes id="2" name="TestNode2" address="http://test2.eu"/>
-    
-    <dex_users_nodes id="1" user_id="1" node_id="1"/>
-    <dex_users_nodes id="2" user_id="2" node_id="2"/>
     
     <dex_data_sources id="1" name="DataSource1" type="local"
                       description="A test data source"/>

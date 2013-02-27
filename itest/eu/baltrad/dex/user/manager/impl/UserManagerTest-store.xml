@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+            
+    <dex_roles id="1" name="admin"/>
+    <dex_roles id="2" name="operator"/>
+    <dex_roles id="3" name="user"/>  
+    <dex_roles id="4" name="peer"/>   
+       
+    <dex_users name="User1" password="passw0rd" org_name="org1" 
+               org_unit="unit1" locality="locality1" state="state1" 
+               country_code="XX" node_address="http://test1.baltrad.eu"/>
+    <dex_users name="User2" password="passw0rd" org_name="org2" 
+               org_unit="unit2" locality="locality2" state="state2" 
+               country_code="YY" node_address="http://test2.baltrad.eu"/>      
+    <dex_users name="User3" password="passw0rd" org_name="org3" 
+               org_unit="unit3" locality="locality3" state="state3" 
+               country_code="ZZ" node_address="http://test3.baltrad.eu"/> 
+    <dex_users name="User4" password="passw0rd" org_name="org4" 
+               org_unit="unit4" locality="locality4" state="state4" 
+               country_code="XY" node_address="http://test4.baltrad.eu"/> 
+    <dex_users name="User5" password="passw0rd" org_name="org5" 
+               org_unit="unit5" locality="locality5" state="state5" 
+               country_code="XZ" node_address="http://test5.baltrad.eu"/>      
+    <dex_users name="User6" password="passw0rd" org_name="org6" 
+               org_unit="unit6" locality="locality6" state="state6" 
+               country_code="VV" node_address="http://test6.baltrad.eu"/> 
+               
+</dataset>

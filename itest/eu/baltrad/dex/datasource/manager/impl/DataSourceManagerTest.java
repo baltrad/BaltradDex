@@ -84,8 +84,6 @@ public class DataSourceManagerTest extends TestCase {
         verifyDBTables(null, "dex_users", null);
         verifyDBTables(null, "dex_roles", null);
         verifyDBTables(null, "dex_users_roles", null);
-        verifyDBTables(null, "dex_nodes", null);
-        verifyDBTables(null, "dex_users_nodes", null);
         verifyDBTables(null, "dex_data_source_users", null);
         verifyDBTables(null, "dex_radars", null);
         verifyDBTables(null, "dex_data_source_radars", null);

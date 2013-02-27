@@ -1286,7 +1286,6 @@ Authorization: baltrad.imgw.pl:APa7608wLQI ...
     "date":1357909585672,
     "active":true,
     "dataSource":"LegionowoPVOL",
-    "operator":"baltrad-backup.imgw.pl",
     "user":"baltrad.imgw.pl",
     "syncronized":true
   },  
@@ -1296,7 +1295,6 @@ Authorization: baltrad.imgw.pl:APa7608wLQI ...
     "date":1357909585757,
     "active":true,
     "dataSource":"PoznańSCAN",
-    "operator":"baltrad-backup.imgw.pl",
     "user":"baltrad.imgw.pl",
     "syncronized":true
   }
@@ -1330,7 +1328,6 @@ Node-Name: baltrad-backup.imgw.pl
     "date":1357909625659,
     "active":true,
     "dataSource":"LegionowoPVOL",
-    "operator":"baltrad-backup.imgw.pl",
     "user":"baltrad.imgw.pl",
     "syncronized":true
   },
@@ -1340,7 +1337,6 @@ Node-Name: baltrad-backup.imgw.pl
     "date":1357909625706,
     "active":true,
     "dataSource":"PoznańSCAN",
-    "operator":"baltrad-backup.imgw.pl",
     "user":"baltrad.imgw.pl",
     "syncronized":true
   }
