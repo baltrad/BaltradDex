@@ -65,15 +65,15 @@ import java.util.*;
 public class StartSubscriptionServletTest {
     
     private static final String JSON_SOURCES_OK =
-            "[{\"name\":\"DS1\",\"id\":0,\"type\":\"local\",\"description\"" +
-            ":\"A test data source\"},{\"name\":\"DS2\",\"id\":0,\"type\":" + 
+            "[{\"name\":\"DS1\",\"type\":\"local\",\"description\"" +
+            ":\"A test data source\"},{\"name\":\"DS2\",\"type\":" + 
             "\"local\",\"description\":\"One more test data source\"}," + 
-            "{\"name\":\"DS3\",\"id\":0,\"type\":\"local\",\"description\":" + 
+            "{\"name\":\"DS3\",\"type\":\"local\",\"description\":" + 
             "\"Yet another test data source\"}]";
     
     private static final String JSON_SOURCES_PARTIAL =  
-            "[{\"name\":\"DS1\",\"id\":0,\"type\":\"local\",\"description\"" +
-            ":\"A test data source\"},{\"name\":\"DS2\",\"id\":0,\"type\":" + 
+            "[{\"name\":\"DS1\",\"type\":\"local\",\"description\"" +
+            ":\"A test data source\"},{\"name\":\"DS2\",\"type\":" + 
             "\"local\",\"description\":\"One more test data source\"}]";
     
     private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";

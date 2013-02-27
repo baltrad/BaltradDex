@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.datasource.model;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import java.io.Serializable;
 
 /**
@@ -38,6 +40,7 @@ public class DataSource implements Serializable, Comparable<DataSource> {
     public static final String PEER = "peer";
     
     /** Data source ID */
+    @JsonIgnore
     private int id;
     /** Data source name */
     private String name;
@@ -106,12 +109,14 @@ public class DataSource implements Serializable, Comparable<DataSource> {
      *
      * @return Data source ID
      */
+    @JsonIgnore
     public int getId() { return id; }
     /**
      * Sets data source ID
      *
      * @param id Data source ID
      */
+    @JsonIgnore
     public void setId( int id ) { this.id = id; }
     /**
      * Gets data source name.

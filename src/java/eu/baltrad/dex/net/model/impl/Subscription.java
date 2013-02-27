@@ -23,6 +23,8 @@ package eu.baltrad.dex.net.model.impl;
 
 import eu.baltrad.dex.net.model.ISubscription;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import java.io.Serializable;
 
 import java.util.Date;
@@ -36,6 +38,7 @@ import java.util.Date;
  */
 public class Subscription implements ISubscription, Serializable {
     
+    @JsonIgnore
     private int id;
     private Date date;
     private String type;
@@ -92,6 +95,7 @@ public class Subscription implements ISubscription, Serializable {
     /**
      * @return the id
      */
+    @JsonIgnore
     public int getId() {
         return id;
     }
@@ -99,6 +103,7 @@ public class Subscription implements ISubscription, Serializable {
     /**
      * @param id the id to set
      */
+    @JsonIgnore
     public void setId(int id) {
         this.id = id;
     }

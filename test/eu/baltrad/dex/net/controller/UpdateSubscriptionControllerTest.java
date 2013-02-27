@@ -73,22 +73,21 @@ import java.sql.Timestamp;
 public class UpdateSubscriptionControllerTest {
     
     private static final String JSON_SUBSCRIPTIONS_OK = 
-            "[{\"id\":1,\"type\":\"download\",\"date\":1340189763867," + 
+            "[{\"type\":\"download\",\"date\":1340189763867," + 
             "\"active\":true,\"user\":\"User1\",\"dataSource\":\"DataSource1" + 
-            "\",\"syncronized\":true},{\"id\":2,\"type\":\"download" + 
+            "\",\"syncronized\":true},{\"type\":\"download" + 
             "\",\"date\":1340189763867,\"active\":true,\"user\":\"" + 
             "User2\",\"dataSource\":\"DataSource2\",\"syncronized\":false}," + 
-            "{\"id\":3,\"type\":\"upload\",\"date\":1340189763867,\"active\"" +
+            "{\"type\":\"upload\",\"date\":1340189763867,\"active\"" +
             ":false,\"user\":\"User3\",\"dataSource\":\"DataSource3\"," + 
             "\"syncronized\":true}]";
             
     private static final String JSON_SUBSCRIPTIONS_PARTIAL =
-            "[{\"id\":1,\"type\":\"" + 
-            "download\",\"date\":1340189763867,\"active\":true,\"user\":" +
-            "\"User1\",\"dataSource\":\"DataSource1\",\"syncronized\":true}," + 
-            "{\"id\":3,\"type\":\"upload\",\"date\":1340189763867,\"active\"" +
-            ":false,\"user\":\"User3\",\"dataSource\":\"DataSource3\"," + 
-            "\"syncronized\":true}]";
+            "[{\"type\":\"download\",\"date\":1340189763867,\"active\":true," +
+            "\"user\":\"User1\",\"dataSource\":\"DataSource1\",\"syncronized" +
+            "\":true},{\"type\":\"upload\",\"date\":1340189763867," + 
+            "\"active\":false,\"user\":\"User3\",\"dataSource\":\"" +
+            "DataSource3\",\"syncronized\":true}]";
     
     private GSController classUnderTest;
     private List<Object> mocks;

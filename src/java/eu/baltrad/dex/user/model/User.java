@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.user.model;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 /**
  * Class implements user object.
  *
@@ -30,6 +32,7 @@ package eu.baltrad.dex.user.model;
  */
 public class User implements Comparable<User> {
 
+    @JsonIgnore
     private int id;
     private String name;
     private String role;
@@ -181,11 +184,13 @@ public class User implements Comparable<User> {
     /**
      * @return User id
      */
+    @JsonIgnore
     public int getId() { return id; }
     
     /**
      * @param id User id
      */
+    @JsonIgnore
     public void setId( int id ) { this.id = id; }
     
     /**

@@ -40,24 +40,24 @@ import org.junit.Test;
 public class JsonUtilTest {
     
     private static final String JSON_ACCOUNT = 
-            "{\"name\":\"test\",\"id\":1,\"state\":\"state\",\"nodeAddress\"" +
+            "{\"name\":\"test\",\"state\":\"state\",\"nodeAddress\"" +
             ":\"http://localhost:8084\",\"orgName\":\"org\",\"orgUnit\":" +
             "\"unit\",\"locality\":\"locality\",\"countryCode\":\"XX\"," +
             "\"role\":\"user\",\"password\":\"s3cret\"}";
     
     private static final String JSON_SOURCES = 
-            "[{\"name\":\"DS1\",\"type\":\"local\",\"id\":1,\"description\"" +
+            "[{\"name\":\"DS1\",\"type\":\"local\",\"description\"" +
             ":\"A test data source\"},{\"name\":\"DS2\",\"type\":\"local\"," +
-            "\"id\":2,\"description\":\"One more test data source\"},{\"" + 
-            "name\":\"DS3\",\"type\":\"local\",\"id\":3,\"description\":\"" + 
+            "\"description\":\"One more test data source\"},{\"" + 
+            "name\":\"DS3\",\"type\":\"local\",\"description\":\"" + 
             "Yet another test data source\"}]";
         
     private static final String JSON_SUBSCRIPTIONS = 
-            "[{\"id\":1,\"type\":\"local\",\"date\":1340189763867,\"active\":" + 
+            "[{\"type\":\"local\",\"date\":1340189763867,\"active\":" + 
             "true,\"dataSource\":\"DataSource1\",\"user\":\"User1\"," +
-            "\"syncronized\":true},{\"id\":2,\"type\":\"local\",\"date\":" +
+            "\"syncronized\":true},{\"type\":\"local\",\"date\":" +
             "1340189763867,\"active\":true,\"dataSource\":\"DataSource2\"," +
-            "\"user\":\"User2\",\"syncronized\":false},{\"id\":3,\"type\":" +
+            "\"user\":\"User2\",\"syncronized\":false},{\"type\":" +
             "\"peer\",\"date\":1340189763867,\"active\":false,\"dataSource\":" +
             "\"DataSource3\",\"user\":\"User3\",\"syncronized\":true}]"; 
             
@@ -112,7 +112,6 @@ public class JsonUtilTest {
     public void jsonToUserAccount() {
         User _user = classUnderTest.jsonToUserAccount(JSON_ACCOUNT);
         assertNotNull(_user);
-        assertEquals(user.getId(), _user.getId());
         assertEquals(user.getName(), _user.getName());
         assertEquals(user.getPassword(), _user.getPassword());
         assertEquals(user.getOrgName(), _user.getOrgName());
@@ -136,12 +135,14 @@ public class JsonUtilTest {
                              classUnderTest.jsonToDataSources(JSON_SOURCES);
         assertNotNull(sources);
         assertEquals(3, sources.size());
-        for (DataSource ds : sources) {
-            assertNotNull(ds);
-            assertNotNull(ds.getId());
-            assertNotNull(ds.getName());
-            assertNotNull(ds.getType());
-            assertNotNull(ds.getDescription());
+        
+        List<DataSource> in = new ArrayList<DataSource>(dataSources);
+        List<DataSource> out = new ArrayList<DataSource>(sources);
+        
+        for (int i = 0; i < in.size(); i++) {
+            assertEquals(in.get(i).getName(), out.get(i).getName());
+            assertEquals(in.get(i).getType(), out.get(i).getType());
+            assertEquals(in.get(i).getDescription(), out.get(i).getDescription());
         }
     }
     
@@ -160,7 +161,6 @@ public class JsonUtilTest {
         assertEquals(subscriptions.size(), subs.size());
         
         for (int i = 0; i < subs.size(); i++) {
-            assertEquals(subscriptions.get(i).getId(), subs.get(i).getId());
             assertEquals(subscriptions.get(i).getDate(), 
                     subs.get(i).getDate());
             assertEquals(subscriptions.get(i).getType(), 

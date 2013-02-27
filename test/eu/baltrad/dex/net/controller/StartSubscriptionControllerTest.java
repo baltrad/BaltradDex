@@ -79,14 +79,14 @@ public class StartSubscriptionControllerTest {
     };
     
     private static final String JSON_SOURCES_OK =  
-            "[{\"name\":\"DS1\",\"id\":1,\"description\":\"A test "
-            + "data source\"},{\"name\":\"DS2\",\"id\":2,\"description\":\"One "
-            + "more test data source\"},{\"name\":\"DS3\",\"id\":3,\"" 
-            + "description\":\"Yet another test data source\"}]";
+            "[{\"name\":\"DS1\",\"description\":\"A test "
+            + "data source\"},{\"name\":\"DS2\",\"description\":\"One "
+            + "more test data source\"},{\"name\":\"DS3\"," 
+            + "\"description\":\"Yet another test data source\"}]";
     
     private static final String JSON_SOURCES_PARTIAL =  
-            "[{\"name\":\"DS1\",\"id\":1,\"description\":\"A test "
-            + "data source\"},{\"name\":\"DS2\",\"id\":2,\"description\":\"One "
+            "[{\"name\":\"DS1\",\"description\":\"A test "
+            + "data source\"},{\"name\":\"DS2\",\"description\":\"One "
             + "more test data source\"}]";
     
     private List<Object> mocks;

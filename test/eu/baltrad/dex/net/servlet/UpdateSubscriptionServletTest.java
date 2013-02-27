@@ -62,12 +62,12 @@ import java.text.SimpleDateFormat;
  */
 public class UpdateSubscriptionServletTest {
     
-    private static final String JSON_SUBSCRIPTIONS = "[{\"id\":1,\"type\":\"" + 
+    private static final String JSON_SUBSCRIPTIONS = "[{\"type\":\"" + 
             "download\",\"date\":1340189763867,\"active\":true,\"user\":" +
             "\"User1\",\"dataSource\":\"DataSource1\",\"syncronized\":true}," +
-            "{\"id\":2,\"type\":\"download\",\"date\":1340189763867," + 
+            "{\"type\":\"download\",\"date\":1340189763867," + 
             "\"active\":true,\"user\":\"User2\",\"dataSource\":" + 
-            "\"DataSource2\",\"syncronized\":false},{\"id\":3,\"type\":" + 
+            "\"DataSource2\",\"syncronized\":false},{\"type\":" + 
             "\"upload\",\"date\":1340189763867,\"active\":true,\"user\":" + 
             "\"User3\",\"dataSource\":\"DataSource3\",\"syncronized\":true}]";
     

@@ -1162,17 +1162,17 @@ Node-Name: baltrad-backup.imgw.pl
 [
   {
     "name":"PoznańSCAN",
-    "id":12,
+    "type":"peer",
     "description":"Polar scans from Poznań"
   },
   {
     "name":"LegionowoPVOL",
-    "id":11,
+    "type":"peer",
     "description":"Polar volumes from Legionowo"
   },
   {
     "name":"PastewnikALL",
-    "id":13,
+    "type":"peer",
     "description":"Polar scans and volumes from Pastewnik"
   }
 ]
@@ -1207,12 +1207,12 @@ Authorization: baltrad.imgw.pl:APa7608wLQI ...
 [
   {
     "name":"PoznańSCAN",
-    "id":12,
+    "type":"peer",
     "description":"Polar scans from Poznań"
   },
   {
     "name":"LegionowoPVOL",
-    "id":11,
+    "type":"peer",
     "description":"Polar volumes from Legionowo"
   }
 ]
@@ -1242,12 +1242,12 @@ Node-Name: baltrad-backup.imgw.pl
 [
   {
     "name":"PoznańSCAN",
-    "id":0,
+    "type":"peer",
     "description":"Polar scans from Poznań"
   },
   {
     "name":"LegionowoPVOL",
-    "id":0,
+    "type":"peer",
     "description":"Polar volumes from Legionowo"
   }
 ]
@@ -1281,8 +1281,7 @@ Date: Fri, 6 Jul 2012 13:00:26 CEST
 Authorization: baltrad.imgw.pl:APa7608wLQI ...
 [
   {
-    "id":19,
-    "type":"download",
+    "type":"local",
     "date":1357909585672,
     "active":true,
     "dataSource":"LegionowoPVOL",
@@ -1290,8 +1289,7 @@ Authorization: baltrad.imgw.pl:APa7608wLQI ...
     "syncronized":true
   },  
   {
-    "id":18,
-    "type":"download",
+    "type":"local",
     "date":1357909585757,
     "active":true,
     "dataSource":"PoznańSCAN",
@@ -1323,8 +1321,7 @@ Content-MD5 header value consists of Base64-encoded list of subscriptions.
 Node-Name: baltrad-backup.imgw.pl
 [
   {
-    "id":0,
-    "type":"upload",
+    "type":"local",
     "date":1357909625659,
     "active":true,
     "dataSource":"LegionowoPVOL",
@@ -1332,8 +1329,7 @@ Node-Name: baltrad-backup.imgw.pl
     "syncronized":true
   },
   {
-    "id":0,
-    "type":"upload",
+    "type":"local",
     "date":1357909625706,
     "active":true,
     "dataSource":"PoznańSCAN",
