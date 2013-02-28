@@ -71,7 +71,7 @@ Author     : szewczenko
                                     <c:out value="${sub.dataSource}"/>
                                 </div>
                                 <div id="cell" class="operator">
-                                    <c:out value="${sub.operator}"/>
+                                    <c:out value="${sub.user}"/>
                                 </div>
                             </div>
                         </c:forEach>
