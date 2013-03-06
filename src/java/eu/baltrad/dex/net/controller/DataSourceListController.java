@@ -34,11 +34,11 @@ import eu.baltrad.dex.net.controller.util.MessageSetter;
 import eu.baltrad.dex.net.util.UrlValidatorUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.user.manager.IUserManager;
-
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.WebValidator;
 import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.util.CompressDataUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,11 +56,16 @@ import org.apache.log4j.Logger;
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
+
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+
 import java.util.HashSet;
 import java.util.Set;
-
 
 /**
  * Controls access to data sources available at the peer node for subscription.
@@ -84,6 +89,19 @@ public class DataSourceListController implements MessageSetter {
     private static final String DATA_SOURCES_KEY = "data_sources";
     /** Peer node name key */
     private static final String PEER_NAME_KEY = "peer_name";
+    
+    /** Send key controller error */
+    private static final String DS_SEND_KEY_CONTROLLER_ERROR_KEY = 
+            "datasource.controller.send_key_controller_error";
+    /** Send key server error */
+    private static final String DS_SEND_KEY_SERVER_ERROR_KEY = 
+            "datasource.controller.send_key_server_error";
+    /** Send key server OK message */
+    private static final String DS_SEND_KEY_SERVER_MSG_KEY = 
+            "datasource.controller.send_key_server_msg";
+    /** Key already exists on server */
+    private static final String DS_SEND_KEY_EXISTS_MSG_KEY =
+            "datasource.controller.send_key_exists";
     
     /** Message signer error key */
     private static final String DS_MESSAGE_SIGNER_ERROR_KEY = 
@@ -215,94 +233,149 @@ public class DataSourceListController implements MessageSetter {
     @RequestMapping("/node_connected.htm")
     public String nodeConnected(Model model, 
             @RequestParam(value="node_select", required=false) String nodeSelect,
-            @RequestParam(value="url_input", required=false) String urlInput) 
+            @RequestParam(value="url_input", required=false) String urlInput,
+            @RequestParam(value="connect", required=false) String connect,
+            @RequestParam(value="send_key", required=false) String sendKey) 
     {
         initConfiguration();
         String viewName = null;
-        // Validate node's URL address 
-        String urlSelect = null;
-        if (WebValidator.validate(nodeSelect)) {
-            User user = userManager.load(nodeSelect);
-            urlSelect = user.getNodeAddress();
-        }
-        String url = urlValidator.validate(urlInput) ? urlInput : urlSelect;
-        if (!urlValidator.validate(url)) {
-            setMessage(model, ERROR_MSG_KEY,
-                       messages.getMessage(DS_INVALID_NODE_URL_KEY));
+        
+        // send key
+        if (sendKey != null) {
+            if (!urlValidator.validate(urlInput)) {
+                setMessage(model, ERROR_MSG_KEY,
+                           messages.getMessage(DS_INVALID_NODE_URL_KEY));       
+            } else {
+                try {
+                    CompressDataUtil cdu = new CompressDataUtil(
+                            confManager.getAppConf().getKeystoreDir() 
+                            + File.separator + localNode.getName() + ".pub");
+                    requestFactory = new DefaultRequestFactory(
+                            URI.create(urlInput));
+                    HttpUriRequest req = requestFactory.createPostKeyRequest(
+                            localNode, new ByteArrayInputStream(cdu.zip()));
+                    HttpResponse res = httpClient.post(req);
+                    if (res.getStatusLine().getStatusCode() 
+                            == HttpServletResponse.SC_OK) {
+                        String okMsg = messages
+                                .getMessage(DS_SEND_KEY_SERVER_MSG_KEY);
+                        setMessage(model, SUCCESS_MSG_KEY, okMsg);
+                    } else if(res.getStatusLine().getStatusCode() 
+                            == HttpServletResponse.SC_CONFLICT) {
+                        String errorMsg = messages
+                                .getMessage(DS_SEND_KEY_EXISTS_MSG_KEY);
+                        setMessage(model, ERROR_MSG_KEY, errorMsg);
+                    } else {
+                        String errorMsg = messages.getMessage(
+                            DS_SEND_KEY_SERVER_ERROR_KEY);
+                        String errorDetails = res.getStatusLine()
+                                .getReasonPhrase();
+                        setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                                errorMsg, errorDetails);
+                        log.error(errorMsg + ": " + errorDetails);
+                    }
+                } catch (Exception e) {
+                    String errorMsg = messages.getMessage(
+                            DS_SEND_KEY_CONTROLLER_ERROR_KEY);
+                    setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                            errorMsg, e.getMessage());
+                    log.error(errorMsg + ": " + e.getMessage());
+                }
+            }
             viewName = DS_CONNECT_VIEW;
-        } else {
-            // Post request if URL was successfully validated 
-            requestFactory = new DefaultRequestFactory(URI.create(url));
-            HttpUriRequest req = requestFactory
-                .createDataSourceListingRequest(localNode);
-            try {
-                authenticator.addCredentials(req, localNode.getName());
-                HttpResponse res = httpClient.post(req);
-                if (res.getStatusLine().getStatusCode() == 
-                        HttpServletResponse.SC_OK) {
-                    // alright, read data sources
-                    peerNodeName = res.getFirstHeader("Node-Name").getValue();
-                    model.addAttribute(PEER_NAME_KEY, peerNodeName);
-                    String json = readResponse(res);
-                    peerDataSources = jsonUtil.jsonToDataSources(json);
-                    viewName = DS_CONNECTED_VIEW;
-                    model.addAttribute(DATA_SOURCES_KEY, peerDataSources);
-                } else if (res.getStatusLine().getStatusCode() ==
-                        HttpServletResponse.SC_CREATED) {
-                    // user account established on server, create local account
-                    peerNodeName = res.getFirstHeader("Node-Name").getValue();
-                    model.addAttribute(PEER_NAME_KEY, peerNodeName);
-                    String json = readResponse(res);
-                    User peer = jsonUtil.jsonToUserAccount(json);
-                    if (userManager.load(peer.getName()) == null) {
-                        peer.setRole(Role.PEER);
-                        try {
-                            userManager.store(peer);
-                            log.warn("New peer account created: " + 
-                                    peer.getName());
-                        } catch (Exception e) {
-                            throw e;
-                        }   
-                    }       
-                    viewName = DS_CONNECTED_VIEW;
-                } else {
+        }
+        
+        // connect to node
+        if (connect != null) {
+            // Validate node's URL address 
+            String urlSelect = null;
+            if (WebValidator.validate(nodeSelect)) {
+                User user = userManager.load(nodeSelect);
+                urlSelect = user.getNodeAddress();
+            }
+            String url = urlValidator.validate(urlInput) ? urlInput : urlSelect;
+            if (!urlValidator.validate(url)) {
+                setMessage(model, ERROR_MSG_KEY,
+                           messages.getMessage(DS_INVALID_NODE_URL_KEY));
+                viewName = DS_CONNECT_VIEW;
+            } else {
+                // Post request if URL was successfully validated 
+                requestFactory = new DefaultRequestFactory(URI.create(url));
+                HttpUriRequest req = requestFactory
+                    .createDataSourceListingRequest(localNode);
+                try {
+                    authenticator.addCredentials(req, localNode.getName());
+                    HttpResponse res = httpClient.post(req);
+                    if (res.getStatusLine().getStatusCode() == 
+                            HttpServletResponse.SC_OK) {
+                        // alright, read data sources
+                        peerNodeName = res.getFirstHeader("Node-Name")
+                                .getValue();
+                        model.addAttribute(PEER_NAME_KEY, peerNodeName);
+                        String json = readResponse(res);
+                        peerDataSources = jsonUtil.jsonToDataSources(json);
+                        viewName = DS_CONNECTED_VIEW;
+                        model.addAttribute(DATA_SOURCES_KEY, peerDataSources);
+                    } else if (res.getStatusLine().getStatusCode() ==
+                            HttpServletResponse.SC_CREATED) {
+                        // user account established on server, create local 
+                        // account
+                        peerNodeName = res.getFirstHeader("Node-Name")
+                                .getValue();
+                        model.addAttribute(PEER_NAME_KEY, peerNodeName);
+                        String json = readResponse(res);
+                        User peer = jsonUtil.jsonToUserAccount(json);
+                        if (userManager.load(peer.getName()) == null) {
+                            peer.setRole(Role.PEER);
+                            try {
+                                userManager.store(peer);
+                                log.warn("New peer account created: " + 
+                                        peer.getName());
+                            } catch (Exception e) {
+                                throw e;
+                            }   
+                        }       
+                        viewName = DS_CONNECTED_VIEW;
+                    } else {
+                        viewName = DS_CONNECT_VIEW;
+                        String errorMsg = messages.getMessage(
+                            DS_SERVER_ERROR_KEY);
+                        String errorDetails = res.getStatusLine()
+                                .getReasonPhrase(); 
+                        setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                                errorMsg, errorDetails);
+                        log.error(errorMsg + ": " + errorDetails);
+                    }
+                } catch (KeyczarException e){ 
                     viewName = DS_CONNECT_VIEW;
                     String errorMsg = messages.getMessage(
-                        DS_SERVER_ERROR_KEY);
-                    String errorDetails = res.getStatusLine().getReasonPhrase(); 
+                            DS_MESSAGE_SIGNER_ERROR_KEY); 
                     setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                            errorMsg, errorDetails);
-                    log.error(errorMsg + ": " + errorDetails);
+                            errorMsg, e.getMessage());
+                    log.error(errorMsg + ": " + e.getMessage());
+                } catch (InternalControllerException e) {
+                     viewName = DS_CONNECT_VIEW;
+                     String errorMsg = messages.getMessage(
+                         DS_INTERNAL_CONTROLLER_ERROR_KEY, 
+                         new String[] {peerNodeName});
+                     setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                            errorMsg, e.getMessage());
+                     log.error(errorMsg + ": " + e.getMessage());
+                } catch (IOException e) {
+                    viewName = DS_CONNECT_VIEW;
+                    String errorMsg = messages.getMessage(
+                            DS_HTTP_CONN_ERROR_KEY, new String[] {url});
+                    setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                            errorMsg, e.getMessage());
+                    log.error(errorMsg + ": " + e.getMessage());
+                } catch (Exception e) {
+                    viewName = DS_CONNECT_VIEW;
+                    String errorMsg = messages.getMessage(
+                            DS_GENERIC_CONN_ERROR_KEY, new String[] {url});
+                    setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                            errorMsg, e.getMessage());
+                    log.error(errorMsg + ": " + e.getMessage());
                 }
-            } catch (KeyczarException e){ 
-                viewName = DS_CONNECT_VIEW;
-                String errorMsg = messages.getMessage(
-                        DS_MESSAGE_SIGNER_ERROR_KEY); 
-                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                        errorMsg, e.getMessage());
-                log.error(errorMsg + ": " + e.getMessage());
-            } catch (InternalControllerException e) {
-                 viewName = DS_CONNECT_VIEW;
-                 String errorMsg = messages.getMessage(
-                     DS_INTERNAL_CONTROLLER_ERROR_KEY, 
-                     new String[] {peerNodeName});
-                 setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                        errorMsg, e.getMessage());
-                 log.error(errorMsg + ": " + e.getMessage());
-            } catch (IOException e) {
-                viewName = DS_CONNECT_VIEW;
-                String errorMsg = messages.getMessage(DS_HTTP_CONN_ERROR_KEY,
-                        new String[] {url});
-                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                        errorMsg, e.getMessage());
-                log.error(errorMsg + ": " + e.getMessage());
-            } catch (Exception e) {
-                viewName = DS_CONNECT_VIEW;
-                String errorMsg = messages.getMessage(DS_GENERIC_CONN_ERROR_KEY,
-                        new String[] {url});
-                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                        errorMsg, e.getMessage());
-                log.error(errorMsg + ": " + e.getMessage());
             }
         }
         model.addAttribute(NODES_KEY, userManager.loadPeers());

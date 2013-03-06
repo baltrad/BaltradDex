@@ -176,6 +176,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- Log manager -->
     <bean id="logManager" class="eu.baltrad.dex.log.manager.impl.LogManager"
           autowire="byType"/>
+    
+    <!-- DB log appender -->
+    <bean id="dbLogAppender" class="eu.baltrad.dex.log.appender.DBLogAppender">
+        <property name="logManager" ref="logManager"/>
+    </bean>
           
     <!-- Registry controller -->
     <bean id="registryController" 
@@ -219,6 +224,16 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- Change password validator -->
     <bean id="changePasswordValidator" 
           class="eu.baltrad.dex.user.validator.PasswordValidator"
+          autowire="byType"/>
+    
+    <!-- Keystore manager -->
+    <bean id="keystoreManager"
+          class="eu.baltrad.dex.user.manager.impl.KeystoreManager"
+          autowire="byType"/>  
+    
+    <!-- Keystore controller -->
+    <bean id="keystoreController"
+          class="eu.baltrad.dex.user.controller.KeystoreController"
           autowire="byType"/>
 
     <!-- Save radar controller -->
@@ -285,6 +300,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- Post message servlet -->
     <bean id="postMessageServlet" 
           class="eu.baltrad.dex.net.servlet.PostMessageServlet" 
+          autowire="byType"/>
+    
+    <!-- Post key servlet -->
+    <bean id="postKeyServlet" 
+          class="eu.baltrad.dex.net.servlet.PostKeyServlet" 
           autowire="byType"/>      
           
     <!-- Incoming file namer -->      

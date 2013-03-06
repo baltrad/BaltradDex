@@ -44,11 +44,12 @@
         </li>
         <li>
             <img src="includes/images/icons/user.png" alt="">
-            <a href="#">User accounts</a>
+            <a href="#">User accounts & keys</a>
             <ul>
-                <li><a href="save_user_account.htm">Add</a></li>
-                <li><a href="edit_user_account.htm">Edit</a></li>
-                <li><a href="remove_user_account.htm">Remove</a></li>
+                <li><a href="save_user_account.htm">Add account</a></li>
+                <li><a href="edit_user_account.htm">Edit account</a></li>
+                <li><a href="remove_user_account.htm">Remove account</a></li>
+                <li><a href="manage_keystore.htm">Manage keystore</a></li>
             </ul>
         </li>
         <li>

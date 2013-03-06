@@ -19,39 +19,34 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.user.manager;
+package eu.baltrad.dex.user.model.mapper;
 
-import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.model.Key;
 
-import java.util.List;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
- * User manager interface.
- *
+ * Row mapper for key object.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.2.1
- * @since 1.2.1
+ * @version 1.6.0
+ * @since 1.6.0
  */
-public interface IUserManager {
-    
-    public List<User> load();
-    
-    public User load(int id);
-    
-    public User load(String name);
-    
-    public List<String> loadPeers(); 
-    
-    public List<User> loadUsers();
-    
-    public List<User> loadOperators();
-    
-    public int store(User user) throws Exception;
-    
-    public void update(User user) throws Exception;
-    
-    public int updatePassword(int id, String password) throws Exception;
-    
-    public int delete(int id);
-    
+public class KeyMapper implements ParameterizedRowMapper<Key> {
+    /**
+    * Maps records to result set. 
+    * @param rs Result set 
+    * @param rowNum Row number
+    * @return User object
+    * @throws SQLException 
+    */
+    public Key mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return new Key(
+                rs.getInt("id"),
+                rs.getString("name"),
+                rs.getString("checksum"),
+                rs.getBoolean("authorized"));
+    }  
 }

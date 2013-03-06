@@ -21,7 +21,6 @@
 
 package eu.baltrad.dex.util;
 
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ByteArrayOutputStream;
@@ -86,12 +85,12 @@ public class CompressDataUtil {
                 return bos.toByteArray();
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed create ZIP archive", e);
+            throw new RuntimeException("Failed to create ZIP archive", e);
         }
     }
     
     /**
-     * Extract files from ZIP archive.
+     * Extract files from ZIP archive and save to file.
      * @param folder Root folder
      * @param is Compressed input stream 
      * @throws RuntimeException 
@@ -124,7 +123,41 @@ public class CompressDataUtil {
                 zis.close();
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed to extract ZIP archive", e);
+            throw new RuntimeException("Failed to extract ZIP archive to file", 
+                    e);
+        }
+    }
+    
+    /**
+     * Extract files from ZIP archive and write to output stream.
+     * @param is Compressed input stream 
+     * @return Uncompressed byte array  
+     * @throws RuntimeException 
+     */
+    public byte[] unzip(InputStream is) throws RuntimeException {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ZipInputStream zis = null;
+            byte[] buff = new byte[1024];
+            try {
+                zis = new ZipInputStream(is);
+                ZipEntry entry = zis.getNextEntry();
+                while (entry != null) {
+                    int len = 0;
+                    while ((len = zis.read(buff)) > 0) {
+                        bos.write(buff, 0, len);
+                    }
+                    entry = zis.getNextEntry();
+                }
+            } finally {
+                zis.closeEntry();
+                zis.close();
+                bos.close();
+                return bos.toByteArray();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to extract ZIP archive to " + 
+                    "stream", e);
         }
     }
     

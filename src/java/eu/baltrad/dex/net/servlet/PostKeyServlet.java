@@ -21,6 +21,32 @@
 
 package eu.baltrad.dex.net.servlet;
 
+import eu.baltrad.dex.config.manager.IConfigurationManager;
+import eu.baltrad.dex.user.manager.IKeystoreManager;
+import eu.baltrad.dex.net.request.impl.NodeRequest;
+import eu.baltrad.dex.net.response.impl.NodeResponse;
+import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.user.model.Key;
+import eu.baltrad.dex.util.CompressDataUtil;
+import eu.baltrad.dex.util.MessageDigestUtil;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.portlet.ModelAndView;
+
+import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.ServletInputStream;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 /**
  * Receives and handles post key requests.
  * 
@@ -28,6 +54,131 @@ package eu.baltrad.dex.net.servlet;
  * @version 1.7.0
  * @since 1.7.0
  */
-public class PostKeyServlet {
+@Controller
+public class PostKeyServlet extends HttpServlet {
+    
+    private static final String PK_INTERNAL_SERVER_ERROR_KEY = 
+            "postkey.server.internal_server_error";
+    
+    private IConfigurationManager confManager;
+    private IKeystoreManager keystoreManager;
+    private MessageResourceUtil messages;
+    private Logger log;
+    
+    /**
+     * Default constructor.
+     */
+    public PostKeyServlet() {
+        this.log = Logger.getLogger("DEX");
+    }
+    
+    /**
+     * Check if key exists. 
+     * @param nodeName Node name
+     * @return True if key exists, false otherwise
+     */
+    protected boolean keyExists(String nodeName) {
+        String keyName = confManager.getAppConf().getKeystoreDir() + 
+                File.separator + nodeName;
+        return /*(new File(keyName + ".pub")).exists() ||*/ 
+                (new File(keyName + ".pub.zip")).exists();
+    }
+    
+    /**
+     * Stores compressed key in the keystore directory.
+     * @param request HTTP servlet request
+     * @param nodeName Node name
+     * @throws RuntimeException  
+     */
+    protected void storeKey(HttpServletRequest request, String nodeName) 
+            throws RuntimeException {
+        String fileName = confManager.getAppConf().getKeystoreDir() + 
+                File.separator + nodeName + ".pub.zip";
+        CompressDataUtil cdu = new CompressDataUtil();
+        try {
+            ServletInputStream sis = request.getInputStream();
+            FileOutputStream fos = new FileOutputStream(new File(fileName));
+            try {
+                int len = 0;
+                byte[] buff = new byte[1024];
+                while ((len = sis.read(buff)) > 0) {
+                   fos.write(buff, 0, len); 
+                }
+                String checksum = MessageDigestUtil
+                        .createHash("MD5", cdu.unzip(sis));
+                Key key = new Key(nodeName, checksum, false);
+                keystoreManager.store(key);
+            } finally {
+                fos.close();
+                sis.close();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to extract key from " +
+                    "input stream", e);
+        }
+    }
+    
+    /**
+     * Handles incoming HTTP request.
+     * @param request HTTP servlet request
+     * @param response HTTP servlet response
+     * @return Model and view 
+     */
+    @RequestMapping("/post_key.htm")
+    public ModelAndView handleRequest(HttpServletRequest request, 
+            HttpServletResponse response) {
+        HttpSession session = request.getSession(true);
+        doPost(request, response);
+        return new ModelAndView();
+    }
+    
+    /**
+     * Process HTTP request and send response. 
+     * @param request HTTP servlet request
+     * @param response HTTP servlet response 
+     */
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) 
+    {
+        NodeRequest req = new NodeRequest(request);
+        NodeResponse res = new NodeResponse(response);
+        try {
+            if (!keyExists(req.getNodeName())) {
+                log.info("Public key received from " + req.getNodeName());
+                storeKey(request, req.getNodeName());
+                res.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                res.setStatus(HttpServletResponse.SC_CONFLICT);
+            }
+        } catch (Exception e) {
+            log.error(messages.getMessage(PK_INTERNAL_SERVER_ERROR_KEY));
+            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+                    messages.getMessage(PK_INTERNAL_SERVER_ERROR_KEY));
+        }
+    }        
+
+    /**
+     * @param confManager the confManager to set
+     */
+    @Autowired
+    public void setConfManager(IConfigurationManager confManager) {
+        this.confManager = confManager;
+    }
+    
+    /**
+     * @param keystoreManager the keystoreManager to set
+     */
+    @Autowired
+    public void setKeystoreManager(IKeystoreManager keystoreManager) {
+        this.keystoreManager = keystoreManager;
+    }
+    
+    /**
+     * @param messages the messages to set
+     */
+    @Autowired
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
+    }
     
 }

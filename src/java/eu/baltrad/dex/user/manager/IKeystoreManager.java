@@ -19,15 +19,29 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.net.controller;
+package eu.baltrad.dex.user.manager;
+
+import eu.baltrad.dex.user.model.Key;
+
+import java.util.List;
 
 /**
- * Posts public key to peer node.
- * 
+ * Keystore manager interface.
+ *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.7.0
- * @since 1.7.0
+ * @version 1.6.0
+ * @since 1.6.0
  */
-public class PostKeyController {
+public interface IKeystoreManager {
+    
+    public List<Key> load();
+    
+    public Key load(String name);
+    
+    public int store(Key key) throws Exception;
+    
+    public void update(Key key) throws Exception;
+    
+    public int delete(int id); 
     
 }

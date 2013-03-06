@@ -24,6 +24,7 @@ Author     : szewczenko
 DROP TABLE IF EXISTS dex_roles CASCADE;
 DROP TABLE IF EXISTS dex_users CASCADE;
 DROP TABLE IF EXISTS dex_users_roles;
+DROP TABLE IF EXISTS dex_keys;
 DROP TABLE IF EXISTS dex_messages;
 DROP TABLE IF EXISTS dex_radars CASCADE;
 DROP TABLE IF EXISTS dex_subscriptions CASCADE;
@@ -75,6 +76,14 @@ CREATE TABLE dex_users_roles
     id SERIAL NOT NULL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE,
     role_id INT NOT NULL REFERENCES dex_roles (id) ON DELETE CASCADE
+);
+
+CREATE TABLE dex_keys
+(
+    id SERIAL NOT NULL PRIMARY KEY,
+    name VARCHAR (64) NOT NULL UNIQUE,
+    checksum VARCHAR (32),
+    authorized BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE dex_messages

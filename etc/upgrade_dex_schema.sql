@@ -109,9 +109,30 @@ CREATE OR REPLACE FUNCTION dex_trim_registry_by_age() RETURNS trigger AS $$
     END;
 $$ LANGUAGE plpgsql;
 
+/*
+    Add dex_keys table
+*/
+CREATE OR REPLACE FUNCTION create_dex_keys_table() RETURNS void AS $$
+BEGIN
+    PERFORM true FROM information_schema.tables WHERE table_name = 'dex_keys';
+    IF NOT FOUND THEN
+        CREATE TABLE dex_keys
+        (
+            id SERIAL NOT NULL PRIMARY KEY,
+            name VARCHAR (64) NOT NULL UNIQUE,
+            checksum VARCHAR (32),
+            authorized BOOLEAN DEFAULT FALSE
+        );
+    ELSE
+        RAISE NOTICE 'table "dex_keys" already exists';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
 SELECT remove_name_hash_from_dex_users();
 --SELECT reset_user_passwords();
 SELECT rename_registry_table();
+SELECT create_dex_keys_table();
 
 DROP FUNCTION make_plpgsql(); 
 DROP FUNCTION remove_name_hash_from_dex_users();

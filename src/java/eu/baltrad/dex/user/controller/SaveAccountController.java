@@ -115,8 +115,8 @@ public class SaveAccountController  {
         if (result.hasErrors()) {
             return FORM_VIEW;
         }
-        user.setPassword(MessageDigestUtil.createHash("MD5", 16, 
-                            user.getPassword()));
+        user.setPassword(MessageDigestUtil
+                .createHash("MD5", user.getPassword()));
         try {
             if (user.getId() > 0) {
                 userManager.update(user);

@@ -107,8 +107,7 @@ public class ChangeUserPasswordController {
         }
         try {
             userManager.updatePassword(user.getId(), 
-                    MessageDigestUtil.createHash(
-                        "MD5", 16, user.getPassword()));
+                    MessageDigestUtil.createHash("MD5", user.getPassword()));
             String msg = messages.getMessage(CHANGE_PASSWORD_OK_MSG_KEY, 
                             new Object[] {user.getName()});
             model.addAttribute(OK_MSG_KEY, msg);

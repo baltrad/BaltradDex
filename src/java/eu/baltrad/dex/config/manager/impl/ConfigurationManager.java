@@ -25,9 +25,12 @@ import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.config.model.RegistryConfiguration;
+import eu.baltrad.dex.user.manager.IKeystoreManager;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
+import eu.baltrad.dex.user.model.Key;
+import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.ServletContextUtil;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -58,6 +61,7 @@ public class ConfigurationManager implements IConfigurationManager,
     private RegistryConfiguration registryConf;
     
     private IUserManager userManager;
+    private IKeystoreManager keystoreManager;
     
     private Logger log;
     
@@ -77,16 +81,29 @@ public class ConfigurationManager implements IConfigurationManager,
      * Create local peer account.
      */
     public void afterPropertiesSet() {
-        User user = new User(appConf.getNodeName(), Role.NODE, null,
-                appConf.getOrgName(), appConf.getOrgUnit(), 
-                appConf.getLocality(), appConf.getState(), 
-                appConf.getCountryCode(), appConf.getNodeAddress());
         try {
+            // create local peer account
             if (userManager.load(appConf.getNodeName()) == null) {
+                User user = new User(appConf.getNodeName(), Role.NODE, null,
+                    appConf.getOrgName(), appConf.getOrgUnit(), 
+                    appConf.getLocality(), appConf.getState(), 
+                    appConf.getCountryCode(), appConf.getNodeAddress());
                 userManager.store(user);
                 log.warn("Created local peer account: " 
                         + appConf.getNodeName());
             }
+            // import local key
+            if (keystoreManager.load(appConf.getNodeName()) == null) {
+                File keyFile = new File(appConf.getKeystoreDir() + File.separator +
+                        appConf.getNodeName());
+                Key key = new Key(appConf.getNodeName(), 
+                        MessageDigestUtil.createHash("MD5",
+                            MessageDigestUtil.getBytes(keyFile)), true);
+                keystoreManager.store(key);
+                log.warn("Local key imported to keystore");
+            }
+            
+            
         } catch (Exception e) {
             log.error("Failed to create local peer account", e);
         }
@@ -309,6 +326,14 @@ public class ConfigurationManager implements IConfigurationManager,
     @Autowired
     public void setUserManager(IUserManager userManager) {
         this.userManager = userManager;
+    }
+
+    /**
+     * @param keystoreManager the keystoreManager to set
+     */
+    @Autowired
+    public void setKeystoreManager(IKeystoreManager keystoreManager) {
+        this.keystoreManager = keystoreManager;
     }
     
 }

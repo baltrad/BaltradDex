@@ -116,7 +116,8 @@
         <security:intercept-url pattern="/remove_user_account_status.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/change_user_password.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/change_user_password_status.htm" access="ROLE_ADMIN" />
-
+        <security:intercept-url pattern="/manage_keystore.htm" access="ROLE_ADMIN" />
+        
         <security:intercept-url pattern="/node_settings.htm" access="ROLE_ADMIN" />
     </security:http>
 

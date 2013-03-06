@@ -38,9 +38,15 @@ Author     : szewczenko
                 Connect to peer node
             </div>
             <div class="blttext">
-                Select peer node from the drop-down list or enter URL address.
-                Click <i>Connect</i> to access data sources available at the
-                peer node.
+                <p>
+                    Enter node's URL address and click <i>Send key</i> to send 
+                    your public key to the peer node.
+                </p>
+                <p>
+                    Select peer node from the drop-down list or enter URL 
+                    address and click <i>Connect</i> to access data sources 
+                    available at the peer node.
+                </p>    
             </div>
             <div class="table">
                 <%@include file="/WEB-INF/jsp/messages.jsp"%>
@@ -82,7 +88,12 @@ Author     : szewczenko
                         </div>
                         <div class="tablefooter">
                            <div class="buttons">
-                               <button class="rounded" type="submit">
+                               <button class="rounded" type="submit" 
+                                       name="send_key">
+                                   <span>Send key</span>
+                               </button>
+                               <button class="rounded" type="submit" 
+                                       name="connect">
                                    <span>Connect</span>
                                </button>
                            </div>

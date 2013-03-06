@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+ * Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
  *
  * This file is part of the BaltradDex software.
  *
@@ -21,14 +21,8 @@
 
 package eu.baltrad.dex.log.appender;
 
-import eu.baltrad.dex.log.manager.ILogManager;
 import eu.baltrad.dex.log.model.LogEntry;
 import eu.baltrad.dex.log.manager.impl.LogManager;
-
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
-
-import org.apache.commons.dbcp.BasicDataSource;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
@@ -42,23 +36,21 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public class DBLogAppender extends AppenderSkeleton {
     
-    private SimpleJdbcOperations jdbcTemplate;
-    private BasicDataSource dataSource;
-    private LogManager logManager;
+    private static LogManager logManager = null;
     
     /**
      * Constructor. 
      */
-    public DBLogAppender() {
-        dataSource = new BasicDataSource();
-        dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/baltrad");
-        dataSource.setUsername("baltrad");
-        dataSource.setPassword("baltrad");
-        jdbcTemplate = new SimpleJdbcTemplate(dataSource);
-        logManager = new LogManager();
-        logManager.setJdbcTemplate(jdbcTemplate);
-    }
+    public DBLogAppender() {}
+    
+    /**
+     * @param manager 
+     */
+    public synchronized void setLogManager(LogManager manager) {
+	    if (logManager == null) {
+	        logManager = manager;
+        }
+    }       
     
     public boolean requiresLayout() {
         return false;
@@ -71,9 +63,11 @@ public class DBLogAppender extends AppenderSkeleton {
      * @param event Logging event
      */
     public void append(LoggingEvent event) {
-        logManager.store(new LogEntry(event.getTimeStamp(),
+        if (logManager != null) {
+            logManager.store(new LogEntry(event.getTimeStamp(),
                 event.getLoggerName(), event.getLevel().toString(), 
-                event.getRenderedMessage()));      
+                event.getRenderedMessage()));
+        }
     }
     
 }

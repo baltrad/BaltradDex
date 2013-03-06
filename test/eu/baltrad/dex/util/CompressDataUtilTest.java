@@ -21,7 +21,6 @@
 
 package eu.baltrad.dex.util;
 
-import java.io.ByteArrayInputStream;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.After;
@@ -31,6 +30,8 @@ import java.io.File;
 
 import java.util.Map;
 import java.util.HashMap;
+
+import java.io.ByteArrayInputStream;
 
 /**
  * Data compression utility test.
@@ -53,6 +54,18 @@ public class CompressDataUtilTest {
     }
     
     private ZipDataUtil classUnderTest;
+    
+    private static int folderSize(File directory) {
+        int length = 0;
+        for (File file : directory.listFiles()) {
+            if (file.isFile()) {
+                length += file.length();
+            } else {
+                length += folderSize(file); 
+            }    
+        }
+        return length;
+    }
     
     @Before
     public void setUp() {
@@ -95,7 +108,7 @@ public class CompressDataUtilTest {
     }
     
     @Test
-    public void unzip() throws Exception {
+    public void unzipToFile() throws Exception {
         byte[] bytes = classUnderTest.zip();
         classUnderTest.unzip("localhost.pub", new ByteArrayInputStream(bytes));
         
@@ -104,5 +117,15 @@ public class CompressDataUtilTest {
         assertEquals((new File("keystore/localhost.pub/meta")).length(), 
                 (new File("localhost.pub/meta")).length()); 
     } 
+    
+    @Test
+    public void unzipToStream() throws Exception {
+        byte[] zip = classUnderTest.zip();
+        byte[] unzip = classUnderTest
+                .unzip(new ByteArrayInputStream(zip));
+        
+        assertNotNull(unzip);
+        assertEquals(folderSize(new File("keystore/localhost.pub")), unzip.length);
+    }
     
 }

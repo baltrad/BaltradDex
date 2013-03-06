@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.net.controller;
 
+import eu.baltrad.dex.config.manager.IConfigurationManager;
+import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.util.json.impl.JsonUtil;
 import eu.baltrad.dex.net.util.json.IJsonUtil;
@@ -60,11 +62,14 @@ import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Properties;
 
 import java.io.IOException;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+
 
 /**
  * Data source list controller test.
@@ -88,6 +93,7 @@ public class DataSourceListControllerTest {
     private IJsonUtil jsonUtilMock;
     private MessageResourceUtil messages;
     private DSLController classUnderTest;
+    private IConfigurationManager configManagerMock;
     private IUserManager  userManagerMock;
     private Authenticator authenticatorMock;
     private IHttpClientUtil httpClientMock;
@@ -130,12 +136,13 @@ public class DataSourceListControllerTest {
     @Before
     public void setUp() throws Exception {
         mocks = new ArrayList<Object>();
+        configManagerMock = (IConfigurationManager) 
+                createMock(IConfigurationManager.class);
         userManagerMock = (IUserManager) createMock(IUserManager.class);
         authenticatorMock = (Authenticator) 
                 createMock(Authenticator.class);
         httpClientMock = (IHttpClientUtil) createMock(IHttpClientUtil.class);
         jsonUtilMock = (IJsonUtil) createMock(IJsonUtil.class);
-        
         classUnderTest = new DSLController();
         urlValidator = new UrlValidatorUtil();
         classUnderTest.setUrlValidator(urlValidator);
@@ -177,16 +184,14 @@ public class DataSourceListControllerTest {
         Model model = new ExtendedModelMap();
         classUnderTest.setUserManager(userManagerMock);
         String viewName = classUnderTest.connect2Node(model);
+        
+        verifyAll();
+        
         assertEquals("connect_to_node", viewName);
     }
     
     @Test
     public void nodeConnected_InvalidURL() throws Exception {
-        expect(userManagerMock.load("test.baltrad.eu"))
-            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
-                "locality", "state", "XX", "user", 
-                "http://test.baltrad.eu:8084"));
-        
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
@@ -196,12 +201,158 @@ public class DataSourceListControllerTest {
         Model model = new ExtendedModelMap();
         classUnderTest.setUserManager(userManagerMock);
         String viewName = classUnderTest.nodeConnected(model, null, 
-                "http://invalid");
+                "http://invalid", "connect", null);
+        
+        verifyAll();
+        
         assertEquals("connect_to_node", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
                 messages.getMessage("datasource.controller.invalid_node_url"), 
                     (String) model.asMap().get("error_message"));
+    }
+    
+    @Test
+    public void nodeConnected_SendKeyInternalControllerError() {
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
+        
+        replayAll();
+        
+        classUnderTest.setUserManager(userManagerMock);
+        Model model = new ExtendedModelMap();
+        String viewName = classUnderTest.nodeConnected(model, null, 
+                "http://test.baltrad.eu", null, "send_key");
+        
+        verifyAll();
+        
+        assertTrue(model.containsAttribute("error_message"));
+        assertEquals(messages
+                .getMessage("datasource.controller.send_key_controller_error"), 
+                    (String) model.asMap().get("error_message"));
+        assertEquals("connect_to_node", viewName);
+    }
+    
+    @Test
+    public void nodeConnected_SendKeyInternalServerError() throws Exception {
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
+        
+        Properties props = new Properties();
+        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
+        AppConfiguration appConf = new AppConfiguration(props);
+        
+        expect(configManagerMock.getAppConf()).andReturn(appConf);
+        
+        classUnderTest.localNode.setName("localhost");
+        
+        HttpResponse res = createResponse(
+                HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
+                "Internal server error");
+        
+        expect(httpClientMock.post(isA(HttpUriRequest.class)))
+                .andReturn(res);
+        
+        replayAll();
+        
+        classUnderTest.setConfigurationManager(configManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
+        classUnderTest.setHttpClient(httpClientMock);
+        Model model = new ExtendedModelMap();
+        String viewName = classUnderTest.nodeConnected(model, null, 
+                "http://test.baltrad.eu", null, "send_key");
+        
+        verifyAll();
+        
+        assertTrue(model.containsAttribute("error_message"));
+        assertEquals(messages
+                .getMessage("datasource.controller.send_key_server_error"), 
+                    (String) model.asMap().get("error_message"));
+        assertEquals("connect_to_node", viewName);
+        assertTrue(model.containsAttribute("error_details"));
+        assertEquals("Internal server error", model.asMap()
+                .get("error_details"));
+    }
+    
+    @Test
+    public void nodeConnected_SendKeyConflict() throws Exception {
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
+        
+        Properties props = new Properties();
+        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
+        AppConfiguration appConf = new AppConfiguration(props);
+        
+        expect(configManagerMock.getAppConf()).andReturn(appConf);
+        
+        classUnderTest.localNode.setName("localhost");
+        
+        HttpResponse res = createResponse(
+                HttpServletResponse.SC_CONFLICT, null);
+        
+        expect(httpClientMock.post(isA(HttpUriRequest.class)))
+                .andReturn(res);
+        
+        replayAll();
+        
+        classUnderTest.setConfigurationManager(configManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
+        classUnderTest.setHttpClient(httpClientMock);
+        Model model = new ExtendedModelMap();
+        String viewName = classUnderTest.nodeConnected(model, null, 
+                "http://test.baltrad.eu", null, "send_key");
+        
+        verifyAll();
+        
+        assertTrue(model.containsAttribute("error_message"));
+        assertEquals(messages
+                .getMessage("datasource.controller.send_key_exists"), 
+                    (String) model.asMap().get("error_message"));
+        assertEquals("connect_to_node", viewName);
+    }
+    
+    @Test
+    public void nodeConnected_SendKeyOK() throws Exception {
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
+        
+        Properties props = new Properties();
+        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
+        AppConfiguration appConf = new AppConfiguration(props);
+        
+        expect(configManagerMock.getAppConf()).andReturn(appConf);
+        
+        classUnderTest.localNode.setName("localhost");
+        
+        HttpResponse res = createResponse(HttpServletResponse.SC_OK, null);
+        
+        expect(httpClientMock.post(isA(HttpUriRequest.class)))
+                .andReturn(res);
+        
+        replayAll();
+        
+        classUnderTest.setConfigurationManager(configManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
+        classUnderTest.setHttpClient(httpClientMock);
+        Model model = new ExtendedModelMap();
+        String viewName = classUnderTest.nodeConnected(model, null, 
+                "http://test.baltrad.eu", null, "send_key");
+        
+        verifyAll();
+        
+        assertTrue(model.containsAttribute("success_message"));
+        assertEquals(messages
+                .getMessage("datasource.controller.send_key_server_msg"), 
+                    (String) model.asMap().get("success_message"));
+        assertEquals("connect_to_node", viewName);
     }
     
     @Test
@@ -227,7 +378,7 @@ public class DataSourceListControllerTest {
         classUnderTest.setAuthenticator(authenticatorMock);
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.nodeConnected(model, null, 
-                "http://test.baltrad.eu");
+                "http://test.baltrad.eu", "connect", null);
         
         verifyAll();
         
@@ -272,7 +423,7 @@ public class DataSourceListControllerTest {
         
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.nodeConnected(model, null, 
-                "http://test.baltrad.eu");
+                "http://test.baltrad.eu", "connect", null);
         
         verifyAll();
         
@@ -317,7 +468,7 @@ public class DataSourceListControllerTest {
         
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.nodeConnected(model, null, 
-                "http://test.baltrad.eu");
+                "http://test.baltrad.eu", "connect", null);
         
         verifyAll();
         
@@ -359,7 +510,7 @@ public class DataSourceListControllerTest {
             
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.nodeConnected(model, null, 
-                "http://test.baltrad.eu");
+                "http://test.baltrad.eu", "connect", null);
         
         verifyAll();
         assertEquals("connect_to_node", viewName);
@@ -399,7 +550,7 @@ public class DataSourceListControllerTest {
             
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.nodeConnected(model, null, 
-                "http://test.baltrad.eu");
+                "http://test.baltrad.eu","connect", null);
         
         verifyAll();
         assertEquals("connect_to_node", viewName);
@@ -442,7 +593,7 @@ public class DataSourceListControllerTest {
         
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.nodeConnected(model, null,
-                "http://test.baltrad.eu");
+                "http://test.baltrad.eu", "connect", null);
         
         verifyAll();
         
@@ -493,7 +644,7 @@ public class DataSourceListControllerTest {
         
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.nodeConnected(model, null,
-                "http://test.baltrad.eu");
+                "http://test.baltrad.eu", "connect", null);
         
         verifyAll();
         
@@ -540,7 +691,7 @@ public class DataSourceListControllerTest {
         
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.nodeConnected(model, "test.baltrad.eu",
-                null);
+                null, "connect", null);
         
         verifyAll();
         
@@ -587,7 +738,7 @@ public class DataSourceListControllerTest {
         
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.nodeConnected(model, "test.baltrad.eu",
-                "http://test.baltrad.eu");
+                "http://test.baltrad.eu", "connect", null);
         
         verifyAll();
         

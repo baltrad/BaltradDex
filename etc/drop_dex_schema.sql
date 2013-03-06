@@ -24,6 +24,7 @@ Author     : szewczenko
 DROP TABLE IF EXISTS dex_roles CASCADE;
 DROP TABLE IF EXISTS dex_users CASCADE;
 DROP TABLE IF EXISTS dex_users_roles;
+DROP TABLE IF EXISTS dex_keys;
 DROP TABLE IF EXISTS dex_messages;
 DROP TABLE IF EXISTS dex_radars CASCADE;
 DROP TABLE IF EXISTS dex_subscriptions CASCADE;

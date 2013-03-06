@@ -85,7 +85,6 @@ public class NodeConfigurationController {
     
     /**
      * Load form backing object and render form.
-     * @param request Http servlet request
      * @param model Model map 
      * @return View name
      */
