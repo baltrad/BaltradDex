@@ -23,9 +23,12 @@ package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.config.model.AppConfiguration;
+import eu.baltrad.dex.user.manager.IKeystoreManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.user.model.Key;
 
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -35,13 +38,14 @@ import org.junit.Test;
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
 
+import javax.servlet.http.HttpServletResponse;
+
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Properties;
 
 import java.io.File;
-import javax.servlet.http.HttpServletResponse;
-import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * Post key servlet test.
@@ -53,6 +57,7 @@ public class PostKeyServletTest {
     
     private PostKeyServlet classUnderTest;
     private IConfigurationManager confManagerMock;
+    private IKeystoreManager keystoreManagerMock;
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
     private MessageResourceUtil messages;
@@ -89,6 +94,8 @@ public class PostKeyServletTest {
         classUnderTest = new PostKeyServlet();
         confManagerMock = (IConfigurationManager)
                 createMock(IConfigurationManager.class);
+        keystoreManagerMock = (IKeystoreManager)
+                createMock(IKeystoreManager.class);
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         messages = new MessageResourceUtil();
@@ -107,7 +114,7 @@ public class PostKeyServletTest {
     }
 
     @Test
-    public void keyExists() {
+    public void keyExists() throws Exception {
         Properties props = new Properties();
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
         AppConfiguration appConf = new AppConfiguration(props);
@@ -117,6 +124,7 @@ public class PostKeyServletTest {
         replayAll();
         
         classUnderTest.setConfManager(confManagerMock);
+        
         assertTrue(classUnderTest.keyExists("localhost"));
         assertFalse(classUnderTest.keyExists("test.baltrad.eu"));
         
@@ -124,16 +132,18 @@ public class PostKeyServletTest {
     }
     
     @Test
-    public void storeKey() {
+    public void storeKey() throws Exception {
         Properties props = new Properties();
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
         AppConfiguration appConf = new AppConfiguration(props);
         
         expect(confManagerMock.getAppConf()).andReturn(appConf);
+        expect(keystoreManagerMock.store(isA(Key.class))).andReturn(Integer.SIZE);
         
         replayAll();
         
         classUnderTest.setConfManager(confManagerMock);
+        classUnderTest.setKeystoreManager(keystoreManagerMock);
         request.setContent("public key content".getBytes());
         
         classUnderTest.storeKey(request, "test.baltrad.eu");
@@ -144,10 +154,11 @@ public class PostKeyServletTest {
     }
     
     @Test
-    public void handleRequest_ServerError() {
+    public void handleRequest_ServerError() throws Exception {
         Properties props = new Properties();
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
         AppConfiguration appConf = new AppConfiguration(props);
+        
         expect(confManagerMock.getAppConf()).andReturn(appConf).times(2);
         
         classUnderTest.setConfManager(confManagerMock);
@@ -166,10 +177,11 @@ public class PostKeyServletTest {
     }
     
     @Test
-    public void handleRequest_KeyExists() {
+    public void handleRequest_KeyExists() throws Exception {
         Properties props = new Properties();
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
         AppConfiguration appConf = new AppConfiguration(props);
+        
         expect(confManagerMock.getAppConf()).andReturn(appConf);
         
         classUnderTest.setConfManager(confManagerMock);
@@ -185,13 +197,16 @@ public class PostKeyServletTest {
     }
     
     @Test
-    public void handleRequest_OK() {
+    public void handleRequest_OK() throws Exception {
         Properties props = new Properties();
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
         AppConfiguration appConf = new AppConfiguration(props);
+        
+        expect(keystoreManagerMock.store(isA(Key.class))).andReturn(Integer.SIZE);
         expect(confManagerMock.getAppConf()).andReturn(appConf).times(2);
         
         classUnderTest.setConfManager(confManagerMock);
+        classUnderTest.setKeystoreManager(keystoreManagerMock);
         
         replayAll();
         

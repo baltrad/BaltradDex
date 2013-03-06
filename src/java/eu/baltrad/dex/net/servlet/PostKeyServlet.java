@@ -45,7 +45,6 @@ import javax.servlet.ServletInputStream;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 
 /**
  * Receives and handles post key requests.
@@ -80,7 +79,7 @@ public class PostKeyServlet extends HttpServlet {
     protected boolean keyExists(String nodeName) {
         String keyName = confManager.getAppConf().getKeystoreDir() + 
                 File.separator + nodeName;
-        return /*(new File(keyName + ".pub")).exists() ||*/ 
+        return (new File(keyName + ".pub")).exists() || 
                 (new File(keyName + ".pub.zip")).exists();
     }
     
