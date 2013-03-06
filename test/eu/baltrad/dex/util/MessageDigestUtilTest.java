@@ -58,22 +58,4 @@ public class MessageDigestUtilTest {
         assertTrue(bytes.length > 0);
     }
     
-    @Test
-    public void foo() throws Exception {
-        
-        File f1 = new File("/opt/baltrad/etc/bltnode-keys/dev.baltrad.imgw.pl.pub");
-        File f2 = new File("/opt/baltrad/etc/bltnode-keys/test.baltrad.imgw.pl.pub");
-        
-        String check1 = MessageDigestUtil.createHash("MD5", MessageDigestUtil.getBytes(f1));
-        String check2 = MessageDigestUtil.createHash("MD5", MessageDigestUtil.getBytes(f2));
-        
-        System.out.println("check 1: " + check1);
-        System.out.println("check 2: " + check2);
-        
-        
-        System.out.println("crc 1" + MessageDigestUtil.createCRC32(MessageDigestUtil.getBytes(f1)));
-        System.out.println("crc 2" + MessageDigestUtil.createCRC32(MessageDigestUtil.getBytes(f2)));
-    }
-    
-    
 }
