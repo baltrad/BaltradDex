@@ -73,7 +73,6 @@
           <security:intercept-url pattern="/supervisor.htm" access="ROLE_OPERATOR" />
         -->
         
-        
         <!-- 
             Admin pages 
         -->

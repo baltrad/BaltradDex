@@ -1431,5 +1431,65 @@ input:focus, textarea:focus {
     padding:8px 0px 4px 0px;
 }
 
+/* Keystore management page */
 
-/*----------------------------------------------------------------------------*/
+.keystore > form > .entry {
+    height: 28px;
+    width: 100%;
+    font-size: 0.9em;
+}
+
+.keystore > form > .entry > .authorized > button,
+.keystore > form > .entry > .delete > .delete-key {
+    background: inherit;
+    height: 24px;
+    width: 24px;
+}
+
+.keystore > form > .entry > .name, 
+.keystore > form > .entry > .checksum,
+.keystore > form > .entry > .access   {
+    height: 24px;
+    margin-top: 4px;
+}
+
+.keystore > form > .entry > .name,
+.keystore > .tableheader > .name {
+    width: 25%;
+}
+
+.keystore > form > .entry > .checksum,
+.keystore > .tableheader > .checksum {
+    width: 35%;
+}
+
+.keystore > form > .entry > .authorized,
+.keystore > .tableheader > .authorized {
+    width: 10%;
+    text-align: center;
+}
+
+.keystore > form > .entry > .delete,
+.keystore > .tableheader > .delete {
+    width: 20%;
+    text-align: center;
+}
+
+.keystore > form > .entry > .delete > .confirm-delete,
+.keystore > form > .entry > .delete > .cancel-delete {
+    padding: 0px 4px 6px 4px;
+    height: 22px;
+    line-height: 22px;
+    width: 48px;
+    font-size: 12px;
+    color: #444444;
+    background-color: #A0CB6F;       
+    border: 1px solid #A7A7A7;
+    -moz-border-radius: 4px;
+    border-radius: 4px;    
+}
+
+.keystore > form > .entry > .delete > .confirm-delete:hover,
+.keystore > form > .entry > .delete > .cancel-delete:hover {
+    background-color: #5CA420; 
+}

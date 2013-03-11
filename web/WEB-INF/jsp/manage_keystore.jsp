@@ -37,46 +37,106 @@ Author     : szewczenko
                 Manage keystore
             </div>
             <div class="blttext">
-                Use functionality below to manage keystore
+                <p>
+                    Use functionality below to manage keys. Click <i>Access</i>
+                    button in order to grant or revoke access for a particular 
+                    key.
+                </p>
+                <p>
+                    Click <i>Delete</i> button to permanently delete a given 
+                    key from the keystore.  
+                </p>    
             </div>
-            
-            
-            
-            
-            <div class="table">
-                <div class="tableheader">
-                    <div id="cell">
-                        Key name
+            <c:choose>
+                <c:when test="${not empty keys}">
+                    <div class="table">
+                        <div class="keystore">
+                            <div class="tableheader">
+                                <div id="cell" class="name">
+                                    Key name
+                                </div>
+                                <div id="cell" class="checksum">
+                                    Checksum
+                                </div>
+                                <div id="cell" class="authorized">
+                                    Access
+                                </div>
+                                <div id="cell" class="delete">
+                                    Delete
+                                </div>
+                            </div>
+                            <c:forEach var="key" items="${keys}">
+                                <form method="post">
+                                    <div class="entry">
+                                        <div class="hidden">
+                                            <c:out value="${key.id}"/>
+                                        </div>
+                                        <div id="cell" class="name">
+                                            <c:out value="${key.name}"/>
+                                        </div>
+                                        <div id="cell" class="checksum">
+                                            <c:out value="${key.checksum}"/>
+                                        </div>
+                                        <div id="cell" class="authorized">
+                                            <c:choose>
+                                                <c:when test="${key.authorized == false}">
+                                                    <button type="submit" name="grant" 
+                                                            value="${key.id}">
+                                                        <img src="includes/images/icons/stop.png"
+                                                             alt="Revoked" 
+                                                             title="Key access revoked">
+                                                    </button>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <button type="submit" name="revoke"
+                                                            value="${key.id}">
+                                                        <img src="includes/images/icons/success.png"
+                                                             alt="Granted" 
+                                                             title="Key access granted">
+                                                    </button>
+                                                </c:otherwise>
+                                            </c:choose> 
+                                        </div>  
+                                        <div id="cell" class="delete">
+                                            <c:choose>
+                                                <c:when test="${delete_key_id == key.id}">
+                                                    <button type="submit"
+                                                            name="confirm_delete"
+                                                            class="confirm-delete"
+                                                            value="${key.id}"
+                                                            title="Confirm key deletion">
+                                                        Delete
+                                                    </button>
+                                                    <button type="submit"
+                                                            name="cancel_delete"
+                                                            class="cancel-delete"
+                                                            title="Cancel key deletion">
+                                                        Cancel
+                                                    </button>        
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <button type="submit" name="delete"
+                                                            class="delete-key"
+                                                            value="${key.id}">
+                                                        <img src="includes/images/icons/failure.png"
+                                                             alt="Granted" 
+                                                             title="Delete key permanently">
+                                                    </button>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>    
+                                    </div>
+                                </form>
+                            </c:forEach>      
+                        </div>                            
                     </div>
-                    <div id="cell">
-                        Checksum
+                </c:when>
+                <c:otherwise>
+                    <div class="blttext">
+                        No keys found in the keystore.
                     </div>
-                    <div id="cell">
-                        Status
-                    </div>
-                    <div id="cell">
-                        Modify
-                    </div>
-                </div>
-                <c:forEach var="key" items="${keys}">
-                    
-                    <div id="cell">
-                        <c:out value="${key.name}"/>
-                    </div>
-                    <div id="cell">
-                        <c:out value="${key.checksum}"/>
-                    </div>
-                    <div id="cell">
-                        <c:out value="${key.authorized}"/>
-                    </div>
-                    
-                    
-                </c:forEach>
-            </div>
-           
-            
-            
-            
+                </c:otherwise>
+            </c:choose>
         </div>
     </jsp:body>
 </t:page_tabbed>

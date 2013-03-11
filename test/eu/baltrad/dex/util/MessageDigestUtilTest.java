@@ -21,10 +21,10 @@
 
 package eu.baltrad.dex.util;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
 import static org.junit.Assert.*;
 import org.junit.Test;
+
+import java.io.File;
 
 /**
  * Message digest utility test.

@@ -44,7 +44,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletInputStream;
 
 import java.io.File;
-import java.io.FileOutputStream;
 
 /**
  * Receives and handles post key requests.
@@ -56,6 +55,7 @@ import java.io.FileOutputStream;
 @Controller
 public class PostKeyServlet extends HttpServlet {
     
+    private static final String INCOMING_KEY_DIR = ".incoming";
     private static final String PK_INTERNAL_SERVER_ERROR_KEY = 
             "postkey.server.internal_server_error";
     
@@ -72,18 +72,6 @@ public class PostKeyServlet extends HttpServlet {
     }
     
     /**
-     * Check if key exists. 
-     * @param nodeName Node name
-     * @return True if key exists, false otherwise
-     */
-    protected boolean keyExists(String nodeName) {
-        String keyName = confManager.getAppConf().getKeystoreDir() + 
-                File.separator + nodeName;
-        return (new File(keyName + ".pub")).exists() || 
-                (new File(keyName + ".pub.zip")).exists();
-    }
-    
-    /**
      * Stores compressed key in the keystore directory.
      * @param request HTTP servlet request
      * @param nodeName Node name
@@ -91,24 +79,24 @@ public class PostKeyServlet extends HttpServlet {
      */
     protected void storeKey(HttpServletRequest request, String nodeName) 
             throws RuntimeException {
-        String fileName = confManager.getAppConf().getKeystoreDir() + 
-                File.separator + nodeName + ".pub.zip";
         CompressDataUtil cdu = new CompressDataUtil();
         try {
             ServletInputStream sis = request.getInputStream();
-            FileOutputStream fos = new FileOutputStream(new File(fileName));
             try {
-                int len = 0;
-                byte[] buff = new byte[1024];
-                while ((len = sis.read(buff)) > 0) {
-                   fos.write(buff, 0, len); 
+                String incomingPath = confManager.getAppConf().getKeystoreDir() 
+                        + File.separator + INCOMING_KEY_DIR; 
+                File incomingDir = new File(incomingPath); 
+                if (!incomingDir.exists()) {
+                    incomingDir.mkdir();
                 }
-                String checksum = MessageDigestUtil
-                        .createHash("MD5", cdu.unzip(sis));
+                cdu.unzip(incomingPath + File.separator + nodeName + ".pub", sis);
+                File keyDir = new File(incomingPath + File.separator + nodeName 
+                        + ".pub");
+                String checksum = MessageDigestUtil.createHash("MD5", 
+                        MessageDigestUtil.getBytes(keyDir));
                 Key key = new Key(nodeName, checksum, false);
                 keystoreManager.store(key);
             } finally {
-                fos.close();
                 sis.close();
             }
         } catch (Exception e) {
@@ -142,7 +130,7 @@ public class PostKeyServlet extends HttpServlet {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
         try {
-            if (!keyExists(req.getNodeName())) {
+            if (keystoreManager.load(req.getNodeName()) == null) {
                 log.info("Public key received from " + req.getNodeName());
                 storeKey(request, req.getNodeName());
                 res.setStatus(HttpServletResponse.SC_OK);

@@ -36,12 +36,14 @@ public interface IKeystoreManager {
     
     public List<Key> load();
     
+    public Key load(int id);
+    
     public Key load(String name);
     
     public int store(Key key) throws Exception;
     
-    public void update(Key key) throws Exception;
+    public int update(Key key) throws Exception;
     
-    public int delete(int id); 
+    public int delete(int id);
     
 }

@@ -21,7 +21,6 @@
 
 package eu.baltrad.dex.util;
 
-import java.io.BufferedInputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 
@@ -29,13 +28,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-
-import java.util.zip.Checksum;
-import java.util.zip.CheckedInputStream;
-import java.util.zip.CRC32;
-
-
-
 
 /**
  * Utility class implementing MD5 hash function used to protect passwords.
@@ -87,7 +79,7 @@ public class MessageDigestUtil {
             try {
                 byte[] buff = new byte[1024];
                 int len;
-                while ((len = bis.read()) > 0) {
+                while ((len = bis.read(buff)) > 0) {
                     md.update(buff, 0, len);
                 }
                 return getChecksum(md.digest());
@@ -99,26 +91,6 @@ public class MessageDigestUtil {
                     e);
         }
     }
-    
-    
-    public static String createCRC32(byte[] b) throws Exception {
-        
-        ByteArrayInputStream bis = new ByteArrayInputStream(b);
-        CheckedInputStream check = 
-          new CheckedInputStream(bis, new CRC32());
-        BufferedInputStream in = new BufferedInputStream(check);
-        while (in.read() != -1) {
-            // Read file in completely
-        }
-        System.out.println("Checksum is " + 
-          check.getChecksum().getValue());
-        
-        
-        return "";
-    }
-    
-    
-    
     
     /**
      * Reads file or directory into byte array.
@@ -136,7 +108,7 @@ public class MessageDigestUtil {
                         FileInputStream fis = null;
                         try {
                             fis = new FileInputStream(file);
-                            int len = 0;
+                            int len;
                             while((len = fis.read(buff)) > 0) {
                                 bos.write(buff, 0, len);
                             }
@@ -148,8 +120,10 @@ public class MessageDigestUtil {
                     }    
                 }
             } finally {
+                byte[] bytes = bos.toByteArray();
                 bos.close();
-                return bos.toByteArray();
+                bos.reset();
+                return bytes;
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to read directory to " +

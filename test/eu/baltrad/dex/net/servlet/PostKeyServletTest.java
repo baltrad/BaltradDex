@@ -112,24 +112,6 @@ public class PostKeyServletTest {
         }
         resetAll();
     }
-
-    @Test
-    public void keyExists() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
-        AppConfiguration appConf = new AppConfiguration(props);
-        
-        expect(confManagerMock.getAppConf()).andReturn(appConf).times(2);
-        
-        replayAll();
-        
-        classUnderTest.setConfManager(confManagerMock);
-        
-        assertTrue(classUnderTest.keyExists("localhost"));
-        assertFalse(classUnderTest.keyExists("test.baltrad.eu"));
-        
-        verifyAll();
-    }
     
     @Test
     public void storeKey() throws Exception {
@@ -150,7 +132,7 @@ public class PostKeyServletTest {
         
         verifyAll();
         
-        assertTrue((new File("keystore/test.baltrad.eu.pub.zip")).exists());
+        assertTrue((new File("keystore/.incoming/test.baltrad.eu.pub")).exists());
     }
     
     @Test
@@ -159,12 +141,11 @@ public class PostKeyServletTest {
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
         AppConfiguration appConf = new AppConfiguration(props);
         
-        expect(confManagerMock.getAppConf()).andReturn(appConf).times(2);
-        
-        classUnderTest.setConfManager(confManagerMock);
+        expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(null);
         
         replayAll();
         
+        classUnderTest.setKeystoreManager(keystoreManagerMock);
         request.setAttribute("Node-Name", "test.baltrad.eu");
         classUnderTest.handleRequest(request, response);
         
@@ -180,15 +161,13 @@ public class PostKeyServletTest {
     public void handleRequest_KeyExists() throws Exception {
         Properties props = new Properties();
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
-        AppConfiguration appConf = new AppConfiguration(props);
         
-        expect(confManagerMock.getAppConf()).andReturn(appConf);
-        
-        classUnderTest.setConfManager(confManagerMock);
+        expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(new Key());
         
         replayAll();
         
-        request.setAttribute("Node-Name", "localhost");
+        classUnderTest.setKeystoreManager(keystoreManagerMock);
+        request.setAttribute("Node-Name", "test.baltrad.eu");
         classUnderTest.handleRequest(request, response);
         
         verifyAll();
@@ -202,13 +181,14 @@ public class PostKeyServletTest {
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
         AppConfiguration appConf = new AppConfiguration(props);
         
+        expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(null);
         expect(keystoreManagerMock.store(isA(Key.class))).andReturn(Integer.SIZE);
-        expect(confManagerMock.getAppConf()).andReturn(appConf).times(2);
+        expect(confManagerMock.getAppConf()).andReturn(appConf);
+        
+        replayAll();
         
         classUnderTest.setConfManager(confManagerMock);
         classUnderTest.setKeystoreManager(keystoreManagerMock);
-        
-        replayAll();
         
         request.setAttribute("Node-Name", "test.baltrad.eu");
         request.setContent("public key content".getBytes());

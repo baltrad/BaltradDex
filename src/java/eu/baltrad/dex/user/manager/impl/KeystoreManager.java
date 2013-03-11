@@ -74,7 +74,22 @@ public class KeystoreManager implements IKeystoreManager {
      * @return List of all available keys.
      */
     public List<Key> load() {
-        return jdbcTemplate.query("SELECT * FROM dex_keys", mapper);
+        return jdbcTemplate.query("SELECT * FROM dex_keys ORDER BY name DESC;", 
+                mapper);
+    }
+    
+    /**
+     * Load key with a given id
+     * @param id Key id
+     * @return Key
+     */
+    public Key load(int id) {
+        String sql = "SELECT * FROM dex_keys WHERE id = ?;";
+        try {
+            return jdbcTemplate.queryForObject(sql, mapper, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
     
     /**
@@ -126,11 +141,12 @@ public class KeystoreManager implements IKeystoreManager {
     /**
      * Update key.
      * @param key Key  
+     * @return Number of rows affected
      * @throws Exception 
      */
-    public void update(Key key) throws Exception {
+    public int update(Key key) throws Exception {
         try {
-            jdbcTemplate.update("UPDATE dex_keys SET authorized = ? " + 
+            return jdbcTemplate.update("UPDATE dex_keys SET authorized = ? " + 
                     "WHERE id = ?",
                 key.isAuthorized(),
                 key.getId());

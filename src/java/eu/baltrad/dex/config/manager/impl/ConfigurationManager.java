@@ -95,15 +95,13 @@ public class ConfigurationManager implements IConfigurationManager,
             // import local key
             if (keystoreManager.load(appConf.getNodeName()) == null) {
                 File keyFile = new File(appConf.getKeystoreDir() + File.separator +
-                        appConf.getNodeName());
+                        appConf.getNodeName() + ".pub");
                 Key key = new Key(appConf.getNodeName(), 
                         MessageDigestUtil.createHash("MD5",
                             MessageDigestUtil.getBytes(keyFile)), true);
                 keystoreManager.store(key);
                 log.warn("Local key imported to keystore");
             }
-            
-            
         } catch (Exception e) {
             log.error("Failed to create local peer account", e);
         }
