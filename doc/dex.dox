@@ -231,7 +231,7 @@ $ ant create-full-schema
 \endcode
 
 Next step is preparing a keystore to be used with application. In order to do
-this, edit some properties in \p etc/dex.user.properties file:
+this, edit some properties in \p etc/dex.properties file:
 
 - \p node.name - the name of your BALTRAD node, e.g. test.baltrad.eu
 - \p keystore.directory - the directory where keystore will be created
@@ -548,27 +548,64 @@ of authentication, private/public key pair is used. Outgoing message is signed
 with node's private key and incoming message is verified and authenticated 
 with public key. According to this approach, local node's public key has to be 
 available in the peer node's keystore. Therefore, before connecting to peer
-node, local node's public key has to be extracted from the keystore and
-and delivered to peer node using a trusted transfer method. Assuming that local
-keystore is located in the default location and local node name is 
-\p test.baltrad.eu, do the following:
+node, local node's public key has to available in peer node's keystore. 
+In order to send your public key to the peer node, go to \p Exchange tab and 
+click \p Connect option from the main menu. Type peer node's URL address in 
+the edit box and click <tt>Send key</tt> button. 
 
-\code
-$ cd /opt/baltrad/etc/bltnode-keys
-$ tar cvzf test.baltrad.eu.pub.tar.gz test.baltrad.eu.pub/
-\endcode
+\image html post_key_address.png
 
-The tarball containing public key has to be sent to the peer node's
-administrator and stored in the keystore. 
-\n
-The same operation has to performed at the peer node's side. That is peer 
-node's public key has to be extracted from the keystore, delivered in a secure 
-way and stored in local keystore. 
-\n
-From now on authenticated connections should be possible in both directions.  
+In case the key was successfully sent to the peer node, user will be informed 
+with the following message:
 
-See section \ref build_dex for information about how to configure and access 
-the keystore.     
+\image html post_key_success_msg.png
+
+In case when the key already exists in the peer node's keystore (e.g. has 
+already been sent earlier), the following message is shown:
+
+\image html post_key_exists_msg.png
+
+Once local key has been sent to the peer node, peer node's administrator has 
+to verify the key. In order to access the keystore, node's admin has to select 
+\p Settings tab, then click <tt>User accounts & keys</tt> option from the main 
+menu and select <tt>Manage keystore</tt> option. Keystore content will be 
+presented as in the image below.  
+
+\image html keystore_mgmt.png
+
+The first thing to do is verification of the key sent by the user. In order
+to confirm that the file hasn't been substituted or tampered with along its
+way to the server, the checksum of incoming key has to be compared with 
+original key's checksum. At this stage node's admin has to ask user for 
+original key's checksum (e.g. via phone or e-mail). Once node's admin makes sure 
+that the key is valid and secure, next thing is granting access for this key. 
+In the following example, <tt>test.baltrad.eu</tt> is the incoming key, while
+<tt>test.baltrad.imgw.pl</tt> is local node's public key. 
+
+\note
+For security reasons, local node's key can't be modified or removed. Local key 
+is always marked with blue buttons.
+\endnote      
+
+To grant access for the selected key, click \p Access button next to given key 
+entry. Red icon will change to green, indicating that access for the given key
+has been granted.
+
+\image html keystore_grant.png
+
+From now on the system will let throught every incoming message that can be 
+successfully verified with this key.
+ 
+In order to revoke access, click on the same icon once again. It will turn red
+again and access for the selected key will be revoked.
+
+Keystore management page allows to remove peer's key permanently. To remove 
+selected key click \p Delete icon next to given key entry. Once clicked, icon 
+reveals dialog asking user to confirm key deletion. Click \p Delete button to 
+remove key permanently from the keystore, or \p Cancel button to get leave the 
+key in the keystore. 
+
+\image html keystore_delete.png  
 
 \section conn Connecting to peer node
 

@@ -53,6 +53,7 @@ public class KeystoreController {
     /** Model keys */
     private static final String KEYS = "keys";
     private static final String DELETE_KEY_ID = "delete_key_id";
+    private static final String LOCAL_NODE_NAME = "local_node_name";
     
     /** Directory to store incoming keys */
     private static final String INCOMING_KEY_DIR = ".incoming";
@@ -80,6 +81,8 @@ public class KeystoreController {
     @RequestMapping(method = RequestMethod.GET)
     public String setupForm(ModelMap model) {
         model.addAttribute(KEYS, keystoreManager.load());
+        model.addAttribute(LOCAL_NODE_NAME, 
+                confManager.getAppConf().getNodeName());
         return FORM_VIEW;
     } 
     
@@ -140,9 +143,13 @@ public class KeystoreController {
                 }
             }
             model.addAttribute(KEYS, keystoreManager.load());
+            model.addAttribute(LOCAL_NODE_NAME, 
+                confManager.getAppConf().getNodeName());
             return FORM_VIEW;
         } catch (Exception e) {
             model.addAttribute(KEYS, keystoreManager.load());
+            model.addAttribute(LOCAL_NODE_NAME, 
+                confManager.getAppConf().getNodeName());
             return FORM_VIEW;
         }
     }
