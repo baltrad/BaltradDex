@@ -135,8 +135,8 @@ public class KeystoreController {
                 int id = Integer.parseInt(confirmDelete);
                 Key key = keystoreManager.load(id);
                 int del = keystoreManager.delete(id);
-                delete(key.getName());
                 if (del == 1) {
+                    delete(key.getName());
                     log.warn("Permanently deleted key " + key.getName());
                 } else {
                     log.error("Failed to delete key " + key.getName());

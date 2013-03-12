@@ -25,7 +25,6 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.validator.PasswordValidator;
-import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -78,7 +77,7 @@ public class ChangeUserPasswordControllerTest {
         reset(userManagerMock);
     }
     
-    //@Test
+    @Test
     public void setupForm() {
         expect(userManagerMock.load(1)).andReturn(test);
         replay(userManagerMock);

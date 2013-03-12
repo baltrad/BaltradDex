@@ -21,11 +21,9 @@
 
 package eu.baltrad.dex.user.manager.impl;
 
-import eu.baltrad.dex.user.manager.impl.UserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.db.itest.DexDBITestHelper;
 import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.util.MessageDigestUtil;
 
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
@@ -78,7 +76,6 @@ public class UserManagerTest extends TestCase{
         if (ignoreColumn != null) {
             Assertion.assertEqualsIgnoreCols(expected, actual, 
                 new String[] {ignoreColumn});
-            
         } else {
             Assertion.assertEquals(expected, actual);
         }
