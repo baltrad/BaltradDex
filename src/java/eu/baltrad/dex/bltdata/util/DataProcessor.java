@@ -1,6 +1,6 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
-* Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.bltdata.util;
 
@@ -59,7 +59,7 @@ import java.io.IOException;
  * @since 0.1.6
  */
 public class DataProcessor {
-//---------------------------------------------------------------------------------------- Constants
+    
     // HDF5 file extension
     public static final String H5_FILE_EXT = ".h5";
     // image file extension
@@ -109,7 +109,7 @@ public class DataProcessor {
     public static final String ODIMH5_XSEC_OBJ = "XSEC"; // 2-D vertical cross section(s)
     public static final String ODIMH5_VP_OBJ = "VP"; // 1-D vertical profile
     public static final String ODIMH5_PIC_OBJ = "PIC"; // Embedded graphical image
-//---------------------------------------------------------------------------------------- Variables
+
     /* Message logger */
     private Logger log;
     /* Used to store HDF5 dataset */
@@ -118,7 +118,7 @@ public class DataProcessor {
     private Attribute attribute;
     /* List of full dataset names */
     private List<String> datasetFullNames = new ArrayList<String>();
-//------------------------------------------------------------------------------------------ Methods
+
     /**
      * Constructor.
      */
@@ -462,25 +462,24 @@ public class DataProcessor {
 	return palette;
     }
     /**
-     * Saves product image as PNG file.
-     *
+     * Saves product image to PNG file.
      * @param image Source image
      * @param fileName Output file name
+     * @return Save operation result
+     * @throws Runtime exception
      */
-    public int saveImageToFile( BufferedImage image, String fileName ) {
-        int res;
+    public boolean saveImageToFile(BufferedImage image, String fileName) 
+            throws RuntimeException {
         Graphics2D g = image.createGraphics();
-        g.drawImage( image, 0, 0, null );
+        g.drawImage(image, 0, 0, null);
         g.dispose();
         try {
-            File f = new File( fileName );
-            ImageIO.write( image, "png", f );
-            res = 0;
-        } catch( IOException e ) {
-            log.error( "Failed to save image to file", e );
-            res = 1;
+            File f = new File(fileName);
+            return ImageIO.write(image, "png", f);
+        } catch (IOException e) {
+            log.error("Failed to save image to file", e);
+            throw new RuntimeException(e);
         }
-        return res;
     }
     
     /**
@@ -536,28 +535,33 @@ public class DataProcessor {
      * @param rangeRingsColor Range rings color string
      * @param rangeMaskColor Range mask color String
      * @param imageFileName Output file name
+     * @throws Runtime exception
      */
-    public void polarH5Dataset2Image( H5File h5File, String datasetPath, String groupPath, int imageSize,
-            short rangeRingsDistance, float rangeMaskStroke, String rangeRingsColor,
-            String rangeMaskColor, String imageFileName ) {
+    public boolean polarH5Dataset2Image(H5File h5File, String datasetPath, 
+            String groupPath, int imageSize, short rangeRingsDistance, 
+            float rangeMaskStroke, String rangeRingsColor,
+            String rangeMaskColor, String imageFileName) 
+                throws RuntimeException {
         try {
-            Group root = getH5Root( h5File );
-            getH5Dataset( root, datasetPath );
+            Group root = getH5Root(h5File);
+            getH5Dataset(root, datasetPath);
             Dataset dset = getDataset();
-            getH5Attribute( root, groupPath, DataProcessor.H5_NBINS_ATTR );
-            long nbins_val = ( Long )getAttributeValue();
-            getH5Attribute( root, groupPath, DataProcessor.H5_NRAYS_ATTR );
-            long nrays_val = ( Long )getAttributeValue();
-            getH5Attribute( root, groupPath, DataProcessor.H5_A1GATE_ATTR );
-            long a1gate_val = ( Long )getAttributeValue();
+            getH5Attribute(root, groupPath, DataProcessor.H5_NBINS_ATTR);
+            long nbins_val = (Long) getAttributeValue();
+            getH5Attribute(root, groupPath, DataProcessor.H5_NRAYS_ATTR);
+            long nrays_val = (Long) getAttributeValue();
+            getH5Attribute(root, groupPath, DataProcessor.H5_A1GATE_ATTR);
+            long a1gate_val = (Long) getAttributeValue();
             Color[] colorPalette = createColorPalette(
-                    ServletContextUtil.getServletContextPath() + COLOR_PALETTE_FILE );
-            BufferedImage bi = polarH5Dataset2Image( dset, nbins_val, nrays_val,
-                    a1gate_val, imageSize, colorPalette, rangeRingsDistance, rangeMaskStroke,
-                    rangeRingsColor, rangeMaskColor );
-            saveImageToFile( bi, imageFileName );
-        } catch( ArrayIndexOutOfBoundsException e ) {
-            log.error( "Failed to create image from polar dataset", e );
+                    ServletContextUtil.getServletContextPath() 
+                    + COLOR_PALETTE_FILE);
+            BufferedImage bi = polarH5Dataset2Image(dset, nbins_val, nrays_val,
+                    a1gate_val, imageSize, colorPalette, rangeRingsDistance, 
+                    rangeMaskStroke, rangeRingsColor, rangeMaskColor);
+            return saveImageToFile(bi, imageFileName);
+        } catch (Exception e) {
+            log.error("Failed to create image from polar dataset", e);
+            throw new RuntimeException(e);
         }
     }
     
@@ -637,4 +641,4 @@ public class DataProcessor {
         this.datasetFullNames = datasetFullNames;
     }
 }
-//--------------------------------------------------------------------------------------------------
+

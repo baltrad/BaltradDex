@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -25,6 +25,7 @@ import eu.baltrad.dex.bltdata.util.DataProcessor;
 
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
+import eu.baltrad.dex.util.ServletContextUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -98,7 +99,10 @@ public class ImagePreviewController {
         String urLon = request.getParameter( "urLon" );
 
         // try to load image from disk before creating a new one
-        String filePath = configurationManager.getAppConf().getImagesDir() + 
+        String filePath = ServletContextUtil.getServletContextPath() + 
+                configurationManager.getAppConf().getWorkDir() +
+                File.separator + 
+                configurationManager.getAppConf().getImagesDir() + 
                 File.separator + fileUuid
             + datasetPath.replaceAll( DataProcessor.H5_PATH_SEPARATOR, "_" ) +
             DataProcessor.IMAGE_FILE_EXT;

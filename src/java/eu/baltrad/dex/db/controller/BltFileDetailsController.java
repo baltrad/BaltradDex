@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -29,6 +29,7 @@ import eu.baltrad.dex.bltdata.util.DataProjector;
 
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
+import eu.baltrad.dex.util.ServletContextUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -243,19 +244,21 @@ public class BltFileDetailsController {
 
                 // add dataset object to the list
                 bltDatasets.add( bltDataset );
-
                 // try to load thumb from disk before creating a new one
-                String thumbPath = configurationManager.getAppConf().getThumbsDir() + File.separator
-                    + uuid + datasetFullNames.get( i ).replaceAll(
-                        DataProcessor.H5_PATH_SEPARATOR, "_" )  + DataProcessor.IMAGE_FILE_EXT;
-
+                String thumbPath = ServletContextUtil.getServletContextPath() +
+                        configurationManager.getAppConf().getWorkDir() +
+                        File.separator + 
+                        configurationManager.getAppConf().getThumbsDir() + 
+                        File.separator + uuid + datasetFullNames.get( i )
+                            .replaceAll(DataProcessor.H5_PATH_SEPARATOR, "_" )  
+                        + DataProcessor.IMAGE_FILE_EXT;
                 // generate image thumbs
                 File thumb = new File( thumbPath );
-                if( !thumb.exists() ) {
+                if (!thumb.exists()) {
                     bltDataProcessor.polarH5Dataset2Image( h5File,
                     datasetFullNames.get( i ).toString(), whereGroup, THUMB_IMAGE_SIZE,
                     THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE, THUMB_RANGE_RINGS_COLOR,
-                    THUMB_RANGE_MASK_COLOR, thumbPath );
+                    THUMB_RANGE_MASK_COLOR, thumbPath);
                 }
             }
         } finally {
