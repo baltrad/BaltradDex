@@ -26,6 +26,8 @@ import eu.baltrad.dex.bltdata.util.DataProcessor;
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.util.ServletContextUtil;
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +39,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 
 import java.util.UUID;
+import ncsa.hdf.object.Dataset;
+import ncsa.hdf.object.Group;
+import ncsa.hdf.object.h5.H5File;
 
 /**
  * Implements data visualization and preview functionality.
@@ -72,6 +77,8 @@ public class ImagePreviewController {
     // range mask color string
     private static final String IMAGE_RANGE_MASK_COLOR = "#A7A7A7";
     
+    private static final String PALETTE_FILE = "includes/color_palette.txt";
+    
     private DataProcessor bltDataProcessor;
     private FileCatalog fileCatalog;
     private ConfigurationManager configurationManager;
@@ -83,7 +90,8 @@ public class ImagePreviewController {
      * @return View name
      */
     @RequestMapping("/data_preview.htm")
-    public String showPreview(HttpServletRequest request, ModelMap model) {
+    public String showPreview(HttpServletRequest request, ModelMap model) 
+        throws Exception {
         // get dataset metadata
         String fileUuid = request.getParameter( "file_uuid" );
         String fileObject = request.getParameter( "file_object" );
@@ -106,24 +114,32 @@ public class ImagePreviewController {
                 File.separator + fileUuid
             + datasetPath.replaceAll( DataProcessor.H5_PATH_SEPARATOR, "_" ) +
             DataProcessor.IMAGE_FILE_EXT;
-        File imageFile = new File( filePath );
-        if( !imageFile.exists() ) {
+        File imageFile = new File(filePath);
+        if (!imageFile.exists()) {
+            Color[] palette = bltDataProcessor.createColorPalette(
+                ServletContextUtil.getServletContextPath() + PALETTE_FILE);
+            H5File file = bltDataProcessor.openH5File(fileCatalog
+                    .getLocalPathForUuid(UUID.fromString(fileUuid)).toString());
+            Group root = bltDataProcessor.getH5Root(file);
+            bltDataProcessor.getH5Attribute(root, datasetWhere, 
+                    DataProcessor.H5_NBINS_ATTR );
+            long nbins = (Long) bltDataProcessor.getH5AttributeValue();
             // Create image from SCAN or PVOL
-            if( fileObject.equals( DataProcessor.ODIMH5_SCAN_OBJ ) || 
-                    fileObject.equals(DataProcessor.ODIMH5_PVOL_OBJ ) ) {
-                bltDataProcessor.polarH5Dataset2Image(
-                    fileCatalog.getLocalPathForUuid(
-                        UUID.fromString(fileUuid)).toString(),
-                    datasetPath, datasetWhere,
-                    Integer.parseInt( datasetWidth ), ( short )0, 1.0f, 
-                    IMAGE_RANGE_RINGS_COLOR,
-                    IMAGE_RANGE_MASK_COLOR, filePath );
+            if (fileObject.equals(DataProcessor.ODIMH5_SCAN_OBJ) || 
+                    fileObject.equals(DataProcessor.ODIMH5_PVOL_OBJ)) {
+                bltDataProcessor.getH5Dataset(root, datasetPath);
+                Dataset dataset = bltDataProcessor.getH5Dataset();
+                BufferedImage bi = bltDataProcessor.polarDataset2CartImage(
+                    nbins, dataset, palette, Integer.parseInt(datasetWidth), 
+                    0, 1.0f, IMAGE_RANGE_RINGS_COLOR, IMAGE_RANGE_MASK_COLOR);
+                bltDataProcessor.saveImageToFile(bi, filePath);
             }
             // Create image from Cartesian IMAGE object
-            if( fileObject.equals( DataProcessor.ODIMH5_IMAGE_OBJ ) ) {
+            if (fileObject.equals(DataProcessor.ODIMH5_IMAGE_OBJ)) {
                 // ... to be implemented ...
             }
             // ... other objects will come here ...
+            bltDataProcessor.closeH5File(file);
         }
         // reconstruct image URL
         StringBuffer requestURL = request.getRequestURL();

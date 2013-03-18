@@ -19,7 +19,7 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.bltdata.controller;
+package eu.baltrad.dex.bltdata.util;
 
 import eu.baltrad.dex.bltdata.util.DataProjector;
 
@@ -32,7 +32,7 @@ import junit.framework.TestCase;
  * @version 0.1.6
  * @since 0.1.6
  */
-public class BltDataProjectorControllerTest extends TestCase {
+public class BltDataProjectorTest extends TestCase {
 //---------------------------------------------------------------------------------------- Variables
     private static DataProjector bltDataProjector;
 //------------------------------------------------------------------------------------------ Methods

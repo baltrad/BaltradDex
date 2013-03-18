@@ -145,8 +145,7 @@ public class DexDBITestHelper extends TestCase {
     }
     
     /**
-     * Gets a file as a resource and returns its absolute path.
-     * 
+     * Gets a file as a resource and returns its absolute path. 
      * @param resource
      * @return
      * @throws Exception 

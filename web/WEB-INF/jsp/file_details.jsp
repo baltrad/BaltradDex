@@ -133,7 +133,7 @@ Author     : szewczenko
                             <form action="radars.htm">
                                 <div class="buttons">
                                     <button class="rounded" type="button" 
-                                            onclick="history.go(-1);">
+                                            onclick="window.location.href='browse_files.htm'">
                                         <span>Back</span>
                                     </button>
                                 </div>
@@ -150,7 +150,7 @@ Author     : szewczenko
                             <form action="radars.htm">
                                 <div class="buttons">
                                     <button class="rounded" type="button" 
-                                            onclick="history.go(-1);">
+                                            onclick="window.location.href='browse_files.htm'">
                                         <span>Back</span>
                                     </button>
                                 </div>

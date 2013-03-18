@@ -26,10 +26,10 @@ import eu.baltrad.dex.db.manager.impl.BltFileManager;
 import eu.baltrad.dex.db.model.BltFile;
 import eu.baltrad.dex.db.model.BltDataset;
 import eu.baltrad.dex.bltdata.util.DataProjector;
-
-import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.util.ServletContextUtil;
+
+import eu.baltrad.bdb.FileCatalog;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,12 +38,15 @@ import org.springframework.ui.ModelMap;
 
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.Group;
-
-import javax.servlet.http.HttpServletRequest;
+import ncsa.hdf.object.Dataset;
 
 import org.apache.log4j.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.awt.Color;
 
 import java.text.SimpleDateFormat;
 
@@ -93,6 +96,8 @@ public class BltFileDetailsController {
     private static final String THUMB_RANGE_RINGS_COLOR = "#003098";
     // Range mask color string
     private static final String THUMB_RANGE_MASK_COLOR = "#003098";
+    
+    private static final String PALETTE_FILE = "includes/color_palette.txt";
 
     private DataProcessor bltDataProcessor;
     private BltFileManager bltFileManager;
@@ -168,63 +173,77 @@ public class BltFileDetailsController {
     public void processPolarData(BltFile bltFile, H5File h5File, 
             String uuid, ModelMap model) {
         // process the file
-        Group root = bltDataProcessor.getH5Root( h5File );
+        Group root = bltDataProcessor.getH5Root(h5File);
         // get dataset full names
-        bltDataProcessor.getH5Datasets( root );
-        List<String> datasetFullNames = bltDataProcessor.getDatasetFullNames();
+        List<String> datasetPaths = new ArrayList<String>();
+        bltDataProcessor.getH5DatasetPaths(root, datasetPaths);
         // dataset objects holds file's metadata
         List<BltDataset> bltDatasets = new ArrayList<BltDataset>();
-
         // get radar location latitude
         bltDataProcessor.getH5Attribute( root, DataProcessor.H5_PATH_SEPARATOR +
                 DataProcessor.H5_WHERE_GROUP_PREFIX, DataProcessor.H5_LAT_0_ATTR );
-        double lat0_val = ( Double )bltDataProcessor.getAttributeValue();
+        double lat0_val = (Double) bltDataProcessor.getH5AttributeValue();
 
         // get radar location longitude
-        bltDataProcessor.getH5Attribute( root, DataProcessor.H5_PATH_SEPARATOR +
+        bltDataProcessor.getH5Attribute(root, DataProcessor.H5_PATH_SEPARATOR +
                 DataProcessor.H5_WHERE_GROUP_PREFIX, DataProcessor.H5_LON_0_ATTR );
-        double lon0_val = ( Double )bltDataProcessor.getAttributeValue();
+        double lon0_val = (Double) bltDataProcessor.getH5AttributeValue();
 
         // initialize projection
-        String[] projParms = new String[] { "+proj=" + PROJ4_PROJ_CODE, "+lat_0=" + lat0_val,
-            "+lon_0=" + lon0_val, "+ellps=" + PROJ4_ELLPS_CODE, "+a=" + EARTH_RADIUS };
-        int res = DataProjector.initializeProjection( projParms );
-        if( res == 1 ) {
+        String[] projParms = new String[] {"+proj=" + PROJ4_PROJ_CODE, 
+            "+lat_0=" + lat0_val, "+lon_0=" + lon0_val, "+ellps=" + 
+                PROJ4_ELLPS_CODE, "+a=" + EARTH_RADIUS};
+        int res = DataProjector.initializeProjection(projParms);
+        if (res == 1) {
             log.error( "Failed to initialize projection" );
         }
+        Color[] palette = bltDataProcessor.createColorPalette(
+                ServletContextUtil.getServletContextPath() + PALETTE_FILE);
         try {
             // iterate through datasets
-            for( int i = 0; i < datasetFullNames.size(); i++ ) {
+            for( int i = 0; i < datasetPaths.size(); i++ ) {
                  // find dataset specific WHERE group and data specific WHAT group
-                String datasetFullName = datasetFullNames.get( i );
-                String[] nameParts = datasetFullName.split( DataProcessor.H5_PATH_SEPARATOR );
+                String datasetFullName = datasetPaths.get( i );
+                String[] nameParts = datasetFullName.split(
+                        DataProcessor.H5_PATH_SEPARATOR);
                 String whereGroup = "";
                 String whatGroup = "";
-                for( int j = 0; j < nameParts.length; j++ ) {
-                    if( nameParts[ j ].startsWith( DataProcessor.H5_DATASET_PREFIX ) ) {
-                        whereGroup = DataProcessor.H5_PATH_SEPARATOR + nameParts[ j ] +
-                            DataProcessor.H5_PATH_SEPARATOR + DataProcessor.H5_WHERE_GROUP_PREFIX;
-                        whatGroup = datasetFullName.substring( 0, datasetFullName.lastIndexOf(
-                            DataProcessor.H5_PATH_SEPARATOR ) ) + DataProcessor.H5_PATH_SEPARATOR
-                            + DataProcessor.H5_WHAT_GROUP_PREFIX;
+                for (int j = 0; j < nameParts.length; j++) {
+                    if (nameParts[j].startsWith(
+                            DataProcessor.H5_DATASET_PREFIX)){
+                        whereGroup = DataProcessor.H5_PATH_SEPARATOR + 
+                                nameParts[j] + DataProcessor.H5_PATH_SEPARATOR + 
+                                DataProcessor.H5_WHERE_GROUP_PREFIX;
+                        whatGroup = datasetFullName.substring(0, 
+                                datasetFullName.lastIndexOf(
+                                    DataProcessor.H5_PATH_SEPARATOR)) + 
+                                    DataProcessor.H5_PATH_SEPARATOR + 
+                                    DataProcessor.H5_WHAT_GROUP_PREFIX;
                     }
                 }
                 // get data quantity
-                bltDataProcessor.getH5Attribute( root, whatGroup,
+                bltDataProcessor.getH5Attribute(root, whatGroup,
                         DataProcessor.H5_QUANTITY_ATTR );
-                String quantity_val = ( String )bltDataProcessor.getAttributeValue();
+                String quantity_val = (String) bltDataProcessor
+                        .getH5AttributeValue();
 
                 // get elevation angles
-                bltDataProcessor.getH5Attribute( root, whereGroup, DataProcessor.H5_ELANGLE_ATTR );
-                double elangle_val = ( Double )bltDataProcessor.getAttributeValue();
+                bltDataProcessor.getH5Attribute(root, whereGroup, 
+                        DataProcessor.H5_ELANGLE_ATTR );
+                double elangle_val = (Double) bltDataProcessor
+                        .getH5AttributeValue();
 
                 // get number of range bins
-                bltDataProcessor.getH5Attribute( root, whereGroup, DataProcessor.H5_NBINS_ATTR );
-                long nbins_val = ( Long )bltDataProcessor.getAttributeValue();
+                bltDataProcessor.getH5Attribute(root, whereGroup, 
+                        DataProcessor.H5_NBINS_ATTR );
+                long nbins_val = (Long) bltDataProcessor
+                        .getH5AttributeValue();
 
                 // retrieve data domain coordinates
-                bltDataProcessor.getH5Attribute( root, whereGroup, DataProcessor.H5_RSCALE_ATTR );
-                double rscale_val = ( Double )bltDataProcessor.getAttributeValue();
+                bltDataProcessor.getH5Attribute(root, whereGroup, 
+                        DataProcessor.H5_RSCALE_ATTR);
+                double rscale_val = (Double) bltDataProcessor
+                        .getH5AttributeValue();
 
                 // scale - in meters
                 double range = rscale_val * nbins_val;
@@ -234,39 +253,43 @@ public class BltFileDetailsController {
                 Point2D.Double urLatLon = DataProjector.pointXY2Geo( urXY );
 
                 // create dataset objects
-                BltDataset bltDataset = new BltDataset( datasetFullNames.get( i ),
+                BltDataset bltDataset = new BltDataset(datasetPaths.get(i),
                     whereGroup, quantity_val, nbins_val * 2, nbins_val * 2,
-                    lat0_val, lon0_val, llLatLon.getY(), llLatLon.getX(), urLatLon.getY(),
-                    urLatLon.getX(), elangle_val, configurationManager.getAppConf().getWorkDir() +
-                    File.separator + configurationManager.getAppConf().getThumbsDir() + File.separator +
-                    uuid + datasetFullNames.get( i ).replaceAll( DataProcessor.H5_PATH_SEPARATOR,
-                    "_" ) + DataProcessor.IMAGE_FILE_EXT );
+                    lat0_val, lon0_val, llLatLon.getY(), llLatLon.getX(), 
+                    urLatLon.getY(), urLatLon.getX(), elangle_val, 
+                        configurationManager.getAppConf().getWorkDir() +
+                    File.separator + configurationManager.getAppConf()
+                        .getThumbsDir() + File.separator +
+                    uuid + datasetPaths.get(i)
+                        .replaceAll(DataProcessor.H5_PATH_SEPARATOR, "_") +
+                        DataProcessor.IMAGE_FILE_EXT );
 
                 // add dataset object to the list
-                bltDatasets.add( bltDataset );
+                bltDatasets.add(bltDataset);
                 // try to load thumb from disk before creating a new one
                 String thumbPath = ServletContextUtil.getServletContextPath() +
                         configurationManager.getAppConf().getWorkDir() +
                         File.separator + 
                         configurationManager.getAppConf().getThumbsDir() + 
-                        File.separator + uuid + datasetFullNames.get( i )
+                        File.separator + uuid + datasetPaths.get(i)
                             .replaceAll(DataProcessor.H5_PATH_SEPARATOR, "_" )  
                         + DataProcessor.IMAGE_FILE_EXT;
                 // generate image thumbs
                 File thumb = new File( thumbPath );
                 if (!thumb.exists()) {
-                    bltDataProcessor.polarH5Dataset2Image( h5File,
-                    datasetFullNames.get( i ).toString(), whereGroup, THUMB_IMAGE_SIZE,
-                    THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE, THUMB_RANGE_RINGS_COLOR,
-                    THUMB_RANGE_MASK_COLOR, thumbPath);
+                    bltDataProcessor.getH5Dataset(root, datasetPaths.get(i));
+                    Dataset dataset = bltDataProcessor.getH5Dataset();
+                    BufferedImage bi = bltDataProcessor.polarDataset2CartImage(
+                        nbins_val, dataset, palette, THUMB_IMAGE_SIZE, 
+                        THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE, 
+                        THUMB_RANGE_RINGS_COLOR, THUMB_RANGE_MASK_COLOR);
+                    bltDataProcessor.saveImageToFile(bi, thumbPath);
                 }
             }
         } finally {
             // important: image generating method does not close the file
-            bltDataProcessor.closeH5File( h5File );
-        }
-        // reset dataset names list
-        bltDataProcessor.setDatasetFullNames( new ArrayList<String>() );
+            bltDataProcessor.closeH5File(h5File);
+        }        
         Collections.sort(bltDatasets);
         model.addAttribute(DATASETS_KEY, bltDatasets);
         model.addAttribute(FILE_KEY, bltFile);

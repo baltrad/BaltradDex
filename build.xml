@@ -28,7 +28,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="src.dir" value="src"/>
   <property name="web.dir" value="web"/>
   <property name="webinf.dir" value="${web.dir}/WEB-INF"/>
-  <property name="webinf.dir" value="${web.dir}/WEB-INF"/>
   <property name="etc.dir" value="etc"/>
   <property name="dist.dir" value="${root.dir}/dist"/>
   <property name="build.dir" value="build"/>
@@ -45,6 +44,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="compile.includeAntRuntime" value="no"/>
   <property name="compile.optimize" value="true"/>
   <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java"/>
+  <property name="include.dir" value="${web.dir}/includes"/>
   <property name="doc.dir" value="${root.dir}/doc"/>
   <property name="doc.build.dir" value="${doc.dir}/build"/>
   <property name="javadoc.dir" value="${doc.build.dir}/javadoc"/>
@@ -121,6 +121,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <include name="ant-junit/*.jar"/>
       <include name="easymock/*.jar"/>
       <include name="cglib/*.jar"/>
+      <include name="jetty/*.jar"/>
       <include name="jetty/*.jar"/>
       <include name="jakarta-commons/commons-fileupload-1.2.1.jar"/>
     </fileset>
@@ -411,11 +412,17 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="**/*.xml"/>
         <include name="**/*.properties"/>
       	<include name="**/*.groovy"/>
+        <include name="**/*.h5"/>
       </fileset>
     </copy>
     <copy todir="${test.conf.dir}">
       <fileset dir="${etc.dir}">
         <include name="dex.properties"/>
+      </fileset>
+    </copy>
+    <copy todir="${test.conf.dir}">
+      <fileset dir="${include.dir}">
+        <include name="color_palette.txt"/>
       </fileset>
     </copy>
   </target>
@@ -430,7 +437,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 	  <classpath refid="test.lib.path"/>
 	  <classpath location="${build.classes.dir}"/>
 	  <classpath refid="lib.path"/>
-          <classpath refid="dep.lib.path"/>
+      <classpath refid="dep.lib.path"/>
 	  <classpath location="${build.test.dir}" />
 	  <batchtest fork="yes" todir="${dist.dir}/junit-reports">
 	    <fileset dir="${build.test.dir}" includes="**/*Test.class"/>
