@@ -105,9 +105,8 @@ public class ChangePasswordController {
      * @return View name
      */
     @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("user_account") User user,
-                HttpServletRequest request, BindingResult result, 
-                ModelMap model) {
+    public String processSubmit(HttpServletRequest request, ModelMap model,
+            @ModelAttribute("user_account") User user, BindingResult result) {
         validator.validate(request, user, result);
         if (result.hasErrors()) {
             return FORM_VIEW;
