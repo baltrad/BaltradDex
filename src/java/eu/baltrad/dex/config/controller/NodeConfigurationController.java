@@ -29,10 +29,11 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,6 +46,7 @@ import java.util.Arrays;
 
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -101,6 +103,7 @@ public class NodeConfigurationController {
      * @param model Model map
      * @return View name
      */
+    @Transactional(rollbackFor=Exception.class)
     @RequestMapping(method = RequestMethod.POST)
     protected String processSubmit(
             @ModelAttribute("config") AppConfiguration conf, 
@@ -120,6 +123,26 @@ public class NodeConfigurationController {
                         conf.getLocality(), conf.getState(), 
                         conf.getCountryCode(), conf.getNodeAddress());
                 userManager.update(user);
+                
+                String nodeName = 
+                        configurationManager.getAppConf().getNodeName();
+                // rename key folders if changed
+                if (!conf.getNodeName().equals(nodeName)) {
+                    File srcPriv = new File(configurationManager.getAppConf()
+                        .getKeystoreDir() + File.separator + nodeName + 
+                            ".priv");
+                    File destPriv = new File(configurationManager.getAppConf()
+                         .getKeystoreDir() +  File.separator + 
+                            conf.getNodeName()+ ".priv");
+                    srcPriv.renameTo(destPriv);
+                    File srcPub = new File(configurationManager.getAppConf()
+                        .getKeystoreDir() + File.separator + nodeName + 
+                            ".pub");
+                    File destPub = new File(configurationManager.getAppConf()
+                         .getKeystoreDir() +  File.separator + 
+                            conf.getNodeName()+ ".pub");
+                    srcPub.renameTo(destPub);
+                }
                 // save configuration
                 configurationManager.saveAppConf(conf);
             }
