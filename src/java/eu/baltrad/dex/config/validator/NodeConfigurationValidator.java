@@ -39,7 +39,7 @@ import org.springframework.validation.ValidationUtils;
  */
 public class NodeConfigurationValidator implements Validator {
 
-    private static final int MIN_FIELD_LENGTH = 8;
+    //private static final int MIN_FIELD_LENGTH = 8;
     private static final int COUNTRY_CODE_LENGTH = 2;
 
     private MessageResourceUtil messages;
@@ -92,11 +92,11 @@ public class NodeConfigurationValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "adminEmail", 
                 "saveconf.missing.admin_email",
                 messages.getMessage("saveconf.missing.admin_email"));
-        if (conf.getNodeName().trim().length() > 0 
+        /*if (conf.getNodeName().trim().length() > 0 
                 && conf.getNodeName().trim().length() < MIN_FIELD_LENGTH) {
             errors.rejectValue("nodeName", "saveconf.invalid.node_name",
                     messages.getMessage("saveconf.invalid.node_name"));
-        }
+        }*/
         if (!webValidator.validateUrl(conf.getNodeAddress())) {
             errors.rejectValue("nodeAddress", "saveconf.invalid.node_address",
                     messages.getMessage("saveconf.invalid.node_address"));
