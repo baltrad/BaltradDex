@@ -238,8 +238,15 @@ public class DataSourceListController implements MessageSetter {
         initConfiguration();
         String viewName = null;
         
+        
+        log.debug("DataSourceListController: keystore dir: " + confManager.getAppConf().getKeystoreDir());
+        
+        
         // send key
         if (sendKey != null) {
+            
+            log.debug("DataSourceListController: Sending key");
+            
             if (!urlValidator.validate(urlInput)) {
                 setMessage(model, ERROR_MSG_KEY,
                            messages.getMessage(DS_INVALID_NODE_URL_KEY));       
@@ -253,11 +260,15 @@ public class DataSourceListController implements MessageSetter {
                     HttpUriRequest req = requestFactory.createPostKeyRequest(
                             localNode, new ByteArrayInputStream(cdu.zip()));
                     HttpResponse res = httpClient.post(req);
+                    
                     if (res.getStatusLine().getStatusCode() 
                             == HttpServletResponse.SC_OK) {
                         String okMsg = messages
                                 .getMessage(DS_SEND_KEY_SERVER_MSG_KEY);
                         setMessage(model, SUCCESS_MSG_KEY, okMsg);
+                        
+                        log.debug("DataSourceListController: Key sent OK");
+                        
                     } else if(res.getStatusLine().getStatusCode() 
                             == HttpServletResponse.SC_CONFLICT) {
                         String errorMsg = messages
@@ -285,6 +296,9 @@ public class DataSourceListController implements MessageSetter {
         
         // connect to node
         if (connect != null) {
+            
+            log.debug("DataSourceListController: Connecting to node");
+            
             // Validate node's URL address 
             String urlSelect = null;
             if (WebValidator.validate(nodeSelect)) {
@@ -314,6 +328,9 @@ public class DataSourceListController implements MessageSetter {
                         peerDataSources = jsonUtil.jsonToDataSources(json);
                         viewName = DS_CONNECTED_VIEW;
                         model.addAttribute(DATA_SOURCES_KEY, peerDataSources);
+                        
+                        log.debug("DataSourceListController: Node connection OK");
+                        
                     } else if (res.getStatusLine().getStatusCode() ==
                             HttpServletResponse.SC_CREATED) {
                         // user account established on server, create local 
@@ -332,7 +349,10 @@ public class DataSourceListController implements MessageSetter {
                             } catch (Exception e) {
                                 throw e;
                             }   
-                        }       
+                        } 
+                        
+                        log.debug("DataSourceListController: Node connection OK, peer account created ");
+                        
                         viewName = DS_CONNECTED_VIEW;
                     } else {
                         viewName = DS_CONNECT_VIEW;
@@ -343,6 +363,10 @@ public class DataSourceListController implements MessageSetter {
                         setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
                                 errorMsg, errorDetails);
                         log.error(errorMsg + ": " + errorDetails);
+                        
+                        
+                        log.debug("DataSourceListController: Node connection failed - server error " + 
+                                res.getStatusLine().getStatusCode() + " " + res.getStatusLine().getReasonPhrase());
                     }
                 } catch (KeyczarException e){ 
                     viewName = DS_CONNECT_VIEW;
@@ -351,6 +375,11 @@ public class DataSourceListController implements MessageSetter {
                     setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
                             errorMsg, e.getMessage());
                     log.error(errorMsg + ": " + e.getMessage());
+                    
+                    
+                    log.debug("DataSourceListController: Node connection failed - keyczar exception " + 
+                                e.getMessage());
+                    
                 } catch (InternalControllerException e) {
                      viewName = DS_CONNECT_VIEW;
                      String errorMsg = messages.getMessage(
@@ -359,6 +388,12 @@ public class DataSourceListController implements MessageSetter {
                      setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
                             errorMsg, e.getMessage());
                      log.error(errorMsg + ": " + e.getMessage());
+                     
+                     
+                     log.debug("DataSourceListController: Node connection failed - internal controller exception " + 
+                                e.getMessage());
+                     
+                     
                 } catch (IOException e) {
                     viewName = DS_CONNECT_VIEW;
                     String errorMsg = messages.getMessage(
@@ -366,6 +401,11 @@ public class DataSourceListController implements MessageSetter {
                     setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
                             errorMsg, e.getMessage());
                     log.error(errorMsg + ": " + e.getMessage());
+                    
+                    log.debug("DataSourceListController: Node connection failed - IO exception " + 
+                                e.getMessage());
+                    
+                    
                 } catch (Exception e) {
                     viewName = DS_CONNECT_VIEW;
                     String errorMsg = messages.getMessage(
@@ -373,6 +413,10 @@ public class DataSourceListController implements MessageSetter {
                     setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
                             errorMsg, e.getMessage());
                     log.error(errorMsg + ": " + e.getMessage());
+                    
+                    log.debug("DataSourceListController: Node connection failed - general exception " + 
+                                e.getMessage());
+                    
                 }
             }
         }

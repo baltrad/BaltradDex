@@ -129,13 +129,26 @@ public class PostKeyServlet extends HttpServlet {
     {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
+        
+        
+        log.debug("PostKeyServlet: keystore dir: " + confManager.getAppConf().getKeystoreDir() + 
+                File.separator + INCOMING_KEY_DIR);
+        log.debug("PostKeyServlet: key received from " + req.getNodeName());
+        
         try {
             if (keystoreManager.load(req.getNodeName()) == null) {
                 log.info("Public key received from " + req.getNodeName());
                 storeKey(request, req.getNodeName());
                 res.setStatus(HttpServletResponse.SC_OK);
+                
+                log.debug("PostKeyServlet: key stored OK");
+                
+                
             } else {
                 res.setStatus(HttpServletResponse.SC_CONFLICT);
+                
+                log.debug("PostKeyServlet: key already exists ");
+                
             }
         } catch (Exception e) {
             log.error(messages.getMessage(PK_INTERNAL_SERVER_ERROR_KEY));
