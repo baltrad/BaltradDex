@@ -173,8 +173,8 @@ public class DataSourceListServlet extends HttpServlet {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
         
-        log.debug("DataSourceListServlet: request received from " + req.getNodeName());
-        log.debug("DataSourceListServlet: authenticating, msg: " + req.getMessage() + 
+        log.warn("DataSourceListServlet: request received from " + req.getNodeName());
+        log.warn("DataSourceListServlet: authenticating, msg: " + req.getMessage() + 
                 ", signature: " + req.getSignature());
         
         try {
@@ -209,21 +209,21 @@ public class DataSourceListServlet extends HttpServlet {
                         messages.getMessage(DS_UNAUTHORIZED_REQUEST_KEY));
                 
                 
-                log.debug("DataSourceListServlet: authentication failed");
+                log.warn("DataSourceListServlet: authentication failed");
                 
             }
         } catch (KeyczarException e) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
                     messages.getMessage(DS_MESSAGE_VERIFIER_ERROR_KEY));
             
-            log.debug("DataSourceListServlet: keyczar exception " + e.getMessage()); 
+            log.warn("DataSourceListServlet: keyczar exception " + e.getMessage()); 
             
         } catch (Exception e) {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(DS_INTERNAL_SERVER_ERROR_KEY,
                         new String[] {e.getMessage()}));
             
-            log.debug("DataSourceListServlet:  general exception " + e.getMessage());
+            log.warn("DataSourceListServlet:  general exception " + e.getMessage());
         }
     }
     

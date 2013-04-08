@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
+import org.apache.log4j.Logger;
 
 import org.keyczar.exceptions.KeyczarException;
 
@@ -52,12 +53,18 @@ public class KeyczarAuthenticator implements Authenticator {
     
     private CryptoFactory cryptoFactory;
     
+    private Logger log;
+    
+    
     /**
      * Constructor.
      * @param keystoreRoot Keystore root directory
      */
     public KeyczarAuthenticator(String keystoreRoot) {
         this.cryptoFactory = new KeyczarCryptoFactory(new File(keystoreRoot));
+        
+        this.log = Logger.getLogger("DEX");
+        
     }
     
     /**
@@ -68,8 +75,17 @@ public class KeyczarAuthenticator implements Authenticator {
     public void addCredentials(HttpUriRequest request, String keyName) 
                 throws KeyczarException {
         String message = getMessage(request);
+        
         Signer signer = cryptoFactory.createSigner(keyName);
-        request.addHeader(AUTH_HDR, keyName + ":" + signer.sign(message));
+        
+        String signature = signer.sign(message);
+        
+        request.addHeader(AUTH_HDR, keyName + ":" + /*signer.sign(message)*/signature);
+        
+        log.warn("KeyczarAuthenticator::addCredentials(): key name: " + keyName);
+        log.warn("KeyczarAuthenticator::addCredentials(): message: " + message);
+        log.warn("KeyczarAuthenticator::addCredentials(): signature: " + signature);
+        
     }
     
     /**
@@ -82,6 +98,12 @@ public class KeyczarAuthenticator implements Authenticator {
     public boolean authenticate(String message, String signature, 
             String keyName) throws KeyczarException {
         Verifier verifier = cryptoFactory.createVerifier(keyName);
+        
+        log.warn("KeyczarAuthenticator::authenticate(): key name: " + keyName);
+        log.warn("KeyczarAuthenticator::authenticate(): message: " + message);
+        log.warn("KeyczarAuthenticator::authenticate(): signature: " + signature);
+        
+        
         return verifier.verify(message, signature);
     }
     

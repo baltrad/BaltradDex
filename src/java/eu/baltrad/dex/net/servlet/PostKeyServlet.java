@@ -131,9 +131,9 @@ public class PostKeyServlet extends HttpServlet {
         NodeResponse res = new NodeResponse(response);
         
         
-        log.debug("PostKeyServlet: keystore dir: " + confManager.getAppConf().getKeystoreDir() + 
+        log.warn("PostKeyServlet: keystore dir: " + confManager.getAppConf().getKeystoreDir() + 
                 File.separator + INCOMING_KEY_DIR);
-        log.debug("PostKeyServlet: key received from " + req.getNodeName());
+        log.warn("PostKeyServlet: key received from " + req.getNodeName());
         
         try {
             if (keystoreManager.load(req.getNodeName()) == null) {
@@ -141,13 +141,13 @@ public class PostKeyServlet extends HttpServlet {
                 storeKey(request, req.getNodeName());
                 res.setStatus(HttpServletResponse.SC_OK);
                 
-                log.debug("PostKeyServlet: key stored OK");
+                log.warn("PostKeyServlet: key stored OK");
                 
                 
             } else {
                 res.setStatus(HttpServletResponse.SC_CONFLICT);
                 
-                log.debug("PostKeyServlet: key already exists ");
+                log.warn("PostKeyServlet: key already exists ");
                 
             }
         } catch (Exception e) {
