@@ -237,7 +237,6 @@ public class DataSourceListController implements MessageSetter {
     {
         initConfiguration();
         String viewName = null;
-        
         // send key
         if (sendKey != null) {
             if (!urlValidator.validate(urlInput)) {
@@ -253,6 +252,7 @@ public class DataSourceListController implements MessageSetter {
                     HttpUriRequest req = requestFactory.createPostKeyRequest(
                             localNode, new ByteArrayInputStream(cdu.zip()));
                     HttpResponse res = httpClient.post(req);
+                    
                     if (res.getStatusLine().getStatusCode() 
                             == HttpServletResponse.SC_OK) {
                         String okMsg = messages
@@ -332,7 +332,7 @@ public class DataSourceListController implements MessageSetter {
                             } catch (Exception e) {
                                 throw e;
                             }   
-                        }       
+                        }
                         viewName = DS_CONNECTED_VIEW;
                     } else {
                         viewName = DS_CONNECT_VIEW;

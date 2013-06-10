@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.util.List;
 import java.util.ArrayList;
+import org.apache.log4j.Logger;
 
 import org.keyczar.exceptions.KeyczarException;
 
@@ -49,8 +50,8 @@ public class KeyczarAuthenticator implements Authenticator {
     private static final String[] HEADERS = {"Content-Type", "Content-MD5",
         "Date"};
     private static final String AUTH_HDR = "Authorization";
-    
     private CryptoFactory cryptoFactory;
+    private Logger log;
     
     /**
      * Constructor.
@@ -58,6 +59,7 @@ public class KeyczarAuthenticator implements Authenticator {
      */
     public KeyczarAuthenticator(String keystoreRoot) {
         this.cryptoFactory = new KeyczarCryptoFactory(new File(keystoreRoot));
+        this.log = Logger.getLogger("DEX");
     }
     
     /**
