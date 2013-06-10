@@ -25,11 +25,11 @@ import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.config.model.RegistryConfiguration;
-import eu.baltrad.dex.user.manager.IKeystoreManager;
+import eu.baltrad.dex.keystore.manager.IKeystoreManager;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.user.model.Key;
+import eu.baltrad.dex.keystore.model.Key;
 import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.ServletContextUtil;
 
@@ -43,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.File;
 
 import java.util.Properties;
+import java.util.Date;
 
 /**
  * Class implements configuration object handling functionality.
@@ -126,6 +127,16 @@ public class ConfigurationManager implements IConfigurationManager,
      */
     public RegistryConfiguration getRegistryConf() {
         return registryConf;
+    }
+    
+    /**
+     * Get last modification time.
+     * @return The time the file was last modified
+     */
+    public long getLastModified() {
+        File f = new File(ServletContextUtil.getServletContextPath() 
+                        + DEX_PROPS_FILE);
+        return f.lastModified();
     }
     
     /**

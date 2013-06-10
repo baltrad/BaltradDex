@@ -9,7 +9,7 @@ jQuery.template("bdb_filter_common",
 
 
 jQuery.template("bdb_filter_attr",
-  '<span class="bdbAttributeFilter">' +
+  '<span class="bdb-attribute-filter">' +
   '  {{tmpl($data) "bdb_filter_common"}}' +
   '  <label for="negated">NOT</label>' +
   '  <input type="checkbox" name="negated" value="true" {{if $data.negated}} checked="checked" {{/if}}/>' +
@@ -25,7 +25,7 @@ jQuery.template("bdb_filter_attr",
 );
 
 jQuery.template("bdb_filter_combined",
-  '<div class="bdbCombinedFilter"> ' +
+  '<div class="bdb-combined-filter"> ' +
   '  {{tmpl($data) "bdb_filter_common"}} ' +
   '  <select name="matchType">' +
   '    {{tmpl($item.matchTypes, {current: $data.matchType}) "bdb_filter_select_option"}}' +
@@ -35,7 +35,7 @@ jQuery.template("bdb_filter_combined",
 );
 
 jQuery.template("bdb_filter_add_child",
-  '<input class="bdbFilterAdd" type="image" src="includes/images/icons/circle-plus.png">' +
+  '<input class="bdb-filter-add" type="image" src="includes/images/filter-add.png" title="Add filter">' +
   '<select name="filterType">' +
   '  {{tmpl($item.filterTypes) "bdb_filter_select_option"}}' +
   '</select>'
@@ -61,7 +61,7 @@ function BdbCombinedFilter(data) {
 
   this.wrapChildFilterDom = function (childFilter) {
     var dom = childFilter.dom.wrapAll("<li/>").parent();
-    dom.prepend("<input type='image' class='bdbFilterRemove' src='includes/images/icons/circle-delete.png'/>");
+    dom.prepend("<input type='image' class='bdb-filter-remove' src='includes/images/filter-remove.png' title='Remove filter'/>");
     createChildRemovalCallback(dom, this, childFilter);
     return dom;
   };
@@ -111,7 +111,7 @@ function BdbCombinedFilter(data) {
 };
 
 function createChildAdditionCallback(addChildDom, filter) {
-  var addChildFilterButton = addChildDom.find("input.bdbFilterAdd");
+  var addChildFilterButton = addChildDom.find("input.bdb-filter-add");
 
   addChildFilterButton.click(function(evt) {
     evt.preventDefault();
@@ -239,4 +239,3 @@ function isValidBdbFilter(filter) {
   });
   return r;
 };
-

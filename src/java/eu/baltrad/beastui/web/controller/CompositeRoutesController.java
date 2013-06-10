@@ -121,7 +121,7 @@ public class CompositeRoutesController {
    * @param detectors the detectors that should be used for this rule
    * @return a jsp page string or redirect
    */
-  @RequestMapping("/compositeroute_create.htm")
+  @RequestMapping("/route_create_composite.htm")
   public String createRoute(
       Model model,
       @RequestParam(value = "name", required = false) String name,
@@ -199,7 +199,7 @@ public class CompositeRoutesController {
         List<String> recip = (recipients == null) ? new ArrayList<String>() : recipients;
         RouteDefinition def = manager.create(name, author, bactive, description, recip, rule);
         manager.storeDefinition(def);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         t.printStackTrace();
         emessage = "Failed to create definition: '" + t.getMessage() + "'";
@@ -225,7 +225,7 @@ public class CompositeRoutesController {
    * @param sources the sources this rule should affect
    * @return a jsp page string or redirect
    */
-  @RequestMapping("/compositeroute_show.htm")
+  @RequestMapping("/route_show_composite.htm")
   public String showRoute(
       Model model,
       @RequestParam(value = "name", required = false) String name,
@@ -247,12 +247,12 @@ public class CompositeRoutesController {
     if (def == null) {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
-    if (operation != null && operation.equals("Modify")) {
+    if (operation != null && operation.equals("Save")) {
       return modifyRoute(model, name, author, active, description, byscan, method, prodpar, selection_method, recipients, areaid, interval, timeout, sources, detectors);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         return viewShowRoutes(model, "Failed to delete \"" + name + "\", have you verified that there are no reffering scheduled jobs");
       }
@@ -312,7 +312,7 @@ public class CompositeRoutesController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "compositeroute_create";
+    return "route_create_composite";
   }
   
   protected String viewShowRoute(
@@ -359,7 +359,7 @@ public class CompositeRoutesController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "compositeroute_show";
+    return "route_show_composite";
   }
   
   /**
@@ -377,7 +377,7 @@ public class CompositeRoutesController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "showroutes";
+    return "routes";
   }
   
   /**
@@ -453,7 +453,7 @@ public class CompositeRoutesController {
         RouteDefinition def = manager.create(name, author, isactive, description,
             newrecipients, rule);
         manager.updateDefinition(def);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         t.printStackTrace();
         emessage = "Failed to update definition: '" + t.getMessage() + "'";

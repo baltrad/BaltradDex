@@ -46,12 +46,12 @@ import org.apache.log4j.Logger;
  * @since 0.7.3
  */
 @Controller
-@RequestMapping("/configure_messages.htm")
+@RequestMapping("/messages_configure.htm")
 @SessionAttributes("config")
 public class MessagesConfigurationController {
 
     // View name
-    private static final String FORM_VIEW = "configure_messages";
+    private static final String FORM_VIEW = "messages_configure";
     
     // Model keys
     private static final String CONF_KEY = "config";
@@ -59,8 +59,8 @@ public class MessagesConfigurationController {
             "savemsgconf.completed_success";
     private static final String SAVE_MESSAGES_CONF_ERROR = 
             "savemsgconf.completed_failure";
-    private static final String OK_MSG_KEY = "message";
-    private static final String ERROR_MSG_KEY = "error";
+    private static final String OK_MSG_KEY = "messages_conf_success";
+    private static final String ERROR_MSG_KEY = "messages_conf_error";
 
     private ConfigurationManager configManager;
     private LogManager logManager;

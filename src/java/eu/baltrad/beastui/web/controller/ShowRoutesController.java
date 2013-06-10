@@ -65,36 +65,36 @@ public class ShowRoutesController {
     this.manager = manager;
   }
   
-  @RequestMapping("/showroutes.htm")
+  @RequestMapping("/routes.htm")
   public String showRoutes(Model model) {
     logger.debug("showRoutes(Model)");
     List<RouteDefinition> definitions = manager.getDefinitions();
     model.addAttribute("routes", definitions);
-    return "showroutes";
+    return "routes";
   }
   
-  @RequestMapping("/createroute.htm")
+  @RequestMapping("/route_create.htm")
   public String createRoute(
       Model model,
       @RequestParam(value = "submitButton", required = false) String operation) {
     if (operation != null && operation.equals("Script")) {
-      return "redirect:groovyroute_create.htm";
+      return "redirect:route_create_groovy.htm";
     } else if (operation != null && operation.equals("Composite")) {
-      return "redirect:compositeroute_create.htm";
+      return "redirect:route_create_composite.htm";
     } else if (operation != null && operation.equals("Volume")) {
-      return "redirect:volumeroute_create.htm";
+      return "redirect:route_create_volume.htm";
     } else if (operation != null && operation.equals("BdbTrimAge")) {
-      return "redirect:bdbtrimageroute_create.htm";
+      return "redirect:route_create_bdb_trim_age.htm";
     } else if (operation != null && operation.equals("BdbTrimCount")) {
-      return "redirect:bdbtrimcountroute_create.htm";
+      return "redirect:route_create_bdb_trim_count.htm";
     } else if (operation != null && operation.equals("GoogleMap")) {
-      return "redirect:googlemaproute_create.htm";
+      return "redirect:route_create_google_map.htm";
     }
     model.addAttribute("emessage", "Unknown operation: '"+operation+"'");
-    return "redirect:showroutes.htm";
+    return "redirect:routes.htm";
   }
   
-  @RequestMapping("/showroute.htm")
+  @RequestMapping("/route.htm")
   public String showRoute(
       Model model,
       @RequestParam(value = "name") String name) {
@@ -103,19 +103,19 @@ public class ShowRoutesController {
     if (def != null) {
       String type = def.getRuleType();
       if (type.equals("groovy")) {
-        result = "redirect:groovyroute_show.htm";
+        result = "redirect:route_show_groovy.htm";
       } else if (type.equals("blt_composite")) {
-        result = "redirect:compositeroute_show.htm";
+        result = "redirect:route_show_composite.htm";
       } else if (type.equals("blt_volume")) {
-        result = "redirect:volumeroute_show.htm";
+        result = "redirect:route_show_volume.htm";
       } else if (type.equals("distribution")) {
-        result = "redirect:distributionroute.htm";
+        result = "redirect:route_create_distribution.htm";
       } else if (type.equals("bdb_trim_age")) {
-        result = "redirect:bdbtrimageroute_show.htm";
+        result = "redirect:route_show_bdb_trim_age.htm";
       } else if (type.equals("bdb_trim_count")) {
-        result = "redirect:bdbtrimcountroute_show.htm";
+        result = "redirect:route_show_bdb_trim_count.htm";
       } else if (type.equals("blt_gmap")) {
-        result = "redirect:googlemaproute_show.htm";
+        result = "redirect:route_show_google_map.htm";
       }
 
       if (result != null) {
@@ -124,7 +124,7 @@ public class ShowRoutesController {
     }
   
     if (result == null) {
-      result = "redirect:showroutes.htm";
+      result = "redirect:routes.htm";
     }
     return result;
   }

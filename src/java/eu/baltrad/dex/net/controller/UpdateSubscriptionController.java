@@ -78,16 +78,16 @@ import java.util.Arrays;
 public class UpdateSubscriptionController implements MessageSetter {
     
     /** Subscribed peers view */
-    private static final String SUBSCRIBED_PEERS_VIEW = "subscribed_peers";
+    private static final String SUBSCRIBED_PEERS_VIEW = "subscription_peers";
     /** Subscription by peer view */
     private static final String SUBSCRIPTION_BY_PEER_VIEW = 
-            "subscription_by_peer";
+            "subscription_show";
     /** Selected subscription view */
     private static final String SELECTED_SUBSCRIPTION_VIEW = 
-            "selected_subscription";
+            "subscription_selected";
     /** Subscription status view */
     private static final String SUBSCRIPTION_STATUS_VIEW = 
-            "subscription_status";
+            "subscription_update_status";
     
     /** Subscribed peers key */
     private static final String SUBSCRIBED_PEERS_KEY = "subscribed_peers";
@@ -96,12 +96,15 @@ public class UpdateSubscriptionController implements MessageSetter {
             "subscription_by_peer"; 
     /** Selected subscription key */
     private static final String SELECTED_SUBSCRIPION_KEY = 
-            "selected_subscription";
+            "subscription_selected";
     /** Peer node name key */
     private static final String PEER_NAME_KEY = "peer_name";
     /** Subscription modification status key */
-    private static final String STATUS_NOT_CHANGED_KEY = "status_not_changed";
-    
+    private static final String STATUS_NOT_CHANGED_KEY = 
+            "subscription_status_unchanged";
+    /** Subscription not changed message key */
+    private static final String GS_SUBSCRIPTION_UNCHANGED_KEY = 
+            "getsubscription.controller.subscription_unchanged";
     /** Message signer error key */
     private static final String GS_MESSAGE_SIGNER_ERROR_KEY = 
             "getsubscription.controller.message_signer_error";
@@ -112,7 +115,7 @@ public class UpdateSubscriptionController implements MessageSetter {
     private static final String GS_SERVER_ERROR_KEY = 
             "getsubscription.controller.subscription_server_error";
      /** Subscription server - partial subscription message */
-    private static final String GS_SERVER_PARTIAL_SUBSCRIPTION = 
+    private static final String GS_SERVER_PARTIAL_SUBSCRIPTION_KEY = 
             "getsubscription.controller.subscription_server_partial";
     /** Internal controller error key */
     private static final String GS_INTERNAL_CONTROLLER_ERROR_KEY = 
@@ -311,7 +314,7 @@ public class UpdateSubscriptionController implements MessageSetter {
      * @param model Model
      * @return Subscribed peers view
      */
-    @RequestMapping("/subscribed_peers.htm")
+    @RequestMapping("/subscription_peers.htm")
     public String subscribedPeers(Model model) {
         model.addAttribute(SUBSCRIBED_PEERS_KEY, userManager.loadOperators());
         return SUBSCRIBED_PEERS_VIEW;
@@ -323,7 +326,7 @@ public class UpdateSubscriptionController implements MessageSetter {
      * @param peerName Peer node name
      * @return Subscriptions by peer view
      */
-    @RequestMapping("/subscription_by_peer.htm")
+    @RequestMapping("/subscription_show.htm")
     public String subscriptionByPeer(Model model,
             @RequestParam(value="peer_name", required=true) String peerName) {
         List<Subscription> subscriptionByPeer = subscriptionManager.load(
@@ -342,7 +345,7 @@ public class UpdateSubscriptionController implements MessageSetter {
      * @param selectedSubscriptionIds IDs of selected subscriptions  
      * @return Selected subscriptions view
      */
-    @RequestMapping("/selected_subscription.htm")
+    @RequestMapping("/subscription_selected.htm")
     public String selectedSubscription(Model model,
             @RequestParam(value="peer_name", required=true) String peerName,
             @RequestParam(value="current_subscription_ids", required=true) 
@@ -385,7 +388,8 @@ public class UpdateSubscriptionController implements MessageSetter {
             List<Subscription> subscriptionByPeer = subscriptionManager.load(
                 Subscription.LOCAL, peerName);
             model.addAttribute(SUBSCRIPTION_BY_PEER_KEY, subscriptionByPeer);
-            model.addAttribute(STATUS_NOT_CHANGED_KEY, "unchanged");
+            model.addAttribute(STATUS_NOT_CHANGED_KEY, 
+                    messages.getMessage(GS_SUBSCRIPTION_UNCHANGED_KEY));
             return SUBSCRIPTION_BY_PEER_VIEW;
         }
     }
@@ -399,7 +403,7 @@ public class UpdateSubscriptionController implements MessageSetter {
      *                                subscriptions 
      * @return Subscription status view
      */
-    @RequestMapping("/subscription_status.htm")
+    @RequestMapping("/subscription_update_status.htm")
     public String updateSubscription(Model model,
             @RequestParam(value="peer_name", required=true) String peerName,
             @RequestParam(value="active_subscription_ids", required=false) 
@@ -426,7 +430,7 @@ public class UpdateSubscriptionController implements MessageSetter {
             } else if (res.getStatusLine().getStatusCode() 
                     == HttpServletResponse.SC_PARTIAL_CONTENT) {
                 String errorMsg = messages.getMessage(
-                    GS_SERVER_PARTIAL_SUBSCRIPTION, new String[] {peerName});
+                    GS_SERVER_PARTIAL_SUBSCRIPTION_KEY, new String[] {peerName});
                 storeLocalSubscriptions(res, readSubscriptions(res));
                 setMessage(model, ERROR_MSG_KEY, errorMsg);
                 log.error(errorMsg);

@@ -70,12 +70,12 @@ import java.util.ArrayList;
  * @since 1.2.1
  */
 @Controller
-@RequestMapping("/save_datasource.htm")
+@RequestMapping("/datasources_save.htm")
 @SessionAttributes("data_source")
 public class SaveDataSourceController {
     
-    private static final String FORM_VIEW = "save_datasource";
-    private static final String SUCCESS_VIEW = "save_datasource_status";
+    private static final String FORM_VIEW = "datasources_save";
+    private static final String SUCCESS_VIEW = "datasources_save_status";
     
     /** ODIM what/source attribute key */
     private static final String DS_SOURCE_ATTR_STR = "what/source:WMO";
@@ -90,8 +90,8 @@ public class SaveDataSourceController {
             "savedatasource.failure";
     private static final String SAVE_DATASOURCE_OK_MSG_KEY = 
             "savedatasource.success";
-    private static final String ERROR_MSG_KEY = "error";
-    private static final String OK_MSG_KEY = "message";
+    private static final String ERROR_MSG_KEY = "datasource_save_error";
+    private static final String OK_MSG_KEY = "datasource_save_success";
     
     private PlatformTransactionManager transactionManager;
     private RadarManager radarManager;

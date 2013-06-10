@@ -42,7 +42,7 @@ import java.util.Collections;
 @Controller
 public class EditAccountController {
 
-    private static final String SUCCESS_VIEW = "edit_user_account";
+    private static final String SUCCESS_VIEW = "user_edit";
     private static final String ACCOUNTS_KEY = "accounts";
     
     private UserManager accountManager;
@@ -52,7 +52,7 @@ public class EditAccountController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/edit_user_account.htm")
+    @RequestMapping("/user_edit.htm")
     public String handleRequest(ModelMap model) {
          List<User> users = accountManager.load();
          Collections.sort(users);

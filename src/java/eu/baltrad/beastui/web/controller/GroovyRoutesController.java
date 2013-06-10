@@ -84,7 +84,7 @@ public class GroovyRoutesController {
     this.adaptormanager = adaptormanager;
   }
 
-  @RequestMapping("/groovyroute_create.htm")
+  @RequestMapping("/route_create_groovy.htm")
   public String createRoute(
       Model model,
       @RequestParam(value = "name", required = false) String name,
@@ -115,7 +115,7 @@ public class GroovyRoutesController {
         GroovyRule rule = createRule(typdef);
         RouteDefinition def = manager.create(name, author, bactive, description, recipients, rule);
         manager.storeDefinition(def);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         emessage = "Failed to create definition: '" + t.getMessage() + "'";
         if (t.getCause() != null) {
@@ -127,7 +127,7 @@ public class GroovyRoutesController {
         recipients, typdef, emessage);
   }
 
-  @RequestMapping("/groovyroute_show.htm")
+  @RequestMapping("/route_show_groovy.htm")
   public String showRoute(
       Model model,
       @RequestParam(value = "name", required = true) String name,
@@ -142,12 +142,12 @@ public class GroovyRoutesController {
     if (def == null) {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
-    if (operation != null && operation.equals("Modify")) {
+    if (operation != null && operation.equals("Save")) {
       return modifyRoute(model, name, author, active, description, recipients, typdef);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         return viewShowRoutes(model, "Failed to delete \"" + name + "\", have you verified that there are no reffering scheduled jobs");
       }
@@ -207,7 +207,7 @@ public class GroovyRoutesController {
     model.addAttribute("emessage", emessage);
     model.addAttribute("typdef", definition);
 
-    return "groovyroute_create";
+    return "route_create_groovy";
   }
 
   /**
@@ -226,7 +226,7 @@ public class GroovyRoutesController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "showroutes";
+    return "routes";
   }
 
   /**
@@ -264,7 +264,7 @@ public class GroovyRoutesController {
     model.addAttribute("definition", definition);
     model.addAttribute("emessage", emessage);
 
-    return "groovyroute_show";
+    return "route_show_groovy";
   }
   
   /**
@@ -307,7 +307,7 @@ public class GroovyRoutesController {
         RouteDefinition def = manager.create(name, author, isactive, description,
             newrecipients, rule);
         manager.updateDefinition(def);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         emessage = "Failed to update definition: '" + t.getMessage() + "'";
         if (t.getCause() != null) {

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -34,7 +34,7 @@ import java.util.List;
 public interface IRegistryManager {
     
     /** Number of file entries per page */
-    public final static int ENTRIES_PER_PAGE = 12;
+    public final static int ENTRIES_PER_PAGE = 16;
     /** Number of pages in the scroll bar, must be an odd number >= 3 */
     public final static int SCROLL_RANGE = 11;
     /** Trim registry by number trigger */
@@ -44,9 +44,15 @@ public interface IRegistryManager {
     public static final String TRIM_REG_BY_AGE_TG = 
             "dex_trim_registry_by_age_tg";
     
-    public long count();
+    public long count(String type);
     
-    public List<RegistryEntry> load(int offset, int limit);
+    public long countDownloads(int dataSourceId);
+    
+    public long countSuccessfulUploads(int dataSourceId);
+    
+    public long countFailedUploads(int dataSourceId);
+    
+    public List<RegistryEntry> load(String type, int offset, int limit);
     
     public int store(RegistryEntry entry) throws Exception;
     

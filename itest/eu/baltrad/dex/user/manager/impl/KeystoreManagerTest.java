@@ -21,8 +21,9 @@
 
 package eu.baltrad.dex.user.manager.impl;
 
+import eu.baltrad.dex.keystore.manager.impl.KeystoreManager;
 import eu.baltrad.dex.db.itest.DexDBITestHelper;
-import eu.baltrad.dex.user.model.Key;
+import eu.baltrad.dex.keystore.model.Key;
 
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;

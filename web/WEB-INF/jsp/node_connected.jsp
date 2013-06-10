@@ -1,5 +1,5 @@
 <%------------------------------------------------------------------------------
-Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -16,114 +16,97 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 --------------------------------------------------------------------------------
-Document   : Shows data sources available at a peer node
-Created on : May 9, 2012, 10:39 AM
+Document   : Show peer data sources
+Created on : May 29, 2013, 3:10 PM
 Author     : szewczenko
 ------------------------------------------------------------------------------%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+<%@ include file="/WEB-INF/jsp/include.jsp" %>
 
-<%@include file="/WEB-INF/jsp/include.jsp"%>
-
-<t:page_tabbed pageTitle="Connect" activeTab="exchange">
+<t:generic_page pageTitle="Connect">
     <jsp:body>
-        <div class="left">
-            <t:menu_exchange/>
-        </div>
-        <div class="right"> 
-            <c:choose>
-                <c:when test="${not empty data_sources}">
-                    <div class="blttitle">
-                        <img src="includes/images/icons/connection.png" alt="">
-                        Connected to <c:out value="${peer_name}"/>
-                    </div>
-                    <div class="blttext">
-                        Data sources available at <c:out value="${peer_name}"/>. 
-                        Subscribe a desired data source by selecting a corresponding check box.
-                    </div>
-                    <div class="table">
-                        <div class="dsconnect">
-                            <form action="selected_datasource.htm" method="post">
-                                <div class="tableheader">
-                                    <div id="cell" class="count">&nbsp;</div>
-                                    <div id="cell" class="name">
-                                        Name
-                                    </div>
-                                    <div id="cell" class="description">
-                                        Description
-                                    </div>
-                                    <div id="cell" class="check">
-                                        Select
-                                    </div>
+        <div class="node-connected">
+            <div class="table">
+                <c:choose>
+                    <c:when test="${not empty data_sources}">
+                        <div class="header">
+                            <div class="row">Connected to ${peer_name}</div>
+                        </div>
+                        <div class="header-text">
+                            Data sources available at ${peer_name}.
+                            Click checkbox next to selected data source 
+                            and <i>OK</i> to subscribe.
+                        </div>
+                        <form action="node_datasources.htm" method="POST">
+                            <div class="body">
+                                <div class="header-row">
+                                    <div class="count">&nbsp;</div>
+                                    <div class="ds_name">Data source name</div>
+                                    <div class="ds_description">Description</div>
+                                    <div class="select">Select</div>
                                 </div>
                                 <c:set var="count" scope="page" value="1"/>
                                 <c:forEach items="${data_sources}" var="ds">
-                                    <div class="entry">
-                                        <div id="cell" class="count">
+                                    <div class="row">
+                                        <div class="count">
                                             <c:out value="${count}"/>
                                             <c:set var="count" value="${count + 1}"/>
                                         </div>
-                                        <div id="cell" class="name">
+                                        <div class="ds_name">
                                             <c:out value="${ds.name}"/>
                                         </div>
-                                        <div id="cell" class="description">
+                                        <div class="ds_description">
                                             <c:out value="${ds.description}"/>
                                         </div>
-                                        <div id="cell" class="check">
+                                        <div class="select">
                                             <input type="checkbox" 
                                                    name="selected_data_sources"
                                                    value="${ds.id}_${ds.name}_${ds.description}"/>
                                         </div>
                                     </div>
                                 </c:forEach>
-                                <div class="tablefooter">
-                                    <div class="buttons">
-                                        <button class="rounded" type="button"
-                                                onclick="window.location.href='connect_to_node.htm'">
-                                            <span>Back</span>
-                                        </button>
-                                        <button class="rounded" type="submit">
-                                            <span>OK</span>
-                                        </button>
+                            </div>
+                            <div class="table-footer">
+                                <div class="buttons">
+                                    <div class="button-wrap">
+                                        <input class="button" type="button" 
+                                               value="Back"
+                                               onclick="window.location.href='node_connect.htm'"/>
+                                    </div>
+                                    <div class="button-wrap">
+                                        <input class="button" type="submit" 
+                                               value="OK"/>
                                     </div>
                                 </div>
-                            </form>
-                        </div>
-                    </div>
-                </c:when>
-                <c:otherwise>
-                    <div class="blttitle">
-                        <img src="includes/images/icons/connection.png" alt="">
-                        Connected to <c:out value="${peer_name}"/>
-                    </div>
-                    <div class="blttext">
-                        <div class ="alert">
-                            <div class="icon">
-                                <img src="includes/images/icons/circle-alert.png" 
-                                     alt="">
                             </div>
-                            <div class="text">
-                                You have successfully connected to 
-                                <c:out value="${peer_name}"/>, but no data 
-                                sources have been found. Ask peer node's 
-                                administrator to make data sources available 
-                                for you.
+                        </form>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="header">
+                            <div class="row">Connected to ${peer_name}</div>
+                        </div>
+                        <div class="header-text">
+                            <img src="includes/images/circle-check.png" 
+                                 alt="OK"/>
+                            <div class="msg">
+                                Successfully connected to ${peer_name}, but 
+                                no data sources are available.</br> 
+                                Ask peer node's administrator to make data 
+                                sources available for subscription.
                             </div>
                         </div>
-                    </div>
-                    <div class="table">
-                        <div class="tablefooter">
+                        <div class="table-footer">
                             <div class="buttons">
-                                <button class="rounded" type="button"
-                                        onclick="window.location.href='connect_to_node.htm'">
-                                    <span>OK</span>
-                                </button>
+                                <div class="button-wrap">
+                                    <input class="button" type="button" 
+                                           value="OK"
+                                           onclick="window.location.href='node_connect.htm'"/>
+                                </div>
                             </div>
-                        </div>
-                    </div>    
-                </c:otherwise>
-            </c:choose>
-        </div>      
+                        </div>    
+                    </c:otherwise>
+                </c:choose>    
+            </div>
+        </div>
     </jsp:body>
-</t:page_tabbed>
+</t:generic_page>

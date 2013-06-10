@@ -24,7 +24,6 @@ package eu.baltrad.dex.db.manager;
 import eu.baltrad.dex.db.model.BltFile;
 
 import eu.baltrad.bdb.db.DatabaseError;
-import eu.baltrad.bdb.db.FileEntry;
 
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.dex.db.model.BltQueryParameter;
@@ -39,6 +38,8 @@ import java.util.List;
  * @since 1.1.1
  */
 public interface IBltFileManager {
+    
+    public long count() throws DatabaseError;
     
     public long count(String dsName) throws DatabaseError;
     

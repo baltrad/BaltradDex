@@ -1,5 +1,5 @@
 /*******************************************************************************
-Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -129,10 +129,74 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/*
+    Modify dex_delivery_registry table
+*/
+CREATE OR REPLACE FUNCTION upgrade_dex_delivery_registry_table() 
+    RETURNS void AS $$
+BEGIN
+    PERFORM true FROM information_schema.columns WHERE table_name = 
+        'dex_delivery_registry' AND column_name = 'type';
+    IF NOT FOUND THEN
+        DECLARE
+            rec RECORD;
+        BEGIN
+            ALTER TABLE dex_delivery_registry ADD COLUMN type VARCHAR(16);
+            ALTER TABLE dex_delivery_registry ADD COLUMN status_tmp 
+                    BOOLEAN NOT NULL DEFAULT FALSE;
+            FOR rec IN SELECT * FROM dex_delivery_registry
+            LOOP
+                UPDATE dex_delivery_registry SET type = 'upload' 
+                    WHERE id = rec.id;
+                IF rec.status = 'SUCCESS' THEN
+                    UPDATE dex_delivery_registry SET status_tmp = true 
+                        WHERE id = rec.id; 
+                ELSE
+                    UPDATE dex_delivery_registry SET status_tmp = false 
+                        WHERE id = rec.id; 
+                END IF;
+            END LOOP;
+            ALTER TABLE dex_delivery_registry ALTER COLUMN type SET NOT NULL;
+            ALTER TABLE dex_delivery_registry DROP COLUMN status;
+            ALTER TABLE dex_delivery_registry RENAME COLUMN status_tmp TO status; 
+        EXCEPTION WHEN OTHERS THEN 
+            RAISE NOTICE 'Failed to upgrade dex_delivery_registry';
+        END;
+    ELSE
+        RAISE NOTICE 'table dex_delivery_registry already upgraded';
+    END IF;
+END
+$$ LANGUAGE plpgsql;
+
+/*
+    Add dex_dex_delivery_registry_data_sources table
+*/
+CREATE OR REPLACE FUNCTION create_dex_delivery_registry_data_sources_table() 
+    RETURNS void AS $$
+BEGIN
+    PERFORM true FROM information_schema.tables WHERE 
+        table_name = 'dex_delivery_registry_data_sources';
+    IF NOT FOUND THEN
+        CREATE TABLE dex_delivery_registry_data_sources
+        (
+            id SERIAL NOT NULL PRIMARY KEY,
+            entry_id INT NOT NULL REFERENCES dex_delivery_registry (id) ON DELETE CASCADE,
+            data_source_id INT NOT NULL REFERENCES dex_data_sources (id) ON DELETE CASCADE
+        );
+    ELSE
+        RAISE NOTICE 'table "dex_delivery_registry_data_sources" already exists';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
 SELECT remove_name_hash_from_dex_users();
 --SELECT reset_user_passwords();
 SELECT rename_registry_table();
 SELECT create_dex_keys_table();
+SELECT upgrade_dex_delivery_registry_table();
+SELECT create_dex_delivery_registry_data_sources_table();
 
 DROP FUNCTION make_plpgsql(); 
 DROP FUNCTION remove_name_hash_from_dex_users();

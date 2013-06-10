@@ -17,136 +17,91 @@ You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 --------------------------------------------------------------------------------
 Document   : Log in page
-Created on : Sep 22, 2010, 1:51 PM
+Created on : Apr 2, 2013, 9:32 AM
 Author     : szewczenko
 ------------------------------------------------------------------------------%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" 
+    "http://www.w3.org/TR/html4/strict.dtd">
 
-<%@include file="/WEB-INF/jsp/include.jsp"%>
-
-<%@page import="java.util.Date"%>
-<%@page import="java.text.SimpleDateFormat"%>
-<%@page import="eu.baltrad.dex.config.manager.impl.ConfigurationManager"%> 
-
-<jsp:useBean id="configurationManager" scope="request"
-             class="eu.baltrad.dex.config.manager.impl.ConfigurationManager">
-</jsp:useBean>
-
-<%
-    Date now = new Date();
-    SimpleDateFormat format = new SimpleDateFormat("dd MMMM yyyy, h:mm aa");
-    String dateAndTime = format.format(now); 
-    
-    if (configurationManager.getAppConf() == null ) {
-        request.getSession().setAttribute("init_status", 1);
-    } else {
-        request.getSession().setAttribute("init_status", 0);
-    }
-    String adminEmail = configurationManager.getAppConf().getAdminEmail();
-%>
-
-<html>
-    <head>
+<%@ include file="/WEB-INF/jsp/include.jsp"%>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link href="includes/baltraddex.css" rel="stylesheet" type="text/css"/>
+        <link rel="StyleSheet" href="includes/dex.css" type="text/css" 
+              media="screen"/>
+        <link rel="icon" type="image/png" href="includes/images/favicon.png"/>
+        <script src="includes/js/load_clock.js" type="text/javascript" 
+                language="Javascript">
+        </script>
         <title>BALTRAD | Login</title>
-    </head>
-    <body>
-        <div id="bltcontainer">
-            <div id="bltheader">
-                <script type="text/javascript" src="includes/js/header_login.js"></script>
-            </div>
-            <div id="bltmain">
-                <div class="login">
+	</head>
+	<body onload="loadClock();">
+		<div id="container">
+			<t:header_login/>
+			<div id="sidebar">
+				<div id="logo-init"></div>
+			</div>
+			<div id="content">
+                <div id="clock"></div>
+				<form method="POST" id="login-form"
+                      action="<c:url value='j_spring_security_check' />">
+					<div class="logo"></div>
                     <c:choose>
-                        <c:when test="${ init_status == 0 }">
-                            <form method="post" action="<c:url value='j_spring_security_check' />">
-                                <c:if test="${not empty login_error}">
-                                    <div class="systemerror">
-                                        <div class="header">
-                                            Login failed.
-                                        </div>
-                                        <div class="message">
-                                            Invalid user credentials.
-                                        </div>
-                                    </div>
-                                    <c:set var="login_error" value="" scope="session" />
-                                </c:if>
-                                <c:if test="${not empty logout_message}">
-                                    <div class="systemmessage">
-                                        <div class="header">
-                                            Logout successful.
-                                        </div>
-                                        <div class="message">
-                                            User successfully logged out.
-                                        </div>
-                                    </div>
-                                    <c:set var="logout_message" value="" scope="session" />
-                                </c:if>  
-                                <div class="left">
-                                    <div class="date">
-                                        <%= dateAndTime %>
-                                    </div>
-                                    <div class="username">
-                                        User name
-                                    </div>
-                                    <div class="password">
-                                        Password
-                                    </div>
-                                </div>
-                                <div class="right">
-                                    <div class="prompt">
-                                        | Log on to BALTRAD
-                                    </div>
-                                    <div class="username">
-                                        <input type="text" name="j_username"/>
-                                        <div class="hint">
-                                            Valid account name
-                                        </div>
-                                    </div>
-                                    <div class="password">
-                                        <input type="password" name="j_password"/>
-                                        <div class="hint">
-                                            Case-sensitive
-                                        </div>
-                                    </div>
-                                    <div class="buttons">
-                                        <button class="rounded" type="reset">
-                                            <span>Clear</span>
-                                        </button>
-                                        <button class="rounded" type="submit">
-                                            <span>Sign in</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                            <div class="passwdrecovery">
-                                Forgot your user name or password?&nbsp; 
-                                <a href="recovery.htm">Click here.</a>
-                            </div>
+                        <c:when test="${not empty init_error}">
+                            <t:message_box errorHeader="System error"
+                                           errorBody="${init_error}"
+                                           email="${admin_email}"
+                                           link="Report problem"/>
                         </c:when>
                         <c:otherwise>
-                            <div class="systemerror">
-                                <div class="header">
-                                    System failed to initialize.
+                            <t:message_box msgHeader="Signed out"
+                                           msgBody="${logout_msg}"
+                                           errorHeader="Failed to sign in"
+                                           errorBody="${login_error}"/>
+                            <div class="leftcol">
+                                <div class="row">
+                                    Server Name:
                                 </div>
-                                <div class="message">
-                                    System failed to initialize correctly. This may affect
-                                    its basic functionality.<br>
-                                    Please <a href="mailto:<%=adminEmail%>">report this problem</a>
-                                    to node administrator.
+                                <div class="row">
+                                    User Name:
                                 </div>
-                                <c:set var="error_message" value="" scope="session"/>
+                                <div class="row">
+                                    Password:
+                                </div>
                             </div>
+                            <div class="rightcol">
+                                <div class="row">
+                                    <c:out value="${node_name}"></c:out>
+                                </div>
+                                <div class="row">
+                                    <input class="editbox" type="text" 
+                                           name="j_username"
+                                           title="User name">
+                                    </input>
+                                </div>
+                                <div class="row">
+                                    <input class="editbox" type="password" 
+                                           name="j_password" 
+                                           title="Password"></input>
+                                </div>
+                                <div class="buttons">
+                                    <div class="button-wrap">
+                                        <input class="button" type="reset" 
+                                               value="Clear"></input>
+                                    </div>
+                                    <div class="button-wrap">
+                                        <input class="button" type="submit" 
+                                               value="Sign In"></input>
+                                    </div>
+                                </div>
+                            </div>        
                         </c:otherwise>
                     </c:choose>
-                </div>
-            </div>
-        </div>
-        <div id="bltfooter">
-            <%@include file="/WEB-INF/jsp/footer.jsp"%>
-        </div>
-    </body>
+				</form>	
+			</div>
+			<div id="clearfooter"></div>
+		</div>
+		<t:footer/>    
+	</body>
 </html>

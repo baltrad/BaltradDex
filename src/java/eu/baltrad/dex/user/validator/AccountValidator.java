@@ -88,8 +88,9 @@ public class AccountValidator {
                     "saveaccount.missing.repeat_password",
                     messages.getMessage("saveaccount.missing.repeat_password"));
             }
-            if (repeatPassword.length() > 0 && 
-                !user.getPassword().equals(repeatPassword)) {
+            if (user.getPassword().length() > MIN_PASSWD_LENGTH 
+                    && repeatPassword.length() > 0 
+                    && !user.getPassword().equals(repeatPassword)) {
                     errors.rejectValue("password", 
                         "saveaccount.mismatch.password",
                         messages.getMessage("saveaccount.mismatch.password"));

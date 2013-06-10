@@ -225,7 +225,7 @@ public class UpdateSubscriptionControllerTest {
         classUnderTest.setUserManager(userManagerMock);
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.subscribedPeers(model);
-        assertEquals("subscribed_peers", viewName);
+        assertEquals("subscription_peers", viewName);
         assertTrue(model.containsAttribute("subscribed_peers"));
         assertEquals(users, model.asMap().get("subscribed_peers"));
         
@@ -242,7 +242,7 @@ public class UpdateSubscriptionControllerTest {
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.subscriptionByPeer(model, 
                 "test.baltrad.eu");
-        assertEquals("subscription_by_peer", viewName);
+        assertEquals("subscription_show", viewName);
         assertTrue(model.containsAttribute("peer_name"));
         assertTrue(model.containsAttribute("subscription_by_peer"));
         assertEquals("test.baltrad.eu", model.asMap().get("peer_name"));
@@ -269,7 +269,7 @@ public class UpdateSubscriptionControllerTest {
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.selectedSubscription(model, 
             "test.baltrad.eu", currentSubscriptionIds, selectedSubscriptionIds);
-        assertEquals("subscription_by_peer", viewName);
+        assertEquals("subscription_show", viewName);
         assertTrue(model.containsAttribute("peer_name"));
         assertTrue(model.containsAttribute("subscription_by_peer"));
         assertEquals("test.baltrad.eu", model.asMap().get("peer_name"));
@@ -298,11 +298,11 @@ public class UpdateSubscriptionControllerTest {
         String viewName = classUnderTest.selectedSubscription(model, 
             "test.baltrad.eu", currentSubscriptionIds, selectedSubscriptionIds);
         
-        assertEquals("selected_subscription", viewName);
+        assertEquals("subscription_selected", viewName);
         assertTrue(model.containsAttribute("peer_name"));
-        assertTrue(model.containsAttribute("selected_subscription"));
+        assertTrue(model.containsAttribute("subscription_selected"));
         assertEquals("test.baltrad.eu", model.asMap().get("peer_name"));
-        assertEquals(subscriptions, model.asMap().get("selected_subscription"));
+        assertEquals(subscriptions, model.asMap().get("subscription_selected"));
         
         verifyAll();
     }
@@ -336,7 +336,7 @@ public class UpdateSubscriptionControllerTest {
         String viewName = classUnderTest.updateSubscription(
                 model, "test.baltrad.eu", activeSubscriptionIds, 
                 inactiveSubscriptionIds);
-        assertEquals("subscription_status", viewName);
+        assertEquals("subscription_update_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
                 "getsubscription.controller.message_signer_error",
@@ -387,7 +387,7 @@ public class UpdateSubscriptionControllerTest {
         
         verifyAll();
         
-        assertEquals("subscription_status", viewName);
+        assertEquals("subscription_update_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
             messages.getMessage(
@@ -429,7 +429,7 @@ public class UpdateSubscriptionControllerTest {
         String viewName = classUnderTest.updateSubscription(model, 
             "test.baltrad.eu", activeSubscriptionIds, inactiveSubscriptionIds);
         
-        assertEquals("subscription_status", viewName);
+        assertEquals("subscription_update_status", viewName);
         assertTrue(model.containsAttribute("peer_name"));
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
@@ -473,7 +473,7 @@ public class UpdateSubscriptionControllerTest {
         String viewName = classUnderTest.updateSubscription(model, 
             "test.baltrad.eu", activeSubscriptionIds, inactiveSubscriptionIds);
         
-        assertEquals("subscription_status", viewName);
+        assertEquals("subscription_update_status", viewName);
         assertTrue(model.containsAttribute("peer_name"));
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
@@ -519,7 +519,7 @@ public class UpdateSubscriptionControllerTest {
         String viewName = classUnderTest.updateSubscription(model, 
             "test.baltrad.eu", activeSubscriptionIds, inactiveSubscriptionIds);
         
-        assertEquals("subscription_status", viewName);
+        assertEquals("subscription_update_status", viewName);
         assertTrue(model.containsAttribute("peer_name"));
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
@@ -566,7 +566,7 @@ public class UpdateSubscriptionControllerTest {
         String viewName = classUnderTest.updateSubscription(model, 
             "test.baltrad.eu", activeSubscriptionIds, inactiveSubscriptionIds);
         
-        assertEquals("subscription_status", viewName);
+        assertEquals("subscription_update_status", viewName);
         assertTrue(model.containsAttribute("peer_name"));
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
@@ -612,7 +612,7 @@ public class UpdateSubscriptionControllerTest {
         String viewName = classUnderTest.updateSubscription(model, 
             "test.baltrad.eu", activeSubscriptionIds, inactiveSubscriptionIds);
         
-        assertEquals("subscription_status", viewName);
+        assertEquals("subscription_update_status", viewName);
         assertTrue(model.containsAttribute("peer_name"));
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
@@ -663,7 +663,7 @@ public class UpdateSubscriptionControllerTest {
         String viewName = classUnderTest.updateSubscription(model, 
             "test.baltrad.eu", activeSubscriptionIds, inactiveSubscriptionIds);
         
-        assertEquals("subscription_status", viewName);
+        assertEquals("subscription_update_status", viewName);
         assertTrue(model.containsAttribute("peer_name"));
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
@@ -716,7 +716,7 @@ public class UpdateSubscriptionControllerTest {
         String viewName = classUnderTest.updateSubscription(model, 
             "test.baltrad.eu", activeSubscriptionIds, inactiveSubscriptionIds);
         
-        assertEquals("subscription_status", viewName);
+        assertEquals("subscription_update_status", viewName);
         assertTrue(model.containsAttribute("peer_name"));
         assertTrue(model.containsAttribute("success_message"));
         assertEquals(messages.getMessage(

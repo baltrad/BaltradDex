@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -23,11 +23,7 @@ package eu.baltrad.dex.registry.model.impl;
 
 import eu.baltrad.dex.registry.model.IRegistryEntry;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
 import java.util.Date;
-
 /**
  * Class implements data delivery register entry.
  *
@@ -37,15 +33,15 @@ import java.util.Date;
  */
 public class RegistryEntry implements IRegistryEntry {
     
-    private final static String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
-    
     private int id;
+    private int userId;
+    private int dataSourceId;
     private long timeStamp;
-    private String dateTime;
+    private Date date;
+    private String type;
     private String uuid;
-    private String status;
-    private String user;
-    private DateFormat format = new SimpleDateFormat(DATE_FORMAT);
+    private String userName;
+    private boolean status;
     
     /**
      * Default constructor.
@@ -55,35 +51,111 @@ public class RegistryEntry implements IRegistryEntry {
     /**
      * Constructor.
      * @param id Record id
-     * @param timestamp Timestamp 
+     * @param userId User id
+     * @param dataSourceId Data source id
+     * @param type Entry type
+     * @param timeStamp Timestamp 
      * @param uuid File's UUID
+     * @param userName User name
      * @param status Delivery status
-     * @param user User name
      */
-    public RegistryEntry(int id, long timeStamp, String uuid,
-            String status, String user) {
+    public RegistryEntry(int id, int userId, int dataSourceId, long timeStamp, 
+            String type, String uuid, String userName, boolean status) {
         this.id = id;
+        this.userId = userId;
+        this.dataSourceId = dataSourceId;
         this.timeStamp = timeStamp;
-        this.dateTime = format.format(new Date(timeStamp));
+        this.date = new Date(timeStamp);
+        this.type = type;
         this.uuid = uuid;
+        this.userName = userName;
         this.status = status;
-        this.user = user;
     }
     
     /**
      * Constructor.
-     * @param time Time in milliseconds
+     * @param userId User id
+     * @param dataSourceId Data source id
+     * @param type Entry type
+     * @param timeStamp Timestamp 
      * @param uuid File's UUID
+     * @param userName User name
      * @param status Delivery status
-     * @param user User name
      */
-    public RegistryEntry(long timeStamp, String uuid, String status, 
-            String user) {
+    public RegistryEntry(int userId, int dataSourceId, long timeStamp, 
+            String type, String uuid, String userName, boolean status) {
+        this.userId = userId;
+        this.dataSourceId = dataSourceId;
         this.timeStamp = timeStamp;
-        this.dateTime = format.format(new Date(timeStamp));
+        this.date = new Date(timeStamp);
+        this.type = type;
         this.uuid = uuid;
+        this.userName = userName;
         this.status = status;
-        this.user = user;
+    }
+    
+    /**
+     * Constructor.
+     * @param id Record id
+     * @param type Entry type
+     * @param timeStamp Timestamp 
+     * @param uuid File's UUID
+     * @param userName User name
+     * @param status Delivery status
+     */
+    public RegistryEntry(int id, long timeStamp, String type, String uuid, 
+            String userName, boolean status) {
+        this.id = id;
+        this.timeStamp = timeStamp;
+        this.date = new Date(timeStamp);
+        this.type = type;
+        this.uuid = uuid;
+        this.userName = userName;
+        this.status = status;
+    }
+    
+    /**
+     * Compares this object with another.
+     * @param obj Object to compare with
+     * @return True is tested parameters are equal
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if(obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+        RegistryEntry entry = (RegistryEntry) obj; 
+        return this.getUserId() == entry.getUserId() && 
+               this.getDataSourceId() == entry.getDataSourceId() &&
+               this.getType() != null && 
+               this.getType().equals(entry.getType()) &&
+               this.getUuid() != null &&
+               this.getUuid().equals(entry.getUuid()) && 
+               this.getUserName() != null && 
+               this.getUserName().equals(entry.getUserName());
+    }
+    
+    /**
+     * Generate hash code.
+     * @return Hash code
+     */
+    @Override
+    public int hashCode() {
+        int prime = 7;
+        int result = 1;
+        result = prime * result + this.getId(); 
+        result = prime * result + this.getUserId(); 
+        result = prime * result + this.getDataSourceId();
+        result = prime * result + ((this.getDate() == null) ? 
+                0 : this.getDate().hashCode());
+        result = prime * result + ((this.getType() == null) ? 
+                0 : this.getType().hashCode());
+        result = prime * result + ((this.getUuid() == null) ? 
+                0 : this.getUuid().hashCode());
+        result = prime * result + ((this.getUserName() == null) ? 
+                0 : this.getUserName().hashCode());
+        return result;
     }
 
     /**
@@ -98,6 +170,34 @@ public class RegistryEntry implements IRegistryEntry {
      */
     public void setId(int id) {
         this.id = id;
+    }
+    
+    /**
+     * @return the userId
+     */
+    public int getUserId() {
+        return userId;
+    }
+
+    /**
+     * @param userId the userId to set
+     */
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    /**
+     * @return the dataSourceId
+     */
+    public int getDataSourceId() {
+        return dataSourceId;
+    }
+
+    /**
+     * @param dataSourceId the dataSourceId to set
+     */
+    public void setDataSourceId(int dataSourceId) {
+        this.dataSourceId = dataSourceId;
     }
 
     /**
@@ -115,19 +215,31 @@ public class RegistryEntry implements IRegistryEntry {
     }
     
     /**
-     * Get formatted date and time.
-     * @return Formatted date and time
+     * @return the date
      */
-    public String getDateTime() {
-        return dateTime;
+    public Date getDate() {
+        return date;
     }
 
     /**
-     * Set formatted date and time.
-     * @param dateTime Formatted date and time
+     * @param date the date to set
      */
-    public void setDateTime(String dateTime) {
-        this.dateTime = dateTime;
+    public void setDate(Date date) {
+        this.date = date;
+    }
+    
+    /**
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * @param type the type to set
+     */
+    public void setType(String type) {
+        this.type = type;
     }
 
     /**
@@ -145,31 +257,31 @@ public class RegistryEntry implements IRegistryEntry {
     }
 
     /**
+     * @return the userName
+     */
+    public String getUserName() {
+        return userName;
+    }
+
+    /**
+     * @param userName the userName to set
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    /**
      * @return the status
      */
-    public String getStatus() {
+    public boolean getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(String status) {
+    public void setStatus(boolean status) {
         this.status = status;
-    }
-
-    /**
-     * @return the user
-     */
-    public String getUser() {
-        return user;
-    }
-
-    /**
-     * @param user the user to set
-     */
-    public void setUser(String user) {
-        this.user = user;
     }
     
 }

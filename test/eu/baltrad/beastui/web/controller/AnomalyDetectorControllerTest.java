@@ -93,7 +93,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.showAnomalyDetectors(model, null);
     
     verify();
-    assertEquals("anomalydetectors", result);
+    assertEquals("anomaly_detectors", result);
   }
   
   public void testShowAnomalyDetectors_withEmessage() throws Exception {
@@ -110,7 +110,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.showAnomalyDetectors(model, "a message");
     
     verify();
-    assertEquals("anomalydetectors", result);
+    assertEquals("anomaly_detectors", result);
   }
   
   public void testCreateAnomalyDetector_show() throws Exception {
@@ -119,7 +119,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.createAnomalyDetector(model, null, null, null);
     
     verify();
-    assertEquals("anomalydetector_create", result);
+    assertEquals("anomaly_detector_create", result);
   }
 
   public void testCreateAnomalyDetector_create() throws Exception {
@@ -141,7 +141,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.createAnomalyDetector(model, "aname", "a description", "Add");
     
     verify();
-    assertEquals("redirect:anomalydetectors.htm", result);
+    assertEquals("redirect:anomaly_detectors.htm", result);
   }
 
   public void testCreateAnomalyDetector_unknownOperation() throws Exception {
@@ -150,7 +150,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.createAnomalyDetector(model, "aname", "a description", "Unknown");
     
     verify();
-    assertEquals("anomalydetector_create", result);
+    assertEquals("anomaly_detector_create", result);
   }
   
   public void testCreateAnomalyDetector_failedAdd() throws Exception {
@@ -179,7 +179,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.createAnomalyDetector(model, "aname", "a description", "Add");
     
     verify();
-    assertEquals("anomalydetector_create", result);
+    assertEquals("anomaly_detector_create", result);
   }
 
   public void testShowAnomalyDetector() throws Exception {
@@ -199,7 +199,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.showAnomalyDetector(model, "aname");
     
     verify();
-    assertEquals("anomalydetector_show", result);
+    assertEquals("anomaly_detector_show", result);
   }
 
   public void testShowAnomalyDetector_noSuchDetector() throws Exception {
@@ -218,7 +218,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.showAnomalyDetector(model, "aname");
     
     verify();
-    assertEquals("anomalydetectors", result);
+    assertEquals("anomaly_detectors", result);
   }
 
   public void testModifyAnomalyDetector_delete() throws Exception {
@@ -229,7 +229,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.modifyAnomalyDetector(model, "aname", "a description", "Delete");
     
     verify();
-    assertEquals("redirect:anomalydetectors.htm", result);
+    assertEquals("redirect:anomaly_detectors.htm", result);
   }
   
   public void testModifyAnomalyDetector_delete_failure() throws Exception {
@@ -249,7 +249,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.modifyAnomalyDetector(model, "aname", "a description", "Delete");
     
     verify();
-    assertEquals("anomalydetectors", result);
+    assertEquals("anomaly_detectors", result);
   }
 
   public void testModifyAnomalyDetector_modify() throws Exception {
@@ -271,7 +271,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.modifyAnomalyDetector(model, "aname", "a description", "Modify");
     
     verify();
-    assertEquals("redirect:anomalydetectors.htm", result);
+    assertEquals("redirect:anomaly_detectors.htm", result);
   }
 
   public void testModifyAnomalyDetector_modify_failed() throws Exception {
@@ -300,7 +300,7 @@ public class AnomalyDetectorControllerTest extends TestCase {
     String result = classUnderTest.modifyAnomalyDetector(model, "aname", "a description", "Modify");
     
     verify();
-    assertEquals("anomalydetector_show", result);
+    assertEquals("anomaly_detector_show", result);
   }
 
   

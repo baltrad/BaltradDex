@@ -158,7 +158,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.CAPPI, "500", 0, "areaid", 30, 40, sources, detectors);
     
     verify();
-    assertEquals("redirect:showroutes.htm", result);
+    assertEquals("redirect:routes.htm", result);
   }
   
   public void testCreateRoute_noAdaptors() throws Exception {
@@ -316,7 +316,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.PMAX, "500, 70000.0", 0, "areaid", 30, 40, sources, detectors);
     
     verify();
-    assertEquals("redirect:showroutes.htm", result);
+    assertEquals("redirect:routes.htm", result);
     
   }
 
@@ -355,7 +355,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.PMAX, "0,1", 0, "areaid", 30, 40, sources, detectors);
     
     verify();
-    assertEquals("redirect:showroutes.htm", result);
+    assertEquals("redirect:routes.htm", result);
     
   }
 
@@ -466,7 +466,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
         recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
     verify();
-    assertEquals("compositeroute_create", result);
+    assertEquals("route_create_composite", result);
   }
 
   public void testViewCreateRoute_emessage() throws Exception {
@@ -554,7 +554,7 @@ public class CompositeRoutesControllerTest extends TestCase {
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
         recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
     verify();
-    assertEquals("compositeroute_create", result);
+    assertEquals("route_create_composite", result);
   }
   
   public void testCreateRule() throws Exception {

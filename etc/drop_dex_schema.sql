@@ -32,6 +32,7 @@ DROP TABLE IF EXISTS dex_subscriptions_users;
 DROP TABLE IF EXISTS dex_subscriptions_data_sources;
 DROP TABLE IF EXISTS dex_delivery_registry CASCADE;
 DROP TABLE IF EXISTS dex_delivery_registry_users;
+DROP TABLE IF EXISTS dex_delivery_registry_data_sources;
 DROP TABLE IF EXISTS dex_data_sources CASCADE;
 DROP TABLE IF EXISTS dex_file_objects CASCADE;
 DROP TABLE IF EXISTS dex_data_quantities CASCADE;

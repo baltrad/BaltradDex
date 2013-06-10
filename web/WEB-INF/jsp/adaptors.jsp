@@ -1,5 +1,5 @@
-<%--------------------------------------------------------------------------------------------------
-Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
+<%------------------------------------------------------------------------------
+Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -15,17 +15,16 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
-----------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 List of adaptors
 @date 2010-03-23
 @author Anders Henja
---------------------------------------------------------------------------------------------------%>
-
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
+------------------------------------------------------------------------------%>
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+
 <%@ page import="java.util.List" %>
+
 <%
     // Check if there are adaptors available to display
     List adaptors = ( List )request.getAttribute( "adaptors" );
@@ -36,64 +35,58 @@ List of adaptors
     }
 %>
 
-<t:page_tabbed pageTitle="Adaptors" activeTab="processing">
+<t:generic_page pageTitle="Adaptors">
     <jsp:body>
-        <div class="left">
-            <t:menu_processing/>
-        </div>
-        <div class="right">
-            <div class="blttitle">
-                Adaptors
-            </div>
-            <div class="blttext">
-                List of adaptors. Click on adaptor name to modify or delete or click
-                Create to create a new adaptor.
-            </div>
+        <div class="adaptors">
             <div class="table">
-                <t:error_message message="${emessage}"/>
-                <form name="createAdaptorForm" action="createadaptor.htm">
+                <div class="header">
+                    <div class="row">Adaptors</div>
+                </div>
+                <div class="header-text">
+                    Click on adaptor name to modify or delete or click
+                    <i>Create</i> to create a new adaptor. 
+                </div>
+                <form name="createAdaptorForm" action="adaptor_create.htm">
+                    <t:message_box errorHeader="Problems encountered."
+                                   errorBody="${emessage}"/>
                     <c:choose>
                         <c:when test="${adaptors_status == 1}">
-                            <div class="adaptors">
-                                <div class="tableheader">
-                                    <div id="cell" class="count">&nbsp;</div>
-                                    <div id="cell" class="name">Name</div>
-                                    <div id="cell" class="type">Type</div>
+                            <div class="body">
+                                <div class="header-row">
+                                    <div class="count">&nbsp;</div>
+                                    <div class="name">Name</div>
+                                    <div class="type">Type</div>
                                 </div>
                                 <c:set var="count" scope="page" value="1"/>
                                 <c:forEach var="adaptor" items="${adaptors}">
-                                    <div class="entry">
-                                        <div id="cell" class="count">
+                                    <div class="row">
+                                        <div class="count">
                                             <c:out value="${count}"/>
                                             <c:set var="count" value="${count + 1}"/>
                                         </div>
-                                        <div id="cell" class="name">
-                                            <a href="showadaptor.htm?name=${adaptor.name}">
+                                        <div class="name">
+                                            <a href="adaptor_show.htm?name=${adaptor.name}">
                                                 <c:out value="${adaptor.name}"/>
                                             </a>
                                         </div>
-                                        <div id="cell" class="type">
+                                        <div class="type">
                                             <c:out value="${adaptor.type}"/>
                                         </div>
                                     </div>
                                 </c:forEach>
-                            </div>
+                            </div>  
                         </c:when>
                     </c:choose>
-                    <br>
-                    <div class="tablefooter">
+                    <div class="table-footer">
                         <div class="buttons">
-                            <button class="rounded" type="button"
-                                    onclick="window.location.href='processing.htm'">
-                                <span>Back</span>
-                            </button>
-                            <button class="rounded" type="submit">
-                                <span>Create</span>
-                            </button>
+                            <div class="button-wrap">
+                                <input class="button" type="submit" 
+                                       value="Create"/>
+                            </div>
                         </div>
-                    </div>
-                </form>
-            </div>      
+                    </div>                      
+                </form>    
+            </div>
         </div>
     </jsp:body>
-</t:page_tabbed>
+</t:generic_page>

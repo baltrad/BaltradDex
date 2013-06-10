@@ -23,9 +23,9 @@ package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.config.model.AppConfiguration;
-import eu.baltrad.dex.user.manager.IKeystoreManager;
+import eu.baltrad.dex.keystore.manager.IKeystoreManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.user.model.Key;
+import eu.baltrad.dex.keystore.model.Key;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;

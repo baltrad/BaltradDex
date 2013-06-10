@@ -97,7 +97,7 @@ public class SchedulerControllerTest extends TestCase {
     String result = classUnderTest.showSchedule(model, null);
     
     verify();
-    assertEquals("showschedule", result);
+    assertEquals("schedule", result);
   }
  
   public void testCreateScheduledJob_default() throws Exception {
@@ -177,7 +177,7 @@ public class SchedulerControllerTest extends TestCase {
     verify();
     methodsControl.verify();
     cronutilControl.verify();
-    assertEquals("redirect:showschedule.htm", result);
+    assertEquals("redirect:schedule.htm", result);
   }
 
   public void testCreateScheduledJob_badCron() throws Exception {
@@ -307,11 +307,11 @@ public class SchedulerControllerTest extends TestCase {
     cronutilControl.replay();
     
     classUnderTest.setCronEntryUtilities(cronutil);
-    String result = classUnderTest.showScheduledJob(model, 10, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "BAC", "Modify");
+    String result = classUnderTest.showScheduledJob(model, 10, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "BAC", "Save");
     
     verify();
     cronutilControl.verify();
-    assertEquals("redirect:showschedule.htm", result);
+    assertEquals("redirect:schedule.htm", result);
   }
 
   public void testShowScheduledJob_delete() throws Exception {
@@ -332,7 +332,7 @@ public class SchedulerControllerTest extends TestCase {
     String result = classUnderTest.showScheduledJob(model, 10, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "BAC", "Delete");
     
     verify();
-    assertEquals("redirect:showschedule.htm", result);
+    assertEquals("redirect:schedule.htm", result);
   }
 
   
@@ -464,7 +464,7 @@ public class SchedulerControllerTest extends TestCase {
     String result = classUnderTest.viewCreateScheduledJob(model, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "nisse", null);
     
     verify();
-    assertEquals("createscheduledjob", result);
+    assertEquals("schedule_create_job", result);
   }
 
   public void testViewShowScheduledJob() throws Exception {
@@ -517,7 +517,7 @@ public class SchedulerControllerTest extends TestCase {
     String result = classUnderTest.viewShowScheduledJob(model, 10, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "nisse", null);
     
     verify();
-    assertEquals("showscheduledjob", result);
+    assertEquals("schedule_show_job", result);
   }
   
   public void testViewShowSchedule() throws Exception {
@@ -527,7 +527,7 @@ public class SchedulerControllerTest extends TestCase {
     String result = classUnderTest.viewShowSchedule(model, null);
     
     verify();
-    assertEquals("showschedule", result);
+    assertEquals("schedule", result);
   }
   
   public void testViewShowSchedule_emessage() throws Exception {
@@ -539,6 +539,6 @@ public class SchedulerControllerTest extends TestCase {
     String result = classUnderTest.viewShowSchedule(model, "an error occured");
     
     verify();
-    assertEquals("showschedule", result);
+    assertEquals("schedule", result);
   }
 }

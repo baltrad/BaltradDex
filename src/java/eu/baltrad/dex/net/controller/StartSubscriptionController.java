@@ -75,7 +75,7 @@ import java.io.IOException;
 public class StartSubscriptionController implements MessageSetter {
     
     /** Initial view */
-    private static final String SUBSCRIBE_VIEW = "subscribe";
+    private static final String SUBSCRIBE_VIEW = "subscription_start_status";
     /** Message signer error key */
     private static final String PS_MESSAGE_SIGNER_ERROR_KEY = 
             "postsubscription.controller.message_signer_error";
@@ -206,8 +206,11 @@ public class StartSubscriptionController implements MessageSetter {
                 // save peer data sources
                 DataSource dataSource = dataSourceManager.load(ds.getName(), 
                         DataSource.PEER);
+                User user = userManager.load(peerName);
                 if (dataSource == null) {
-                    dataSourceManager.store(ds);
+                    int id = dataSourceManager.store(ds);
+                    /* save peer data source user (operator) */
+                    dataSourceManager.storeUser(id, user.getId());
                 } else {
                     ds.setId(dataSource.getId());
                     dataSourceManager.update(ds);
@@ -239,7 +242,7 @@ public class StartSubscriptionController implements MessageSetter {
      * @param selectedDataSources Data sources selected for subscription
      * @return View name
      */
-    @RequestMapping("/subscribe.htm")
+    @RequestMapping("/subscription_start_status.htm")
     public String startSubscription(Model model,
             @RequestParam(value="peer_name", required=true) String peerName,
             @RequestParam(value="selected_data_sources", required=true) 

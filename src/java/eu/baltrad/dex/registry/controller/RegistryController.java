@@ -47,21 +47,21 @@ import java.util.List;
 public class RegistryController {
 
     // View names
-    private static final String SHOW_REGISTRY_VIEW = "registry";
-    private static final String CLEAR_REGISTRY_VIEW = "clear_registry";
+    private static final String SHOW_REGISTRY_VIEW = "registry_show";
+    private static final String CLEAR_REGISTRY_VIEW = "registry_delete";
     private static final String CLEAR_REGISTRY_STATUS_VIEW = 
-            "clear_registry_status";
+            "registry_delete_status";
     
     // Model keys
-    private static final String PAGE_NUMBER = "pagenum";
+    private static final String PAGE_NUMBER = "selected_page";
     private static final String REGISTRY_ENTRIES = "entries";
     private static final String NUMBER_OF_ENTRIES_KEY = "number_of_entries";
     private static final String CLEAR_REGISTRY_OK_MSG_KEY = 
             "clearregistry.completed_success";
     private static final String CLEAR_REGISTRY_ERROR_MSG_KEY = 
             "clearregistry.completed_failure";
-    private static final String OK_MSG_KEY = "message";
-    private static final String ERROR_MSG_KEY = "error";
+    private static final String OK_MSG_KEY = "registry_delete_success";
+    private static final String ERROR_MSG_KEY = "registry_delete_error";
     
     private RegistryManager registryManager;
     private MessageResourceUtil messages;
@@ -82,7 +82,7 @@ public class RegistryController {
      * @return Numbers of first, last and current page for a given dataset 
      */
     private int[] getPages() {
-        long numEntries = registryManager.count();
+        long numEntries = registryManager.count(RegistryEntry.UPLOAD);
         int numPages = (int) Math.ceil(
                 numEntries / RegistryManager.ENTRIES_PER_PAGE);
         if ((numPages * RegistryManager.ENTRIES_PER_PAGE) < numEntries) {
@@ -119,15 +119,15 @@ public class RegistryController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/registry.htm")
+    @RequestMapping("/registry_show.htm")
     public String showRegistry(HttpServletRequest request, ModelMap model) {
         String pageNum = request.getParameter(PAGE_NUMBER);
         List<RegistryEntry> entries = null;
         if (pageNum != null) {
             if (pageNum.matches("<<")) {
                 firstPage();
-                entries = registryManager
-                        .load(0, RegistryManager.ENTRIES_PER_PAGE);
+                entries = registryManager.load(RegistryEntry.UPLOAD, 0, 
+                        RegistryManager.ENTRIES_PER_PAGE);
             } else {
                 if (pageNum.matches(">>")) {
                     lastPage();
@@ -142,13 +142,13 @@ public class RegistryController {
                 int offset = (getCurrentPage() 
                         * RegistryManager.ENTRIES_PER_PAGE)
                         - RegistryManager.ENTRIES_PER_PAGE;
-                entries = registryManager.load(offset,
+                entries = registryManager.load(RegistryEntry.UPLOAD, offset,
                         RegistryManager.ENTRIES_PER_PAGE);
             }
         } else {
             setCurrentPage(1);
-            entries = registryManager
-                    .load(0, RegistryManager.ENTRIES_PER_PAGE );
+            entries = registryManager.load(RegistryEntry.UPLOAD, 0, 
+                    RegistryManager.ENTRIES_PER_PAGE );
         }
         int pages[] = getPages();
         model.addAttribute("first_page", pages[0]);
@@ -163,9 +163,10 @@ public class RegistryController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/clear_registry.htm")
+    @RequestMapping("/registry_delete.htm")
     public String clearRegistry(ModelMap model) {
-        model.addAttribute(NUMBER_OF_ENTRIES_KEY, registryManager.count());        
+        model.addAttribute(NUMBER_OF_ENTRIES_KEY, 
+                registryManager.count(RegistryEntry.UPLOAD));        
         return CLEAR_REGISTRY_VIEW;
     }
     
@@ -174,7 +175,7 @@ public class RegistryController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/clear_registry_status.htm")
+    @RequestMapping("/registry_delete_status.htm")
     public String clearRegistryStatus(ModelMap model) {
         try {
             int delete = registryManager.delete();
@@ -206,10 +207,11 @@ public class RegistryController {
      * Sets page number to the next page number.
      */
     public void nextPage() {
-        int lastPage = (int) Math.ceil(registryManager.count() 
+        int lastPage = (int) Math.ceil(
+                registryManager.count(RegistryEntry.UPLOAD) 
                 / RegistryManager.ENTRIES_PER_PAGE);
         if ((lastPage * RegistryManager.ENTRIES_PER_PAGE) 
-                < registryManager.count()) {
+                < registryManager.count(RegistryEntry.UPLOAD)) {
             ++lastPage;
         }
         if (lastPage == 0) {
@@ -237,11 +239,11 @@ public class RegistryController {
      * Sets page number to the last page.
      */
     public void lastPage() {
-        long numEntries = registryManager.count();
+        long numEntries = registryManager.count(RegistryEntry.UPLOAD);
         int lastPage = (int) Math.ceil(numEntries 
                 / RegistryManager.ENTRIES_PER_PAGE);
         if ((lastPage * RegistryManager.ENTRIES_PER_PAGE) 
-                < registryManager.count()) {
+                < registryManager.count(RegistryEntry.UPLOAD)) {
             ++lastPage;
         }
         if (lastPage == 0) {

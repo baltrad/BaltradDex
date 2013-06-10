@@ -58,7 +58,7 @@ public class BdbTrimCountRoutesController {
     this.manager = manager;
   }
 
-  @RequestMapping("/bdbtrimcountroute_create.htm")
+  @RequestMapping("/route_create_bdb_trim_count.htm")
   public String createRoute(
       Model model,
       @RequestParam(value = "name", required = false) String name,
@@ -88,7 +88,7 @@ public class BdbTrimCountRoutesController {
         RouteDefinition def = manager.create(name, author, bactive,
             description, new ArrayList<String>(), rule);
         manager.storeDefinition(def);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         emessage = "Failed to create definition: '" + t.getMessage() + "'";
       }
@@ -108,11 +108,11 @@ public class BdbTrimCountRoutesController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "bdbtrimcountroute_create";
+    return "route_create_bdb_trim_count";
   }
 
 
-  @RequestMapping("/bdbtrimcountroute_show.htm")
+  @RequestMapping("/route_show_bdb_trim_count.htm")
   public String showRoute(
       Model model,
       @RequestParam(value = "name", required = true) String name,
@@ -126,12 +126,12 @@ public class BdbTrimCountRoutesController {
     if (def == null) {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
-    if (operation != null && operation.equals("Modify")) {
+    if (operation != null && operation.equals("Save")) {
       return modifyRoute(model, name, author, active, description, countLimit);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         return viewShowRoutes(model, "Failed to delete \"" + name + "\", have you verified that there are no reffering scheduled jobs");
       }
@@ -151,7 +151,7 @@ public class BdbTrimCountRoutesController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "showroutes";
+    return "routes";
   }
 
   protected String viewShowRoute(Model model, String name, String author,
@@ -166,7 +166,7 @@ public class BdbTrimCountRoutesController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "bdbtrimcountroute_show";
+    return "route_show_bdb_trim_count";
   }
 
   /**
@@ -205,7 +205,7 @@ public class BdbTrimCountRoutesController {
         RouteDefinition def = manager.create(name, author, isactive,
             description, new ArrayList<String>(), rule);
         manager.updateDefinition(def);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         emessage = "Failed to update definition: '" + t.getMessage() + "'";
       }

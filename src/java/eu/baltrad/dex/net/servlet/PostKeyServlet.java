@@ -22,11 +22,11 @@
 package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.config.manager.IConfigurationManager;
-import eu.baltrad.dex.user.manager.IKeystoreManager;
+import eu.baltrad.dex.keystore.manager.IKeystoreManager;
 import eu.baltrad.dex.net.request.impl.NodeRequest;
 import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.user.model.Key;
+import eu.baltrad.dex.keystore.model.Key;
 import eu.baltrad.dex.util.CompressDataUtil;
 import eu.baltrad.dex.util.MessageDigestUtil;
 

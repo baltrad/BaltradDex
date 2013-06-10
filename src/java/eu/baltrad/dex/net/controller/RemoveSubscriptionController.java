@@ -54,16 +54,18 @@ import java.util.ArrayList;
 public class RemoveSubscriptionController {
 
     // View names
-    private static final String REMOVE_DOWNLOADS_VIEW = "remove_downloads";
+    private static final String REMOVE_DOWNLOADS_VIEW = 
+            "subscription_remove_downloads";
     private static final String REMOVE_SELECTED_DOWNLOADS_VIEW = 
-            "remove_selected_downloads";
+            "subscription_remove_selected_downloads";
     private static final String REMOVE_DOWNLOADS_STATUS_VIEW = 
-            "remove_downloads_status";
-    private static final String REMOVE_UPLOADS_VIEW = "remove_uploads";
+            "subscription_remove_downloads_status";
+    private static final String REMOVE_UPLOADS_VIEW = 
+            "subscription_remove_uploads";
     private static final String REMOVE_SELECTED_UPLOADS_VIEW = 
-            "remove_selected_uploads";
+            "subscription_remove_selected_uploads";
     private static final String REMOVE_UPLOADS_STATUS_VIEW = 
-            "remove_uploads_status";
+            "subscription_remove_uploads_status";
     
     // Model keys
     private static final String DOWNLOADS_KEY = "downloads"; 
@@ -74,8 +76,8 @@ public class RemoveSubscriptionController {
     private static final String DOWNLOAD_IDS = "downloadIds";
     private static final String UPLOAD_IDS = "uploadIds";
     
-    private static final String OK_MSG_KEY = "message";
-    private static final String ERROR_MSG_KEY = "error";
+    private static final String OK_MSG_KEY = "subscription_remove_success";
+    private static final String ERROR_MSG_KEY = "subscription_remove_error";
     
     private static final String REMOVE_SUBSCRIPTION_SUCCESS_MSG_KEY = 
             "removesubscription.success";
@@ -107,7 +109,7 @@ public class RemoveSubscriptionController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/remove_downloads.htm")
+    @RequestMapping("/subscription_remove_downloads.htm")
     public String removeDownloads(ModelMap model) {
         model.addAttribute(DOWNLOADS_KEY, 
                 subscriptionManager.load(Subscription.LOCAL));
@@ -120,7 +122,7 @@ public class RemoveSubscriptionController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/remove_selected_downloads.htm")
+    @RequestMapping("/subscription_remove_selected_downloads.htm")
     public String removeSelectedDownloads(HttpServletRequest request,
             ModelMap model) {
         String[] downloadIds = request.getParameterValues(DOWNLOAD_IDS);
@@ -144,7 +146,7 @@ public class RemoveSubscriptionController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/remove_downloads_status.htm")
+    @RequestMapping("/subscription_remove_downloads_status.htm")
     public String removeDownloadsStatus(ModelMap model) {
         TransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = txManager.getTransaction(def);
@@ -179,7 +181,7 @@ public class RemoveSubscriptionController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/remove_uploads.htm")
+    @RequestMapping("/subscription_remove_uploads.htm")
     public String removeUploads(ModelMap model) {
         model.addAttribute(UPLOADS_KEY, 
                 subscriptionManager.load(Subscription.PEER));
@@ -192,7 +194,7 @@ public class RemoveSubscriptionController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/remove_selected_uploads.htm")
+    @RequestMapping("/subscription_remove_selected_uploads.htm")
     public String removeSelectedUploads(HttpServletRequest request,
             ModelMap model) {
         String[] uploadIds = request.getParameterValues(UPLOAD_IDS);
@@ -216,7 +218,7 @@ public class RemoveSubscriptionController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/remove_uploads_status.htm")
+    @RequestMapping("/subscription_remove_uploads_status.htm")
     public String removeUploadsStatus(ModelMap model) {
         try {
             for (Subscription s : selectedUploads) {

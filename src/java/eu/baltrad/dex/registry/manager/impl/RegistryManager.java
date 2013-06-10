@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -24,7 +24,7 @@ package eu.baltrad.dex.registry.manager.impl;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
 import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.registry.model.mapper.RegistryEntryMapper;
-import eu.baltrad.dex.user.manager.impl.UserManager;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -51,8 +51,6 @@ public class RegistryManager implements IRegistryManager {
     
     /** JDBC template */
     private SimpleJdbcOperations jdbcTemplate;
-    /** User account manager */
-    private UserManager accountManager;
     /** Row mapper */
     private RegistryEntryMapper mapper;
     
@@ -72,20 +70,61 @@ public class RegistryManager implements IRegistryManager {
     }
     
     /**
-     * @param accountManager the accountManager to set
-     */
-    @Autowired
-    public void setAccountManager(UserManager accountManager) {
-        this.accountManager = accountManager;
-    }
-    
-    /**
      * Counts entries.
      * @return Total number of entries in the registry
      */
-    public long count() {
-        String sql = "SELECT count(*) FROM dex_delivery_registry";
-        return jdbcTemplate.queryForLong(sql);
+    public long count(String type) {
+        String sql = "SELECT count(*) FROM dex_delivery_registry " + 
+                     "WHERE type = ?;";
+        return jdbcTemplate.queryForLong(sql, type);
+    }
+    
+    /**
+     * Count files downloaded from a given data source.
+     * @param dataSourceId Data source id
+     * @return Number of files downloaded from a given data source
+     */
+    public long countDownloads(int dataSourceId) {
+        String sql = "SELECT count(*) FROM dex_delivery_registry dr, " + 
+            "dex_users u, dex_data_sources ds, " + 
+            "dex_delivery_registry_users dru, " + 
+            "dex_delivery_registry_data_sources drds WHERE " +
+            "dru.entry_id = dr.id AND dru.user_id = u.id AND " +
+            "drds.entry_id = dr.id AND drds.data_source_id = ds.id AND " + 
+            "dr.type = 'download' AND ds.id = ?;";
+        return jdbcTemplate.queryForLong(sql, dataSourceId);
+    }
+    
+    /**
+     * Count successful uploads from a given data source.
+     * @param dataSourceId Data source id
+     * @return Number of files successfully uploaded from a given data source 
+     */
+    public long countSuccessfulUploads(int dataSourceId) {
+        String sql = "SELECT count(*) FROM dex_delivery_registry dr, " +
+            "dex_users u, dex_data_sources ds, " + 
+            "dex_delivery_registry_users dru, " + 
+            "dex_delivery_registry_data_sources drds WHERE " + 
+            "dru.entry_id = dr.id AND dru.user_id = u.id AND " + 
+            "drds.entry_id = dr.id AND drds.data_source_id = ds.id AND " + 
+            "dr.type = 'upload' AND dr.status = true AND ds.id = ?;";
+        return jdbcTemplate.queryForLong(sql, dataSourceId);
+    }
+    
+    /**
+     * Count failed uploads from a given data source.
+     * @param dataSourceId Data source id
+     * @return Number of upload failures from a given data source 
+     */
+    public long countFailedUploads(int dataSourceId) {
+        String sql = "SELECT count(*) FROM dex_delivery_registry dr, " + 
+            "dex_users u, dex_data_sources ds, " + 
+            "dex_delivery_registry_users dru, " + 
+            "dex_delivery_registry_data_sources drds WHERE " +
+            "dru.entry_id = dr.id AND dru.user_id = u.id AND " + 
+            "drds.entry_id = dr.id AND drds.data_source_id = ds.id AND " +
+            "dr.type = 'upload' AND dr.status = false AND ds.id = ?;";
+        return jdbcTemplate.queryForLong(sql, dataSourceId);
     }
     
     /**
@@ -94,15 +133,14 @@ public class RegistryManager implements IRegistryManager {
      * @param limit Limit
      * @return List of registry entries
      */
-    public List<RegistryEntry> load(int offset, int limit) {
-        String sql = "SELECT dex_delivery_registry.*, dex_users.name AS " + 
-            "user_name FROM dex_delivery_registry, dex_users, " + 
-            "dex_delivery_registry_users WHERE " +
-            "dex_delivery_registry_users.entry_id = dex_delivery_registry.id " +
-            "AND dex_delivery_registry_users.user_id = dex_users.id " + 
-            "ORDER BY time_stamp DESC OFFSET ? LIMIT ?";
+    public List<RegistryEntry> load(String type, int offset, int limit) {
+        String sql = "SELECT dr.*, u.name AS user_name " + 
+            "FROM dex_delivery_registry dr, dex_users u, " + 
+            "dex_delivery_registry_users dru WHERE " +
+            "dru.entry_id = dr.id AND dru.user_id = u.id " + 
+            "AND dr.type = ? ORDER BY time_stamp DESC OFFSET ? LIMIT ?";
         try {
-            return jdbcTemplate.query(sql, mapper, offset, limit);
+            return jdbcTemplate.query(sql, mapper, type, offset, limit);
         } catch (DataAccessException e) {
             return null;
         }
@@ -119,7 +157,7 @@ public class RegistryManager implements IRegistryManager {
     public int store(RegistryEntry registryEntry) throws Exception {
         
         final String sql = "INSERT INTO dex_delivery_registry " +
-                "(time_stamp, uuid, status) VALUES (?,?,?)";
+                "(time_stamp, type, uuid, status) VALUES (?, ?, ?, ?)";
         final RegistryEntry entry = registryEntry;
         
         try {
@@ -131,15 +169,20 @@ public class RegistryManager implements IRegistryManager {
                         PreparedStatement ps = conn.prepareStatement(sql,
                                 new String[] {"id"});
                         ps.setLong(1, entry.getTimeStamp());
-                        ps.setString(2, entry.getUuid());
-                        ps.setString(3, entry.getStatus());
+                        ps.setString(2, entry.getType());
+                        ps.setString(3, entry.getUuid());
+                        ps.setBoolean(4, entry.getStatus());
                         return ps;
                     }
                 }, keyHolder);
             int entryId = keyHolder.getKey().intValue(); 
-            int userId = accountManager.load(entry.getUser()).getId();
+            int userId = entry.getUserId();
+            int dataSourceId = entry.getDataSourceId();
             jdbcTemplate.update("INSERT INTO dex_delivery_registry_users " +
                     "(entry_id, user_id) VALUES (?,?)", entryId, userId);
+            jdbcTemplate.update("INSERT INTO dex_delivery_registry_data_sources"
+                    + " (entry_id, data_source_id) VALUES (?,?)", 
+                    entryId, dataSourceId);
             return entryId;
         } catch (DataAccessException e) {
             throw new Exception(e.getMessage());

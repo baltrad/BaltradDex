@@ -61,11 +61,11 @@ import java.io.IOException;
 public class RemoveDataSourceController {
 
     // View names
-    private static final String DS_REMOVE_VIEW = "remove_datasource";
+    private static final String DS_REMOVE_VIEW = "datasources_remove";
     private static final String DS_REMOVE_SELECTED_VIEW = 
-            "remove_selected_datasource";
+            "datasources_remove_selected";
     private static final String DS_REMOVE_STATUS_VIEW = 
-            "remove_datasource_status";
+            "datasources_remove_status";
     
     // Model keys
     private static final String DS_KEY = "data_sources";
@@ -77,8 +77,8 @@ public class RemoveDataSourceController {
             "removedatasource.completed_success";
     private static final String REMOVE_DS_COMPLETED_ERROR_MSG_KEY = 
             "removedatasource.completed_failure"; 
-    private static final String OK_MSG_KEY = "message";
-    private static final String ERROR_MSG_KEY = "error";
+    private static final String OK_MSG_KEY = "datasource_remove_success";
+    private static final String ERROR_MSG_KEY = "datasource_remove_error";
 
     private DataSourceManager dataSourceManager;
     private SubscriptionManager subscriptionManager;
@@ -99,7 +99,7 @@ public class RemoveDataSourceController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/remove_datasource.htm")
+    @RequestMapping("/datasources_remove.htm")
     public String removeDatasources(ModelMap model) {
         List<DataSource> dataSources = dataSourceManager.load(DataSource.LOCAL);
         Collections.sort(dataSources);
@@ -115,7 +115,7 @@ public class RemoveDataSourceController {
      * @return View name
      * @throws IOException 
      */
-    @RequestMapping("/remove_selected_datasource.htm")
+    @RequestMapping("/datasources_remove_selected.htm")
     public String removeSelectedDataSources(HttpServletRequest request,
             HttpServletResponse response, ModelMap model) throws IOException {
         String[] dataSourceIds = request.getParameterValues(DS_SELECTED_KEY);
@@ -127,7 +127,7 @@ public class RemoveDataSourceController {
             }
             model.addAttribute(DS_SELECTED_KEY, dataSources);
         } else {
-            response.sendRedirect("remove_datasource.htm");
+            response.sendRedirect("datasources_remove.htm");
         }
         return DS_REMOVE_SELECTED_VIEW;
     }
@@ -138,7 +138,7 @@ public class RemoveDataSourceController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/remove_datasource_status.htm")
+    @RequestMapping("/datasources_remove_status.htm")
     public String removeDatasourcesStatus(HttpServletRequest request, 
             ModelMap model) {
         TransactionDefinition def = new DefaultTransactionDefinition();

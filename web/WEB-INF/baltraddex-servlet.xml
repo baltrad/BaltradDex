@@ -42,6 +42,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <prop key="save_radar_status">urlFilenameController</prop>
                 <prop key="save_user_account_status.htm">urlFilenameController</prop>
                 <prop key="change_user_password_status.htm">urlFilenameController</prop>
+                <prop key="clock.htm">urlFilenameController</prop>
             </props>
         </property>
     </bean>
@@ -69,20 +70,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="urlFilenameController"
           class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
 
-    <!-- Download status controller -->
-    <bean id="downloadStatusController"
-          class="eu.baltrad.dex.net.controller.DownloadStatusController"
-          autowire="byType"/>
-    
-    <!-- Upload status controller -->
-    <bean id="uploadStatusController"
-          class="eu.baltrad.dex.net.controller.UploadStatusController"
-          autowire="byType"/>
-
     <!-- Login/logout controller -->
     <bean id="loginController" 
           class="eu.baltrad.dex.auth.controller.LoginController"
-          autowire="byType"/>      
+          autowire="byType"/>
+    
+    <!-- Node status controller -->
+    <bean id="nodeStatusController" 
+          class="eu.baltrad.dex.status.controller.NodeStatusController"
+          autowire="byType"/>       
 
     <!-- Data source file listing controller -->
     <bean id="dataSourceController"
@@ -109,16 +105,21 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           class="eu.baltrad.dex.net.controller.RemoveSubscriptionController"
           autowire="byType"/>
 
-    <!-- Log table controller -->
-    <bean id="logTableController" 
-          class="eu.baltrad.dex.log.controller.LogTableController"
+    <!-- System messages controller -->
+    <bean id="liveMessagesController" 
+          class="eu.baltrad.dex.log.controller.LiveMessagesController"
           autowire="byType"/>
-
-    <!-- System log controller -->
-    <bean id="logController" 
-          class="eu.baltrad.dex.log.controller.LogController"
+    
+    <!-- System messages controller -->
+    <bean id="browseMessagesController" 
+          class="eu.baltrad.dex.log.controller.BrowseMessagesController"
           autowire="byType"/>
-
+    
+    <!-- Messages table controller -->
+    <bean id="messagesTableController" 
+          class="eu.baltrad.dex.log.controller.MessagesTableController"
+          autowire="byType"/>
+    
     <!-- Data download controller -->
     <bean id="bltFileDownloadController"
           class="eu.baltrad.dex.db.controller.BltFileDownloadController"
@@ -140,9 +141,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- Frame publisher -->
     <bean id="framePublisher" class="eu.baltrad.dex.net.util.FramePublisher"/>
     
-    <!-- Change user password controller -->
-    <bean id="changeUserPasswordController"
-          class="eu.baltrad.dex.user.controller.ChangeUserPasswordController"
+    <!-- User settings controller -->
+    <bean id="userSettingsController"
+          class="eu.baltrad.dex.user.controller.UserSettingsController"
           autowire="byType"/>
 
     <!-- User manager -->
@@ -228,12 +229,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     
     <!-- Keystore manager -->
     <bean id="keystoreManager"
-          class="eu.baltrad.dex.user.manager.impl.KeystoreManager"
+          class="eu.baltrad.dex.keystore.manager.impl.KeystoreManager"
           autowire="byType"/>  
     
     <!-- Keystore controller -->
     <bean id="keystoreController"
-          class="eu.baltrad.dex.user.controller.KeystoreController"
+          class="eu.baltrad.dex.keystore.controller.KeystoreController"
           autowire="byType"/>
 
     <!-- Save radar controller -->

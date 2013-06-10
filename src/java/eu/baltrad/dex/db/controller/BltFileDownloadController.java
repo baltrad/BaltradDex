@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -54,7 +54,7 @@ import java.util.UUID;
 @Controller
 public class BltFileDownloadController {
 
-    private static final String SUCCESS_VIEW = "download";
+    private static final String SUCCESS_VIEW = "file_download";
     private static final String ENTRY_UUID = "uuid";
 
     private Logger log;
@@ -73,7 +73,7 @@ public class BltFileDownloadController {
      * @param response Http response
      * @return Model and view
      */
-    @RequestMapping("/download.htm")
+    @RequestMapping("/file_download.htm")
     public String handleRequest(HttpServletRequest request, 
             HttpServletResponse response) {
         User user = (User) SecurityManager.getSessionUser(

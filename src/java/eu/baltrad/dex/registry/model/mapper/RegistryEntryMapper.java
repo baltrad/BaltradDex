@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -49,9 +49,10 @@ public class RegistryEntryMapper
         return new RegistryEntry(
             rs.getInt("id"),
             rs.getLong("time_stamp"),
-            rs.getString("uuid"),    
-            rs.getString("status"),
-            rs.getString("user_name"));    
+            rs.getString("type"),    
+            rs.getString("uuid"),
+            rs.getString("user_name"),    
+            rs.getBoolean("status"));    
     }
     
 }

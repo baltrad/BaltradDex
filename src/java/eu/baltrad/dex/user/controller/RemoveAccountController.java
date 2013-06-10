@@ -58,11 +58,11 @@ import java.io.IOException;
 public class RemoveAccountController {
     
     private static final String REMOVE_USER_ACCOUNT_VIEW = 
-            "remove_user_account";
+            "user_remove";
     private static final String REMOVE_SELECTED_USER_ACCOUNT_VIEW = 
-            "remove_selected_user_account";
+            "user_remove_selected";
     private static final String REMOVE_USER_ACCOUNT_STATUS_VIEW = 
-            "remove_user_account_status";
+            "user_remove_status";
     
     private static final String ACCOUNTS_KEY = "accounts";
     private static final String REMOVE_ACCOUNT_OK_MSG_KEY = 
@@ -72,8 +72,8 @@ public class RemoveAccountController {
     private static final String REMOVE_ACCOUNT_COMPLETED_ERROR_MSG_KEY = 
             "removeaccount.completed_failure";
     
-    private static final String OK_MSG_KEY = "message";
-    private static final String ERROR_MSG_KEY = "error";
+    private static final String OK_MSG_KEY = "user_remove_success";
+    private static final String ERROR_MSG_KEY = "user_remove_error";
     
     private UserManager accountManager;
     private PlatformTransactionManager transactionManager;
@@ -93,7 +93,7 @@ public class RemoveAccountController {
      * @param model Model map 
      * @return View name
      */
-    @RequestMapping("/remove_user_account.htm")
+    @RequestMapping("/user_remove.htm")
     public String removeUserAccount(HttpServletRequest request, ModelMap model) 
     {
         List<User> all = accountManager.load();
@@ -118,7 +118,7 @@ public class RemoveAccountController {
      * @return View name
      * @throws IOException 
      */
-    @RequestMapping("/remove_selected_user_account.htm")
+    @RequestMapping("/user_remove_selected.htm")
     public String removeSelectedUserAccount(HttpServletRequest request, 
             HttpServletResponse response, ModelMap model) throws IOException {
         String[] userIds = request.getParameterValues(ACCOUNTS_KEY);
@@ -130,7 +130,7 @@ public class RemoveAccountController {
             Collections.sort(users);
             model.addAttribute(ACCOUNTS_KEY, users);
         } else {
-            response.sendRedirect("remove_user_account.htm");
+            response.sendRedirect("user_remove.htm");
         }
         return REMOVE_SELECTED_USER_ACCOUNT_VIEW;
     }
@@ -141,7 +141,7 @@ public class RemoveAccountController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/remove_user_account_status.htm")
+    @RequestMapping("/user_remove_status.htm")
     public String removeUserAccountStatus(HttpServletRequest request, 
                     ModelMap model) {
         String[] userIds = request.getParameterValues(ACCOUNTS_KEY);

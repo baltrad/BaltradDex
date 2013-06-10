@@ -49,19 +49,19 @@ import java.util.List;
  * @since 0.7.2
  */
 @Controller
-@RequestMapping("/browse_files.htm")
+@RequestMapping("/file_browser.htm")
 @SessionAttributes("query_param")
 public class BltFileBrowserController {
 
     // View name
-    private static final String FORM_VIEW = "browse_files";  
+    private static final String FORM_VIEW = "file_browser";  
     
     // Model keys
-    private static final String FC_ERROR_KEY = "file_catalog_error";
+    private static final String FC_ERROR_KEY = "fc_error";
     private static final String FC_ERROR_MESSAGE_KEY = 
             "browsefiles.file_catalog_error";
     private static final String QUERY_PARAMETER_KEY = "query_param";
-    private static final String FILE_ENTRIES_KEY = "file_entries";
+    private static final String FILE_ENTRIES_KEY = "files";
     private static final String FIRST_PAGE_KEY = "first_page";
     private static final String LAST_PAGE_KEY = "last_page";
     private static final String CURRENT_PAGE_KEY = "current_page";

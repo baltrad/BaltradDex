@@ -101,7 +101,8 @@ public class NodeConfigurationValidator implements Validator {
             errors.rejectValue("nodeAddress", "saveconf.invalid.node_address",
                     messages.getMessage("saveconf.invalid.node_address"));
         }
-        if (!webValidator.validateEmail(conf.getAdminEmail())) {
+        if (!conf.getAdminEmail().isEmpty() && 
+                !webValidator.validateEmail(conf.getAdminEmail())) {
             errors.rejectValue("adminEmail", "saveconf.invalid.admin_email",
                     messages.getMessage("saveconf.invalid.admin_email"));
         }

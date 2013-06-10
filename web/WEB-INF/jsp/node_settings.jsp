@@ -1,5 +1,5 @@
 <%------------------------------------------------------------------------------
-Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -16,173 +16,156 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 --------------------------------------------------------------------------------
-Document   : Local node settings page
-Created on : Jun 6, 2011, 10:02 AM
+Document   : Node settings
+Created on : May 20, 2013, 3:18 AM
 Author     : szewczenko
 ------------------------------------------------------------------------------%>
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+<%@ include file="/WEB-INF/jsp/include.jsp" %>
 
-<%@include file="/WEB-INF/jsp/include.jsp"%>
-
-<t:page_tabbed pageTitle="Node settings" activeTab="settings">
+<t:generic_page pageTitle="Node settings">
     <jsp:body>
-        <div class="left">
-            <t:menu_settings/>
-        </div>
-        <div class="right">
-            <div class="blttitle">
-                <img src="includes/images/icons/settings.png" alt="">
-                Local node settings
-            </div>
-            <div class="blttext">
-                Local node configuration. Click save button to store modified
-                settings.
-            </div>
+        <div class="node-settings">
             <div class="table">
-                <div class="props">
-                    <form:form method="POST" commandName="config">
-                        <%@include file="/WEB-INF/jsp/form_messages.jsp" %>
-                        <div class="leftcol">
-                            <div class="row">Node name</div>
-                            <div class="row">Node type</div>
-                            <div class="row">Node address</div>
-                            <div class="row">Organization name</div>
-                            <div class="row">Unit name</div>
-                            <div class="row">Locality name (City)</div>
-                            <div class="row">State name (Country)</div>
-                            <div class="row">Country code</div>
-                            <div class="row">Local time zone</div>
-                            <div class="row">Work directory</div>
-                            <div class="row">Administrator's email</div>
-                        </div>
-                        <div class="rightcol">
-                            <div class="row">
-                                <div class="nodename">
-                                    <form:input path="nodeName" 
-                                        title="Enter node name"/>
-                                    <div class="hint">
-                                        Unique node identifier
-                                    </div>
-                                </div>
+                <div class="header">
+                    <div class="row">Local node settings</div>
+                </div>
+                <div class="header-text">
+                    Edit node settings and click <i>Save</i> button in order 
+                    to save changes. 
+                </div>
+                <form:form method="POST" commandName="config">
+                    <t:message_box msgHeader="Success."
+                                   msgBody="${message}"
+                                   errorHeader="Problems encountered."
+                                   errorBody="${error}"/>
+                    <div class="body">
+                        <div class="row">
+                            <div class="leftcol">
+                                Node name:
+                            </div>
+                            <div class="rightcol">
+                                <form:input path="nodeName" 
+                                            title="Unique node name"/>
                                 <form:errors path="nodeName" cssClass="error"/>
                             </div>
-                            <div class="row">
-                                <div class="nodetype">
-                                    <form:select path="nodeType" 
-                                                 title="Select node type">
-                                        <form:options items="${node_types}"/>
-                                    </form:select>    
-                                    <div class="hint">
-                                        Primary or backup node
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="row">
+                            <div class="leftcol">
+                                Node address:
+                            </div>
+                            <div class="rightcol">
+                                <form:input path="nodeAddress" 
+                                            title="Node address, e.g. http://baltrad.eu:8084"/>
+                                <form:errors path="nodeAddress" cssClass="error"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="leftcol">
+                                Node type:
+                            </div>
+                            <div class="rightcol">
+                                <form:select path="nodeType" 
+                                             title="Select node type">
+                                    <form:options items="${node_types}"/>
+                                </form:select>
                                 <form:errors path="nodeType" cssClass="error"/>
                             </div>
-                            <div class="row">
-                                <div class="fulladdress">
-                                    <form:input path="nodeAddress"
-                                        title="Enter fully qualified node address"/>
-                                    <div class="hint">
-                                        Node address, e.g. http://baltrad.eu:8084
-                                    </div>
-                                </div>
-                                <form:errors path="nodeAddress" cssClass="error"/>
-                            </div>        
-                            <div class="row">
-                                <div class="orgname">
-                                    <form:input path="orgName"
-                                                title="Enter organization name"/>
-                                    <div class="hint">
-                                        Name of organization
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="row">
+                            <div class="leftcol">
+                                Organization name:
+                            </div>
+                            <div class="rightcol">
+                                <form:input path="orgName"
+                                            title="Name of organization"/>
                                 <form:errors path="orgName" cssClass="error"/>
                             </div>
-                            <div class="row">
-                                <div class="orgname">
-                                    <form:input path="orgUnit"
-                                                title="Enter unit name"/>
-                                    <div class="hint">
-                                        Unit name, e.g. Forecast Department
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="row">
+                            <div class="leftcol">
+                                Unit name:
+                            </div>
+                            <div class="rightcol">
+                                <form:input path="orgUnit"
+                                            title="Unit name, e.g. Forecast Department"/>
                                 <form:errors path="orgUnit" cssClass="error"/>
                             </div>
-                            <div class="row">
-                                <div class="city">
-                                    <form:input path="locality"
-                                                title="Enter address"/>
-                                    <div class="hint">
-                                        Address
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="row">
+                            <div class="leftcol">
+                                Address:
+                            </div>
+                            <div class="rightcol">
+                                <form:input path="locality" title="Address"/>
                                 <form:errors path="locality" cssClass="error"/>
                             </div>
-                            <div class="row">
-                                <div class="country">
-                                    <form:input path="state"
-                                                title="State name"/>
-                                    <div class="hint">
-                                        State name (Country)
-                                    </div>
-                                </div>
+                        </div>        
+                        <div class="row">
+                            <div class="leftcol">
+                                Country:
+                            </div>
+                            <div class="rightcol">
+                                <form:input path="state" title="Country name"/>
                                 <form:errors path="state" cssClass="error"/>
                             </div>
-                            <div class="row">
-                                <div class="zipcode">
-                                    <form:input path="countryCode"
-                                                title="Enter two-letter country code"/>
-                                    <div class="hint">
-                                        Two-letter country code
-                                    </div>
-                                </div>
-                                <form:errors path="countryCode" cssClass="error"/>
-                            </div>                 
-                            <div class="row">
-                                <div class="timezone">
-                                    <form:select path="timeZone" 
-                                                 title="Select time zone">
-                                        <form:options items="${time_zones}"/>
-                                    </form:select> 
-                                    <div class="hint">
-                                        UTC time zone 
-                                    </div>
-                                </div>
-                                <form:errors path="timeZone" cssClass="error"/>
+                        </div>
+                        <div class="row">
+                            <div class="leftcol">
+                                Country code:
                             </div>
-                            <div class="row">
-                                <div class="workdir">
-                                    <form:input path="workDir"
-                                        title="Enter work directory path"/>
-                                    <div class="hint">
-                                        Storage for temporary files & images 
-                                    </div>
-                                </div>
+                            <div class="rightcol">
+                                <form:input path="countryCode" 
+                                            title="2-letter country code"/>
+                                <form:errors path="countryCode" cssClass="error"/>
+                            </div>
+                        </div>         
+                        <div class="row">
+                            <div class="leftcol">
+                                Time zone:
+                            </div>
+                            <div class="rightcol">
+                                <form:select path="timeZone" 
+                                             title="Select time zone">
+                                    <form:options items="${time_zones}"/>
+                                </form:select> 
+                                <form:errors path="timeZone" cssClass="error" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="leftcol">
+                                Working directory:
+                            </div>
+                            <div class="rightcol">
+                                <form:input path="workDir" 
+                                            title="Working directory path, 
+                                            storage for temporary files and images"/>
                                 <form:errors path="workDir" cssClass="error"/>
                             </div>
-                            <div class="row">
-                                <div class="adminmail">
-                                    <form:input path="adminEmail"
-                                        title="Enter administrator's e-mail"/>
-                                    <div class="hint">
-                                        Node administrator's e-mail
-                                    </div>
-                                </div>
+                        </div>
+                        <div class="row">
+                            <div class="leftcol">
+                                Administrator's e-mail:
+                            </div>
+                            <div class="rightcol">
+                                <form:input path="adminEmail" 
+                                            title="Node administrator's email
+                                            address"/>
                                 <form:errors path="adminEmail" cssClass="error"/>
                             </div>
-                        </div>
-                        <div class="tablefooter">
-                            <div class="buttons">
-                                <button class="rounded" type="submit">
-                                    <span>Save</span>
-                                </button>
+                        </div>       
+                    </div>
+                    <div class="table-footer">
+                        <div class="buttons">
+                            <div class="button-wrap">
+                                <input class="button" type="submit" 
+                                       value="Save"/>
                             </div>
                         </div>
-                    </form:form>
-                </div>
+                    </div>             
+                </form:form>
             </div>
         </div>
     </jsp:body>
-</t:page_tabbed>
+</t:generic_page>
+

@@ -37,6 +37,10 @@ import eu.baltrad.dex.db.manager.IBltFileManager;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.config.manager.IConfigurationManager;
+import eu.baltrad.dex.user.model.Role;
+import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.bdb.db.FileEntry;
@@ -48,8 +52,7 @@ import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
-import eu.baltrad.dex.config.manager.IConfigurationManager;
-import eu.baltrad.dex.user.model.Role;
+import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -105,6 +108,7 @@ public class PostFileServlet extends HttpServlet {
     private IHttpClientUtil httpClient;
     private FramePublisherManager framePublisherManager;
     private ISubscriptionManager subscriptionManager;
+    private IDataSourceManager dataSourceManager;
     private MessageResourceUtil messages;
     private Logger log;
     
@@ -172,6 +176,7 @@ public class PostFileServlet extends HttpServlet {
                 } finally {
                     is.close();
                 }
+                
                 if (entry != null) {
                     String name = namer.name(entry);
                     UUID uuid = entry.getUuid();
@@ -180,14 +185,38 @@ public class PostFileServlet extends HttpServlet {
                     BltDataMessage msg = new BltDataMessage();
                     msg.setFileEntry(entry);
                     messageManager.manage(msg);
+                    
+                    // add incoming file to registry
+                    List<Subscription> downloads = subscriptionManager
+                            .load(Subscription.LOCAL);
+                    for (Subscription s : downloads) {
+                        IFilter filter = fileManager
+                                .loadFilter(s.getDataSource());
+                        if (matcher.match(entry.getMetadata(), 
+                                filter.getExpression())) {
+                            DataSource dataSource = dataSourceManager
+                                .load(s.getDataSource(), DataSource.PEER);
+                            User sender = userManager.load(s.getUser());
+                            RegistryEntry registryEntry = new RegistryEntry(
+                                sender.getId(), dataSource.getId(), 
+                                System.currentTimeMillis(), 
+                                RegistryEntry.DOWNLOAD, 
+                                entry.getUuid().toString(), 
+                                sender.getName(), true);
+                            registryManager.store(registryEntry);
+                        }
+                    }
+                    // send file to subscribers
                     List<Subscription> uploads = subscriptionManager.load(
                             Subscription.PEER);
                     for (Subscription s : uploads) {
                         IFilter filter = fileManager
                                 .loadFilter(s.getDataSource());
-                        User receiver = userManager.load(s.getUser());
                         if (matcher.match(entry.getMetadata(), 
                                 filter.getExpression())) {
+                            DataSource dataSource = dataSourceManager
+                                .load(s.getDataSource(), DataSource.LOCAL);
+                            User receiver = userManager.load(s.getUser());
                             RequestFactory requestFactory = 
                                 new DefaultRequestFactory(
                                     URI.create(receiver.getNodeAddress()));
@@ -199,7 +228,7 @@ public class PostFileServlet extends HttpServlet {
                             PostFileTask task = new PostFileTask(httpClient, 
                                     registryManager, deliveryRequest, 
                                     entry.getUuid().toString(), 
-                                    receiver);
+                                    receiver, dataSource);
                             framePublisherManager.getFramePublisher(
                                     receiver.getName()).addTask(task);
                         }  
@@ -336,6 +365,14 @@ public class PostFileServlet extends HttpServlet {
      */
     public void setHttpClient(IHttpClientUtil httpClient) {
         this.httpClient = httpClient;
+    }
+
+    /**
+     * @param dataSourceManager the dataSourceManager to set
+     */
+    @Autowired
+    public void setDataSourceManager(IDataSourceManager dataSourceManager) {
+        this.dataSourceManager = dataSourceManager;
     }
     
 }

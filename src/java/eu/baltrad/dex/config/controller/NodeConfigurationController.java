@@ -126,7 +126,7 @@ public class NodeConfigurationController {
                 
                 String nodeName = 
                         configurationManager.getAppConf().getNodeName();
-                // rename key folders if changed
+                // rename key folders if node name changed
                 if (!conf.getNodeName().equals(nodeName)) {
                     File srcPriv = new File(configurationManager.getAppConf()
                         .getKeystoreDir() + File.separator + nodeName + 

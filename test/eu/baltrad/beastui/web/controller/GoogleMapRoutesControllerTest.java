@@ -88,14 +88,14 @@ public class GoogleMapRoutesControllerTest extends TestCase {
 
   public void testCreateRoute_initial() throws Exception {
     method.viewCreateRoute(model, null, null, null, null, null, null, null, null);
-    methodControl.setReturnValue("googlemaproute_create");
+    methodControl.setReturnValue("route_create_google_map");
     
     replayAll();
     
     String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null);
     
     verifyAll();
-    assertEquals("googlemaproute_create", result);
+    assertEquals("route_create_google_map", result);
   }
 
   public void testCreateRoute() throws Exception {
@@ -113,7 +113,7 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     String result = classUnderTest.createRoute(model, "name", "author", true, "test", recipients, "sswe", "/tmp");
     
     verifyAll();
-    assertEquals("redirect:showroutes.htm", result);
+    assertEquals("redirect:routes.htm", result);
   }
   
   public void testViewShowRoutes() throws Exception {
@@ -128,7 +128,7 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     String result = classUnderTest.viewShowRoutes(model, null);
     
     verifyAll();
-    assertEquals("showroutes", result);
+    assertEquals("routes", result);
   }
   
   public void testViewCreateRoute_allNull() throws Exception {
@@ -155,7 +155,7 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     String result = classUnderTest.viewCreateRoute(model, null, null, null, null, null, null, null, null);
     
     verifyAll();
-    assertEquals("googlemaproute_create", result);
+    assertEquals("route_create_google_map", result);
   }
 
   public void testViewCreateRoute() throws Exception {
@@ -183,7 +183,7 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     String result = classUnderTest.viewCreateRoute(model, "name", "author", true, "a test", recipients, "sswe", "/tmp", null);
     
     verifyAll();
-    assertEquals("googlemaproute_create", result);
+    assertEquals("route_create_google_map", result);
   }
 
   public void testViewShowRoute() throws Exception {
@@ -211,7 +211,7 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     String result = classUnderTest.viewShowRoute(model, "name", "author", true, "a test", recipients, "sswe", "/tmp", null);
     
     verifyAll();
-    assertEquals("googlemaproute_show", result);
+    assertEquals("route_show_google_map", result);
   }
     
 }

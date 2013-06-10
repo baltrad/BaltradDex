@@ -75,11 +75,11 @@ import java.util.Set;
 public class DataSourceListController implements MessageSetter {
     
     /** Initial view - connect to data source*/
-    private static final String DS_CONNECT_VIEW = "connect_to_node";
+    private static final String DS_CONNECT_VIEW = "node_connect";
     /** Successful connection view */
     private static final String DS_CONNECTED_VIEW = "node_connected";
     /** Presents list of data sources selected for subscription */
-    private static final String DS_SELECTED_VIEW = "selected_datasource";
+    private static final String DS_SELECTED_VIEW = "node_datasources";
     
     /** List of available connections */
     private final static String NODES_KEY = "nodes";
@@ -215,8 +215,8 @@ public class DataSourceListController implements MessageSetter {
      * @param model Model
      * @return View name
      */
-    @RequestMapping("/connect_to_node.htm")
-    public String connect2Node(Model model) {
+    @RequestMapping("/node_connect.htm")
+    public String nodeConnect(Model model) {
         model.addAttribute(NODES_KEY, userManager.loadPeers());
         return DS_CONNECT_VIEW;
     }
@@ -386,7 +386,7 @@ public class DataSourceListController implements MessageSetter {
      * @param selectedDataSources Data sources selected for subscription 
      * @return View name
      */
-    @RequestMapping("/selected_datasource.htm")
+    @RequestMapping("/node_datasources.htm")
     public String selectedDataSources(Model model, 
                 @RequestParam(value="selected_data_sources", required=false) 
                 String[] selectedDataSources) {

@@ -50,20 +50,20 @@ import javax.servlet.http.HttpServletRequest;
  * @since 0.7.1
  */
 @Controller
-@RequestMapping("/change_user_password.htm")
+@RequestMapping("/user_change_password.htm")
 @SessionAttributes("user_account")
 public class ChangePasswordController {
 
-    private static final String FORM_VIEW = "change_user_password";
-    private static final String SUCCESS_VIEW = "change_user_password_status";
+    private static final String FORM_VIEW = "user_change_password";
+    private static final String SUCCESS_VIEW = "user_change_password_status";
     
     private static final String USER_ACCOUNT_MODEL_KEY = "user_account";
     private static final String CHANGE_PASSWORD_ERROR_MSG_KEY = 
             "changepassword.failure";
     private static final String CHANGE_PASSWORD_OK_MSG_KEY = 
             "changepassword.success";
-    private static final String OK_MSG_KEY = "message";
-    private static final String ERROR_MSG_KEY = "error";
+    private static final String OK_MSG_KEY = "change_password_success";
+    private static final String ERROR_MSG_KEY = "change_password_error";
     
     private UserManager userManager;
     private PasswordValidator validator;

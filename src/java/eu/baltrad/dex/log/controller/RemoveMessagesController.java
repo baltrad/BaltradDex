@@ -42,9 +42,9 @@ import org.apache.log4j.Logger;
 public class RemoveMessagesController {
 
     // View names
-    private static final String CLEAR_MESSAGES_VIEW = "clear_messages";
+    private static final String CLEAR_MESSAGES_VIEW = "messages_delete";
     private static final String CLEAR_MESSAGES_STATUS_VIEW = 
-            "clear_messages_status";
+            "messages_delete_status";
     
     // Model keys
     private static final String NUMBER_OF_ENTRIES_KEY = "number_of_entries";
@@ -52,8 +52,8 @@ public class RemoveMessagesController {
             "clearmessages.completed_success";
     private static final String CLEAR_MESSAGES_ERROR_MSG_KEY = 
             "clearmessages.completed_failure";
-    private static final String OK_MSG_KEY = "message";
-    private static final String ERROR_MSG_KEY = "error";
+    private static final String OK_MSG_KEY = "messages_delete_success";
+    private static final String ERROR_MSG_KEY = "messages_delete_error";
 
     private Logger log;
     private LogManager logManager;
@@ -71,7 +71,7 @@ public class RemoveMessagesController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/clear_messages.htm")
+    @RequestMapping("/messages_delete.htm")
     public String clearMessages(ModelMap model) {
         model.addAttribute(NUMBER_OF_ENTRIES_KEY, logManager.count());
         return CLEAR_MESSAGES_VIEW;
@@ -82,7 +82,7 @@ public class RemoveMessagesController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/clear_messages_status.htm")
+    @RequestMapping("/messages_delete_status.htm")
     public String clearMessagesStatus(ModelMap model) {
         try {
             int delete = logManager.delete();

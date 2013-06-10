@@ -73,7 +73,7 @@ public class AdaptorsController {
     return "adaptors";
   }
 
-  @RequestMapping("/showadaptor.htm")
+  @RequestMapping("/adaptor_show.htm")
   public String showAdaptor(Model model, @RequestParam("name") String name) {
     logger.debug("showAdaptor(Model,..)");
     IAdaptor adaptor = manager.getAdaptor(name);
@@ -87,7 +87,7 @@ public class AdaptorsController {
         model.addAttribute("uri", xmladaptor.getUrl());
         model.addAttribute("timeout", xmladaptor.getTimeout());
       }
-      return "showadaptor";
+      return "adaptor_show";
     } else {
       logger.debug("showAdaptor(Model,..): Could not find adaptor: " + name);
       model.addAttribute("emessage", "Could not retrieve adaptor " + name);
@@ -96,7 +96,7 @@ public class AdaptorsController {
     }
   }
 
-  @RequestMapping("/modifyadaptor.htm")
+  @RequestMapping("/adaptor_edit.htm")
   public String modifyAdaptor(Model model, @RequestParam("name") String name,
       @RequestParam("type") String type,
       @RequestParam(value = "uri", required = false) String uri,
@@ -141,12 +141,12 @@ public class AdaptorsController {
       model.addAttribute("uri", uri);
       model.addAttribute("timeout", timeout);
       model.addAttribute("emessage", emessage);
-      result = "showadaptor";
+      result = "adaptor_show";
     }
     return result;
   }
 
-  @RequestMapping("/createadaptor.htm")
+  @RequestMapping("/adaptor_create.htm")
   public String createAdaptor(Model model,
       @RequestParam(value = "name", required = false) String name,
       @RequestParam(value = "type", required = false) String type,
@@ -172,12 +172,16 @@ public class AdaptorsController {
         model.addAttribute("type", type);
         model.addAttribute("uri", uri);
         model.addAttribute("timeout", timeout);
+        
+          System.out.println("_______________ adding error message");
+        
+        
         model.addAttribute("emessage", "Failed to register adaptor: " + e.getMessage());
         logger.debug("createAdaptor(Model,..): Failed to register adaptor " + name);
       }
     }
     
     model.addAttribute("types", types);
-    return "createadaptor";
+    return "adaptor_create";
   }
 }

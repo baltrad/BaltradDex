@@ -23,6 +23,7 @@ package eu.baltrad.dex.datasource.controller;
 
 import eu.baltrad.dex.db.manager.impl.BltFileManager;
 import eu.baltrad.dex.db.model.BltFile;
+import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.ui.ModelMap;
 import org.springframework.stereotype.Controller;
@@ -48,14 +49,19 @@ public class DataSourceFilesController {
     private static final String SUCCESS_VIEW = "datasource_files";
     
     // Model keys
-    private static final String DATASOURCE_NAME_KEY = "datasource_name";
-    private static final String FILE_ENTRIES_KEY = "file_entries";
+    private static final String FC_ERROR_KEY = "fc_error";
+    private static final String FC_ERROR_MESSAGE_KEY = 
+            "browsefiles.file_catalog_error";
+    private static final String DATASOURCE_NAME_KEY = "data_source_name";
+    private static final String FILES_KEY = "files";
     private static final String FIRST_PAGE_KEY = "first_page";
     private static final String LAST_PAGE_KEY = "last_page";
     private static final String CURRENT_PAGE_KEY = "current_page";
 
     /** Reference to file manager object */
     private BltFileManager fileManager;
+    /** Message source */
+    private MessageResourceUtil messages;
     /** Current page number */
     private static int currentPage;
     /** Data source name */
@@ -75,46 +81,50 @@ public class DataSourceFilesController {
                     String dataSourceName,
             @RequestParam(value="selected_page", required=false) 
                     String selectedPage) {
-        
         if (dataSourceName != null && !dataSourceName.isEmpty()) {
             dsName = dataSourceName;
         }
-        List<BltFile> fileEntries = null;
-        if (selectedPage != null) {
-            if (selectedPage.matches("<<")) {
-                firstPage();
-                fileEntries = fileManager.load(dsName, 0,
-                        BltFileManager.ENTRIES_PER_PAGE);
-            } else {
-                if (selectedPage.matches(">>")) {
-                    lastPage(dsName);
-                } else if (selectedPage.matches(">")) {
-                    nextPage(dsName);
-                } else if (selectedPage.matches("<")) {
-                    previousPage();
+        try {
+            List<BltFile> fileEntries = null;
+            if (selectedPage != null) {
+                if (selectedPage.matches("<<")) {
+                    firstPage();
+                    fileEntries = fileManager.load(dsName, 0,
+                            BltFileManager.ENTRIES_PER_PAGE);
                 } else {
-                    int page = Integer.parseInt(selectedPage);
-                    setCurrentPage(page);
+                    if (selectedPage.matches(">>")) {
+                        lastPage(dsName);
+                    } else if (selectedPage.matches(">")) {
+                        nextPage(dsName);
+                    } else if (selectedPage.matches("<")) {
+                        previousPage();
+                    } else {
+                        int page = Integer.parseInt(selectedPage);
+                        setCurrentPage(page);
+                    }
+                    int offset = (getCurrentPage() 
+                            * BltFileManager.ENTRIES_PER_PAGE)
+                            - BltFileManager.ENTRIES_PER_PAGE;
+                    fileEntries = fileManager.load(dsName, offset,
+                            BltFileManager.ENTRIES_PER_PAGE );
                 }
-                int offset = (getCurrentPage() 
-                        * BltFileManager.ENTRIES_PER_PAGE)
-                        - BltFileManager.ENTRIES_PER_PAGE;
-                fileEntries = fileManager.load(dsName, offset,
+            } else {
+                setCurrentPage(1);
+                fileEntries = fileManager.load(dsName, 0, 
                         BltFileManager.ENTRIES_PER_PAGE );
             }
-        } else {
-            setCurrentPage( 1 );
-            fileEntries = fileManager.load(dsName, 0, 
-                    BltFileManager.ENTRIES_PER_PAGE );
+
+            int[] pages = getPages(dsName);
+            model.addAttribute(DATASOURCE_NAME_KEY, dsName);
+            model.addAttribute(FIRST_PAGE_KEY, pages[0]);
+            model.addAttribute(LAST_PAGE_KEY, pages[1]);
+            model.addAttribute(CURRENT_PAGE_KEY, pages[2]);
+            model.addAttribute(FILES_KEY, fileEntries);
+        } catch (Exception e) {
+            model.addAttribute(FC_ERROR_KEY, 
+                    messages.getMessage(FC_ERROR_MESSAGE_KEY, 
+                        new String[] {e.getMessage()}));
         }
-        
-        int[] pages = getPages(dsName);
-        model.addAttribute(DATASOURCE_NAME_KEY, dsName);
-        model.addAttribute(FIRST_PAGE_KEY, pages[0]);
-        model.addAttribute(LAST_PAGE_KEY, pages[1]);
-        model.addAttribute(CURRENT_PAGE_KEY, pages[2]);
-        model.addAttribute(FILE_ENTRIES_KEY, fileEntries);
-        
         return SUCCESS_VIEW;
     }
     
@@ -220,6 +230,14 @@ public class DataSourceFilesController {
     @Autowired
     public void setBltFileManager(BltFileManager fileManager) {
         this.fileManager = fileManager;
+    }
+
+    /**
+     * @param messages the messages to set
+     */
+    @Autowired
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
     }
     
 }

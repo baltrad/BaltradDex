@@ -140,7 +140,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
 
   public void testCreateRoute_initial() {
     methodMock.viewCreateRoute(model, null, null, null, null, null, null);
-    methodMockControl.setReturnValue("bdbtrimcountroute_create");
+    methodMockControl.setReturnValue("route_create_bdb_trim_count");
     
     replay();
 
@@ -148,7 +148,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
         null, null);
 
     verify();
-    assertEquals("bdbtrimcountroute_create", result);
+    assertEquals("route_create_bdb_trim_count", result);
   }
 
   public void testCreateRoute_success() {
@@ -176,7 +176,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
         description, countLimit);
 
     verify();
-    assertEquals("redirect:showroutes.htm", result);
+    assertEquals("redirect:routes.htm", result);
   }
 
   public void testCreateRoute_noName() {
@@ -187,7 +187,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     Integer countLimit = 1;
 
     methodMock.viewCreateRoute(model, name, "nisse", true, "some description", 1, "Name must be specified.");
-    methodMockControl.setReturnValue("bdbtrimcountroute_create");
+    methodMockControl.setReturnValue("route_create_bdb_trim_count");
 
     replay();
 
@@ -195,7 +195,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
         description, countLimit);
 
     verify();
-    assertEquals("bdbtrimcountroute_create", result);
+    assertEquals("route_create_bdb_trim_count", result);
   }
   
   public void testCreateRoute_noCountLimit() {
@@ -236,14 +236,14 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     manager.storeDefinition(routedef);
     managerControl.setThrowable(new RuleException("Duplicate name"));
     methodMock.viewCreateRoute(model, name, author, active, description, countLimit, "Failed to create definition: 'Duplicate name'");
-    methodMockControl.setReturnValue("bdbtrimcountroute_create");
+    methodMockControl.setReturnValue("route_create_bdb_trim_count");
     replay();
 
     String result = classUnderTest.createRoute(model, name, author, active,
         description, countLimit);
 
     verify();
-    assertEquals("bdbtrimcountroute_create", result);
+    assertEquals("route_create_bdb_trim_count", result);
   }
 
   
@@ -266,14 +266,14 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     managerControl.setReturnValue(routeDefinition);
     
     methodMock.viewShowRoute(model, name, "nisse", true, "descr", 1, null);
-    methodMockControl.setReturnValue("bdbtrimcountroute_show");
+    methodMockControl.setReturnValue("route_show_bdb_trim_count");
     
     replay();
 
     String result = classUnderTest.showRoute(model, name, null, null, null, null, null);
     
     verify();
-    assertEquals("bdbtrimcountroute_show", result);
+    assertEquals("route_show_bdb_trim_count", result);
   }
 
   public void testShowRoute_byName_nonExisting() {
@@ -281,14 +281,14 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     manager.getDefinition(name);
     managerControl.setReturnValue(null);
     methodMock.viewShowRoutes(model, "No route named \"somename\"");
-    methodMockControl.setReturnValue("showroutes");
+    methodMockControl.setReturnValue("routes");
     
     replay();
 
     String result = classUnderTest.showRoute(model, name, null, null, null, null,null);
     
     verify();
-    assertEquals("showroutes", result);
+    assertEquals("routes", result);
   }
 
   public void testShowRoute_modify() {
@@ -303,7 +303,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     
     replay();
 
-    String result = classUnderTest.showRoute(model, name, "hugga", false, "new descr", 1, "Modify");
+    String result = classUnderTest.showRoute(model, name, "hugga", false, "new descr", 1, "Save");
     
     verify();
     assertEquals("somedirect", result);
@@ -322,7 +322,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String result = classUnderTest.showRoute(model, name, null, null, null, null, "Delete");
     
     verify();
-    assertEquals("redirect:showroutes.htm", result);
+    assertEquals("redirect:routes.htm", result);
   }
 
   public void testShowRoute_delete_failed() {
@@ -363,7 +363,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String result = classUnderTest.viewCreateRoute(model, "somename", "someauthor", true, "descr", 1, null);
     
     verify();
-    assertEquals("bdbtrimcountroute_create", result);
+    assertEquals("route_create_bdb_trim_count", result);
     
   }
   
@@ -384,7 +384,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String result = classUnderTest.viewShowRoutes(model, null);
     
     verify();
-    assertEquals("showroutes", result);
+    assertEquals("routes", result);
   }
   
   public void testViewShowRoute() {
@@ -406,7 +406,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String result = classUnderTest.viewShowRoute(model, "somename", "someauthor", true, "descr", 1, null);
     
     verify();
-    assertEquals("bdbtrimcountroute_show", result);
+    assertEquals("route_show_bdb_trim_count", result);
   }
 
   public void testViewShowRoute_wEmessage() {
@@ -430,7 +430,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String result = classUnderTest.viewShowRoute(model, "somename", "someauthor", true, "descr", 1, "xyz");
     
     verify();
-    assertEquals("bdbtrimcountroute_show", result);
+    assertEquals("route_show_bdb_trim_count", result);
   }
   
   public void testModifyRoute() throws Exception {
@@ -463,7 +463,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String result = classUnderTest.modifyRoute(model, name, author, active, description, countLimit);
     
     verify();
-    assertEquals("redirect:showroutes.htm", result);
+    assertEquals("redirect:routes.htm", result);
   }
 
   public void testModifyRoute_noCountLimit() throws Exception {

@@ -43,8 +43,8 @@ import java.util.Collections;
 public class ShowDataSourcesController {
 
     // View names
-    private static final String SHOW_DATA_SOURCES_VIEW = "show_datasources";
-    private static final String EDIT_DATA_SOURCES_VIEW = "edit_datasources";
+    private static final String SHOW_DATA_SOURCES_VIEW = "datasources_show";
+    private static final String EDIT_DATA_SOURCES_VIEW = "datasources_edit";
     
     // Model keys
     private static final String DATA_SOURCES_KEY = "data_sources";
@@ -56,7 +56,7 @@ public class ShowDataSourcesController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/show_datasources.htm")
+    @RequestMapping("/datasources_show.htm")
     public String showDataSources(ModelMap model) {
         List<DataSource> dataSources = dataSourceManager.load(DataSource.LOCAL);
         Collections.sort(dataSources);
@@ -69,7 +69,7 @@ public class ShowDataSourcesController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/edit_datasources.htm")
+    @RequestMapping("/datasources_edit.htm")
     public String editDataSources(ModelMap model) {
         List<DataSource> dataSources = dataSourceManager.load(DataSource.LOCAL);
         Collections.sort(dataSources);

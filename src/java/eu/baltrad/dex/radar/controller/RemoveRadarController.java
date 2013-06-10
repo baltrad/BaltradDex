@@ -54,11 +54,11 @@ import java.io.IOException;
 @Controller
 public class RemoveRadarController {
     
-    private static final String REMOVE_RADAR_VIEW = "remove_radar";
+    private static final String REMOVE_RADAR_VIEW = "radars_remove";
     private static final String REMOVE_SELECTED_RADAR_VIEW = 
-            "remove_selected_radar";
+            "radars_remove_selected";
     private static final String REMOVE_RADAR_STATUS_VIEW = 
-            "remove_radar_status";
+            "radars_remove_status";
     
     private static final String RADARS_KEY = "radars";
     private static final String REMOVE_RADAR_OK_MSG_KEY = "removeradar.success";
@@ -67,8 +67,8 @@ public class RemoveRadarController {
     private static final String REMOVE_RADAR_COMPLETED_ERROR_MSG_KEY = 
             "removeradar.completed_failure";
     
-    private static final String OK_MSG_KEY = "message";
-    private static final String ERROR_MSG_KEY = "error";   
+    private static final String OK_MSG_KEY = "radar_remove_success";
+    private static final String ERROR_MSG_KEY = "radar_remove_error";   
 
     private RadarManager radarManager;
     private PlatformTransactionManager transactionManager;
@@ -87,7 +87,7 @@ public class RemoveRadarController {
      * @param model Model map 
      * @return View name
      */
-    @RequestMapping("/remove_radar.htm")
+    @RequestMapping("/radars_remove.htm")
     public String removeRadar(ModelMap model) {
         model.addAttribute(RADARS_KEY, radarManager.load());
         return REMOVE_RADAR_VIEW;
@@ -101,7 +101,7 @@ public class RemoveRadarController {
      * @return View name
      * @throws IOException 
      */
-    @RequestMapping("/remove_selected_radar.htm")
+    @RequestMapping("/radars_remove_selected.htm")
     public String removeSelectedRadar(HttpServletRequest request,
             HttpServletResponse response, ModelMap model) throws IOException {
         String[] radarIds = request.getParameterValues(RADARS_KEY);
@@ -112,7 +112,7 @@ public class RemoveRadarController {
             }
             model.addAttribute(RADARS_KEY, radars);
         } else {
-            response.sendRedirect("remove_radar.htm");
+            response.sendRedirect("radars_remove.htm");
         }
         return REMOVE_SELECTED_RADAR_VIEW;
     }
@@ -123,7 +123,7 @@ public class RemoveRadarController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/remove_radar_status.htm")
+    @RequestMapping("/radars_remove_status.htm")
     public String removeRadarStatus(HttpServletRequest request, 
                     ModelMap model) {
         String[] radarIds = request.getParameterValues(RADARS_KEY);

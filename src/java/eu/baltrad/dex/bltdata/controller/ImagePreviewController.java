@@ -54,7 +54,7 @@ import ncsa.hdf.object.h5.H5File;
 public class ImagePreviewController {
  
     // View name
-    private static final String SUCCESS_VIEW = "data_preview";
+    private static final String SUCCESS_VIEW = "file_preview";
     
     // the URL of image to be displayed
     private static final String IMAGE_URL_KEY = "image_url";
@@ -89,7 +89,7 @@ public class ImagePreviewController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/data_preview.htm")
+    @RequestMapping("/file_preview.htm")
     public String showPreview(HttpServletRequest request, ModelMap model) 
         throws Exception {
         // get dataset metadata

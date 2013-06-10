@@ -213,14 +213,14 @@ public class VolumeRoutesControllerTest extends TestCase {
     adaptorManager.getAdaptorNames();
     adaptorControl.setReturnValue(adaptors);
     methodMock.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    methodMockControl.setReturnValue("volumeroute_create");
+    methodMockControl.setReturnValue("route_create_volume");
     
     replay();
 
     String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null, null, null, null);
 
     verify();
-    assertEquals("volumeroute_create", result);
+    assertEquals("route_create_volume", result);
   }
 
   public void testCreateRoute_noAdaptors() {
@@ -277,7 +277,7 @@ public class VolumeRoutesControllerTest extends TestCase {
     String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
 
     verify();
-    assertEquals("redirect:showroutes.htm", result);
+    assertEquals("redirect:routes.htm", result);
   }
 
   public void testCreateRoute_noadaptor_selected() {
@@ -376,13 +376,13 @@ public class VolumeRoutesControllerTest extends TestCase {
     manager.storeDefinition(routedef);
     managerControl.setThrowable(new RuleException("Duplicate name"));
     methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, "Failed to create definition: 'Duplicate name'");
-    methodMockControl.setReturnValue("volumeroute_create");
+    methodMockControl.setReturnValue("route_create_volume");
     replay();
 
     String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
 
     verify();
-    assertEquals("volumeroute_create", result);
+    assertEquals("route_create_volume", result);
   }
   
   public void testModifyRoute_success() throws Exception {
@@ -433,7 +433,7 @@ public class VolumeRoutesControllerTest extends TestCase {
     String result = classUnderTest.modifyRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
     
     verify();
-    assertEquals("redirect:showroutes.htm", result);
+    assertEquals("redirect:routes.htm", result);
   }
 
   public void testModifyRoute_noadaptorselected() throws Exception {

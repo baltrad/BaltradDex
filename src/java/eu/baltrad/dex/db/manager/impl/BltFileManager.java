@@ -71,7 +71,7 @@ public class BltFileManager implements IBltFileManager {
     /** Image file extension */
     private static final String IMAGE_FILE_EXT = ".png";
     /** Number of file entries per page */
-    public final static int ENTRIES_PER_PAGE = 12;
+    public final static int ENTRIES_PER_PAGE = 16;
     /** Number of pages in the scroll bar, must be an odd number >= 3 */
     public final static int SCROLL_RANGE = 11;
 
@@ -109,10 +109,35 @@ public class BltFileManager implements IBltFileManager {
             attributeFilter = coreFilterManager.load(
                     dataSourceManager.loadFilterId(dataSource.getId()));
         } catch (Exception e) {
-            log.error("getFilter(): Failed to get filter ID:", e);
+            log.error("Failed to get filter ID: ", e);
         }
         return attributeFilter;
     }
+    
+    /**
+     * Count all entries in the database.
+     * @return Total number of entries in the database.
+     * @throws DatabaseError 
+     */
+    public long count() throws DatabaseError {
+        try {
+            ExpressionFactory xpr = new ExpressionFactory();
+            AttributeQuery q = new AttributeQuery();
+            q.fetch("entryCount", xpr.count(xpr.attribute("_bdb/uuid")));
+            AttributeResult r = fileCatalog.getDatabase().execute(q);
+            long count = 0;
+            try {
+                r.next();
+                count = r.getLong("entryCount");
+            } finally {
+                r.close();
+            }
+            return count;
+        } catch (Exception e) {
+            throw new DatabaseError(e);
+        }
+    }
+    
     /**
      * Counts file entries from a given data source.
      *

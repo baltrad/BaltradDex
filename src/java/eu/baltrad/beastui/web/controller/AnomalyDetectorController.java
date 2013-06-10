@@ -70,13 +70,13 @@ public class AnomalyDetectorController {
    * @param emessage a error message if any
    * @return the jsp page that handles the model
    */
-  @RequestMapping("/anomalydetectors.htm")
+  @RequestMapping("/anomaly_detectors.htm")
   public String showAnomalyDetectors(Model model,
       @RequestParam(value="emessage", required=false) String emessage) {
     logger.debug("showAnomalyDetectors(Model)");
     model.addAttribute("emessage", emessage);
     model.addAttribute("anomaly_detectors", manager.list());
-    return "anomalydetectors";
+    return "anomaly_detectors";
   }
   
   /**
@@ -87,7 +87,7 @@ public class AnomalyDetectorController {
    * @param op the operation, Add is currently only supported
    * @return the jsp page that handles this model
    */
-  @RequestMapping("/create_anomaly_detector.htm")
+  @RequestMapping("/anomaly_detector_create.htm")
   public String createAnomalyDetector(Model model,
       @RequestParam(value = "name", required = false) String name,
       @RequestParam(value = "description", required = false) String description,
@@ -97,7 +97,7 @@ public class AnomalyDetectorController {
       try {
         AnomalyDetector detector = createDetector(name, description);
         manager.add(detector);
-        return "redirect:anomalydetectors.htm";
+        return "redirect:anomaly_detectors.htm";
       } catch (AnomalyException e) {
         logger.error("Failed to register anomaly detector", e);
         model.addAttribute("name", name);
@@ -105,7 +105,7 @@ public class AnomalyDetectorController {
         model.addAttribute("emessage", "Failed to register anomaly detector: " + e.getMessage());
       }
     }
-    return "anomalydetector_create";
+    return "anomaly_detector_create";
   }
   
   /**
@@ -114,18 +114,18 @@ public class AnomalyDetectorController {
    * @param name the name of the anomaly detector to show
    * @return the jsp page that handles this model
    */
-  @RequestMapping("/show_anomaly_detector.htm")
+  @RequestMapping("/anomaly_detector_show.htm")
   public String showAnomalyDetector(Model model, @RequestParam("name") String name) {
     try {
       AnomalyDetector detector = manager.get(name);
       model.addAttribute("name", detector.getName());
       model.addAttribute("description", detector.getDescription());
-      return "anomalydetector_show";
+      return "anomaly_detector_show";
     } catch (AnomalyException e) {
       logger.debug("Failed to locate anomaly detector '" + name + "'");
       model.addAttribute("anomaly_detectors", manager.list());
       model.addAttribute("emessage", "Failed to locate anomaly detector '" + name +"': " + e.getMessage());
-      return "anomalydetectors";
+      return "anomaly_detectors";
     }
   }
 
@@ -137,7 +137,7 @@ public class AnomalyDetectorController {
    * @param operation the operation, either Modify or Delete
    * @return the jsp page or a redirection url
    */
-  @RequestMapping("/modify_anomaly_detector.htm")
+  @RequestMapping("/anomaly_detector_edit.htm")
   public String modifyAnomalyDetector(Model model,
       @RequestParam("name") String name,
       @RequestParam("description") String description,
@@ -147,19 +147,19 @@ public class AnomalyDetectorController {
     if (operation.equals("Delete")) {
       try {
         manager.remove(name);
-        result = "redirect:anomalydetectors.htm";
+        result = "redirect:anomaly_detectors.htm";
       } catch (AnomalyException e) {
         logger.error("Failed to remove anomaly detector: " + name);
         model.addAttribute("anomaly_detectors", manager.list());
         model.addAttribute("emessage", "Failed to delete '"+name+"': " + e.getMessage());
-        result = "anomalydetectors";
+        result = "anomaly_detectors";
         emessage = "Failed to anomaly detector";
       }
     } else {
       try {
         AnomalyDetector detector = createDetector(name, description);
         manager.update(detector);
-        return "redirect:anomalydetectors.htm";
+        return "redirect:anomaly_detectors.htm";
       } catch (AnomalyException e) {
         emessage = "Failed to update anomaly detector '" + name + "': " + e.getMessage();
       }
@@ -168,7 +168,7 @@ public class AnomalyDetectorController {
       model.addAttribute("name", name);
       model.addAttribute("description", description);
       model.addAttribute("emessage", emessage);
-      result = "anomalydetector_show";
+      result = "anomaly_detector_show";
     }
     return result;
   }

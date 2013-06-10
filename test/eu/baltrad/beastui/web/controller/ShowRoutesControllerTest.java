@@ -76,7 +76,7 @@ public class ShowRoutesControllerTest extends TestCase {
     String result = classUnderTest.showRoutes(model);
 
     verify();
-    assertEquals("showroutes", result);
+    assertEquals("routes", result);
   }
   
   public void testCreateRoute_Script() {
@@ -85,7 +85,7 @@ public class ShowRoutesControllerTest extends TestCase {
     String result = classUnderTest.createRoute(model, "Script");
     
     verify();
-    assertEquals("redirect:groovyroute_create.htm", result);
+    assertEquals("redirect:route_create_groovy.htm", result);
   }
 
   public void testCreateRoute_Composite() {
@@ -94,7 +94,7 @@ public class ShowRoutesControllerTest extends TestCase {
     String result = classUnderTest.createRoute(model, "Composite");
     
     verify();
-    assertEquals("redirect:compositeroute_create.htm", result);
+    assertEquals("redirect:route_create_composite.htm", result);
   }
 
   public void testCreateRoute_BdbTrimAge() {
@@ -103,7 +103,7 @@ public class ShowRoutesControllerTest extends TestCase {
     String result = classUnderTest.createRoute(model, "BdbTrimAge");
     
     verify();
-    assertEquals("redirect:bdbtrimageroute_create.htm", result);
+    assertEquals("redirect:route_create_bdb_trim_age.htm", result);
   }
 
   public void testCreateRoute_BdbTrimCount() {
@@ -112,7 +112,7 @@ public class ShowRoutesControllerTest extends TestCase {
     String result = classUnderTest.createRoute(model, "BdbTrimCount");
     
     verify();
-    assertEquals("redirect:bdbtrimcountroute_create.htm", result);
+    assertEquals("redirect:route_create_bdb_trim_count.htm", result);
   }
   
   public void testCreateRoute_GoogleMap() {
@@ -121,7 +121,7 @@ public class ShowRoutesControllerTest extends TestCase {
     String result = classUnderTest.createRoute(model, "GoogleMap");
     
     verify();
-    assertEquals("redirect:googlemaproute_create.htm", result);
+    assertEquals("redirect:route_create_google_map.htm", result);
   }
   
   public void testCreateRoute_Unknown() {
@@ -133,7 +133,7 @@ public class ShowRoutesControllerTest extends TestCase {
     String result = classUnderTest.createRoute(model, "Unknown");
     
     verify();
-    assertEquals("redirect:showroutes.htm", result);
+    assertEquals("redirect:routes.htm", result);
   }
   
   public void testShowRoute_Script() {
@@ -156,7 +156,7 @@ public class ShowRoutesControllerTest extends TestCase {
     verify();
     defControl.verify();
     
-    assertEquals("redirect:groovyroute_show.htm", result);
+    assertEquals("redirect:route_show_groovy.htm", result);
   }
 
   public void testShowRoute_Composite() {
@@ -179,7 +179,7 @@ public class ShowRoutesControllerTest extends TestCase {
     verify();
     defControl.verify();
     
-    assertEquals("redirect:compositeroute_show.htm", result);
+    assertEquals("redirect:route_show_composite.htm", result);
   }
 
   public void testShowRoute_BdbTrimAge() {
@@ -202,7 +202,7 @@ public class ShowRoutesControllerTest extends TestCase {
     verify();
     defControl.verify();
     
-    assertEquals("redirect:bdbtrimageroute_show.htm", result);
+    assertEquals("redirect:route_show_bdb_trim_age.htm", result);
   }
 
   public void testShowRoute_BdbTrimCount() {
@@ -225,7 +225,7 @@ public class ShowRoutesControllerTest extends TestCase {
     verify();
     defControl.verify();
     
-    assertEquals("redirect:bdbtrimcountroute_show.htm", result);
+    assertEquals("redirect:route_show_bdb_trim_count.htm", result);
   }
 
   public void testShowRoute_GoogleMap() {
@@ -248,6 +248,6 @@ public class ShowRoutesControllerTest extends TestCase {
     verify();
     defControl.verify();
     
-    assertEquals("redirect:googlemaproute_show.htm", result);
+    assertEquals("redirect:route_show_google_map.htm", result);
   }
 }

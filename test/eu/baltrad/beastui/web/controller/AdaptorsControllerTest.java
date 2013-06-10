@@ -125,6 +125,6 @@ public class AdaptorsControllerTest extends TestCase {
     String result = classUnderTest.showAdaptor(model, "A1");
     
     verify();
-    assertEquals(result, "showadaptor");
+    assertEquals(result, "adaptor_show");
   }
 }

@@ -21,20 +21,19 @@
 
 package eu.baltrad.dex.auth.controller;
 
-import eu.baltrad.dex.user.manager.impl.UserManager;
-import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.auth.manager.SecurityManager;
-import eu.baltrad.dex.user.manager.impl.RoleManager;
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
+import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpSession;
-import java.security.Principal;
 
 /**
  * Login controller class implementing basic user authentication functionality.
@@ -43,12 +42,15 @@ import java.security.Principal;
  * @version 1.2.2
  * @since 1.0.0
  */
-
 @Controller
 public class LoginController {
 
-    private UserManager accountManager;
-    private RoleManager roleManager;
+    private static final String INIT_ERROR = "login.controller.node_init_error";
+    private static final String LOGIN_ERROR = "login.controller.login_error";
+    private static final String LOGOUT_MSG = "login.controller.logout_message";
+    
+    private ConfigurationManager confManager;
+    private MessageResourceUtil messages;
     private Logger log;
     
     /**
@@ -77,29 +79,9 @@ public class LoginController {
      */
     @RequestMapping("/login_failed.htm")
     public String loginFailed(Model model) {
-        model.addAttribute("login_error", "true");
+        model.addAttribute("login_error", messages.getMessage(LOGIN_ERROR));
         return "login";
     }
-    
-    /**
-     * Sets session user and renders welcome page.
-     * @param model Model 
-     * @param principal Principal
-     * @param session Http session
-     * @return Welcome page name
-     */
-    @RequestMapping("/home.htm")
-    public String welcome(Model model, Principal principal, HttpSession session) 
-    {
-        if (SecurityManager.getSessionUser(session) == null) {
-            User user = accountManager.load(principal.getName());
-            SecurityManager.setSessionUser(session, user);
-            SecurityManager.setSessionRole(session, 
-                    roleManager.load(user.getRole()));
-            log.info("User " + user.getName() + " signed in");
-        }
-        return "home";
-    }  
     
     /**
      * Resets session user, sets logout attribute and renders login page.
@@ -111,25 +93,54 @@ public class LoginController {
     public String logout(Model model, HttpSession session) {
         SecurityManager.resetSessionUser(session);
         SecurityManager.resetSessionRole(session);
-        model.addAttribute("logout_message", "true");
+        model.addAttribute("logout_msg", messages.getMessage(LOGOUT_MSG));
         return "login";
     }
     
     /**
-     * Sets reference to account manager object.
-     * @param accountManager Account manager object.
+     * Load node name as model attribute. 
+     * @return Node name
      */
-    @Autowired
-    public void setAccountManager(UserManager accountManager ) { 
-        this.accountManager = accountManager; 
+    @ModelAttribute("init_error")
+    public String getInitStatus() {
+        if (confManager.getAppConf() == null) {
+            return messages.getMessage(INIT_ERROR);
+        }
+        return null;
+    }
+    
+    /**
+     * Load node name as model attribute. 
+     * @return Node name
+     */
+    @ModelAttribute("node_name")
+    public String getNodeName() {
+        return confManager.getAppConf().getNodeName();
+    }
+    
+    /**
+     * Load admin email as model attribute. 
+     * @return Admin email
+     */
+    @ModelAttribute("admin_email")
+    public String getAdminEmail() {
+        return confManager.getAppConf().getAdminEmail();
     }
 
     /**
-     * @param roleManager the roleManager to set
+     * @param confManager the confManager to set
      */
     @Autowired
-    public void setRoleManager(RoleManager roleManager) {
-        this.roleManager = roleManager;
+    public void setConfManager(ConfigurationManager confManager) {
+        this.confManager = confManager;
+    }
+
+    /**
+     * @param messages the messages to set
+     */
+    @Autowired
+    public void setMessages(MessageResourceUtil messages) {
+        this.messages = messages;
     }
     
 }

@@ -56,19 +56,19 @@ import java.util.Iterator;
  * @since 0.1.6
  */
 @Controller
-@RequestMapping("/save_radar.htm")
+@RequestMapping("/radars_save.htm")
 @SessionAttributes("radar")
 public class SaveRadarController {
 
-    private static final String FORM_VIEW = "save_radar";
-    private static final String SUCCESS_VIEW = "save_radar_status";
+    private static final String FORM_VIEW = "radars_save";
+    private static final String SUCCESS_VIEW = "radars_save_status";
     private static final String ODIM_SOURCE_FILE = "conf/odim_source.xml";
     
     private static final String SAVE_RADAR_OK_MSG_KEY = "saveradar.success";
     private static final String SAVE_RADAR_ERROR_MSG_KEY = "saveradar.failure";
     
-    private static final String OK_MSG_KEY = "message";
-    private static final String ERROR_MSG_KEY = "error";
+    private static final String OK_MSG_KEY = "radar_save_success";
+    private static final String ERROR_MSG_KEY = "radar_save_error";
     
     private RadarManager radarManager;
     private MessageResourceUtil messages;

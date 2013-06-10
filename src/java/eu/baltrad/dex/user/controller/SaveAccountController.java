@@ -54,19 +54,19 @@ import javax.servlet.http.HttpServletRequest;
  * @since 0.1.6
  */
 @Controller
-@RequestMapping("/save_user_account.htm")
+@RequestMapping("/user_save.htm")
 @SessionAttributes("user_account")
 public class SaveAccountController  {
     
-    private static final String FORM_VIEW = "save_user_account";
-    private static final String SUCCESS_VIEW = "save_user_account_status";
+    private static final String FORM_VIEW = "user_save";
+    private static final String SUCCESS_VIEW = "user_save_status";
     private static final String USER_ACCOUNT_MODEL_KEY = "user_account";
     private static final String SAVE_ACCOUNT_ERROR_MSG_KEY = 
             "saveaccount.failure";
     private static final String SAVE_ACCOUNT_OK_MSG_KEY = 
             "saveaccount.success";
-    private static final String ERROR_MSG_KEY = "error";
-    private static final String OK_MSG_KEY = "message";
+    private static final String ERROR_MSG_KEY = "user_save_error";
+    private static final String OK_MSG_KEY = "user_save_success";
     
     private IUserManager userManager;
     private IRoleManager roleManager;

@@ -79,17 +79,18 @@ public class PasswordValidator {
         }
         // New password and confirmed password don't match
         String repeatPassword = request.getParameter("repeat_password");
-        if (user.getPassword().length() > MIN_PASSWD_LENGTH 
+        if (user.getPassword().length() >= MIN_PASSWD_LENGTH 
                     && repeatPassword.isEmpty()) {
                 errors.rejectValue("password", 
                     "saveaccount.missing.repeat_password",
                     messages.getMessage("saveaccount.missing.repeat_password"));
         }
-        if (repeatPassword.length() > 0 && 
-            !user.getPassword().equals(repeatPassword)) {
+        if (user.getPassword().length() >= MIN_PASSWD_LENGTH && 
+                repeatPassword.length() > 0 && 
+                !user.getPassword().equals(repeatPassword)) {
                 errors.rejectValue("password",
                     "changepassword.mismatch.password",
-                    messages.getMessage("changepassword.mismatch.password"));
+                    messages.getMessage("changepassword.mismatch.password"));       
         }
     }
 

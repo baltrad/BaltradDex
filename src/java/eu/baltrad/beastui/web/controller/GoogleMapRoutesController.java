@@ -96,7 +96,7 @@ public class GoogleMapRoutesController {
    * @param path the path
    * @return
    */
-  @RequestMapping("/googlemaproute_create.htm")
+  @RequestMapping("/route_create_google_map.htm")
   public String createRoute(
       Model model,
       @RequestParam(value = "name", required = false) String name,
@@ -130,7 +130,7 @@ public class GoogleMapRoutesController {
         GoogleMapRule rule = createRule(area, path);
         RouteDefinition def = manager.create(name, author, bactive, description, recipients, rule);
         manager.storeDefinition(def);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         emessage = "Failed to create definition: '" + t.getMessage() + "'";
         if (t.getCause() != null) {
@@ -155,7 +155,7 @@ public class GoogleMapRoutesController {
    * @param operation
    * @return
    */
-  @RequestMapping("/googlemaproute_show.htm")
+  @RequestMapping("/route_show_google_map.htm")
   public String showRoute(
       Model model,
       @RequestParam(value = "name", required = false) String name,
@@ -173,12 +173,12 @@ public class GoogleMapRoutesController {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
     
-    if (operation != null && operation.equals("Modify")) {
+    if (operation != null && operation.equals("Save")) {
       return modifyRoute(model, name, author, active, description, recipients, area, path);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         return viewShowRoutes(model, "Failed to delete \"" + name + "\", have you verified that there are no reffering scheduled jobs");
       }
@@ -224,7 +224,7 @@ public class GoogleMapRoutesController {
         GoogleMapRule rule = createRule(area, path);
         RouteDefinition def = manager.create(name, author, isactive, description, newrecipients, rule);
         manager.updateDefinition(def);
-        return "redirect:showroutes.htm";
+        return "redirect:routes.htm";
       } catch (Throwable t) {
         t.printStackTrace();
         emessage = "Failed to update definition: '" + t.getMessage() + "'";
@@ -262,7 +262,7 @@ public class GoogleMapRoutesController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "showroutes";
+    return "routes";
   }
   
   /**
@@ -299,7 +299,7 @@ public class GoogleMapRoutesController {
       model.addAttribute("emessage", emessage);
     }
     
-    return "googlemaproute_create";
+    return "route_create_google_map";
   }
 
   /**
@@ -337,6 +337,6 @@ public class GoogleMapRoutesController {
       model.addAttribute("emessage", emessage);
     }
     
-    return "googlemaproute_show";
+    return "route_show_google_map";
   }
 }

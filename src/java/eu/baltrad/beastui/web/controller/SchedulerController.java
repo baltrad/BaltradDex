@@ -126,12 +126,12 @@ public class SchedulerController {
    * @param emessage
    * @return
    */
-  @RequestMapping("/showschedule.htm")
+  @RequestMapping("/schedule.htm")
   public String showSchedule(Model model,
       @RequestParam(value="emessage", required=false) String emessage) {
     model.addAttribute("schedule", scheduler.getSchedule());
     model.addAttribute("emessage", emessage);
-    return "showschedule";
+    return "schedule";
   }
   
   /**
@@ -141,7 +141,7 @@ public class SchedulerController {
    * @param jobname the job name
    * @return the redirect string
    */
-  @RequestMapping("/createscheduledjob.htm")
+  @RequestMapping("/schedule_create_job.htm")
   public String createScheduledJob(Model model,
       @RequestParam(value = "seconds", required = false) List<String> seconds,
       @RequestParam(value = "minutes", required = false) List<String> minutes,
@@ -155,7 +155,7 @@ public class SchedulerController {
       try {
         String expression = cronutilities.createExpression(seconds, minutes, hours, daysOfMonth, months, daysOfWeek);
         scheduler.register(expression, jobname);
-        result = "redirect:showschedule.htm";
+        result = "redirect:schedule.htm";
       } catch (Throwable t) {
         result = viewCreateScheduledJob(model, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, jobname, "Could not register: "+t.getMessage());
       }
@@ -170,7 +170,7 @@ public class SchedulerController {
    * @param model
    * @return
    */
-  @RequestMapping("/showscheduledjob.htm")
+  @RequestMapping("/schedule_show_job.htm")
   public String showScheduledJob(Model model,
       @RequestParam(value = "id", required = true) Integer id,
       @RequestParam(value = "seconds", required = false) List<String> seconds,
@@ -197,9 +197,9 @@ public class SchedulerController {
             entry.getName(),
             null);
       } else if (operation != null) {
-        result = "redirect:showschedule.htm";
+        result = "redirect:schedule.htm";
         try {
-          if (operation.equals("Modify")) {
+          if (operation.equals("Save")) {
             String expression = cronutilities.createExpression(seconds, minutes, hours, daysOfMonth, months, daysOfWeek);
             scheduler.reregister(entry.getId(), expression, jobname);
           } else if (operation.equals("Delete")) {
@@ -256,7 +256,7 @@ public class SchedulerController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "createscheduledjob";
+    return "schedule_create_job";
   }
   
   /**
@@ -297,7 +297,7 @@ public class SchedulerController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "showscheduledjob";
+    return "schedule_show_job";
   }
   
   /**
@@ -311,7 +311,7 @@ public class SchedulerController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "showschedule";
+    return "schedule";
   }
   
   /**

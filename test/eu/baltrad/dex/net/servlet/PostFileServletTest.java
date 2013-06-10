@@ -40,6 +40,8 @@ import eu.baltrad.bdb.expr.Expression;
 import eu.baltrad.beast.message.IBltMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.util.FramePublisherManager;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
 import eu.baltrad.dex.registry.model.impl.RegistryEntry;
@@ -99,9 +101,12 @@ public class PostFileServletTest {
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
     private DateFormat format;
-    private List<Subscription> subscriptions;
+    private List<Subscription> localSubscriptions;
+    private List<Subscription> peerSubscriptions;
     private Subscription s1;
     private Subscription s2;
+    private Subscription s3;
+    private Subscription s4;
     private List mocks;
     
     protected class PFServlet extends PostFileServlet {
@@ -181,11 +186,21 @@ public class PostFileServletTest {
         response = new MockHttpServletResponse();
         format = new SimpleDateFormat(DATE_FORMAT);
         long time = 1340189763867L;
-        subscriptions = new ArrayList<Subscription>();
-        s1 = new Subscription(1, time, "upload", "User1", "S1", true, true);
-        subscriptions.add(s1);
-        s2 = new Subscription(2, time, "upload", "User2", "DS2", true, true);
-        subscriptions.add(s2);
+        
+        peerSubscriptions = new ArrayList<Subscription>();
+        
+        s1 = new Subscription(1, time, "peer", "User1", "DS1", true, true);
+        peerSubscriptions.add(s1);
+        s2 = new Subscription(2, time, "peer", "User2", "DS2", true, true);
+        peerSubscriptions.add(s2);
+        
+        localSubscriptions = new ArrayList<Subscription>();
+        
+        s3 = new Subscription(3, time, "local", "User1", "DS3", true, true);
+        localSubscriptions.add(s1);
+        s4 = new Subscription(4, time, "local", "User2", "DS4", true, true);
+        localSubscriptions.add(s2);
+        
         setAttributes(request);
     }
     
@@ -334,18 +349,37 @@ public class PostFileServletTest {
         
         ISubscriptionManager subscriptionManagerMock = 
                 (ISubscriptionManager) createMock(ISubscriptionManager.class);
+        expect(subscriptionManagerMock.load(Subscription.LOCAL)).
+                andReturn(localSubscriptions);
         expect(subscriptionManagerMock.load(Subscription.PEER)).
-                andReturn(subscriptions);
+                andReturn(peerSubscriptions);
+        
         IFilter filterMock = (IFilter) createMock(IFilter.class);
         expect(filterMock.getExpression()).andReturn(null).anyTimes();
         
+        IDataSourceManager dataSourceManagerMock =
+                (IDataSourceManager) createMock(IDataSourceManager.class);
         
+        DataSource ds1 = new DataSource(1, "DS1", DataSource.PEER, 
+                "Some data source");
+        DataSource ds2 = new DataSource(2, "DS2", DataSource.PEER, 
+                "Another data source");
+        expect(dataSourceManagerMock.load("DS1", DataSource.PEER))
+                .andReturn(ds1);
+        expect(dataSourceManagerMock.load("DS2", DataSource.PEER))
+                .andReturn(ds2);
+        expect(dataSourceManagerMock.load("DS1", DataSource.LOCAL))
+                .andReturn(ds1);
+        expect(dataSourceManagerMock.load("DS2", DataSource.LOCAL))
+                .andReturn(ds2);  
+      
         IBltFileManager fileManagerMock = 
                 (IBltFileManager) createMock(IBltFileManager.class);
+        
         expect(fileManagerMock.loadFilter(s1.getDataSource()))
-                .andReturn(filterMock);
+                .andReturn(filterMock).times(2);
         expect(fileManagerMock.loadFilter(s2.getDataSource()))
-                .andReturn(filterMock);
+                .andReturn(filterMock).times(2);
         
         IUserManager userManagerMock = 
                 (IUserManager) createMock(IUserManager.class);
@@ -356,7 +390,6 @@ public class PostFileServletTest {
         
         IRegistryManager deliveryRegistryManagerMock =
           (IRegistryManager) createMock(IRegistryManager.class);
-        
         expect(deliveryRegistryManagerMock.store(isA(RegistryEntry.class)))
                 .andReturn(Integer.SIZE).anyTimes();
         
@@ -376,6 +409,7 @@ public class PostFileServletTest {
         classUnderTest.setFileManager(fileManagerMock);
         classUnderTest.setMatcher(new EasyMetadataMatcher());
         classUnderTest.setUserManager(userManagerMock);
+        classUnderTest.setDataSourceManager(dataSourceManagerMock);
         classUnderTest.setRegistryManager(deliveryRegistryManagerMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setFramePublisherManager(new FramePublisherManager());

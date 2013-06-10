@@ -11,17 +11,24 @@
                country_code="XX" node_address="http://test2.baltrad.eu"/>
                
     <dex_users_roles id="1" user_id="1" role_id="1"/>
-    <dex_users_roles id="2" user_id="2" role_id="1"/>            
+    <dex_users_roles id="2" user_id="2" role_id="1"/>      
+    
+    <dex_data_sources id="1" name="DS1" type="local" 
+                      description="A test data source"/> 
+    <dex_data_sources id="2" name="DS2" type="local" 
+                      description="Another test data source"/> 
+    <dex_data_sources id="3" name="DS3" type="peer" 
+                      description="Yet one more test data source"/>          
  
-    <dex_delivery_registry time_stamp="1345800600000" 
-                           uuid="888888888888" status="FAILURE"/>
-    <dex_delivery_registry time_stamp="1345801200000" 
-                           uuid="999999999999" status="SUCCESS"/>                           
-    <dex_delivery_registry time_stamp="1345801800000" 
-                           uuid="101010101010" status="SUCCESS"/>
-    <dex_delivery_registry time_stamp="1345802400000" 
-                           uuid="101010101010" status="SUCCESS"/>
-    <dex_delivery_registry time_stamp="1345803000000" 
-                           uuid="121212121212" status="SUCCESS"/>                                                         
+    <dex_delivery_registry time_stamp="1345800600000" type="download"
+                           uuid="888888888888" status="False"/>
+    <dex_delivery_registry time_stamp="1345801200000" type="download"
+                           uuid="999999999999" status="False"/>                           
+    <dex_delivery_registry time_stamp="1345801800000" type="download" 
+                           uuid="101010101010" status="True"/>
+    <dex_delivery_registry time_stamp="1345802400000" type="download"
+                           uuid="101010101010" status="True"/>
+    <dex_delivery_registry time_stamp="1345803000000" type="download"
+                           uuid="121212121212" status="True"/>                                                       
         
 </dataset>

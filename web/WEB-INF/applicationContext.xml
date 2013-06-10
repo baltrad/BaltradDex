@@ -10,64 +10,71 @@
        
     <security:http auto-config="true" access-denied-page="/login.htm"> 
         <security:form-login login-page="/login.htm" 
-                             default-target-url="/home.htm" 
+                             default-target-url="/status.htm" 
                              authentication-failure-url="/login_failed.htm" 
                              always-use-default-target="true"/>
         <security:logout logout-success-url="/logout.htm"/>
         <!-- 
             User pages 
         -->
-        <security:intercept-url pattern="/home.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/latest_messages.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/system_messages.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/logtable.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/data_download.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/data_upload.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/show_datasources.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/browse_files.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/status.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/messages_live.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/messages_table.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/messages_browser.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/datasources.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/datasource_files.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/file_browser.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/file_details.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/data_preview.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/download.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/file_preview.htm" access="ROLE_USER" />
+        <security:intercept-url pattern="/file_download.htm" access="ROLE_USER" />
         <security:intercept-url pattern="/user_settings.htm" access="ROLE_USER" />
         <!-- 
             Operator pages 
         -->
-        <security:intercept-url pattern="/exchange.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/processing.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/connect_to_node.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/node_connect.htm" access="ROLE_OPERATOR" />
         <security:intercept-url pattern="/node_connected.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/selected_datasource.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/subscribed_peers.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/subscription_by_peer.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/selected_subscription.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/subscription_status.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/registry.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/node_datasources.htm" access="ROLE_OPERATOR" />
+        
+        <security:intercept-url pattern="/subscription_start_status.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/subscription_peers.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/subscription_show.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/subscription_selected.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/subscription_update_status.htm" access="ROLE_OPERATOR" />
+        
+        <security:intercept-url pattern="/registry_show.htm" access="ROLE_OPERATOR" />
+        
         <security:intercept-url pattern="/adaptors.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/anomalydetector_create.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/anomalydetector_show.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/anomalydetectors.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/bdbtrimageroute_create.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/bdbtrimageroute_show.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/bdbtrimcountroute_create.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/bdbtrimcountroute_show.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/compositeroute_create.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/compositeroute_show.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/createadaptor.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/createscheduledjob.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/distributionroute.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/googlemaproute_create.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/googlemaproute_show.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/groovyroute_create.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/groovyroute_show.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/showadaptor.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/showroutes.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/showschedule.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/showscheduledjob.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/volumeroute_create.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/supervisorsettings.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/addsupervisorsetting.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/removesupervisorsetting.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/adaptor_show.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/adaptor_create.htm" access="ROLE_OPERATOR" />
+        
+        <security:intercept-url pattern="/anomaly_detector_create.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/anomaly_detector_show.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/anomaly_detectors.htm" access="ROLE_OPERATOR" />
+        
+        <security:intercept-url pattern="/routes.htm" access="ROLE_OPERATOR" />
+        
+        <security:intercept-url pattern="/route_create_bdb_trim_age.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_show_bdb_trim_age.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_create_bdb_trim_count.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_show_bdb_trim_count.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_create_composite.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_show_composite.htm" access="ROLE_OPERATOR" />
+        
+        <security:intercept-url pattern="/route_create_distribution.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_create_google_map.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_show_google_map.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_create_groovy.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_show_groovy.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_create_volume.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_show_volume.htm" access="ROLE_OPERATOR" />
+        
+        <security:intercept-url pattern="/schedule.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/schedule_show_job.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/schedule_create_job.htm" access="ROLE_OPERATOR" />
+        
+        <security:intercept-url pattern="/supervisor_settings.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/supervisor_add_setting.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/supervisor_remove_setting.htm" access="ROLE_OPERATOR" />
         <!-- DO NOT ACTIVATE interceptor for supervisor.htm since that is using
              host filter checks
           <security:intercept-url pattern="/supervisor.htm" access="ROLE_OPERATOR" />
@@ -76,47 +83,45 @@
         <!-- 
             Admin pages 
         -->
-        <security:intercept-url pattern="/settings.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/save_radar.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/show_radar.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/save_radar_status" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_radar.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_selected_radar.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_radar_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/radars_show.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/radars_save.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/radars_save_status" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/radars_remove.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/radars_remove_selected.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/radars_remove_status.htm" access="ROLE_ADMIN" />
         
-        <security:intercept-url pattern="/save_datasource.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/edit_datasources.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/save_datasource_status" access="ROLE_ADMIN"/>
+        <security:intercept-url pattern="/datasources_save.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/datasources_edit.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/datasources_save_status" access="ROLE_ADMIN"/>
+        <security:intercept-url pattern="/datasources_remove.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/datasources_remove_selected.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/datasources_remove_status.htm" access="ROLE_ADMIN" />
         
-        <security:intercept-url pattern="/remove_datasource.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_selected_datasource.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_datasource_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/subscription_remove_downloads.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/subscription_remove_uploads.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/subscription_remove_selected_downloads.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/subscription_remove_selected_uploads.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/subscription_remove_downloads_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/subscription_remove_uploads_status.htm" access="ROLE_ADMIN" />
         
-        <security:intercept-url pattern="/remove_downloads.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_uploads.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_selected_downloads.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_selected_uploads.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_downloads_status.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_uploads_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/registry_configure.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/registry_delete.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/registry_delete_status.htm" access="ROLE_ADMIN" />
         
-        <security:intercept-url pattern="/configure_registry.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/clear_registry.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/clear_registry_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/messages_configure.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/messages_delete.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/messages_delete_status.htm" access="ROLE_ADMIN" />
         
-        <security:intercept-url pattern="/configure_messages.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/clear_messages.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/clear_messages_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/user_save.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/user_save_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/user_edit.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/user_remove.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/user_remove_selected.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/user_remove_status.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/user_change_password.htm" access="ROLE_ADMIN" />
+        <security:intercept-url pattern="/user_change_password_status.htm" access="ROLE_ADMIN" />
         
-        <security:intercept-url pattern="/save_user_account.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/save_user_account_status.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/edit_user_account.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_user_account.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_selected_user_account.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/remove_user_account_status.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/change_user_password.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/change_user_password_status.htm" access="ROLE_ADMIN" />
-        <security:intercept-url pattern="/manage_keystore.htm" access="ROLE_ADMIN" />
-        
+        <security:intercept-url pattern="/keystore.htm" access="ROLE_ADMIN" />
         <security:intercept-url pattern="/node_settings.htm" access="ROLE_ADMIN" />
     </security:http>
 

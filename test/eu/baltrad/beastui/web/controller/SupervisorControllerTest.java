@@ -113,7 +113,7 @@ public class SupervisorControllerTest extends TestCase {
     String result = classUnderTest.supervisorSettings(model, request);
     
     verifyAll();
-    Assert.assertEquals("supervisorsettings", result);
+    Assert.assertEquals("supervisor_settings", result);
   }
   
   public void testAddSupervisorSetting() throws Exception {
@@ -132,7 +132,7 @@ public class SupervisorControllerTest extends TestCase {
     String result = classUnderTest.addSupervisorSetting(model, "192.168.1.1", request);
     
     verifyAll();
-    Assert.assertEquals("supervisorsettings", result);
+    Assert.assertEquals("supervisor_settings", result);
   }
   
   public void testAddSupervisorSetting_alreadyRegistered() throws Exception {
@@ -151,7 +151,7 @@ public class SupervisorControllerTest extends TestCase {
     String result = classUnderTest.addSupervisorSetting(model, "192.168.1.1", request);
     
     verifyAll();
-    Assert.assertEquals("supervisorsettings", result);
+    Assert.assertEquals("supervisor_settings", result);
   }
 
   public void testRemoveSupervisorSetting() throws Exception {
@@ -169,7 +169,7 @@ public class SupervisorControllerTest extends TestCase {
     String result = classUnderTest.removeSupervisorSetting(model, "192.168.1.1",request);
     
     verifyAll();
-    Assert.assertEquals("supervisorsettings", result);
+    Assert.assertEquals("supervisor_settings", result);
   }
 
   public void testRemoveSupervisorSetting_failed() throws Exception {
@@ -188,7 +188,7 @@ public class SupervisorControllerTest extends TestCase {
     String result = classUnderTest.removeSupervisorSetting(model, "192.168.1.1",request);
     
     verifyAll();
-    Assert.assertEquals("supervisorsettings", result);
+    Assert.assertEquals("supervisor_settings", result);
   }
   
   public void testSupervisorStatus() throws Exception {

@@ -47,7 +47,7 @@ public class DistributionRoutesController {
   private ObjectMapper jsonMapper = new ObjectMapper();
   private static Logger logger = LogManager.getLogger(DistributionRoutesController.class);
 
-  protected enum Operation { Add, Modify, Delete, View };
+  protected enum Operation { Add, Save, Delete, View };
  
   /**
    * Set the router manager instance
@@ -57,7 +57,7 @@ public class DistributionRoutesController {
     this.manager = manager;
   }
 
-  @RequestMapping("/distributionroute.htm")
+  @RequestMapping("/route_create_distribution.htm")
   public String distributionRoute(
       Model model,
       @RequestParam(value="name", required=false) String name,
@@ -102,7 +102,7 @@ public class DistributionRoutesController {
     switch (op) {
       case Add:
         return addRoute(model, routeDef, destination, namingTemplate, filterJson);
-      case Modify:
+      case Save:
         return modifyRoute(model, routeDef, destination, namingTemplate, filterJson);
       case Delete:
         return deleteRoute(model, name);
@@ -123,7 +123,7 @@ public class DistributionRoutesController {
       DistributionRule rule = createRule(destination, namingTemplate, filterJson);
       routeDef.setRule(rule);
       manager.storeDefinition(routeDef);
-      return "redirect:showroutes.htm";
+      return "redirect:routes.htm";
     } catch (Exception e) {
       logger.error("Failed to create definition", e);
       emessage = "Failed to create definition: " + e.getMessage();
@@ -138,7 +138,7 @@ public class DistributionRoutesController {
     }
     try {
       manager.deleteDefinition(name);
-      return "redirect:showroutes.htm";
+      return "redirect:routes.htm";
     } catch (RuntimeException e) {
       logger.error("failed to delete route '" + name + "'", e);
       return viewShowRoutes(
@@ -161,7 +161,7 @@ public class DistributionRoutesController {
       DistributionRule rule = createRule(destination, namingTemplate, filterJson);
       routeDef.setRule(rule);
       manager.updateDefinition(routeDef);
-      return "redirect:showroutes.htm";
+      return "redirect:routes.htm";
     } catch (Exception e) {
       logger.error("Failed to update definition", e);
       emessage = "Failed to update definition: " + e.getMessage();
@@ -184,7 +184,7 @@ public class DistributionRoutesController {
     model.addAttribute("namingTemplate", namingTemplate);
     model.addAttribute("filterJson", filterJson);
     model.addAttribute("emessage", emessage);
-    return "distributionroute";
+    return "route_create_distribution";
   }
 
   /**
@@ -201,7 +201,7 @@ public class DistributionRoutesController {
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
-    return "showroutes";
+    return "routes";
   }
   
   /**

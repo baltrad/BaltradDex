@@ -139,7 +139,6 @@ public class UserManager implements IUserManager {
                 "FROM dex_users u, dex_roles r, dex_users_roles ur " + 
                 "WHERE ur.user_id = u.id AND ur.role_id = r.id " + 
                 "AND r.name = 'peer';";			
-
         return jdbcTemplate.query(sql, new ParameterizedRowMapper<String>() {
                 public String mapRow(ResultSet rs, int i) throws SQLException {
                     return rs.getString("user_name");

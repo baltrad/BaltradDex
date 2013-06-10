@@ -25,6 +25,8 @@ import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.config.model.RegistryConfiguration;
 
+import java.util.Date;
+
 /**
  * Configuration manager interface.
  *
@@ -33,6 +35,8 @@ import eu.baltrad.dex.config.model.RegistryConfiguration;
  * @since 1.2.2
  */
 public interface IConfigurationManager {
+    
+    public long getLastModified();
     
     public AppConfiguration getAppConf();
    

@@ -199,7 +199,7 @@ public class StartSubscriptionControllerTest {
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
-        assertEquals("subscribe", viewName);
+        assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
                 "postsubscription.controller.message_signer_error",
@@ -240,7 +240,7 @@ public class StartSubscriptionControllerTest {
         
         verifyAll();
         
-        assertEquals("subscribe", viewName);
+        assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
             messages.getMessage(
@@ -274,7 +274,7 @@ public class StartSubscriptionControllerTest {
         String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         
-        assertEquals("subscribe", viewName);
+        assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
                 "postsubscription.controller.http_connection_error",
@@ -309,7 +309,7 @@ public class StartSubscriptionControllerTest {
         String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         
-        assertEquals("subscribe", viewName);
+        assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
                 "postsubscription.controller.generic_connection_error",
@@ -347,7 +347,7 @@ public class StartSubscriptionControllerTest {
         String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         
-        assertEquals("subscribe", viewName);
+        assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
                 "postsubscription.controller.subscription_server_error",
@@ -385,7 +385,7 @@ public class StartSubscriptionControllerTest {
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
-        assertEquals("subscribe", viewName);
+        assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
                 "postsubscription.controller.internal_controller_error",
@@ -424,7 +424,7 @@ public class StartSubscriptionControllerTest {
         String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
         
-        assertEquals("subscribe", viewName);
+        assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
                 "postsubscription.controller.subscription_server_error",
@@ -454,6 +454,8 @@ public class StartSubscriptionControllerTest {
                 .andReturn(null).anyTimes();
         expect(dataSourceManagerMock.store(isA(DataSource.class)))
                 .andReturn(Integer.SIZE).anyTimes();
+        expect(dataSourceManagerMock.storeUser(Integer.SIZE, 1))
+                .andReturn(Integer.SIZE).anyTimes();
         expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
                 isA(String.class))).andReturn(null).anyTimes();
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
@@ -470,7 +472,7 @@ public class StartSubscriptionControllerTest {
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.startSubscription(model, "test.baltrad.eu",
                 SELECTED_DATA_SOURCES);
-        assertEquals("subscribe", viewName);
+        assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
                 "postsubscription.controller.subscription_server_partial",
@@ -503,6 +505,8 @@ public class StartSubscriptionControllerTest {
                 .andReturn(null).anyTimes();
         expect(dataSourceManagerMock.store(isA(DataSource.class)))
                 .andReturn(Integer.SIZE).anyTimes();
+        expect(dataSourceManagerMock.storeUser(Integer.SIZE, 1))
+                .andReturn(Integer.SIZE).anyTimes();
         expect(subscriptionManagerMock.load(isA(String.class), 
             isA(String.class), isA(String.class))).andReturn(null).anyTimes();
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
@@ -518,7 +522,7 @@ public class StartSubscriptionControllerTest {
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.startSubscription(model, 
                 "test.baltrad.eu", SELECTED_DATA_SOURCES);
-        assertEquals("subscribe", viewName);
+        assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("success_message"));
         assertEquals(messages.getMessage(
                 "postsubscription.controller.subscription_server_success",

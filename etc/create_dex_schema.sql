@@ -32,6 +32,7 @@ DROP TABLE IF EXISTS dex_subscriptions_users;
 DROP TABLE IF EXISTS dex_subscriptions_data_sources;
 DROP TABLE IF EXISTS dex_delivery_registry CASCADE;
 DROP TABLE IF EXISTS dex_delivery_registry_users;
+DROP TABLE IF EXISTS dex_delivery_registry_data_sources;
 DROP TABLE IF EXISTS dex_data_sources CASCADE;
 DROP TABLE IF EXISTS dex_file_objects CASCADE;
 DROP TABLE IF EXISTS dex_data_quantities CASCADE;
@@ -143,8 +144,9 @@ CREATE TABLE dex_delivery_registry
 (
     id SERIAL NOT NULL PRIMARY KEY,
     time_stamp BIGINT NOT NULL,
+    type VARCHAR(16) NOT NULL,
     uuid VARCHAR(128) NOT NULL,
-    status VARCHAR(16) NOT NULL
+    status BOOLEAN DEFAULT FALSE
 );
 
 CREATE UNIQUE INDEX dex_delivery_registry_timestamp_idx ON dex_messages (time_stamp);
@@ -154,6 +156,13 @@ CREATE TABLE dex_delivery_registry_users
     id SERIAL NOT NULL PRIMARY KEY,
     entry_id INT NOT NULL REFERENCES dex_delivery_registry (id) ON DELETE CASCADE,
     user_id INT NOT NULL REFERENCES dex_users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE dex_delivery_registry_data_sources
+(
+    id SERIAL NOT NULL PRIMARY KEY,
+    entry_id INT NOT NULL REFERENCES dex_delivery_registry (id) ON DELETE CASCADE,
+    data_source_id INT NOT NULL REFERENCES dex_data_sources (id) ON DELETE CASCADE
 );
 
 CREATE TABLE dex_file_objects

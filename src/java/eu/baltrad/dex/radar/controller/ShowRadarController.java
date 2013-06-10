@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class ShowRadarController {
 
-    private static final String SUCCESS_VIEW = "show_radar";
+    private static final String SUCCESS_VIEW = "radars_show";
     private static final String MODEL_KEY = "radars";
     
     private RadarManager radarManager;
@@ -48,7 +48,7 @@ public class ShowRadarController {
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/show_radar.htm")
+    @RequestMapping("/radars_show.htm")
     public String showRadars(ModelMap model) {
         model.addAttribute(MODEL_KEY, radarManager.load());
         return SUCCESS_VIEW;

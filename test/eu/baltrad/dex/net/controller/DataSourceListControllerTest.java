@@ -173,7 +173,7 @@ public class DataSourceListControllerTest {
     } 
     
     @Test
-    public void connect2Node() {
+    public void nodeConnect() {
         userManagerMock = (IUserManager) createMock(IUserManager.class);
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
@@ -183,11 +183,11 @@ public class DataSourceListControllerTest {
         
         Model model = new ExtendedModelMap();
         classUnderTest.setUserManager(userManagerMock);
-        String viewName = classUnderTest.connect2Node(model);
+        String viewName = classUnderTest.nodeConnect(model);
         
         verifyAll();
         
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
     }
     
     @Test
@@ -205,7 +205,7 @@ public class DataSourceListControllerTest {
         
         verifyAll();
         
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
                 messages.getMessage("datasource.controller.invalid_node_url"), 
@@ -232,7 +232,7 @@ public class DataSourceListControllerTest {
         assertEquals(messages
                 .getMessage("datasource.controller.send_key_controller_error"), 
                     (String) model.asMap().get("error_message"));
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
     }
     
     @Test
@@ -272,7 +272,7 @@ public class DataSourceListControllerTest {
         assertEquals(messages
                 .getMessage("datasource.controller.send_key_server_error"), 
                     (String) model.asMap().get("error_message"));
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
         assertTrue(model.containsAttribute("error_details"));
         assertEquals("Internal server error", model.asMap()
                 .get("error_details"));
@@ -314,7 +314,7 @@ public class DataSourceListControllerTest {
         assertEquals(messages
                 .getMessage("datasource.controller.send_key_exists"), 
                     (String) model.asMap().get("error_message"));
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
     }
     
     @Test
@@ -352,7 +352,7 @@ public class DataSourceListControllerTest {
         assertEquals(messages
                 .getMessage("datasource.controller.send_key_server_msg"), 
                     (String) model.asMap().get("success_message"));
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
     }
     
     @Test
@@ -382,7 +382,7 @@ public class DataSourceListControllerTest {
         
         verifyAll();
         
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
             messages.getMessage("datasource.controller.message_signer_error"), 
@@ -427,7 +427,7 @@ public class DataSourceListControllerTest {
         
         verifyAll();
         
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
             messages.getMessage("datasource.controller.server_error"), 
@@ -472,7 +472,7 @@ public class DataSourceListControllerTest {
         
         verifyAll();
         
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
             messages.getMessage("datasource.controller.server_error"), 
@@ -513,7 +513,7 @@ public class DataSourceListControllerTest {
                 "http://test.baltrad.eu", "connect", null);
         
         verifyAll();
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
             messages.getMessage("datasource.controller.http_connection_error",
@@ -553,7 +553,7 @@ public class DataSourceListControllerTest {
                 "http://test.baltrad.eu","connect", null);
         
         verifyAll();
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
             messages.getMessage("datasource.controller.generic_connection_error",
@@ -597,7 +597,7 @@ public class DataSourceListControllerTest {
         
         verifyAll();
         
-        assertEquals("connect_to_node", viewName);
+        assertEquals("node_connect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
                 messages.getMessage(

@@ -62,9 +62,6 @@ public class SaveDataSourceControllerTest {
     
     private MessageResourceUtil messages;
     
-    
-    
-    
     private List mocks;
     
     private Object createMock(Class clazz) {
@@ -121,7 +118,7 @@ public class SaveDataSourceControllerTest {
     public void setupForm_NewDataSource() {
         ModelMap model = new ModelMap();
         String viewName = classUnderTest.setupForm(null, model);
-        assertEquals("save_datasource", viewName);
+        assertEquals("datasources_save", viewName);
         assertTrue(model.containsAttribute("data_source"));
     }
     
@@ -130,7 +127,7 @@ public class SaveDataSourceControllerTest {
         ModelMap model = new ModelMap();
         String viewName = classUnderTest.setupForm("101", model);
         verifyAll();
-        assertEquals("save_datasource", viewName);
+        assertEquals("datasources_save", viewName);
         assertTrue(model.containsAttribute("data_source"));
         DataSource dataSource = (DataSource) model.get("data_source");
         assertNotNull(dataSource);
@@ -148,7 +145,7 @@ public class SaveDataSourceControllerTest {
         result.addError(new FieldError("data_source", "name", "Missing name"));
         String viewName = classUnderTest.processSubmit(dataSource, result, 
                 model, request, null, null, null);
-        assertEquals("save_datasource", viewName);
+        assertEquals("datasources_save", viewName);
     }
     
     @Test 

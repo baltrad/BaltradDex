@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -30,33 +30,41 @@ package eu.baltrad.dex.registry.model;
  */
 public interface IRegistryEntry {
 
-    /** Delivery success */
-    public static final String SUCCESS = "SUCCESS";
-    /** Delivery failure */
-    public static final String FAILURE = "FAILURE";
+    /** Upload entry */
+    public static final String UPLOAD = "upload";
+    /** Download entry */
+    public static final String DOWNLOAD = "download";
 
     public int getId();
     
     public void setId(int id);
     
+    public int getUserId();
+    
+    public void setUserId(int userId);
+    
+    public int getDataSourceId();
+    
+    public void setDataSourceId(int dataSourceId);
+    
     public long getTimeStamp();
     
     public void setTimestamp(long timeStamp);
     
-    public String getDateTime();
+    public String getType();
     
-    public void setDateTime(String dateTime);
+    public void setType(String type);
     
     public String getUuid();
     
     public void setUuid(String uuid);
     
-    public String getStatus();
+    public String getUserName();
     
-    public void setStatus(String status);
+    public void setUserName(String userName);
     
-    public String getUser();
+    public boolean getStatus();
     
-    public void setUser(String user);
+    public void setStatus(boolean status);
     
 }
