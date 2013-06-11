@@ -189,7 +189,41 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
+/*
+    Add peer data sources to dex_data_source_users table
+*/
+CREATE OR REPLACE FUNCTION update_dex_data_source_users_table() 
+    RETURNS void AS $$
+DECLARE
+	rec RECORD;
+	num_rec INT;
+BEGIN
+	CREATE TEMP TABLE peer_data_source_users ON COMMIT DROP AS 
+        SELECT 
+            u.id AS user_id, ds.id AS data_source_id 
+        FROM
+            dex_subscriptions s, dex_users u, dex_data_sources ds, 
+            dex_subscriptions_users su, dex_subscriptions_data_sources sds 
+        WHERE 
+            s.id = su.subscription_id AND u.id = su.user_id AND 
+            s.type = 'local' AND s.id = sds.subscription_id AND 
+            ds.id = sds.data_source_id;
+        
+        FOR rec IN SELECT * FROM peer_data_source_users LOOP
+            SELECT count(*) INTO num_rec FROM dex_data_source_users WHERE 
+                data_source_id = rec.data_source_id AND user_id = rec.user_id;
+		
+		IF num_rec = 0 THEN
+			RAISE NOTICE 'inserting row: % %', rec.data_source_id, rec.user_id;
+			INSERT INTO dex_data_source_users (data_source_id, user_id) 
+                VALUES (rec.data_source_id, rec.user_id);
+        ELSE
+            RAISE NOTICE 'row already exists: % %', rec.data_source_id, 
+                rec.user_id;
+		END IF;
+	END LOOP;
+END;
+$$ LANGUAGE plpgsql;
 
 SELECT remove_name_hash_from_dex_users();
 --SELECT reset_user_passwords();
@@ -197,8 +231,10 @@ SELECT rename_registry_table();
 SELECT create_dex_keys_table();
 SELECT upgrade_dex_delivery_registry_table();
 SELECT create_dex_delivery_registry_data_sources_table();
+SELECT update_dex_data_source_users_table(); 
 
 DROP FUNCTION make_plpgsql(); 
 DROP FUNCTION remove_name_hash_from_dex_users();
 DROP FUNCTION reset_user_passwords();
 DROP FUNCTION rename_registry_table();
+DROP FUNCTION update_dex_data_source_users_table();
