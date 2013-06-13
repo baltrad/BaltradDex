@@ -59,6 +59,7 @@ import java.text.SimpleDateFormat;
 
 import java.io.File;
 import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Node status controller.
@@ -284,13 +285,15 @@ public class NodeStatusController {
      * @return User name
      */
     @ModelAttribute("current_user")
-    public String getCurrentUser(HttpSession session, Principal principal) {
+    public String getCurrentUser(HttpSession session, 
+                HttpServletRequest request, Principal principal) {
         if (SecurityManager.getSessionUser(session) == null) {
             User user = userManager.load(principal.getName());
             SecurityManager.setSessionUser(session, user);
             SecurityManager.setSessionRole(session, 
                     roleManager.load(user.getRole()));
-            String[] args = {user.getName()};
+            String[] args = {user.getName(), request.getRemoteHost() + 
+                    "/" + request.getRemoteAddr()};
             log.info(messages.getMessage(LOGIN_MSG, args));
             return user.getName();
         } else {
