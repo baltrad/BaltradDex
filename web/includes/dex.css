@@ -867,24 +867,31 @@ textarea {
 }
 .system-log .date,
 .registry .date {
-    width: 80px;    
+    width: 80px;
+    overflow: hidden;
 }
 .system-log .time,
 .registry .time {
     width: 70px;
+    overflow: hidden;
 }
 .registry .recipient {
     width: 160px;
+    overflow: hidden;
 }
 .registry .uuid {
-    width: 180px;
+    width: 240px;
+    overflow: hidden;
+}
+.registry .uuid span {
+    cursor: pointer;
 }
 .registry .header-row .status {
     padding: 4px 2px 0 2px;
 }
 .registry .status {
     float: right;
-    width: 60px;
+    width: 40px;
     text-align: center;
 }
 .system-log .flag {
@@ -1068,6 +1075,7 @@ textarea {
 .file-browser .download {
     float: left;
     padding: 4px 2px 0 2px;
+    overflow: hidden;
 }
 .file-browser .header-row input {
     text-decoration: underline;
@@ -1075,23 +1083,40 @@ textarea {
 .file-browser .header-row input:hover {
     text-decoration: none;
 }
-.file-browser .date {
+.file-browser .date, 
+.file-browser .header-row .date {
     width: 80px;
 }
-.file-browser .time {
+.file-browser .time,
+.file-browser .header-row .time {
     width: 70px;
 }
-.file-browser .source {
+.file-browser .source,
+.file-browser .header-row .source {
     width: 240px;
 }
-.file-browser .type {
+.file-browser .type,
+.file-browser .header-row .type {
     width: 80px;
+    text-align: center;
 }
 .file-browser .details {
     width: 70px;
 }
 .file-browser .download {
     width: 70px;
+}
+.file-browser .header-row .source input {
+    width: 240px;
+    text-align: left;
+    padding-left: 0;
+}
+.file-browser .header-row .type input {
+    width: 80px;
+    text-align: center;
+}
+.file-browser .source span {
+    cursor: pointer;
 }
 
 /* file details */

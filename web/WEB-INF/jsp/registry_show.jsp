@@ -38,41 +38,7 @@ Author     : szewczenko
                             Data delivery registry entries.
                         </div>
                         <form action="registry_show.htm" method="POST">
-                            <div id="scroll">
-                                
-                                <%--
-                                
-                                <form action="registry.htm" method="post">
-                                    <input type="submit" name="pagenum" value="<<"
-                                            title="First page">
-                                    <span></span>
-                                    <input type="submit" name="pagenum" value="<"
-                                            title="Previous page">
-                                    <span></span>
-                                    <c:forEach var="i" begin="${first_page}" end="${last_page}"
-                                                step="1" varStatus ="status">
-                                            <c:choose>
-                                                <c:when test="${current_page == i}">
-                                                    <input style="background:#FFFFFF" type="submit"
-                                                            name="pagenum" value="${i}">
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <input type="submit" name="pagenum" value="${i}">
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </c:forEach>
-                                    <span></span>
-                                    <input type="submit" name="pagenum" value=">"
-                                            title="Next page">
-                                    <span></span>
-                                    <input type="submit" name="pagenum" value=">>"
-                                            title="Last page">
-                                </form>
-                                --%>
-                                
-                                
-                                
-                                
+                            <div id="scroll"> 
                                 <div class="leftcol">
                                     <input type="submit" name="selected_page" value="<<"
                                            title="First page">
@@ -129,7 +95,9 @@ Author     : szewczenko
                                         <c:out value="${entry.userName}"/>
                                     </div>
                                     <div class="uuid">
-                                        <c:out value="${entry.uuid}"/>
+                                        <span title="${entry.uuid}">
+                                            <c:out value="${entry.uuid}"/>
+                                        </span>
                                     </div>
                                     <div class="status">
                                         <c:choose>

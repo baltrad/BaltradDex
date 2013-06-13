@@ -213,7 +213,7 @@ public class SubscriptionManager implements ISubscriptionManager {
     } 
     
     /**
-     * Load downloads.
+     * Load uploads.
      * @param userId User id
      * @return List of current uploads
      */

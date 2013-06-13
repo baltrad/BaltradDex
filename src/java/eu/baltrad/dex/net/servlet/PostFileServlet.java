@@ -180,13 +180,13 @@ public class PostFileServlet extends HttpServlet {
                 if (entry != null) {
                     String name = namer.name(entry);
                     UUID uuid = entry.getUuid();
-                    log.warn("File " + name + " stored with UUID " 
+                    log.info("File " + name + " stored with UUID " 
                             + uuid.toString());
                     BltDataMessage msg = new BltDataMessage();
                     msg.setFileEntry(entry);
                     messageManager.manage(msg);
                     
-                    // add incoming file to registry
+                    /*/ add incoming file to registry
                     List<Subscription> downloads = subscriptionManager
                             .load(Subscription.LOCAL);
                     for (Subscription s : downloads) {
@@ -205,7 +205,8 @@ public class PostFileServlet extends HttpServlet {
                                 sender.getName(), true);
                             registryManager.store(registryEntry);
                         }
-                    }
+                    }*/
+                    
                     // send file to subscribers
                     List<Subscription> uploads = subscriptionManager.load(
                             Subscription.PEER);

@@ -349,8 +349,6 @@ public class PostFileServletTest {
         
         ISubscriptionManager subscriptionManagerMock = 
                 (ISubscriptionManager) createMock(ISubscriptionManager.class);
-        expect(subscriptionManagerMock.load(Subscription.LOCAL)).
-                andReturn(localSubscriptions);
         expect(subscriptionManagerMock.load(Subscription.PEER)).
                 andReturn(peerSubscriptions);
         
@@ -364,10 +362,7 @@ public class PostFileServletTest {
                 "Some data source");
         DataSource ds2 = new DataSource(2, "DS2", DataSource.PEER, 
                 "Another data source");
-        expect(dataSourceManagerMock.load("DS1", DataSource.PEER))
-                .andReturn(ds1);
-        expect(dataSourceManagerMock.load("DS2", DataSource.PEER))
-                .andReturn(ds2);
+      
         expect(dataSourceManagerMock.load("DS1", DataSource.LOCAL))
                 .andReturn(ds1);
         expect(dataSourceManagerMock.load("DS2", DataSource.LOCAL))
@@ -377,9 +372,9 @@ public class PostFileServletTest {
                 (IBltFileManager) createMock(IBltFileManager.class);
         
         expect(fileManagerMock.loadFilter(s1.getDataSource()))
-                .andReturn(filterMock).times(2);
+                .andReturn(filterMock).once();
         expect(fileManagerMock.loadFilter(s2.getDataSource()))
-                .andReturn(filterMock).times(2);
+                .andReturn(filterMock).once();
         
         IUserManager userManagerMock = 
                 (IUserManager) createMock(IUserManager.class);

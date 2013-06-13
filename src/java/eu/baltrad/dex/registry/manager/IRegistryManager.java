@@ -48,9 +48,9 @@ public interface IRegistryManager {
     
     public long countDownloads(int dataSourceId);
     
-    public long countSuccessfulUploads(int dataSourceId);
+    public long countSuccessfulUploads(int dataSourceId, int userId);
     
-    public long countFailedUploads(int dataSourceId);
+    public long countFailedUploads(int dataSourceId, int userId);
     
     public List<RegistryEntry> load(String type, int offset, int limit);
     

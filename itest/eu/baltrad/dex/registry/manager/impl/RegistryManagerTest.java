@@ -105,13 +105,13 @@ public class RegistryManagerTest extends TestCase {
     }
     
     public void testCountSuccessfulUploads() throws Exception {
-        assertEquals(3, classUnderTest.countSuccessfulUploads(1));
-        assertEquals(1, classUnderTest.countSuccessfulUploads(2));
+        assertEquals(2, classUnderTest.countSuccessfulUploads(1, 1));
+        assertEquals(1, classUnderTest.countSuccessfulUploads(2, 2));
     }
     
     public void testCountFailedUploads() throws Exception {
-        assertEquals(1, classUnderTest.countFailedUploads(1));
-        assertEquals(1, classUnderTest.countFailedUploads(2));
+        assertEquals(1, classUnderTest.countFailedUploads(1, 1));
+        assertEquals(1, classUnderTest.countFailedUploads(2, 2));
     }
     
     public void testLoad() throws Exception {

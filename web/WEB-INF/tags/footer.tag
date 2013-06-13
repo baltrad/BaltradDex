@@ -12,9 +12,9 @@
             2013 &#169 <a href="http://baltrad.eu">BALTRAD Partnership</a>
         </div>
         <div class="rightcol">
-            <a href="about.htm">About</a> | 
-            <a href="security.htm">Security</a> |
-            <a href="conditions.htm">Terms and Conditions</a>
+            <a href="#">About</a> | 
+            <a href="#">Security</a> |
+            <a href="#">Terms and Conditions</a>
         </div>
     </div>
 </div>

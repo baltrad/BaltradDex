@@ -131,11 +131,11 @@ public class NodeStatusController {
             User user = userManager.load(peer);
             List<Download> ds = subscriptionManager.loadDownloads(user.getId());
             for (Download d : ds) {
-                DataSource dataSource = dataSourceManager
-                        .load(d.getDataSource(), DataSource.PEER);
+                //DataSource dataSource = dataSourceManager
+                //        .load(d.getDataSource(), DataSource.PEER);
                 d.setNode(peer);
-                d.setFilesReceived(registryManager
-                        .countDownloads(dataSource.getId()));
+                //d.setFilesReceived(registryManager
+                //        .countDownloads(dataSource.getId()));
                 downloads.add(d);
             }
         }
@@ -158,9 +158,11 @@ public class NodeStatusController {
                         .load(u.getDataSource(), DataSource.LOCAL);
                 u.setNode(peer);
                 u.setFilesSent(registryManager
-                        .countSuccessfulUploads(dataSource.getId()));
+                        .countSuccessfulUploads(dataSource.getId(), 
+                                                user.getId()));
                 u.setFailures(registryManager
-                        .countFailedUploads(dataSource.getId()));
+                        .countFailedUploads(dataSource.getId(),
+                                            user.getId()));
                 uploads.add(u);
             }
         }    

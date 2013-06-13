@@ -164,17 +164,18 @@ Author     : szewczenko
                                     </div>
                                     <c:forEach var="download" items="${downloads}">
                                         <c:if test="${download.node == node}">
-                                            <c:set var="hasDownloads" value="true"/>
+                                            <c:set var="hasDownloads" value="1"/>
                                         </c:if>
                                     </c:forEach>
                                     <c:forEach var="upload" items="${uploads}">
                                         <c:if test="${upload.node == node}">
-                                            <c:set var="hasUploads" value="true"/>
+                                            <c:set var="hasUploads" value="1"/> 
                                         </c:if>
                                     </c:forEach> 
                                     <div id="${node}_exchange" 
                                          class="transfers">
-                                        <c:if test="${hasDownloads == true}">
+                                        <c:if test="${hasDownloads == 1}">    
+                                            <c:set var="hasDownloads" value="0"/>
                                             <ul class="exchange-submenu">
                                                 <li>
                                                     <div class="expand-downloads"
@@ -198,9 +199,9 @@ Author     : szewczenko
                                                             <div class="subscription-status">
                                                                 Subscription status
                                                             </div>
-                                                            <div class="files-received">
+                                                            <!--div class="files-received">
                                                                 Files received
-                                                            </div>
+                                                            </div-->
                                                         </div>
                                                         <c:forEach var="download" items="${downloads}">
                                                             <c:if test="${download.node == node}">
@@ -216,17 +217,18 @@ Author     : szewczenko
                                                                         <c:out value="${download.active == true 
                                                                                         ? 'Active' : 'Off'}"/>
                                                                     </div>
-                                                                    <div class="files-received">
+                                                                    <%--div class="files-received">
                                                                         <c:out value="${download.filesReceived}"/>
-                                                                    </div> 
+                                                                    </div--%> 
                                                                 </div>
                                                             </c:if>
                                                         </c:forEach>
                                                     </ul>
                                                 </li>
                                             </ul>    
-                                        </c:if>                       
-                                        <c:if test="${hasUploads == true}">
+                                        </c:if>  
+                                        <c:if test="${hasUploads == 1}">
+                                            <c:set var="hasUploads" value="0"/>
                                             <ul class="exchange-submenu">
                                                 <li>
                                                     <div class="expand-uploads"
@@ -276,7 +278,7 @@ Author     : szewczenko
                                                     </ul>    
                                                 </li>
                                             </ul>    
-                                        </c:if> 
+                                        </c:if>
                                     </div>                                               
                                 </li>
                             </ul>

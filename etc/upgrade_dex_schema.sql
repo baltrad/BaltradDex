@@ -226,7 +226,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 SELECT remove_name_hash_from_dex_users();
---SELECT reset_user_passwords();
+-- SELECT reset_user_passwords();
 SELECT rename_registry_table();
 SELECT create_dex_keys_table();
 SELECT upgrade_dex_delivery_registry_table();

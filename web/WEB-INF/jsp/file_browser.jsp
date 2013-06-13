@@ -219,10 +219,12 @@ Author     : szewczenko
                                                         value="${file.timeStamp}"/>
                                                 </div>
                                                 <div class="source">
-                                                    <c:out value="${file.source}"></c:out>
+                                                    <span title="${file.source}">
+                                                        <c:out value="${file.source}"/>
+                                                    </span>
                                                 </div>
                                                 <div class="type">
-                                                    <c:out value="${file.type}"></c:out>
+                                                    <c:out value="${file.type}"/>
                                                 </div>
                                                 <div class="details">
                                                     <a href="file_details.htm?uuid=${file.uuid}">
