@@ -28,13 +28,13 @@ import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.keystore.model.Key;
 import eu.baltrad.dex.util.CompressDataUtil;
-import eu.baltrad.dex.util.MessageDigestUtil;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.ModelAndView;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpSession;
@@ -75,27 +75,31 @@ public class PostKeyServlet extends HttpServlet {
      * Stores compressed key in the keystore directory.
      * @param request HTTP servlet request
      * @param nodeName Node name
+     * @return 0 in case of successful key checksum verification, 1 otherwise
      * @throws RuntimeException  
      */
-    protected void storeKey(HttpServletRequest request, String nodeName) 
+    protected int storeKey(HttpServletRequest request, String nodeName) 
             throws RuntimeException {
         CompressDataUtil cdu = new CompressDataUtil();
         try {
             ServletInputStream sis = request.getInputStream();
             try {
-                String incomingPath = confManager.getAppConf().getKeystoreDir() 
+                String checksumHeader = request.getHeader("Content-MD5");
+                String checksumCalc = DigestUtils.md5Hex(sis);
+                if (checksumHeader.equals(checksumCalc)) {
+                    String incomingPath = confManager.getAppConf().getKeystoreDir() 
                         + File.separator + INCOMING_KEY_DIR; 
-                File incomingDir = new File(incomingPath); 
-                if (!incomingDir.exists()) {
-                    incomingDir.mkdir();
+                    File incomingDir = new File(incomingPath); 
+                    if (!incomingDir.exists()) {
+                        incomingDir.mkdir();
+                    }
+                    cdu.unzip(incomingPath + File.separator + nodeName + ".pub", sis);
+                    Key key = new Key(nodeName, checksumCalc, false);
+                    keystoreManager.store(key);
+                    return 0;
+                } else {
+                    return 1;
                 }
-                cdu.unzip(incomingPath + File.separator + nodeName + ".pub", sis);
-                File keyDir = new File(incomingPath + File.separator + nodeName 
-                        + ".pub");
-                String checksum = MessageDigestUtil.createHash("MD5", 
-                        MessageDigestUtil.getBytes(keyDir));
-                Key key = new Key(nodeName, checksum, false);
-                keystoreManager.store(key);
             } finally {
                 sis.close();
             }
@@ -132,8 +136,11 @@ public class PostKeyServlet extends HttpServlet {
         try {
             if (keystoreManager.load(req.getNodeName()) == null) {
                 log.info("Public key received from " + req.getNodeName());
-                storeKey(request, req.getNodeName());
-                res.setStatus(HttpServletResponse.SC_OK);
+                if(storeKey(request, req.getNodeName()) == 0) {
+                    res.setStatus(HttpServletResponse.SC_OK);
+                } else {
+                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                }
             } else {
                 res.setStatus(HttpServletResponse.SC_CONFLICT);
             }

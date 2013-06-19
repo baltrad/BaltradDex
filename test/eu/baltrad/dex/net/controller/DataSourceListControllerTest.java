@@ -278,6 +278,45 @@ public class DataSourceListControllerTest {
                 .get("error_details"));
     }
     
+    @Test 
+    public void nodeConnected_SendKeyUnauthorized() throws Exception {
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
+        
+        Properties props = new Properties();
+        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
+        AppConfiguration appConf = new AppConfiguration(props);
+        
+        expect(configManagerMock.getAppConf()).andReturn(appConf);
+        
+        classUnderTest.localNode.setName("localhost");
+        
+        HttpResponse res = createResponse(
+                HttpServletResponse.SC_UNAUTHORIZED, null);
+        
+        expect(httpClientMock.post(isA(HttpUriRequest.class)))
+                .andReturn(res);
+        
+        replayAll();
+        
+        classUnderTest.setConfigurationManager(configManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
+        classUnderTest.setHttpClient(httpClientMock);
+        Model model = new ExtendedModelMap();
+        String viewName = classUnderTest.nodeConnected(model, null, 
+                "http://test.baltrad.eu", null, "send_key");
+        
+        verifyAll();
+        
+        assertTrue(model.containsAttribute("error_message"));
+        assertEquals(messages
+                .getMessage("datasource.controller.send_key_unauthorized"), 
+                    (String) model.asMap().get("error_message"));
+        assertEquals("node_connect", viewName);
+    }
+    
     @Test
     public void nodeConnected_SendKeyConflict() throws Exception {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 

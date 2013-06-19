@@ -287,12 +287,12 @@ public class DefaultRequestFactory implements RequestFactory {
     public HttpPost createPostKeyRequest(User user, 
             InputStream keyContent) throws RuntimeException {
         try {
+            byte[] bytes = IOUtils.toByteArray(keyContent);
             HttpPost httpPost = new HttpPost(getRequestUri("post_key.htm"));
-            httpPost.setEntity(new ByteArrayEntity(
-                    IOUtils.toByteArray(keyContent)));
+            httpPost.setEntity(new ByteArrayEntity(bytes));
             httpPost.addHeader("Node-Name", user.getName());
             httpPost.addHeader("Content-Type", "application/zip");
-            httpPost.addHeader("Content-MD5", DigestUtils.md5Hex(keyContent));
+            httpPost.addHeader("Content-MD5", DigestUtils.md5Hex(bytes));
             httpPost.addHeader("Date", dateFormat.format(new Date()));
             return httpPost;
         } catch (Exception e) {

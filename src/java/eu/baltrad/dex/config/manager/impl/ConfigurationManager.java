@@ -36,6 +36,7 @@ import eu.baltrad.dex.util.ServletContextUtil;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
@@ -95,11 +96,11 @@ public class ConfigurationManager implements IConfigurationManager,
             }
             // import local key
             if (keystoreManager.load(appConf.getNodeName()) == null) {
-                File keyFile = new File(appConf.getKeystoreDir() + File.separator +
-                        appConf.getNodeName() + ".pub");
-                Key key = new Key(appConf.getNodeName(), 
-                        MessageDigestUtil.createHash("MD5",
-                            MessageDigestUtil.getBytes(keyFile)), true);
+                File keyFile = new File(appConf.getKeystoreDir() + 
+                        File.separator + appConf.getNodeName() + ".pub");
+                Key key = new Key(appConf.getNodeName(),
+                        DigestUtils.md5Hex(MessageDigestUtil.getBytes(keyFile)), 
+                        true);
                 keystoreManager.store(key);
                 log.warn("Local key imported to keystore");
             }

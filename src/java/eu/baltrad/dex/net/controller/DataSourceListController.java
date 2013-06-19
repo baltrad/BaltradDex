@@ -100,6 +100,9 @@ public class DataSourceListController implements MessageSetter {
     /** Key already exists on server */
     private static final String DS_SEND_KEY_EXISTS_MSG_KEY =
             "datasource.controller.send_key_exists";
+    /** Key could not be verified by server */
+    private static final String DS_SEND_KEY_UNATHORIZED_MSG_KEY =
+            "datasource.controller.send_key_unauthorized";
     
     /** Message signer error key */
     private static final String DS_MESSAGE_SIGNER_ERROR_KEY = 
@@ -258,10 +261,15 @@ public class DataSourceListController implements MessageSetter {
                         String okMsg = messages
                                 .getMessage(DS_SEND_KEY_SERVER_MSG_KEY);
                         setMessage(model, SUCCESS_MSG_KEY, okMsg);
-                    } else if(res.getStatusLine().getStatusCode() 
+                    } else if (res.getStatusLine().getStatusCode() 
                             == HttpServletResponse.SC_CONFLICT) {
                         String errorMsg = messages
                                 .getMessage(DS_SEND_KEY_EXISTS_MSG_KEY);
+                        setMessage(model, ERROR_MSG_KEY, errorMsg);
+                    } else if (res.getStatusLine().getStatusCode() 
+                            == HttpServletResponse.SC_UNAUTHORIZED) {
+                        String errorMsg = messages
+                                .getMessage(DS_SEND_KEY_UNATHORIZED_MSG_KEY);
                         setMessage(model, ERROR_MSG_KEY, errorMsg);
                     } else {
                         String errorMsg = messages.getMessage(

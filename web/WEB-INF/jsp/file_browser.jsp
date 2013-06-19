@@ -179,7 +179,6 @@ Author     : szewczenko
                                     </div>
                                     <div class="body">    
                                         <div class="header-row">
-                                            <div class="count">&nbsp;</div>
                                             <div class="date">
                                                 <input name="sortByDate" type="submit" 
                                                        value="Date" 
@@ -203,13 +202,8 @@ Author     : szewczenko
                                             <div class="details">&nbsp;</div>
                                             <div class="download">&nbsp;</div>
                                         </div>
-                                        <c:set var="count" scope="page" value="1"/>
                                         <c:forEach var="file" items="${files}">
                                             <div class="row">
-                                                <div class="count">
-                                                    <c:out value="${count}"/>
-                                                    <c:set var="count" value="${count + 1}"/>
-                                                </div>
                                                 <div class="date">
                                                     <fmt:formatDate pattern="yyyy-MM-dd"
                                                         value="${file.timeStamp}"/>

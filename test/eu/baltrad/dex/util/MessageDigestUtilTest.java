@@ -43,14 +43,6 @@ public class MessageDigestUtilTest {
     }
     
     @Test
-    public void createFileHash() {
-        String checksum = MessageDigestUtil
-                .createHash("MD5", "File content".getBytes());
-        
-        assertEquals(32, checksum.length());
-    }
-    
-    @Test
     public void getBytes() throws Exception {
         File f = new File("keystore/localhost.pub");
         byte[] bytes = MessageDigestUtil.getBytes(f);

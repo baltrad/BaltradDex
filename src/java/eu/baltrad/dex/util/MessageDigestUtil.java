@@ -66,33 +66,6 @@ public class MessageDigestUtil {
     }
     
     /**
-     * Create file hash.
-     * @param algorithm Algorithm
-     * @param bos File bytes
-     * @return Checksum
-     */
-    public static String createHash(String algorithm, byte[] bytes) {
-        try {
-            ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-            MessageDigest md = MessageDigest.getInstance(algorithm);
-            md.reset();
-            try {
-                byte[] buff = new byte[1024];
-                int len;
-                while ((len = bis.read(buff)) > 0) {
-                    md.update(buff, 0, len);
-                }
-                return getChecksum(md.digest());
-            } finally {
-                bis.close();
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error while initializing hash function", 
-                    e);
-        }
-    }
-    
-    /**
      * Reads file or directory into byte array.
      * @param directory File or directory to read
      * @param bytes Byte array
@@ -129,21 +102,6 @@ public class MessageDigestUtil {
             throw new RuntimeException("Failed to read directory to " +
                             "byte array", e);
         }
-    }
-    
-    /**
-     * Convert byte array to HEX string.
-     * @param bytes Byte array
-     * @return HEX string
-     * @throws Exception 
-     */
-    private static String getChecksum(byte[] bytes) throws Exception {
-        String checksum = "";
-        for (int i = 0; i < bytes.length; i++) {
-            checksum += Integer.toString((bytes[i] & 0xff ) + 0x100, 16)
-                    .substring(1);
-        }
-        return checksum;
     }
     
 }
