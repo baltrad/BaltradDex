@@ -156,9 +156,8 @@ public class DefaultRequestFactoryTest {
     
     @Test
     public void createPostKeyRequest() throws Exception {
-        InputStream is = new ByteArrayInputStream(compressDataUtil.zip());
         HttpUriRequest request = classUnderTest
-                .createPostKeyRequest(user, is);
+                .createPostKeyRequest(user, compressDataUtil.zip());
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/post_key.htm"), 

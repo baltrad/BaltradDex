@@ -59,7 +59,6 @@ import java.net.URI;
 
 import java.io.InputStream;
 import java.io.IOException;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 
 import java.util.HashSet;
@@ -253,7 +252,7 @@ public class DataSourceListController implements MessageSetter {
                     requestFactory = new DefaultRequestFactory(
                             URI.create(urlInput));
                     HttpUriRequest req = requestFactory.createPostKeyRequest(
-                            localNode, new ByteArrayInputStream(cdu.zip()));
+                            localNode, cdu.zip());
                     HttpResponse res = httpClient.post(req);
                     
                     if (res.getStatusLine().getStatusCode() 
@@ -352,7 +351,7 @@ public class DataSourceListController implements MessageSetter {
                                 errorMsg, errorDetails);
                         log.error(errorMsg + ": " + errorDetails);
                     }
-                } catch (KeyczarException e){ 
+                } catch (KeyczarException e){
                     viewName = DS_CONNECT_VIEW;
                     String errorMsg = messages.getMessage(
                             DS_MESSAGE_SIGNER_ERROR_KEY); 
@@ -360,13 +359,13 @@ public class DataSourceListController implements MessageSetter {
                             errorMsg, e.getMessage());
                     log.error(errorMsg + ": " + e.getMessage());
                 } catch (InternalControllerException e) {
-                     viewName = DS_CONNECT_VIEW;
-                     String errorMsg = messages.getMessage(
-                         DS_INTERNAL_CONTROLLER_ERROR_KEY, 
-                         new String[] {peerNodeName});
-                     setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
-                            errorMsg, e.getMessage());
-                     log.error(errorMsg + ": " + e.getMessage());
+                    viewName = DS_CONNECT_VIEW;
+                    String errorMsg = messages.getMessage(
+                        DS_INTERNAL_CONTROLLER_ERROR_KEY, 
+                        new String[] {peerNodeName});
+                    setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                           errorMsg, e.getMessage());
+                    log.error(errorMsg + ": " + e.getMessage());
                 } catch (IOException e) {
                     viewName = DS_CONNECT_VIEW;
                     String errorMsg = messages.getMessage(

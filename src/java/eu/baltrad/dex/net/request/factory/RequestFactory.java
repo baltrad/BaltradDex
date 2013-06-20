@@ -53,7 +53,6 @@ public interface RequestFactory {
     public HttpUriRequest createPostMessageRequest(User user, 
             String message);
     
-    public HttpUriRequest createPostKeyRequest(User user, 
-            InputStream keyContent);
+    public HttpUriRequest createPostKeyRequest(User user, byte[] keyContent);
     
 }

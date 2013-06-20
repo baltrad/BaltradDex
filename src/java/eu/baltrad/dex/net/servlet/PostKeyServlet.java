@@ -28,6 +28,7 @@ import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.keystore.model.Key;
 import eu.baltrad.dex.util.CompressDataUtil;
+import java.io.ByteArrayOutputStream;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.ModelAndView;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpSession;
@@ -83,9 +85,12 @@ public class PostKeyServlet extends HttpServlet {
         CompressDataUtil cdu = new CompressDataUtil();
         try {
             ServletInputStream sis = request.getInputStream();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            IOUtils.copy(sis, baos);
+            byte[] keyContent = baos.toByteArray();
             try {
                 String checksumHeader = request.getHeader("Content-MD5");
-                String checksumCalc = DigestUtils.md5Hex(sis);
+                String checksumCalc = DigestUtils.md5Hex(keyContent);
                 if (checksumHeader.equals(checksumCalc)) {
                     String incomingPath = confManager.getAppConf().getKeystoreDir() 
                         + File.separator + INCOMING_KEY_DIR; 
@@ -93,7 +98,8 @@ public class PostKeyServlet extends HttpServlet {
                     if (!incomingDir.exists()) {
                         incomingDir.mkdir();
                     }
-                    cdu.unzip(incomingPath + File.separator + nodeName + ".pub", sis);
+                    cdu.unzip(incomingPath + File.separator + nodeName + ".pub", 
+                            keyContent);
                     Key key = new Key(nodeName, checksumCalc, false);
                     keystoreManager.store(key);
                     return 0;

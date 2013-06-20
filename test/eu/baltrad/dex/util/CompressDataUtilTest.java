@@ -110,7 +110,7 @@ public class CompressDataUtilTest {
     @Test
     public void unzipToFile() throws Exception {
         byte[] bytes = classUnderTest.zip();
-        classUnderTest.unzip("localhost.pub", new ByteArrayInputStream(bytes));
+        classUnderTest.unzip("localhost.pub", bytes);
         
         assertEquals((new File("keystore/localhost.pub/1")).length(), 
                 (new File("localhost.pub/1")).length()); 

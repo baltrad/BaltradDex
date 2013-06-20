@@ -21,12 +21,13 @@
 
 package eu.baltrad.dex.util;
 
-import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.File;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -95,7 +96,7 @@ public class CompressDataUtil {
      * @param is Compressed input stream 
      * @throws RuntimeException 
      */
-    public void unzip(String folder, InputStream is) throws RuntimeException {
+    public void unzip(String folder, byte[] bytes) throws RuntimeException {
         try {
             if (!(new File(folder)).exists()) {
                 (new File(folder)).mkdir();
@@ -103,7 +104,7 @@ public class CompressDataUtil {
             ZipInputStream zis = null;
             byte[] buff = new byte[1024];
             try {
-                zis = new ZipInputStream(is);
+                zis = new ZipInputStream(new ByteArrayInputStream(bytes));
                 ZipEntry entry = zis.getNextEntry();
                 while (entry != null) {
                     String fileName = entry.getName();
