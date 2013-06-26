@@ -52,7 +52,7 @@ public class FramePublisherManager {
         framePublishers.put( userName, framePublisher );
     }
     /**
-     * Gets existing frame publisher assosiated with a given user name or creates a new one
+     * Gets existing frame publisher associated with a given user name or creates a new one
      *
      * @param userName User name
      * @return New or existing FramePublisher object

@@ -46,7 +46,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             </props>
         </property>
     </bean>
-
+    
     <!-- View resolver -->
     <bean id="viewResolver"
           class="org.springframework.web.servlet.view.InternalResourceViewResolver"

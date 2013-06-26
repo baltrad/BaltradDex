@@ -27,7 +27,6 @@ import eu.baltrad.dex.net.model.impl.Subscription;
 
 import org.apache.http.client.methods.HttpUriRequest;
 
-import java.io.InputStream;
 import java.util.Set;
 import java.util.List;
 
@@ -47,8 +46,7 @@ public interface RequestFactory {
     public HttpUriRequest createUpdateSubscriptionRequest(User user, 
             List<Subscription> subscriptions);
     
-    public HttpUriRequest createPostFileRequest(User user, 
-            InputStream fileContent);
+    public HttpUriRequest createPostFileRequest(User user, byte[] fileContent);
     
     public HttpUriRequest createPostMessageRequest(User user, 
             String message);

@@ -265,8 +265,10 @@ public class NodeStatusController {
         String path = ServletContextUtil.getServletContextPath() + 
                 confManager.getAppConf().getWorkDir();
         File f = new File(path);
-        long mBytes = f.getUsableSpace() / BYTES_PER_MB;
-        return Long.toString(mBytes) + " MB";
+        long mbUsable = f.getUsableSpace() / BYTES_PER_MB;
+        long mbTotal = f.getTotalSpace() / BYTES_PER_MB;
+        long percentUsable = mbUsable * 100 / mbTotal;        
+        return Long.toString(mbUsable) + " MB (" + percentUsable +"%)";
     }
     
     /**

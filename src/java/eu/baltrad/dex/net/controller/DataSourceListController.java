@@ -117,7 +117,13 @@ public class DataSourceListController implements MessageSetter {
             "datasource.controller.server_error";
     /** Data source connection error key */
     private final static String DS_HTTP_CONN_ERROR_KEY = 
-            "datasource.controller.http_connection_error";        
+            "datasource.controller.http_connection_error";
+    /** Key not approved message */ 
+    private final static String DS_KEY_NOT_APPROVED = 
+            "datasource.controller.key_not_approved";
+    /** Unauthorized connection message */
+    private final static String DS_CONNECTION_UNAUTHORIZED = 
+            "datasource.controller.connection_unauthorized";
     /** Data source general connection error */
     private static final String DS_GENERIC_CONN_ERROR_KEY = 
             "datasource.controller.generic_connection_error"; 
@@ -254,7 +260,6 @@ public class DataSourceListController implements MessageSetter {
                     HttpUriRequest req = requestFactory.createPostKeyRequest(
                             localNode, cdu.zip());
                     HttpResponse res = httpClient.post(req);
-                    
                     if (res.getStatusLine().getStatusCode() 
                             == HttpServletResponse.SC_OK) {
                         String okMsg = messages
@@ -341,6 +346,26 @@ public class DataSourceListController implements MessageSetter {
                             }   
                         }
                         viewName = DS_CONNECTED_VIEW;
+                    } else if (res.getStatusLine().getStatusCode() == 
+                            HttpServletResponse.SC_NOT_FOUND) {
+                        viewName = DS_CONNECT_VIEW;
+                        String errorMsg = messages.getMessage(
+                            DS_KEY_NOT_APPROVED);
+                        String errorDetails = res.getStatusLine()
+                                .getReasonPhrase(); 
+                        setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                                errorMsg, errorDetails);
+                        log.error(errorMsg + ": " + errorDetails);
+                    } else if (res.getStatusLine().getStatusCode() ==
+                            HttpServletResponse.SC_UNAUTHORIZED) {
+                        viewName = DS_CONNECT_VIEW;
+                        String errorMsg = messages.getMessage(
+                            DS_CONNECTION_UNAUTHORIZED);
+                        String errorDetails = res.getStatusLine()
+                                .getReasonPhrase();
+                        setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY,
+                                errorMsg, errorDetails);
+                        log.error(errorMsg + ": " + errorDetails);
                     } else {
                         viewName = DS_CONNECT_VIEW;
                         String errorMsg = messages.getMessage(

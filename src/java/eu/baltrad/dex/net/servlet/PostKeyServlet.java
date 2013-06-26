@@ -108,6 +108,7 @@ public class PostKeyServlet extends HttpServlet {
                 }
             } finally {
                 sis.close();
+                baos.close();
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to extract key from " +

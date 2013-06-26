@@ -52,7 +52,8 @@ import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
-import eu.baltrad.dex.registry.model.impl.RegistryEntry;
+
+import java.io.ByteArrayOutputStream;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +63,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.keyczar.exceptions.KeyczarException;
 
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -72,7 +74,6 @@ import javax.servlet.http.HttpSession;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Receives and handles post file requests.
@@ -176,12 +177,10 @@ public class PostFileServlet extends HttpServlet {
                 } finally {
                     is.close();
                 }
-                
                 if (entry != null) {
                     String name = namer.name(entry);
-                    UUID uuid = entry.getUuid();
-                    log.info("File " + name + " stored with UUID " 
-                            + uuid.toString());
+                    String uuid = entry.getUuid().toString();
+                    log.info("File " + name + " stored with UUID " + uuid);
                     BltDataMessage msg = new BltDataMessage();
                     msg.setFileEntry(entry);
                     messageManager.manage(msg);
@@ -210,29 +209,42 @@ public class PostFileServlet extends HttpServlet {
                     // send file to subscribers
                     List<Subscription> uploads = subscriptionManager.load(
                             Subscription.PEER);
-                    for (Subscription s : uploads) {
-                        IFilter filter = fileManager
-                                .loadFilter(s.getDataSource());
-                        if (matcher.match(entry.getMetadata(), 
-                                filter.getExpression())) {
-                            DataSource dataSource = dataSourceManager
-                                .load(s.getDataSource(), DataSource.LOCAL);
-                            User receiver = userManager.load(s.getUser());
-                            RequestFactory requestFactory = 
-                                new DefaultRequestFactory(
-                                    URI.create(receiver.getNodeAddress()));
-                            HttpUriRequest deliveryRequest = requestFactory
-                                .createPostFileRequest(localNode, 
-                                    entry.getContentStream());
-                            authenticator.addCredentials(deliveryRequest,
-                                    localNode.getName());
-                            PostFileTask task = new PostFileTask(httpClient, 
-                                    registryManager, deliveryRequest, 
-                                    entry.getUuid().toString(), 
-                                    receiver, dataSource);
-                            framePublisherManager.getFramePublisher(
-                                    receiver.getName()).addTask(task);
-                        }  
+                    if (uploads.size() > 0) {
+                        byte[] fileContent = null;
+                        InputStream eis = null;
+                        ByteArrayOutputStream baos = null;
+                        try {
+                            eis = entry.getContentStream();
+                            baos = new ByteArrayOutputStream();
+                            IOUtils.copy(eis, baos);
+                            fileContent = baos.toByteArray();
+                        } finally {
+                            eis.close();
+                            baos.close();
+                        }
+                        for (Subscription s : uploads) {
+                            IFilter filter = fileManager
+                                    .loadFilter(s.getDataSource());
+                            if (matcher.match(entry.getMetadata(), 
+                                    filter.getExpression())) {
+                                DataSource dataSource = dataSourceManager
+                                    .load(s.getDataSource(), DataSource.LOCAL);
+                                User receiver = userManager.load(s.getUser());
+                                RequestFactory requestFactory = 
+                                    new DefaultRequestFactory(
+                                        URI.create(receiver.getNodeAddress()));
+                                HttpUriRequest deliveryRequest = requestFactory
+                                    .createPostFileRequest(localNode,
+                                        fileContent);
+                                authenticator.addCredentials(deliveryRequest,
+                                        localNode.getName());
+                                PostFileTask task = new PostFileTask(httpClient, 
+                                        registryManager, deliveryRequest, 
+                                        uuid, receiver, dataSource);
+                                framePublisherManager.getFramePublisher(
+                                        receiver.getName()).addTask(task);
+                            }  
+                        }
                     }
                 } else {
                     res.setStatus(HttpServletResponse.SC_NOT_FOUND, 

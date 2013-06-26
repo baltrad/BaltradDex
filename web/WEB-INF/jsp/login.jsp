@@ -46,6 +46,9 @@ Author     : szewczenko
                 <div id="clock"></div>
 				<form method="POST" id="login-form"
                       action="<c:url value='j_spring_security_check' />">
+                    <!-- allows sharing session between http and https -->
+                    <input type='hidden' name='_spring_security_remember_me' 
+                           value="true"/>
 					<div class="logo"></div>
                     <c:choose>
                         <c:when test="${not empty init_error}">

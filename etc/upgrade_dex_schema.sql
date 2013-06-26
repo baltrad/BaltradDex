@@ -84,27 +84,83 @@ END;
 $$ LANGUAGE plpgsql;
 
 /*
-    Update trigger functions with new registry table name. 
+    Update trigger functions 
 */
+CREATE OR REPLACE FUNCTION dex_trim_messages_by_number() RETURNS trigger AS $$
+    DECLARE
+        records_limit INTEGER;
+    BEGIN
+        records_limit = TG_ARGV[0];
+        DELETE FROM dex_messages WHERE id IN (SELECT id FROM dex_messages 
+            ORDER BY time_stamp DESC OFFSET records_limit);
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION dex_trim_messages_by_age() RETURNS trigger AS $$
+    DECLARE
+	MILLIS_PER_DAY BIGINT = 86400000;
+	MILLIS_PER_HOUR BIGINT= 3600000;
+        MILLIS_PER_MINUTE BIGINT= 60000;
+                
+        now_date TIMESTAMP WITHOUT TIME ZONE;
+        now_epoch BIGINT;
+	max_age BIGINT;
+		
+        days INT;
+	hours INT;
+	minutes INT;	
+    BEGIN
+        SELECT now() INTO now_date;
+        SELECT (EXTRACT (epoch FROM now_date)::BIGINT) * 1000 INTO now_epoch;
+        SELECT TG_ARGV[0]::BIGINT INTO days;
+        SELECT TG_ARGV[1]::BIGINT INTO hours;
+        SELECT TG_ARGV[2]::BIGINT INTO minutes;
+
+        max_age = now_epoch - (days * MILLIS_PER_DAY + hours * 
+                    MILLIS_PER_HOUR + minutes * MILLIS_PER_MINUTE);
+		
+        DELETE FROM dex_messages WHERE time_stamp < max_age; 
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION dex_trim_registry_by_number() RETURNS trigger AS $$ 
     DECLARE
         records_limit INTEGER;
     BEGIN
         records_limit = TG_ARGV[0];
-        DELETE FROM dex_delivery_registry WHERE id IN (SELECT id FROM dex_delivery_registry
-            ORDER BY timestamp DESC OFFSET records_limit);
+        DELETE FROM dex_delivery_registry WHERE id IN (SELECT id 
+            FROM dex_delivery_registry ORDER BY time_stamp DESC OFFSET 
+                records_limit);
         RETURN NEW; 
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION dex_trim_registry_by_age() RETURNS trigger AS $$ 
+CREATE OR REPLACE FUNCTION dex_trim_registry_by_age() RETURNS trigger AS $$
     DECLARE
-        max_age INTERVAL;
+	MILLIS_PER_DAY BIGINT = 86400000;
+	MILLIS_PER_HOUR BIGINT= 3600000;
+        MILLIS_PER_MINUTE BIGINT= 60000;
+                
+        now_date TIMESTAMP WITHOUT TIME ZONE;
+        now_epoch BIGINT;
+	max_age BIGINT;
+		
+        days INT;
+	hours INT;
+	minutes INT;	
     BEGIN
-        SELECT (TG_ARGV[0] || ' days ' || TG_ARGV[1] || ' hours ' || TG_ARGV[2] ||
-            ' minutes')::INTERVAL INTO max_age;
-        DELETE FROM dex_delivery_registry WHERE timestamp IN (SELECT timestamp FROM
-            dex_delivery_registry WHERE age(now(), timestamp) > max_age);
+        SELECT now() INTO now_date;
+        SELECT (EXTRACT (epoch FROM now_date)::BIGINT) * 1000 INTO now_epoch;
+        SELECT TG_ARGV[0]::BIGINT INTO days;
+        SELECT TG_ARGV[1]::BIGINT INTO hours;
+        SELECT TG_ARGV[2]::BIGINT INTO minutes;
+
+        max_age = now_epoch - (days * MILLIS_PER_DAY + hours * 
+                    MILLIS_PER_HOUR + minutes * MILLIS_PER_MINUTE);
+		
+        DELETE FROM dex_delivery_registry WHERE time_stamp < max_age; 
         RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;

@@ -432,7 +432,52 @@ public class DataSourceListControllerTest {
     }
     
     @Test
-    public void nodeConnected_MessageVerificationError() throws Exception {
+    public void nodeConnected_KeyNotApproved() throws Exception  {
+        expect(userManagerMock.load("test.baltrad.eu"))
+            .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
+                "locality", "state", "XX", "user", 
+                "http://test.baltrad.eu:8084")).anyTimes();
+        
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        expect(userManagerMock.loadPeers()).andReturn(peers);
+        
+        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
+                isA(String.class));
+        
+        HttpResponse res = createResponse(
+                HttpServletResponse.SC_NOT_FOUND, 
+                "Key not found or not approved by server");
+        
+        expect(httpClientMock.post(isA(HttpUriRequest.class)))
+                .andReturn(res);
+        
+        expectLastCall();
+        replayAll();
+        
+        classUnderTest.setUserManager(userManagerMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
+        classUnderTest.setHttpClient(httpClientMock);
+        
+        Model model = new ExtendedModelMap();
+        String viewName = classUnderTest.nodeConnected(model, null, 
+                "http://test.baltrad.eu", "connect", null);
+        
+        verifyAll();
+        
+        assertEquals("node_connect", viewName);
+        assertTrue(model.containsAttribute("error_message"));
+        assertEquals(
+            messages.getMessage("datasource.controller.key_not_approved"), 
+            model.asMap().get("error_message"));
+        assertTrue(model.containsAttribute("error_details"));
+        assertEquals("Key not found or not approved by server", model.asMap()
+                .get("error_details"));
+    }
+    
+    @Test
+    public void nodeConnected_ConnectionUnauthorized() throws Exception {
         expect(userManagerMock.load("test.baltrad.eu"))
             .andReturn(new User(1, "test.baltrad.eu", "s3cret", "org", "unit", 
                 "locality", "state", "XX", "user", 
@@ -469,7 +514,7 @@ public class DataSourceListControllerTest {
         assertEquals("node_connect", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(
-            messages.getMessage("datasource.controller.server_error"), 
+            messages.getMessage("datasource.controller.connection_unauthorized"), 
             model.asMap().get("error_message"));
         assertTrue(model.containsAttribute("error_details"));
         assertEquals("Failed to verify message", model.asMap()
