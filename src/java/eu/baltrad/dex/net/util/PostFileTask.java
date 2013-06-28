@@ -25,6 +25,7 @@ import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
 import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
 import eu.baltrad.dex.user.model.User;
 
 import org.apache.http.client.methods.HttpUriRequest;
@@ -52,23 +53,24 @@ public class PostFileTask implements Runnable {
 
     /**
      * Constructor.
-     * @param httpClient Http client
      * @param manager Delivery registry manager
      * @param request Data delivery request
      * @param uuid File entry identifier string
      * @param user Recipient
      * @param dataSource Data source
+     * @param connTimeout Connection timeout
+     * @param soTimeout Socket timeout
      */
-    public PostFileTask(IHttpClientUtil httpClient, IRegistryManager manager,
-            HttpUriRequest request, String uuid, User user, 
-            DataSource dataSource) {
+    public PostFileTask(IRegistryManager manager, HttpUriRequest request, 
+            String uuid, User user, DataSource dataSource,
+            int connTimeout, int soTimeout) {
         this.log = Logger.getLogger("DEX");
-        this.httpClient = httpClient;
         this.manager = manager;
         this.request = request;
         this.uuid = uuid;
         this.user = user;
         this.dataSource = dataSource;
+        this.httpClient = new HttpClientUtil(connTimeout, soTimeout);
     }
     
     /**
@@ -77,50 +79,57 @@ public class PostFileTask implements Runnable {
      */
     public void run() {
         try {
-            HttpResponse response = httpClient.post(request);
-            if (response.getStatusLine().getStatusCode() == 
-                    HttpServletResponse.SC_OK) {
-                RegistryEntry entry = new RegistryEntry(
-                        user.getId(), dataSource.getId(), 
-                        System.currentTimeMillis(), RegistryEntry.UPLOAD,
-                        uuid, user.getName(), true);
-                log.info("File " + uuid + " sent to user " + user.getName());
-                manager.store(entry);
-            } else {
-                // don't retry if file is already delivered 
-                if (response.getStatusLine().getStatusCode() 
-                        != HttpServletResponse.SC_CONFLICT) {
-                    boolean success = false;
-                    for (int i = 0; i < 3; i++) {
-                        response = httpClient.post(request);
-                        if (response.getStatusLine().getStatusCode() ==
-                                HttpServletResponse.SC_OK) {
-                            success = true;
-                            break;
-                        }
-                    }
-                    if (success) {
-                        RegistryEntry entry = new RegistryEntry(
+            try {
+                HttpResponse response = httpClient.post(request);
+                if (response.getStatusLine().getStatusCode() == 
+                        HttpServletResponse.SC_OK) {
+                    RegistryEntry entry = new RegistryEntry(
                             user.getId(), dataSource.getId(), 
                             System.currentTimeMillis(), RegistryEntry.UPLOAD,
                             uuid, user.getName(), true);
-                        log.info("File " + uuid + " sent to user " 
-                                + user.getName());
-                        manager.store(entry);
-                    } else {
-                        RegistryEntry entry = new RegistryEntry(
-                            user.getId(), dataSource.getId(), 
-                            System.currentTimeMillis(), RegistryEntry.UPLOAD,
-                            uuid, user.getName(), false);
-                        log.error("Failed to deliver file " + uuid + " to user " 
-                                + user.getName());
-                        manager.store(entry);
-                    }
-                }    
-            }    
+                    log.info("File " + uuid + " sent to user " + user.getName());
+                    manager.store(entry);
+                } else {
+                    // don't retry if file is already delivered 
+                    if (response.getStatusLine().getStatusCode() 
+                            != HttpServletResponse.SC_CONFLICT) {
+                        boolean success = false;
+                        for (int i = 0; i < 3; i++) {
+                            response = httpClient.post(request);
+                            if (response.getStatusLine().getStatusCode() ==
+                                    HttpServletResponse.SC_OK) {
+                                success = true;
+                                break;
+                            }
+                        }
+                        if (success) {
+                            RegistryEntry entry = new RegistryEntry(
+                                user.getId(), dataSource.getId(), 
+                                System.currentTimeMillis(), RegistryEntry.UPLOAD,
+                                uuid, user.getName(), true);
+                            log.info("File " + uuid + " sent to user " 
+                                    + user.getName());
+                            manager.store(entry);
+                        } else {
+                            RegistryEntry entry = new RegistryEntry(
+                                user.getId(), dataSource.getId(), 
+                                System.currentTimeMillis(), RegistryEntry.UPLOAD,
+                                uuid, user.getName(), false);
+                            log.error("Failed to send file " + uuid + " to user " 
+                                    + user.getName() + ": " + 
+                                    response.getStatusLine().getStatusCode() 
+                                    + " - " + response.getStatusLine()
+                                        .getReasonPhrase());
+                            manager.store(entry);
+                        }
+                    }    
+                }
+            } finally {
+                httpClient.shutdown();
+            }
         } catch (Exception e) {
-            log.error("Failed to deliver file " + uuid + " to user " 
-                    + user.getName(), e);
+            log.error("Problems encountered while sending file " + uuid + 
+                    " to user " + user.getName() + ": " + e.getMessage(), e);
         }
     }
 }

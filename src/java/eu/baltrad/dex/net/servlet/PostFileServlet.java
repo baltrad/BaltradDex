@@ -23,8 +23,6 @@ package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.net.request.factory.RequestFactory;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
-import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
-import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.request.impl.NodeRequest;
@@ -106,12 +104,14 @@ public class PostFileServlet extends HttpServlet {
     private IBltFileManager fileManager;
     private IRegistryManager registryManager;
     private IUserManager userManager;
-    private IHttpClientUtil httpClient;
     private FramePublisherManager framePublisherManager;
     private ISubscriptionManager subscriptionManager;
     private IDataSourceManager dataSourceManager;
     private MessageResourceUtil messages;
     private Logger log;
+    
+    private int connTimeout;
+    private int soTimeout;
     
     protected User localNode;
     
@@ -128,9 +128,10 @@ public class PostFileServlet extends HttpServlet {
     protected void initConfiguration() {
         this.authenticator = new KeyczarAuthenticator(
                 confManager.getAppConf().getKeystoreDir());
-        this.httpClient = new HttpClientUtil(
-                 Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
-                 Integer.parseInt(confManager.getAppConf().getSoTimeout()));
+        this.connTimeout = Integer.parseInt(confManager.getAppConf()
+                .getConnTimeout());
+        this.soTimeout = Integer.parseInt(confManager.getAppConf()
+                .getSoTimeout());
         this.localNode = new User(confManager.getAppConf().getNodeName(),
                 Role.NODE, null, confManager.getAppConf().getOrgName(),
                 confManager.getAppConf().getOrgUnit(),
@@ -238,9 +239,10 @@ public class PostFileServlet extends HttpServlet {
                                         fileContent);
                                 authenticator.addCredentials(deliveryRequest,
                                         localNode.getName());
-                                PostFileTask task = new PostFileTask(httpClient, 
-                                        registryManager, deliveryRequest, 
-                                        uuid, receiver, dataSource);
+                                PostFileTask task = new PostFileTask(
+                                    registryManager, deliveryRequest, uuid, 
+                                    receiver, dataSource, connTimeout, 
+                                    soTimeout);
                                 framePublisherManager.getFramePublisher(
                                         receiver.getName()).addTask(task);
                             }  
@@ -371,13 +373,6 @@ public class PostFileServlet extends HttpServlet {
     public void setFramePublisherManager(FramePublisherManager 
             framePublisherManager) {
         this.framePublisherManager = framePublisherManager;
-    }
-
-    /**
-     * @param httpClient the httpClient to set
-     */
-    public void setHttpClient(IHttpClientUtil httpClient) {
-        this.httpClient = httpClient;
     }
 
     /**

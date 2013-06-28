@@ -388,12 +388,6 @@ public class PostFileServletTest {
         expect(deliveryRegistryManagerMock.store(isA(RegistryEntry.class)))
                 .andReturn(Integer.SIZE).anyTimes();
         
-        HttpResponse res = createResponse(HttpServletResponse.SC_OK, null);
-        IHttpClientUtil httpClientMock = 
-                (IHttpClientUtil) createMock(IHttpClientUtil.class);
-        expect(httpClientMock.post(isA(HttpUriRequest.class)))
-                .andReturn(res).anyTimes();
-        
         replayAll();
         
         classUnderTest.setAuthenticator(authMock);
@@ -406,7 +400,6 @@ public class PostFileServletTest {
         classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         classUnderTest.setRegistryManager(deliveryRegistryManagerMock);
-        classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setFramePublisherManager(new FramePublisherManager());
         classUnderTest.handleRequest(request, response);
         verifyAll();

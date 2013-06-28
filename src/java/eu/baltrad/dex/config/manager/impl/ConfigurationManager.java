@@ -44,7 +44,6 @@ import java.io.FileOutputStream;
 import java.io.File;
 
 import java.util.Properties;
-import java.util.Date;
 
 /**
  * Class implements configuration object handling functionality.

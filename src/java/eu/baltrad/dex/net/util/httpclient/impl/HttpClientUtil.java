@@ -106,6 +106,13 @@ public class HttpClientUtil implements IHttpClientUtil {
     }
     
     /**
+     * Shutdown HTTP client
+     */
+    public void shutdown() {
+        client.getConnectionManager().shutdown();
+    }
+    
+    /**
      * Registers HTTP scheme.
      * 
      * @param schemeReg Scheme registry

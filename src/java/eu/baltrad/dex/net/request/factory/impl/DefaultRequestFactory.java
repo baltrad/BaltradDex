@@ -33,7 +33,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.ByteArrayEntity;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -42,7 +41,6 @@ import java.util.Date;
 import java.util.Set;
 import java.util.List;
 import java.util.Locale;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 
 /**
