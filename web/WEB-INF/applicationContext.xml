@@ -26,6 +26,10 @@
             User pages 
         -->
         <security:intercept-url pattern="/login.htm" requires-channel="https"/>
+        <security:intercept-url pattern="/login_failed.htm" 
+                                requires-channel="https"/>
+        <security:intercept-url pattern="/logout.htm" requires-channel="https"/>
+        
         <security:intercept-url pattern="/status.htm" access="ROLE_USER" 
                                 requires-channel="http"/>
         <security:intercept-url pattern="/messages_live.htm" access="ROLE_USER" 
