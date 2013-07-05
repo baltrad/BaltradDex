@@ -21,7 +21,9 @@
                              default-target-url="/status.htm" 
                              authentication-failure-url="/login_failed.htm" 
                              always-use-default-target="true"/>
+        
         <security:logout logout-success-url="/logout.htm"/>
+                    
         <!-- 
             User pages 
         -->

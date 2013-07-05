@@ -6,16 +6,6 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<jsp:useBean id="configurationManager"
-             scope="session"
-             class="eu.baltrad.dex.config.manager.impl.ConfigurationManager">
-</jsp:useBean>
-
-<%
-    request.getSession().setAttribute("nodeName", 
-            configurationManager.getAppConf().getNodeName());
-%>
-
 <div id="titlebar">
     <div id="title">
         <div class="leftcol">

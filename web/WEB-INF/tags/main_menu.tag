@@ -6,26 +6,6 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<%@ tag import="eu.baltrad.dex.user.model.Role" %>
-
-<jsp:useBean id="securityManager"
-             scope="session"
-             class="eu.baltrad.dex.auth.manager.SecurityManager">
-</jsp:useBean>
-
-<%
-    Role role = (Role) securityManager.getSessionRole(session);
-    if (role.getName().equals(Role.ADMIN)) {
-        request.getSession().setAttribute("sessionRole", 1);
-    }
-    if (role.getName().equals(Role.OPERATOR)) {
-        request.getSession().setAttribute("sessionRole", 2);
-    }
-    if (role.getName().equals(Role.USER)) {
-        request.getSession().setAttribute("sessionRole", 3);
-    }
-%>
-
 <div class="menu">
     <ul class="topmenu">    
         <div class="separator">

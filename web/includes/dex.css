@@ -313,6 +313,9 @@ textarea {
     margin: 8px;
     text-align: center;
 }
+#session-expiry {
+    margin: 220px 0 0 180px;
+}
 
 /* login form */
 
