@@ -72,11 +72,7 @@ public class ImagePreviewController {
     private static final String RADAR_UR_LON_KEY = "urLon";
     // URL path separator
     private static final String URL_PATH_SEPARATOR = "/";
-    // range rings color string
-    private static final String IMAGE_RANGE_RINGS_COLOR = "#A7A7A7";
-    // range mask color string
-    private static final String IMAGE_RANGE_MASK_COLOR = "#A7A7A7";
-    
+    // Color palette file
     private static final String PALETTE_FILE = "includes/color_palette.txt";
     
     private DataProcessor bltDataProcessor;
@@ -124,14 +120,17 @@ public class ImagePreviewController {
             bltDataProcessor.getH5Attribute(root, datasetWhere, 
                     DataProcessor.H5_NBINS_ATTR );
             long nbins = (Long) bltDataProcessor.getH5AttributeValue();
+            bltDataProcessor.getH5Attribute(root, datasetWhere, 
+                    DataProcessor.H5_RSCALE_ATTR );
+            double rscale = (Double) bltDataProcessor.getH5AttributeValue();
+            
             // Create image from SCAN or PVOL
             if (fileObject.equals(DataProcessor.ODIMH5_SCAN_OBJ) || 
                     fileObject.equals(DataProcessor.ODIMH5_PVOL_OBJ)) {
                 bltDataProcessor.getH5Dataset(root, datasetPath);
                 Dataset dataset = bltDataProcessor.getH5Dataset();
-                BufferedImage bi = bltDataProcessor.polarDataset2CartImage(
-                    nbins, dataset, palette, Integer.parseInt(datasetWidth), 
-                    0, 1.0f, IMAGE_RANGE_RINGS_COLOR, IMAGE_RANGE_MASK_COLOR);
+                BufferedImage bi = bltDataProcessor.polar2CartImage(
+                    nbins, rscale, dataset, palette, 0, true, false);
                 bltDataProcessor.saveImageToFile(bi, filePath);
             }
             // Create image from Cartesian IMAGE object
