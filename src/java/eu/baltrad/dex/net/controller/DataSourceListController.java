@@ -225,7 +225,7 @@ public class DataSourceListController implements MessageSetter {
      */
     @RequestMapping("/node_connect.htm")
     public String nodeConnect(Model model) {
-        model.addAttribute(NODES_KEY, userManager.loadPeers());
+        model.addAttribute(NODES_KEY, userManager.loadPeerNames());
         return DS_CONNECT_VIEW;
     }
     
@@ -408,7 +408,7 @@ public class DataSourceListController implements MessageSetter {
                 }
             }
         }
-        model.addAttribute(NODES_KEY, userManager.loadPeers());
+        model.addAttribute(NODES_KEY, userManager.loadPeerNames());
         return viewName;
     }
     

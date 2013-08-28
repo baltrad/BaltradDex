@@ -39,27 +39,32 @@ import eu.baltrad.dex.registry.manager.IRegistryManager;
 import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.util.ServletContextUtil;
 
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 
 import java.security.Principal;
 
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Date;
 import java.util.Locale;
 import java.util.List;
+import java.util.ArrayList;
 
 import java.text.SimpleDateFormat;
 
 import java.io.File;
-import java.util.ArrayList;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Node status controller.
@@ -69,6 +74,7 @@ import javax.servlet.http.HttpServletRequest;
  * @since 1.6.1
  */
 @Controller
+@RequestMapping("/status.htm")
 public class NodeStatusController {
     
     private static final String LOGIN_MSG = "login.controller.login_message";
@@ -88,6 +94,11 @@ public class NodeStatusController {
     
     private SimpleDateFormat format;
     
+    // static arrays holding data transfer information
+    private static Map<String, Boolean> peersStatus;
+    private static Map<String, List<Download>> peersDownloads;
+    private static Map<String, List<Upload>> peersUploads;
+    
     /**
      * Default constructor.
      */
@@ -95,6 +106,9 @@ public class NodeStatusController {
         this.log = Logger.getLogger("DEX");
         this.format = 
                 new SimpleDateFormat("EEE, MMM d HH:mm:ss z yyyy", Locale.US);
+        peersStatus = new HashMap<String, Boolean>();
+        peersDownloads = new HashMap<String, List<Download>>();
+        peersUploads = new HashMap<String, List<Upload>>();
         log.info("BALTRAD system started");
     }
     
@@ -105,7 +119,7 @@ public class NodeStatusController {
      * @param session Http session
      * @return Welcome page name
      */
-    @RequestMapping("/status.htm")
+    @RequestMapping(method = RequestMethod.GET)
     public String showStatus(Model model, Principal principal, 
                              HttpSession session) {
         return "status";
@@ -117,57 +131,91 @@ public class NodeStatusController {
      */
     @ModelAttribute("nodes")
     public List<String> getNodes() {
-        return userManager.loadPeers();
+        List<String> userNames = new ArrayList<String>();
+        List<User> users = userManager.loadPeers();
+        for (User user : users) {
+            if (subscriptionManager.countDownloads(user.getId()) > 0 ||
+                    subscriptionManager.countUploads(user.getId()) > 0) {
+                userNames.add(user.getName());
+            }
+        }
+        return userNames;
     }
     
     /**
-     * Get downloads list.
+     * Get list of downloads for a given peer.
+     * @param peerName Peer name
      * @return List of downloads
      */
-    @ModelAttribute("downloads")
-    public List<Download> getDownloads() {
+    private List<Download> getPeerDownloads(String peerName) {
         List<Download> downloads = new ArrayList<Download>();
-        List<String> peers = userManager.loadPeers();
-        for (String peer : peers) {
-            User user = userManager.load(peer);
-            List<Download> ds = subscriptionManager.loadDownloads(user.getId());
-            for (Download d : ds) {
-                //DataSource dataSource = dataSourceManager
-                //        .load(d.getDataSource(), DataSource.PEER);
-                d.setNode(peer);
-                //d.setFilesReceived(registryManager
-                //        .countDownloads(dataSource.getId()));
-                downloads.add(d);
-            }
+        User user = userManager.load(peerName);
+        List<Download> ds = subscriptionManager.loadDownloads(user.getId());
+        for (Download download : ds) {
+            download.setNode(peerName);
+            downloads.add(download);
         }
         return downloads;
     }
     
     /**
-     * Get uploads list.
+     * Get list of uploads for a given peer.
+     * @param peerName Peer name
      * @return List of uploads
      */
-    @ModelAttribute("uploads")
-    public List<Upload> getUploads() {
+    private List<Upload> getPeerUploads(String peerName) {
         List<Upload> uploads = new ArrayList<Upload>();
-        List<String> peers = userManager.loadPeers();
-        for (String peer : peers) {
-            User user = userManager.load(peer);
-            List<Upload> us = subscriptionManager.loadUploads(user.getId());
-            for (Upload u : us) {
-                DataSource dataSource = dataSourceManager
-                        .load(u.getDataSource(), DataSource.LOCAL);
-                u.setNode(peer);
-                u.setFilesSent(registryManager
+        User user = userManager.load(peerName);
+        List<Upload> us = subscriptionManager.loadUploads(user.getId());
+        for (Upload upload : us) {
+            DataSource dataSource = dataSourceManager
+                        .load(upload.getDataSource(), DataSource.LOCAL);
+            upload.setNode(peerName);
+            upload.setFilesSent(registryManager
                         .countSuccessfulUploads(dataSource.getId(), 
                                                 user.getId()));
-                u.setFailures(registryManager
+            upload.setFailures(registryManager
                         .countFailedUploads(dataSource.getId(),
                                             user.getId()));
-                uploads.add(u);
-            }
-        }    
+            uploads.add(upload);
+        }
         return uploads;
+    }
+    
+    /**
+     * Process submit request. Get transfer information for a selected peer.
+     * @param model Model map
+     * @param peerName Peer name for which transfer status is prepared 
+     * @param request HTTP serlet request
+     * @return View name
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    protected String processSubmit(ModelMap model,
+            @RequestParam(value="peer_name", required=false) String peerName,
+            HttpServletRequest request) {
+        
+        // show transfers toggle
+        if (peersStatus.containsKey(peerName)) {
+            Boolean showTransfers = peersStatus.get(peerName);
+            peersStatus.remove(peerName);
+            peersStatus.put(peerName, !showTransfers);
+        } else {
+            peersStatus.put(peerName, true);
+        }
+        // load download status for selected peer
+        if (peersDownloads.containsKey(peerName)) {
+            peersDownloads.remove(peerName);
+        }
+        peersDownloads.put(peerName, getPeerDownloads(peerName));
+        // load upload status for selected peer
+        if (peersUploads.containsKey(peerName)) {
+            peersUploads.remove(peerName);
+        }
+        peersUploads.put(peerName, getPeerUploads(peerName));
+        model.addAttribute("peers_status", peersStatus);
+        model.addAttribute("peers_downloads", peersDownloads);
+        model.addAttribute("peers_uploads", peersUploads);
+        return "status";
     }
     
     /**
@@ -267,9 +315,7 @@ public class NodeStatusController {
         File f = new File(path);
         long mbUsable = f.getUsableSpace() / BYTES_PER_MB;
         long mbTotal = f.getTotalSpace() / BYTES_PER_MB;
-        long percentUsable = mbUsable * 100 / mbTotal;    
-        
-        
+        long percentUsable = mbUsable * 100 / mbTotal;
         return Long.toString(mbUsable) + " MB (" + percentUsable +"%)";
     }
     

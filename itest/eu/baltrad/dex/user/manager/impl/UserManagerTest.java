@@ -129,7 +129,7 @@ public class UserManagerTest extends TestCase{
     }
     
     public void testLoadPeers() throws Exception {
-        List<String> users = classUnderTest.loadPeers();
+        List<String> users = classUnderTest.loadPeerNames();
         assertNotNull(users);
         assertTrue(users.size() == 2);
         assertTrue(users.contains("User4"));

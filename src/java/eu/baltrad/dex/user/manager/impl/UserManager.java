@@ -131,10 +131,10 @@ public class UserManager implements IUserManager {
     }
     
     /**
-     * Returns distinct users.
+     * Returns distinct user names.
      * @return List containing distinct user names
      */
-    public List<String> loadPeers() {
+    public List<String> loadPeerNames() {
         String sql = "SELECT DISTINCT u.name AS user_name, r.name AS role " +
                 "FROM dex_users u, dex_roles r, dex_users_roles ur " + 
                 "WHERE ur.user_id = u.id AND ur.role_id = r.id " + 
@@ -144,6 +144,18 @@ public class UserManager implements IUserManager {
                     return rs.getString("user_name");
                 }
             });
+    }
+    
+    /**
+     * Returns distinct users.
+     * @return List containing distinct users
+     */
+    public List<User> loadPeers() {
+        String sql = "SELECT DISTINCT u.*, r.name AS role " +
+                "FROM dex_users u, dex_roles r, dex_users_roles ur " + 
+                "WHERE ur.user_id = u.id AND ur.role_id = r.id " + 
+                "AND r.name = 'peer';";
+        return jdbcTemplate.query(sql, mapper);
     }
     
     /**
@@ -173,7 +185,6 @@ public class UserManager implements IUserManager {
                 "s.type = 'peer';";
         return jdbcTemplate.query(sql, mapper);
     }
-    
     
     /**
      * Store user account object in the db.

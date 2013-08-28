@@ -178,7 +178,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         replayAll();
         
         Model model = new ExtendedModelMap();
@@ -195,7 +195,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         replayAll();
         
         Model model = new ExtendedModelMap();
@@ -217,7 +217,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         replayAll();
         
@@ -240,7 +240,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         Properties props = new Properties();
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
@@ -283,7 +283,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         Properties props = new Properties();
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
@@ -322,7 +322,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         Properties props = new Properties();
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
@@ -361,7 +361,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         Properties props = new Properties();
         props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
@@ -404,7 +404,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -441,7 +441,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -486,7 +486,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -531,7 +531,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -577,7 +577,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andThrow(new IOException("Http connection exception"));
@@ -618,7 +618,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         expect(httpClientMock.post(isA(HttpUriRequest.class)))
                 .andThrow(new Exception("Generic connection exception"));
         
@@ -658,7 +658,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -703,7 +703,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -750,7 +750,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));
@@ -797,7 +797,7 @@ public class DataSourceListControllerTest {
         List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
             "peer.baltrad.eu"});
         
-        expect(userManagerMock.loadPeers()).andReturn(peers);
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
         
         authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
                 isA(String.class));

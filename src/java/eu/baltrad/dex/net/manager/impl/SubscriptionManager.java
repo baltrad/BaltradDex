@@ -192,6 +192,37 @@ public class SubscriptionManager implements ISubscriptionManager {
     }
     
     /**
+     * Count downloads.
+     * @param userId User id
+     * @return Number of downloads for a given user
+     */
+    public int countDownloads(int userId) {
+        String sql = "SELECT count(*) FROM dex_subscriptions s, " + 
+            "dex_data_sources ds, dex_users u, dex_subscriptions_users su, " + 
+            "dex_subscriptions_data_sources sds, dex_data_source_users dsu " +
+            "WHERE su.subscription_id = s.id AND su.user_id = u.id AND " + 
+            "sds.subscription_id = s.id AND sds.data_source_id = ds.id AND " + 
+            "dsu.data_source_id = ds.id AND s.type = 'local' AND " + 
+            "ds.type = 'peer' AND dsu.user_id = ?;";
+        return jdbcTemplate.queryForInt(sql, userId);
+    }
+    
+    /**
+     * Count uploads.
+     * @param userId User id
+     * @return Number of uploads for a given user
+     */
+    public int countUploads(int userId) {
+        String sql = "SELECT count(*) FROM dex_subscriptions s, " + 
+            "dex_data_sources ds, dex_users u, dex_subscriptions_users su, " +
+            "dex_subscriptions_data_sources sds WHERE " + 
+            "su.subscription_id = s.id AND su.user_id = u.id AND " + 
+            "sds.subscription_id = s.id AND sds.data_source_id = ds.id AND " + 
+            "s.type = 'peer' AND ds.type = 'local' AND u.id = ?;";
+        return jdbcTemplate.queryForInt(sql, userId);
+    }
+    
+    /**
      * Load downloads.
      * @param userId User id
      * @return List of current downloads

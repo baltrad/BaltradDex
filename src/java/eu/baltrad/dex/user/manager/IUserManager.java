@@ -40,7 +40,9 @@ public interface IUserManager {
     
     public User load(String name);
     
-    public List<String> loadPeers(); 
+    public List<String> loadPeerNames();
+    
+    public List<User> loadPeers();
     
     public List<User> loadUsers();
     

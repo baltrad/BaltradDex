@@ -45,6 +45,10 @@ public interface ISubscriptionManager {
     
     public Subscription load(String type, String user, String dataSource);
     
+    public int countDownloads(int userId);
+    
+    public int countUploads(int userId);
+    
     public List<Download> loadDownloads(int userId);
     
     public List<Upload> loadUploads(int userId);
