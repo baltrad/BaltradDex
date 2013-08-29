@@ -195,23 +195,28 @@ public class NodeStatusController {
             HttpServletRequest request) {
         
         // show transfers toggle
+        Boolean showTransfers = true;
         if (peersStatus.containsKey(peerName)) {
-            Boolean showTransfers = peersStatus.get(peerName);
+            showTransfers = peersStatus.get(peerName);
+            showTransfers = !showTransfers;
             peersStatus.remove(peerName);
-            peersStatus.put(peerName, !showTransfers);
+            peersStatus.put(peerName, showTransfers);
         } else {
             peersStatus.put(peerName, true);
         }
-        // load download status for selected peer
-        if (peersDownloads.containsKey(peerName)) {
-            peersDownloads.remove(peerName);
+        // don't load transfer information when tree node is collapsed
+        if (showTransfers) {
+            // load download status for selected peer
+            if (peersDownloads.containsKey(peerName)) {
+                peersDownloads.remove(peerName);
+            }
+            peersDownloads.put(peerName, getPeerDownloads(peerName));
+            // load upload status for selected peer
+            if (peersUploads.containsKey(peerName)) {
+                peersUploads.remove(peerName);
+            }
+            peersUploads.put(peerName, getPeerUploads(peerName));
         }
-        peersDownloads.put(peerName, getPeerDownloads(peerName));
-        // load upload status for selected peer
-        if (peersUploads.containsKey(peerName)) {
-            peersUploads.remove(peerName);
-        }
-        peersUploads.put(peerName, getPeerUploads(peerName));
         model.addAttribute("peers_status", peersStatus);
         model.addAttribute("peers_downloads", peersDownloads);
         model.addAttribute("peers_uploads", peersUploads);
