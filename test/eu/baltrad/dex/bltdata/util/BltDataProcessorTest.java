@@ -47,9 +47,12 @@ import java.io.File;
  */
 public class BltDataProcessorTest {
     
-    private static final String TEST_FILE = 
-            "fixtures/Z_PVOL_2013031310500600_plleg.h5";
-    
+    private static final String FILE_PLLEG = 
+            "fixtures/Z_PVOL_2013062801500700_plleg.h5";
+    private static final String FILE_LVRIX =
+            "fixtures/Z_PVOL_2013081422004400_lvrix.h5";
+    private static final String FILE_BYMIN =
+            "fixtures/Z_PVOL_2013081413301200_bymin.h5";
     private DataProcessor classUnderTest;
     
     @Before
@@ -69,21 +72,21 @@ public class BltDataProcessorTest {
     
     @Test
     public void openH5File() throws Exception { 
-        H5File file = classUnderTest.openH5File(getFilePath(TEST_FILE));
+        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         assertNotNull(file);
         assertTrue(file.getFID() > 0);
     }
     
     @Test
     public void closeH5File() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(TEST_FILE));
+        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         classUnderTest.closeH5File(file);
         assertEquals(-1, file.getFID());
     }
     
     @Test
     public void getH5Root() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(TEST_FILE));
+        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         assertNotNull(root);
         assertTrue(root.isRoot());
@@ -91,7 +94,7 @@ public class BltDataProcessorTest {
     
     @Test
     public void getH5DatasetPaths() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(TEST_FILE));
+        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         List<String> paths = new ArrayList<String>();
         classUnderTest.getH5DatasetPaths(root, paths);
@@ -100,7 +103,7 @@ public class BltDataProcessorTest {
     
     @Test
     public void getH5Dataset() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(TEST_FILE));
+        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         List<String> paths = new ArrayList<String>();
         classUnderTest.getH5DatasetPaths(root, paths);
@@ -111,7 +114,7 @@ public class BltDataProcessorTest {
     
     @Test
     public void getH5Attribute() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(TEST_FILE));
+        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/what", "object");
         assertEquals("object", classUnderTest.getH5Attribute().getName());
@@ -123,7 +126,7 @@ public class BltDataProcessorTest {
     
     @Test
     public void getH5AttributeValue() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(TEST_FILE));
+        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/what", "object");
         assertEquals("PVOL", classUnderTest.getH5AttributeValue());
@@ -141,17 +144,21 @@ public class BltDataProcessorTest {
     }
     
     @Test 
-    public void polarDataset2CartImage() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(TEST_FILE));
+    public void polarDataset2CartImage_PL_LEG() throws Exception {
+        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/dataset1/where", "nbins");
         
         assertEquals("nbins", classUnderTest.getH5Attribute().getName());
         
         long nbins = (Long) classUnderTest.getH5AttributeValue();
-        int range = (int) nbins;
+        classUnderTest.getH5Attribute(root, "/dataset1/where", "rscale");
         
-        assertEquals(250, range);
+        assertEquals("rscale", classUnderTest.getH5Attribute().getName());
+        
+        double rscale = (Double) classUnderTest.getH5AttributeValue();
+        
+        assertEquals(1000, rscale, 0);
         
         classUnderTest.getH5Dataset(root, "/dataset1/data1/data");
         Dataset dataset = classUnderTest.getH5Dataset();
@@ -160,12 +167,76 @@ public class BltDataProcessorTest {
         
         Color[] palette = classUnderTest
                 .createColorPalette("conf/color_palette.txt");
-        BufferedImage bi = classUnderTest.polarDataset2CartImage(nbins, dataset, 
-                palette, 500, 50, 0.1f, "#FFFFFF", "#FFFFFF");
+        BufferedImage bi = classUnderTest.polar2CartImage(nbins, rscale, dataset, 
+                palette, 0, true, true);
         
         assertNotNull(bi);
         assertTrue(classUnderTest
                 .saveImageToFile(bi, "legionowo_dataset1.png"));
+    }
+    
+    @Test 
+    public void polarDataset2CartImage_LV_RIX() throws Exception {
+        H5File file = classUnderTest.openH5File(getFilePath(FILE_LVRIX));
+        Group root = classUnderTest.getH5Root(file);
+        classUnderTest.getH5Attribute(root, "/dataset1/where", "nbins");
+        
+        assertEquals("nbins", classUnderTest.getH5Attribute().getName());
+        
+        long nbins = (Long) classUnderTest.getH5AttributeValue();
+        classUnderTest.getH5Attribute(root, "/dataset1/where", "rscale");
+        
+        assertEquals("rscale", classUnderTest.getH5Attribute().getName());
+        
+        double rscale = (Double) classUnderTest.getH5AttributeValue();
+        
+        assertEquals(500, rscale, 0);
+        
+        classUnderTest.getH5Dataset(root, "/dataset1/data1/data");
+        Dataset dataset = classUnderTest.getH5Dataset();
+        
+        assertNotNull(dataset);
+        
+        Color[] palette = classUnderTest
+                .createColorPalette("conf/color_palette.txt");
+        BufferedImage bi = classUnderTest.polar2CartImage(nbins, rscale, 
+                dataset, palette, 0, true, true);
+        
+        assertNotNull(bi);
+        assertTrue(classUnderTest
+                .saveImageToFile(bi, "riga_dataset1.png"));
+    }
+    
+    @Test 
+    public void polarDataset2CartImage_BY_MIN() throws Exception {
+        H5File file = classUnderTest.openH5File(getFilePath(FILE_BYMIN));
+        Group root = classUnderTest.getH5Root(file);
+        classUnderTest.getH5Attribute(root, "/dataset1/where", "nbins");
+        
+        assertEquals("nbins", classUnderTest.getH5Attribute().getName());
+        
+        long nbins = (Long) classUnderTest.getH5AttributeValue();
+        classUnderTest.getH5Attribute(root, "/dataset1/where", "rscale");
+        
+        assertEquals("rscale", classUnderTest.getH5Attribute().getName());
+        
+        double rscale = (Double) classUnderTest.getH5AttributeValue();
+        
+        assertEquals(250, rscale, 0);
+        
+        classUnderTest.getH5Dataset(root, "/dataset1/data1/data");
+        Dataset dataset = classUnderTest.getH5Dataset();
+        
+        assertNotNull(dataset);
+        
+        Color[] palette = classUnderTest
+                .createColorPalette("conf/color_palette.txt");
+        BufferedImage bi = classUnderTest.polar2CartImage(nbins, rscale, dataset, 
+                palette, 0, true, true);
+        
+        assertNotNull(bi);
+        assertTrue(classUnderTest
+                .saveImageToFile(bi, "minsk_dataset1.png"));
     }
     
 }

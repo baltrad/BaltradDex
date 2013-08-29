@@ -28,8 +28,6 @@ import ncsa.hdf.object.Dataset;
 import ncsa.hdf.object.Datatype;
 import ncsa.hdf.object.Attribute;
 
-import org.apache.log4j.Logger;
-
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.imageio.ImageIO;
 
@@ -47,6 +45,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Class implements radar data processing methods.
@@ -87,6 +86,9 @@ public class DataProcessor {
     public static final String ODIMH5_XSEC_OBJ = "XSEC"; 
     public static final String ODIMH5_VP_OBJ = "VP"; 
     public static final String ODIMH5_PIC_OBJ = "PIC";
+    
+    public static final float DELTA_ANGLE = 0.004f;
+    public static final int RANGE_RINGS_DISTANCE = 50;
     
     private Dataset h5Dataset;
     private Attribute h5Attribute;
@@ -288,89 +290,112 @@ public class DataProcessor {
     }
     
     /**
-     * Convert polar dataset into cartesian image.
-     * @param nbins Number of range bins
-     * @param dataset Polar dataset to convert
+     * Transform polar dataset into Cartesian image.
+     * @param nbins Number of range samples per ray
+     * @param rscale Range sample size in meters
+     * @param dataset Polar dataset
      * @param palette Color palette
      * @param imageSize Output image size
-     * @param rangeRingsDistance Range rings distance 
-     * @param rangeMaskStroke Range mask stroke
-     * @param rangeRingsColor Range rings color
-     * @param rangeMaskColor Range mask color
-     * @return Buffered image
+     * @param rangeRings Range rings toggle
+     * @param rangeMask Range mask toggle
+     * @return Cartesian image
      * @throws RuntimeException 
      */
-    public BufferedImage polarDataset2CartImage(long nbins, Dataset dataset,
-            Color[] palette, int imageSize, int rangeRingsDistance, 
-            float rangeMaskStroke, String rangeRingsColor, 
-            String rangeMaskColor) throws RuntimeException {
+    public BufferedImage polar2CartImage(long nbins, double rscale, 
+            Dataset dataset, Color[] palette, int imageSize, boolean rangeRings,
+            boolean rangeMask) throws RuntimeException {
         try {
-            int radius = (int) nbins;
             byte[] polar = (byte[]) dataset.read();
-
-            BufferedImage bi = new BufferedImage(radius * 2, radius * 2, 
+            int radius = (int) nbins;
+            int ray = 0;
+            
+            BufferedImage bi = new BufferedImage(radius * 2, radius * 2,
                     BufferedImage.TYPE_INT_ARGB);
             int rule = AlphaComposite.SRC;
             Graphics2D g2d = bi.createGraphics();
-
-            // draw radar image
+            
             for (int i = 0; i < polar.length; i++) {
-                int ray;
-                int bin;
-                ray = (int) Math.floor(i / radius);
-                bin = i - (radius * ray);
-                double alpha = ray * (Math.PI / 180);
-                // rotate 90 deg counter-clockwise
-                alpha -= Math.PI / 2;
-                double x = bin * Math.cos(alpha) + radius;
-                double y = bin * Math.sin(alpha) + radius;
-                int xc = (int) Math.floor(x);
-                int yc = (int) Math.floor(y);
-                int val =  (int) polar[i];
-                // in case value is less than zero
-                if (val < 0) {
-                    val = -val;
-                }
-                Color color = palette[(COLOR_TABLE_DEPTH - 1) - val];
-                if (val > 0) {
-                    AlphaComposite ac = AlphaComposite.getInstance(rule, 1);
-                    g2d.setComposite(ac);
-                    g2d.setColor(color);
-                } else {
-                    AlphaComposite ac = AlphaComposite.getInstance(rule, 0);
-                    g2d.setComposite(ac);
-                    g2d.setColor(Color.WHITE);
-                }
-                g2d.drawRect(xc, yc, 1, 1);
-                // fill empty spaces by increasing ray angle a bit
-                alpha += 0.006f;
-                x = bin * Math.cos(alpha) + radius;
-                y = bin * Math.sin(alpha) + radius;
-                xc = (int) Math.floor(x);
-                yc = (int) Math.floor(y);
-                g2d.drawRect(xc, yc, 1, 1);
+                if (i % radius == 0) {
+                    ray++;
+                    
+                    double alpha = ray * (Math.PI / 180);
+                    // rotate 90 deg counter clockwise
+                    alpha -= Math.PI / 2;
+                    double a1 = alpha - 2 * DELTA_ANGLE;
+                    double a2 = alpha - DELTA_ANGLE;
+                    double a3 = alpha + DELTA_ANGLE;
+                    double a4 = alpha + 2 * DELTA_ANGLE;
+                    
+                    double[] alphas = {alpha, a1, a2, a3, a4};
+                    
+                    for (int angle = 0; angle < alphas.length; angle++) {
+                        for (int j = 0; j < radius; j++) {
+                            double x = j * Math.cos(alphas[angle]) + radius;
+                            double y = j * Math.sin(alphas[angle]) + radius;
+                            int xc = (int) Math.round(x);
+                            int yc = (int) Math.round(y);
+
+                            int byteVal = (0xFF & ((int) polar[i + j]));
+                            short val = (short) byteVal;
+                            
+                            if (val > 0) {
+                                AlphaComposite ac = 
+                                        AlphaComposite.getInstance(rule, 1);
+                                g2d.setComposite(ac);
+                                Color color = 
+                                        palette[(COLOR_TABLE_DEPTH - 1) - val];
+                                g2d.setColor(color);
+                            } else {
+                                AlphaComposite ac = 
+                                        AlphaComposite.getInstance(rule, 0);
+                                g2d.setComposite(ac);
+                                g2d.setColor(Color.WHITE);
+                            }
+                            g2d.drawRect(xc, yc, 1, 1);
+                        }       
+                    }
+                }   
             }
+            
+            // range bins per kilometer
+            double binsPerKm = 1000 / rscale;
+            int dist = (int) Math.round(RANGE_RINGS_DISTANCE * binsPerKm);
+            
             // draw range rings
-            if (rangeRingsDistance > 0) {
+            if (rangeRings) {
                 AlphaComposite ac = AlphaComposite.getInstance(rule, 1);
                 g2d.setComposite(ac);
-                g2d.setColor(Color.decode(rangeRingsColor));
+                g2d.setColor(Color.decode("#A7A7A7"));
                 for (int i = 1; i <= radius; i++) {
-                    if (i % rangeRingsDistance == 0) {
+                    if (i % dist == 0) {
                         g2d.drawOval(radius - i, radius - i, 2 * i, 2 * i);
                     }
                 }
-            }
+            }    
+            
             // draw range mask
-            if (rangeMaskStroke > 0) {
-                AlphaComposite ac = AlphaComposite.getInstance(rule, 1);
+            if (rangeMask) {
+                AlphaComposite ac = AlphaComposite.getInstance(rule, 0.1f);
                 g2d.setComposite(ac);
-                g2d.setColor(Color.decode(rangeMaskColor));
-                BasicStroke stroke = new BasicStroke(rangeMaskStroke);
-                g2d.setStroke(stroke);
-                g2d.drawOval(0, 0, radius * 2, radius * 2);
+                g2d.setColor(Color.decode("#000000"));
+                for (int x = 0; x < bi.getWidth(); x++) {
+                    for (int y = 0; y < bi.getHeight(); y++) {
+                        int dx = Math.abs(radius - x);
+                        int dy = Math.abs(radius - y);
+                        if (Math.sqrt(dx * dx + dy * dy) > radius) {
+                            g2d.drawRect(x, y, 1, 1);
+                        }   
+                    }
+                }
             }
-            // get scaled image
+            
+            // range in kilometers
+            int range = (int) Math.round(nbins * rscale / 1000);
+            if (imageSize == 0) {
+                imageSize = 2 * range;
+            }
+            
+            // get image scaled according to range
             Image img = bi.getScaledInstance(imageSize, imageSize, 
                     BufferedImage.SCALE_SMOOTH);
             BufferedImage scaledImage = new BufferedImage(imageSize, imageSize, 
@@ -380,8 +405,7 @@ public class DataProcessor {
             g2d.dispose();
             return scaledImage;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to convert polar dataset to " +
-                    "image", e);
+            throw new RuntimeException("Failed to generate cartesian image", e);
         }
     }
     
@@ -434,6 +458,62 @@ public class DataProcessor {
             throw new RuntimeException("Failed to save image to file", e);
         }
     } 
+    
+    /**
+     * Interpolate image using arithmetic average calculated in 5x5 filter 
+     * @param image Input image
+     *
+    public void interpolate(BufferedImage image) {
+        for (int x = 2; x < image.getWidth() - 2; x++) {
+            for (int y = 2; y < image.getHeight() - 2; y++) {
+                int[] argb = extractRGB(image.getRGB(x, y));
+                // interpolate with 5x5 filter for no-data pixels only
+                if (argb[0] == 0) {
+                    List<Integer> filter = new ArrayList<Integer>();
+                    for (int wx = x - 2; wx <= x + 2; wx++) {
+                        for (int wy = y - 2; wy <= y + 2; wy++) {
+                            argb = extractRGB(image.getRGB(wx, wy));
+                            if (argb[0] != 0) {
+                                filter.add(image.getRGB(wx, wy));
+                            }
+                        }
+                    }
+                    // calculate mean for each color component separately
+                    if (filter.size() > 12) {
+                        int r = 0;
+                        int g = 0;
+                        int b = 0;
+                        for (int i = 0; i < filter.size(); i++) {
+                            argb = extractRGB(filter.get(i));
+                            r += argb[1];
+                            g += argb[2];
+                            b += argb[3];
+                        }
+                        r /= filter.size();
+                        g /= filter.size();
+                        b /= filter.size();
+                        int rgb = new Color(r, g, b).getRGB();
+                        image.setRGB(x, y, rgb);
+                    }
+                }   
+            }
+        }
+    }*/
+    
+    
+    /**
+     * Extract color component information from integer ARGB value.
+     * @param px ARGB pixel value
+     * @return ARGB color component array
+     *
+    private int[] extractRGB(int px) {
+        int argb[] = new int[4];
+        argb[0] = (px >> 24) & 0xFF;
+        argb[1] = (px >> 16) & 0xFF;
+        argb[2] = (px >> 8) & 0xFF;
+        argb[3] = px & 0xFF;
+        return argb;
+    }*/
     
 }
 

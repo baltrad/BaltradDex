@@ -146,7 +146,6 @@
                 <config-file>web/WEB-INF/applicationContext.xml</config-file>
                 <config-file>web/WEB-INF/baltraddex-servlet.xml</config-file>
                 <config-file>web/WEB-INF/bdb.xml</config-file>
-                <config-file>web/WEB-INF/test.xml</config-file>
             </config-files>
             <config-file-groups>
                 <config-file-group name="Default Group">

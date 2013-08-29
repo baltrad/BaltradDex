@@ -759,15 +759,18 @@ textarea {
     padding-top: 0;
     margin-top: 0;
 }
-.status-exchange .node-name {
+.status-exchange .node-name input {
 	float: left;
 	clear: right;
 	color: #003399;
-	font-size: 16px;
+	font-size: 15px;
 	font-weight: bold;
-	margin-top: 2px;
+    font-family: 'Arial', sans-serif;
+	margin: 1px 0 0 -6px;
+    border: none;
+    background: none;
 }
-.status-exchange .node-name:hover {
+.status-exchange .node-name input:hover {
 	text-decoration: underline;
 	cursor: pointer;	
 }

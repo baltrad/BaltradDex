@@ -88,15 +88,7 @@ public class BltFileDetailsController {
     private static final int EARTH_RADIUS = 6371000;
     // Image thumb size
     private static final int THUMB_IMAGE_SIZE = 64;
-    // Range rings distance
-    private static final short THUMB_RANGE_RINGS_DISTANCE = 0;
-    // Range mask line stroke
-    private static final float THUMB_RANGE_MASK_STROKE = 1.0f;
-    // Range rings color string
-    private static final String THUMB_RANGE_RINGS_COLOR = "#003098";
-    // Range mask color string
-    private static final String THUMB_RANGE_MASK_COLOR = "#003098";
-    
+    // color palette file
     private static final String PALETTE_FILE = "includes/color_palette.txt";
 
     private DataProcessor bltDataProcessor;
@@ -238,8 +230,8 @@ public class BltFileDetailsController {
                         DataProcessor.H5_NBINS_ATTR );
                 long nbins_val = (Long) bltDataProcessor
                         .getH5AttributeValue();
-
-                // retrieve data domain coordinates
+                
+                // get bin resolution
                 bltDataProcessor.getH5Attribute(root, whereGroup, 
                         DataProcessor.H5_RSCALE_ATTR);
                 double rscale_val = (Double) bltDataProcessor
@@ -247,6 +239,7 @@ public class BltFileDetailsController {
 
                 // scale - in meters
                 double range = rscale_val * nbins_val;
+                // retrieve data domain coordinates
                 Point2D.Double llXY = new Point2D.Double( -range, -range );
                 Point2D.Double llLatLon = DataProjector.pointXY2Geo( llXY );
                 Point2D.Double urXY = new Point2D.Double( range, range );
@@ -279,10 +272,9 @@ public class BltFileDetailsController {
                 if (!thumb.exists()) {
                     bltDataProcessor.getH5Dataset(root, datasetPaths.get(i));
                     Dataset dataset = bltDataProcessor.getH5Dataset();
-                    BufferedImage bi = bltDataProcessor.polarDataset2CartImage(
-                        nbins_val, dataset, palette, THUMB_IMAGE_SIZE, 
-                        THUMB_RANGE_RINGS_DISTANCE, THUMB_RANGE_MASK_STROKE, 
-                        THUMB_RANGE_RINGS_COLOR, THUMB_RANGE_MASK_COLOR);
+                    BufferedImage bi = bltDataProcessor.polar2CartImage(
+                        nbins_val, rscale_val, dataset, palette, 
+                        THUMB_IMAGE_SIZE, false, true);
                     bltDataProcessor.saveImageToFile(bi, thumbPath);
                 }
             }

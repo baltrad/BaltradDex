@@ -151,138 +151,123 @@ Author     : szewczenko
                             Click node name to access file transfer 
                             information. 
                         </div>
-                        <c:forEach var="node" items="${nodes}">
-                            <ul class="exchange-menu">
-                                <li>
-                                    <div class="expand-node"
-                                         id="${node}_exchange_icon">
-                                    </div>
-                                    <div class="node-name" id="${node}"
-                                         onclick="javascript:show_hide_status('${node}_exchange',
-                                                 'collapse-node', 'expand-node');">
-                                        <c:out value="${node}"/>
-                                    </div>
-                                    <c:forEach var="download" items="${downloads}">
-                                        <c:if test="${download.node == node}">
-                                            <c:set var="hasDownloads" value="1"/>
-                                        </c:if>
-                                    </c:forEach>
-                                    <c:forEach var="upload" items="${uploads}">
-                                        <c:if test="${upload.node == node}">
-                                            <c:set var="hasUploads" value="1"/> 
-                                        </c:if>
-                                    </c:forEach> 
-                                    <div id="${node}_exchange" 
-                                         class="transfers">
-                                        <c:if test="${hasDownloads == 1}">    
-                                            <c:set var="hasDownloads" value="0"/>
+                        <c:forEach var="peer" items="${nodes}">
+                            <form method="POST">
+                                <ul class="exchange-menu">
+                                    <li>
+                                        <c:set var="show_transfers" value="${peers_status[peer]}"/>
+                                        <c:choose>
+                                            <c:when test="${show_transfers == true}">
+                                                <div class="collapse-node"></div>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <div class="expand-node"></div>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        <div class="node-name">
+                                            <input name="peer_name" type="submit" value="${peer}">
                                             <ul class="exchange-submenu">
-                                                <li>
-                                                    <div class="expand-downloads"
-                                                         id="${node}_downloads_icon">
-                                                    </div>
-                                                    <div class="transfer-name" 
-                                                         id="${node}"
-                                                         onclick="javascript:show_hide_status('${node}_downloads',
-                                                                        'collapse-downloads', 'expand-downloads');">
-                                                        Downloads
-                                                    </div>
-                                                    <ul class="exchange-subsubmenu" 
-                                                        id="${node}_downloads">
-                                                        <div class="header">
-                                                            <div class="data-source-name">
-                                                                Data source name
-                                                            </div>
-                                                            <div class="subscription-start">
-                                                                Subscription started
-                                                            </div>
-                                                            <div class="subscription-status">
-                                                                Subscription status
-                                                            </div>
-                                                            <!--div class="files-received">
-                                                                Files received
-                                                            </div-->
-                                                        </div>
-                                                        <c:forEach var="download" items="${downloads}">
-                                                            <c:if test="${download.node == node}">
-                                                                <div class="data-source">
-                                                                    <div class="data-source-name">
-                                                                        <c:out value="${download.dataSource}"/>
-                                                                    </div>
-                                                                    <div class="subscription-start">
-                                                                        <fmt:formatDate value="${download.date}" 
-                                                                                        pattern="yyyy/MM/dd HH:mm:ss"/>
-                                                                    </div>
-                                                                    <div class="subscription-status">
-                                                                        <c:out value="${download.active == true 
-                                                                                        ? 'Active' : 'Off'}"/>
-                                                                    </div>
-                                                                    <%--div class="files-received">
-                                                                        <c:out value="${download.filesReceived}"/>
-                                                                    </div--%> 
+                                                <c:if test="${show_transfers == true}">
+                                                    <c:if test="${fn:length(peers_downloads[peer]) gt 0}">
+                                                        <ul class="exchange-submenu">
+                                                            <li>
+                                                                <div class="expand-downloads"
+                                                                     id="${peer}_downloads_icon">
                                                                 </div>
-                                                            </c:if>
-                                                        </c:forEach>
-                                                    </ul>
-                                                </li>
-                                            </ul>    
-                                        </c:if>  
-                                        <c:if test="${hasUploads == 1}">
-                                            <c:set var="hasUploads" value="0"/>
-                                            <ul class="exchange-submenu">
-                                                <li>
-                                                    <div class="expand-uploads"
-                                                         id="${node}_uploads_icon">
-                                                    </div>
-                                                    <div class="transfer-name" 
-                                                         id="${node}"
-                                                         onclick="javascript:show_hide_status('${node}_uploads',
-                                                                        'collapse-uploads', 'expand-uploads');">
-                                                        Uploads
-                                                    </div>
-                                                    <ul class="exchange-subsubmenu"
-                                                        id="${node}_uploads">
-                                                        <div class="header">
-                                                            <div class="data-source-name">
-                                                                Data source name
-                                                            </div>
-                                                            <div class="subscription-start">
-                                                                Subscription started
-                                                            </div>
-                                                            <div class="files-sent">
-                                                                Files uploaded
-                                                            </div>
-                                                            <div class="failures">
-                                                                Upload failures
-                                                            </div>
-                                                        </div>
-                                                        <c:forEach var="upload" items="${uploads}">
-                                                            <c:if test="${upload.node == node}">
-                                                                <div class="data-source">
-                                                                    <div class="data-source-name">
-                                                                        <c:out value="${upload.dataSource}"/>
-                                                                    </div>
-                                                                    <div class="subscription-start">
-                                                                        <fmt:formatDate value="${upload.date}" 
-                                                                                        pattern="yyyy/MM/dd HH:mm:ss"/>
-                                                                    </div>
-                                                                    <div class="files-sent">
-                                                                        <c:out value="${upload.filesSent}"/>
-                                                                    </div>
-                                                                    <div class="failures">
-                                                                        <c:out value="${upload.failures}"/>
-                                                                    </div> 
+                                                                <div class="transfer-name" 
+                                                                     id="${peer}"
+                                                                     onclick="javascript:show_hide_status('${peer}_downloads',
+                                                                                    'collapse-downloads', 'expand-downloads');">
+                                                                    Downloads
                                                                 </div>
-                                                            </c:if>    
-                                                        </c:forEach>
-                                                    </ul>    
-                                                </li>
-                                            </ul>    
-                                        </c:if>
-                                    </div>                                               
-                                </li>
-                            </ul>
-                        </c:forEach>
+                                                                <ul class="exchange-subsubmenu" 
+                                                                    id="${peer}_downloads">
+                                                                    <div class="header">
+                                                                        <div class="data-source-name">
+                                                                            Data source name
+                                                                        </div>
+                                                                        <div class="subscription-start">
+                                                                            Subscription started
+                                                                        </div>
+                                                                        <div class="subscription-status">
+                                                                            Subscription status
+                                                                        </div>
+                                                                    </div>
+                                                                    <c:forEach var="download" items="${peers_downloads[peer]}">
+                                                                        <div class="data-source">
+                                                                            <div class="data-source-name">
+                                                                                <c:out value="${download.dataSource}"/>
+                                                                            </div>
+                                                                            <div class="subscription-start">
+                                                                                <fmt:formatDate value="${download.date}" 
+                                                                                                pattern="yyyy/MM/dd HH:mm:ss"/>
+                                                                            </div>
+                                                                            <div class="subscription-status">
+                                                                                <c:out value="${download.active == true 
+                                                                                                ? 'Active' : 'Off'}"/>
+                                                                            </div>
+                                                                        </div>
+                                                                    </c:forEach>       
+                                                                </ul>
+                                                            </li>    
+                                                        </ul>    
+                                                    </c:if>
+                                                    <c:if test="${fn:length(peers_uploads[peer]) gt 0}">
+                                                        <ul class="exchange-submenu">
+                                                            <li>
+                                                                <div class="expand-uploads"
+                                                                     id="${peer}_uploads_icon">
+                                                                </div>
+                                                                <div class="transfer-name" 
+                                                                     id="${peer}"
+                                                                     onclick="javascript:show_hide_status('${peer}_uploads',
+                                                                                    'collapse-uploads', 'expand-uploads');">
+                                                                    Uploads
+                                                                </div>
+                                                                <ul class="exchange-subsubmenu"
+                                                                    id="${peer}_uploads">
+                                                                    <div class="header">
+                                                                        <div class="data-source-name">
+                                                                            Data source name
+                                                                        </div>
+                                                                        <div class="subscription-start">
+                                                                            Subscription started
+                                                                        </div>
+                                                                        <div class="files-sent">
+                                                                            Files uploaded
+                                                                        </div>
+                                                                        <div class="failures">
+                                                                            Upload failures
+                                                                        </div>
+                                                                    </div>
+                                                                    <c:forEach var="upload" items="${peers_uploads[peer]}">
+                                                                        <div class="data-source">
+                                                                            <div class="data-source-name">
+                                                                                <c:out value="${upload.dataSource}"/>
+                                                                            </div>
+                                                                            <div class="subscription-start">
+                                                                                <fmt:formatDate value="${upload.date}" 
+                                                                                                pattern="yyyy/MM/dd HH:mm:ss"/>
+                                                                            </div>
+                                                                            <div class="files-sent">
+                                                                                <c:out value="${upload.filesSent}"/>
+                                                                            </div>
+                                                                            <div class="failures">
+                                                                                <c:out value="${upload.failures}"/>
+                                                                            </div> 
+                                                                        </div> 
+                                                                    </c:forEach>
+                                                                </ul>
+                                                            </li>    
+                                                        </ul>
+                                                    </c:if>
+                                                </c:if>
+                                            </ul>
+                                        </div>     
+                                    </li>
+                                </ul>
+                            </form>      
+                        </c:forEach>                                            
                     </c:otherwise>
                 </c:choose>
             </div>
