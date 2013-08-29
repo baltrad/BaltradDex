@@ -298,6 +298,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <copy todir="${build.webinf.dir}">
       <fileset dir="${webinf.dir}">
         <include name="applicationContext.xml" />
+        <include name="authenticationContext.xml" />
         <include name="baltraddex-servlet.xml" />
         <include name="web.xml" />
 	<include name="bdb.xml" />

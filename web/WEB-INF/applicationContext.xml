@@ -282,16 +282,10 @@
     
     </security:http>
 
-    <security:authentication-provider 
-                user-service-ref="simpleUserDetailsService">
-        <security:password-encoder hash="md5"/>
-    </security:authentication-provider>
-    
-    <beans:bean id="simpleUserDetailsService" 
-                class="eu.baltrad.dex.auth.util.SimpleUserDetailsService"
-                autowire="byType">          
-    </beans:bean>
-    
+    <!-- We keep the authentication context in a specific file so that we can replace it with
+         site specific authentication mechanisms -->
+    <beans:import resource="authenticationContext.xml" />
+        
     <beans:bean id="userManager" 
                 class="eu.baltrad.dex.user.manager.impl.UserManager"
                 autowire="byType">          
