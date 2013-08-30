@@ -89,6 +89,8 @@ public class ShowRoutesController {
       return "redirect:route_create_bdb_trim_count.htm";
     } else if (operation != null && operation.equals("GoogleMap")) {
       return "redirect:route_create_google_map.htm";
+    } else if (operation != null && operation.equals("ACRR")) {
+      return "redirect:route_create_acrr.htm";
     }
     model.addAttribute("emessage", "Unknown operation: '"+operation+"'");
     return "redirect:routes.htm";
@@ -116,6 +118,8 @@ public class ShowRoutesController {
         result = "redirect:route_show_bdb_trim_count.htm";
       } else if (type.equals("blt_gmap")) {
         result = "redirect:route_show_google_map.htm";
+      } else if (type.equals("blt_acrr")) {
+        result = "redirect:route_show_acrr.htm";
       }
 
       if (result != null) {
