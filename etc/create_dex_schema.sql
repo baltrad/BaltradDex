@@ -272,7 +272,8 @@ CREATE OR REPLACE FUNCTION dex_trim_messages_by_number() RETURNS trigger AS $$
     BEGIN
         records_limit = TG_ARGV[0];
         DELETE FROM dex_messages WHERE id IN (SELECT id FROM dex_messages 
-            ORDER BY time_stamp DESC OFFSET records_limit);
+            WHERE  level <> 'STICKY' ORDER BY time_stamp DESC OFFSET 
+            records_limit);
         RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;
@@ -300,7 +301,8 @@ CREATE OR REPLACE FUNCTION dex_trim_messages_by_age() RETURNS trigger AS $$
         max_age = now_epoch - (days * MILLIS_PER_DAY + hours * 
                     MILLIS_PER_HOUR + minutes * MILLIS_PER_MINUTE);
 		
-        DELETE FROM dex_messages WHERE time_stamp < max_age; 
+        DELETE FROM dex_messages WHERE time_stamp < max_age 
+                    AND level <> 'STICKY'; 
         RETURN NEW;
     END;
 $$ LANGUAGE plpgsql;

@@ -120,6 +120,16 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           class="eu.baltrad.dex.log.controller.MessagesTableController"
           autowire="byType"/>
     
+    <!-- Sticky messages controller -->
+    <bean id="stickyMessagesController" 
+          class="eu.baltrad.dex.log.controller.StickyMessagesController"
+          autowire="byType"/>
+    
+    <!-- Sticky messages counter -->
+    <bean id="stickyMessagesConter" 
+          class="eu.baltrad.dex.log.controller.StickyMessagesCounter"
+          autowire="byType"/>
+    
     <!-- Data download controller -->
     <bean id="bltFileDownloadController"
           class="eu.baltrad.dex.db.controller.BltFileDownloadController"
@@ -179,7 +189,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           autowire="byType"/>
     
     <!-- DB log appender -->
-    <bean id="dbLogAppender" class="eu.baltrad.dex.log.appender.DBLogAppender">
+    <bean id="dbLogAppender" class="eu.baltrad.dex.log.DBLogAppender">
         <property name="logManager" ref="logManager"/>
     </bean>
           

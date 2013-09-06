@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.log.manager;
 
-import eu.baltrad.dex.log.model.LogEntry;
+import eu.baltrad.dex.log.model.impl.LogEntry;
 
 import java.util.List;
 
@@ -44,6 +44,9 @@ public interface ILogManager {
     /** Trim messages by date trigger */
     public static final String TRIM_MSG_BY_AGE_TG = 
             "dex_trim_messages_by_age_tg";
+    /** SQL query to select sticky-level messages */
+    public static final String SQL_SELECT_STICKY = "SELECT count(*) FROM " + 
+            "dex_messages WHERE level = 'STICKY';";
     
     public long count();
     
@@ -55,11 +58,15 @@ public interface ILogManager {
     
     public List<LogEntry> load(int offset, int limit);
     
+    public List<LogEntry> load(String level);
+    
     public List<LogEntry> load(String sql, int offset, int limit);
     
     public int store(LogEntry entry);
     
     public int delete();
+    
+    public int delete(int id);
     
     public void setTrimmer(int limit);
     

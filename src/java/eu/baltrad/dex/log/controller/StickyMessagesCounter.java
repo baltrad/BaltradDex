@@ -21,32 +21,49 @@
 
 package eu.baltrad.dex.log.controller;
 
+import eu.baltrad.dex.log.manager.ILogManager;
+
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
+
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
- * Implements functionality allowing to display and auto-refresh 
- * system messages.
+ * Implements functionality allowing to display sticky message counter.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.6.1
- * @since 0.1.6
+ * @version 1.7
+ * @since 1.7
  */
 @Controller
-public class LiveMessagesController {
+public class StickyMessagesCounter {
+    
+    private ILogManager logManager;
     
     /**
-     * Display auto-updated message set.
+     * Display sticky message counter.
      * @param request HTTP servlet request
      * @param model Model map
      * @return View name
      */
-    @RequestMapping("/messages_live.htm")
-    public String liveMessages(HttpServletRequest request, ModelMap model) {
-        return "messages_live";
+    @RequestMapping("/messages_sticky_counter.htm")
+    public String stickyMessages(HttpServletRequest request, ModelMap model) {
+        long messageCount = logManager.count(ILogManager.SQL_SELECT_STICKY);
+        HttpSession session = request.getSession();
+        session.setAttribute("message_count", messageCount);
+        return "messages_sticky_counter"; 
+    }
+
+    /**
+     * @param logManager the logManager to set
+     */
+    @Autowired
+    public void setLogManager(ILogManager logManager) {
+        this.logManager = logManager;
     }
     
 }

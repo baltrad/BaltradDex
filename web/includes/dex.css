@@ -498,6 +498,24 @@ textarea {
 	padding: 8px 18px 0 0;
 	background: #FFFFFF;
 }
+#sticky-message {
+    width: 80%;
+    height: 24px;
+    float: left;
+    clear: both;
+    margin: 20px 12px 12px 60px;
+	padding: 9px 4px 0 14px;
+	font-size: 13px;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+    background: #63AF27;
+    background-image: -webkit-linear-gradient(top, #8FD656, #B9E893);
+	background-image: -moz-linear-gradient(top, #8FD656, #B9E893);
+	background-image: -o-linear-gradient(top, #8FD656, #B9E893);
+	background-image: -ms-linear-gradient(top, #8FD656, #B9E893);
+	background-image: linear-gradient(top, #8FD656, #B9E893);
+}
 
 /* system information, file details */ 
 
@@ -842,6 +860,22 @@ textarea {
     font-weight: normal;
     padding-top: 2px;
 }
+.system-log input#auto-update-toggle {
+    float: right;
+    font-size: 13px;
+    font-weight: normal;
+    margin-right: -8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: inherit;
+    color: #003399;
+    font-family: 'Arial', sans-serif;
+    text-decoration: underline;
+}
+.system-log input#auto-update-toggle:hover {
+    text-decoration: none;
+}
 .system-log #logtable {
     width: 100%;
 }
@@ -988,6 +1022,43 @@ textarea {
 .system-log form .buttons {
     float: right;
     padding-top: 4px;
+}
+
+/* Sticky messages */
+
+.sticky-messages {
+	width: 674px;
+	float: left; 
+	clear: both;
+	margin: 20px 8px 80px 8px;
+}
+.sticky-messages > .table {
+    padding-bottom: 18px;
+}
+.sticky-messages > .table > .header-text {
+    margin-bottom: 16px;
+}
+.sticky-messages > .table > form > .message-header,
+.sticky-messages > .table > form > .message-content,
+.sticky-messages > .table > form > .message-footer {
+    width: 100%;
+    float: left;
+    clear: both;
+}
+.sticky-messages > .table > form > .message-header {
+    height: 16px;
+    margin-top: 6px;
+    border-bottom: 1px solid #B4CAE8;
+    font-weight: bold;
+    background: #FFFFFF;
+    padding-top: 2px;
+    color: #003399;
+}
+.sticky-messages > .table > form > .message-content {
+    margin: 4px 0 4px 0;
+}
+.sticky-messages > .table > form > .message-footer > .buttons {
+    float: right;
 }
 
 /* file browser */

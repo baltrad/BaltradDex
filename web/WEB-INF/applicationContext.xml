@@ -176,6 +176,9 @@
         <!-- 
             Admin pages 
         -->
+        <security:intercept-url pattern="/messages_sticky.htm" 
+                                access="ROLE_ADMIN" 
+                                requires-channel="https"/>
         <security:intercept-url pattern="/radars_show.htm" 
                                 access="ROLE_ADMIN" 
                                 requires-channel="https"/>

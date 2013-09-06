@@ -27,6 +27,8 @@ import eu.baltrad.dex.net.request.impl.NodeRequest;
 import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.keystore.model.Key;
+import eu.baltrad.dex.log.StickyLevel;
+import eu.baltrad.dex.log.manager.ILogManager;
 import eu.baltrad.dex.util.CompressDataUtil;
 import java.io.ByteArrayOutputStream;
 
@@ -60,6 +62,7 @@ public class PostKeyServlet extends HttpServlet {
     private static final String INCOMING_KEY_DIR = ".incoming";
     private static final String PK_INTERNAL_SERVER_ERROR_KEY = 
             "postkey.server.internal_server_error";
+    private static final String PK_KEY_RECEIVED = "postkey.server.key_received";
     
     private IConfigurationManager confManager;
     private IKeystoreManager keystoreManager;
@@ -92,8 +95,8 @@ public class PostKeyServlet extends HttpServlet {
                 String checksumHeader = request.getHeader("Content-MD5");
                 String checksumCalc = DigestUtils.md5Hex(keyContent);
                 if (checksumHeader.equals(checksumCalc)) {
-                    String incomingPath = confManager.getAppConf().getKeystoreDir() 
-                        + File.separator + INCOMING_KEY_DIR; 
+                    String incomingPath = confManager.getAppConf()
+                        .getKeystoreDir() + File.separator + INCOMING_KEY_DIR; 
                     File incomingDir = new File(incomingPath); 
                     if (!incomingDir.exists()) {
                         incomingDir.mkdir();
@@ -101,7 +104,10 @@ public class PostKeyServlet extends HttpServlet {
                     cdu.unzip(incomingPath + File.separator + nodeName + ".pub", 
                             keyContent);
                     Key key = new Key(nodeName, checksumCalc, false);
-                    keystoreManager.store(key);
+                    if (keystoreManager.store(key) > 0) {
+                        log.log(StickyLevel.STICKY, messages.getMessage(
+                            PK_KEY_RECEIVED, new String[] {nodeName}));
+                    }
                     return 0;
                 } else {
                     return 1;
@@ -136,8 +142,7 @@ public class PostKeyServlet extends HttpServlet {
      * @param response HTTP servlet response 
      */
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) 
-    {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
         try {

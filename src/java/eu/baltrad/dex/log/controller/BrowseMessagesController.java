@@ -22,8 +22,8 @@
 package eu.baltrad.dex.log.controller;
 
 import eu.baltrad.dex.log.manager.impl.LogManager;
-import eu.baltrad.dex.log.model.LogEntry;
-import eu.baltrad.dex.log.model.LogParameter;
+import eu.baltrad.dex.log.model.impl.LogEntry;
+import eu.baltrad.dex.log.model.impl.LogParameter;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

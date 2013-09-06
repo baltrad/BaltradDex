@@ -23,8 +23,8 @@ package eu.baltrad.dex.log.manager.impl;
 
 import eu.baltrad.dex.log.manager.ILogManager;
 import eu.baltrad.dex.log.model.mapper.LogEntryMapper;
-import eu.baltrad.dex.log.model.LogEntry;
-import eu.baltrad.dex.log.model.LogParameter;
+import eu.baltrad.dex.log.model.impl.LogEntry;
+import eu.baltrad.dex.log.model.impl.LogParameter;
 import static eu.baltrad.dex.util.WebValidator.validate;
 
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
@@ -67,7 +67,7 @@ public class LogManager implements ILogManager {
      */
     public LogManager() {
         this.mapper = new LogEntryMapper();
-        this.format = new SimpleDateFormat(DATE_FORMAT);
+        this.format = new SimpleDateFormat(DATE_FORMAT); 
     }
     
     /**
@@ -166,6 +166,12 @@ public class LogManager implements ILogManager {
                 hasParameters = true;
             }
         }
+        if (hasParameters) {
+                sql += " AND level <> 'STICKY'";
+            } else {
+                sql += " WHERE level <> 'STICKY'";
+                hasParameters = true;
+            }
         if (!count) {
             sql += " ORDER BY time_stamp DESC OFFSET ? LIMIT ?";
         }
@@ -177,10 +183,9 @@ public class LogManager implements ILogManager {
      * @return Total number of entries in the registry
      */
     public long count() {
-        String sql = "SELECT count(*) FROM dex_messages";
+        String sql = "SELECT count(*) FROM dex_messages WHERE level <> 'STICKY'";
         return jdbcTemplate.queryForLong(sql);
     }
-    
     
     /**
      * Counts entries.
@@ -195,7 +200,7 @@ public class LogManager implements ILogManager {
      * @return All log entries
      */
     public List<LogEntry> load() {
-        String sql = "SELECT * FROM dex_messages";
+        String sql = "SELECT * FROM dex_messages WHERE level <> 'STICKY'";
 	List<LogEntry> entries = jdbcTemplate.query(sql, mapper);
 	return entries;
     }
@@ -206,8 +211,8 @@ public class LogManager implements ILogManager {
      * @return List of log entries
      */
     public List<LogEntry> load(int limit) {
-        String sql = "SELECT * FROM dex_messages ORDER BY time_stamp" +
-                " DESC LIMIT ?";
+        String sql = "SELECT * FROM dex_messages WHERE level <> 'STICKY'" +
+                " ORDER BY time_stamp DESC LIMIT ?";
         try {
             return jdbcTemplate.query(sql, mapper, limit);
         } catch (EmptyResultDataAccessException e) {
@@ -222,10 +227,25 @@ public class LogManager implements ILogManager {
      * @return List of log entries
      */
     public List<LogEntry> load(int offset, int limit) {
-        String sql = "SELECT * FROM dex_messages ORDER BY time_stamp" +
-                " DESC OFFSET ? LIMIT ?";
+        String sql = "SELECT * FROM dex_messages WHERE level <> 'STICKY'" + 
+                " ORDER BY time_stamp DESC OFFSET ? LIMIT ?";
         try {
             return jdbcTemplate.query(sql, mapper, offset, limit);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * Load log entries matching a given level.
+     * @param level Log entry level
+     * @return List of log entries matching given level
+     */
+    public List<LogEntry> load(String level) {
+        String sql = "SELECT * FROM dex_messages WHERE level = ?" + 
+                " ORDER BY time_stamp DESC;";
+        try {
+            return jdbcTemplate.query(sql, mapper, level);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
@@ -279,7 +299,17 @@ public class LogManager implements ILogManager {
      * @return Number of records deleted
      */
     public int delete() {
-        return jdbcTemplate.update("DELETE FROM dex_messages");
+        return jdbcTemplate.update("DELETE FROM dex_messages WHERE level" +
+                " <> 'STICKY'");
+    }
+    
+    /**
+     * Delete log entry with a given id.
+     * @return Number of records deleted
+     */
+    public int delete(int id) {
+        return jdbcTemplate.update("DELETE FROM dex_messages WHERE id = ?", 
+                id);
     }
     
     /**

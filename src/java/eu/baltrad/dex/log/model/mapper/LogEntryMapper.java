@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.log.model.mapper;
 
-import eu.baltrad.dex.log.model.LogEntry;
+import eu.baltrad.dex.log.model.impl.LogEntry;
 
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 

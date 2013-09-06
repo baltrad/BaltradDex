@@ -19,7 +19,9 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.log.model;
+package eu.baltrad.dex.log.model.impl;
+
+import eu.baltrad.dex.log.model.ILogEntry;
 
 import java.io.Serializable;
 
@@ -32,7 +34,7 @@ import java.util.Date;
  * @version 1.0
  * @since 1.0
  */
-public class LogEntry implements Serializable {
+public class LogEntry implements ILogEntry, Serializable {
     
     /** Log entry ID */
     private int id;
@@ -72,7 +74,8 @@ public class LogEntry implements Serializable {
      * @param level Message level
      * @param message Message body
      */
-    public LogEntry(long timeStamp, String logger, String level, String message) {
+    public LogEntry(long timeStamp, String logger, String level, String message) 
+    {
         this.timeStamp = timeStamp;
         this.date = new Date(timeStamp);
         this.logger = logger;

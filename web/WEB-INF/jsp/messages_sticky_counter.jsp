@@ -16,35 +16,32 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 --------------------------------------------------------------------------------
-Document   : Latest system messages
-Created on : May 6, 2013, 9:54 AM
+Document   : Sticky message counter
+Created on : Sep 4, 2013, 11:07:59 AM
 Author     : szewczenko
 ------------------------------------------------------------------------------%>
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 
-<t:generic_page pageTitle="Latest messages">
-    <jsp:body>
-        <div class="system-log">
-            <div class="table">
-                <div class="header">
-                    <div class="row">
-                        Latest system messages
-                        <a href="messages_browser.htm">
-                            Browse  
-                        </a>
-                    </div>
-                </div>
-                <div class="header-text">
-                    Page is refreshed automatically if auto-update option is on.
-                    <input type="button" value="Auto-update on" 
-                           id="auto-update-toggle" 
-                           onclick="toggleTimeout('updateMessages()', 1000);"/>
-                </div>
-                <div class="body" id="message-table"></div>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title>Sticky message counter</title>
+    </head>
+    <body>
+        <c:if test="${message_count > 0}">
+            <div id="sticky-message">
+                <c:choose>
+                    <c:when test="${message_count == 1}">
+                        You have <c:out value="${message_count}"/> sticky message. 
+                    </c:when>
+                    <c:otherwise>
+                        You have <c:out value="${message_count}"/> sticky 
+                        messages. 
+                    </c:otherwise>
+                </c:choose>
+                Click <a href="messages_sticky.htm">here</a> to read.
             </div>
-        </div>
-    </jsp:body>
-</t:generic_page>
-
-
+        </c:if>
+    </body>
+</html>

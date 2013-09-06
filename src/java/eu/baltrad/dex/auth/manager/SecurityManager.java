@@ -86,4 +86,5 @@ public class SecurityManager {
     public static void resetSessionRole(HttpSession session) {
         session.removeAttribute("session_role");
     }
+    
 }

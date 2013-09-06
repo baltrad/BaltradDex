@@ -42,6 +42,7 @@
 	-# \ref node_status
 	-# \ref registry
 	-# \ref log
+	-# \ref sticky_messages
 	-# \ref more_data_sources
 	-# \ref data_browse
 	-# \ref data_processing 
@@ -851,6 +852,42 @@ to reset message search options.
 The <tt>Show latest</tt> link in the upper right corner of the page allows 
 to return to \p live messages display mode.
 \endnote
+
+\section sticky_messages Sticky messages
+
+Sticky messages serve as notification system informing user about events 
+that require some kind of interaction. For instance, user is informed about 
+receiving public key from a peer node. Since it is up to the user to approve 
+or reject the key, they have to be aware that the key has been received and
+that it awaits further action. 
+\n
+First, user is informed that sticky messages have been received. This is 
+accomplished with a special message box located in the title bar at the top 
+of each page, as shown in the image below.
+
+\image html sticky_message_notification.png 
+
+The message box will remain visible as long as at least one sticky message is
+available in the system.
+\n
+\n
+In order access and read messages, click the link given in the message box. The 
+system will display sticky messages in a dedicated page as shown below. 
+
+\image html sticky_message_show.png
+
+Sticky message consists of the header containing date and time when the 
+message was received and of actual message content. The content may include 
+some tips on the further actions that should be taken, as in case of receiving
+public key from a peer node.  
+\n
+\n
+Sticky messages should be removed once it is read. To remove a sticky message, 
+click \p Delete button next to it. If there are no messages remaining, 
+notification box will be no longer visible in the title bar and the system will 
+display the following information:
+
+\image html sticky_message_deleted.png
 
 \section more_data_sources More on data sources
 

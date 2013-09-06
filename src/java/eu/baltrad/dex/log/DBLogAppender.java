@@ -19,9 +19,9 @@
  *
  ******************************************************************************/
 
-package eu.baltrad.dex.log.appender;
+package eu.baltrad.dex.log;
 
-import eu.baltrad.dex.log.model.LogEntry;
+import eu.baltrad.dex.log.model.impl.LogEntry;
 import eu.baltrad.dex.log.manager.impl.LogManager;
 
 import org.apache.log4j.AppenderSkeleton;

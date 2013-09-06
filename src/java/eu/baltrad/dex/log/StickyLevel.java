@@ -19,34 +19,50 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.log.controller;
+package eu.baltrad.dex.log;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.servlet.http.HttpServletRequest;
+import org.apache.log4j.Level;
 
 /**
- * Implements functionality allowing to display and auto-refresh 
- * system messages.
+ * Custom log level.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.6.1
- * @since 0.1.6
+ * @version 1.7
+ * @since 1.7
  */
-@Controller
-public class LiveMessagesController {
+public class StickyLevel extends Level {
+    
+    public static final StickyLevel STICKY = 
+                                            new StickyLevel(60000, "STICKY", 0);
     
     /**
-     * Display auto-updated message set.
-     * @param request HTTP servlet request
-     * @param model Model map
-     * @return View name
+     * Constructor.
+     * @param level  
+     * @param levelStr 
+     * @param syslogEquivalent 
      */
-    @RequestMapping("/messages_live.htm")
-    public String liveMessages(HttpServletRequest request, ModelMap model) {
-        return "messages_live";
+    public StickyLevel(int level, String levelStr, int syslogEquivalent) {
+        super(level, levelStr, syslogEquivalent);
+    }
+    
+    /**
+     * Convert an integer passed as argument to a level.
+     * @param val Integer 
+     * @param defaultLevel Default level
+     * @return Level
+     */
+    public static StickyLevel toLevel(int val, Level defaultLevel) {
+        return STICKY;
+    }
+
+    /**
+     * Convert string the passed as argument to a level.
+     * @param sArg String
+     * @param defaultLevel Default level
+     * @return Level
+     */
+    public static StickyLevel toLevel(String sArg, Level defaultLevel) {
+        return STICKY;  
     }
     
 }

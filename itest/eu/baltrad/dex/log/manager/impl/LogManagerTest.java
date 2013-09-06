@@ -23,8 +23,8 @@ package eu.baltrad.dex.log.manager.impl;
 
 import eu.baltrad.dex.log.manager.impl.LogManager;
 import eu.baltrad.dex.db.itest.DexDBITestHelper;
-import eu.baltrad.dex.log.model.LogEntry;
-import eu.baltrad.dex.log.model.LogParameter;
+import eu.baltrad.dex.log.model.impl.LogEntry;
+import eu.baltrad.dex.log.model.impl.LogParameter;
 
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;

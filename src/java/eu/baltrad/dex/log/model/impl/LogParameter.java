@@ -19,7 +19,7 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.log.model;
+package eu.baltrad.dex.log.model.impl;
 
 /**
  * Log entry parameters.
