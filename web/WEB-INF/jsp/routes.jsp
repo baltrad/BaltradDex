@@ -82,7 +82,7 @@ List of routes
                                                 <c:when test="${route.ruleType == 'blt_volume'}">
                                                     <c:out value="Volume"/>
                                                 </c:when>
-                                                <c:when test="${route.ruleType == 'composite'}">
+                                                <c:when test="${route.ruleType == 'blt_composite'}">
                                                     <c:out value="Composite"/>
                                                 </c:when>
                                                 <c:when test="${route.ruleType == 'bdb_trim_age'}">
@@ -91,8 +91,11 @@ List of routes
                                                 <c:when test="${route.ruleType == 'bdb_trim_count'}">
                                                     <c:out value="BdbTrimCount"/>
                                                 </c:when>
-                                                <c:when test="${route.ruleType == 'bdb_gmap'}">
+                                                <c:when test="${route.ruleType == 'blt_gmap'}">
                                                     <c:out value="GoogleMap"/>
+                                                </c:when>
+                                                <c:when test="${route.ruleType == 'blt_acrr'}">
+                                                    <c:out value="ACRR"/>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <c:out value="${route.ruleType}"/>
