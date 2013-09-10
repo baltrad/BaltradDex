@@ -124,14 +124,16 @@ public class DataSourceManager implements IDataSourceManager {
     }
     
     /**
-     * Load data sources by user.
+     * Load data sources by user and type.
      * @param id User id
+     * @param type Data source type
      * @return List of data sources for a given user.
      */
-    public List<DataSource> loadByUser(int id) {
+    public List<DataSource> load(int id, String type) {
         String sql = "SELECT * FROM dex_data_sources WHERE id IN (SELECT " +
-                "data_source_id FROM dex_data_source_users WHERE user_id = ?)";
-        return jdbcTemplate.query(sql, dataSourceMapper, id);
+                "data_source_id FROM dex_data_source_users WHERE user_id = ?)"
+                + " AND type = ?";
+        return jdbcTemplate.query(sql, dataSourceMapper, id, type);
     }
     
     /**

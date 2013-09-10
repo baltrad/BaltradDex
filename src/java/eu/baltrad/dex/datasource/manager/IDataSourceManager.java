@@ -43,7 +43,7 @@ public interface IDataSourceManager {
     
     public DataSource load(String name, String type);
     
-    public List<DataSource> loadByUser(int id);
+    public List<DataSource> load(int id, String type);
     
     public int store(DataSource dataSource);
     

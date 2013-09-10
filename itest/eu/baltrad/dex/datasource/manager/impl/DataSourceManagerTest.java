@@ -127,7 +127,8 @@ public class DataSourceManagerTest extends TestCase {
     }
     
     public void testLoadByUser() throws Exception {
-        List<DataSource> userDataSources = classUnderTest.loadByUser(2);
+        List<DataSource> userDataSources = classUnderTest.load(2, 
+                DataSource.LOCAL);
         assertNotNull(userDataSources);
         assertEquals(2, userDataSources.size());
         verifyAll();

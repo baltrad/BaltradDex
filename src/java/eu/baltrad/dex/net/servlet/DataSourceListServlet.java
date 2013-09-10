@@ -194,7 +194,7 @@ public class DataSourceListServlet extends HttpServlet {
                     // account exists
                     User user = userManager.load(peer.getName());
                     List<DataSource> userDataSources = dataSourceManager
-                            .loadByUser(user.getId());
+                            .load(user.getId(), DataSource.LOCAL);
                     writeResponse(res, jsonUtil.dataSourcesToJson(
                             new HashSet<DataSource>(userDataSources)),
                             HttpServletResponse.SC_OK);
