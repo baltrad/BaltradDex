@@ -130,7 +130,7 @@ public class DataSourceManagerTest extends TestCase {
         List<DataSource> userDataSources = classUnderTest.load(2, 
                 DataSource.LOCAL);
         assertNotNull(userDataSources);
-        assertEquals(2, userDataSources.size());
+        assertEquals(1, userDataSources.size());
         verifyAll();
     }
     

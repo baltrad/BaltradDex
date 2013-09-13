@@ -22,24 +22,24 @@
 package eu.baltrad.dex.datasource.controller;
 
 import eu.baltrad.dex.radar.model.Radar;
-import eu.baltrad.dex.radar.manager.impl.RadarManager;
 import eu.baltrad.dex.datasource.model.FileObject;
-import eu.baltrad.dex.datasource.manager.impl.FileObjectManager;
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.manager.impl.UserManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.net.manager.impl.SubscriptionManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.util.DataSourceValidator;
 import eu.baltrad.dex.util.WebValidator;
 import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.datasource.manager.IFileObjectManager;
+import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.radar.manager.IRadarManager;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.Role;
 
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.AttributeFilter;
 import eu.baltrad.beast.db.CombinedFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
-import eu.baltrad.dex.user.model.Role;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,8 @@ import org.apache.log4j.Logger;
 import javax.servlet.http.HttpServletRequest;
 
 import java.util.List;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Allows to configure new data source or to modify an existing one.
@@ -94,21 +95,34 @@ public class SaveDataSourceController {
     private static final String OK_MSG_KEY = "datasource_save_success";
     
     private PlatformTransactionManager transactionManager;
-    private RadarManager radarManager;
-    private FileObjectManager fileObjectManager;
-    private UserManager userManager;
+    private IRadarManager radarManager;
+    private IFileObjectManager fileObjectManager;
+    private IUserManager userManager;
     private IDataSourceManager dataSourceManager;
     private CoreFilterManager coreFilterManager;
-    private SubscriptionManager subscriptionManager;
+    private ISubscriptionManager subscriptionManager;
     private DataSourceValidator validator;
     private MessageResourceUtil messages;
     private Logger log;
+    
+    private Map<Integer, Radar> radarsAvailable;
+    private Map<Integer, Radar> radarsSelected;
+    private Map<Integer, FileObject> fileObjectsAvailable;
+    private Map<Integer, FileObject> fileObjectsSelected;
+    private Map<Integer, User> usersAvailable;
+    private Map<Integer, User> usersSelected;
     
     /**
      * Constructor.
      */
     public SaveDataSourceController() {
         this.log = Logger.getLogger("DEX");
+        radarsAvailable = new HashMap<Integer, Radar>();
+        radarsSelected = new HashMap<Integer, Radar>();
+        fileObjectsAvailable = new HashMap<Integer, FileObject>();
+        fileObjectsSelected = new HashMap<Integer, FileObject>();
+        usersAvailable = new HashMap<Integer, User>();
+        usersSelected = new HashMap<Integer, User>();
     }
     
     /**
@@ -121,12 +135,62 @@ public class SaveDataSourceController {
     public String setupForm(@RequestParam(value="ds_id", required=false) 
             String dsId, ModelMap model) {
         DataSource dataSource;
+        clearModelData();
         if (WebValidator.validate(dsId)) {
             dataSource = dataSourceManager.load(Integer.parseInt(dsId));
+            // determine selected and available radars
+            List<Radar> radars = dataSourceManager
+                    .loadRadar(Integer.parseInt(dsId));
+            for (Radar radar : radars) {
+                radarsSelected.put(radar.getId(), radar);
+            }
+            for (Radar radar : radarManager.load()) {
+                if (!radarsSelected.containsKey(radar.getId())) {       
+                    radarsAvailable.put(radar.getId(), radar);
+                }
+            }
+            // determine selected and available file objects
+            List<FileObject> fileObjects = dataSourceManager
+                    .loadFileObject(Integer.parseInt(dsId));
+            for (FileObject fileObject : fileObjects) {
+                fileObjectsSelected.put(fileObject.getId(), fileObject);
+            }
+            for (FileObject fileObject : fileObjectManager.load()) {
+                if (!fileObjectsSelected.containsKey(fileObject.getId())) {       
+                    fileObjectsAvailable.put(fileObject.getId(), fileObject);
+                }
+            }
+            // determine selected and available users
+            List<User> users = dataSourceManager
+                    .loadUser(Integer.parseInt(dsId));
+            for (User user : users) {
+                usersSelected.put(user.getId(), user);
+            }
+            for (User user : userManager.load()) {
+                if (!usersSelected.containsKey(user.getId()) && 
+                        user.getRole().equals(Role.PEER)) {       
+                    usersAvailable.put(user.getId(), user);
+                }
+            }
         } else {
             dataSource = new DataSource();
+            // load all radars 
+            for (Radar radar : radarManager.load()) {
+                radarsAvailable.put(radar.getId(), radar);
+            }
+            // load all file objects 
+            for (FileObject fileObject : fileObjectManager.load()) {
+                fileObjectsAvailable.put(fileObject.getId(), fileObject);
+            }
+            // load all users
+            for (User user : userManager.load()) {
+                if (user.getRole().equals(Role.PEER)) {
+                    usersAvailable.put(user.getId(), user);
+                }
+            }
         }
         model.addAttribute(DATA_SOURCE_MODEL_KEY, dataSource);
+        setModelAttributes(model);
         return FORM_VIEW;
     }
     
@@ -135,306 +199,277 @@ public class SaveDataSourceController {
      * @param dataSource Data source objects
      * @param result Binding result
      * @param model Model map
-     * @param selectedRadars Selected radars parameter
-     * @param selectedFileObjects Selected file objects parameter
-     * @param selectedUsers Selected users parameter 
+     * @param request HTTP servlet request
      * @return View name
      */
     @RequestMapping(method = RequestMethod.POST)
     public String processSubmit(
             @ModelAttribute("data_source") DataSource dataSource,
-                BindingResult result, ModelMap model,
-                HttpServletRequest request,
-            @RequestParam(value="selected_radars_hid", required=false) 
-                    String[] selectedRadars,
-            @RequestParam(value="selected_file_objects_hid", required=false) 
-                    String[] selectedFileObjects,            
-            @RequestParam(value="selected_users_hid", required=false) 
-                    String[] selectedUsers) {
-        
-        validator.validate(dataSource, result);
-        if (result.hasErrors() || selectedRadars == null) {
-            if (selectedRadars == null) {
-                request.getSession().setAttribute(MISSING_RADAR_MODEL_KEY, 
-                        messages.getMessage(MISSING_RADAR_ERROR_MSG_KEY));
-            }
-            return FORM_VIEW;
-        } else {
-            // begin transaction
-            TransactionDefinition def = new DefaultTransactionDefinition();
-            TransactionStatus status = transactionManager.getTransaction(def);
-            try {
-                int dataSourceId = 0;
-                // set data source type
-                dataSource.setType(DataSource.LOCAL);
-                if (dataSource.getId() > 0) {
-                    dataSourceManager.update(dataSource);
-                    dataSourceId = dataSource.getId();
-                } else {
-                    dataSourceId = dataSourceManager.store(dataSource);
+                BindingResult result, ModelMap model, 
+                HttpServletRequest request) {
+        String view = "";
+        // add radar 
+        if (request.getParameter("add_radar") != null) {
+            int[] radars = 
+                    toIntArray(request.getParameterValues("radars_available"));
+            if (radars != null) {
+                for (int i = 0; i < radars.length; i++) {
+                    radarsSelected.put(radars[i], 
+                            radarsAvailable.get(radars[i]));
+                    radarsAvailable.remove(radars[i]);
                 }
-                if (dataSourceId > 0) {
-                    // Remove filter parameter
-                    int filterId = dataSourceManager.loadFilterId(dataSourceId);
-                    if (filterId > 0) {
-                        IFilter filter = coreFilterManager.load(filterId);
-                        coreFilterManager.remove(filter);
-                    }
-                    // Save radar parameter
-                    dataSourceManager.deleteRadar(dataSourceId);
-                    String wmoAttrValue = "";
-                    if (selectedRadars != null) {    
-                        for (int i = 0; i < selectedRadars.length; i++) {
-                            String[] radarParms = selectedRadars[i].split("/");
-                            Radar radar = radarManager
-                                    .load(radarParms[0].trim());
-                            dataSourceManager.storeRadar(dataSourceId, 
-                                    radar.getId());
-                            // Set filter value
-                            wmoAttrValue += radar.getRadarWmo() + ",";
-                        }
-                    }
-                    // Save file object parameter
-                    dataSourceManager.deleteFileObject(dataSourceId);
-                    String fileObjectAttrValue = "";
-                    if (selectedFileObjects != null) {
-                        for (int i = 0; i < selectedFileObjects.length; i++) {
-                            int fileObjectId = (fileObjectManager
-                                .load(selectedFileObjects[i])).getId();
-                            dataSourceManager.storeFileObject(dataSourceId, 
-                                    fileObjectId);
-                            // Set filter value
-                            fileObjectAttrValue += selectedFileObjects[i] + ",";
-                        }
-                    }
-                    wmoAttrValue = wmoAttrValue
-                            .substring(0, wmoAttrValue.lastIndexOf(","));
-                    if (!fileObjectAttrValue.isEmpty()) {
-                        fileObjectAttrValue = fileObjectAttrValue
-                            .substring( 0, fileObjectAttrValue.lastIndexOf(","));
-                    }
-                    /* 
-                     * Save user parameter. Remove respective subscriptions 
-                     * in case when data source access right was revoked
-                     * for a given user
-                     */
-                    List<Subscription> uploads = subscriptionManager
-                                .load(Subscription.PEER);
-                    dataSourceManager.deleteUser(dataSourceId);
-                    if (selectedUsers != null) {
-                        List<User> selectedUsrs = 
-                                new ArrayList<User>();
-                        for (int i = 0; i < selectedUsers.length; i++) {
-                            User usr = userManager.load(selectedUsers[i]);
-                            selectedUsrs.add(usr);    
-                            dataSourceManager.storeUser(dataSourceId, 
-                                    usr.getId());
-                        }
-                        for (Subscription s : uploads) {
-                            if (s.getDataSource().equals(dataSource.getName())
-                                    && !containsUser(selectedUsrs, 
-                                        s.getUser())) {
-                                subscriptionManager.delete(s.getId());
-                            }
-                        }
+            }
+            view = FORM_VIEW;
+        }
+        // remove radar
+        if (request.getParameter("remove_radar") != null) {
+            int[] radars = 
+                    toIntArray(request.getParameterValues("radars_selected"));
+            if (radars != null) {
+                for (int i = 0; i < radars.length; i++) {
+                    radarsAvailable.put(radars[i], 
+                            radarsSelected.get(radars[i]));
+                    radarsSelected.remove(radars[i]);
+                }
+            }
+            view = FORM_VIEW;
+        }
+        // add file object
+        if (request.getParameter("add_file_object") != null) {
+            int[] file_objects = toIntArray(request
+                    .getParameterValues("file_objects_available"));
+            if (file_objects != null) {
+                for (int i = 0; i < file_objects.length; i++) {
+                    fileObjectsSelected.put(file_objects[i], 
+                            fileObjectsAvailable.get(file_objects[i]));
+                    fileObjectsAvailable.remove(file_objects[i]);
+                }
+            }
+            view = FORM_VIEW;
+        }
+        // remove file object
+        if (request.getParameter("remove_file_object") != null) {
+            int[] file_objects = toIntArray(request
+                    .getParameterValues("file_objects_selected"));
+            if (file_objects != null) {
+                for (int i = 0; i < file_objects.length; i++) {
+                    fileObjectsAvailable.put(file_objects[i], 
+                            fileObjectsSelected.get(file_objects[i]));
+                    fileObjectsSelected.remove(file_objects[i]);
+                }
+            }
+            view = FORM_VIEW;
+        }
+        // add user
+        if (request.getParameter("add_user") != null) {
+            int[] users = 
+                    toIntArray(request.getParameterValues("users_available"));
+            if (users != null) {
+                for (int i = 0; i < users.length; i++) {
+                    usersSelected.put(users[i], usersAvailable.get(users[i]));
+                    usersAvailable.remove(users[i]);
+                }
+            }
+            view = FORM_VIEW;
+        }
+        // remove user
+        if (request.getParameter("remove_user") != null) {
+            int[] users = 
+                    toIntArray(request.getParameterValues("users_selected"));
+            if (users != null) {
+                for (int i = 0; i < users.length; i++) {
+                    usersAvailable.put(users[i], usersSelected.get(users[i]));
+                    usersSelected.remove(users[i]);
+                }
+            }
+            view = FORM_VIEW;
+        }
+        if (request.getParameter("save_data_source") != null) {
+            validator.validate(dataSource, result);
+            if (result.hasErrors() || radarsSelected.isEmpty()) {
+                
+                if (radarsSelected.isEmpty()) {
+                    request.getSession().setAttribute(MISSING_RADAR_MODEL_KEY, 
+                            messages.getMessage(MISSING_RADAR_ERROR_MSG_KEY));
+                }
+                view = FORM_VIEW;
+            } else {
+                // begin transaction
+                TransactionDefinition def = new DefaultTransactionDefinition();
+                TransactionStatus status = 
+                        transactionManager.getTransaction(def);
+                try {
+                    int dataSourceId = 0;
+                    // set data source type
+                    dataSource.setType(DataSource.LOCAL);
+                    if (dataSource.getId() > 0) {
+                        dataSourceManager.update(dataSource);
+                        dataSourceId = dataSource.getId();
                     } else {
-                        for (Subscription s : uploads) {
-                            if (s.getDataSource().equals(dataSource.getName()))
-                            {
-                                subscriptionManager.delete(s.getId());
+                        dataSourceId = dataSourceManager.store(dataSource);
+                    }
+                    if (dataSourceId > 0) {
+                        // Remove filter parameter
+                        int filterId = 
+                                dataSourceManager.loadFilterId(dataSourceId);
+                        if (filterId > 0) {
+                            IFilter filter = coreFilterManager.load(filterId);
+                            coreFilterManager.remove(filter);
+                        }
+                        // Save radar parameter
+                        dataSourceManager.deleteRadar(dataSourceId);
+                        String wmoAttrValue = "";
+                        if (!radarsSelected.isEmpty()) {    
+                            for (Radar radar : radarsSelected.values()) {
+                                dataSourceManager.storeRadar(dataSourceId, 
+                                        radar.getId());
+                                // Set filter value
+                                wmoAttrValue += radar.getRadarWmo() + ",";
                             }
                         }
+                        // Save file object parameter
+                        dataSourceManager.deleteFileObject(dataSourceId);
+                        String fileObjectAttrValue = "";
+                        if (!fileObjectsSelected.isEmpty()) {
+                            for (FileObject fileObject : 
+                                    fileObjectsSelected.values()) {;
+                                dataSourceManager.storeFileObject(dataSourceId, 
+                                        fileObject.getId());
+                                // Set filter value
+                                fileObjectAttrValue += fileObject.getName()
+                                        + ",";
+                            }
+                        }
+                        wmoAttrValue = wmoAttrValue
+                                .substring(0, wmoAttrValue.lastIndexOf(","));
+                        if (!fileObjectAttrValue.isEmpty()) {
+                            fileObjectAttrValue = fileObjectAttrValue
+                                .substring( 0, 
+                                        fileObjectAttrValue.lastIndexOf(","));
+                        }
+                        /* 
+                         * Save user parameter. Remove respective subscriptions 
+                         * in case when data source access right was revoked
+                         * for a given user
+                         */
+                        List<Subscription> uploads = subscriptionManager
+                                    .load(Subscription.PEER);
+                        dataSourceManager.deleteUser(dataSourceId);
+                        if (!usersSelected.isEmpty()) {
+                            for (User user : usersSelected.values()) {
+                                dataSourceManager.storeUser(dataSourceId, 
+                                        user.getId());
+                            }
+                            for (Subscription s : uploads) {
+                                User user = userManager.load(s.getUser());
+                                if (s.getDataSource()
+                                        .equals(dataSource.getName())
+                                        && usersSelected
+                                            .containsKey(user.getId())) {
+                                    subscriptionManager.delete(s.getId());
+                                }
+                            }
+                        } else {
+                            for (Subscription s : uploads) {
+                                if (s.getDataSource()
+                                        .equals(dataSource.getName())) {
+                                    subscriptionManager.delete(s.getId());
+                                }
+                            }
+                        }
+                        // Configure filters
+                        CombinedFilter combinedFilter = new CombinedFilter();
+                        combinedFilter.setMatchType(CombinedFilter
+                                .MatchType.ALL);
+                        AttributeFilter sourceFilter = new AttributeFilter();
+                        if (!wmoAttrValue.isEmpty()) {
+                            sourceFilter.setAttribute(DS_SOURCE_ATTR_STR);
+                            sourceFilter.setValueType(
+                                    AttributeFilter.ValueType.STRING);
+                            sourceFilter.setOperator(AttributeFilter
+                                    .Operator.IN);
+                            sourceFilter.setValue(wmoAttrValue);
+                            combinedFilter.addChildFilter(sourceFilter);
+                        }
+                        AttributeFilter fileObjectFilter = new AttributeFilter();
+                        if (!fileObjectAttrValue.isEmpty()) {
+                            fileObjectFilter.setAttribute(DS_OBJECT_ATTR_STR);
+                            fileObjectFilter.setValueType(
+                                    AttributeFilter.ValueType.STRING);
+                            fileObjectFilter.setOperator(
+                                    AttributeFilter.Operator.IN);
+                            fileObjectFilter.setValue(fileObjectAttrValue);
+                            combinedFilter.addChildFilter(fileObjectFilter);
+                        }
+                        // Save filter parameter
+                        coreFilterManager.store(combinedFilter);
+                        dataSourceManager.deleteFilter(dataSourceId);
+                        dataSourceManager.storeFilter(dataSourceId, 
+                                combinedFilter.getId());
+                        String msg = messages
+                                .getMessage(SAVE_DATASOURCE_OK_MSG_KEY, 
+                                new Object[] {dataSource.getName()});
+                        model.addAttribute(OK_MSG_KEY, msg);
+                        log.warn(msg);
+                    } else {
+                        String msg = messages
+                                .getMessage(SAVE_DATASOURCE_ERROR_MSG_KEY, 
+                                new Object[] {dataSource.getName()});
+                        model.addAttribute(ERROR_MSG_KEY, msg);
+                        log.error(msg);
                     }
-                    // Configure filters
-                    CombinedFilter combinedFilter = new CombinedFilter();
-                    combinedFilter.setMatchType(CombinedFilter.MatchType.ALL);
-                    AttributeFilter sourceFilter = new AttributeFilter();
-                    if (!wmoAttrValue.isEmpty()) {
-                        sourceFilter.setAttribute(DS_SOURCE_ATTR_STR);
-                        sourceFilter.setValueType(
-                                AttributeFilter.ValueType.STRING);
-                        sourceFilter.setOperator(AttributeFilter.Operator.IN);
-                        sourceFilter.setValue(wmoAttrValue);
-                        combinedFilter.addChildFilter(sourceFilter);
-                    }
-                    AttributeFilter fileObjectFilter = new AttributeFilter();
-                    if (!fileObjectAttrValue.isEmpty()) {
-                        fileObjectFilter.setAttribute(DS_OBJECT_ATTR_STR);
-                        fileObjectFilter.setValueType(
-                                AttributeFilter.ValueType.STRING);
-                        fileObjectFilter.setOperator(
-                                AttributeFilter.Operator.IN);
-                        fileObjectFilter.setValue(fileObjectAttrValue);
-                        combinedFilter.addChildFilter(fileObjectFilter);
-                    }
-                    // Save filter parameter
-                    coreFilterManager.store(combinedFilter);
-                    dataSourceManager.deleteFilter(dataSourceId);
-                    dataSourceManager.storeFilter(dataSourceId, 
-                            combinedFilter.getId());
+                    transactionManager.commit(status);
+                } catch (Exception e) {
+                    transactionManager.rollback(status);
                     String msg = messages
-                            .getMessage(SAVE_DATASOURCE_OK_MSG_KEY, 
-                            new Object[] {dataSource.getName()});
-                    model.addAttribute(OK_MSG_KEY, msg);
-                    log.warn(msg);
-                } else {
-                    String msg = messages
-                            .getMessage(SAVE_DATASOURCE_ERROR_MSG_KEY, 
-                            new Object[] {dataSource.getName()});
+                                .getMessage(SAVE_DATASOURCE_ERROR_MSG_KEY, 
+                                new Object[] {dataSource.getName()});
                     model.addAttribute(ERROR_MSG_KEY, msg);
-                    log.error(msg);
+                    log.error(msg, e);
                 }
-                transactionManager.commit(status);
-            } catch (Exception e) {
-                transactionManager.rollback(status);
-                String msg = messages
-                            .getMessage(SAVE_DATASOURCE_ERROR_MSG_KEY, 
-                            new Object[] {dataSource.getName()});
-                model.addAttribute(ERROR_MSG_KEY, msg);
-                log.error(msg, e);
-            }
-            return SUCCESS_VIEW;
-        }
-    }
-    
-    /**
-     * Get radars available for selection.
-     * @param dsId Data source id
-     * @return List of available radars
-     */
-    @ModelAttribute("all_radars")
-    public List<Radar> getAllRadars(
-            @RequestParam(value="ds_id", required=false) String dsId) {
-        if (dsId != null) {
-            List<Radar> selectedRadars = dataSourceManager
-                    .loadRadar(Integer.parseInt(dsId));
-            List<Radar> allButSelectedRadars = new ArrayList<Radar>();
-            for (Radar radar : radarManager.load()) {
-                if (!selectedRadars.contains(radar)) {       
-                    allButSelectedRadars.add(radar);
-                }
-            }
-            return allButSelectedRadars;
-        } else {
-            return radarManager.load();
-        }
-    }
-    
-    /**
-     * Get selected radars
-     * @param dsId Data source id
-     * @return List of selected radars
-     */
-    @ModelAttribute("selected_radars")
-    public List<Radar> getSelectedRadars(
-            @RequestParam(value="ds_id", required=false) String dsId) {
-        if (dsId != null) {
-            return dataSourceManager.loadRadar(Integer.parseInt(dsId));
-        } else {
-            return null;
-        }
-    }
-    
-    /**
-     * Get file objects available for selection.
-     * @param dsId Data source id
-     * @return List of available file objects
-     */
-    @ModelAttribute("all_file_objects")
-    public List<FileObject> getAllFileObjects(
-            @RequestParam(value="ds_id", required=false) String dsId) {
-        if (dsId != null) {
-            List<FileObject> selectedFileObjects = dataSourceManager
-                    .loadFileObject(Integer.parseInt(dsId));
-            List<FileObject> allButSelectedFileObjects = 
-                    new ArrayList<FileObject>();
-            for (FileObject fileObject : fileObjectManager.load()) {
-                if (!selectedFileObjects.contains(fileObject)) {
-                    allButSelectedFileObjects.add(fileObject);
-                }
-            }
-            return allButSelectedFileObjects;
-        } else {
-            return fileObjectManager.load();
-        }
-    }
-    
-    /**
-     * Get selected file objects.
-     * @param dsId Data source id
-     * @return List of selected file objects
-     */
-    @ModelAttribute("selected_file_objects")
-    public List<FileObject> getSelectedFileObjects(
-            @RequestParam(value="ds_id", required=false) String dsId) {
-        if (dsId != null) {
-            return dataSourceManager.loadFileObject(Integer.parseInt(dsId));
-        } else {
-            return null;
-        }
-    }
-    
-    /**
-     * Get user accounts available for selection.
-     * @param dsId Data source id
-     * @return List of available users
-     */
-    @ModelAttribute("all_users")
-    public List<User> getAllUsers(
-            @RequestParam(value="ds_id", required=false) String dsId) {
-        if (dsId != null) {
-            List<User> selectedUsers = dataSourceManager
-                    .loadUser(Integer.parseInt(dsId));
-            List<User> allButSelectedUsers = new ArrayList<User>();
-            for (User usr : userManager.load()) {
-                if (!selectedUsers.contains(usr) 
-                        && usr.getRole().equals(Role.PEER)) {
-                    allButSelectedUsers.add(usr);
-                }
-            }
-            return allButSelectedUsers;
-        } else {
-            List<User> allUsers = userManager.load();
-            List<User> peers = new ArrayList<User>();
-            for (User usr : allUsers) {
-                if (usr.getRole().equals(Role.PEER)) {
-                    peers.add(usr);
-                }
-            }
-            return peers;
-        }
-    }
-    
-    /**
-     * Get selected users.
-     * @param dsId Data source id
-     * @return List of selected users
-     */
-    @ModelAttribute("selected_users")
-    public List<User> getSelectedUsers(
-            @RequestParam(value="ds_id", required=false) String dsId) {
-        if (dsId != null) {
-            return dataSourceManager.loadUser(Integer.parseInt(dsId));
-        } else {
-            return null;
-        }
-    }
-    
-    /**
-     * Checks if a given user is present on the list.
-     * @param users List of users
-     * @param user User to look for
-     * @return True in case user is present 
-     */
-    private boolean containsUser(List<User> users, String userName) {
-        boolean result = false;
-        for (User availableUser : users) {
-            if (availableUser.getName().equals(userName)) {
-                result = true;
-                break;
+                view = SUCCESS_VIEW;
             }
         }
-        return result;
+        setModelAttributes(model);
+        return view;
+    }
+    
+    /**
+     * Set model attributes.
+     * @param model Model map 
+     */
+    private void setModelAttributes(ModelMap model) {
+        model.addAttribute("radars_selected", radarsSelected);
+        model.addAttribute("radars_available", radarsAvailable);
+        model.addAttribute("file_objects_selected", fileObjectsSelected);
+        model.addAttribute("file_objects_available", fileObjectsAvailable);
+        model.addAttribute("users_selected", usersSelected);
+        model.addAttribute("users_available", usersAvailable);
+    }
+    
+    /**
+     * Clear model data.
+     */
+    private void clearModelData() {
+        radarsAvailable.clear();
+        radarsSelected.clear();
+        fileObjectsAvailable.clear();
+        fileObjectsSelected.clear();
+        usersAvailable.clear();
+        usersSelected.clear();   
+    }
+    
+    /**
+     * Convert string array to integer array.
+     * @param stringArray Input string array
+     * @return Array containing integer values
+     */
+    private int[] toIntArray(String[] stringArray) {
+        int[] intArray = new int[stringArray.length];
+        for (int i = 0; i < stringArray.length; i++) {
+            intArray[i] = Integer.parseInt(stringArray[i].trim());
+        }
+        return intArray;
     }
     
     /**
@@ -450,7 +485,7 @@ public class SaveDataSourceController {
      * @param radarManager the radarManager to set
      */
     @Autowired
-    public void setRadarManager(RadarManager radarManager) {
+    public void setRadarManager(IRadarManager radarManager) {
         this.radarManager = radarManager;
     }
 
@@ -458,7 +493,7 @@ public class SaveDataSourceController {
      * @param fileObjectManager the fileObjectManager to set
      */
     @Autowired
-    public void setFileObjectManager(FileObjectManager fileObjectManager) {
+    public void setFileObjectManager(IFileObjectManager fileObjectManager) {
         this.fileObjectManager = fileObjectManager;
     }
 
@@ -466,7 +501,7 @@ public class SaveDataSourceController {
      * @param userManager the userManager to set
      */
     @Autowired
-    public void setUserManager(UserManager userManager) {
+    public void setUserManager(IUserManager userManager) {
         this.userManager = userManager;
     }
 
@@ -506,7 +541,7 @@ public class SaveDataSourceController {
      * @param subscriptionManager the subscriptionManager to set
      */
     @Autowired
-    public void setSubscriptionManager(SubscriptionManager subscriptionManager) 
+    public void setSubscriptionManager(ISubscriptionManager subscriptionManager) 
     {
         this.subscriptionManager = subscriptionManager;
     }

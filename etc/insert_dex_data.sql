@@ -75,3 +75,4 @@ INSERT INTO dex_product_parameters (name, description) VALUES
     ('CAPPI', 'Layer height (meters above the radar)'), ('PPI', 'Elevation angle used (degrees)'),
     ('ETOP', 'Reflectivity level (dBZ)'), ('RHI', 'Azimuth angle (degrees)'),
     ('VIL', 'Bottom and top heights (m) of the integration layer');
+

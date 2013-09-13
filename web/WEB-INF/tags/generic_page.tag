@@ -55,8 +55,7 @@
         <script src="includes/js/jQuery.js" type="text/javascript"></script>
         <script src="includes/js/datetimepicker_css.js" type="text/javascript"></script>
         <script src="includes/js/validate_time_input.js" type="text/javascript"></script>
-        <script src="includes/js/submit_center_id.js" type="text/javascript"></script>
-        <script src="includes/js/copy_select_option.js" type="text/javascript"></script>          
+        <script src="includes/js/submit_center_id.js" type="text/javascript"></script>          
         <script src="includes/js/filter.js" type="text/javascript"></script>
         <script src="includes/js/messages_ajax.js" type="text/javascript"></script>
         <jsp:invoke fragment="extraHeader"/>
