@@ -34,7 +34,6 @@ import eu.baltrad.beast.adaptor.IBltAdaptorManager;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.acrr.AcrrRule;
-import eu.baltrad.beast.rules.util.IRuleUtilities;
 
 /**
  * Manages the acrr routes and routing rules.
