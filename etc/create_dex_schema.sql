@@ -149,7 +149,7 @@ CREATE TABLE dex_delivery_registry
     status BOOLEAN DEFAULT FALSE
 );
 
-CREATE UNIQUE INDEX dex_delivery_registry_timestamp_idx ON dex_messages (time_stamp);
+CREATE UNIQUE INDEX dex_delivery_registry_timestamp_idx ON dex_delivery_registry (time_stamp);
 
 CREATE TABLE dex_delivery_registry_users
 (

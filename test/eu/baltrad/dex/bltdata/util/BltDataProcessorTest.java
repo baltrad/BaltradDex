@@ -53,6 +53,8 @@ public class BltDataProcessorTest {
             "fixtures/Z_PVOL_2013081422004400_lvrix.h5";
     private static final String FILE_BYMIN =
             "fixtures/Z_PVOL_2013081413301200_bymin.h5";
+    private static final String FILE_COMP = 
+            "fixtures/Z_COMP_20130927101000_pl.h5";
     private DataProcessor classUnderTest;
     
     @Before
@@ -144,7 +146,7 @@ public class BltDataProcessorTest {
     }
     
     @Test 
-    public void polarDataset2CartImage_PL_LEG() throws Exception {
+    public void polar2CartImage_PL_LEG() throws Exception {
         H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/dataset1/where", "nbins");
@@ -167,7 +169,7 @@ public class BltDataProcessorTest {
         
         Color[] palette = classUnderTest
                 .createColorPalette("conf/color_palette.txt");
-        BufferedImage bi = classUnderTest.polar2CartImage(nbins, rscale, dataset, 
+        BufferedImage bi = classUnderTest.polar2Image(nbins, rscale, dataset, 
                 palette, 0, true, true);
         
         assertNotNull(bi);
@@ -176,7 +178,7 @@ public class BltDataProcessorTest {
     }
     
     @Test 
-    public void polarDataset2CartImage_LV_RIX() throws Exception {
+    public void polar2CartImage_LV_RIX() throws Exception {
         H5File file = classUnderTest.openH5File(getFilePath(FILE_LVRIX));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/dataset1/where", "nbins");
@@ -199,7 +201,7 @@ public class BltDataProcessorTest {
         
         Color[] palette = classUnderTest
                 .createColorPalette("conf/color_palette.txt");
-        BufferedImage bi = classUnderTest.polar2CartImage(nbins, rscale, 
+        BufferedImage bi = classUnderTest.polar2Image(nbins, rscale, 
                 dataset, palette, 0, true, true);
         
         assertNotNull(bi);
@@ -208,7 +210,7 @@ public class BltDataProcessorTest {
     }
     
     @Test 
-    public void polarDataset2CartImage_BY_MIN() throws Exception {
+    public void polar2CartImage_BY_MIN() throws Exception {
         H5File file = classUnderTest.openH5File(getFilePath(FILE_BYMIN));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/dataset1/where", "nbins");
@@ -231,12 +233,55 @@ public class BltDataProcessorTest {
         
         Color[] palette = classUnderTest
                 .createColorPalette("conf/color_palette.txt");
-        BufferedImage bi = classUnderTest.polar2CartImage(nbins, rscale, dataset, 
-                palette, 0, true, true);
+        BufferedImage bi = classUnderTest.polar2Image(nbins, rscale, 
+                dataset, palette, 0, true, true);
         
         assertNotNull(bi);
         assertTrue(classUnderTest
                 .saveImageToFile(bi, "minsk_dataset1.png"));
+    }
+    
+    @Test 
+    public void comp2CartImage() throws Exception {
+        H5File file = classUnderTest.openH5File(getFilePath(FILE_COMP));
+        Group root = classUnderTest.getH5Root(file);
+        classUnderTest.getH5Attribute(root, "/where", "xsize");
+        
+        assertEquals("xsize", classUnderTest.getH5Attribute().getName());
+        
+        long xsize = (Long) classUnderTest.getH5AttributeValue();
+        
+        assertEquals(754, xsize);
+        
+        classUnderTest.getH5Attribute(root, "/where", "ysize");
+        
+        assertEquals("ysize", classUnderTest.getH5Attribute().getName());
+        
+        long ysize = (Long) classUnderTest.getH5AttributeValue();
+        
+        assertEquals(810, ysize);
+        
+        classUnderTest.getH5Attribute(root, "/dataset1/data1/what", "nodata");
+        
+        assertEquals("nodata", classUnderTest.getH5Attribute().getName());
+        
+        double nodata = (Double) classUnderTest.getH5AttributeValue();
+        
+        assertEquals(255, nodata, 0);
+        
+        classUnderTest.getH5Dataset(root, "/dataset1/data1/data");
+        Dataset dataset = classUnderTest.getH5Dataset();
+        
+        assertNotNull(dataset);
+        
+        Color[] palette = classUnderTest
+                .createColorPalette("conf/color_palette.txt");
+        BufferedImage bi = classUnderTest.cart2Image(xsize, ysize, nodata, 
+                dataset, palette, 0, 0, true);
+        
+        assertNotNull(bi);
+        assertTrue(classUnderTest.saveImageToFile(bi, "polcomp.png"));
+        
     }
     
 }

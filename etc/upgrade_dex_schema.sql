@@ -283,6 +283,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/*
+    Remove double index from dex_messages table and create index on 
+    dex_delivery_registry table.
+*/
+CREATE OR REPLACE FUNCTION remove_double_index() RETURNS void AS $$
+BEGIN 
+    DROP INDEX IF EXISTS dex_messages_timestamp_idx;
+    DROP INDEX IF EXISTS dex_delivery_registry_timestamp_idx;
+    CREATE INDEX dex_messages_timestamp_idx ON dex_messages (time_stamp);
+    CREATE INDEX dex_delivery_registry_timestamp_idx 
+            ON dex_delivery_registry (time_stamp);
+END;
+$$ LANGUAGE plpgsql; 
+
 SELECT remove_name_hash_from_dex_users();
 -- SELECT reset_user_passwords();
 SELECT rename_registry_table();
@@ -290,9 +304,11 @@ SELECT create_dex_keys_table();
 SELECT upgrade_dex_delivery_registry_table();
 SELECT create_dex_delivery_registry_data_sources_table();
 SELECT update_dex_data_source_users_table(); 
+SELECT remove_double_index();
 
 DROP FUNCTION make_plpgsql(); 
 DROP FUNCTION remove_name_hash_from_dex_users();
 DROP FUNCTION reset_user_passwords();
 DROP FUNCTION rename_registry_table();
 DROP FUNCTION update_dex_data_source_users_table();
+DROP FUNCTION remove_double_index();

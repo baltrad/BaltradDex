@@ -73,6 +73,7 @@ public class BltFileDetailsController {
     // Model keys
     private static final String FC_FILE_UUID = "uuid";
     private static final String DATASETS_KEY = "blt_datasets";
+    private static final String H5_OBJECT_KEY = "h5_object";
     private static final String FILE_KEY = "blt_file";
     private static final String FILE_NAME_KEY = "file_name";
     private static final String FILE_SOURCE_KEY = "source";
@@ -119,9 +120,7 @@ public class BltFileDetailsController {
      */
     @RequestMapping("/file_details.htm")
     public String processSubmit(HttpServletRequest request, ModelMap model) {
-        
         String uuid = request.getParameter(FC_FILE_UUID);
-        
         BltFile bltFile = bltFileManager.load(uuid);
         String fileName = bltFile.getPath().substring( 
                 bltFile.getPath().lastIndexOf(File.separator)
@@ -147,9 +146,9 @@ public class BltFileDetailsController {
                 bltFile.getType().equals(DataProcessor.ODIMH5_PVOL_OBJ)) {
             processPolarData(bltFile, h5File, uuid, model);
         }
-        // IMAGEs
-        if (bltFile.getType().equals(DataProcessor.ODIMH5_IMAGE_OBJ)) {
-            processCartesianData(bltFile, h5File, uuid, model);
+        // Composite maps
+        if (bltFile.getType().equals(DataProcessor.ODIMH5_COMP_OBJ)) {
+            processCompositeData(bltFile, h5File, uuid, model);
         }
 
         // ... other file objects to be implemented here ...
@@ -191,6 +190,12 @@ public class BltFileDetailsController {
         }
         Color[] palette = bltDataProcessor.createColorPalette(
                 ServletContextUtil.getServletContextPath() + PALETTE_FILE);
+        
+        // get object type
+        bltDataProcessor.getH5Attribute(root, DataProcessor.H5_PATH_SEPARATOR + 
+            DataProcessor.H5_WHAT_GROUP_PREFIX, DataProcessor.H5_OBJECT_ATTR);
+        String object = (String) bltDataProcessor.getH5AttributeValue();
+        
         try {
             // iterate through datasets
             for( int i = 0; i < datasetPaths.size(); i++ ) {
@@ -213,6 +218,7 @@ public class BltFileDetailsController {
                                     DataProcessor.H5_WHAT_GROUP_PREFIX;
                     }
                 }
+                
                 // get data quantity
                 bltDataProcessor.getH5Attribute(root, whatGroup,
                         DataProcessor.H5_QUANTITY_ATTR );
@@ -247,11 +253,11 @@ public class BltFileDetailsController {
 
                 // create dataset objects
                 BltDataset bltDataset = new BltDataset(datasetPaths.get(i),
-                    whereGroup, quantity_val, nbins_val * 2, nbins_val * 2,
+                    whereGroup, quantity_val, nbins_val * 2, nbins_val * 2, 
                     lat0_val, lon0_val, llLatLon.getY(), llLatLon.getX(), 
                     urLatLon.getY(), urLatLon.getX(), elangle_val, 
-                        configurationManager.getAppConf().getWorkDir() +
-                    File.separator + configurationManager.getAppConf()
+                    configurationManager.getAppConf().getWorkDir() 
+                    + File.separator + configurationManager.getAppConf()
                         .getThumbsDir() + File.separator +
                     uuid + datasetPaths.get(i)
                         .replaceAll(DataProcessor.H5_PATH_SEPARATOR, "_") +
@@ -272,7 +278,7 @@ public class BltFileDetailsController {
                 if (!thumb.exists()) {
                     bltDataProcessor.getH5Dataset(root, datasetPaths.get(i));
                     Dataset dataset = bltDataProcessor.getH5Dataset();
-                    BufferedImage bi = bltDataProcessor.polar2CartImage(
+                    BufferedImage bi = bltDataProcessor.polar2Image(
                         nbins_val, rscale_val, dataset, palette, 
                         THUMB_IMAGE_SIZE, false, true);
                     bltDataProcessor.saveImageToFile(bi, thumbPath);
@@ -284,6 +290,7 @@ public class BltFileDetailsController {
         }        
         Collections.sort(bltDatasets);
         model.addAttribute(DATASETS_KEY, bltDatasets);
+        model.addAttribute(H5_OBJECT_KEY, object);
         model.addAttribute(FILE_KEY, bltFile);
     }
     /**
@@ -293,10 +300,132 @@ public class BltFileDetailsController {
      * @param uuid Unique file entry ID
      * @param model Model map
      */
-    public void processCartesianData(BltFile bltFile, H5File h5File, 
+    public void processCompositeData(BltFile bltFile, H5File h5File, 
             String uuid, ModelMap model) {
-        // ... to be implemented ...
-
+        // process the file
+        Group root = bltDataProcessor.getH5Root(h5File);
+        // get dataset full names
+        List<String> datasetPaths = new ArrayList<String>();
+        bltDataProcessor.getH5DatasetPaths(root, datasetPaths);
+        // dataset objects holds file's metadata
+        List<BltDataset> bltDatasets = new ArrayList<BltDataset>();
+        Color[] palette = bltDataProcessor.createColorPalette(
+                ServletContextUtil.getServletContextPath() + PALETTE_FILE);
+        String whereGroup = DataProcessor.H5_PATH_SEPARATOR + 
+                        DataProcessor.H5_WHERE_GROUP_PREFIX;
+        
+        // get object type
+        bltDataProcessor.getH5Attribute(root, DataProcessor.H5_PATH_SEPARATOR + 
+            DataProcessor.H5_WHAT_GROUP_PREFIX, DataProcessor.H5_OBJECT_ATTR);
+        String object = (String) bltDataProcessor.getH5AttributeValue();
+        
+        try {
+            // iterate through datasets
+            for( int i = 0; i < datasetPaths.size(); i++ ) {
+                // find dataset specific WHAT group
+                String datasetFullName = datasetPaths.get(i);
+                String[] nameParts = datasetFullName.split(
+                        DataProcessor.H5_PATH_SEPARATOR);
+                String datasetSpecificHow = "";
+                String dataSpecificWhat = "";
+                for (int j = 0; j < nameParts.length; j++) {
+                    if (nameParts[j].startsWith(
+                            DataProcessor.H5_DATASET_PREFIX)){
+                        datasetSpecificHow = datasetFullName.substring(0,
+                                datasetFullName.indexOf(
+                                DataProcessor.H5_PATH_SEPARATOR, 1)) +
+                                    DataProcessor.H5_PATH_SEPARATOR +
+                                    DataProcessor.H5_HOW_GROUP_PREFIX;
+                        dataSpecificWhat = datasetFullName.substring(0, 
+                                datasetFullName.lastIndexOf(
+                                    DataProcessor.H5_PATH_SEPARATOR)) + 
+                                    DataProcessor.H5_PATH_SEPARATOR + 
+                                    DataProcessor.H5_WHAT_GROUP_PREFIX;
+                    }
+                }
+                
+                // get nodes
+                bltDataProcessor.getH5Attribute(root, datasetSpecificHow,
+                        DataProcessor.H5_NODES_ATTR);
+                String nodes = (String) bltDataProcessor.getH5AttributeValue();
+                String nodesList = nodes.replaceAll("'", "")
+                        .replaceAll(",", ", ");
+                // get data quantity
+                bltDataProcessor.getH5Attribute(root, dataSpecificWhat,
+                        DataProcessor.H5_QUANTITY_ATTR);
+                String quantity_val = (String) bltDataProcessor
+                        .getH5AttributeValue();
+                bltDataProcessor.getH5Attribute(root, whereGroup, 
+                            DataProcessor.H5_XSIZE_ATTR);
+                long xsize = (Long) bltDataProcessor.getH5AttributeValue();
+                bltDataProcessor.getH5Attribute(root, whereGroup, 
+                            DataProcessor.H5_YSIZE_ATTR);
+                long ysize = (Long) bltDataProcessor.getH5AttributeValue();
+                bltDataProcessor.getH5Attribute(root, dataSpecificWhat, 
+                            DataProcessor.H5_NODATA_ATTR);
+                double noData = (Double) bltDataProcessor.getH5AttributeValue();
+                bltDataProcessor.getH5Attribute(root, whereGroup, 
+                            DataProcessor.H5_LL_LON_ATTR);
+                double llLon = (Double) bltDataProcessor.getH5AttributeValue();
+                bltDataProcessor.getH5Attribute(root, whereGroup, 
+                            DataProcessor.H5_LL_LAT_ATTR);
+                double llLat = (Double) bltDataProcessor.getH5AttributeValue();
+                bltDataProcessor.getH5Attribute(root, whereGroup, 
+                            DataProcessor.H5_UR_LON_ATTR);
+                double urLon = (Double) bltDataProcessor.getH5AttributeValue();
+                bltDataProcessor.getH5Attribute(root, whereGroup, 
+                            DataProcessor.H5_UR_LAT_ATTR);
+                double urLat = (Double) bltDataProcessor.getH5AttributeValue();
+                
+                // This will work only in the upper right (north-eastern)
+                // quarter of geographic coordinates system. 
+                double lon0 = llLon + ((urLon - llLon) / 2);
+                double lat0 = llLat + ((urLat - llLat) / 2);
+                
+                // create dataset objects
+                BltDataset bltDataset = new BltDataset(datasetPaths.get(i),
+                    whereGroup, quantity_val, nodesList, xsize, ysize, 
+                    lat0, lon0, llLat, llLon, urLat, urLon, 
+                        configurationManager.getAppConf().getWorkDir() + 
+                        File.separator + 
+                        configurationManager.getAppConf().getThumbsDir() + 
+                        File.separator + uuid + 
+                        datasetPaths.get(i).replaceAll(
+                            DataProcessor.H5_PATH_SEPARATOR, "_") +
+                        DataProcessor.IMAGE_FILE_EXT);
+                        
+                // add dataset object to the list
+                bltDatasets.add(bltDataset);
+                
+                // try to load thumb from disk before creating a new one
+                String thumbPath = ServletContextUtil.getServletContextPath() +
+                        configurationManager.getAppConf().getWorkDir() +
+                        File.separator + 
+                        configurationManager.getAppConf().getThumbsDir() + 
+                        File.separator + uuid + datasetPaths.get(i)
+                            .replaceAll(DataProcessor.H5_PATH_SEPARATOR, "_" )  
+                        + DataProcessor.IMAGE_FILE_EXT;
+                // generate image thumbs
+                File thumb = new File( thumbPath );
+                if (!thumb.exists()) {
+                    int thumbWidth = (int) Math.round(xsize / 10);
+                    int thumbHeight = (int) Math.round(ysize / 10);
+                    bltDataProcessor.getH5Dataset(root, datasetPaths.get(i));
+                    Dataset dataset = bltDataProcessor.getH5Dataset();
+                    BufferedImage bi = bltDataProcessor.cart2Image(xsize, 
+                        ysize, noData, dataset, palette, thumbWidth, 
+                        thumbHeight, true);
+                    bltDataProcessor.saveImageToFile(bi, thumbPath);
+                }
+            }
+        } finally {
+            // important: image generating method does not close the file
+            bltDataProcessor.closeH5File(h5File);
+        }        
+        Collections.sort(bltDatasets);
+        model.addAttribute(DATASETS_KEY, bltDatasets);
+        model.addAttribute(H5_OBJECT_KEY, object);
+        model.addAttribute(FILE_KEY, bltFile);
     }
 
     /**

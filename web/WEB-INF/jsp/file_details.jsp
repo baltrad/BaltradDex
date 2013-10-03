@@ -95,7 +95,13 @@ Author     : szewczenko
                         <div class="body">
                             <div class="header-row">
                                 <div class="count">&nbsp;</div>
-                                <div class="elangle">Elevation angle</div>
+                                <c:if test="${h5_object == 'SCAN' 
+                                                  || h5_object == 'PVOL'}">
+                                    <div class="elangle">Elevation angle</div>
+                                </c:if>
+                                <c:if test="${h5_object == 'COMP'}">
+                                    <div class="elangle">Nodes</div>
+                                </c:if>  
                                 <div class="data-type">Data type</div>
                                 <div class="thumbnail">Preview</div>
                             </div>
@@ -106,18 +112,25 @@ Author     : szewczenko
                                         <c:out value="${count}"/>
                                         <c:set var="count" value="${count + 1}"/>
                                     </div>
-                                    <div class="elangle">
-                                        <fmt:formatNumber type="number" 
-                                                          maxFractionDigits="1"
-                                                          minFractionDigits="1"
-                                                          value="${dataset.elevationAngle}"/>
-                                        &deg;
-                                    </div>
+                                    <c:if test="${h5_object == 'SCAN' 
+                                                  || h5_object == 'PVOL'}">
+                                        <div class="elangle">
+                                            <fmt:formatNumber type="number" 
+                                                              maxFractionDigits="1"
+                                                              minFractionDigits="1"
+                                                              value="${dataset.elevationAngle}"/>
+                                            &deg;
+                                        </div>
+                                    </c:if>
+                                    <c:if test="${h5_object == 'COMP'}">
+                                        <div class="elangle">
+                                            <c:out value="${dataset.nodes}"/>
+                                        </div>
+                                    </c:if>         
                                     <div class="data-type">
                                         <c:out value="${dataset.quantity}"/>
                                     </div>
                                     <div class="thumbnail">
-                                        
                                         <c:url var="imagePreviewURL" value="file_preview.htm">
                                             <c:param name="file_uuid"
                                                     value="${uuid}"/>
@@ -160,8 +173,8 @@ Author     : szewczenko
                 <div class="table-footer">
                     <div class="buttons">
                         <div class="button-wrap">
-                            <input class="button" type="button" value="Home"
-                                   onclick="window.location.href='status.htm';"/>
+                            <input class="button" type="button" value="Back"
+                                   onclick="window.location.href='file_browser.htm';"/>
                         </div>
                     </div>
                 </div>                                                  

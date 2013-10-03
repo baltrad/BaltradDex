@@ -40,6 +40,7 @@ import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.AttributeFilter;
 import eu.baltrad.beast.db.CombinedFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
+import eu.baltrad.beast.db.IFilterManager;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,12 +106,12 @@ public class SaveDataSourceController {
     private MessageResourceUtil messages;
     private Logger log;
     
-    private Map<Integer, Radar> radarsAvailable;
-    private Map<Integer, Radar> radarsSelected;
-    private Map<Integer, FileObject> fileObjectsAvailable;
-    private Map<Integer, FileObject> fileObjectsSelected;
-    private Map<Integer, User> usersAvailable;
-    private Map<Integer, User> usersSelected;
+    protected Map<Integer, Radar> radarsAvailable;
+    protected Map<Integer, Radar> radarsSelected;
+    protected Map<Integer, FileObject> fileObjectsAvailable;
+    protected Map<Integer, FileObject> fileObjectsSelected;
+    protected Map<Integer, User> usersAvailable;
+    protected Map<Integer, User> usersSelected;
     
     /**
      * Constructor.
@@ -196,7 +197,7 @@ public class SaveDataSourceController {
     
     /**
      * Process form submission and save data source and its parameters.
-     * @param dataSource Data source objects
+     * @param dataSource Data source object
      * @param result Binding result
      * @param model Model map
      * @param request HTTP servlet request
@@ -287,7 +288,6 @@ public class SaveDataSourceController {
         if (request.getParameter("save_data_source") != null) {
             validator.validate(dataSource, result);
             if (result.hasErrors() || radarsSelected.isEmpty()) {
-                
                 if (radarsSelected.isEmpty()) {
                     request.getSession().setAttribute(MISSING_RADAR_MODEL_KEY, 
                             messages.getMessage(MISSING_RADAR_ERROR_MSG_KEY));

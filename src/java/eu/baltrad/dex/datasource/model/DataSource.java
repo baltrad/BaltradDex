@@ -102,7 +102,7 @@ public class DataSource implements Serializable, Comparable<DataSource> {
      */
     @Override
     public int hashCode() {
-        return( name != null ? name.hashCode() : 0 );
+        return (name != null ? name.hashCode() : 0);
     }
     /**
      * Gets data source ID.
@@ -129,7 +129,7 @@ public class DataSource implements Serializable, Comparable<DataSource> {
      *
      * @param name Data source name to set
      */
-    public void setName( String name ) { this.name = name; }
+    public void setName(String name) { this.name = name; }
     
     /**
      * @return the type
@@ -156,7 +156,7 @@ public class DataSource implements Serializable, Comparable<DataSource> {
      *
      * @param description Data source description to set
      */
-    public void setDescription( String description ) { 
+    public void setDescription(String description) { 
         this.description = description; 
     }
     /**

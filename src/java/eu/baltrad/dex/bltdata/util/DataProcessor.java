@@ -58,18 +58,35 @@ public class DataProcessor {
     
     public static final String H5_FILE_EXT = ".h5";
     public static final String IMAGE_FILE_EXT = ".png";
+    
+    public static final String H5_OBJECT_ATTR = "object";
     public static final String H5_QUANTITY_ATTR = "quantity";
+    public static final String H5_NODATA_ATTR = "nodata";
     public static final String H5_NBINS_ATTR = "nbins";
     public static final String H5_NRAYS_ATTR = "nrays";
     public static final String H5_RSCALE_ATTR = "rscale";
     public static final String H5_A1GATE_ATTR = "a1gate";
     public static final String H5_ELANGLE_ATTR = "elangle";
+    public static final String H5_NODES_ATTR = "nodes";
+    public static final String H5_PROJDEF_ATTR = "projdef";
     public static final String H5_LAT_0_ATTR = "lat";
     public static final String H5_LON_0_ATTR = "lon";
+    public static final String H5_UL_LAT_ATTR = "UL_lat";
+    public static final String H5_UL_LON_ATTR = "UL_lon";
+    public static final String H5_UR_LAT_ATTR = "UR_lat";
+    public static final String H5_UR_LON_ATTR = "UR_lon";        
+    public static final String H5_LR_LAT_ATTR = "LR_lat";
+    public static final String H5_LR_LON_ATTR = "UR_lon";
+    public static final String H5_LL_LAT_ATTR = "LL_lat";
+    public static final String H5_LL_LON_ATTR = "LL_lon";
+    public static final String H5_XSIZE_ATTR = "xsize";
+    public static final String H5_YSIZE_ATTR = "ysize";
+    
     private static int COLOR_TABLE_DEPTH = 256;
     public static final String H5_PATH_SEPARATOR = "/";
     public static final String H5_WHERE_GROUP_PREFIX = "where";
     public static final String H5_WHAT_GROUP_PREFIX = "what";
+    public static final String H5_HOW_GROUP_PREFIX = "how";
     public static final String H5_DATASET_PREFIX = "dataset";
     
     public static final String DATASET_PATHS_KEY = "dataset_paths";
@@ -295,15 +312,15 @@ public class DataProcessor {
      * @param rscale Range sample size in meters
      * @param dataset Polar dataset
      * @param palette Color palette
-     * @param imageSize Output image size
+     * @param outputImageSize Output image size
      * @param rangeRings Range rings toggle
      * @param rangeMask Range mask toggle
      * @return Cartesian image
      * @throws RuntimeException 
      */
-    public BufferedImage polar2CartImage(long nbins, double rscale, 
-            Dataset dataset, Color[] palette, int imageSize, boolean rangeRings,
-            boolean rangeMask) throws RuntimeException {
+    public BufferedImage polar2Image(long nbins, double rscale, 
+            Dataset dataset, Color[] palette, int outputImageSize, 
+            boolean rangeRings, boolean rangeMask) throws RuntimeException {
         try {
             byte[] polar = (byte[]) dataset.read();
             int radius = (int) nbins;
@@ -391,23 +408,107 @@ public class DataProcessor {
             
             // range in kilometers
             int range = (int) Math.round(nbins * rscale / 1000);
-            if (imageSize == 0) {
-                imageSize = 2 * range;
+            if (outputImageSize == 0) {
+                outputImageSize = 2 * range;
             }
             
             // get image scaled according to range
-            Image img = bi.getScaledInstance(imageSize, imageSize, 
+            Image img = bi.getScaledInstance(outputImageSize, outputImageSize, 
                     BufferedImage.SCALE_SMOOTH);
-            BufferedImage scaledImage = new BufferedImage(imageSize, imageSize, 
+            BufferedImage scaledImage = new BufferedImage(outputImageSize, 
+                    outputImageSize, 
                     BufferedImage.TYPE_INT_ARGB);
             g2d = scaledImage.createGraphics();
             g2d.drawImage(img, 0, 0, null);
             g2d.dispose();
             return scaledImage;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to generate cartesian image", e);
+            throw new RuntimeException("Failed to generate image " + 
+                    "from polar dataset", e);
         }
     }
+    
+    /**
+     * Transform Cartesian dataset into image.
+     * @param width Dataset width
+     * @param height Dataset height
+     * @param noData Out of range areas
+     * @param dataset Dataset
+     * @param palette Color palette
+     * @param outputImageWidth Output image width 
+     * @param outputImageHeight Output image height 
+     * @return Cartesian image
+     * @throws RuntimeException 
+     */
+    public BufferedImage cart2Image(long width, long height, double noData, 
+            Dataset dataset, Color[] palette, int outputImageWidth, 
+            int outputImageHeight, boolean rangeMask) throws RuntimeException {
+        try {
+            int imageWidth = (int) width;
+            int imageHeight = (int) height;
+            byte[] comp = (byte[]) dataset.read();
+
+            BufferedImage bi = new BufferedImage(imageWidth, imageHeight,
+                    BufferedImage.TYPE_INT_ARGB);
+            int rule = AlphaComposite.SRC;
+            Graphics2D g2d = bi.createGraphics();
+            int x = 0;
+            int y = 0;
+            for (int i = 0; i < comp.length; i++) {
+                if (i > 0 && i % imageWidth == 0) {
+                    x++;
+                }
+                y = i - x * imageWidth;
+                int byteVal = (0xFF & ((int) comp[i]));
+                short val = (short) byteVal;
+                if (val > 0) {
+                    AlphaComposite ac = 
+                            AlphaComposite.getInstance(rule, 1);
+                    g2d.setComposite(ac);
+                    Color color = 
+                            palette[(COLOR_TABLE_DEPTH - 1) - val];
+                    g2d.setColor(color);
+                } else {
+                    AlphaComposite ac = 
+                            AlphaComposite.getInstance(rule, 0);
+                    g2d.setComposite(ac);
+                    g2d.setColor(Color.WHITE);
+                }
+                
+                if (val == noData && rangeMask) {
+                    AlphaComposite ac = AlphaComposite.getInstance(rule, 0.1f);
+                    g2d.setComposite(ac);
+                    g2d.setColor(Color.decode("#000000"));
+                }
+                if (val == noData && !rangeMask) {
+                    AlphaComposite ac = AlphaComposite.getInstance(rule, 0.0f);
+                    g2d.setComposite(ac);    
+                }
+                g2d.drawRect(y, x, 1, 1);   
+            }
+            
+            if (outputImageWidth == 0) {
+                outputImageWidth = imageWidth;
+            }
+            if (outputImageHeight == 0) {
+                outputImageHeight = imageHeight;
+            }
+            
+            // get scaled image
+            Image img = bi.getScaledInstance(outputImageWidth, 
+                    outputImageHeight, BufferedImage.SCALE_SMOOTH);
+            BufferedImage scaledImage = new BufferedImage(outputImageWidth, 
+                    outputImageHeight, BufferedImage.TYPE_INT_ARGB);
+            g2d = scaledImage.createGraphics();
+            g2d.drawImage(img, 0, 0, null);
+            g2d.dispose();
+            return scaledImage;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate image " + 
+                    "from cartesian composite", e);
+        } 
+    }
+    
     
     /**
      * Creates color palette from file.

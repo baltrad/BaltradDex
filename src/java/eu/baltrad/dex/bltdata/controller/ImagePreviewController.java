@@ -93,7 +93,6 @@ public class ImagePreviewController {
         String fileObject = request.getParameter( "file_object" );
         String datasetPath = request.getParameter( "dataset_path" );
         String datasetWhere = request.getParameter( "dataset_where" );
-        String datasetWidth = request.getParameter( "dataset_width" );
         // get information necessary to display image
         String lat0 = request.getParameter( "lat0" );
         String lon0 = request.getParameter( "lon0" );
@@ -101,7 +100,6 @@ public class ImagePreviewController {
         String llLon = request.getParameter( "llLon" );
         String urLat = request.getParameter( "urLat" );
         String urLon = request.getParameter( "urLon" );
-
         // try to load image from disk before creating a new one
         String filePath = ServletContextUtil.getServletContextPath() + 
                 configurationManager.getAppConf().getWorkDir() +
@@ -117,27 +115,48 @@ public class ImagePreviewController {
             H5File file = bltDataProcessor.openH5File(fileCatalog
                     .getLocalPathForUuid(UUID.fromString(fileUuid)).toString());
             Group root = bltDataProcessor.getH5Root(file);
-            bltDataProcessor.getH5Attribute(root, datasetWhere, 
-                    DataProcessor.H5_NBINS_ATTR );
-            long nbins = (Long) bltDataProcessor.getH5AttributeValue();
-            bltDataProcessor.getH5Attribute(root, datasetWhere, 
-                    DataProcessor.H5_RSCALE_ATTR );
-            double rscale = (Double) bltDataProcessor.getH5AttributeValue();
             
             // Create image from SCAN or PVOL
             if (fileObject.equals(DataProcessor.ODIMH5_SCAN_OBJ) || 
                     fileObject.equals(DataProcessor.ODIMH5_PVOL_OBJ)) {
+                bltDataProcessor.getH5Attribute(root, datasetWhere, 
+                    DataProcessor.H5_NBINS_ATTR );
+                long nbins = (Long) bltDataProcessor.getH5AttributeValue();
+                bltDataProcessor.getH5Attribute(root, datasetWhere, 
+                        DataProcessor.H5_RSCALE_ATTR );
+                double rscale = (Double) bltDataProcessor.getH5AttributeValue();
                 bltDataProcessor.getH5Dataset(root, datasetPath);
                 Dataset dataset = bltDataProcessor.getH5Dataset();
-                BufferedImage bi = bltDataProcessor.polar2CartImage(
+                BufferedImage bi = bltDataProcessor.polar2Image(
                     nbins, rscale, dataset, palette, 0, true, false);
+                bltDataProcessor.saveImageToFile(bi, filePath);
+            }
+            // Create image from Cartesian composite object
+            if (fileObject.equals(DataProcessor.ODIMH5_COMP_OBJ)) {
+                bltDataProcessor.getH5Attribute(root, datasetWhere, 
+                    DataProcessor.H5_XSIZE_ATTR );
+                long xsize = (Long) bltDataProcessor.getH5AttributeValue();
+                bltDataProcessor.getH5Attribute(root, datasetWhere, 
+                        DataProcessor.H5_YSIZE_ATTR );
+                long ysize = (Long) bltDataProcessor.getH5AttributeValue();
+                String dataSpecificWhat = datasetPath.substring(0, 
+                        datasetPath.lastIndexOf(DataProcessor.H5_PATH_SEPARATOR) 
+                            + 1) + DataProcessor.H5_WHAT_GROUP_PREFIX;
+                bltDataProcessor.getH5Attribute(root, dataSpecificWhat, 
+                        DataProcessor.H5_NODATA_ATTR);
+                double noData = (Double) bltDataProcessor.getH5AttributeValue();
+                bltDataProcessor.getH5Dataset(root, datasetPath);
+                Dataset dataset = bltDataProcessor.getH5Dataset();
+                BufferedImage bi = bltDataProcessor.cart2Image(xsize, ysize, 
+                        noData, dataset, palette, 0, 0, false);
                 bltDataProcessor.saveImageToFile(bi, filePath);
             }
             // Create image from Cartesian IMAGE object
             if (fileObject.equals(DataProcessor.ODIMH5_IMAGE_OBJ)) {
+                
                 // ... to be implemented ...
+            
             }
-            // ... other objects will come here ...
             bltDataProcessor.closeH5File(file);
         }
         // reconstruct image URL
