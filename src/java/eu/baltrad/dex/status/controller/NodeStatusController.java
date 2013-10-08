@@ -320,7 +320,10 @@ public class NodeStatusController {
         File f = new File(path);
         long mbUsable = f.getUsableSpace() / BYTES_PER_MB;
         long mbTotal = f.getTotalSpace() / BYTES_PER_MB;
-        long percentUsable = mbUsable * 100 / mbTotal;
+        long percentUsable = 0;
+        if (mbTotal > 0) {
+            percentUsable = mbUsable * 100 / mbTotal;
+        }
         return Long.toString(mbUsable) + " MB (" + percentUsable +"%)";
     }
     
