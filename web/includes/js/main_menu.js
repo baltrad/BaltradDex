@@ -19,29 +19,10 @@
 *
 *******************************************************************************/
 
-function toggle(menu_id, icon_id) {
-	var menu = document.getElementById(menu_id);
-	var icon = document.getElementById(icon_id);
-	if(menu.style.display=="none" || menu.style.display==""){
-		menu.style.display="block";
-		icon.setAttribute("class", "collapse");
-	} else {
-		menu.style.display="none";
-		icon.setAttribute("class", "expand");
-	}
-}
-
-function show(menu_id, icon_id) {
-	var menu = document.getElementById(menu_id);
-	var icon = document.getElementById(icon_id);
-	menu.style.display="block";
-	icon.setAttribute("class", "collapse");
-}
-
-function hide(menu_id, icon_id) {
-	var menu = document.getElementById(menu_id);
-	var icon = document.getElementById(icon_id);
-	menu.style.display="none";
-	icon.setAttribute("class", "expand");
-}
+$(document).ready(function() {
+    $("li").click(function() {
+        $(this).find("ul").slideToggle(200);
+        $(this).find("#icon").toggleClass("collapse"); 
+    });    
+});
 

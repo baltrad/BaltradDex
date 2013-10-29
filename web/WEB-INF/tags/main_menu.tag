@@ -6,8 +6,10 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<script src="includes/js/main_menu.js"></script>
+
 <div class="menu">
-    <ul class="topmenu">    
+    <ul class="topmenu">
         <div class="separator">
             <div class="status"></div>
         </div>
@@ -45,25 +47,51 @@
                 <span><a href="adaptors.htm">Adaptors</a></span>
             </li>
             <li>
-                <span><a href="anomaly_detectors.htm">Quality controls</a></span>
+                <span>
+                    <a href="anomaly_detectors.htm">Quality controls</a>
+                </span>
             </li>
-            <li onmouseout="javascript:hide('routes', 'routes_icon');">
-                <span onclick="javascript:toggle('routes', 'routes_icon');">
-                    <div id="routes_icon" class="expand"></div>
+            <li>
+                <span>
+                    <div class="expand" id="icon"></div>
                     Routes
                 </span>
-                <ul class="submenu" id="routes"
-                    onmouseover="javascript:show('routes', 'routes_icon');">
-                    <li><a href="routes.htm">Show</a></li>
-                    <li><a href="route_create_groovy.htm">Create script</a></li>
-                    <li><a href="route_create_composite.htm">Create composite</a></li>
-                    <li><a href="route_create_google_map.htm">Create Google map</a></li>
-                    <li><a href="route_create_volume.htm">Create volume</a></li>
-                    <li><a href="route_create_distribution.htm">Create distribution</a></li>
-                    <li><a href="route_create_acrr.htm">Create ACRR</a></li>
-                    <li><a href="route_create_wrwp.htm">Create WRWP</a></li>
-                    <li><a href="route_create_bdb_trim_count.htm">Create DB trim count</a></li>
-                    <li><a href="route_create_bdb_trim_age.htm">Create DB trim age</a></li>
+                <ul class="submenu">
+                    <li>
+                        <a href="routes.htm">Show</a>
+                    </li>
+                    <li>
+                        <a href="route_create_groovy.htm">Create script</a>
+                    </li>
+                    <li>
+                        <a href="route_create_composite.htm">
+                            Create composite</a>
+                    </li>
+                    <li>
+                        <a href="route_create_google_map.htm">
+                            Create Google map</a>
+                    </li>
+                    <li>
+                        <a href="route_create_volume.htm">Create volume</a>
+                    </li>
+                    <li>
+                        <a href="route_create_distribution.htm">
+                            Create distribution</a>
+                    </li>
+                    <li>
+                        <a href="route_create_acrr.htm">Create ACRR</a>
+                    </li>
+                    <li>
+                        <a href="route_create_wrwp.htm">Create WRWP</a>
+                    </li>
+                    <li>
+                        <a href="route_create_bdb_trim_count.htm">
+                            Create DB trim count</a>
+                    </li>
+                    <li>
+                        <a href="route_create_bdb_trim_age.htm">
+                            Create DB trim age</a>
+                    </li>
                 </ul>
             </li>
             <li>
@@ -74,70 +102,70 @@
             <div class="separator">
                 <div class="settings"></div>
             </div>
-            <li onmouseout="javascript:hide('radars', 'radars_icon');">
-                <span onclick="javascript:toggle('radars', 'radars_icon');">
-                    <div id="radars_icon" class="expand"></div>
+            <li>
+                <span>
+                    <div class="expand" id="icon"></div>
                     Radars
                 </span>
-                <ul class="submenu" id="radars"
-                    onmouseover="javascript:show('radars', 'radars_icon');">
+                <ul class="submenu">
                     <li><a href="radars_show.htm">Show</a></li>
                     <li><a href="radars_save.htm">Add</a></li>
                     <li><a href="radars_remove.htm">Remove</a></li>
                 </ul>
             </li>
-            <li onmouseout="javascript:hide('sources', 'sources_icon');">
-                <span onclick="javascript:toggle('sources', 'sources_icon');">
-                    <div id="sources_icon" class="expand"></div>
+            <li>
+                <span>
+                    <div class="expand" id="icon"></div>
                     Data sources
                 </span>
-                <ul class="submenu" id="sources"
-                    onmouseover="javascript:show('sources', 'sources_icon');">
+                <ul class="submenu">
                     <li><a href="datasources_save.htm">Add</a></li>
                     <li><a href="datasources_edit.htm">Edit</a></li>
                     <li><a href="datasources_remove.htm">Remove</a></li>
                 </ul>
             </li>
-            <li onmouseout="javascript:hide('subscriptions', 'subscriptions_icon');">
-                <span onclick="javascript:toggle('subscriptions', 'subscriptions_icon');">
-                    <div id="subscriptions_icon" class="expand"></div>
+            <li>
+                <span>
+                    <div class="expand" id="icon"></div>
                     Subscriptions
                 </span>
-                <ul class="submenu" id="subscriptions"
-                    onmouseover="javascript:show('subscriptions', 'subscriptions_icon');">
-                    <li><a href="subscription_remove_downloads.htm">Remove downloads</a></li>
-                    <li><a href="subscription_remove_uploads.htm">Remove uploads</a></li>
+                <ul class="submenu">
+                    <li>
+                        <a href="subscription_remove_downloads.htm">
+                            Remove downloads</a>
+                    </li>
+                    <li>
+                        <a href="subscription_remove_uploads.htm">
+                            Remove uploads</a>
+                    </li>
                 </ul>
             </li>
-            <li onmouseout="javascript:hide('registry', 'registry_icon');">
-                <span onclick="javascript:toggle('registry', 'registry_icon');">
-                    <div id="registry_icon" class="expand"></div>
+            <li>
+                <span>
+                    <div class="expand" id="icon"></div>
                     Delivery registry
                 </span>
-                <ul class="submenu" id="registry"
-                    onmouseover="javascript:show('registry', 'registry_icon');">
+                <ul class="submenu">
                     <li><a href="registry_configure.htm">Configure</a></li>
                     <li><a href="registry_delete.htm">Delete</a></li>
                 </ul>
             </li>
-            <li onmouseout="javascript:hide('conf_messages', 'conf_messages_icon');">
-                <span onclick="javascript:toggle('conf_messages', 'conf_messages_icon');">
-                    <div id="conf_messages_icon" class="expand"></div>
+            <li>
+                <span>
+                    <div class="expand" id="icon"></div>
                     Messages
                 </span>
-                <ul class="submenu" id="conf_messages"
-                    onmouseover="javascript:show('conf_messages', 'conf_messages_icon');">
+                <ul class="submenu">
                     <li><a href="messages_configure.htm">Configure</a></li>
                     <li><a href="messages_delete.htm">Delete</a></li>
                 </ul>
             </li>
-            <li onmouseout="javascript:hide('users', 'users_icon');">
-                <span onclick="javascript:toggle('users', 'users_icon');">
-                    <div id="users_icon" class="expand"></div>
+            <li>
+                <span>
+                    <div class="expand" id="icon"></div>
                     User accounts
                 </span>
-                <ul class="submenu" id="users"
-                    onmouseover="javascript:show('users', 'users_icon');">
+                <ul class="submenu">
                     <li><a href="user_save.htm">Add user</a></li>
                     <li><a href="user_edit.htm">Edit user</a></li>
                     <li><a href="user_remove.htm">Remove user</a></li>
@@ -163,5 +191,4 @@
         </c:if>
     </ul>
 </div>
-		
 	

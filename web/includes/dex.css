@@ -583,22 +583,29 @@ textarea {
 .table > form > .body > .row:nth-child(even),
 .table > .body > .row2:nth-child(even),
 .table > form > .body > .row2:nth-child(even),
-.table > .body > .row#info:nth-child(even) {
+.table > .body > .row#info:nth-child(even),
+.table > .body > .row#empty:nth-child(even) {
 	background: #F4F5F0;
 }
 .table > .body > .row:nth-child(odd),
 .table > form > .body > .row:nth-child(odd),
 .table > .body > .row2:nth-child(odd),
 .table > form > .body > .row2:nth-child(odd),
-.table > .body > .row#info:nth-child(odd){
+.table > .body > .row#info:nth-child(odd), 
+.table > .body > .row#empty:nth-child(odd) {
 	background: #FFFFFF;
 }
 .table > .body > .row:hover,
 .table > .body > .row#warning:hover,
 .table > .body > .row#error:hover,
 .table > .body > .row#info:hover,
+.table > .body > .row#empty:hover,
 .table > form > .body > .row:hover {
 	background: #FFE8C8;
+}
+.system-log > .table > .body#message-table > .row,
+.system-log > .table > .body > .row {
+    min-height: 23px;
 }
 .table > form > .body > .header-row input {
     float: left;
@@ -890,6 +897,7 @@ textarea {
 .system-log .time,
 .system-log .flag,
 .system-log .message,
+.system-log .full-row,
 .registry .date, 
 .registry .time, 
 .registry .recipient, 
@@ -899,6 +907,7 @@ textarea {
 .system-log .date,
 .system-log .time,
 .system-log .message,
+.system-log .full-row,
 .registry .date, 
 .registry .time, 
 .registry .recipient, 
@@ -939,6 +948,9 @@ textarea {
 }
 .system-log .message {
     width: 454px;
+}
+.system-log .full-row {
+    width: 100%;
 }
 .row#warning {
     background: #FFF4D2;
@@ -1023,6 +1035,9 @@ textarea {
     float: right;
     padding-top: 4px;
 }
+.system-log > .table > #message-table {
+    min-height: 506px;
+}
 
 /* Sticky messages */
 
@@ -1038,7 +1053,7 @@ textarea {
 .sticky-messages > .table > .header-text {
     margin-bottom: 16px;
 }
-.sticky-messages > .table > form > .message-header,
+.sticky-messages > .table > form > .header,
 .sticky-messages > .table > form > .message-content,
 .sticky-messages > .table > form > .message-footer {
     width: 100%;

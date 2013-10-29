@@ -23,78 +23,99 @@ Author     : szewczenko
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 
+<div class="header-row">
+    <div class="date">Date</div>
+    <div class="time">Time</div>
+    <div class="flag">&nbsp;</div>
+    <div class="message">Message</div>
+</div>
 <c:choose>
     <c:when test="${not empty messages}">
-        <div class="header-row">
-            <div class="date">Date</div>
-            <div class="time">Time</div>
-            <div class="flag">&nbsp;</div>
-            <div class="message">Message</div>
-        </div>
-        <c:forEach var="msg" items="${messages}">
+        <c:forEach begin="0" end="19" varStatus="i">
             <c:choose>
-                <c:when test="${msg.level == 'ERROR'}">
-                    <div class="row" id="error">
-                        <div class="date">
-                            <fmt:formatDate value="${msg.date}" 
-                                            pattern="yyyy/dd/MM"/>
-                        </div>
-                        <div class="time">
-                            <fmt:formatDate value="${msg.date}" 
-                                            pattern="HH:mm:ss"/>  
-                        </div>
-                        <div class="flag">
-                            <img src="includes/images/log-error.png" 
-                                 alt="error"/>
-                        </div>    
-                        <div class="message">
-                            <c:out value="${msg.message}"/>
-                        </div>
-                    </div>
-                </c:when>
-                <c:when test="${msg.level == 'WARN'}">
-                    <div class="row" id="warning">
-                        <div class="date">
-                            <fmt:formatDate value="${msg.date}" 
-                                            pattern="yyyy/dd/MM"/>
-                        </div>
-                        <div class="time">
-                            <fmt:formatDate value="${msg.date}" 
-                                            pattern="HH:mm:ss"/>   
-                        </div>
-                        <div class="flag">
-                            <img src="includes/images/log-alert.png" 
-                                 alt="error"/>
-                        </div>                    
-                        <div class="message">
-                            <c:out value="${msg.message}"/>
-                        </div>
-                    </div>
+                <c:when test="${not empty messages[i.index]}">
+                    <c:set var="msg" value="${messages[i.index]}"></c:set> 
+                    <c:choose>
+                        <c:when test="${msg.level == 'ERROR'}">
+                            <div class="row" id="error">
+                                <div class="date">
+                                    <fmt:formatDate value="${msg.date}" 
+                                                    pattern="yyyy/dd/MM"/>
+                                </div>
+                                <div class="time">
+                                    <fmt:formatDate value="${msg.date}" 
+                                                    pattern="HH:mm:ss"/>  
+                                </div>
+                                <div class="flag">
+                                    <img src="includes/images/log-error.png" 
+                                         alt="error"/>
+                                </div>    
+                                <div class="message">
+                                    <c:out value="${msg.message}"/>
+                                </div>
+                            </div>
+                        </c:when>
+                        <c:when test="${msg.level == 'WARN'}">
+                            <div class="row" id="warning">
+                                <div class="date">
+                                    <fmt:formatDate value="${msg.date}" 
+                                                    pattern="yyyy/dd/MM"/>
+                                </div>
+                                <div class="time">
+                                    <fmt:formatDate value="${msg.date}" 
+                                                    pattern="HH:mm:ss"/>   
+                                </div>
+                                <div class="flag">
+                                    <img src="includes/images/log-alert.png" 
+                                         alt="error"/>
+                                </div>                    
+                                <div class="message">
+                                    <c:out value="${msg.message}"/>
+                                </div>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="row" id="info">
+                                <div class="date">
+                                    <fmt:formatDate value="${msg.date}" 
+                                                    pattern="yyyy/dd/MM"/>
+                                </div>
+                                <div class="time">
+                                    <fmt:formatDate value="${msg.date}" 
+                                                    pattern="HH:mm:ss"/>   
+                                </div>
+                                <div class="flag">
+                                    <img src="includes/images/log-info.png" 
+                                         alt="error"/>
+                                </div>                    
+                                <div class="message">
+                                    <c:out value="${msg.message}"/>
+                                </div>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                 </c:when>
                 <c:otherwise>
-                    <div class="row" id="info">
-                        <div class="date">
-                            <fmt:formatDate value="${msg.date}" 
-                                            pattern="yyyy/dd/MM"/>
-                        </div>
-                        <div class="time">
-                            <fmt:formatDate value="${msg.date}" 
-                                            pattern="HH:mm:ss"/>   
-                        </div>
-                        <div class="flag">
-                            <img src="includes/images/log-info.png" 
-                                 alt="error"/>
-                        </div>                    
-                        <div class="message">
-                            <c:out value="${msg.message}"/>
-                        </div>
-                    </div>
+                    <div class="row" id="empty"></div> 
                 </c:otherwise>
             </c:choose>
         </c:forEach>
     </c:when>
     <c:otherwise>
-        No messages found in system log.
+        <c:forEach begin="0" end="19" varStatus="i">
+            <c:choose>
+                <c:when test="${i.index == 0}">
+                    <div class="row" id="empty">
+                        <div class="full-row">
+                            <c:out value="No messages found in system log."/>
+                        </div>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="row" id="empty"></div>
+                </c:otherwise>
+            </c:choose>
+        </c:forEach>
     </c:otherwise>
 </c:choose>
 

@@ -47,6 +47,10 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 @SessionAttributes("log_parameter")
 public class BrowseMessagesController {
     
+    /** Number of log entries per page */
+    public final static int ENTRIES_PER_PAGE = 20;
+    /** Number of pages in the scroll bar, must be an odd number >= 3 */
+    public final static int SCROLL_RANGE = 11;
     /** Drop down lists */ 
     private static final String[] LEVELS = {"INFO", "WARN", "ERROR"};
     private static final String[] LOGGERS = {"DEX", "BEAST", "PGF"};
@@ -146,7 +150,7 @@ public class BrowseMessagesController {
                 firstPage();
                 entries = logManager.load(
                         logManager.createQuery(logParameter, false), 0,
-                        LogManager.ENTRIES_PER_PAGE);
+                        ENTRIES_PER_PAGE);
             } else {
                 if (selectedPage.matches(">>")) {
                     lastPage(logParameter);
@@ -158,17 +162,17 @@ public class BrowseMessagesController {
                     int page = Integer.parseInt(selectedPage);
                     setCurrentPage(page);
                 }
-                int offset = (getCurrentPage() * LogManager.ENTRIES_PER_PAGE)
-                        - LogManager.ENTRIES_PER_PAGE;
+                int offset = (getCurrentPage() * ENTRIES_PER_PAGE)
+                        - ENTRIES_PER_PAGE;
                 entries = logManager.load(
                         logManager.createQuery(logParameter, false), offset, 
-                        LogManager.ENTRIES_PER_PAGE);
+                            ENTRIES_PER_PAGE);
             }
         } else {
             setCurrentPage(1);
             entries = logManager.load(
-                    logManager.createQuery(logParameter, false), 0, 
-                    LogManager.ENTRIES_PER_PAGE);
+                    logManager.createQuery(logParameter, false), 0,
+                        ENTRIES_PER_PAGE);
         }
         int[] pages = getPages(logParameter);
         model.addAttribute(FIRST_PAGE_KEY, pages[0]);
@@ -192,8 +196,7 @@ public class BrowseMessagesController {
         model.addAttribute(FIRST_PAGE_KEY, pages[0]);
         model.addAttribute(LAST_PAGE_KEY, pages[1]);
         model.addAttribute(CURRENT_PAGE_KEY, pages[2]);
-        model.addAttribute(MESSAGES_KEY, logManager.load(0, 
-                LogManager.ENTRIES_PER_PAGE));
+        model.addAttribute(MESSAGES_KEY, logManager.load(0, ENTRIES_PER_PAGE));
         model.addAttribute(LOG_PARAMETER_KEY, param);
         return FORM_VIEW;
     }
@@ -223,31 +226,29 @@ public class BrowseMessagesController {
      */
     private int[] getPages(LogParameter param) throws Exception {
         long numEntries = logManager.count(logManager.createQuery(param, true));
-        int numPages = (int) Math.ceil(numEntries / 
-                LogManager.ENTRIES_PER_PAGE);
-        if ((numPages * LogManager.ENTRIES_PER_PAGE) < numEntries) {
+        int numPages = (int) Math.ceil(numEntries / ENTRIES_PER_PAGE);
+        if ((numPages * ENTRIES_PER_PAGE) < numEntries) {
             ++numPages;
         }
         if (numPages < 1) {
             numPages = 1;
         }
         int curPage = getCurrentPage();
-        int scrollStart = (LogManager.SCROLL_RANGE - 1) / 2;
+        int scrollStart = (SCROLL_RANGE - 1) / 2;
         int firstPage = 1;
-        int lastPage = LogManager.SCROLL_RANGE;
-        if (numPages <= LogManager.SCROLL_RANGE && curPage 
-                <= LogManager.SCROLL_RANGE) {
+        int lastPage = SCROLL_RANGE;
+        if (numPages <= SCROLL_RANGE && curPage <= SCROLL_RANGE) {
             firstPage = 1;
             lastPage = numPages;
         }
-        if (numPages > LogManager.SCROLL_RANGE && curPage > scrollStart 
+        if (numPages > SCROLL_RANGE && curPage > scrollStart 
                 && curPage < numPages - scrollStart) {
             firstPage = curPage - scrollStart;
             lastPage = curPage + scrollStart;
         }
-        if (numPages > LogManager.SCROLL_RANGE && curPage > scrollStart 
-                && curPage >= numPages - (LogManager.SCROLL_RANGE - 1)) {
-            firstPage = numPages - (LogManager.SCROLL_RANGE - 1);
+        if (numPages > SCROLL_RANGE && curPage > scrollStart 
+                && curPage >= numPages - (SCROLL_RANGE - 1)) {
+            firstPage = numPages - (SCROLL_RANGE - 1);
             lastPage = numPages;
         }
         return new int[] {firstPage, lastPage, curPage};
@@ -270,9 +271,8 @@ public class BrowseMessagesController {
      */
     public void nextPage(LogParameter param) throws Exception {
         int lastPage = (int) Math.ceil(logManager.count(
-            logManager.createQuery(param, true)) / 
-                LogManager.ENTRIES_PER_PAGE);
-        if ((lastPage * LogManager.ENTRIES_PER_PAGE) 
+            logManager.createQuery(param, true)) / ENTRIES_PER_PAGE);
+        if ((lastPage * ENTRIES_PER_PAGE) 
                 < logManager.count(logManager.createQuery(param, true))) {
             ++lastPage;
         }
@@ -304,9 +304,8 @@ public class BrowseMessagesController {
      */
     public void lastPage(LogParameter param) throws Exception {
         long numEntries = logManager.count(logManager.createQuery(param, true));
-        int lastPage = (int) Math.ceil(numEntries / 
-                LogManager.ENTRIES_PER_PAGE);
-        if ((lastPage * LogManager.ENTRIES_PER_PAGE) 
+        int lastPage = (int) Math.ceil(numEntries / ENTRIES_PER_PAGE);
+        if ((lastPage * ENTRIES_PER_PAGE) 
                 < logManager.count(logManager.createQuery(param, true))) {
             ++lastPage;
         }

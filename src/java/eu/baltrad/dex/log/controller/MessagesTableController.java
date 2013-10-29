@@ -39,7 +39,8 @@ import org.springframework.ui.ModelMap;
 public class MessagesTableController {
     
     private static final String MESSAGES_KEY = "messages";
-
+    private static final int ENTRIES_PER_PAGE = 20;
+    
     private LogManager logManager;
     
     /**
@@ -49,8 +50,7 @@ public class MessagesTableController {
      */
     @RequestMapping("/messages_table.htm")
     public String showLogTable(ModelMap model) {
-        model.addAttribute(MESSAGES_KEY, 
-                logManager.load(LogManager.ENTRIES_PER_PAGE));
+        model.addAttribute(MESSAGES_KEY, logManager.load(ENTRIES_PER_PAGE));
         return "messages_table";
     }
 

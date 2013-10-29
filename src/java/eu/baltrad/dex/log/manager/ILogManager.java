@@ -34,10 +34,6 @@ import java.util.List;
  */
 public interface ILogManager {
     
-    /** Number of log entries per page */
-    public final static int ENTRIES_PER_PAGE = 16;
-    /** Number of pages in the scroll bar, must be an odd number >= 3 */
-    public final static int SCROLL_RANGE = 11;
     /** Trim messages by number trigger */
     public static final String TRIM_MSG_BY_NUMBER_TG = 
             "dex_trim_messages_by_number_tg";

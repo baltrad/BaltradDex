@@ -81,6 +81,7 @@ Creates a google map route
                             <div class="rightcol">
                                  <input type="text" name="path" value="${path}"
                                         title="The base path (e.g. /var/www/html/data) where the generated PNG image should be placed."/>
+                            </div>     
                         </div>
                         <div class="row2">
                             <div class="leftcol">Recipients:</div>

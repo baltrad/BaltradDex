@@ -39,38 +39,45 @@ Creates a distribution route
                 src="includes/js/filter.js">
         </script>
         <script type="text/javascript">
-          $(document).ready(function() {
-            var filter = null;
-            <c:choose>
-              <c:when test="${!empty filterJson}">
-                filter = createBdbFilter(${filterJson});
-              </c:when>
-              <c:otherwise>
-                filter = createBdbFilter({
-                  type: "combined",
-                  matchType: "ALL",
-                  childFilters: [{
-                    type: "always"
-                  }]
+            // prevent executing the function twice
+            var checkit = window.check_var;
+            if(checkit === undefined){ 
+                window.check_var = 1;
+            }
+            else {
+                $(document).ready(function() {
+                    var filter = null;
+                    <c:choose>
+                      <c:when test="${!empty filterJson}">
+                        filter = createBdbFilter(${filterJson});
+                      </c:when>
+                      <c:otherwise>
+                        filter = createBdbFilter({
+                          type: "combined",
+                          matchType: "ALL",
+                          childFilters: [{
+                            type: "always"
+                          }]
+                        });
+                      </c:otherwise>
+                    </c:choose>
+                    $("#filter").append(filter.dom);
+                    var submit = $("[name='submitButton']");
+                    submit.click(function(evt) {
+                      filter.updateDataFromDom();
+                      if (!isValidBdbFilter(filter.data)) {
+                        evt.preventDefault();
+                        alert("invalid filter");
+                      } else {
+                        $("#filterJson").val(JSON.stringify(filter.data));
+                        $("#filter").empty();
+                      }
+                    });
                 });
-              </c:otherwise>
-            </c:choose>
-            $("#filter").append(filter.dom);
-
-            var submit = $("[name='submitButton']");
-            submit.click(function(evt) {
-              filter.updateDataFromDom();
-              if (!isValidBdbFilter(filter.data)) {
-                evt.preventDefault();
-                alert("invalid filter");
-              } else {
-                $("#filterJson").val(JSON.stringify(filter.data));
-                $("#filter").empty();
-              }
-            });
-          });
+            }  
         </script>    
     </jsp:attribute>
+        
     <jsp:body>
         <div class="routes">
             <div class="table">

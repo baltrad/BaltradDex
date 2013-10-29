@@ -50,7 +50,6 @@
         <link rel="StyleSheet" href="includes/dex.css" type="text/css" 
               media="screen"/>
         <link rel="icon" type="image/png" href="includes/images/favicon.png"/>
-        <script src="includes/js/main_menu.js" type="text/javascript"></script>
         <script src="includes/js/show_hide_status.js" type="text/javascript"></script>
         <script src="includes/js/jQuery.js" type="text/javascript"></script>
         <script src="includes/js/datetimepicker_css.js" type="text/javascript"></script>
@@ -58,8 +57,6 @@
         <script src="includes/js/submit_center_id.js" type="text/javascript"></script>          
         <script src="includes/js/filter.js" type="text/javascript"></script>
         <script src="includes/js/messages_ajax.js" type="text/javascript"></script>
-        <jsp:invoke fragment="extraHeader"/>
-        
         <jsp:invoke fragment="extraHeader"/>
         <title>BALTRAD | ${pageTitle}</title>
 	</head>
