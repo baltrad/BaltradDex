@@ -33,7 +33,6 @@ import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import java.io.IOException;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,6 +53,8 @@ import org.keyczar.exceptions.KeyczarException;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.OutputStreamWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.HashSet;
 
@@ -137,7 +138,8 @@ public class DataSourceListServlet extends HttpServlet {
      */
     private void writeResponse(NodeResponse response, String body, int status) 
             throws IOException {
-        PrintWriter writer = new PrintWriter(response.getOutputStream());
+        PrintWriter writer = new PrintWriter(
+                new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
         try {
             writer.print(body);
             response.setStatus(status);

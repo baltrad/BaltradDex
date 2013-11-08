@@ -52,13 +52,13 @@ import org.apache.log4j.Logger;
 
 import org.keyczar.exceptions.KeyczarException;
 
-
 import java.io.StringWriter;
 import java.io.PrintWriter;
+import java.io.OutputStreamWriter;
+import java.io.IOException;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.io.IOException;
 
 /**
  * Receives and handles subscription requests.
@@ -67,7 +67,6 @@ import java.io.IOException;
  * @since 1.1.0
  */
 @Controller
-
 public class UpdateSubscriptionServlet extends HttpServlet {
     
     private static final String GS_INTERNAL_SERVER_ERROR_KEY = 
@@ -143,7 +142,8 @@ public class UpdateSubscriptionServlet extends HttpServlet {
      */
     private void writeSubscriptions(NodeResponse response, String subscriptions) 
             throws IOException {
-        PrintWriter writer = new PrintWriter(response.getOutputStream());
+        PrintWriter writer = new PrintWriter(
+                new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
         try {
             response.setNodeName(localNode.getName());
             writer.print(subscriptions);

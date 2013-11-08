@@ -19,9 +19,9 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.bltdata.controller;
+package eu.baltrad.dex.db.controller;
 
-import eu.baltrad.dex.bltdata.util.DataProcessor;
+import eu.baltrad.dex.db.util.BltDataProcessor;
 
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
@@ -51,7 +51,7 @@ import ncsa.hdf.object.h5.H5File;
  * @since 0.5.4
  */
 @Controller
-public class ImagePreviewController {
+public class BltImagePreviewController {
  
     // View name
     private static final String SUCCESS_VIEW = "file_preview";
@@ -75,7 +75,7 @@ public class ImagePreviewController {
     // Color palette file
     private static final String PALETTE_FILE = "includes/color_palette.txt";
     
-    private DataProcessor bltDataProcessor;
+    private BltDataProcessor bltDataProcessor;
     private FileCatalog fileCatalog;
     private ConfigurationManager configurationManager;
 
@@ -106,8 +106,8 @@ public class ImagePreviewController {
                 File.separator + 
                 configurationManager.getAppConf().getImagesDir() + 
                 File.separator + fileUuid
-            + datasetPath.replaceAll( DataProcessor.H5_PATH_SEPARATOR, "_" ) +
-            DataProcessor.IMAGE_FILE_EXT;
+            + datasetPath.replaceAll( BltDataProcessor.H5_PATH_SEPARATOR, "_" ) +
+            BltDataProcessor.IMAGE_FILE_EXT;
         File imageFile = new File(filePath);
         if (!imageFile.exists()) {
             Color[] palette = bltDataProcessor.createColorPalette(
@@ -117,13 +117,13 @@ public class ImagePreviewController {
             Group root = bltDataProcessor.getH5Root(file);
             
             // Create image from SCAN or PVOL
-            if (fileObject.equals(DataProcessor.ODIMH5_SCAN_OBJ) || 
-                    fileObject.equals(DataProcessor.ODIMH5_PVOL_OBJ)) {
+            if (fileObject.equals(BltDataProcessor.ODIMH5_SCAN_OBJ) || 
+                    fileObject.equals(BltDataProcessor.ODIMH5_PVOL_OBJ)) {
                 bltDataProcessor.getH5Attribute(root, datasetWhere, 
-                    DataProcessor.H5_NBINS_ATTR );
+                    BltDataProcessor.H5_NBINS_ATTR );
                 long nbins = (Long) bltDataProcessor.getH5AttributeValue();
                 bltDataProcessor.getH5Attribute(root, datasetWhere, 
-                        DataProcessor.H5_RSCALE_ATTR );
+                        BltDataProcessor.H5_RSCALE_ATTR );
                 double rscale = (Double) bltDataProcessor.getH5AttributeValue();
                 bltDataProcessor.getH5Dataset(root, datasetPath);
                 Dataset dataset = bltDataProcessor.getH5Dataset();
@@ -132,18 +132,18 @@ public class ImagePreviewController {
                 bltDataProcessor.saveImageToFile(bi, filePath);
             }
             // Create image from Cartesian composite object
-            if (fileObject.equals(DataProcessor.ODIMH5_COMP_OBJ)) {
+            if (fileObject.equals(BltDataProcessor.ODIMH5_COMP_OBJ)) {
                 bltDataProcessor.getH5Attribute(root, datasetWhere, 
-                    DataProcessor.H5_XSIZE_ATTR );
+                    BltDataProcessor.H5_XSIZE_ATTR );
                 long xsize = (Long) bltDataProcessor.getH5AttributeValue();
                 bltDataProcessor.getH5Attribute(root, datasetWhere, 
-                        DataProcessor.H5_YSIZE_ATTR );
+                        BltDataProcessor.H5_YSIZE_ATTR );
                 long ysize = (Long) bltDataProcessor.getH5AttributeValue();
                 String dataSpecificWhat = datasetPath.substring(0, 
-                        datasetPath.lastIndexOf(DataProcessor.H5_PATH_SEPARATOR) 
-                            + 1) + DataProcessor.H5_WHAT_GROUP_PREFIX;
+                        datasetPath.lastIndexOf(BltDataProcessor.H5_PATH_SEPARATOR) 
+                            + 1) + BltDataProcessor.H5_WHAT_GROUP_PREFIX;
                 bltDataProcessor.getH5Attribute(root, dataSpecificWhat, 
-                        DataProcessor.H5_NODATA_ATTR);
+                        BltDataProcessor.H5_NODATA_ATTR);
                 double noData = (Double) bltDataProcessor.getH5AttributeValue();
                 bltDataProcessor.getH5Dataset(root, datasetPath);
                 Dataset dataset = bltDataProcessor.getH5Dataset();
@@ -152,7 +152,7 @@ public class ImagePreviewController {
                 bltDataProcessor.saveImageToFile(bi, filePath);
             }
             // Create image from Cartesian IMAGE object
-            if (fileObject.equals(DataProcessor.ODIMH5_IMAGE_OBJ)) {
+            if (fileObject.equals(BltDataProcessor.ODIMH5_IMAGE_OBJ)) {
                 
                 // ... to be implemented ...
             
@@ -168,8 +168,8 @@ public class ImagePreviewController {
                 configurationManager.getAppConf().getImagesDir() + 
                 URL_PATH_SEPARATOR + 
                 fileUuid + datasetPath.replaceAll( 
-                DataProcessor.H5_PATH_SEPARATOR, "_" ) +
-                DataProcessor.IMAGE_FILE_EXT;
+                BltDataProcessor.H5_PATH_SEPARATOR, "_" ) +
+                BltDataProcessor.IMAGE_FILE_EXT;
         // create model
         model.addAttribute(RADAR_LAT_0_KEY, lat0);
         model.addAttribute(RADAR_LON_0_KEY, lon0);
@@ -185,7 +185,7 @@ public class ImagePreviewController {
      * @param bltDataProcessor the bltDataProcessor to set
      */
     @Autowired
-    public void setBltDataProcessor(DataProcessor bltDataProcessor) {
+    public void setBltDataProcessor(BltDataProcessor bltDataProcessor) {
         this.bltDataProcessor = bltDataProcessor;
     }
 

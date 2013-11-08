@@ -28,7 +28,6 @@ import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.keystore.model.Key;
 import eu.baltrad.dex.log.StickyLevel;
-import eu.baltrad.dex.log.manager.ILogManager;
 import eu.baltrad.dex.util.CompressDataUtil;
 import java.io.ByteArrayOutputStream;
 

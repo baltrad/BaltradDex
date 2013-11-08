@@ -19,8 +19,9 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.bltdata.util;
+package eu.baltrad.dex.db.util;
 
+import eu.baltrad.dex.db.util.BltDataProcessor;
 import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.Dataset;
@@ -55,11 +56,11 @@ public class BltDataProcessorTest {
             "fixtures/Z_PVOL_2013081413301200_bymin.h5";
     private static final String FILE_COMP = 
             "fixtures/Z_COMP_20130927101000_pl.h5";
-    private DataProcessor classUnderTest;
+    private BltDataProcessor classUnderTest;
     
     @Before
     public void setUp() {
-        classUnderTest = new DataProcessor();
+        classUnderTest = new BltDataProcessor();
     }
     
     @After

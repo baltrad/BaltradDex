@@ -19,7 +19,7 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.bltdata.util;
+package eu.baltrad.dex.db.util;
 
 import com.jhlabs.map.proj.Projection;
 import com.jhlabs.map.proj.ProjectionFactory;
@@ -36,7 +36,7 @@ import java.awt.geom.Point2D;
  * @version 0.1.5
  * @since 0.1.5
  */
-public class DataProjector {
+public class BltDataProjector {
 
     private static Projection proj;
     private static Logger log;
@@ -44,7 +44,7 @@ public class DataProjector {
     /**
      * Constructor.
      */
-    public DataProjector() {
+    public BltDataProjector() {
         this.log = Logger.getLogger("DEX");
     }
     /**

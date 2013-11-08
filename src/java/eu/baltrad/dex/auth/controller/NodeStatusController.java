@@ -19,7 +19,7 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.status.controller;
+package eu.baltrad.dex.auth.controller;
 
 import eu.baltrad.dex.auth.manager.SecurityManager;
 import eu.baltrad.dex.user.manager.IRoleManager;
@@ -350,8 +350,7 @@ public class NodeStatusController {
             SecurityManager.setSessionUser(session, user);
             SecurityManager.setSessionRole(session, 
                     roleManager.load(user.getRole()));
-            String[] args = {user.getName(), request.getRemoteHost() + 
-                    "/" + request.getRemoteAddr()};
+            String[] args = {user.getName(), request.getRemoteAddr()};
             log.info(messages.getMessage(LOGIN_MSG, args));
             return user.getName();
         } else {

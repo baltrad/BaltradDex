@@ -19,9 +19,9 @@
 *
 ***************************************************************************************************/
 
-package eu.baltrad.dex.bltdata.util;
+package eu.baltrad.dex.db.util;
 
-import eu.baltrad.dex.bltdata.util.DataProjector;
+import eu.baltrad.dex.db.util.BltDataProjector;
 
 import junit.framework.TestCase;
 
@@ -34,11 +34,11 @@ import junit.framework.TestCase;
  */
 public class BltDataProjectorTest extends TestCase {
 //---------------------------------------------------------------------------------------- Variables
-    private static DataProjector bltDataProjector;
+    private static BltDataProjector bltDataProjector;
 //------------------------------------------------------------------------------------------ Methods
 
     public void testInit() {
-        bltDataProjector = new DataProjector();
+        bltDataProjector = new BltDataProjector();
         assertNotNull( bltDataProjector );
     }
 

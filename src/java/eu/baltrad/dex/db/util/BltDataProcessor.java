@@ -19,7 +19,7 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.bltdata.util;
+package eu.baltrad.dex.db.util;
 
 import ncsa.hdf.object.FileFormat;
 import ncsa.hdf.object.h5.H5File;
@@ -54,7 +54,7 @@ import java.util.ArrayList;
  * @version 1.7.0
  * @since 0.1.6
  */
-public class DataProcessor {
+public class BltDataProcessor {
     
     public static final String H5_FILE_EXT = ".h5";
     public static final String IMAGE_FILE_EXT = ".png";
@@ -113,7 +113,7 @@ public class DataProcessor {
     /**
      * Default constructor.
      */
-    public DataProcessor() {}
+    public BltDataProcessor() {}
     
     /**
      * Get HDF5 dataset object.
