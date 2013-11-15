@@ -171,17 +171,15 @@ Author     : szewczenko
                                                     <c:if test="${fn:length(peers_downloads[peer]) gt 0}">
                                                         <ul class="exchange-submenu">
                                                             <li>
-                                                                <div class="expand-downloads"
-                                                                     id="${peer}_downloads_icon">
+                                                                <div id="downloads-icon" 
+                                                                     class="expand-downloads-icon">
                                                                 </div>
-                                                                <div class="transfer-name" 
-                                                                     id="${peer}"
-                                                                     onclick="javascript:show_hide_status('${peer}_downloads',
-                                                                                    'collapse-downloads', 'expand-downloads');">
+                                                                <div id="toggle-download" 
+                                                                     class="transfer-name">
                                                                     Downloads
                                                                 </div>
                                                                 <ul class="exchange-subsubmenu" 
-                                                                    id="${peer}_downloads">
+                                                                    id="list-downloads">
                                                                     <div class="header">
                                                                         <div class="data-source-name">
                                                                             Data source name
@@ -195,7 +193,8 @@ Author     : szewczenko
                                                                     </div>
                                                                     <c:forEach var="download" items="${peers_downloads[peer]}">
                                                                         <div class="data-source">
-                                                                            <div class="data-source-name">
+                                                                            <div class="data-source-name"
+                                                                                 title="${download.dataSource}">
                                                                                 <c:out value="${download.dataSource}"/>
                                                                             </div>
                                                                             <div class="subscription-start">
@@ -215,17 +214,15 @@ Author     : szewczenko
                                                     <c:if test="${fn:length(peers_uploads[peer]) gt 0}">
                                                         <ul class="exchange-submenu">
                                                             <li>
-                                                                <div class="expand-uploads"
-                                                                     id="${peer}_uploads_icon">
+                                                                <div id="uploads-icon" 
+                                                                     class="expand-uploads-icon">
                                                                 </div>
-                                                                <div class="transfer-name" 
-                                                                     id="${peer}"
-                                                                     onclick="javascript:show_hide_status('${peer}_uploads',
-                                                                                    'collapse-uploads', 'expand-uploads');">
+                                                                <div id="toggle-upload" 
+                                                                     class="transfer-name">
                                                                     Uploads
                                                                 </div>
                                                                 <ul class="exchange-subsubmenu"
-                                                                    id="${peer}_uploads">
+                                                                    id="list-uploads">
                                                                     <div class="header">
                                                                         <div class="data-source-name">
                                                                             Data source name
@@ -242,7 +239,8 @@ Author     : szewczenko
                                                                     </div>
                                                                     <c:forEach var="upload" items="${peers_uploads[peer]}">
                                                                         <div class="data-source">
-                                                                            <div class="data-source-name">
+                                                                            <div class="data-source-name"
+                                                                                 title="${upload.dataSource}">
                                                                                 <c:out value="${upload.dataSource}"/>
                                                                             </div>
                                                                             <div class="subscription-start">

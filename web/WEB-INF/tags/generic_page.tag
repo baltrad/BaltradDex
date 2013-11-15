@@ -50,8 +50,8 @@
         <link rel="StyleSheet" href="includes/dex.css" type="text/css" 
               media="screen"/>
         <link rel="icon" type="image/png" href="includes/images/favicon.png"/>
-        <script src="includes/js/show_hide_status.js" type="text/javascript"></script>
         <script src="includes/js/jQuery.js" type="text/javascript"></script>
+        <script src="includes/js/toggle_status.js" type="text/javascript"></script>
         <script src="includes/js/datetimepicker_css.js" type="text/javascript"></script>
         <script src="includes/js/validate_time_input.js" type="text/javascript"></script>
         <script src="includes/js/submit_center_id.js" type="text/javascript"></script>          

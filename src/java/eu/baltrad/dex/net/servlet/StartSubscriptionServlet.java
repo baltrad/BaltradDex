@@ -224,51 +224,19 @@ public class StartSubscriptionServlet extends HttpServlet {
             if (authenticator.authenticate(req.getMessage(), 
                     req.getSignature(), req.getNodeName())) {
                 String jsonRequested = readDataSources(request);
-                
-                //System.out.println("StartSubscriptionServlet::doPost(): jsonRequested - " + jsonRequested);
-                
-                
                 Set<DataSource> requestedDataSources = jsonUtil
                             .jsonToDataSources(jsonRequested);
-                
-                
-                
-                
                 Set<DataSource> subscribedDataSources = 
                         storePeerSubscriptions(req, requestedDataSources);
-                
-                
-                /*if (subscribedDataSources != null) {
-                    System.out.println("StartSubscriptionServlet::doPost(): subscribedDataSources size - " +
-                        subscribedDataSources.size());
-                } else {
-                    System.out.println("StartSubscriptionServlet::doPost(): subscribedDataSources is null");
-                }*/
-                
-                
-                
                 String jsonSubscribed = jsonUtil.dataSourcesToJson(
                         subscribedDataSources);
-                
-                //System.out.println("StartSubscriptionServlet::doPost(): jsonSubcribed - " + jsonSubscribed);
-                
-                
                 if (subscribedDataSources.equals(requestedDataSources)) {
                     writeDataSources(res, jsonSubscribed);
                     res.setStatus(HttpServletResponse.SC_OK);
-                    
-                    //System.out.println("StartSubscriptionServlet::doPost(): SC_OK");
-                    
                 } else if (subscribedDataSources.size() > 0) {
                     writeDataSources(res, jsonSubscribed);
                     res.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-                    
-                    //System.out.println("StartSubscriptionServlet::doPost(): SC_PARTIAL_CONTENT");
-                    
                 } else {
-                    
-                    //System.out.println("StartSubscriptionServlet::doPost(): SC_NOT_FOUND");
-                    
                     res.setStatus(HttpServletResponse.SC_NOT_FOUND,
                         messages.getMessage(PS_GENERIC_SUBSCRIPTION_ERROR));
                 }
@@ -279,13 +247,7 @@ public class StartSubscriptionServlet extends HttpServlet {
         } catch (KeyczarException e) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
                     messages.getMessage(PS_MESSAGE_VERIFIER_ERROR_KEY));
-            
-            //System.out.println("StartSubscriptionServlet::doPost(): KeyczarException - " + e.getMessage());
-            
         } catch (Exception e) {
-            
-            //System.out.println("StartSubscriptionServlet::doPost(): Exception - " + e.getMessage());
-            
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(PS_INTERNAL_SERVER_ERROR_KEY));
         }

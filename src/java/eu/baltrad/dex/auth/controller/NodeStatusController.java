@@ -186,7 +186,7 @@ public class NodeStatusController {
      * Process submit request. Get transfer information for a selected peer.
      * @param model Model map
      * @param peerName Peer name for which transfer status is prepared 
-     * @param request HTTP serlet request
+     * @param request HTTP servlet request
      * @return View name
      */
     @RequestMapping(method = RequestMethod.POST)
@@ -198,10 +198,11 @@ public class NodeStatusController {
         Boolean showTransfers = true;
         if (peersStatus.containsKey(peerName)) {
             showTransfers = peersStatus.get(peerName);
-            showTransfers = !showTransfers;
-            peersStatus.remove(peerName);
+            showTransfers = !showTransfers;   
+            peersStatus.clear();
             peersStatus.put(peerName, showTransfers);
         } else {
+            peersStatus.clear();
             peersStatus.put(peerName, true);
         }
         // don't load transfer information when tree node is collapsed

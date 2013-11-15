@@ -177,7 +177,6 @@ public class StartSubscriptionController implements MessageSetter {
             try {
                 is = response.getEntity().getContent();
                 return IOUtils.toString(is, "UTF-8");
-                
             } finally {
                 is.close();
             }

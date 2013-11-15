@@ -756,26 +756,34 @@ textarea {
 .exchange-subsubmenu .data-source-name {
 	width: 20%;
 	float: left;
+    margin-right: 8px;
+    overflow: hidden;
 }
 .exchange-subsubmenu .subscription-start {
 	width: 20%;
 	float: left;
+    margin-right: 8px;
+    overflow: hidden;
 }
 .exchange-subsubmenu .subscription-status {
 	width: 20%;
 	float: left;
+    overflow: hidden;
 }
 .exchange-subsubmenu .files-received {
 	width: 20%;
 	float: left;
+    overflow: hidden;
 }
 .exchange-subsubmenu .files-sent {
 	width: 20%;
 	float: left;
+    overflow: hidden;
 }
 .exchange-subsubmenu .failures {
 	width: 20%;
 	float: left;
+    overflow: hidden;
 }   
 .status-exchange ul {
 	list-style: none;
@@ -831,26 +839,24 @@ textarea {
 .status-exchange .transfers {
     display: none;
 }
-.status-exchange .expand-downloads, 
-.status-exchange .collapse-downloads,
-.status-exchange .expand-uploads,
-.status-exchange .collapse-uploads {
-	width: 12px;
+.status-exchange .expand-downloads-icon, 
+.status-exchange .collapse-downloads-icon,
+.status-exchange .expand-uploads-icon, 
+.status-exchange .collapse-uploads-icon {
+    width: 12px;
 	height: 12px;
 	float: left;
 	clear: left;
 	margin: 4px 4px 4px 2px;
-    
+    background-repeat: no-repeat;
 }
-.status-exchange .expand-downloads,
-.status-exchange .expand-uploads {
+.status-exchange .expand-downloads-icon,
+.status-exchange .expand-uploads-icon {
     background-image: url("images/expand_small.png");
-    background-repeat: no-repeat;
-}
-.status-exchange .collapse-downloads,
-.status-exchange .collapse-uploads {
+}    
+.status-exchange .collapse-downloads-icon,
+.status-exchange .collapse-uploads-icon {
     background-image: url("images/collapse_small.png");
-    background-repeat: no-repeat;
 }
 
 /* System log and delivery registry*/

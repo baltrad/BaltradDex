@@ -19,18 +19,17 @@
 *
 *******************************************************************************/
 
-function show_hide_status(id, class_expand, class_collapse) {
-	
-    var elem = document.getElementById(id);
-	var icon = document.getElementById(id + "_icon");
+$(document).ready(function() {
+    $(this).find("#toggle-download").click(function() {
+        $(".exchange-submenu").find("#downloads-icon")
+            .toggleClass("collapse-downloads-icon");
+        $(".exchange-submenu").find("#list-downloads").slideToggle(200);
+    });
     
-	if(elem.style.display == "none" || elem.style.display == ""){
-		elem.style.display = "block";
-		icon.setAttribute("class", class_expand);
-	} else {
-		elem.style.display = "none";
-		icon.setAttribute("class", class_collapse);
-	}
-    
-}
+    $(this).find("#toggle-upload").click(function() {
+        $(".exchange-submenu").find("#uploads-icon")
+            .toggleClass("collapse-uploads-icon");
+        $(".exchange-submenu").find("#list-uploads").slideToggle(200);
+    }); 
+});
 

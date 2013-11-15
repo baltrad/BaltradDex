@@ -6,7 +6,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<script src="includes/js/main_menu.js"></script>
+<script type="text/javascript" src="includes/js/main_menu.js"></script>
 
 <div class="menu">
     <ul class="topmenu">
@@ -53,7 +53,7 @@
             </li>
             <li>
                 <span>
-                    <div class="expand" id="icon"></div>
+                    <div class="expand" id="menu-icon"></div>
                     Routes
                 </span>
                 <ul class="submenu">
@@ -104,7 +104,7 @@
             </div>
             <li>
                 <span>
-                    <div class="expand" id="icon"></div>
+                    <div class="expand" id="menu-icon"></div>
                     Radars
                 </span>
                 <ul class="submenu">
@@ -115,7 +115,7 @@
             </li>
             <li>
                 <span>
-                    <div class="expand" id="icon"></div>
+                    <div class="expand" id="menu-icon"></div>
                     Data sources
                 </span>
                 <ul class="submenu">
@@ -126,7 +126,7 @@
             </li>
             <li>
                 <span>
-                    <div class="expand" id="icon"></div>
+                    <div class="expand" id="menu-icon"></div>
                     Subscriptions
                 </span>
                 <ul class="submenu">
@@ -142,7 +142,7 @@
             </li>
             <li>
                 <span>
-                    <div class="expand" id="icon"></div>
+                    <div class="expand" id="menu-icon"></div>
                     Delivery registry
                 </span>
                 <ul class="submenu">
@@ -152,7 +152,7 @@
             </li>
             <li>
                 <span>
-                    <div class="expand" id="icon"></div>
+                    <div class="expand" id="menu-icon"></div>
                     Messages
                 </span>
                 <ul class="submenu">
@@ -162,7 +162,7 @@
             </li>
             <li>
                 <span>
-                    <div class="expand" id="icon"></div>
+                    <div class="expand" id="menu-icon"></div>
                     User accounts
                 </span>
                 <ul class="submenu">

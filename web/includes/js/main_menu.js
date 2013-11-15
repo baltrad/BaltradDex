@@ -21,8 +21,8 @@
 
 $(document).ready(function() {
     $("li").click(function() {
-        $(this).find("ul").slideToggle(200);
-        $(this).find("#icon").toggleClass("collapse"); 
+        $(this).find(".submenu").slideToggle(200);
+        $(this).find("#menu-icon").toggleClass("collapse"); 
     });    
 });
 
