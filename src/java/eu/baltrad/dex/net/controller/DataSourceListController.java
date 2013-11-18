@@ -426,10 +426,16 @@ public class DataSourceListController implements MessageSetter {
         if (selectedDataSources != null) {
             Set<DataSource> selectedPeerDataSources = new HashSet<DataSource>();
             for (int i = 0; i < selectedDataSources.length; i++) {
+                
+                
                 String[] parms = selectedDataSources[i].split("_");
+                
                 selectedPeerDataSources.add(new DataSource(
                         Integer.parseInt(parms[0]), parms[1], DataSource.PEER,
                         parms[2]));
+                
+                
+                
             }
             model.addAttribute(DATA_SOURCES_KEY, selectedPeerDataSources);
             viewName = DS_SELECTED_VIEW;

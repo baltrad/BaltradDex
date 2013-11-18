@@ -352,6 +352,9 @@ public class SaveDataSourceController {
                          * in case when data source access right was revoked
                          * for a given user
                          */
+                        
+                        
+                        
                         List<Subscription> uploads = subscriptionManager
                                     .load(Subscription.PEER);
                         dataSourceManager.deleteUser(dataSourceId);
@@ -360,15 +363,16 @@ public class SaveDataSourceController {
                                 dataSourceManager.storeUser(dataSourceId, 
                                         user.getId());
                             }
+                            
                             for (Subscription s : uploads) {
                                 User user = userManager.load(s.getUser());
                                 if (s.getDataSource()
                                         .equals(dataSource.getName())
-                                        && usersSelected
+                                        && !usersSelected
                                             .containsKey(user.getId())) {
                                     subscriptionManager.delete(s.getId());
                                 }
-                            }
+                            }   
                         } else {
                             for (Subscription s : uploads) {
                                 if (s.getDataSource()
