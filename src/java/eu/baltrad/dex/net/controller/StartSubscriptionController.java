@@ -84,7 +84,10 @@ public class StartSubscriptionController implements MessageSetter {
             "postsubscription.controller.message_signer_error";
     /** Subscription connection error key */
     private final static String PS_HTTP_CONN_ERROR_KEY = 
-            "postsubscription.controller.http_connection_error";        
+            "postsubscription.controller.http_connection_error";
+    /** Peer account not found error key */
+    private final static String PS_PEER_NOT_FOUND_ERROR_KEY =
+            "postsubscription.controller.peer_not_found_error";
     /** Generic connection error */
     private static final String PS_GENERIC_CONN_ERROR_KEY = 
             "postsubscription.controller.generic_connection_error"; 
@@ -237,7 +240,7 @@ public class StartSubscriptionController implements MessageSetter {
         }
     }
     
-    /**
+    /**userManager
      * Sends subscription request to the server.
      * @param model Model
      * @param peerName Peer node name
@@ -252,69 +255,81 @@ public class StartSubscriptionController implements MessageSetter {
                 request.getSession().getAttribute(DS_SELECTED);
         request.getSession().removeAttribute(DS_SELECTED);
         User node = userManager.load(peerName);
-        requestFactory = new DefaultRequestFactory(
+        if (node == null) {
+            String errorMsg = messages.getMessage(PS_PEER_NOT_FOUND_ERROR_KEY,
+                            new String[] {peerName});
+            setMessage(model, ERROR_MSG_KEY, errorMsg);      
+            log.error(errorMsg + ": " + errorMsg );
+        } else {
+            requestFactory = new DefaultRequestFactory(
                 URI.create(node.getNodeAddress()));
-        HttpUriRequest req = requestFactory
-                .createStartSubscriptionRequest(localNode, 
-                                                selectedPeerDataSources);
-        try {
-            authenticator.addCredentials(req, localNode.getName());
-            HttpResponse res = httpClient.post(req);
-            if (res.getStatusLine().getStatusCode() == 
-                    HttpServletResponse.SC_OK) {
-                String okMsg = messages.getMessage(PS_SERVER_SUCCESS_KEY,
+            HttpUriRequest req = requestFactory
+                    .createStartSubscriptionRequest(localNode, 
+                                                    selectedPeerDataSources);
+            try {
+                authenticator.addCredentials(req, localNode.getName());
+                HttpResponse res = httpClient.post(req);
+                if (res.getStatusLine().getStatusCode() == 
+                        HttpServletResponse.SC_OK) {
+                    String okMsg = messages.getMessage(PS_SERVER_SUCCESS_KEY,
+                            new String[] {peerName});
+                    storeLocalSubscriptions(res, readDataSources(res), 
+                            peerName);
+                    setMessage(model, SUCCESS_MSG_KEY, okMsg);
+                    log.warn(okMsg);
+                } else if (res.getStatusLine().getStatusCode() == 
+                        HttpServletResponse.SC_PARTIAL_CONTENT) {
+                    String errorMsg = messages.getMessage(
+                        PS_SERVER_PARTIAL_SUBSCRIPTION, 
                         new String[] {peerName});
-                storeLocalSubscriptions(res, readDataSources(res), peerName);
-                setMessage(model, SUCCESS_MSG_KEY, okMsg);
-                log.warn(okMsg);
-            } else if (res.getStatusLine().getStatusCode() == 
-                    HttpServletResponse.SC_PARTIAL_CONTENT) {
+                    storeLocalSubscriptions(res, readDataSources(res), 
+                            peerName);
+                    setMessage(model, ERROR_MSG_KEY, errorMsg);
+                    log.error(errorMsg);
+                } else if (res.getStatusLine().getStatusCode() == 
+                        HttpServletResponse.SC_NOT_FOUND) {
+                    String errorMsg = messages.getMessage(PS_SERVER_ERROR_KEY,
+                            new String[] {peerName});
+                    String errorDetails = res.getStatusLine().getReasonPhrase();
+                    setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, 
+                            errorMsg, errorDetails);      
+                    log.error(errorMsg + ": " + errorDetails);
+                } else {
+                    String errorMsg = messages.getMessage(PS_SERVER_ERROR_KEY,
+                            new String[] {peerName});
+                    String errorDetails = res.getStatusLine().getReasonPhrase();
+                    setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, 
+                            errorMsg, errorDetails);
+                    log.error(errorMsg + ": " + errorDetails);
+                }  
+            } catch (KeyczarException e) { 
+                String errorMsg = messages
+                        .getMessage(PS_MESSAGE_SIGNER_ERROR_KEY);     
+                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                        e.getMessage());
+                log.error(errorMsg + ": " + e.getMessage());
+            } catch (InternalControllerException e) {
                 String errorMsg = messages.getMessage(
-                    PS_SERVER_PARTIAL_SUBSCRIPTION, new String[] {peerName});
-                storeLocalSubscriptions(res, readDataSources(res), peerName);
-                setMessage(model, ERROR_MSG_KEY, errorMsg);
-                log.error(errorMsg);
-            } else if (res.getStatusLine().getStatusCode() == 
-                    HttpServletResponse.SC_NOT_FOUND) {
-                String errorMsg = messages.getMessage(PS_SERVER_ERROR_KEY,
+                        PS_INTERNAL_CONTROLLER_ERROR_KEY, 
                         new String[] {peerName});
-                String errorDetails = res.getStatusLine().getReasonPhrase();
                 setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                        errorDetails);      
-                log.error(errorMsg + ": " + errorDetails);
-            } else {
-                String errorMsg = messages.getMessage(PS_SERVER_ERROR_KEY,
-                        new String[] {peerName});
-                String errorDetails = res.getStatusLine().getReasonPhrase();
+                        e.getMessage());
+                log.error(errorMsg + ": " + e.getMessage());
+            } catch (IOException e) {
+                String errorMsg = messages.getMessage(
+                        PS_HTTP_CONN_ERROR_KEY, new String[] {peerName});
                 setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                        errorDetails);
-                log.error(errorMsg + ": " + errorDetails);
-            }  
-        } catch (KeyczarException e) { 
-            String errorMsg = messages.getMessage(PS_MESSAGE_SIGNER_ERROR_KEY);     
-            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                    e.getMessage());
-            log.error(errorMsg + ": " + e.getMessage());
-        } catch (InternalControllerException e) {
-            String errorMsg = messages.getMessage(
-                    PS_INTERNAL_CONTROLLER_ERROR_KEY, new String[] {peerName});
-            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                    e.getMessage());
-            log.error(errorMsg + ": " + e.getMessage());
-        } catch (IOException e) {
-            String errorMsg = messages.getMessage(
-                    PS_HTTP_CONN_ERROR_KEY, new String[] {peerName});
-            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                    e.getMessage());
-            log.error(errorMsg + ": " + e.getMessage());
-        } catch (Exception e) {
-            String errorMsg = messages.getMessage(
-                    PS_GENERIC_CONN_ERROR_KEY, new String[] {peerName});
-            setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                    e.getMessage());
-            log.error(errorMsg + ": " + e.getMessage());
+                        e.getMessage());
+                log.error(errorMsg + ": " + e.getMessage());
+            } catch (Exception e) {
+                String errorMsg = messages.getMessage(
+                        PS_GENERIC_CONN_ERROR_KEY, new String[] {peerName});
+                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
+                        e.getMessage());
+                log.error(errorMsg + ": " + e.getMessage());
+            }
+            model.addAttribute(PEER_NAME_KEY, peerName);   
         }
-        model.addAttribute(PEER_NAME_KEY, peerName);
         return SUBSCRIBE_VIEW;
     }
     

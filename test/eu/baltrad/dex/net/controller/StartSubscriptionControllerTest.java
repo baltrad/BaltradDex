@@ -262,6 +262,28 @@ public class StartSubscriptionControllerTest {
     }
     
     @Test
+    public void startSubscription_PeerNotFoundError() throws Exception {
+        expect(userManagerMock.load("test.baltrad.eu"))
+                .andReturn(null).once();
+        
+        replayAll();
+        
+        classUnderTest.setUserManager(userManagerMock);
+        Model model = new ExtendedModelMap();
+        String viewName = classUnderTest.startSubscription(request, model, 
+                "test.baltrad.eu");
+        
+        assertEquals("subscription_start_status", viewName);
+        assertTrue(model.containsAttribute("error_message"));
+        assertEquals(messages.getMessage(
+                "postsubscription.controller.peer_not_found_error",
+                new String[] {"test.baltrad.eu"}),
+                model.asMap().get("error_message"));
+        
+        verifyAll();
+    }
+    
+    @Test
     public void startSubscription_HttpConnectionError() throws Exception {
         expect(userManagerMock.load("test.baltrad.eu"))
             .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
