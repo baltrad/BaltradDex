@@ -64,6 +64,7 @@ import java.util.HashSet;
 
 import java.io.InputStream;
 import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Controls data source subscription process.
@@ -76,6 +77,8 @@ public class StartSubscriptionController implements MessageSetter {
     
     /** Initial view */
     private static final String SUBSCRIBE_VIEW = "subscription_start_status";
+    /** Selected data sources model key */
+    private static final String DS_SELECTED = "selected_data_sources";
     /** Message signer error key */
     private static final String PS_MESSAGE_SIGNER_ERROR_KEY = 
             "postsubscription.controller.message_signer_error";
@@ -242,18 +245,12 @@ public class StartSubscriptionController implements MessageSetter {
      * @return View name
      */
     @RequestMapping("/subscription_start_status.htm")
-    public String startSubscription(Model model,
-            @RequestParam(value="peer_name", required=true) String peerName,
-            @RequestParam(value="selected_data_sources", required=true) 
-            String[] selectedDataSources) {
+    public String startSubscription(HttpServletRequest request, Model model,
+            @RequestParam(value="peer_name", required=true) String peerName) {
         initConfiguration();
-        Set<DataSource> selectedPeerDataSources = new HashSet<DataSource>();
-        for (int i = 0; i < selectedDataSources.length; i++) {
-            String[] parms = selectedDataSources[i].split("_");
-            selectedPeerDataSources.add(new DataSource(
-                    Integer.parseInt(parms[0]), parms[1], DataSource.PEER,
-                    parms[2]));
-        }
+        Set<DataSource> selectedPeerDataSources = (HashSet<DataSource>) 
+                request.getSession().getAttribute(DS_SELECTED);
+        request.getSession().removeAttribute(DS_SELECTED);
         User node = userManager.load(peerName);
         requestFactory = new DefaultRequestFactory(
                 URI.create(node.getNodeAddress()));

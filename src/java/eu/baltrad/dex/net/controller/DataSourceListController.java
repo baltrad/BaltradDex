@@ -63,6 +63,9 @@ import java.io.File;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Controls access to data sources available at the peer node for subscription.
@@ -138,10 +141,10 @@ public class DataSourceListController implements MessageSetter {
     private MessageResourceUtil messages;
     private Logger log;
     
-    protected User localNode;
-    
+    private Map<String, DataSource> peerDataSources;
     private String peerNodeName;
-    private Set<DataSource> peerDataSources;
+    
+    protected User localNode;
     
     /**
      * Default constructor.
@@ -166,6 +169,7 @@ public class DataSourceListController implements MessageSetter {
                 confManager.getAppConf().getState(),
                 confManager.getAppConf().getCountryCode(),
                 confManager.getAppConf().getNodeAddress());
+        this.peerDataSources = new HashMap<String, DataSource>();
     }
     
     /**
@@ -323,9 +327,12 @@ public class DataSourceListController implements MessageSetter {
                                 .getValue();
                         model.addAttribute(PEER_NAME_KEY, peerNodeName);
                         String json = readResponse(res);
-                        peerDataSources = jsonUtil.jsonToDataSources(json);
+                        Set<DataSource> dataSources = jsonUtil.jsonToDataSources(json);
+                        for (DataSource ds : dataSources) {
+                            peerDataSources.put(ds.getName(), ds);
+                        }
                         viewName = DS_CONNECTED_VIEW;
-                        model.addAttribute(DATA_SOURCES_KEY, peerDataSources);
+                        model.addAttribute(DATA_SOURCES_KEY, dataSources);
                     } else if (res.getStatusLine().getStatusCode() ==
                             HttpServletResponse.SC_CREATED) {
                         // user account established on server, create local 
@@ -419,24 +426,20 @@ public class DataSourceListController implements MessageSetter {
      * @return View name
      */
     @RequestMapping("/node_datasources.htm")
-    public String selectedDataSources(Model model, 
+    public String selectedDataSources(HttpServletRequest request, Model model, 
                 @RequestParam(value="selected_data_sources", required=false) 
                 String[] selectedDataSources) {
         String viewName = null;
         if (selectedDataSources != null) {
             Set<DataSource> selectedPeerDataSources = new HashSet<DataSource>();
             for (int i = 0; i < selectedDataSources.length; i++) {
-                
-                
-                String[] parms = selectedDataSources[i].split("_");
-                
-                selectedPeerDataSources.add(new DataSource(
-                        Integer.parseInt(parms[0]), parms[1], DataSource.PEER,
-                        parms[2]));
-                
-                
-                
+                DataSource ds = peerDataSources.get(selectedDataSources[i]);
+                ds.setType(DataSource.PEER);
+                selectedPeerDataSources.add(ds);
             }
+            // pass session attribute to the next controller
+            request.getSession().setAttribute("selected_data_sources", 
+                    selectedPeerDataSources);
             model.addAttribute(DATA_SOURCES_KEY, selectedPeerDataSources);
             viewName = DS_SELECTED_VIEW;
         } else {

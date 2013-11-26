@@ -61,7 +61,7 @@ Author     : szewczenko
                                         <div class="select">
                                             <input type="checkbox" 
                                                    name="selected_data_sources"
-                                                   value="${ds.id}_${ds.name}_${ds.description}"/>
+                                                   value="${ds.name}"/>
                                         </div>
                                     </div>
                                 </c:forEach>

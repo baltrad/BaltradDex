@@ -39,6 +39,7 @@ import static org.easymock.EasyMock.*;
 
 import org.springframework.ui.Model;
 import org.springframework.ui.ExtendedModelMap;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 import org.apache.http.StatusLine;
 import org.apache.http.message.BasicStatusLine;
@@ -61,6 +62,7 @@ import java.util.ArrayList;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 
 import org.keyczar.exceptions.KeyczarException;
 
@@ -70,13 +72,7 @@ import org.keyczar.exceptions.KeyczarException;
  * @version 1.2.2
  * @since 1.1.0
  */
-public class StartSubscriptionControllerTest {
-    
-    private static final String[] SELECTED_DATA_SOURCES = {
-        "1_DataSource1_A test data source",
-        "2_DataSource2_Another test data source",
-        "3_DataSource3_Yet one more test data source"
-    };
+public class StartSubscriptionControllerTest {    
     
     private static final String JSON_SOURCES_OK =  
             "[{\"name\":\"DS1\",\"description\":\"A test "
@@ -99,6 +95,7 @@ public class StartSubscriptionControllerTest {
     private MessageResourceUtil messages;
     private Logger log;
     private JsonUtil jsonUtil;
+    private MockHttpServletRequest request;
     
     class PSController extends StartSubscriptionController {
         public PSController() {
@@ -151,13 +148,25 @@ public class StartSubscriptionControllerTest {
         authenticatorMock = (Authenticator) createMock(Authenticator.class);
         dataSourceManagerMock = (IDataSourceManager) 
                     createMock(IDataSourceManager.class);
-        
+        request = new MockHttpServletRequest();
+        setRequestAttributes(request);
     }
     
     @After
     public void tearDown() throws Exception {
         classUnderTest = null;
         resetAll();
+    }
+    
+    private void setRequestAttributes(MockHttpServletRequest request) {
+        Set<DataSource> selectedDataSources = new HashSet<DataSource>();
+        selectedDataSources.add(new DataSource(1, "DataSource1", 
+                DataSource.PEER, "A test data source"));
+        selectedDataSources.add(new DataSource(2, "DataSource2", 
+                DataSource.PEER, "Another test data source"));
+        selectedDataSources.add(new DataSource(3, "DataSource3", 
+                DataSource.PEER, "Yet one more test data source"));
+        request.setAttribute("selected_data_sources", selectedDataSources);
     }
     
     private HttpResponse createResponse(int code, String reason, 
@@ -197,8 +206,8 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.startSubscription(model, 
-                "test.baltrad.eu", SELECTED_DATA_SOURCES);
+        String viewName = classUnderTest.startSubscription(request, model, 
+                "test.baltrad.eu");
         assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
@@ -235,8 +244,8 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.startSubscription(model, 
-                "test.baltrad.eu", SELECTED_DATA_SOURCES);
+        String viewName = classUnderTest.startSubscription(request, model, 
+                "test.baltrad.eu");
         
         verifyAll();
         
@@ -271,8 +280,8 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.startSubscription(model, 
-                "test.baltrad.eu", SELECTED_DATA_SOURCES);
+        String viewName = classUnderTest.startSubscription(request, model, 
+                "test.baltrad.eu");
         
         assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
@@ -306,8 +315,8 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.startSubscription(model, 
-                "test.baltrad.eu", SELECTED_DATA_SOURCES);
+        String viewName = classUnderTest.startSubscription(request, model, 
+                "test.baltrad.eu");
         
         assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
@@ -344,8 +353,8 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.startSubscription(model, 
-                "test.baltrad.eu", SELECTED_DATA_SOURCES);
+        String viewName = classUnderTest.startSubscription(request, model, 
+                "test.baltrad.eu");
         
         assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
@@ -383,8 +392,8 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.startSubscription(model, 
-                "test.baltrad.eu", SELECTED_DATA_SOURCES);
+        String viewName = classUnderTest.startSubscription(request, model, 
+                "test.baltrad.eu");
         assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
@@ -421,8 +430,8 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.startSubscription(model, 
-                "test.baltrad.eu", SELECTED_DATA_SOURCES);
+        String viewName = classUnderTest.startSubscription(request, model, 
+                "test.baltrad.eu");
         
         assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
@@ -470,8 +479,8 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.startSubscription(model, "test.baltrad.eu",
-                SELECTED_DATA_SOURCES);
+        String viewName = classUnderTest.startSubscription(request, model, 
+                "test.baltrad.eu");
         assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("error_message"));
         assertEquals(messages.getMessage(
@@ -520,8 +529,8 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.startSubscription(model, 
-                "test.baltrad.eu", SELECTED_DATA_SOURCES);
+        String viewName = classUnderTest.startSubscription(request, model, 
+                "test.baltrad.eu");
         assertEquals("subscription_start_status", viewName);
         assertTrue(model.containsAttribute("success_message"));
         assertEquals(messages.getMessage(

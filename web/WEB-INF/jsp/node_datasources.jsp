@@ -55,12 +55,6 @@ Author     : szewczenko
                                 <div class="ds_description">
                                     <c:out value="${ds.description}"/>
                                 </div>
-                                <div class="hidden">
-                                    <input type="checkbox" 
-                                           name="selected_data_sources"
-                                           value="${ds.id}_${ds.name}_${ds.description}"
-                                           checked/>
-                                </div>
                             </div>
                         </c:forEach>
                     </div>
