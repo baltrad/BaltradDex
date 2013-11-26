@@ -32,7 +32,6 @@ import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.net.controller.exception.InternalControllerException;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -58,6 +57,7 @@ import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
 
+import java.util.HashMap;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
@@ -69,7 +69,6 @@ import java.io.IOException;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
 
 /**
  * Data source list controller test.
@@ -104,6 +103,7 @@ public class DataSourceListControllerTest {
         public DSLController() {
             this.localNode = new User(1, "test", "s3cret", "org", "unit", 
                     "locality", "state", "XX", "user", "http://localhost:8084");
+            this.peerDataSources = new HashMap<String, DataSource>();
         }
         @Override
         protected void initConfiguration() {}
@@ -733,6 +733,8 @@ public class DataSourceListControllerTest {
         verifyAll();
         
         assertEquals("node_connected", viewName);
+        
+        
         assertTrue(model.containsAttribute("data_sources"));
         Set<DataSource> dataSources = (HashSet<DataSource>) 
                 model.asMap().get("data_sources");

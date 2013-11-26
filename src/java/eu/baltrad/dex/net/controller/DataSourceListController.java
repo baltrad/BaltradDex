@@ -53,6 +53,7 @@ import org.apache.http.HttpResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
@@ -65,7 +66,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Controls access to data sources available at the peer node for subscription.
@@ -141,9 +141,9 @@ public class DataSourceListController implements MessageSetter {
     private MessageResourceUtil messages;
     private Logger log;
     
-    private Map<String, DataSource> peerDataSources;
     private String peerNodeName;
     
+    protected Map<String, DataSource> peerDataSources;
     protected User localNode;
     
     /**
@@ -327,12 +327,13 @@ public class DataSourceListController implements MessageSetter {
                                 .getValue();
                         model.addAttribute(PEER_NAME_KEY, peerNodeName);
                         String json = readResponse(res);
-                        Set<DataSource> dataSources = jsonUtil.jsonToDataSources(json);
+                        Set<DataSource> dataSources = 
+                                jsonUtil.jsonToDataSources(json);
                         for (DataSource ds : dataSources) {
                             peerDataSources.put(ds.getName(), ds);
                         }
-                        viewName = DS_CONNECTED_VIEW;
                         model.addAttribute(DATA_SOURCES_KEY, dataSources);
+                        viewName = DS_CONNECTED_VIEW;
                     } else if (res.getStatusLine().getStatusCode() ==
                             HttpServletResponse.SC_CREATED) {
                         // user account established on server, create local 
