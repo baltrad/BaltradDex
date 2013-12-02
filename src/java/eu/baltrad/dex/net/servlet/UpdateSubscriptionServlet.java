@@ -75,8 +75,10 @@ public class UpdateSubscriptionServlet extends HttpServlet {
             "postsubscription.server.message_verifier_error";    
     private static final String GS_UNAUTHORIZED_REQUEST_KEY =
             "getsubscription.server.unauthorized_request";
-    private static final String GS_SUBSCRIPTION_SUCCESS_KEY = 
-            "getsubscription.server.subscription_success";
+    private static final String GS_SUBSCRIPTION_START_SUCCESS_KEY = 
+            "getsubscription.server.subscription_start_success";
+    private static final String GS_SUBSCRIPTION_CANCEL_SUCCESS_KEY = 
+            "getsubscription.server.subscription_cancel_success";
     private static final String GS_SUBSCRIPTION_FAILURE_KEY = 
             "getsubscription.server.subscription_failure";
     private static final String GS_GENERIC_SUBSCRIPTION_ERROR = 
@@ -165,25 +167,26 @@ public class UpdateSubscriptionServlet extends HttpServlet {
         List<Subscription> subscriptions = new ArrayList<Subscription>();
         try {
             for (Subscription requested : requestedSubscription) {
-                Subscription current = subscriptionManager.load(Subscription.PEER,
-                        req.getNodeName(), requested.getDataSource());
+                Subscription current = subscriptionManager.load(
+                        Subscription.PEER, req.getNodeName(), 
+                        requested.getDataSource());
                 if (current != null) {
-                    String[] messageArgs = {current.getDataSource(), 
-                            localNode.getName(), current.getUser()};
+                    String[] messageArgs = {current.getUser(), 
+                        current.getDataSource()};
                     if (requested.isActive()) {
                         current.setActive(requested.isActive());
                         current.setSyncronized(true);
                         subscriptionManager.update(current);
                         subscriptions.add(current);
                         log.warn(messages.getMessage(
-                                    GS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
+                            GS_SUBSCRIPTION_START_SUCCESS_KEY, messageArgs));
                     } else {
                         current.setActive(requested.isActive());
                         current.setSyncronized(true);
                         subscriptionManager.delete(current.getId());
                         subscriptions.add(current);
                         log.warn(messages.getMessage(
-                                GS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
+                            GS_SUBSCRIPTION_CANCEL_SUCCESS_KEY, messageArgs));
                     }
                 } else {
                     if (requested.isActive()) {
@@ -191,12 +194,12 @@ public class UpdateSubscriptionServlet extends HttpServlet {
                                 Subscription.PEER, req.getNodeName(), 
                                 requested.getDataSource(), requested.isActive(), 
                                 true);
-                        String[] messageArgs = {current.getDataSource(),
-                            localNode.getName(), current.getUser()};
+                        String[] messageArgs = {current.getUser(), 
+                            current.getDataSource()};
                         subscriptionManager.store(current);
                         subscriptions.add(current);
                         log.warn(messages.getMessage(
-                                GS_SUBSCRIPTION_SUCCESS_KEY, messageArgs));
+                            GS_SUBSCRIPTION_START_SUCCESS_KEY, messageArgs));
                     }
                 }
             }

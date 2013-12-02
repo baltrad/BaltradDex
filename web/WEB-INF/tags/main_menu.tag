@@ -131,7 +131,7 @@
                 </span>
                 <ul class="submenu">
                     <li>
-                        <a href="subscription_remove_downloads.htm">
+                        <a href="subscription_remove_downloads_peers.htm">
                             Remove downloads</a>
                     </li>
                     <li>

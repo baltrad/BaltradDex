@@ -30,84 +30,70 @@ Author     : szewczenko
                 <div class="header">
                     <div class="row">Remove downloads</div>
                 </div>
-                 <c:choose>
-                     <c:when test="${not empty downloads}">
-                        <div class="header-text">
-                            Currently subscribed data sources.
-                            Select subscription to be removed.
+                
+                <div class="header-text">
+                    Data sources subscribed at ${peer_name}.
+                    Select subscription to be removed. 
+                    If the selected subscription is active, the system will 
+                    attempt to cancel subscription at the peer node.
+                </div>
+                <form action="subscription_remove_selected_downloads.htm" 
+                      method="POST">
+                    <div class="body">
+                        <div class="header-row">
+                            <div class="count">&nbsp;</div>
+                            <div class="ds_name">Data source</div>
+                            <div class="started">Started on</div>
+                            <div class="status">Status</div>
+                            <div class="select">Select</div>
                         </div>
-                        <form action="subscription_remove_selected_downloads.htm" 
-                              method="POST">
-                            <div class="body">
-                                <div class="header-row">
-                                    <div class="count">&nbsp;</div>
-                                    <div class="node">Node name</div>
-                                    <div class="ds_name">Data source name</div>
-                                    <div class="started">Started on</div>
-                                    <div class="status">Status</div>
-                                    <div class="select">Select</div>
+                        <c:set var="count" scope="page" value="1"/>
+                        <c:forEach items="${downloads}" var="sub">
+                            <div class="row">
+                                <div class="count">
+                                    <c:out value="${count}"/>
+                                    <c:set var="count" value="${count + 1}"/>
                                 </div>
-                                <c:set var="count" scope="page" value="1"/>
-                                <c:forEach items="${downloads}" var="sub">
-                                    <div class="row">
-                                        <div class="count">
-                                            <c:out value="${count}"/>
-                                            <c:set var="count" value="${count + 1}"/>
-                                        </div>
-                                        <div class="node">
-                                            <c:out value="${sub.user}"/>
-                                        </div>
-                                        <div class="ds_name">
-                                            <c:out value="${sub.dataSource}"/>
-                                        </div>
-                                        <div class="started">
-                                            <fmt:formatDate value="${sub.date}" 
-                                                            pattern="yyyy/dd/MM HH:mm:ss"/>
-                                        </div>
-                                        <div class="status">
-                                            <c:choose>
-                                                <c:when test="${sub.active == true}">
-                                                    <img src="includes/images/log-info.png"
-                                                            alt="Active" title="Active subscription"/>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <img src="includes/images/stop.png"
-                                                            alt="Stopped" title="Stopped subscription"/>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </div>        
-                                        <div class="select">
-                                            <input type="checkbox" name="downloadIds"
-                                                value="${sub.id}"/>
-                                        </div>
-                                    </div>
-                                </c:forEach>
-                            </div>
-                            <div class="table-footer">
-                                <div class="buttons">
-                                    <div class="button-wrap">
-                                        <input class="button" type="submit" 
-                                               value="OK"/>
-                                    </div>
+                                <div class="ds_name" title="${sub.dataSource}">
+                                    <c:out value="${sub.dataSource}"/>
                                 </div>
-                            </div>            
-                        </form>    
-                     </c:when>
-                     <c:otherwise>
-                         <div class="header-text">
-                             No subscriptions found.
-                         </div>
-                         <div class="table-footer">
-                            <div class="buttons">
-                                <div class="button-wrap">
-                                    <input class="button" type="button" 
-                                           value="Home"
-                                           onclick="window.location.href='status.htm'"/>
+                                <div class="started">
+                                    <fmt:formatDate value="${sub.date}" 
+                                                    pattern="yyyy/dd/MM HH:mm:ss"/>
+                                </div>
+                                <div class="status">
+                                    <c:choose>
+                                        <c:when test="${sub.active == true}">
+                                            <img src="includes/images/log-info.png"
+                                                    alt="Active" title="Active subscription"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <img src="includes/images/stop.png"
+                                                    alt="Stopped" title="Stopped subscription"/>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </div>        
+                                <div class="select">
+                                    <input type="checkbox" name="downloadIds"
+                                        value="${sub.id}"/>
                                 </div>
                             </div>
+                        </c:forEach>
+                    </div>
+                    <div class="table-footer">
+                        <div class="buttons">
+                            <div class="button-wrap">
+                                <input class="button" type="button" 
+                                       value="Back"
+                                       onclick="window.location.href='subscription_remove_downloads_peers.htm'"/>
+                                </div>
+                            <div class="button-wrap">
+                                <input class="button" type="submit" 
+                                       value="OK"/>
+                            </div>
                         </div>
-                     </c:otherwise>
-                 </c:choose>
+                    </div>            
+                </form>    
             </div>
         </div>
     </jsp:body>

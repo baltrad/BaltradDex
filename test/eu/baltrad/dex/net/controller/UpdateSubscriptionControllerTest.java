@@ -61,8 +61,6 @@ import java.util.ArrayList;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Timestamp;
-
 
 /**
  * Post subscription request controller test.

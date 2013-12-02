@@ -42,7 +42,7 @@ Author     : szewczenko
                         <div class="button-wrap">
                             <input class="button" type="button" 
                                    value="OK" 
-                                   onclick="window.location.href='subscription_remove_downloads.htm'"/>
+                                   onclick="window.location.href='subscription_remove_downloads_peers.htm'"/>
                         </div>
                     </div>
                 </div>

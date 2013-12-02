@@ -34,7 +34,7 @@ Author     : szewczenko
                     <img src="includes/images/circle-alert.png" 
                          alt="OK"/>
                     <div class="msg">
-                        Selected subscriptions will be removed.
+                        Selected subscriptions at ${peer_name} will be removed.
                     </div>
                 </div>
                 <form action="subscription_remove_downloads_status.htm" 
@@ -42,7 +42,6 @@ Author     : szewczenko
                     <div class="body">
                         <div class="header-row">
                             <div class="count">&nbsp;</div>
-                            <div class="node">Node name</div>
                             <div class="ds_name">Data source name</div>
                             <div class="started">Started on</div>
                             <div class="status">Status</div>
@@ -54,10 +53,7 @@ Author     : szewczenko
                                     <c:out value="${count}"/>
                                     <c:set var="count" value="${count + 1}"/>
                                 </div>
-                                <div class="node">
-                                    <c:out value="${sub.user}"/>
-                                </div>
-                                <div class="ds_name">
+                                <div class="ds_name" title="${sub.dataSource}">
                                     <c:out value="${sub.dataSource}"/>
                                 </div>
                                 <div class="started">
@@ -68,11 +64,13 @@ Author     : szewczenko
                                     <c:choose>
                                         <c:when test="${sub.active == true}">
                                             <img src="includes/images/log-info.png"
-                                                    alt="Active" title="Active subscription"/>
+                                                 alt="Active" 
+                                                 title="Active subscription"/>
                                         </c:when>
                                         <c:otherwise>
                                             <img src="includes/images/stop.png"
-                                                    alt="Stopped" title="Stopped subscription"/>
+                                                 alt="Cancelled"
+                                                 title="Cancelled subscription"/>
                                         </c:otherwise>
                                     </c:choose>
                                 </div>        

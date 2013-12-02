@@ -215,6 +215,9 @@
                                 access="ROLE_ADMIN" 
                                 requires-channel="https"/>
         
+        <security:intercept-url pattern="subscription_remove_downloads_peers.htm"
+                                access="ROLE_ADMIN" 
+                                requires-channel="https"/>
         <security:intercept-url pattern="/subscription_remove_downloads.htm" 
                                 access="ROLE_ADMIN" 
                                 requires-channel="https"/>
