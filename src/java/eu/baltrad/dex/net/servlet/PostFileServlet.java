@@ -86,6 +86,8 @@ public class PostFileServlet extends HttpServlet {
             "postfile.server.message_verifier_error"; 
     private static final String PF_UNAUTHORIZED_REQUEST_KEY =
             "postfile.server.unauthorized_request";
+    private static final String PF_INVALID_SUBSCRIPTION_ERROR_KEY = 
+            "postfile.server.invalid_subscription_error";
     private static final String PF_INTERNAL_SERVER_ERROR_KEY = 
             "postfile.server.internal_server_error";
     private static final String PF_DUPLICATE_ENTRY_ERROR_KEY = 
@@ -224,28 +226,34 @@ public class PostFileServlet extends HttpServlet {
                             baos.close();
                         }
                         for (Subscription s : uploads) {
-                            IFilter filter = fileManager
+                            try {
+                                IFilter filter = fileManager
                                     .loadFilter(s.getDataSource());
-                            if (matcher.match(entry.getMetadata(), 
-                                    filter.getExpression())) {
-                                DataSource dataSource = dataSourceManager
-                                    .load(s.getDataSource(), DataSource.LOCAL);
-                                User receiver = userManager.load(s.getUser());
-                                RequestFactory requestFactory = 
-                                    new DefaultRequestFactory(
-                                        URI.create(receiver.getNodeAddress()));
-                                HttpUriRequest deliveryRequest = requestFactory
-                                    .createPostFileRequest(localNode,
-                                        fileContent);
-                                authenticator.addCredentials(deliveryRequest,
-                                        localNode.getName());
-                                PostFileTask task = new PostFileTask(
-                                    registryManager, deliveryRequest, uuid, 
-                                    receiver, dataSource, connTimeout, 
-                                    soTimeout);
-                                framePublisherManager.getFramePublisher(
-                                        receiver.getName()).addTask(task);
-                            }  
+                                if (matcher.match(entry.getMetadata(), 
+                                        filter.getExpression())) {
+                                    DataSource dataSource = dataSourceManager
+                                        .load(s.getDataSource(), DataSource.LOCAL);
+                                    User receiver = userManager.load(s.getUser());
+                                    RequestFactory requestFactory = 
+                                        new DefaultRequestFactory(
+                                            URI.create(receiver.getNodeAddress()));
+                                    HttpUriRequest deliveryRequest = requestFactory
+                                        .createPostFileRequest(localNode,
+                                            fileContent);
+                                    authenticator.addCredentials(deliveryRequest,
+                                            localNode.getName());
+                                    PostFileTask task = new PostFileTask(
+                                        registryManager, deliveryRequest, uuid, 
+                                        receiver, dataSource, connTimeout, 
+                                        soTimeout);
+                                    framePublisherManager.getFramePublisher(
+                                            receiver.getName()).addTask(task);
+                                } 
+                            } catch (Exception e) {
+                                log.error(messages.getMessage(
+                                        PF_INVALID_SUBSCRIPTION_ERROR_KEY,
+                                        new String[] {e.getMessage()}));
+                            } 
                         }
                     }
                 } else {

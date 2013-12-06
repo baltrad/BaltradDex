@@ -57,10 +57,6 @@ INSERT INTO dex_data_quantities (name, unit, description) VALUES
                                 normalized to between 0 (poorest quality) to 1 (best quality)');
 
 INSERT INTO dex_file_objects (name, description) VALUES
-    ('PVOL', 'Polar volume'), ('CVOL', 'Cartesian volume'), ('SCAN', 'Polar scan'),
-    ('RAY', 'Single polar ray'), ('AZIM', 'Azimuthal object'), ('IMAGE', '2-D cartesian image'),
-    ('COMP', 'Cartesian composite image(s)'), ('XSEC', '2-D vertical cross section(s)'),
-    ('VP', '1-D vertical profile'), ('PIC', 'Embedded graphical image');
 
 INSERT INTO dex_products (name, description) VALUES
     ('SCAN', 'A scan of polar data'), ('PPI', 'Plan position indicator'),
