@@ -22,7 +22,6 @@
 package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.util.MessageResourceUtil;
@@ -37,14 +36,11 @@ import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.bdb.util.FileEntryNamer;
 import eu.baltrad.bdb.expr.Expression;
 
-import eu.baltrad.beast.message.IBltMessage;
-import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.util.FramePublisherManager;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
-import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
 
@@ -58,11 +54,6 @@ import org.keyczar.exceptions.KeyczarException;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.StatusLine;
-import org.apache.http.message.BasicStatusLine;
-import org.apache.http.HttpResponse;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.ProtocolVersion;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
@@ -74,10 +65,11 @@ import org.junit.Test;
 
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
-import java.sql.Timestamp;
-import java.util.Date;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+
+import java.util.Date;
 import java.util.UUID;
 import java.util.List;
 import java.util.ArrayList;
@@ -130,6 +122,14 @@ public class PostFileServletTest {
         }
     }
     
+    protected class ImpossibleMetadataMatcher extends MetadataMatcher 
+                                                        implements Matcher {
+        @Override
+        public boolean match(Metadata metadata, Expression ex) {
+            return false;
+        }
+    }
+    
     private Object createMock(Class clazz) {
         Object mock = EasyMock.createMock(clazz);
         mocks.add(mock);
@@ -148,7 +148,7 @@ public class PostFileServletTest {
         }
     }
     
-    private void resetAll() {
+    private void resetAll() { 
         for (Object mock : mocks) {
             reset(mock);
         }
@@ -162,16 +162,7 @@ public class PostFileServletTest {
         request.addHeader("Authorization", "test.baltrad.eu" + ":" + 
             "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_");   
         request.addHeader("Node-Name", "test.baltrad.eu");
-        request.addHeader("Node-Address", "http://test.baltrad.eu");
         request.setContent("A test file content".getBytes());
-    }
-    
-    private HttpResponse createResponse(int code, String reason) 
-            throws Exception {
-        ProtocolVersion version = new ProtocolVersion("HTTP", 1, 1);
-        StatusLine statusLine = new BasicStatusLine(version, code, reason);
-        HttpResponse res = new BasicHttpResponse(statusLine);
-        return res;
     }
     
     @Before
@@ -317,14 +308,12 @@ public class PostFileServletTest {
             messages.getMessage("postfile.server.database_error"), 
             response.getErrorMessage());
     }
-        
+    
     @Test
-    public void handleRequest_OK() throws Exception {
+    public void handleRequest_MissingProviderHeader() throws Exception {
         Authenticator authMock = (Authenticator) createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
-        authMock.addCredentials(isA(HttpUriRequest.class), isA(String.class));
-        authMock.addCredentials(isA(HttpUriRequest.class), isA(String.class));
         
         FileEntry entryMock = (FileEntry) createMock(FileEntry.class);
         expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
@@ -343,31 +332,55 @@ public class PostFileServletTest {
                 (FileEntryNamer) createMock(FileEntryNamer.class);
         expect(namerMock.name(isA(FileEntry.class))).andReturn(ENTRY_NAME);
         
-        IBltMessageManager messageManagerMock = 
-                (IBltMessageManager) createMock(IBltMessageManager.class);
-        messageManagerMock.manage(isA(IBltMessage.class));
-        
         ISubscriptionManager subscriptionManagerMock = 
                 (ISubscriptionManager) createMock(ISubscriptionManager.class);
         expect(subscriptionManagerMock.load(Subscription.PEER)).
                 andReturn(peerSubscriptions);
         
+        replayAll();
+        
+        classUnderTest.setAuthenticator(authMock);
+        classUnderTest.setCatalog(fileCatalogMock);
+        classUnderTest.setNamer(namerMock);
+        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.handleRequest(request, response);
+        
+        verifyAll();
+    }
+    
+    @Test
+    public void handleRequest_SubscriptionInvalid() throws Exception {
+        Authenticator authMock = (Authenticator) createMock(Authenticator.class);
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE);
+        
+        FileEntry entryMock = (FileEntry) createMock(FileEntry.class);
+        expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
+                .anyTimes();
+        expect(entryMock.getMetadata()).andReturn(null).anyTimes();
+        expect(entryMock.getContentStream())
+            .andReturn(new ByteArrayInputStream("content stream".getBytes()))
+            .anyTimes();
+        
+        FileCatalog fileCatalogMock = 
+                (FileCatalog) createMock(FileCatalog.class);
+        expect(fileCatalogMock.store(isA(InputStream.class)))
+                .andReturn(entryMock);
+        fileCatalogMock.remove(entryMock);
+        expectLastCall();
+        
+        FileEntryNamer namerMock = 
+                (FileEntryNamer) createMock(FileEntryNamer.class);
+        expect(namerMock.name(isA(FileEntry.class))).andReturn(ENTRY_NAME);
+        
+        ISubscriptionManager subscriptionManagerMock = 
+                (ISubscriptionManager) createMock(ISubscriptionManager.class);
+        expect(subscriptionManagerMock.load(Subscription.LOCAL)).
+                andReturn(localSubscriptions);
+        
         IFilter filterMock = (IFilter) createMock(IFilter.class);
         expect(filterMock.getExpression()).andReturn(null).anyTimes();
         
-        IDataSourceManager dataSourceManagerMock =
-                (IDataSourceManager) createMock(IDataSourceManager.class);
-        
-        DataSource ds1 = new DataSource(1, "DS1", DataSource.PEER, 
-                "Some data source");
-        DataSource ds2 = new DataSource(2, "DS2", DataSource.PEER, 
-                "Another data source");
-      
-        expect(dataSourceManagerMock.load("DS1", DataSource.LOCAL))
-                .andReturn(ds1);
-        expect(dataSourceManagerMock.load("DS2", DataSource.LOCAL))
-                .andReturn(ds2);  
-      
         IBltFileManager fileManagerMock = 
                 (IBltFileManager) createMock(IBltFileManager.class);
         
@@ -376,35 +389,266 @@ public class PostFileServletTest {
         expect(fileManagerMock.loadFilter(s2.getDataSource()))
                 .andReturn(filterMock).once();
         
-        IUserManager userManagerMock = 
-                (IUserManager) createMock(IUserManager.class);
-        User account = new User(1, "user", "user", "s3cret", "org", "unit", 
-                "locality", "state", "PL", "http://test.baltrad.eu");
-        expect(userManagerMock.load(isA(String.class)))
-                .andReturn(account).anyTimes();
+        replayAll();
         
-        IRegistryManager deliveryRegistryManagerMock =
-          (IRegistryManager) createMock(IRegistryManager.class);
-        expect(deliveryRegistryManagerMock.store(isA(RegistryEntry.class)))
-                .andReturn(Integer.SIZE).anyTimes();
+        classUnderTest.setAuthenticator(authMock);
+        classUnderTest.setCatalog(fileCatalogMock);
+        classUnderTest.setNamer(namerMock);
+        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setFileManager(fileManagerMock);
+        classUnderTest.setMatcher(new ImpossibleMetadataMatcher());
+        request.addHeader("Provider", "Peer");
+        classUnderTest.handleRequest(request, response);
+        
+        assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
+        
+        verifyAll();
+    }
+    
+    @Test
+    public void handleRequst_SubscriptionOK() throws Exception {
+        Authenticator authMock = (Authenticator) createMock(Authenticator.class);
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE);
+        
+        FileEntry entryMock = (FileEntry) createMock(FileEntry.class);
+        expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
+                .anyTimes();
+        expect(entryMock.getMetadata()).andReturn(null).anyTimes();
+        expect(entryMock.getContentStream())
+            .andReturn(new ByteArrayInputStream("content stream".getBytes()))
+            .anyTimes();
+        
+        FileCatalog fileCatalogMock = 
+                (FileCatalog) createMock(FileCatalog.class);
+        expect(fileCatalogMock.store(isA(InputStream.class)))
+                .andReturn(entryMock);
+        
+        FileEntryNamer namerMock = 
+                (FileEntryNamer) createMock(FileEntryNamer.class);
+        expect(namerMock.name(isA(FileEntry.class))).andReturn(ENTRY_NAME);
+        
+        ISubscriptionManager subscriptionManagerMock = 
+                (ISubscriptionManager) createMock(ISubscriptionManager.class);
+        expect(subscriptionManagerMock.load(Subscription.LOCAL)).
+                andReturn(localSubscriptions);
+        
+        IFilter filterMock = (IFilter) createMock(IFilter.class);
+        expect(filterMock.getExpression()).andReturn(null).anyTimes();
+        
+        IBltFileManager fileManagerMock = 
+                (IBltFileManager) createMock(IBltFileManager.class);
+        
+        expect(fileManagerMock.loadFilter(s1.getDataSource()))
+                .andReturn(filterMock).once();
+        expect(fileManagerMock.loadFilter(s2.getDataSource()))
+                .andReturn(filterMock).once();
         
         replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setCatalog(fileCatalogMock);
         classUnderTest.setNamer(namerMock);
-        classUnderTest.setMessageManager(messageManagerMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         classUnderTest.setFileManager(fileManagerMock);
         classUnderTest.setMatcher(new EasyMetadataMatcher());
-        classUnderTest.setUserManager(userManagerMock);
+        request.addHeader("Provider", "Peer");
+        classUnderTest.handleRequest(request, response);
+        
+        verifyAll();
+    }
+    
+    @Test
+    public void handleRequest_SendToSubscribersNoMatch() throws Exception {
+        Authenticator authMock = (Authenticator) createMock(Authenticator.class);
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE);
+        
+        FileEntry entryMock = (FileEntry) createMock(FileEntry.class);
+        expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
+                .anyTimes();
+        expect(entryMock.getMetadata()).andReturn(null).anyTimes();
+        expect(entryMock.getContentStream())
+            .andReturn(new ByteArrayInputStream("content stream".getBytes()))
+            .anyTimes();
+        
+        FileCatalog fileCatalogMock = 
+                (FileCatalog) createMock(FileCatalog.class);
+        expect(fileCatalogMock.store(isA(InputStream.class)))
+                .andReturn(entryMock);
+        
+        FileEntryNamer namerMock = 
+                (FileEntryNamer) createMock(FileEntryNamer.class);
+        expect(namerMock.name(isA(FileEntry.class))).andReturn(ENTRY_NAME);
+        
+        ISubscriptionManager subscriptionManagerMock = 
+                (ISubscriptionManager) createMock(ISubscriptionManager.class);
+        expect(subscriptionManagerMock.load(Subscription.PEER)).
+                andReturn(localSubscriptions);
+        
+        IFilter filterMock = (IFilter) createMock(IFilter.class);
+        expect(filterMock.getExpression()).andReturn(null).anyTimes();
+        
+        IBltFileManager fileManagerMock = 
+                (IBltFileManager) createMock(IBltFileManager.class);
+        
+        expect(fileManagerMock.loadFilter(s1.getDataSource()))
+                .andReturn(filterMock).once();
+        expect(fileManagerMock.loadFilter(s2.getDataSource()))
+                .andReturn(filterMock).once();
+        
+        replayAll();
+        
+        classUnderTest.setAuthenticator(authMock);
+        classUnderTest.setCatalog(fileCatalogMock);
+        classUnderTest.setNamer(namerMock);
+        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setFileManager(fileManagerMock);
+        classUnderTest.setMatcher(new ImpossibleMetadataMatcher());
+        request.addHeader("Provider", "Injector");
+        classUnderTest.handleRequest(request, response);
+        
+        verifyAll();
+    }
+    
+    @Test
+    public void handleRequest_SendToSubscribersException() throws Exception {
+        Authenticator authMock = (Authenticator) createMock(Authenticator.class);
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE);
+        
+        FileEntry entryMock = (FileEntry) createMock(FileEntry.class);
+        expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
+                .anyTimes();
+        expect(entryMock.getMetadata()).andReturn(null).anyTimes();
+        expect(entryMock.getContentStream())
+            .andReturn(new ByteArrayInputStream("content stream".getBytes()))
+            .anyTimes();
+        
+        FileCatalog fileCatalogMock = 
+                (FileCatalog) createMock(FileCatalog.class);
+        expect(fileCatalogMock.store(isA(InputStream.class)))
+                .andReturn(entryMock);
+        
+        FileEntryNamer namerMock = 
+                (FileEntryNamer) createMock(FileEntryNamer.class);
+        expect(namerMock.name(isA(FileEntry.class))).andReturn(ENTRY_NAME);
+        
+        ISubscriptionManager subscriptionManagerMock = 
+                (ISubscriptionManager) createMock(ISubscriptionManager.class);
+        expect(subscriptionManagerMock.load(Subscription.PEER)).
+                andReturn(localSubscriptions);
+        
+        IFilter filterMock = (IFilter) createMock(IFilter.class);
+        expect(filterMock.getExpression()).andReturn(null).anyTimes();
+        
+        IBltFileManager fileManagerMock = 
+                (IBltFileManager) createMock(IBltFileManager.class);
+        
+        expect(fileManagerMock.loadFilter(s1.getDataSource()))
+                .andReturn(filterMock).once();
+        expect(fileManagerMock.loadFilter(s2.getDataSource()))
+                .andReturn(filterMock).once();
+        
+        IDataSourceManager dataSourceManagerMock = (IDataSourceManager)
+                createMock(IDataSourceManager.class);
+        expect(dataSourceManagerMock.load(isA(String.class), isA(String.class)))
+                .andReturn(null).times(2);
+        
+        replayAll();
+        
+        classUnderTest.setAuthenticator(authMock);
+        classUnderTest.setCatalog(fileCatalogMock);
+        classUnderTest.setNamer(namerMock);
+        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setFileManager(fileManagerMock);
+        classUnderTest.setMatcher(new EasyMetadataMatcher());
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
+        request.addHeader("Provider", "Injector");
+        classUnderTest.handleRequest(request, response);
+        
+        verifyAll();
+    }
+    
+    @Test
+    public void handleRequest_SendToSubscribersOK() throws Exception {
+        Authenticator authMock = (Authenticator) createMock(Authenticator.class);
+        expect(authMock.authenticate(isA(String.class), isA(String.class), 
+                isA(String.class))).andReturn(Boolean.TRUE);
+        authMock.addCredentials(isA(HttpUriRequest.class), isA(String.class));
+        expectLastCall().times(2);
+        
+        FileEntry entryMock = (FileEntry) createMock(FileEntry.class);
+        expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
+                .anyTimes();
+        expect(entryMock.getMetadata()).andReturn(null).anyTimes();
+        expect(entryMock.getContentStream())
+            .andReturn(new ByteArrayInputStream("content stream".getBytes()))
+            .anyTimes();
+        
+        FileCatalog fileCatalogMock = 
+                (FileCatalog) createMock(FileCatalog.class);
+        expect(fileCatalogMock.store(isA(InputStream.class)))
+                .andReturn(entryMock);
+        
+        FileEntryNamer namerMock = 
+                (FileEntryNamer) createMock(FileEntryNamer.class);
+        expect(namerMock.name(isA(FileEntry.class))).andReturn(ENTRY_NAME);
+        
+        ISubscriptionManager subscriptionManagerMock = 
+                (ISubscriptionManager) createMock(ISubscriptionManager.class);
+        expect(subscriptionManagerMock.load(Subscription.PEER)).
+                andReturn(localSubscriptions);
+        
+        IFilter filterMock = (IFilter) createMock(IFilter.class);
+        expect(filterMock.getExpression()).andReturn(null).anyTimes();
+        
+        IBltFileManager fileManagerMock = 
+                (IBltFileManager) createMock(IBltFileManager.class);
+        
+        expect(fileManagerMock.loadFilter(s1.getDataSource()))
+                .andReturn(filterMock).once();
+        expect(fileManagerMock.loadFilter(s2.getDataSource()))
+                .andReturn(filterMock).once();
+        
+        DataSource ds1 = new DataSource(1, "DS1", DataSource.PEER, 
+                "Some data source");
+        DataSource ds2 = new DataSource(2, "DS2", DataSource.PEER, 
+                "Another data source");
+        IDataSourceManager dataSourceManagerMock = (IDataSourceManager)
+                createMock(IDataSourceManager.class);
+        
+        expect(dataSourceManagerMock.load("DS1", DataSource.LOCAL))
+                .andReturn(ds1).once();
+        expect(dataSourceManagerMock.load("DS2", DataSource.LOCAL))
+                .andReturn(ds2).once();
+        
+        IUserManager userManagerMock = 
+                (IUserManager) createMock(IUserManager.class);
+        User account = new User(1, "user", "user", "s3cret", "org", "unit", 
+                "locality", "state", "PL", "http://test.baltrad.eu");
+        expect(userManagerMock.load(isA(String.class)))
+                .andReturn(account).times(2);
+        
+        IRegistryManager deliveryRegistryManagerMock = (IRegistryManager) 
+                createMock(IRegistryManager.class);
+        
+        replayAll();
+        
+        classUnderTest.setAuthenticator(authMock);
+        classUnderTest.setCatalog(fileCatalogMock);
+        classUnderTest.setNamer(namerMock);
+        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setFileManager(fileManagerMock);
+        classUnderTest.setMatcher(new EasyMetadataMatcher());
+        classUnderTest.setDataSourceManager(dataSourceManagerMock);
+        classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setRegistryManager(deliveryRegistryManagerMock);
         classUnderTest.setFramePublisherManager(new FramePublisherManager());
+        request.addHeader("Provider", "Injector");
         classUnderTest.handleRequest(request, response);
-        verifyAll();
         
-        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+        verifyAll();
     }
     
 }

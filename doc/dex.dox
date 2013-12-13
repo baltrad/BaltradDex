@@ -1431,11 +1431,19 @@ custom header fields are introduced:
 
 \code
 Node-Name: <name of requesting node>
-Node-Address: <address of requesting node>
+Provider: [Peer|Injector]
 \endcode
 
 This information is essential for correct node identification within BALTRAD
-network, as well as for message authentication
+network, as well as for message authentication. 
+
+\attention
+Provider header is applied to \ref exchange_post_file and allows to distinguish 
+between request coming from the peer node and request sent by the injector, 
+that is third-party software providing data from local production system.
+It should take one of the following values: \p Injector in case of a request 
+send by an injector software, and \p Peer in case of a request sent by the peer 
+node. 
 
 \section exchange_auth Authentication   
 For safety reasons, all messages passed within BALTRAD network are 
@@ -1807,7 +1815,7 @@ Node-Name: baltrad-backup.imgw.pl
 \par
 - Request URI: <tt>post_file.htm</tt>
 - Method: <tt>POST</tt>
-- Headers: <tt>Node-Name, Content-Type, Content-MD5, Date, Authorization</tt>
+- Headers: <tt>Node-Name, Provider, Content-Type, Content-MD5, Date, Authorization</tt>
 - Body: <tt>File content</tt>
 \n
 \n 
@@ -1815,6 +1823,7 @@ Node-Name: baltrad-backup.imgw.pl
 \code
 POST http://baltrad.imgw.pl:8084/BaltradDex/post_file.htm HTTP/1.1
 Node-Name: baltrad.imgw.pl
+Provider: Peer
 Content-Type: application/x-hdf5
 Content-MD5: aHR0cDovLzE ...
 Date: Fri, 6 Jul 2012 13:00:26 CEST

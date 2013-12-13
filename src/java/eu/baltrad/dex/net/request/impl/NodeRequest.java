@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -102,6 +102,18 @@ public class NodeRequest extends HttpServletRequestWrapper
             ((String) getAttribute(NODE_NAME_HDR) != null) ?
             (String) getAttribute(NODE_NAME_HDR) : 
                 getHeader(NODE_NAME_HDR);
+        return headerValue;
+    }
+    
+    /**
+     * Retrieves provider name from request.
+     * @return Name of the provider
+     */
+    public String getProvider() {
+        String headerValue = 
+            ((String) getAttribute(PROVIDER_HDR) != null) ?
+            (String) getAttribute(PROVIDER_HDR) : 
+                getHeader(PROVIDER_HDR);
         return headerValue;
     }
     

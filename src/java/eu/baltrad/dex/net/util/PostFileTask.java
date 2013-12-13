@@ -23,8 +23,10 @@ package eu.baltrad.dex.net.util;
 
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
+import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
 import eu.baltrad.dex.user.model.User;
 
@@ -43,17 +45,20 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class PostFileTask implements Runnable {
     
-    private IRegistryManager manager;
-    private Logger log;
-    private IHttpClientUtil httpClient;
-    private HttpUriRequest request;
-    private String uuid;
-    private User user;
-    private DataSource dataSource;
+    protected IRegistryManager registryManager;
+    protected ISubscriptionManager subscriptionManager;
+    protected Logger log;
+    protected IHttpClientUtil httpClient;
+    protected HttpUriRequest request;
+    protected String uuid;
+    protected User user;
+    protected DataSource dataSource;
 
+    public PostFileTask() {}
+    
     /**
      * Constructor.
-     * @param manager Delivery registry manager
+     * @param registryManager Delivery registry manager
      * @param request Data delivery request
      * @param uuid File entry identifier string
      * @param user Recipient
@@ -61,11 +66,13 @@ public class PostFileTask implements Runnable {
      * @param connTimeout Connection timeout
      * @param soTimeout Socket timeout
      */
-    public PostFileTask(IRegistryManager manager, HttpUriRequest request, 
+    public PostFileTask(IRegistryManager registryManager, 
+            ISubscriptionManager subscriptionManager, HttpUriRequest request, 
             String uuid, User user, DataSource dataSource,
             int connTimeout, int soTimeout) {
         this.log = Logger.getLogger("DEX");
-        this.manager = manager;
+        this.registryManager = registryManager;
+        this.subscriptionManager = subscriptionManager;
         this.request = request;
         this.uuid = uuid;
         this.user = user;
@@ -88,7 +95,13 @@ public class PostFileTask implements Runnable {
                             System.currentTimeMillis(), RegistryEntry.UPLOAD,
                             uuid, user.getName(), true);
                     log.info("File " + uuid + " sent to user " + user.getName());
-                    manager.store(entry);
+                    registryManager.store(entry);
+                } else if (response.getStatusLine().getStatusCode() ==
+                        HttpServletResponse.SC_FORBIDDEN) {
+                    // remove invalid subscription
+                    Subscription s = subscriptionManager.load(Subscription.PEER, 
+                            user.getName(), dataSource.getName());
+                    subscriptionManager.delete(s.getId());
                 } else {
                     // don't retry if file is already delivered 
                     if (response.getStatusLine().getStatusCode() 
@@ -109,7 +122,7 @@ public class PostFileTask implements Runnable {
                                 uuid, user.getName(), true);
                             log.info("File " + uuid + " sent to user " 
                                     + user.getName());
-                            manager.store(entry);
+                            registryManager.store(entry);
                         } else {
                             RegistryEntry entry = new RegistryEntry(
                                 user.getId(), dataSource.getId(), 
@@ -120,7 +133,7 @@ public class PostFileTask implements Runnable {
                                     response.getStatusLine().getStatusCode() 
                                     + " - " + response.getStatusLine()
                                         .getReasonPhrase());
-                            manager.store(entry);
+                            registryManager.store(entry);
                         }
                     }    
                 }

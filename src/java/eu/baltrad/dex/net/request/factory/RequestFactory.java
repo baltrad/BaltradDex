@@ -38,6 +38,10 @@ import java.util.List;
  */
 public interface RequestFactory {
     
+    /* Providers */
+    public static final String PEER = "Peer";
+    public static final String INJECTOR = "Injector";
+    
     public HttpUriRequest createDataSourceListingRequest(User user);
     
     public HttpUriRequest createStartSubscriptionRequest(User user, 
@@ -46,7 +50,8 @@ public interface RequestFactory {
     public HttpUriRequest createUpdateSubscriptionRequest(User user, 
             List<Subscription> subscriptions);
     
-    public HttpUriRequest createPostFileRequest(User user, byte[] fileContent);
+    public HttpUriRequest createPostFileRequest(User user, String provider, 
+            byte[] fileContent);
     
     public HttpUriRequest createPostMessageRequest(User user, 
             String message);

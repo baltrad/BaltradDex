@@ -1,4 +1,4 @@
-/***************************************************************************************************
+/*******************************************************************************
 *
 * Copyright (C) 2009-2010 Institute of Meteorology and Water Management, IMGW
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-***************************************************************************************************/
+*******************************************************************************/
 
 package eu.baltrad.dex.net.util;
 
