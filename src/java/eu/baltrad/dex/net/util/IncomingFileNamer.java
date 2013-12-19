@@ -1,4 +1,4 @@
-/*******************************************************************************
+/***************************************************************************************************
 *
 * Copyright (C) 2009-2011 Institute of Meteorology and Water Management, IMGW
 *
@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Lesser General Public License
 * along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 *
-*******************************************************************************/
+***************************************************************************************************/
 
 package eu.baltrad.dex.net.util;
 
@@ -28,6 +28,7 @@ import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.oh5.Attribute;
 import eu.baltrad.bdb.oh5.Metadata;
 import eu.baltrad.bdb.oh5.Source;
+//import eu.baltrad.bdb.util.FileNamer;
 import eu.baltrad.bdb.util.FileEntryNamer;
 
 public class IncomingFileNamer implements FileEntryNamer {

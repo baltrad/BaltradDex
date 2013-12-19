@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -32,7 +32,6 @@ public interface INodeRequest {
 
     static final String[] HEADERS = {"Content-Type", "Content-MD5", "Date"};
     static final String NODE_NAME_HDR = "Node-Name";
-    static final String PROVIDER_HDR = "Provider";
     static final String AUTH_HDR = "Authorization";
     static final String HDR_SEPARATOR = ":";
     
@@ -55,10 +54,5 @@ public interface INodeRequest {
      * @return Name of the requesting node
      */
     public String getNodeName();
-    
-    /**
-     * @return Name of provider 
-     */
-    public String getProvider();
     
 }

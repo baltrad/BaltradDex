@@ -70,7 +70,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import java.io.InputStream;
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -145,107 +144,6 @@ public class PostFileServlet extends HttpServlet {
     }
     
     /**
-     * Store incoming file.
-     * @param request Node request
-     * @return File entry
-     */
-    private FileEntry storeFile(NodeRequest request) {
-        InputStream is = null;
-        try { 
-            try {
-                is = request.getInputStream();
-                return catalog.store(is);
-            } finally {
-                is.close();
-            }   
-        } catch (IOException e) {
-            return null;
-        }
-    }
-    
-    /**
-     * Get file entry's content
-     * @param entry File entry 
-     * @return Byte content
-     */
-    private byte[] getEntryContent(FileEntry entry) {
-        InputStream eis = null;
-        ByteArrayOutputStream baos = null;
-        try {
-            try { 
-                eis = entry.getContentStream();
-                baos = new ByteArrayOutputStream();
-                IOUtils.copy(eis, baos);
-                return baos.toByteArray();
-            } finally {
-                eis.close();
-                baos.close();
-            }
-        } catch (IOException e) {
-            return null;
-        }
-    }
-    
-    /**
-     * Check if file comes from a valid subscription.
-     * @param downloads List of subscribed data sources
-     * @param entry File entry
-     * @return True if subscription is valid, false otherwise
-     */
-    private boolean validateSubscription(List<Subscription> downloads,
-            FileEntry entry) {
-        boolean isValid = false;
-        for (Subscription s : downloads) {
-            IFilter filter = fileManager.loadFilter(s.getDataSource());
-            if (matcher.match(entry.getMetadata(), filter.getExpression())) {
-                isValid = true;
-            }
-        }
-        return isValid;
-    }
-    
-    /**
-     * Send file entry to subscribers.
-     * @param uploads List of subscriptions
-     * @param entry File entry
-     */
-    private void sendToSubscribers(List<Subscription> uploads, FileEntry entry) 
-    {
-        if (uploads.size() > 0) {
-            byte[] fileContent = getEntryContent(entry);
-            for (Subscription s : uploads) {
-                try {
-                    IFilter filter = fileManager.loadFilter(s.getDataSource());
-                    if (matcher.match(entry.getMetadata(), 
-                            filter.getExpression())) {
-                        DataSource dataSource = dataSourceManager
-                                .load(s.getDataSource(), DataSource.LOCAL);
-                        User receiver = userManager.load(s.getUser());
-                        RequestFactory requestFactory = 
-                            new DefaultRequestFactory(URI.create(receiver
-                                        .getNodeAddress()));
-                        HttpUriRequest deliveryRequest = requestFactory
-                                .createPostFileRequest(localNode, 
-                                    RequestFactory.PEER, fileContent);
-                        authenticator.addCredentials(deliveryRequest,
-                                localNode.getName());
-                        PostFileTask task = new PostFileTask(registryManager,
-                                subscriptionManager, deliveryRequest, 
-                                entry.getUuid().toString(), receiver, 
-                                dataSource, connTimeout, soTimeout);
-                        framePublisherManager.getFramePublisher(
-                            receiver.getName()).addTask(task);
-                    } 
-                } catch (Exception e) {
-                    log.error(messages.getMessage(
-                            PF_INVALID_SUBSCRIPTION_ERROR_KEY,
-                            new String[] {e.getMessage()}));
-                } 
-            }
-        }
-    } 
-    
-    /**
      * Implements Controller interface.
      * @param request Http servlet request
      * @param response Http servlet response
@@ -274,36 +172,89 @@ public class PostFileServlet extends HttpServlet {
             if (authenticator.authenticate(req.getMessage(), 
                     req.getSignature(), req.getNodeName())) {
                 log.info("New data file received from " + req.getNodeName());
-                // store entry
-                FileEntry entry = storeFile(req);
+                FileEntry entry = null;   
+                InputStream is = null;
+                try {
+                    is = req.getInputStream();
+                    entry = catalog.store(is);
+                } finally {
+                    is.close();
+                }
                 if (entry != null) {
                     String name = namer.name(entry);
-                    // file coming from a peer node 
-                    if (req.getProvider() != null 
-                            && req.getProvider().equals(RequestFactory.PEER)) {
-                        List<Subscription> downloads = subscriptionManager
-                                .load(Subscription.LOCAL);
-                        if (validateSubscription(downloads, entry)) {
-                            // subscription is valid
-                            log.info("File " + name + " stored with UUID " 
-                                    + entry.getUuid().toString());
-                            BltDataMessage msg = new BltDataMessage();
-                            msg.setFileEntry(entry);
-                            messageManager.manage(msg);
-                        } else {
-                            // subscription not found, remove file entry
-                            log.warn("File " + name + " with UUID " + 
-                                    entry.getUuid().toString() +
-                                    " comes from unsubscribed data source. " +
-                                    "Removing file.");
-                            catalog.remove(entry);
-                            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    String uuid = entry.getUuid().toString();
+                    log.info("File " + name + " stored with UUID " + uuid);
+                    BltDataMessage msg = new BltDataMessage();
+                    msg.setFileEntry(entry);
+                    messageManager.manage(msg);
+                    
+                    /*/ add incoming file to registry
+                    List<Subscription> downloads = subscriptionManager
+                            .load(Subscription.LOCAL);
+                    for (Subscription s : downloads) {
+                        IFilter filter = fileManager
+                                .loadFilter(s.getDataSource());
+                        if (matcher.match(entry.getMetadata(), 
+                                filter.getExpression())) {
+                            DataSource dataSource = dataSourceManager
+                                .load(s.getDataSource(), DataSource.PEER);
+                            User sender = userManager.load(s.getUser());
+                            RegistryEntry registryEntry = new RegistryEntry(
+                                sender.getId(), dataSource.getId(), 
+                                System.currentTimeMillis(), 
+                                RegistryEntry.DOWNLOAD, 
+                                entry.getUuid().toString(), 
+                                sender.getName(), true);
+                            registryManager.store(registryEntry);
                         }
-                    } else {
-                        // file coming from injector, send to subscribers
-                        List<Subscription> uploads = subscriptionManager.load(
-                                Subscription.PEER);
-                        sendToSubscribers(uploads, entry);
+                    }*/
+                    
+                    // send file to subscribers
+                    List<Subscription> uploads = subscriptionManager.load(
+                            Subscription.PEER);
+                    if (uploads.size() > 0) {
+                        byte[] fileContent = null;
+                        InputStream eis = null;
+                        ByteArrayOutputStream baos = null;
+                        try {
+                            eis = entry.getContentStream();
+                            baos = new ByteArrayOutputStream();
+                            IOUtils.copy(eis, baos);
+                            fileContent = baos.toByteArray();
+                        } finally {
+                            eis.close();
+                            baos.close();
+                        }
+                        for (Subscription s : uploads) {
+                            try {
+                                IFilter filter = fileManager
+                                    .loadFilter(s.getDataSource());
+                                if (matcher.match(entry.getMetadata(), 
+                                        filter.getExpression())) {
+                                    DataSource dataSource = dataSourceManager
+                                        .load(s.getDataSource(), DataSource.LOCAL);
+                                    User receiver = userManager.load(s.getUser());
+                                    RequestFactory requestFactory = 
+                                        new DefaultRequestFactory(
+                                            URI.create(receiver.getNodeAddress()));
+                                    HttpUriRequest deliveryRequest = requestFactory
+                                        .createPostFileRequest(localNode,
+                                            fileContent);
+                                    authenticator.addCredentials(deliveryRequest,
+                                            localNode.getName());
+                                    PostFileTask task = new PostFileTask(
+                                        registryManager, deliveryRequest, uuid, 
+                                        receiver, dataSource, connTimeout, 
+                                        soTimeout);
+                                    framePublisherManager.getFramePublisher(
+                                            receiver.getName()).addTask(task);
+                                } 
+                            } catch (Exception e) {
+                                log.error(messages.getMessage(
+                                        PF_INVALID_SUBSCRIPTION_ERROR_KEY,
+                                        new String[] {e.getMessage()}));
+                            } 
+                        }
                     }
                 } else {
                     res.setStatus(HttpServletResponse.SC_NOT_FOUND, 
