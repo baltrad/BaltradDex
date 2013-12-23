@@ -40,12 +40,9 @@ Creates a distribution route
         </script>
         <script type="text/javascript">
             // prevent executing the function twice
-            var checkit = window.check_var;
-            if(checkit === undefined){ 
-                window.check_var = 1;
-            }
-            else {
-                $(document).ready(function() {
+            var ready;
+            $(document).ready(function() {
+                if (!ready) {
                     var filter = null;
                     <c:choose>
                       <c:when test="${!empty filterJson}">
@@ -73,8 +70,9 @@ Creates a distribution route
                         $("#filter").empty();
                       }
                     });
-                });
-            }  
+                    ready = true;
+                }
+            });
         </script>    
     </jsp:attribute>
         
