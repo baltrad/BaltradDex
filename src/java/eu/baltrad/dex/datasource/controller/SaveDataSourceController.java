@@ -37,10 +37,7 @@ import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.Role;
 
 import eu.baltrad.beast.db.IFilter;
-import eu.baltrad.beast.db.AttributeFilter;
-import eu.baltrad.beast.db.CombinedFilter;
 import eu.baltrad.beast.db.CoreFilterManager;
-import eu.baltrad.beast.db.IFilterManager;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,11 +75,6 @@ public class SaveDataSourceController {
     
     private static final String FORM_VIEW = "datasources_save";
     private static final String SUCCESS_VIEW = "datasources_save_status";
-    
-    /** ODIM what/source attribute key */
-    private static final String DS_SOURCE_ATTR_STR = "what/source:WMO";
-    /** ODIM what/object attribute key */
-    private static final String DS_OBJECT_ATTR_STR = "what/object";
     
     private static final String MISSING_RADAR_ERROR_MSG_KEY = 
             "savedatasource.missing.radar";
@@ -300,8 +292,12 @@ public class SaveDataSourceController {
                         transactionManager.getTransaction(def);
                 try {
                     int dataSourceId = 0;
+                    String sources = getSources(radarsSelected); 
+                    String fileObjects = getFileObjects(fileObjectsSelected);
                     // set data source type
                     dataSource.setType(DataSource.LOCAL);
+                    dataSource.setSource(sources);
+                    dataSource.setFileObject(fileObjects);
                     if (dataSource.getId() > 0) {
                         dataSourceManager.update(dataSource);
                         dataSourceId = dataSource.getId();
@@ -318,35 +314,10 @@ public class SaveDataSourceController {
                         }
                         // Save radar parameter
                         dataSourceManager.deleteRadar(dataSourceId);
-                        String wmoAttrValue = "";
-                        if (!radarsSelected.isEmpty()) {    
-                            for (Radar radar : radarsSelected.values()) {
-                                dataSourceManager.storeRadar(dataSourceId, 
-                                        radar.getId());
-                                // Set filter value
-                                wmoAttrValue += radar.getRadarWmo() + ",";
-                            }
-                        }
+                        saveRadars(radarsSelected, dataSourceId);
                         // Save file object parameter
                         dataSourceManager.deleteFileObject(dataSourceId);
-                        String fileObjectAttrValue = "";
-                        if (!fileObjectsSelected.isEmpty()) {
-                            for (FileObject fileObject : 
-                                    fileObjectsSelected.values()) {;
-                                dataSourceManager.storeFileObject(dataSourceId, 
-                                        fileObject.getId());
-                                // Set filter value
-                                fileObjectAttrValue += fileObject.getName()
-                                        + ",";
-                            }
-                        }
-                        wmoAttrValue = wmoAttrValue
-                                .substring(0, wmoAttrValue.lastIndexOf(","));
-                        if (!fileObjectAttrValue.isEmpty()) {
-                            fileObjectAttrValue = fileObjectAttrValue
-                                .substring( 0, 
-                                        fileObjectAttrValue.lastIndexOf(","));
-                        }
+                        saveFileObjects(fileObjectsSelected, dataSourceId);
                         /* 
                          * Save user parameter. Remove respective subscriptions 
                          * in case when data source access right was revoked
@@ -360,7 +331,6 @@ public class SaveDataSourceController {
                                 dataSourceManager.storeUser(dataSourceId, 
                                         user.getId());
                             }
-                            
                             for (Subscription s : uploads) {
                                 User user = userManager.load(s.getUser());
                                 if (s.getDataSource()
@@ -379,29 +349,9 @@ public class SaveDataSourceController {
                             }
                         }
                         // Configure filters
-                        CombinedFilter combinedFilter = new CombinedFilter();
-                        combinedFilter.setMatchType(CombinedFilter
-                                .MatchType.ALL);
-                        AttributeFilter sourceFilter = new AttributeFilter();
-                        if (!wmoAttrValue.isEmpty()) {
-                            sourceFilter.setAttribute(DS_SOURCE_ATTR_STR);
-                            sourceFilter.setValueType(
-                                    AttributeFilter.ValueType.STRING);
-                            sourceFilter.setOperator(AttributeFilter
-                                    .Operator.IN);
-                            sourceFilter.setValue(wmoAttrValue);
-                            combinedFilter.addChildFilter(sourceFilter);
-                        }
-                        AttributeFilter fileObjectFilter = new AttributeFilter();
-                        if (!fileObjectAttrValue.isEmpty()) {
-                            fileObjectFilter.setAttribute(DS_OBJECT_ATTR_STR);
-                            fileObjectFilter.setValueType(
-                                    AttributeFilter.ValueType.STRING);
-                            fileObjectFilter.setOperator(
-                                    AttributeFilter.Operator.IN);
-                            fileObjectFilter.setValue(fileObjectAttrValue);
-                            combinedFilter.addChildFilter(fileObjectFilter);
-                        }
+                        IFilter combinedFilter = 
+                                dataSourceManager.createFilter(sources, 
+                                    fileObjects);
                         // Save filter parameter
                         coreFilterManager.store(combinedFilter);
                         dataSourceManager.deleteFilter(dataSourceId);
@@ -471,6 +421,67 @@ public class SaveDataSourceController {
             intArray[i] = Integer.parseInt(stringArray[i].trim());
         }
         return intArray;
+    }
+    
+    /**
+     * Get sources as radar WMO numbers.
+     * @param radars List of radars 
+     * @return Radar's WMO numbers as string 
+     */
+    private String getSources(Map<Integer, Radar> radars) {
+        String sources = "";
+        if (!radars.isEmpty()) {    
+            for (Radar radar : radars.values()) {
+                sources += radar.getRadarWmo().trim() + ",";
+            }
+            sources = sources.substring(0, sources.lastIndexOf(","));
+        }
+        return sources;
+    }
+    
+    /**
+     * Save data source radars parameter.
+     * @param radars Radars to save 
+     * @param dataSourceId Data source id
+     */
+    private void saveRadars(Map<Integer, Radar> radars, int dataSourceId) {
+        if (!radars.isEmpty()) {    
+            for (Radar radar : radars.values()) {
+                dataSourceManager.storeRadar(dataSourceId, radar.getId());
+            }
+        }
+    }
+    
+    /**
+     * Get file object names.
+     * @param fileObjects List of file objects
+     * @return File object names
+     */     
+    private String getFileObjects(Map<Integer, FileObject> fileObjects) {
+        String fileObjectNames = "";
+        if (!fileObjects.isEmpty()) {
+            for (FileObject fileObject : fileObjects.values()) {;
+                fileObjectNames += fileObject.getName().trim() + ",";
+            }
+            fileObjectNames = fileObjectNames
+                    .substring(0, fileObjectNames.lastIndexOf(","));
+        }
+        return fileObjectNames;
+    }
+    
+    /**
+     * Save data source file objects parameter.
+     * @param fileObjects File objects to save 
+     * @param dataSourceId Data sourve id
+     */     
+    private void saveFileObjects(Map<Integer, FileObject> fileObjects, 
+            int dataSourceId) {
+        if (!fileObjects.isEmpty()) {
+            for (FileObject fileObject : fileObjects.values()) {;
+                dataSourceManager.storeFileObject(dataSourceId, 
+                        fileObject.getId());
+            }
+        }
     }
     
     /**

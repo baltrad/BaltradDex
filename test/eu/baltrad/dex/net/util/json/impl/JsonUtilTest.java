@@ -46,11 +46,13 @@ public class JsonUtilTest {
             "\"role\":\"user\",\"password\":\"s3cret\"}";
     
     private static final String JSON_SOURCES = 
-            "[{\"name\":\"DS1\",\"type\":\"local\",\"description\"" +
-            ":\"A test data source\"},{\"name\":\"DS2\",\"type\":\"local\"," +
-            "\"description\":\"One more test data source\"},{\"" + 
-            "name\":\"DS3\",\"type\":\"local\",\"description\":\"" + 
-            "Yet another test data source\"}]";
+            "[{\"name\":\"DS1\",\"type\":\"local\",\"description\":" + 
+            "\"A test data source\",\"source\":\"12374\",\"fileObject\":" +
+            "\"SCAN\"},{\"name\":\"DS2\",\"type\":\"local\",\"description\":" + 
+            "\"One more test data source\",\"source\":\"12331\",\"" + 
+            "fileObject\":\"SCAN\"},{\"name\":\"DS3\",\"type\":\"local\"," + 
+            "\"description\":\"Yet another test data source\",\"source\":" +
+            "\"12374,12331\",\"fileObject\":\"PVOL,SCAN\"}]";
         
     private static final String JSON_SUBSCRIPTIONS = 
             "[{\"type\":\"local\",\"date\":1340189763867,\"active\":" + 
@@ -75,13 +77,13 @@ public class JsonUtilTest {
         
         dataSources = new HashSet<DataSource>();
         DataSource ds1 = new DataSource(1, "DS1", "local", 
-                "A test data source");
+                "A test data source", "12374", "SCAN");
         dataSources.add(ds1);
         DataSource ds2 = new DataSource(2, "DS2", "local", 
-                "One more test data source");
+                "One more test data source", "12331", "SCAN");
         dataSources.add(ds2);
         DataSource ds3 = new DataSource(3, "DS3", "local",
-                "Yet another test data source");
+                "Yet another test data source", "12374,12331", "PVOL,SCAN");
         dataSources.add(ds3);
         assertEquals(3, dataSources.size());
         
@@ -126,6 +128,7 @@ public class JsonUtilTest {
     @Test
     public void dataSourcesToJson() {
         String s = classUnderTest.dataSourcesToJson(dataSources);
+        assertNotNull(s);
         assertEquals(JSON_SOURCES.length(), s.length());
     }
     
@@ -142,7 +145,10 @@ public class JsonUtilTest {
         for (int i = 0; i < in.size(); i++) {
             assertEquals(in.get(i).getName(), out.get(i).getName());
             assertEquals(in.get(i).getType(), out.get(i).getType());
-            assertEquals(in.get(i).getDescription(), out.get(i).getDescription());
+            assertEquals(in.get(i).getDescription(), 
+                    out.get(i).getDescription());
+            assertEquals(in.get(i).getSource(), out.get(i).getSource());
+            assertEquals(in.get(i).getFileObject(), out.get(i).getFileObject());
         }
     }
     

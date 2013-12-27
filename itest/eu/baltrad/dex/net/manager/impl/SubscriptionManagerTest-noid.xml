@@ -13,11 +13,14 @@
     <dex_users_roles id="2" user_id="2" role_id="1"/>
     
     <dex_data_sources id="1" name="DataSource1" type="local"
-                      description="A test data source"/>
+                      description="A test data source" source="11111"
+                      file_object="SCAN"/>
     <dex_data_sources id="2" name="DataSource2" type="local"
-                      description="Another test data source"/>
+                      description="Another test data source" source="22222"
+                      file_object="PVOL"/>
     <dex_data_sources id="3" name="DataSource3" type="peer"
-                      description="Yet one more test data source"/>
+                      description="Yet one more test data source" source="33333"
+                      file_object="IMAGE"/>
     
     <dex_subscriptions time_stamp="1335268800000" 
                        type="local" active="true" sync="true"/>

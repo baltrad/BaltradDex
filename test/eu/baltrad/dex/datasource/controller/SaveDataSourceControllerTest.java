@@ -21,7 +21,6 @@
 
 package eu.baltrad.dex.datasource.controller;
 
-import eu.baltrad.beast.db.AttributeFilter;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.manager.IFileObjectManager;
@@ -36,10 +35,6 @@ import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 
 import eu.baltrad.beast.db.IFilterManager;
-import eu.baltrad.beast.db.CombinedFilter;
-import eu.baltrad.beast.db.IFilter;
-import eu.baltrad.dex.datasource.manager.impl.DataSourceManager;
-import eu.baltrad.dex.net.model.impl.Subscription;
 
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -167,7 +162,7 @@ public class SaveDataSourceControllerTest {
     public void setUp() throws Exception {
         
         dataSource = new DataSource(1, "TestDataSource", DataSource.LOCAL, 
-                "A test data source");
+                "A test data source", "12374,12331", "PVOL,SCAN");
         
         radarsAvailable = new ArrayList<Radar>();
         radarsAvailable.add(new Radar(1, "PL", "SOWR", 220, "Legionowo", "PL41", 
@@ -506,7 +501,7 @@ public class SaveDataSourceControllerTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("save_data_source", "Save");
         DataSource ds = new DataSource(null, DataSource.LOCAL, 
-                "A test data source");
+                "A test data source", "12374,12331", "PVOL,SCAN");
         BindingResult result = new BeanPropertyBindingResult(ds, 
                 "data_source");
         ModelMap model = new ModelMap();
@@ -527,7 +522,8 @@ public class SaveDataSourceControllerTest {
     public void processSubmit_DataSourceWithMissingDescription() {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("save_data_source", "Save");
-        DataSource ds = new DataSource("TestPVOL", DataSource.LOCAL, null);
+        DataSource ds = new DataSource("TestPVOL", DataSource.LOCAL, null, 
+                "12374,12331", "PVOL,SCAN");
         BindingResult result = new BeanPropertyBindingResult(ds, 
                 "data_source");
         ModelMap model = new ModelMap();
@@ -551,7 +547,7 @@ public class SaveDataSourceControllerTest {
         request.addParameter("save_data_source", "Save");
         
         DataSource ds = new DataSource("TestPVOL", DataSource.LOCAL, 
-                "A test data source");
+                "A test data source", "", "PVOL,SCAN");
         BindingResult result = new BeanPropertyBindingResult(ds, 
                 "data_source");
         ModelMap model = new ModelMap();
@@ -571,7 +567,7 @@ public class SaveDataSourceControllerTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("save_data_source", "Save");
         DataSource ds = new DataSource("TestPVOL", DataSource.LOCAL, 
-                "A test data source");
+                "A test data source", "12374,12331", "PVOL,SCAN");
         BindingResult result = new BeanPropertyBindingResult(ds, 
                 "data_source");
         ModelMap model = new ModelMap();
@@ -613,7 +609,7 @@ public class SaveDataSourceControllerTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addParameter("save_data_source", "Save");
         DataSource ds = new DataSource("TestPVOL", DataSource.LOCAL, 
-                "A test data source");
+                "A test data source", "12374,12331", "PVOL,SCAN");
         BindingResult result = new BeanPropertyBindingResult(ds, 
                 "data_source");
         ModelMap model = new ModelMap();
@@ -652,7 +648,7 @@ public class SaveDataSourceControllerTest {
         request.addParameter("save_data_source", "Save");
         
         DataSource ds = new DataSource("TestPVOL", DataSource.LOCAL, 
-                "A test data source");
+                "A test data source", "12374,12331", "PVOL,SCAN");
         BindingResult result = new BeanPropertyBindingResult(ds, 
                 "data_source");
         ModelMap model = new ModelMap();

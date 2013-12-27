@@ -65,16 +65,20 @@ import java.util.*;
 public class StartSubscriptionServletTest {
     
     private static final String JSON_SOURCES_OK =
-            "[{\"name\":\"DS1\",\"type\":\"local\",\"description\"" +
-            ":\"A test data source\"},{\"name\":\"DS2\",\"type\":" + 
-            "\"local\",\"description\":\"One more test data source\"}," + 
-            "{\"name\":\"DS3\",\"type\":\"local\",\"description\":" + 
-            "\"Yet another test data source\"}]";
+            "[{\"name\":\"DS1\",\"type\":\"local\",\"description\":" + 
+            "\"A test data source\",\"source\":\"12374\",\"fileObject\":" +
+            "\"SCAN\"},{\"name\":\"DS2\",\"type\":\"local\",\"description\":" + 
+            "\"One more test data source\",\"source\":\"12331\",\"" + 
+            "fileObject\":\"SCAN\"},{\"name\":\"DS3\",\"type\":\"local\"," + 
+            "\"description\":\"Yet another test data source\",\"source\":" +
+            "\"12374,12331\",\"fileObject\":\"PVOL,SCAN\"}]";
     
     private static final String JSON_SOURCES_PARTIAL =  
-            "[{\"name\":\"DS1\",\"type\":\"local\",\"description\"" +
-            ":\"A test data source\"},{\"name\":\"DS2\",\"type\":" + 
-            "\"local\",\"description\":\"One more test data source\"}]";
+            "[{\"name\":\"DS1\",\"type\":\"local\",\"description\":" + 
+            "\"A test data source\",\"source\":\"12374\",\"fileObject\":" +
+            "\"SCAN\"},{\"name\":\"DS2\",\"type\":\"local\",\"description\":" + 
+            "\"One more test data source\",\"source\":\"12331\",\"" + 
+            "fileObject\":\"SCAN\"}]";
     
     private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
     

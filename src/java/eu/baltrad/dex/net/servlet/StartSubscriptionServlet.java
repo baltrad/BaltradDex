@@ -177,14 +177,16 @@ public class StartSubscriptionServlet extends HttpServlet {
                 if (existing == null) {
                     subscriptionManager.store(requested);
                     subscribedDataSources.add(new DataSource(
-                            ds.getName(), ds.getType(), ds.getDescription()));
+                            ds.getName(), ds.getType(), ds.getDescription(),
+                            ds.getSource(), ds.getFileObject()));
                     log.warn(messages.getMessage(PS_SUBSCRIPTION_SUCCESS_KEY, 
                             msgArgs));
                 } else {
                     requested.setId(existing.getId());
                     subscriptionManager.update(requested);
                     subscribedDataSources.add(new DataSource(
-                            ds.getName(), ds.getType(), ds.getDescription()));
+                            ds.getName(), ds.getType(), ds.getDescription(),
+                            ds.getSource(), ds.getFileObject()));
                     log.warn(messages.getMessage(PS_SUBSCRIPTION_SUCCESS_KEY, 
                             msgArgs));
                 }

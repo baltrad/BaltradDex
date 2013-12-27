@@ -101,9 +101,7 @@ public class DexDBITestHelper extends TestCase {
         "fixtures/Z_SCAN_C_ESWI_20101023180000_sevil_000000.h5"
     };
     
-    public DexDBITestHelper() {
-        
-    }
+    public DexDBITestHelper() {}
     
     public DexDBITestHelper(String bdbServerUri, String bdbStoragePath) {
         this.bdbServerUri = bdbServerUri;

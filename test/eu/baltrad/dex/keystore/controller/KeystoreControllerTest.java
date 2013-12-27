@@ -92,9 +92,9 @@ public class KeystoreControllerTest {
         mocks = new ArrayList<Object>();
         keys = new ArrayList<Key>();
         keys.add(new Key(1, "test.baltrad.eu", 
-                "fh7629shue7493kd893748du572895fi", true));
+                "fh7629shue7493kd893748du572895fi", true, false));
         keys.add(new Key(2, "test.baltrad.imgw.pl", 
-                "yu987876xc6886x898df9sdf89sfd97y", false));
+                "yu987876xc6886x898df9sdf89sfd97y", false, false));
         Properties props = new Properties();
         props.setProperty("node.name", "test.baltrad.eu");
         props.setProperty("keystore.directory", "keystore");
@@ -152,7 +152,7 @@ public class KeystoreControllerTest {
     @Test
     public void processSubmit_Exception() throws Exception {
         Key key = new Key(2, "test.baltrad.imgw.pl", 
-                "yu987876xc6886x898df9sdf89sfd97y", false);
+                "yu987876xc6886x898df9sdf89sfd97y", false, false);
         
         expect(keystoreManager.load(2)).andReturn(key);
         expect(keystoreManager.update(key)).andThrow(new Exception());
@@ -165,7 +165,7 @@ public class KeystoreControllerTest {
         classUnderTest.setConfManager(confManager);
         ModelMap model = new ExtendedModelMap();
         String viewName = classUnderTest.processSubmit(model, "2", null, null, 
-                null);
+                null, null, null);
         
         verifyAll();
         
@@ -179,7 +179,7 @@ public class KeystoreControllerTest {
     @Test
     public void processSubmit_GrantFailure() throws Exception {
         Key key = new Key(2, "test.baltrad.imgw.pl", 
-                "yu987876xc6886x898df9sdf89sfd97y", false);
+                "yu987876xc6886x898df9sdf89sfd97y", false, false);
         
         expect(keystoreManager.load(2)).andReturn(key);
         expect(keystoreManager.update(key)).andReturn(0);
@@ -192,7 +192,7 @@ public class KeystoreControllerTest {
         classUnderTest.setConfManager(confManager);
         ModelMap model = new ExtendedModelMap();
         String viewName = classUnderTest.processSubmit(model, "2", null, null, 
-                null);
+                null, null, null);
         
         verifyAll();
         
@@ -207,7 +207,7 @@ public class KeystoreControllerTest {
     @Test
     public void processSubmit_GrantSuccess() throws Exception {
         Key key = new Key(2, "test.baltrad.imgw.pl", 
-                "yu987876xc6886x898df9sdf89sfd97y", false);
+                "yu987876xc6886x898df9sdf89sfd97y", false, false);
         
         expect(keystoreManager.load(2)).andReturn(key);
         expect(keystoreManager.update(key)).andReturn(1);
@@ -223,8 +223,8 @@ public class KeystoreControllerTest {
         classUnderTest.setKeystoreManager(keystoreManager);
         classUnderTest.setConfManager(confManager);
         ModelMap model = new ExtendedModelMap();
-        String viewName = classUnderTest.processSubmit(model, "2", null, null, 
-                null);
+        String viewName = classUnderTest.processSubmit(model, "2", null, null, null,
+                null, null);
         
         verifyAll();
         
@@ -240,7 +240,7 @@ public class KeystoreControllerTest {
     @Test
     public void processSubmit_RevokeFailure() throws Exception {
         Key key = new Key(2, "test.baltrad.imgw.pl", 
-                "yu987876xc6886x898df9sdf89sfd97y", false);
+                "yu987876xc6886x898df9sdf89sfd97y", false, false);
         
         expect(keystoreManager.load(2)).andReturn(key);
         expect(keystoreManager.update(key)).andReturn(0);
@@ -252,8 +252,8 @@ public class KeystoreControllerTest {
         classUnderTest.setKeystoreManager(keystoreManager);
         classUnderTest.setConfManager(confManager);
         ModelMap model = new ExtendedModelMap();
-        String viewName = classUnderTest.processSubmit(model, null, "2", null, 
-                null);
+        String viewName = classUnderTest.processSubmit(model, null, "2", null, null,
+                null, null);
         
         verifyAll();
         
@@ -268,7 +268,7 @@ public class KeystoreControllerTest {
     @Test
     public void processSubmit_RevokeSuccess() throws Exception {
         Key key = new Key(2, "test.baltrad.imgw.pl", 
-                "yu987876xc6886x898df9sdf89sfd97y", false);
+                "yu987876xc6886x898df9sdf89sfd97y", false, false);
         
         expect(keystoreManager.load(2)).andReturn(key);
         expect(keystoreManager.update(key)).andReturn(1);
@@ -285,7 +285,7 @@ public class KeystoreControllerTest {
         classUnderTest.setConfManager(confManager);
         ModelMap model = new ExtendedModelMap();
         String viewName = classUnderTest.processSubmit(model, null, "2", null, 
-                null);
+                null, null, null);
         
         verifyAll();
         
@@ -299,6 +299,126 @@ public class KeystoreControllerTest {
     }
     
     @Test
+    public void processSubmit_SetInjectorSuccess() throws Exception {
+        Key key = new Key(4, "test.baltrad.imgw.pl", 
+                "yu987876xc6886x898df9sdf89sfd97y", false, false);
+        
+        expect(keystoreManager.load(4)).andReturn(key);
+        
+        key.setInjector(true);
+        
+        expect(keystoreManager.update(key)).andReturn(1);
+        expect(keystoreManager.load()).andReturn(keys);
+        expect(confManager.getAppConf()).andReturn(appConf);
+        
+        replayAll();
+        
+        classUnderTest.setKeystoreManager(keystoreManager);
+        classUnderTest.setConfManager(confManager);
+        ModelMap model = new ExtendedModelMap();
+        String viewName = classUnderTest.processSubmit(model, null, null, 
+                "4", null, null, null);
+        
+        verifyAll();
+        
+        assertEquals("keystore", viewName);
+        assertTrue(model.containsAttribute("keys"));
+        assertTrue(model.containsAttribute("local_node_name"));
+        assertEquals(keys, (List<Key>) model.get("keys"));
+        assertEquals("test.baltrad.eu", (String) model.get("local_node_name"));  
+    }
+    
+    @Test
+    public void processSubmit_SetInjectorFailure() throws Exception  {
+        Key key = new Key(4, "test.baltrad.imgw.pl", 
+                "yu987876xc6886x898df9sdf89sfd97y", false, false);
+        
+        expect(keystoreManager.load(4)).andReturn(key);
+        
+        key.setInjector(true);
+        
+        expect(keystoreManager.update(key)).andReturn(0);
+        expect(keystoreManager.load()).andReturn(keys);
+        expect(confManager.getAppConf()).andReturn(appConf);
+        
+        replayAll();
+        
+        classUnderTest.setKeystoreManager(keystoreManager);
+        classUnderTest.setConfManager(confManager);
+        ModelMap model = new ExtendedModelMap();
+        String viewName = classUnderTest.processSubmit(model, null, null, 
+                "4", null, null, null);
+        
+        verifyAll();
+        
+        assertEquals("keystore", viewName);
+        assertTrue(model.containsAttribute("keys"));
+        assertTrue(model.containsAttribute("local_node_name"));
+        assertEquals(keys, (List<Key>) model.get("keys"));
+        assertEquals("test.baltrad.eu", (String) model.get("local_node_name"));  
+    }
+    
+    @Test
+    public void processSubmit_UnsetInjectorSuccess() throws Exception {
+        Key key = new Key(5, "test.baltrad.imgw.pl", 
+                "yu987876xc6886x898df9sdf89sfd97y", false, true);
+        
+        expect(keystoreManager.load(5)).andReturn(key);
+        
+        key.setInjector(false);
+        
+        expect(keystoreManager.update(key)).andReturn(1);
+        expect(keystoreManager.load()).andReturn(keys);
+        expect(confManager.getAppConf()).andReturn(appConf);
+        
+        replayAll();
+        
+        classUnderTest.setKeystoreManager(keystoreManager);
+        classUnderTest.setConfManager(confManager);
+        ModelMap model = new ExtendedModelMap();
+        String viewName = classUnderTest.processSubmit(model, null, null, 
+                null, "5", null, null);
+        
+        verifyAll();
+        
+        assertEquals("keystore", viewName);
+        assertTrue(model.containsAttribute("keys"));
+        assertTrue(model.containsAttribute("local_node_name"));
+        assertEquals(keys, (List<Key>) model.get("keys"));
+        assertEquals("test.baltrad.eu", (String) model.get("local_node_name"));  
+    }
+    
+    @Test
+    public void processSubmit_UnsetInjectorFailure() throws Exception {
+        Key key = new Key(5, "test.baltrad.imgw.pl", 
+                "yu987876xc6886x898df9sdf89sfd97y", false, true);
+        
+        expect(keystoreManager.load(5)).andReturn(key);
+        
+        key.setInjector(false);
+        
+        expect(keystoreManager.update(key)).andReturn(0);
+        expect(keystoreManager.load()).andReturn(keys);
+        expect(confManager.getAppConf()).andReturn(appConf);
+        
+        replayAll();
+        
+        classUnderTest.setKeystoreManager(keystoreManager);
+        classUnderTest.setConfManager(confManager);
+        ModelMap model = new ExtendedModelMap();
+        String viewName = classUnderTest.processSubmit(model, null, null, 
+                null, "5", null, null);
+        
+        verifyAll();
+        
+        assertEquals("keystore", viewName);
+        assertTrue(model.containsAttribute("keys"));
+        assertTrue(model.containsAttribute("local_node_name"));
+        assertEquals(keys, (List<Key>) model.get("keys"));
+        assertEquals("test.baltrad.eu", (String) model.get("local_node_name"));  
+    }
+    
+    @Test
     public void processSubmit_Delete() {
         expect(keystoreManager.load()).andReturn(keys);
         expect(confManager.getAppConf()).andReturn(appConf);
@@ -308,8 +428,8 @@ public class KeystoreControllerTest {
         classUnderTest.setKeystoreManager(keystoreManager);
         classUnderTest.setConfManager(confManager);
         ModelMap model = new ExtendedModelMap();
-        String viewName = classUnderTest.processSubmit(model, null, null, "2", 
-                null);
+        String viewName = classUnderTest.processSubmit(model, null, null, 
+                null, null, "2", null);
         
         verifyAll();
         
@@ -325,7 +445,7 @@ public class KeystoreControllerTest {
     @Test
     public void processSubmit_ConfirmDeleteFailure() {
         Key key = new Key(2, "test.baltrad.imgw.pl", 
-                "yu987876xc6886x898df9sdf89sfd97y", false);
+                "yu987876xc6886x898df9sdf89sfd97y", false, false);
         
         expect(keystoreManager.load(2)).andReturn(key);
         expect(keystoreManager.delete(2)).andReturn(0);
@@ -342,7 +462,7 @@ public class KeystoreControllerTest {
         classUnderTest.setConfManager(confManager);
         ModelMap model = new ExtendedModelMap();
         String viewName = classUnderTest.processSubmit(model, null, null, null, 
-                "2");
+                null, null, "2");
         
         verifyAll();
         
@@ -357,7 +477,7 @@ public class KeystoreControllerTest {
     @Test
     public void processSubmit_ConfirmDeleteSuccess() {
         Key key = new Key(2, "test.baltrad.imgw.pl", 
-                "yu987876xc6886x898df9sdf89sfd97y", false);
+                "yu987876xc6886x898df9sdf89sfd97y", false, false);
         
         expect(keystoreManager.load(2)).andReturn(key);
         expect(keystoreManager.delete(2)).andReturn(1);
@@ -376,8 +496,8 @@ public class KeystoreControllerTest {
         classUnderTest.setKeystoreManager(keystoreManager);
         classUnderTest.setConfManager(confManager);
         ModelMap model = new ExtendedModelMap();
-        String viewName = classUnderTest.processSubmit(model, null, null, null, 
-                "2");
+        String viewName = classUnderTest.processSubmit(model, null, null, 
+                null, null, null, "2");
         
         verifyAll();
         

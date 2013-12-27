@@ -88,9 +88,7 @@ public class PostFileTaskTest {
             this.dataSource = dataSource;
             this.log = Logger.getLogger("DEX");
         }
-        public IHttpClientUtil getHttpClient() {
-            return httpClient;
-        }
+        public IHttpClientUtil getHttpClient() { return httpClient; }
         public void setHttpClient(IHttpClientUtil httpClient) {
             this.httpClient = httpClient;
         }
@@ -134,7 +132,8 @@ public class PostFileTaskTest {
         request = new HttpPost();
         receiver = new User(1, "test", "user", "s3cret", "org", "unit", 
                 "locality", "state", "XX", "http://test.baltrad.eu:8084");
-        dataSource = new DataSource(1, "DS1", DataSource.PEER, "A data source");
+        dataSource = new DataSource(1, "DS1", DataSource.PEER, "A data source",
+                "12374", "SCAN");
         s = new Subscription(1, 1340189763867L, Subscription.PEER, 
                 receiver.getName(), dataSource.getName(), true, true);
     }

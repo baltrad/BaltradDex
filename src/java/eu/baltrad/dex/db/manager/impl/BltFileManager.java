@@ -97,19 +97,18 @@ public class BltFileManager implements IBltFileManager {
     }
     /**
      * Gets filter associated with a given data source.
-     *
      * @param dsName Data source name
+     * @param type Data source type
      * @return Filter associated with a given data source
      */
-    public IFilter loadFilter(String dsName) {
+    public IFilter loadFilter(String dsName, String type) {
         IFilter attributeFilter = null;
         try {
-            DataSource dataSource = dataSourceManager.load(dsName, 
-                    DataSource.LOCAL);
+            DataSource dataSource = dataSourceManager.load(dsName, type);
             attributeFilter = coreFilterManager.load(
                     dataSourceManager.loadFilterId(dataSource.getId()));
         } catch (Exception e) {
-            log.error("Failed to get filter ID: ", e);
+            log.error("Failed to load filter: " + e.getMessage());
         }
         return attributeFilter;
     }
@@ -147,7 +146,7 @@ public class BltFileManager implements IBltFileManager {
      */
     public long count(String dsName) throws DatabaseError {
         try {
-            IFilter attributeFilter = loadFilter( dsName );
+            IFilter attributeFilter = loadFilter(dsName, DataSource.LOCAL);
             AttributeQuery q = new AttributeQuery();
             ExpressionFactory xpr = new ExpressionFactory();
             q.setFilter(attributeFilter.getExpression());
@@ -242,7 +241,7 @@ public class BltFileManager implements IBltFileManager {
         try {
             ExpressionFactory xpr = new ExpressionFactory();
             FileQuery q = new FileQuery();
-            IFilter attributeFilter = loadFilter(dsName);
+            IFilter attributeFilter = loadFilter(dsName, DataSource.LOCAL);
             q.setLimit(limit);
             q.setSkip(offset);
             q.appendOrderClause(xpr.desc(xpr.combinedDateTime("what/date", 

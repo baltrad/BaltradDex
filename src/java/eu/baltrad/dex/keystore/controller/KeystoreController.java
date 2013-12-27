@@ -91,6 +91,8 @@ public class KeystoreController {
      * @param model Model map 
      * @param grant Grant access parameter 
      * @param revoke Revoke access parameter
+     * @param setInjector Set injector
+     * @param unsetInjector Unset injector
      * @param delete Delete key parameter
      * @param confirmDelete Confirm key deletion parameter
      * @return View name
@@ -99,17 +101,20 @@ public class KeystoreController {
     public String processSubmit(ModelMap model,
             @RequestParam(value="grant", required=false) String grant,
             @RequestParam(value="revoke", required=false) String revoke,
+            @RequestParam(value="set_injector", required=false) 
+                    String setInjector,
+            @RequestParam(value="unset_injector", required=false)
+                    String unsetInjector,
             @RequestParam(value="delete", required=false) String delete,
             @RequestParam(value="confirm_delete", required=false) 
                     String confirmDelete) {
-        
         try {
             if (grant != null) {
                 int id = Integer.parseInt(grant);
                 Key key = keystoreManager.load(id);
                 key.setAuthorized(true);
                 int update = keystoreManager.update(key);
-                if(update == 1 && grant(key.getName())) {
+                if (update == 1 && grant(key.getName())) {
                     log.warn("Access granted for key " + key.getName());
                 } else {
                     log.error("Failed to grant access for key " + 
@@ -126,6 +131,31 @@ public class KeystoreController {
                 } else {
                     log.error("Failed to revoke access for key " + 
                             key.getName());
+                }
+            }
+            if (setInjector != null) {
+                int id = Integer.parseInt(setInjector);
+                Key key = keystoreManager.load(id);
+                key.setInjector(true);
+                int update = keystoreManager.update(key);
+                if (update == 1) {
+                    log.warn("Injector status set for " + key.getName());
+                } else {
+                    log.error("Failed to set injector status for " 
+                            + key.getName());
+                }
+            }
+            if (unsetInjector != null) {
+                int id = Integer.parseInt(unsetInjector);
+                Key key = keystoreManager.load(id);
+                key.setInjector(false);
+                int update = keystoreManager.update(key);
+                if (update == 1) {
+                    log.warn("Injector status switched off for " 
+                            + key.getName());
+                } else {
+                    log.error("Failed to switch off injector status for " 
+                            + key.getName());
                 }
             }
             if (delete != null) {

@@ -105,16 +105,4 @@ public class NodeRequest extends HttpServletRequestWrapper
         return headerValue;
     }
     
-    /**
-     * Retrieves provider name from request.
-     * @return Name of the provider
-     */
-    public String getProvider() {
-        String headerValue = 
-            ((String) getAttribute(PROVIDER_HDR) != null) ?
-            (String) getAttribute(PROVIDER_HDR) : 
-                getHeader(PROVIDER_HDR);
-        return headerValue;
-    }
-    
 }

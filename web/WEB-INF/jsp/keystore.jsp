@@ -46,6 +46,7 @@ Author     : szewczenko
                                     <div class="name">Key name</div>
                                     <div class="checksum">Checksum</div>
                                     <div class="authorized">Access</div>
+                                    <div class="injector">Injector</div>
                                     <div class="delete">Delete</div>
                                 </div>
                                 <c:forEach var="key" items="${keys}">
@@ -90,6 +91,26 @@ Author     : szewczenko
                                                 </c:otherwise>
                                             </c:choose>
                                         </div>
+                                        <div class="injector">
+                                            <c:choose>
+                                                <c:when test="${key.injector == false}">
+                                                    <button type="submit" name="set_injector" 
+                                                            value="${key.id}"
+                                                            title="Set injector">
+                                                        <img src="includes/images/stop.png"
+                                                             alt="Not injector">
+                                                    </button>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <button type="submit" name="unset_injector"
+                                                            value="${key.id}"
+                                                            title="Not injector">
+                                                        <img src="includes/images/log-info.png"
+                                                             alt="Injector">
+                                                    </button>
+                                                </c:otherwise>
+                                            </c:choose> 
+                                        </div>                                                    
                                         <div class="delete">
                                             <c:choose>
                                                 <c:when test="${key.name == local_node_name}">

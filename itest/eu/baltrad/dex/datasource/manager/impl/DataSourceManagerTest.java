@@ -136,23 +136,28 @@ public class DataSourceManagerTest extends TestCase {
     
     public void testStore() throws Exception {
         helper.cleanInsert(this, "noid");
-        DataSource dataSource = new DataSource("DataSource4", 
-                DataSource.PEER, "Stored data source");
+        DataSource ds = new DataSource(4, "DataSource4", 
+                DataSource.PEER, "Stored data source", "44444", "SCAN");
         
-        assertEquals(4, classUnderTest.store(dataSource));
-        assertEquals("DataSource4", dataSource.getName());
-        assertEquals("Stored data source", dataSource.getDescription());
+        assertEquals(4, classUnderTest.store(ds));
+        assertEquals("DataSource4", ds.getName());
+        assertEquals("Stored data source", ds.getDescription());
+        assertEquals("44444", ds.getSource());
+        assertEquals("SCAN", ds.getFileObject());
+        
         verifyDBTables("store", "dex_data_sources", "id");
     }
     
     public void testUpdate() throws Exception {
         DataSource dataSource = new DataSource("DataSource3", 
-                DataSource.PEER, "Updated data source");
+                DataSource.PEER, "Updated data source", "33555", "SCAN");
         dataSource.setId(3);
         assertEquals(1, classUnderTest.update(dataSource));
         assertEquals("DataSource3", dataSource.getName());
         assertEquals("peer", dataSource.getType());
         assertEquals("Updated data source", dataSource.getDescription());
+        assertEquals("33555", dataSource.getSource());
+        assertEquals("SCAN", dataSource.getFileObject());
         verifyDBTables("update", "dex_data_sources", null);
     }
     

@@ -26,6 +26,9 @@ import eu.baltrad.dex.datasource.model.FileObject;
 import eu.baltrad.dex.radar.model.Radar;
 import eu.baltrad.dex.user.model.User;
 
+import eu.baltrad.beast.db.CombinedFilter;
+import eu.baltrad.beast.db.IFilter;
+
 import java.util.List;
 
 /**
@@ -74,4 +77,7 @@ public interface IDataSourceManager {
     public int storeFilter(int dataSourceId, int filterId);
     
     public int deleteFilter(int dataSourceId);
+    
+    public IFilter createFilter(String wmoNumbers, String fileObjects);
+    
 }

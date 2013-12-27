@@ -47,6 +47,7 @@ public class KeyMapper implements ParameterizedRowMapper<Key> {
                 rs.getInt("id"),
                 rs.getString("name"),
                 rs.getString("checksum"),
-                rs.getBoolean("authorized"));
+                rs.getBoolean("authorized"),
+                rs.getBoolean("injector"));
     }  
 }

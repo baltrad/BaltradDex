@@ -279,22 +279,26 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="jsonUtil" class="eu.baltrad.dex.net.util.json.impl.JsonUtil"/>
     
     <!-- Post subscription controller -->
-    <bean id="postSubscriptionController" 
+    <bean id="startSubscriptionController" 
           class="eu.baltrad.dex.net.controller.StartSubscriptionController"
-          autowire="byType"/>
+          autowire="byType">
+        <property name="filterManager">
+            <ref bean="coreFilterManager"/>
+        </property>
+    </bean>
           
     <!-- Post subscription servlet -->
-    <bean id="postSubscriptionServlet" 
+    <bean id="startSubscriptionServlet" 
           class="eu.baltrad.dex.net.servlet.StartSubscriptionServlet"
           autowire="byType"/>
           
     <!-- Get subscription controller -->
-    <bean id="getSubscriptionController" 
+    <bean id="updateSubscriptionController" 
           class="eu.baltrad.dex.net.controller.UpdateSubscriptionController" 
           autowire="byType"/>
           
     <!-- Get subscription servlet -->
-    <bean id="getSubscriptionServlet" 
+    <bean id="updateSubscriptionServlet" 
           class="eu.baltrad.dex.net.servlet.UpdateSubscriptionServlet"
           autowire="byType"/>
           

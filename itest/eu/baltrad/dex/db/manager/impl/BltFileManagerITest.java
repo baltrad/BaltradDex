@@ -98,7 +98,7 @@ public class BltFileManagerITest extends TestCase {
         jdbcHelper.deleteCombinedFilters();
         // Polar volumes - Legionowo
         DataSource dsLeg = new DataSource("LegionowoPVOLs", DataSource.LOCAL,
-                "Polar volumes from Legionowo");
+                "Polar volumes from Legionowo", "12374", "PVOL");
         
         assertNotNull(dsLeg);
         dsLegId = jdbcHelper.saveDataSource(dsLeg);
@@ -128,7 +128,7 @@ public class BltFileManagerITest extends TestCase {
         
         // polar volumes - Gdańsk
         DataSource dsBrz = new DataSource("BrzuchaniaPVOLs", DataSource.LOCAL,
-                "Polar volumes from Brzuchania");
+                "Polar volumes from Brzuchania", "12331", "PVOL");
         
         assertNotNull(dsBrz);
         dsBrzId = jdbcHelper.saveDataSource(dsBrz);

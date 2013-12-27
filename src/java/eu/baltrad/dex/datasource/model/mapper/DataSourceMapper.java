@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2012 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -45,11 +45,8 @@ public class DataSourceMapper implements ParameterizedRowMapper<DataSource> {
     */
     public DataSource mapRow(ResultSet rs, int rowNum) 
             throws SQLException {
-        DataSource ds = new DataSource();
-        ds.setId(rs.getInt("id"));
-        ds.setName(rs.getString("name"));
-        ds.setType(rs.getString("type"));
-        ds.setDescription(rs.getString("description"));
-        return ds;
+        return new DataSource(rs.getInt("id"), rs.getString("name"),
+                rs.getString("type"), rs.getString("description"), 
+                rs.getString("source"), rs.getString("file_object"));
     }
 }

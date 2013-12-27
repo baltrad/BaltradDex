@@ -179,7 +179,8 @@ BEGIN
             id SERIAL NOT NULL PRIMARY KEY,
             name VARCHAR (64) NOT NULL UNIQUE,
             checksum VARCHAR (32),
-            authorized BOOLEAN DEFAULT FALSE
+            authorized BOOLEAN DEFAULT FALSE,
+            injector BOOLEAN DEFAULT FALSE
         );
     ELSE
         RAISE NOTICE 'table "dex_keys" already exists';
@@ -297,6 +298,71 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql; 
 
+/*
+    Upgrade dex_keys table by adding "injector" field
+*/
+CREATE OR REPLACE FUNCTION upgrade_dex_keys_table() RETURNS void AS $$
+BEGIN
+    PERFORM true FROM information_schema.columns WHERE table_name = 
+        'dex_keys' AND column_name = 'injector';
+    IF NOT FOUND THEN
+        ALTER TABLE dex_keys ADD COLUMN injector BOOLEAN DEFAULT FALSE;
+    ELSE
+        RAISE NOTICE 'column "dex_keys.injector" already exists';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+/*
+    Upgrade dex_data_sources table
+*/
+CREATE OR REPLACE FUNCTION upgrade_dex_data_sources_table() RETURNS void AS $$
+BEGIN
+    PERFORM true FROM information_schema.columns WHERE table_name = 
+        'dex_data_sources' AND column_name = 'source';
+    IF NOT FOUND THEN
+        ALTER TABLE dex_data_sources ADD COLUMN source VARCHAR(256);
+    ELSE
+        RAISE NOTICE 'column "dex_data_sources.source" already exists';
+    END IF;
+    
+    PERFORM true FROM information_schema.columns WHERE table_name = 
+        'dex_data_sources' AND column_name = 'file_object';
+    IF NOT FOUND THEN
+        ALTER TABLE dex_data_sources ADD COLUMN file_object VARCHAR(256);
+    ELSE
+        RAISE NOTICE 'column "dex_data_sources.file_object" already exists';
+    END IF;
+
+    DECLARE
+        rec RECORD;
+    BEGIN
+        FOR rec IN SELECT 
+			ds.id AS ds_id, ds.name AS ds_name, af.attr AS filter_attr, 
+            af.value AS filter_value 
+		FROM 
+			dex_data_sources ds, dex_data_source_filters dsf, 
+            beast_attr_filters af, beast_combined_filters cf, 
+            beast_combined_filter_children cfc 
+		WHERE 
+			ds.type = 'local' AND ds.id = dsf.data_source_id 
+            AND cf.filter_id = dsf.filter_id AND cf.filter_id = cfc.filter_id 
+			AND af.filter_id = cfc.child_id
+        LOOP
+        	IF rec.filter_attr = 'what/source:WMO' THEN
+            	UPDATE dex_data_sources SET source = rec.filter_value 
+                    WHERE dex_data_sources.id = rec.ds_id;
+            ELSE 
+                UPDATE dex_data_sources SET file_object = rec.filter_value 
+                    WHERE dex_data_sources.id = rec.ds_id;
+            END IF; 
+        END LOOP;
+    EXCEPTION WHEN OTHERS THEN 
+        RAISE NOTICE 'Failed to upgrade dex_data_sources table';	
+    END;
+END;
+$$ LANGUAGE plpgsql;
+
 SELECT remove_name_hash_from_dex_users();
 -- SELECT reset_user_passwords();
 SELECT rename_registry_table();
@@ -305,6 +371,8 @@ SELECT upgrade_dex_delivery_registry_table();
 SELECT create_dex_delivery_registry_data_sources_table();
 SELECT update_dex_data_source_users_table(); 
 SELECT remove_double_index();
+SELECT upgrade_dex_keys_table();
+SELECT upgrade_dex_data_sources_table();
 
 DROP FUNCTION make_plpgsql(); 
 DROP FUNCTION remove_name_hash_from_dex_users();
@@ -312,3 +380,5 @@ DROP FUNCTION reset_user_passwords();
 DROP FUNCTION rename_registry_table();
 DROP FUNCTION update_dex_data_source_users_table();
 DROP FUNCTION remove_double_index();
+DROP FUNCTION upgrade_dex_keys_table();
+DROP FUNCTION upgrade_dex_data_sources_table();

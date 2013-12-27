@@ -32,6 +32,11 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
+import eu.baltrad.beast.db.IFilter;
+import eu.baltrad.beast.db.CombinedFilter;
+import eu.baltrad.beast.db.CoreFilterManager;
+import eu.baltrad.beast.db.IFilterManager;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.easymock.EasyMock;
@@ -74,16 +79,21 @@ import org.keyczar.exceptions.KeyczarException;
  */
 public class StartSubscriptionControllerTest {    
     
-    private static final String JSON_SOURCES_OK =  
-            "[{\"name\":\"DS1\",\"description\":\"A test "
-            + "data source\"},{\"name\":\"DS2\",\"description\":\"One "
-            + "more test data source\"},{\"name\":\"DS3\"," 
-            + "\"description\":\"Yet another test data source\"}]";
+    private static final String JSON_SOURCES_OK =
+            "[{\"name\":\"DS1\",\"type\":\"local\",\"description\":" + 
+            "\"A test data source\",\"source\":\"12374\",\"fileObject\":" +
+            "\"SCAN\"},{\"name\":\"DS2\",\"type\":\"local\",\"description\":" + 
+            "\"One more test data source\",\"source\":\"12331\",\"" + 
+            "fileObject\":\"SCAN\"},{\"name\":\"DS3\",\"type\":\"local\"," + 
+            "\"description\":\"Yet another test data source\",\"source\":" +
+            "\"12374,12331\",\"fileObject\":\"PVOL,SCAN\"}]";
     
     private static final String JSON_SOURCES_PARTIAL =  
-            "[{\"name\":\"DS1\",\"description\":\"A test "
-            + "data source\"},{\"name\":\"DS2\",\"description\":\"One "
-            + "more test data source\"}]";
+            "[{\"name\":\"DS1\",\"type\":\"local\",\"description\":" + 
+            "\"A test data source\",\"source\":\"12374\",\"fileObject\":" +
+            "\"SCAN\"},{\"name\":\"DS2\",\"type\":\"local\",\"description\":" + 
+            "\"One more test data source\",\"source\":\"12331\",\"" + 
+            "fileObject\":\"SCAN\"}]";
     
     private List<Object> mocks;
     private PSController classUnderTest;
@@ -92,18 +102,22 @@ public class StartSubscriptionControllerTest {
     private Authenticator authenticatorMock;
     private ISubscriptionManager subscriptionManagerMock;
     private IDataSourceManager dataSourceManagerMock;
+    private IFilterManager filterManagerMock;
     private MessageResourceUtil messages;
     private Logger log;
     private JsonUtil jsonUtil;
     private MockHttpServletRequest request;
+    private IFilter filter;
     
     class PSController extends StartSubscriptionController {
+        
         public PSController() {
             this.localNode = new User(1, "test", "user", "s3cret", "org", 
                     "unit", "locality", "state", "XX", "http://localhost:8084");
         }
         @Override
         public void initConfiguration() {}
+        
     }
     
     private Object createMock(Class clazz) {
@@ -148,6 +162,8 @@ public class StartSubscriptionControllerTest {
         authenticatorMock = (Authenticator) createMock(Authenticator.class);
         dataSourceManagerMock = (IDataSourceManager) 
                     createMock(IDataSourceManager.class);
+        filterManagerMock = (IFilterManager) createMock(IFilterManager.class);
+        filter = (IFilter) createMock(IFilter.class);
         request = new MockHttpServletRequest();
         setRequestAttributes(request);
     }
@@ -161,11 +177,12 @@ public class StartSubscriptionControllerTest {
     private void setRequestAttributes(MockHttpServletRequest request) {
         Set<DataSource> selectedDataSources = new HashSet<DataSource>();
         selectedDataSources.add(new DataSource(1, "DataSource1", 
-                DataSource.PEER, "A test data source"));
+                DataSource.PEER, "A test data source", "12374", "SCAN"));
         selectedDataSources.add(new DataSource(2, "DataSource2", 
-                DataSource.PEER, "Another test data source"));
+                DataSource.PEER, "Another test data source", "12331", "SCAN"));
         selectedDataSources.add(new DataSource(3, "DataSource3", 
-                DataSource.PEER, "Yet one more test data source"));
+                DataSource.PEER, "Yet one more test data source", "12374,12331", 
+                "PVOL,SCAN"));
         request.setAttribute("selected_data_sources", selectedDataSources);
     }
     
@@ -487,10 +504,19 @@ public class StartSubscriptionControllerTest {
                 .andReturn(Integer.SIZE).anyTimes();
         expect(dataSourceManagerMock.storeUser(Integer.SIZE, 1))
                 .andReturn(Integer.SIZE).anyTimes();
+        expect(filter.getId()).andReturn(Integer.SIZE).times(2);
+        expect(dataSourceManagerMock.createFilter("12374", "SCAN"))
+                .andReturn(filter).once();
+        expect(dataSourceManagerMock.createFilter("12331", "SCAN"))
+                .andReturn(filter).once();
+        filterManagerMock.store(filter);
+        expectLastCall().times(2);
+        expect(dataSourceManagerMock.storeFilter(Integer.SIZE, Integer.SIZE))
+                .andReturn(Integer.SIZE).times(2);
         expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
-                isA(String.class))).andReturn(null).anyTimes();
+                isA(String.class))).andReturn(null).times(2);
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
-                .andReturn(Integer.SIZE).anyTimes();
+                .andReturn(Integer.SIZE).times(2);
         
         replayAll();
         
@@ -499,6 +525,7 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
+        classUnderTest.setFilterManager(filterManagerMock);
         
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.startSubscription(request, model, 
@@ -538,10 +565,21 @@ public class StartSubscriptionControllerTest {
                 .andReturn(Integer.SIZE).anyTimes();
         expect(dataSourceManagerMock.storeUser(Integer.SIZE, 1))
                 .andReturn(Integer.SIZE).anyTimes();
+        expect(filter.getId()).andReturn(Integer.SIZE).times(3);
+        expect(dataSourceManagerMock.createFilter("12374", "SCAN"))
+                .andReturn(filter).once();
+        expect(dataSourceManagerMock.createFilter("12331", "SCAN"))
+                .andReturn(filter).once();
+        expect(dataSourceManagerMock.createFilter("12374,12331", "PVOL,SCAN"))
+                .andReturn(filter).once();
+        filterManagerMock.store(filter);
+        expectLastCall().times(3);
+        expect(dataSourceManagerMock.storeFilter(Integer.SIZE, Integer.SIZE))
+                .andReturn(Integer.SIZE).times(3);
         expect(subscriptionManagerMock.load(isA(String.class), 
-            isA(String.class), isA(String.class))).andReturn(null).anyTimes();
+            isA(String.class), isA(String.class))).andReturn(null).times(3);
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
-                .andReturn(Integer.SIZE).anyTimes();
+                .andReturn(Integer.SIZE).times(3);
         
         replayAll();
         
@@ -550,6 +588,7 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
+        classUnderTest.setFilterManager(filterManagerMock);
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.startSubscription(request, model, 
                 "test.baltrad.eu");

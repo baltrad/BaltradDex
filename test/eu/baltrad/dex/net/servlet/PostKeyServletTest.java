@@ -208,7 +208,8 @@ public class PostKeyServletTest {
         AppConfiguration appConf = new AppConfiguration(props);
         
         expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(null);
-        expect(keystoreManagerMock.store(isA(Key.class))).andReturn(Integer.SIZE);
+        expect(keystoreManagerMock.store(isA(Key.class)))
+                .andReturn(Integer.SIZE);
         expect(confManagerMock.getAppConf()).andReturn(appConf);
         
         replayAll();

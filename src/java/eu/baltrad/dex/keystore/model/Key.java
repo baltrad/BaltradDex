@@ -24,7 +24,7 @@ package eu.baltrad.dex.keystore.model;
 /**
  * Implements key object.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.7.0
+ * @version 2.0.0
  * @since 1.7.0
  */
 public class Key {
@@ -33,6 +33,7 @@ public class Key {
     private String name;
     private String checksum;
     private boolean authorized;
+    private boolean injector;
 
     /**
      * Default constructor.
@@ -44,25 +45,31 @@ public class Key {
      * @param id Record id
      * @param name Key name
      * @param checksum File checksum
-     * @param authorized Authorization toggle 
+     * @param authorized Authorization toggle
+     * @param injector Injector toggle
      */
-    public Key(int id, String name, String checksum, boolean authorized) {
+    public Key(int id, String name, String checksum, boolean authorized,
+            boolean injector) {
         this.id = id;
         this.name = name;
         this.checksum = checksum;
         this.authorized = authorized;
+        this.injector = injector;
     }
     
     /**
      * Constructor.
      * @param name Key name
      * @param checksum File checksum
-     * @param authorized Authorization toggle 
+     * @param authorized Authorization toggle
+     * @param injector Injector toggle
      */
-    public Key(String name, String checksum, boolean authorized) {
+    public Key(String name, String checksum, boolean authorized,
+            boolean injector) {
         this.name = name;
         this.checksum = checksum;
         this.authorized = authorized;
+        this.injector = injector;
     }
     
     /**
@@ -119,6 +126,20 @@ public class Key {
      */
     public void setAuthorized(boolean authorized) {
         this.authorized = authorized;
+    }
+
+    /**
+     * @return the injector
+     */
+    public boolean isInjector() {
+        return injector;
+    }
+
+    /**
+     * @param injector the injector to set
+     */
+    public void setInjector(boolean injector) {
+        this.injector = injector;
     }
     
 }

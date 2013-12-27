@@ -43,7 +43,7 @@ import java.util.List;
  * Keystore manager.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.6.0
+ * @version 2.0.0
  * @since 1.6.0
  */
 public class KeystoreManager implements IKeystoreManager {
@@ -114,8 +114,8 @@ public class KeystoreManager implements IKeystoreManager {
      */
     public int store(Key key) throws Exception {
         
-        final String sql = "INSERT INTO dex_keys (name, checksum, authorized)" +
-                    " VALUES (?,?,?)";
+        final String sql = "INSERT INTO dex_keys (name, checksum, authorized, "
+                + "injector) VALUES (?,?,?,?)";
         final Key k = key;
         
         try {
@@ -129,6 +129,7 @@ public class KeystoreManager implements IKeystoreManager {
                         ps.setString(1, k.getName());
                         ps.setString(2, k.getChecksum());
                         ps.setBoolean(3, k.isAuthorized());
+                        ps.setBoolean(4, k.isInjector());
                         return ps;
                     }
                 }, keyHolder);
@@ -140,15 +141,16 @@ public class KeystoreManager implements IKeystoreManager {
     
     /**
      * Update key.
-     * @param key Key  
+     * @param key Key to update  
      * @return Number of rows affected
      * @throws Exception 
      */
     public int update(Key key) throws Exception {
         try {
-            return jdbcTemplate.update("UPDATE dex_keys SET authorized = ? " + 
-                    "WHERE id = ?",
+            return jdbcTemplate.update("UPDATE dex_keys SET authorized = ?, " + 
+                    "injector = ? WHERE id = ?",
                 key.isAuthorized(),
+                key.isInjector(),
                 key.getId());
         } catch (DataAccessException e) {
             throw new Exception(e.getMessage());

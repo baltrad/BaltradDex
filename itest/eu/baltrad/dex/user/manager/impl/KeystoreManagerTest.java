@@ -91,12 +91,14 @@ public class KeystoreManagerTest extends TestCase {
         assertEquals("test.baltrad.imgw.pl", key.getName());
         assertEquals("d41d8cd98f00b204e9800998ecf8427e", key.getChecksum());
         assertEquals(false, key.isAuthorized());
+        assertEquals(true, key.isInjector());
         
         key = classUnderTest.load(4);
         assertEquals(4, key.getId());
         assertEquals("test.baltrad.se", key.getName());
         assertEquals("ut56789djk38duy386jdu73926jd9dm3", key.getChecksum());
         assertEquals(false, key.isAuthorized());
+        assertEquals(false, key.isInjector());
         verifyDBTable(null, null);        
     }
     public void testLoadByName() throws Exception {
@@ -106,26 +108,28 @@ public class KeystoreManagerTest extends TestCase {
         assertEquals("test.baltrad.eu", key.getName());
         assertEquals("409201f7793e7a15b34c37cad27773b5", key.getChecksum());
         assertEquals(true, key.isAuthorized());
+        assertEquals(false, key.isInjector());
         
         key = classUnderTest.load("dev.baltrad.imgw.pl");
         assertEquals(3, key.getId());
         assertEquals("dev.baltrad.imgw.pl", key.getName());
         assertEquals("2345we4509huji788956gt4e64ji92gi", key.getChecksum());
         assertEquals(true, key.isAuthorized());
+        assertEquals(false, key.isInjector());
         verifyDBTable(null, null);
     }
     
     public void testStore() throws Exception {
         helper.cleanInsert(this, "noid");
         Key key = new Key("test.baltrad.lv", "df987sf7sa9875674sadf9708967876s",
-                false);
+                false, false);
         assertEquals(5, classUnderTest.store(key));
         verifyDBTable("store", "id");
     }
     
     public void testUpdate() throws Exception {
         Key key = new Key(2, "test.baltrad.imgw.pl", 
-                "d41d8cd98f00b204e9800998ecf8427e", true);
+                "d41d8cd98f00b204e9800998ecf8427e", true, false);
         assertEquals(1, classUnderTest.update(key));
         verifyDBTable("update", null);
     }

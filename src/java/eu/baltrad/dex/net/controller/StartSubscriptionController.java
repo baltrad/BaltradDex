@@ -40,6 +40,9 @@ import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
+import eu.baltrad.beast.db.IFilter;
+import eu.baltrad.beast.db.IFilterManager;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +58,7 @@ import org.apache.http.HttpResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.net.URI;
@@ -64,7 +68,6 @@ import java.util.HashSet;
 
 import java.io.InputStream;
 import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Controls data source subscription process.
@@ -113,6 +116,7 @@ public class StartSubscriptionController implements MessageSetter {
     
     private IDataSourceManager dataSourceManager;
     private ISubscriptionManager subscriptionManager;
+    private IFilterManager filterManager;
     private IUserManager userManager;
     private RequestFactory requestFactory;
     private MessageResourceUtil messages;
@@ -214,8 +218,13 @@ public class StartSubscriptionController implements MessageSetter {
                 User user = userManager.load(peerName);
                 if (dataSource == null) {
                     int id = dataSourceManager.store(ds);
-                    /* save peer data source user (operator) */
+                    // save peer data source user (operator) 
                     dataSourceManager.storeUser(id, user.getId());
+                    // save peer data source filter
+                    IFilter filter = dataSourceManager
+                            .createFilter(ds.getSource(), ds.getFileObject());
+                    filterManager.store(filter);
+                    dataSourceManager.storeFilter(id, filter.getId());
                 } else {
                     ds.setId(dataSource.getId());
                     dataSourceManager.update(ds);
@@ -372,6 +381,13 @@ public class StartSubscriptionController implements MessageSetter {
     public void setSubscriptionManager(ISubscriptionManager subscriptionManager) 
     {
         this.subscriptionManager = subscriptionManager;
+    }
+    
+    /**
+     * @param filterManager the IFilterManager to set
+     */
+    public void setFilterManager(IFilterManager filterManager) {
+        this.filterManager = filterManager;
     }
     
     /**

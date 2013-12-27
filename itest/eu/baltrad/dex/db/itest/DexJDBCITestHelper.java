@@ -61,6 +61,8 @@ public class DexJDBCITestHelper {
         parms.put("name", ds.getName());
         parms.put("type", ds.getType());
         parms.put("description", ds.getDescription());
+        parms.put("source", ds.getSource());
+        parms.put("file_object", ds.getFileObject());
         return insertDs.executeAndReturnKey(parms).intValue();
     }
     

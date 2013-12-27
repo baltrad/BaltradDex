@@ -53,7 +53,7 @@ public interface IBltFileManager {
     public List<BltFile> load(String dsName, int offset, int limit) 
                     throws DatabaseError;
     
-    public IFilter loadFilter(String name);
+    public IFilter loadFilter(String name, String type);
     
     public List<String> loadDistinctRadarStations() throws DatabaseError;
     

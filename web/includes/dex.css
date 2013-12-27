@@ -1849,23 +1849,30 @@ textarea {
 }
 
 .keystore .header-row .authorized,
-.keystore .header-row .delete {
-    float: right;
+.keystore .header-row .delete,
+.keystore .header-row .injector {
+    float: left;
     padding: 4px 2px 2px 2px;
     text-align: center;
 }
 .keystore .authorized,
-.keystore .delete {
-    float: right;
+.keystore .delete,
+.keystore .injector {
+    float: left;
 }
 .keystore .authorized {
     width: 80px;
+    margin-left: 20px;
+}
+.keystore .injector {
+    width: 80px;
 }
 .keystore .delete {
-    width: 120px;
+    width: 80px;
 }
 .keystore .authorized button,
-.keystore .delete button {
+.keystore .delete button,
+.keystore .injector button {
     width: 20px;
     height: 20px;
     float:left;
@@ -1874,10 +1881,13 @@ textarea {
     cursor: pointer;
 }
 .keystore .authorized button {
-    margin-left: 24px;
+    margin-left: 30px;
 }
 .keystore .delete .delete-button {
-    margin-left: 40px;
+    margin-left: 38px;
+}
+.keystore .injector button {
+    margin-left: 32px;
 }
 .keystore button.delete-confirm,
 .keystore button.delete-cancel {

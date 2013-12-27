@@ -36,6 +36,7 @@ import eu.baltrad.dex.registry.manager.IRegistryManager;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
+import eu.baltrad.dex.keystore.manager.IKeystoreManager;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
@@ -99,6 +100,7 @@ public class PostFileServlet extends HttpServlet {
             "postfile.server.generic_post_file_error";
     
     private IConfigurationManager confManager;
+    private IKeystoreManager keystoreManager;
     private Authenticator authenticator;
     private FileCatalog catalog;
     private FileEntryNamer namer;
@@ -187,6 +189,16 @@ public class PostFileServlet extends HttpServlet {
     }
     
     /**
+     * Send message to the beast framework.
+     * @param entry File entry
+     */
+    private void sendMessage(FileEntry entry) {
+        BltDataMessage msg = new BltDataMessage();
+        msg.setFileEntry(entry);
+        messageManager.manage(msg);
+    }
+    
+    /**
      * Check if file comes from a valid subscription.
      * @param downloads List of subscribed data sources
      * @param entry File entry
@@ -196,8 +208,10 @@ public class PostFileServlet extends HttpServlet {
             FileEntry entry) {
         boolean isValid = false;
         for (Subscription s : downloads) {
-            IFilter filter = fileManager.loadFilter(s.getDataSource());
-            if (matcher.match(entry.getMetadata(), filter.getExpression())) {
+            IFilter filter = fileManager.loadFilter(s.getDataSource(), 
+                    DataSource.PEER);
+            if (filter != null && matcher.match(entry.getMetadata(), 
+                    filter.getExpression())) {
                 isValid = true;
             }
         }
@@ -215,7 +229,8 @@ public class PostFileServlet extends HttpServlet {
             byte[] fileContent = getEntryContent(entry);
             for (Subscription s : uploads) {
                 try {
-                    IFilter filter = fileManager.loadFilter(s.getDataSource());
+                    IFilter filter = fileManager.loadFilter(s.getDataSource(),
+                            DataSource.LOCAL);
                     if (matcher.match(entry.getMetadata(), 
                             filter.getExpression())) {
                         DataSource dataSource = dataSourceManager
@@ -225,8 +240,7 @@ public class PostFileServlet extends HttpServlet {
                             new DefaultRequestFactory(URI.create(receiver
                                         .getNodeAddress()));
                         HttpUriRequest deliveryRequest = requestFactory
-                                .createPostFileRequest(localNode, 
-                                    RequestFactory.PEER, fileContent);
+                                .createPostFileRequest(localNode, fileContent);
                         authenticator.addCredentials(deliveryRequest,
                                 localNode.getName());
                         PostFileTask task = new PostFileTask(registryManager,
@@ -276,22 +290,25 @@ public class PostFileServlet extends HttpServlet {
                 log.info("New data file received from " + req.getNodeName());
                 // store entry
                 FileEntry entry = storeFile(req);
-                if (entry != null) {
+                if (entry != null) {                    
                     String name = namer.name(entry);
-                    // file coming from a peer node 
-                    if (req.getProvider() != null 
-                            && req.getProvider().equals(RequestFactory.PEER)) {
+                    if (keystoreManager.load(req.getNodeName()).isInjector()) {
+                        // file sent by injector
+                        log.info("File " + name + " stored with UUID " 
+                                    + entry.getUuid().toString());
+                        sendMessage(entry);
+                        List<Subscription> uploads = subscriptionManager.load(
+                                Subscription.PEER);
+                        sendToSubscribers(uploads, entry);                        
+                    } else {
+                        // file sent by peer
                         List<Subscription> downloads = subscriptionManager
                                 .load(Subscription.LOCAL);
                         if (validateSubscription(downloads, entry)) {
-                            // subscription is valid
                             log.info("File " + name + " stored with UUID " 
                                     + entry.getUuid().toString());
-                            BltDataMessage msg = new BltDataMessage();
-                            msg.setFileEntry(entry);
-                            messageManager.manage(msg);
+                            sendMessage(entry);
                         } else {
-                            // subscription not found, remove file entry
                             log.warn("File " + name + " with UUID " + 
                                     entry.getUuid().toString() +
                                     " comes from unsubscribed data source. " +
@@ -299,12 +316,7 @@ public class PostFileServlet extends HttpServlet {
                             catalog.remove(entry);
                             res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                         }
-                    } else {
-                        // file coming from injector, send to subscribers
-                        List<Subscription> uploads = subscriptionManager.load(
-                                Subscription.PEER);
-                        sendToSubscribers(uploads, entry);
-                    }
+                    }   
                 } else {
                     res.setStatus(HttpServletResponse.SC_NOT_FOUND, 
                     messages.getMessage(PF_GENERIC_POST_FILE_ERROR_KEY));
@@ -335,7 +347,15 @@ public class PostFileServlet extends HttpServlet {
     public void setConfigurationManager(IConfigurationManager confManager) {
         this.confManager = confManager;
     }
-
+    
+    /**
+     * @param keystoreManager the keystoreManager to set
+     */
+    @Autowired
+    public void setKeystoreManager(IKeystoreManager keystoreManager) {
+        this.keystoreManager = keystoreManager;
+    }
+    
      /**
      * @param catalog the catalog to set
      */

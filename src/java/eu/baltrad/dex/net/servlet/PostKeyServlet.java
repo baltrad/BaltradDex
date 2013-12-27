@@ -102,7 +102,7 @@ public class PostKeyServlet extends HttpServlet {
                     }
                     cdu.unzip(incomingPath + File.separator + nodeName + ".pub", 
                             keyContent);
-                    Key key = new Key(nodeName, checksumCalc, false);
+                    Key key = new Key(nodeName, checksumCalc, false, false);
                     if (keystoreManager.store(key) > 0) {
                         log.log(StickyLevel.STICKY, messages.getMessage(
                             PK_KEY_RECEIVED, new String[] {nodeName}));

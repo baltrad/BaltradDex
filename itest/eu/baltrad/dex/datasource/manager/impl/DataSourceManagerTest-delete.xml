@@ -2,10 +2,11 @@
 <dataset>
     
     <dex_data_sources id="1" name="DataSource1" type="local"
-        description="A test data source"/>
+        description="A test data source" source="11111" file_object="PVOL"/>
     <dex_data_sources id="3" name="DataSource3" type="peer"
-        description="Yet one more test data source"/>
-          
+        description="Yet one more test data source" source="33333" 
+        file_object="IMAGE"/>
+    
     <dex_data_source_radars id="1" data_source_id="1" radar_id="1"/>
     
     <dex_data_source_file_objects id="3" data_source_id="3" 

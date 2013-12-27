@@ -29,7 +29,7 @@ import java.io.Serializable;
  * Class implements data source object.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 0.6.4
+ * @version 2.0.0
  * @since 0.6.4
  */
 public class DataSource implements Serializable, Comparable<DataSource> {
@@ -48,6 +48,10 @@ public class DataSource implements Serializable, Comparable<DataSource> {
     private String type;
     /** Description */
     private String description;
+    /** Data source code */
+    private String source;
+    /** File object code */
+    private String fileObject;
 
     /**
      * Default constructor.
@@ -58,11 +62,16 @@ public class DataSource implements Serializable, Comparable<DataSource> {
      * @param name Data source name
      * @param type Data source type
      * @param description Description
+     * @param source Data source code
+     * @param fileObject File object code
      */
-    public DataSource(String name, String type, String description) {
+    public DataSource(String name, String type, String description, 
+            String source, String fileObject) {
         this.name = name;
         this.type = type;
         this.description = description;
+        this.source = source;
+        this.fileObject = fileObject;
     }
     
     /**
@@ -71,12 +80,17 @@ public class DataSource implements Serializable, Comparable<DataSource> {
      * @param name Data source name
      * @param type Data source type
      * @param description Description
+     * @param source Data source code
+     * @param fileObject File object code
      */
-    public DataSource(int id, String name, String type, String description) {
+    public DataSource(int id, String name, String type, String description,
+            String source, String fileObject) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.description = description;
+        this.source = source;
+        this.fileObject = fileObject;
     }
     
     /**
@@ -146,6 +160,34 @@ public class DataSource implements Serializable, Comparable<DataSource> {
     }
     
     /**
+     * @return the source
+     */
+    public String getSource() {
+        return source;
+    }
+
+    /**
+     * @param source the source to set
+     */
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    /**
+     * @return the fileObject
+     */
+    public String getFileObject() {
+        return fileObject;
+    }
+
+    /**
+     * @param fileObject the fileObject to set
+     */
+    public void setFileObject(String fileObject) {
+        this.fileObject = fileObject;
+    }
+    
+    /**
      * Gets data source description.
      *
      * @return Data source description
@@ -169,5 +211,6 @@ public class DataSource implements Serializable, Comparable<DataSource> {
     public int compareTo( DataSource ds ) { 
         return getName().compareTo( ds.getName() ); 
     }
+    
 }
 

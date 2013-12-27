@@ -21,6 +21,9 @@
 
 package eu.baltrad.dex.datasource.manager.impl;
 
+import eu.baltrad.beast.db.AttributeFilter;
+import eu.baltrad.beast.db.CombinedFilter;
+import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.model.mapper.DataSourceMapper;
 import eu.baltrad.dex.datasource.model.mapper.FileObjectMapper;
@@ -52,6 +55,11 @@ import java.util.List;
  * @since 1.2.1
  */
 public class DataSourceManager implements IDataSourceManager {
+    
+    /** ODIM what/source attribute key */
+    private static final String DS_SOURCE_ATTR_STR = "what/source:WMO";
+    /** ODIM what/object attribute key */
+    private static final String DS_OBJECT_ATTR_STR = "what/object";
     
     /** JDBC template */
     private SimpleJdbcOperations jdbcTemplate;
@@ -143,7 +151,7 @@ public class DataSourceManager implements IDataSourceManager {
      */
     public int store(DataSource dataSource) {
         final String sql = "INSERT INTO dex_data_sources " +
-            "(name, type, description) VALUES (?,?,?)";
+            "(name, type, description, source, file_object) VALUES (?,?,?,?,?)";
         final DataSource ds = dataSource;
         
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -156,6 +164,8 @@ public class DataSourceManager implements IDataSourceManager {
                     ps.setString(1, ds.getName());
                     ps.setString(2, ds.getType());
                     ps.setString(3, ds.getDescription());
+                    ps.setString(4, ds.getSource());
+                    ps.setString(5, ds.getFileObject());
                     return ps;
                 }
             }, keyHolder);
@@ -169,9 +179,11 @@ public class DataSourceManager implements IDataSourceManager {
      */
     public int update(DataSource dataSource) {
         return jdbcTemplate.update("UPDATE dex_data_sources SET name = ?," + 
-                " description = ? WHERE id = ?",
+                " description = ?, source = ?, file_object = ? WHERE id = ?",
             dataSource.getName(),
             dataSource.getDescription(),
+            dataSource.getSource(),
+            dataSource.getFileObject(),
             dataSource.getId());
     } 
     
@@ -335,6 +347,39 @@ public class DataSourceManager implements IDataSourceManager {
     public int deleteFilter(int dataSourceId) {
         return jdbcTemplate.update("DELETE FROM dex_data_source_filters " +
                 "WHERE data_source_id = ?", dataSourceId);
+    }
+    
+    /**
+     * Creates filter based on user selected parameters.
+     * @param wmoNumbers Radar's WMO numbers
+     * @param fileObjects File object names
+     * @return Filter object
+     */
+    public CombinedFilter createFilter(String wmoNumbers, String fileObjects) {
+        CombinedFilter combinedFilter = new CombinedFilter();
+        combinedFilter.setMatchType(CombinedFilter
+                .MatchType.ALL);
+        AttributeFilter sourceFilter = new AttributeFilter();
+        if (!wmoNumbers.isEmpty()) {
+            sourceFilter.setAttribute(DS_SOURCE_ATTR_STR);
+            sourceFilter.setValueType(
+                    AttributeFilter.ValueType.STRING);
+            sourceFilter.setOperator(AttributeFilter
+                    .Operator.IN);
+            sourceFilter.setValue(wmoNumbers);
+            combinedFilter.addChildFilter(sourceFilter);
+        }
+        AttributeFilter fileObjectFilter = new AttributeFilter();
+        if (!fileObjects.isEmpty()) {
+            fileObjectFilter.setAttribute(DS_OBJECT_ATTR_STR);
+            fileObjectFilter.setValueType(
+                    AttributeFilter.ValueType.STRING);
+            fileObjectFilter.setOperator(
+                    AttributeFilter.Operator.IN);
+            fileObjectFilter.setValue(fileObjects);
+            combinedFilter.addChildFilter(fileObjectFilter);
+        }
+        return combinedFilter;
     }
     
 }

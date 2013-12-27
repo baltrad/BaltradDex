@@ -93,13 +93,13 @@ public class ConfigurationManager implements IConfigurationManager,
                 log.warn("Created local peer account: " 
                         + appConf.getNodeName());
             }
-            // import local key
+            // import local key - by default it is set as injector's key
             if (keystoreManager.load(appConf.getNodeName()) == null) {
                 File keyFile = new File(appConf.getKeystoreDir() + 
                         File.separator + appConf.getNodeName() + ".pub");
                 Key key = new Key(appConf.getNodeName(),
                         DigestUtils.md5Hex(MessageDigestUtil.getBytes(keyFile)), 
-                        true);
+                        true, true);
                 keystoreManager.store(key);
                 log.warn("Local key imported to keystore");
             }
