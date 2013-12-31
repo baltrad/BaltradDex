@@ -1861,14 +1861,14 @@ textarea {
     float: left;
 }
 .keystore .authorized {
-    width: 80px;
+    width: 60px;
     margin-left: 20px;
 }
 .keystore .injector {
-    width: 80px;
+    width: 60px;
 }
 .keystore .delete {
-    width: 80px;
+    width: 120px;
 }
 .keystore .authorized button,
 .keystore .delete button,
@@ -1881,13 +1881,13 @@ textarea {
     cursor: pointer;
 }
 .keystore .authorized button {
-    margin-left: 30px;
+    margin-left: 22px;
 }
 .keystore .delete .delete-button {
-    margin-left: 38px;
+    margin-left: 56px;
 }
 .keystore .injector button {
-    margin-left: 32px;
+    margin-left: 22px;
 }
 .keystore button.delete-confirm,
 .keystore button.delete-cancel {
@@ -1896,10 +1896,15 @@ textarea {
     width: 44px;
     border: none;
     background: none;
-    margin-left: 8px;
     text-decoration: underline;
     color: #003399;
 }
+.keystore button.delete-confirm {
+    margin-left: 18px;
+}
+.keystore button.delete-cancel {
+    margin-left: 12px;
+}    
 .keystore button.delete-confirm:hover,
 .keystore button.delete-cancel:hover {
     text-decoration: none;

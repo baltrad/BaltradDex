@@ -96,7 +96,7 @@ Author     : szewczenko
                                                 <c:when test="${key.injector == false}">
                                                     <button type="submit" name="set_injector" 
                                                             value="${key.id}"
-                                                            title="Set injector">
+                                                            title="Not injector">
                                                         <img src="includes/images/stop.png"
                                                              alt="Not injector">
                                                     </button>
@@ -104,7 +104,7 @@ Author     : szewczenko
                                                 <c:otherwise>
                                                     <button type="submit" name="unset_injector"
                                                             value="${key.id}"
-                                                            title="Not injector">
+                                                            title="Injector">
                                                         <img src="includes/images/log-info.png"
                                                              alt="Injector">
                                                     </button>
