@@ -39,6 +39,7 @@ public class FramePublisher {
     private static final int KEEP_ALIVE_TIME = 60;
 
     private ThreadPoolExecutor executor;
+    // Task queue
     private ArrayBlockingQueue<Runnable> queue;
 
     /**
@@ -66,6 +67,7 @@ public class FramePublisher {
     
     /**
      * Adds and executes task.
+     *
      * @param task Task class implementing Runnable interface
      */
     public void addTask(Runnable task) {
