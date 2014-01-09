@@ -1,0 +1,276 @@
+/** \page supervisor Supervisor
+\date January 7, 2014
+\version 2.0
+
+\page supervisor Supervisor
+
+\ref main_index
+
+-# \ref supervisor_overview
+-# \ref supervisor_admin
+-# \ref supervisor_qinterface
+-# \ref supervisor_returncodes
+-# \ref supervisor_formatting
+-# \ref supervisor_reporters
+-# \ref supervisor_reporters_db_status
+-# \ref supervisor_reporters_bdb_status
+-# \ref supervisor_reporters_bdb_args
+-# \ref supervisor_reporters_radar_connection_status
+-# \ref supervisor_reporters_bdb_object_status
+
+\section supervisor Supervisor
+
+\subsection supervisor_overview Overview
+The supervisor provides a query interface API that can be used for monitoring the state of the
+node. It is possible to query things like db status, bdb status, product availability and more.
+If it is necessary to push status information to an external monitoring tool it can be solved
+by writing a scheduled rule and queries the node for system information. 
+
+\subsection supervisor_admin Administration
+The supervisor only provides requestors about current state of the node so there is no real need for authentication procedures.
+However, we have added an IP-block in the supervisor query interface so that we at least can avoid processing unessecary questions.
+The supervisor administration interface can be reached by navigating to: Processing-&gt;Supervisor.
+
+\image html supervisor_admin.png
+
+The supervisor will always allow connections from 127.0.0.1. The rest of the ip-addresses that should be allowed should be added
+in this administration GUI. The format of the ip-address should always be N.N.N.N where N either can be a value between 0-255 or a *.
+There is actually not a test if the number is &gt; 255 but it will make the filter useless. Also, remember that if you are using a
+proxy, the ip-package might contain an ip-address different than what you expect.
+
+The supervisor GUI shows the ip-address from where you are connecting so if you are in doubt, you can always login
+to the supervisor GUI and see what ip-address you should put in the filter.
+
+\subsection supervisor_qinterface Query interface
+Basic usage is to send a http-get query towards the supervisor and parse, check the response. The following query
+
+\code
+  wget -q -O- "http://localhost:8080/BaltradDex/supervisor.htm?reporters=bdb.object.status&sources=seang&objects=SCAN&minutes=5"
+\endcode
+
+would result in the following response
+
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+
+<system-status>
+<reporter name="bdb.object.status" value="sources=seang&amp;objects=SCAN&amp;minutes=5" status="OK"/>
+</system-status>
+\endcode
+
+which says that the bdb.object.status reporter determined that a seang SCAN has arrived within the last 5 minutes.
+
+Each reporter supports different attributes and these combinations is described by each reporter.
+It is possible to add more than one reporter in the same query and that is controlled by the reporters attribute. This means that if
+you for example combine two different reporters you should consider that the reporters might use the same attribute which might not be
+the wanted behaviour.
+Each reporter will produce a separate &lt;reporter /&gt; entry that can be parsed separately.
+
+As an example, if you want to know the db, bdb and bdb object status, this query
+\code
+  wget -q -O- "http://localhost:8080/BaltradDex/supervisor.htm?reporters=bdb.status,db.status,bdb.object.status&sources=seang&objects=SCAN&minutes=5"
+\endcode
+
+will produce
+
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+
+<system-status>
+<reporter name="bdb.status" value="" status="OK"/>
+<component name="db.status" value="" status="OK"/>
+<reporter name="bdb.object.status" value="sources=seang&amp;objects=SCAN&amp;minutes=5" status="OK"/>
+</system-status>
+\endcode
+
+that says that the baltrad db, postgres connection are working ok and that we got a SCAN from seang within the last 5 minutes.
+
+\subsection supervisor_returncodes Return codes
+The &lt;reporter&gt; tag contains a status attribute that specifies what the result of the operation was. This result can actually 
+more than one if the reporter identifies a conflicting state. For example, if asking for two radar sources in the same query and one
+of the radar sources has delivered within asked time but the other radar source hasn't. In that case, the result would be OK|COMMUNICATION_PROBLEM
+or similar.
+
+<table>
+ <tr>
+  <td>status code</td>
+  <td>Description</td>
+ </tr>
+ <tr>
+  <td>OK</td>
+  <td>All seems ok</td>
+ </tr>
+ <tr>
+  <td>COMMUNICATION_PROBLEM</td>
+  <td>There is some problem related to communication</td>
+ </tr>
+ <tr>
+  <td>MEMORY_PROBLEM</td>
+  <td>We have identified that we might be leaking memory</td>
+ </tr>
+ <tr>
+  <td>EXCHANGE_PROBLEM</td>
+  <td>We have problems exchanging data</td>
+ </tr>
+ <tr>
+  <td>PROCESSING_PROBLEM</td>
+  <td>An error occured when trying to process data</td>
+ </tr>
+</table>
+
+\subsection supervisor_formatting Formatting of responses
+Currently, the only supported formatter is the xml formatter. In the future we hope that you will have access to various kinds
+of formatters that is more suitable for your use. The formatter is specified by a separate attribute called named \b format and
+the value would be \b xml. However, this is default behaviour so it can be omitted.
+
+If you want to manually specify the formatter, then the request url would be:
+\code
+  http://..../BaltradDex/supervisor.htm?format=xml&reporter=......
+\endcode
+
+The format of the returned xml message will always be in the format:
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+
+<system-status>
+[<reporter name="..." value="..." status="..."/>]*
+</system-status>
+\endcode
+
+
+\subsection supervisor_reporters Reporters API
+There are several reporters delivered with the system and this list will probably grow with time. 
+
+\subsection supervisor_reporters_db_status Reporter name: db.status
+This reporter will just verify that a query can be executed towards the postgres database. 
+
+\subsubsection supervisor_reporters_db_args Arguments
+N/A
+
+\subsubsection supervisor_reporters_db_example Example usage
+
+Query:
+\code
+wget -q -O- "http://localhost:8080/BaltradDex/supervisor.htm?reporters=db.status"
+\endcode
+
+Response:
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+
+<system-status>
+<reporter name="db.status" value="" status="OK"/>
+</system-status>
+\endcode
+
+\subsection supervisor_reporters_bdb_status Reporter name: bdb.status
+This reporter will verify that the node has connection with the bdb server. 
+
+\subsection supervisor_reporters_bdb_args Arguments
+N/A
+
+\subsubsection supervisor_reporters_bdb_example Example usage
+
+Query:
+\code
+wget -q -O- "http://localhost:8080/BaltradDex/supervisor.htm?reporters=bdb.status"
+\endcode
+
+Response:
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+
+<system-status>
+<reporter name="bdb.status" value="" status="OK"/>
+</system-status>
+\endcode
+
+\subsection supervisor_reporters_radar_connection_status Reporter name: radar.connection.status
+This reporter can be used to control if a radar has been able to provide the composites and volumes
+with data without causing a timeout. If, for example, a composite is expecting a scan from searl
+and this scan does not arrive within the timeout. Then, this reporter will know about that. This reporter is
+a faster version of a product tester but not as accurate as the \ref supervisor_reporters_bdb_object_status "bdb object status reporter".
+
+\subsubsection supervisor_reporters_radar_connection_args Arguments
+<table>
+  <tr>
+    <td>Name</td>
+    <td>Description</td>
+  </tr>
+  <tr>
+    <td>sources</td>
+    <td>A comma separated list of source names, e.g. searl,seang</td>
+  </tr>
+</table>
+
+\subsubsection supervisor_reporters_radar_connection_example Example usage
+
+Query:
+\code
+wget -q -O- "http://localhost:8080/BaltradDex/supervisor.htm?reporters=radar.connection.status&sources=searl,seang"
+\endcode
+
+Response:
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+
+<system-status>
+<reporter name="radar.connection.status" value="sources=searl,seang" status="OK"/>
+</system-status>
+\endcode
+
+\subsection supervisor_reporters_bdb_object_status Reporter name: bdb.object.status
+
+This reporter is currently the most advanced reporter mechanism. It queries the baltrad db
+for availability of objects (SCAN,PVOL,COMP,...) for sources (searl, seang, ...) and areas (swegmaps_2000, ...)
+within a specific time limit in minutes.
+This means that you are able to query for almost anything within the database and verify if you have got it in
+time. However, the caveat to this is that it is a quite expensive version of reporter so make sure that you don't
+affect perforance drastically by calling this reporter too frequently. You might notice that the performance for
+handling incomming data will decrease if you continuously call this reporter.
+
+\subsubsection supervisor_reporters_bdb_object_args Arguments
+<table>
+  <tr>
+    <td>Name</td>
+    <td>Description</td>
+  </tr>
+  <tr>
+    <td>minutes</td>
+    <td>The time limit backward in time to check in minutes. E.g. 5. Default 5</td>
+  </tr>
+  <tr>
+    <td>objects</td>
+    <td>A comma separated list of what/object types that should be looked up, for example SCAN,PVOL,COMP</td>
+  </tr>
+  <tr>
+    <td>sources</td>
+    <td>A comma separated list of sources (used with SCAN,PVOL,...), for example searl,seang</td>
+  </tr>
+  <tr>
+    <td>areas</td>
+    <td>A comma separated list of sources (used with COMP,...), for example swegmaps_2000</td>
+  </tr>
+</table>
+
+You can combine for example SCAN,PVOL and COMP together with a list of sources and areas. 
+
+\subsubsection supervisor_reporters_bdb_object_example Example usage
+
+
+Query if a SCAN from seang and a COMP for area swegmaps_2000 has arrived within the last 5 minutes.
+
+\code
+wget -q -O- "http://localhost:8080/BaltradDex/supervisor.htm?reporters=bdb.object.status&sources=seang&areas=swegmaps_2000&objects=SCAN,COMP&minutes=5"
+\endcode
+
+Response:
+\code
+<?xml version="1.0" encoding="UTF-8"?>
+
+<system-status>
+<reporter name="bdb.object.status" value="sources=seang&amp;areas=swegmaps_2000&amp;objects=SCAN&amp;minutes=5" status="OK"/>
+</system-status>
+\endcode
+
+*/

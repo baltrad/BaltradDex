@@ -1,0 +1,509 @@
+/** \page format Data exchange format
+\date January 7, 2014
+\version 2.0
+
+\page format Data exchange format
+
+\ref main_index
+
+-# \ref exchange_general
+-# \ref exchange_auth 
+	-# \ref exchange_hdr
+	-# \ref exchange_sign
+-# \ref exchange_datasource_listing
+-# \ref exchange_start_subscription
+-# \ref exchange_update_subscription
+-# \ref exchange_post_key
+-# \ref exchange_post_file
+-# \ref exchange_post_message
+
+
+\section exchange_general General information
+
+BaltradDex uses standard HTTP message structure for communication. 
+Request and response parameters are passed as HTTP message headers. However, 
+for passing additional information between BALTRAD nodes, the following 
+custom header fields are introduced:
+
+\code
+Node-Name: <name of requesting node>
+Provider: [Peer|Injector]
+\endcode
+
+This information is essential for correct node identification within BALTRAD
+network, as well as for message authentication. 
+
+\attention
+Provider header is applied to \ref exchange_post_file and allows to distinguish 
+between request coming from the peer node and request sent by the injector, 
+that is third-party software providing data from local production system.
+It should take one of the following values: \p Injector in case of a request 
+send by an injector software, and \p Peer in case of a request sent by the peer 
+node. 
+
+\section exchange_auth Authentication   
+For safety reasons, all messages passed within BALTRAD network are 
+authenticated. Authentication is based on private/public keys using 
+<a href="http://www.keyczar.org">KeyCzar</a> toolkit.
+
+\subsection exchange_hdr Authentication header 
+For the purpose of authentication, a standard HTTP \p Authorization header 
+is used. The header value consists of user name name and user-specific 
+credentials in the following format:
+
+\code
+Authorization: <user name>:<credentials>
+\endcode
+
+\attention 
+User name is used to locate and access keys in the keystore. By default, 
+BaltradDex uses node name property for this purpose. Therefore node name 
+provided at the stage of installation (or initialization of the keystore) 
+should not be modified without a justified reason.
+
+\subsection exchange_sign Signing a request
+In order to sign a request, first an input message should be prepared. This 
+message will be next used to generate a signature. Input message is assembled 
+from the following request elements:
+
+	- Request method 
+	- Request URI
+	- Content-Type request header
+	- Content-MD5 request header
+	- Date
+  
+Typical input message will look like the following:
+\code
+GET
+http://example.baltrad.eu:8084/BaltradDex/get_datasource_listing.htm
+text/html
+aHR0cDovLzE ...
+Fri, 6 Jul 2012 13:00:26 CEST
+\endcode
+
+\attention
+The value of Content-MD5 request differs depending on the type of request. 
+Refer to the documentation of particular request types for details.
+
+Input message is signed with KeyCzar \p sign() method available in
+\p org.keyczar.Signer class, resulting in Base64 encoded signature string. 
+Exemplary authorization header will take the following form:
+
+\code
+Authorization: example.baltrad.eu:APa7608wLQI ...
+\endcode
+  
+Once signed, the request is ready to submit. In case of a failure to 
+authenticate the request on server side, the server will response with 
+<tt>HTTP 401 Unauthorized</tt> status code. In case the server is unable 
+to find a public key matching user name provided in \p Authorization header, 
+<tt>HTTP 500 Internal Server Error</tt> response is returned.
+
+\section exchange_datasource_listing Data source listing request
+
+\par
+\b Description
+\n 
+\n Request for data source listing. Reponse contains list of data sources 
+available for a given user to subscribe.
+
+\par 
+\b Request
+
+\par
+- Request URI: <tt>datasource_listing.htm</tt>
+- Method: <tt>POST</tt>
+- Headers: <tt>Node-Name, Content-Type, Content-MD5, Date, Authorization</tt>
+- Body: <tt>Subscriber node's credentials</tt>
+\n
+\n
+- <b>Example:</b>
+\code
+POST http://baltrad.imgw.pl:8084/BaltradDex/datasource_listing.htm HTTP/1.1
+Node-Name: baltrad.imgw.pl
+Content-Type: application/json
+Content-MD5: aHR0cDovLzE ...
+Date: Fri, 6 Jul 2012 13:00:26 CEST
+Authorization: baltrad.imgw.pl:APa7608wLQI ...
+{
+  "name":"baltrad.imgw.pl",
+  "nodeAddress":"http://baltrad.imgw.pl:8084",
+  "orgName":"Institute of Meteorology and Water Management",
+  "orgUnit":"Remote Sensing Department",
+  "locality":"Warsaw",
+  "state":"Poland",
+  "countryCode":"PL"
+}
+\endcode
+\par
+\note
+Content-MD5 header value consists of Base64-encoded request URI.
+
+\par 
+\b Response
+
+\par
+- Headers: <tt>Node-Name</tt>
+- Status: 
+     - <tt>200 OK</tt> : Success - data sources subscribed
+	 - <tt>201 Created</tt> : Success - user account established
+     - <tt>401 Unauthorized</tt> : Server failed to authenticate request
+     - <tt>500 Internal server error</tt> : Server error			
+- Body: 
+	- <tt>201</tt> : User account credentials
+	- <tt>200</tt> : List of subscribed data sources
+\n
+\n
+- <b>Example 201 response:</b>
+\code
+Node-Name: baltrad-backup.imgw.pl
+{
+  "name":"baltrad.imgw.pl",
+  "nodeAddress":"http://baltrad.imgw.pl:8084",
+  "orgName":"Institute of Meteorology and Water Management",
+  "orgUnit":"Remote Sensing Department",
+  "locality":"Warsaw",
+  "state":"Poland",
+  "countryCode":"PL"
+}
+\endcode
+- <b>Example 200 response:</b>
+\code
+Node-Name: baltrad-backup.imgw.pl
+[
+  {
+    "name":"PoznańSCAN",
+    "type":"peer",
+    "description":"Polar scans from Poznań"
+  },
+  {
+    "name":"LegionowoPVOL",
+    "type":"peer",
+    "description":"Polar volumes from Legionowo"
+  },
+  {
+    "name":"PastewnikALL",
+    "type":"peer",
+    "description":"Polar scans and volumes from Pastewnik"
+  }
+]
+\endcode
+
+\section exchange_start_subscription Start subscription request
+
+\par
+\b Description
+\n 
+\n Request for data source subscription. Reponse contains list of successfully 
+subscribed data sources. 
+
+\par 
+\b Request
+
+\par
+- Request URI: <tt>start_subscription.htm</tt>
+- Method: <tt>POST</tt>
+- Headers: <tt>Node-Name, Content-Type, Content-MD5, Date, Authorization</tt>
+- Body: <tt>List of data sources selected for subscription</tt>
+\n
+\n
+- <b>Example:</b>
+\code
+POST http://baltrad.imgw.pl:8084/BaltradDex/start_subscription.htm HTTP/1.1
+Node-Name: baltrad.imgw.pl
+Content-Type: application/json
+Content-MD5: aHR0cDovLzE ...
+Date: Fri, 6 Jul 2012 13:00:26 CEST
+Authorization: baltrad.imgw.pl:APa7608wLQI ...
+[
+  {
+    "name":"PoznańSCAN",
+    "type":"peer",
+    "description":"Polar scans from Poznań"
+  },
+  {
+    "name":"LegionowoPVOL",
+    "type":"peer",
+    "description":"Polar volumes from Legionowo"
+  }
+]
+\endcode
+\par
+\note
+Content-MD5 header value consists of Base64-encoded list of data sources 
+selected for subscription.
+
+\par 
+\b Response
+
+\par
+- Headers: <tt>Node-Name</tt>
+- Status: 
+     - <tt>200 OK</tt> : Success
+     - <tt>206 Partial Content</tt> : Subscription request was completed partially
+     - <tt>401 Unauthorized</tt> : Server failed to authenticate request
+     - <tt>404 Not Found</tt> : Generic subscription error
+     - <tt>500 Internal server error</tt> : Server error 					
+- Body: <tt>List of successfully subscribed data sources</tt>
+\n
+\n
+- <b>Example:</b>
+\code
+Node-Name: baltrad-backup.imgw.pl
+[
+  {
+    "name":"PoznańSCAN",
+    "type":"peer",
+    "description":"Polar scans from Poznań"
+  },
+  {
+    "name":"LegionowoPVOL",
+    "type":"peer",
+    "description":"Polar volumes from Legionowo"
+  }
+]
+\endcode
+
+\section exchange_update_subscription Update subscription request
+
+\par
+\b Description
+\n 
+\n Request for subscription update. Reponse contains list of updated 
+subscriptions. 
+
+\par 
+\b Request
+
+\par
+- Request URI: <tt>update_subscription.htm</tt>
+- Method: <tt>POST</tt>
+- Headers: <tt>Node-Name, Content-Type, Content-MD5, Date, Authorization</tt>
+- Body: <tt>List of subscriptions</tt>
+\n
+\n 
+- <b>Example:</b>
+\code
+POST http://baltrad.imgw.pl:8084/BaltradDex/update_subscription.htm HTTP/1.1
+Node-Name: baltrad.imgw.pl
+Content-Type: application/json
+Content-MD5: aHR0cDovLzE ...
+Date: Fri, 6 Jul 2012 13:00:26 CEST
+Authorization: baltrad.imgw.pl:APa7608wLQI ...
+[
+  {
+    "type":"local",
+    "date":1357909585672,
+    "active":true,
+    "dataSource":"LegionowoPVOL",
+    "user":"baltrad.imgw.pl",
+    "syncronized":true
+  },  
+  {
+    "type":"local",
+    "date":1357909585757,
+    "active":true,
+    "dataSource":"PoznańSCAN",
+    "user":"baltrad.imgw.pl",
+    "syncronized":true
+  }
+]
+\endcode
+\par
+\note
+Content-MD5 header value consists of Base64-encoded list of subscriptions.
+
+\par 
+\b Response
+
+\par
+- Headers: <tt>Node-Name</tt>
+- Status: 
+     - <tt>200 OK</tt> : Success
+     - <tt>206 Partial Content</tt> : Subscription request was completed partially 
+     - <tt>401 Unauthorized</tt> : Server failed to authenticate request 
+     - <tt>404 Not Found</tt> : Generic subscription error 
+     - <tt>500 Internal server error</tt> : Server error 
+- Body: <tt>List of successfully updated subscriptions</tt>
+\n
+\n 
+- <b>Example:</b>
+\code
+Node-Name: baltrad-backup.imgw.pl
+[
+  {
+    "type":"local",
+    "date":1357909625659,
+    "active":true,
+    "dataSource":"LegionowoPVOL",
+    "user":"baltrad.imgw.pl",
+    "syncronized":true
+  },
+  {
+    "type":"local",
+    "date":1357909625706,
+    "active":true,
+    "dataSource":"PoznańSCAN",
+    "user":"baltrad.imgw.pl",
+    "syncronized":true
+  }
+]
+\endcode
+
+\section exchange_post_key Post key request
+\par
+\b Description
+\n 
+\n Post key request. Reponse indicates post key operation result. 
+
+\par 
+\b Request
+
+\par
+- Request URI: <tt>post_key.htm</tt>
+- Method: <tt>POST</tt>
+- Headers: <tt>Node-Name, Content-Type, Content-MD5, Date, Authorization</tt>
+- Body: <tt>Key content</tt>
+\n
+\n 
+- <b>Example:</b>
+\code
+POST http://baltrad.imgw.pl:8084/BaltradDex/post_key.htm HTTP/1.1
+Node-Name: baltrad.imgw.pl
+Content-Type: application/zip
+Content-MD5: aHR0cDovLzE ...
+Date: Fri, 6 Jul 2012 13:00:26 CEST
+Authorization: baltrad.imgw.pl:APa7608wLQI ...
+<key content>
+\endcode
+\par
+\note
+Content-MD5 header value consists of MD5-encoded key content as hexadecimal
+string.
+\endnote
+\par 
+\b Response
+
+\par
+- Headers: <tt>Node-Name</tt>
+- Status: 
+     - <tt>200 OK</tt> : Success
+     - <tt>401 Unauthorized</tt> : Server failed to authenticate request
+     - <tt>409 Conflict</tt> : Key already exists on server
+     - <tt>500 Internal server error</tt> : Server error 		
+- Body: <tt>No content</tt>
+\n
+\n 
+- <b>Example:</b>
+\code
+Node-Name: baltrad-backup.imgw.pl
+\endcode
+
+\section exchange_post_file Post file request
+\par
+\b Description
+\n 
+\n Post file request. Reponse indicates post file operation result. 
+
+\par 
+\b Request
+
+\par
+- Request URI: <tt>post_file.htm</tt>
+- Method: <tt>POST</tt>
+- Headers: <tt>Node-Name, Provider, Content-Type, Content-MD5, Date, Authorization</tt>
+- Body: <tt>File content</tt>
+\n
+\n 
+- <b>Example:</b>
+\code
+POST http://baltrad.imgw.pl:8084/BaltradDex/post_file.htm HTTP/1.1
+Node-Name: baltrad.imgw.pl
+Provider: Peer
+Content-Type: application/x-hdf5
+Content-MD5: aHR0cDovLzE ...
+Date: Fri, 6 Jul 2012 13:00:26 CEST
+Authorization: baltrad.imgw.pl:APa7608wLQI ...
+<file content>
+\endcode
+\par
+\note
+Content-MD5 header value consists of Base64-encoded request URI.
+
+\par 
+\b Response
+
+\par
+- Headers: <tt>Node-Name</tt>
+- Status: 
+     - <tt>200 OK</tt> : Success
+     - <tt>401 Unauthorized</tt> : Server failed to authenticate request
+     - <tt>404 Not Found</tt> : Generic post file error
+     - <tt>409 Conflict</tt> : File already stored in the database
+     - <tt>500 Internal server error</tt> : Server error 		
+- Body: <tt>No content</tt>
+\n
+\n 
+- <b>Example:</b>
+\code
+Node-Name: baltrad-backup.imgw.pl
+\endcode
+
+
+\section exchange_post_message Post message request
+\par
+\b Description
+\n 
+\n Post message request. Message body is processed by Beast messaginng 
+interface. Reponse indicates post message operation result. 
+
+\par 
+\b Request
+
+\par
+- Request URI: <tt>post_message.htm</tt>
+- Method: <tt>POST</tt>
+- Headers: <tt>Node-Name, Content-Type, Content-MD5, Date, Authorization</tt>
+- Body: <tt>Message string</tt>
+\n
+\n 
+- <b>Example:</b>
+\code
+POST http://baltrad.imgw.pl:8084/BaltradDex/post_message.htm HTTP/1.1
+Node-Name: baltrad.imgw.pl
+Content-Type: text/html
+Content-MD5: aHR0cDovLzE ...
+Date: Fri, 6 Jul 2012 13:00:26 CEST
+Authorization: baltrad.imgw.pl:APa7608wLQI ...
+<Message body>
+\endcode
+\par
+\note
+Content-MD5 header value consists of Base64-encoded message body.   
+
+\par 
+\b Response
+
+\par
+- Headers: <tt>Node-Name</tt>
+- Status: 
+     - <tt>200 OK</tt> : Success
+     - <tt>401 Unauthorized</tt> : Server failed to authenticate request
+     - <tt>500 Internal server error</tt> : Server error / Unsupported message
+											format  		
+- Body: <tt>No content</tt>
+\n
+\n 
+- <b>Example:</b>
+\code
+Node-Name: baltrad-backup.imgw.pl
+\endcode
+
+\attention
+Because message body is processed by Beast messaging interface, its format 
+should match XML-based message format defined by Beast. In case of attempt to
+pass a message of unsupported format, the server will respond with 
+<tt> Internal Server Error (500)</tt>. Refer to Beast framework documentation 
+for details.
+
+*/

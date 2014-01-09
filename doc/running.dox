@@ -1,0 +1,883 @@
+/** \page running Running BaltradDex
+\date January 7, 2014
+\version 2.0
+
+\page running Running BaltradDex
+
+\ref main_index
+
+-# \ref start
+-# \ref login
+-# \ref change_password 
+-# \ref quick_setup 
+	-# \ref quick_node_settings
+	-# \ref quick_radars
+	-# \ref quick_data_sources
+	-# \ref quick_injector 
+	-# \ref quick_keys
+-# \ref conn
+-# \ref subscribe
+-# \ref node_status
+-# \ref registry
+-# \ref log
+-# \ref sticky_messages
+-# \ref more_data_sources
+-# \ref data_browse
+-# \ref data_processing 
+-# \ref admin
+	-# \ref radars
+	-# \ref data_sources
+	-# \ref subscription_settings
+	-# \ref registry_settings
+	-# \ref messages_settings
+	-# \ref accounts	
+	-# \ref node_settings
+
+\section start Starting BaltradDex
+Assuming that your Tomcat server is installed on local machine and listening 
+on port 8084, in order to run the application, open a web browser and type 
+the following in the address bar:
+
+\code
+http://localhost:8443/
+\endcode
+
+\attention
+BaltradDex was tested with the following browsers: Firefox, Opera, 
+Google Chrome and Konqueror. Usage of Internet Explorer is currently not 
+supported.
+Because we are using self-signed certificates, your browser will warn you about
+untrusted connection and ask you if you want to add a security exception. 
+Confirm security exception to access BaltradDex login page.   
+
+\section login Login/Logout
+
+Sign in typing your user name and password in the textbox available on the 
+login screen. During installation, default administrator's account is created 
+with user name \p admin and password \p baltrad.
+
+\attention
+It is absolutely crucial that you change administrator's password immediately 
+after signing in for the first time. Refer to \ref accounts section for details.  
+
+In order to sign out, use \p Logout link available in the upper 
+right corner of each page.  
+
+\note 
+For security reasons, it is important that user signs out each time after 
+work session is over. The following message on the login page confirms that user
+credentials have been successfully removed from HTTP session.      
+\n
+\n
+\image html logout.png
+\endnote
+
+\section change_password Change user's password
+
+It is important for the user to change the default password set by system 
+administrator. In order to change the password, click \p Password option located 
+in \p Settings group of the left-column menu. User will be presented with a page 
+allowing to modify the password.
+
+\image html change_user_password.png
+
+Enter new password, confirm it by typing the password again and click \p Save.
+System will display a message confirming that password has been changed. 
+From now on new password will be used in order to sign in.
+
+\image html change_user_password_status.png
+
+\attention
+For security reasons, it is strongly recommended that user changes the password 
+as soon as possible, preferably after signing in for the first time.
+
+\section quick_setup Quick setup
+
+In order to configure a fully functional system ready to exchange data, several 
+things have to be done.
+
+\subsection quick_node_settings Node settings
+
+First thing to do is to configure node properties. Since setting node properties
+require administrative privileges, it is necessary to sign in as user \p admin.
+Once signed in, click <tt>Node settings</tt> option from left-column menu. 
+
+\image html node_properties.png
+
+The most important settings are <tt>Node name</tt> and <tt>Node address</tt>. 
+Make sure that these settings are correct before configuring data exchange.
+
+\attention
+Make sure that <tt>Node name</tt> setting always matches the name of
+localhosts's key entry in the keystore. If you have installed BaltradDex 
+software  with node-installer package, your node name was specified on 
+installation stage and it should remain unchanged. In case of installing 
+BaltradDex as standalone module, proceed according to the instructions given 
+in \ref build_dex.
+
+\subsection quick_radars Radars
+
+BaltradDex provides radar interface which allows to access data from  a given
+radar station. Radar interface is not used directly - it is selected as a 
+basic parameter of data source (see the next section). In order to configure 
+radar, click <tt>Radars</tt> item in the main menu. Menu will expand showing
+available options. Click \p Add option. Next, select desired center from the 
+list on the left by clicking on the center identifier. Identifiers have the 
+following form: Country code - GTS code - center number. Once clicked, the box 
+on the right reveals the list of radar stations available for a given center. 
+Radar station names are presented in the following form: Place - radar code - 
+WMO number. Click \p Save button to save radar configuration. 
+
+\image html save_radar.png
+
+\note
+Use \p Show option from \p Radars menu to display the list of currently 
+configured radar stations. \p Remove option will delete selected radars.
+\endnote
+
+\subsection quick_data_sources Data sources  
+
+Next step is configuration of data sources. Data source is an interface
+allowing to access data injected into baltrad node from local production 
+system. Data available with a given data source must exactly match its 
+parameters. 
+\n Click <tt>Data Sources</tt> option in the main menu and \p Add.
+At the top of the page, fill in the textboxes providing a significant data 
+source name and description like in the example given below. Typically, data
+sources are named after radars, including some additional parameters, like 
+data type in the example below. 
+
+\image html data_source_name.png
+
+Next scroll down to radar selection box. General rule for setting data source
+parameters is to add parameters from left options box to the right. Select a
+parameter in the left options box, then use button marked with \p > sign in 
+order to add the parameter to the options box in the right. Use \p < button to
+remove unwanted parameter. Select one or more radars according to your needs. 
+Typically only one radar is selected for a data source, but more radars is 
+still possible. Remember that data files coming from these radars will be 
+available with this data source.  
+\note
+At least one radar is required. In case of an attempt to save data source 
+without selected radar, user will be warned with a relevant message.  
+\endnote
+
+\image html data_source_radar.png
+
+Scroll the page down. Next step is selection of file object according to ODIM_H5 
+model specification. Select file object from the left options box and use \p >
+button in order to add it to selected options box, just like in the previous 
+step. It is possible to select more than one file object. In such case all 
+selected objects will be available with this data source.  
+
+\image html data_source_file_object.png
+
+\note
+Move mouse cursor over a selected option to get detailed file object description 
+displayed as tooltip. 
+\endnote
+
+Scroll the page to the bottom. Last step of data source configuration is 
+selection of users for which this data source will be available. This means 
+that users selected at this stage will be able to subscribe the data source and 
+will receive data matching its parameters defined in the previous steps. 
+\note
+The desired user account might not be available in the system at the stage 
+of data source configuration. This is because user accounts with role \p peer
+(typically used for data exchange) are created automatically upon first 
+incoming connection. It is possible however to configure data source with no 
+user accounts assigned and add given account as soon as it is created.   
+\endnote 
+
+\image html data_source_user.png
+
+Once the above steps are completed, press \p Save to store data source 
+configuration. User will be redirected to status page indicating whether saving
+of data source was successful. Clicking \p OK in the status page will take user 
+to data source selection page.
+
+\image html data_source_summary.png
+
+\note
+Use \p Edit and \p Remove options available in <tt>Data sources</tt> menu in 
+order to modify data source parameters or delete data source from the system.
+Note that in case when name of existing data source is modified, it will
+be saved as a new data source.      
+\endnote 
+
+\subsection quick_injector Import injector's key
+
+In order to get data from local production system into BALTRAD node, it is 
+necessary to configure injector software which will deliver data to the node.
+Because each incoming file/message is authenticated, it is required that 
+injector software provides its public key in order for the node to be able
+to authenticate incoming file/message. If you are running injector software like 
+OdimH5 or other software that doesn't have it's own tool for exporting the key, 
+you can use a key import tool available in \p script directory of BaltradDex 
+package.
+
+\code 
+node-installer/packages/BaltradDex/script/import_key.py
+\endcode  
+
+Prior to using key import script, make sure that you have Python's 
+\p psycopg2 module installed in your system. Under Ubuntu linux, you can 
+install this module with the following command:
+
+\verbatim 
+$ sudo apt-get install python-psycopg2
+\endverbatim
+
+In order to test the script, execute the following command:
+
+\code
+$ python import_key.py --help
+\endcode
+
+Assuming that all necessary modules are in place, the script will display 
+usage information.
+Once the module is installed, you can imort the key either from local or remote 
+machine, depending on where the injector is supposed to run. Following is the 
+example of importing key from local machine (injector runs on the same machine as 
+the node software itself):
+
+\code
+$ python import_key.py --key=/opt/baltrad/odimH5/.keystore/rainbow.imgw.pl.pub 
+--dst=/opt/baltrad/etc/bltnode-keys --dbuser=baltrad --dbhost=localhost 
+--db=baltrad --pwd=baltrad
+\endcode 
+
+In the example above, the following parameters have been used:
+
+\verbatim
+--key - path to the source key directory
+--dst - destination directory, typically BALTRAD keystore folder as shown above
+--dbuser - database user, in this case we're using a default user
+--dbhost - database server address, localhost used here
+--db - database name
+--pwd - database password
+\endverbatim
+
+Once the script is executed, the key will be copied to the destination 
+directory and its metadata will be stored in the database.
+It is also possible to import the key from remote machine available with SSH.
+Here's an example. 
+
+\code
+$ python import_key.py --key=/opt/baltrad/odimH5/.keystore/rainbow.imgw.pl.pub 
+--dst=/opt/baltrad/etc/bltnode-keys --user=baltrad --host=192.168.1.101
+--dbuser=baltrad --dbhost=localhost --db=baltrad --pwd=baltrad
+\endcode
+
+There are 2 additional parameters applied:
+
+\verbatim
+--user - remote host's user name
+--host - remote host IP address
+\endverbatim
+
+Assuming that injector's key has been successfully imported, you should see 
+a message like the following.
+
+\verbatim
+Copying the key from /opt/baltrad/odimH5/.keystore/rainbow.imgw.pl.pub  ...
+... OK.
+Calculating key checksum ...
+... OK.
+Storing key in the database baltrad ...
+... OK.
+\endverbatim
+
+The last step is telling the node which messages are coming from the injector
+(in contrast to the messages coming from the peer node). \n
+Click \p Keystore from the \p Settings menu group. You will be presented with 
+a list of keys available in the keystore, as shown in the image below.
+
+\image html keystore_injector.png
+
+Each key in the keystore has an option called \p Injector. If this option is 
+set to on, node will be aware that messages that are authenticated using this
+particular key are coming from an injector. \n
+According to the previous example, \p Injector option should be set to on for 
+the key that has been imported from the injector. In order to achieve this, 
+click \p Injector button next to the selected key entry. Red icon will turn 
+blue, indicating that the given key has been set to injector. 
+\n Independently of identifying a key as injector, in order to let the files 
+through authentication process, access should be granted for the key. 
+To do this, click \p Access button so it turns from red to blue. In the image 
+below key named \p rainbow.imgw.pl.pub is configured as approved injector's key.
+
+\image html keystore_injector_approve.png
+
+From now on node should be able to successfully authenticate messages coming 
+from the injector.
+
+\subsection quick_keys Exchange keys between nodes
+
+Every message arriving in BALTRAD node is authenticated using private/public key 
+pair. In general, outgoing message is signed with node's private key and 
+incoming message is verified and authenticated with public key. According to 
+this approach, for communication to take place, local node's public key has to 
+be available in the peer node's keystore and vice versa. 
+\n\n
+Therefore, before connecting to peer node, local node's public key has to 
+available in peer node's keystore. In order to send your public key to the peer 
+node, click \p Connect option located in the \p Exchange group in the main menu. 
+Type peer node's URL address in the edit box and click <tt>Send key</tt> button. 
+
+\image html post_key_address.png
+
+In case the key was successfully sent to the peer node, user will be informed 
+with the following message:
+
+\image html post_key_success_msg.png
+
+In case when the key already exists in the peer node's keystore (e.g. has 
+already been sent earlier), the following message is shown:
+
+\image html post_key_exists_msg.png
+
+Once local key has been sent to the peer node, peer node's administrator has 
+to approve a given key. In order to access the keystore, node's admin clicks 
+\p Keystore option from the \p Settings group in the menu. Keystore content 
+will be presented as in the image below.  
+
+\image html keystore_mgmt.png
+
+\note
+Key's authenticity is verified automatically by the receiving node. 
+Authentication consists in comparison of key's checksum sent along with the key 
+itself against the checksum calculated by the receiving node. In case the 
+checksums differ (e.g. in case of content substitution), the key will be 
+rejected.  
+\endnote
+
+Once the key has arrived, next thing is granting access for this key. 
+In the following example, \p dev.baltrad.imgw.pl is the incoming key, while
+<tt>baltrad2.imgw.pl</tt> is local node's public key. 
+
+\note
+For security reasons, local node's key can't be modified or removed. Local key 
+is always marked with blue buttons.
+\endnote      
+
+To grant access for the selected key, click \p Access button next to given key 
+entry. Red icon turn blue, indicating that access for the given key has been 
+granted.
+
+\image html keystore_grant.png
+
+From now on the system will let throught every incoming message that can be 
+successfully verified with this key.
+ 
+In order to revoke access, click on the same icon once again. It will turn red
+again and access for the selected key will be revoked.
+
+Keystore management page allows to remove peer's key permanently. To remove 
+selected key click \p Delete icon next to given key entry. Once clicked, icon 
+reveals dialog asking user to confirm key deletion. Click \p Delete button to 
+remove key permanently from the keystore, or \p Cancel button to get leave the 
+key in the keystore. 
+
+\image html keystore_delete.png  
+
+\section conn Connecting to peer node
+
+Basic BaltradDex functionality allows to connect to peer node and access and 
+subscribe data sources available for a given user. In order to connect, sign in
+to BaltradDex, click \p Connect option from \p Exchange group in the main 
+menu. Assuming that connection to a given node is made for the first time,
+type node address in the text box <tt>Enter URL address</tt> according 
+to the example below.   
+
+\image html connect_address.png
+
+\note
+Make sure to type address in the correct format: 
+\n
+\n
+<tt>http://server.name.org:[port number]</tt>
+\n
+\n
+If incorrect address is specified, system will issue a following message:
+
+\image html invalid_address.png 
+\endnote
+
+Clict \p Connect. Upon successful connection, peer node will render the view
+with a list od data sources available for the user to subscribe (see the image
+below). In order to subscribe a given data source, click a checkbox next to 
+data source name and description. Once selection is made, click \p OK. The
+system will ask to confirm the selection by clicking \p OK on the next screen
+and submitting subscripions request at the peer node.      
+
+\image html connect_data_sources.png
+
+If subscription request was successfully completed, user is presented with the 
+following message confirming the operation. Clicking \OK will redirect user
+to subscription status page.
+
+\image html connect_success.png
+
+Subscription status page (see image below) allows to access subscription list
+on per node basis, that is to access and manage subscriptions at each peer 
+node separately. Click peer node name to access subscription management page.
+\note
+User can access subscription status page at all times by clicking 
+\p Subscriptions option from \p Exchange group in the main menu.
+\endnote  
+
+\image html peer_subscription.png
+
+After clicking on peer node name, system displays list of data sources 
+subscribed at this node. This page allows to modify subscription status by 
+activating or cancelling subscription of particular data sources. 
+\n
+\n
+Refer to \ref subscribe section for details.
+
+\image html subscriptions.png
+
+\section subscribe Managing subscriptions
+
+To access subcription management page, click on \p Subscriptions option in
+the main menu. Click name of desired peer node to access subscriptions
+available at this node. Now it is possible start or cancel subscription of 
+a given data source. Simply check or uncheck a corresponding check box and 
+click \p OK button.   
+
+\image html subscriptions_selected.png  
+
+Next page shows subcription request that will be sent to the peer node and 
+serves as a confirmation. Blue check mark denotes activating subscription, 
+whereas red circle means that subscription of a given data source will be cancelled.
+Click \p Back to go back to selection page or \p OK to send subscription 
+request.
+
+\image html subscriptions_requested.png 
+
+Assuming that the request was successfully posted at the peer node, the system
+will display the following message to confirm that subscription status was
+modified. Click \p OK to go back to initial subacription status page. 
+
+\image html subscriptions_status.png 
+
+\note
+Detailed information on system activity, i.e. node connections, subscription
+requests, incoming data etc. can be accessed with message logging interface.  
+Refer to \ref log section for details. 
+\endnote
+
+\section node_status Checking node status
+
+Node status data is displayed on status page which is available directly after 
+user signs in. It is also available by clicking \p Status link in the main menu.
+Node status page is divided into 2 sections, containing different type of 
+information.  
+\n
+First section, shown in the image below, presents useful information concerning
+the server itself, i.e: node name, software version, operator, number of 
+entries in system log and delivery registry, as well as currently available disk 
+space. 
+
+\image html node_status_info.png
+
+The second section contains information on data exchange. The information is 
+grouped by nodes, which are currently exchanging data with the local node 
+(see image below).  
+
+\image html node_status_exchange.png
+
+There are 2 types of data transfer:
+
+\n
+- Downloads - data downloaded from the peer nodes. Downloads option shows the 
+status of your subscriptions to data sources available on peer nodes.      
+\n 
+- Uploads - data uploaded to the peer nodes. Upload option allows to access 
+information about local data sources subscribed by peer nodes.  
+
+User can check current data transfer status clicking a given node name. This 
+reveals 2 items: \p Downloads and \p Uploads (depending on the current data 
+exchange status), as shown in the image below.
+
+\image html node_status_transfers.png
+
+Clicking \p Downloads option will display the list of data sources currently
+subscribed at the selected peer node. In the example below, clicking 
+\p Downloads item shows list of data sources subscribed at \p se.baltrad.eu.    
+
+\image html node_status_downloads.png
+
+Each item on the list contains name of data source, date and and time when 
+subscription has started as well as subscription status. If subscription status 
+is set to \p Active, it means that local node is currently receiving data from a 
+given data source. If subscription is stopped, the status control changes to
+\p Off. 
+
+\n
+By analogy, clicking \p Uploads item shows list of local data sources subscribed 
+by a given peer node, in this case \p se.baltrad.eu, as shown below.   
+
+\image html node_status_uploads.png   
+ 
+Uploads list contains information about data source name, date and time when 
+subscription has started, number of successfully uploaded files and upload
+failures.
+
+
+\section registry Data delivery registry
+
+If there are active subscriptions and local node is supplied with data from
+local production system, user can check the status of data delivery to the peer    
+nodes that subscribed local data sources.
+\n
+To check data delivery status, click <tt>Delivery registry</tt> link from 
+the \p Exchange options group. Delivery registry page is shown in the image 
+below.
+
+\image html delivery_registry.png
+
+Each entry in the registry contains timestamp, recipient (user) name, data file 
+signature and delivery status (blue check mark denotes delivery success, red
+circle - failure). User can navigate through registry entries in a standard way,
+using either buttons with page numbers or scroll buttons. 
+
+\section log Message logging
+
+System messages interface allows to access and display detailed information 
+on system activity. It is possible to display system messages in two modes. 
+First mode allows to update message display automatically. Click \p Messages 
+link in <tt>Node status</tt> options group of the main menu. By default, 
+system will enter \p live mode, which means that the display will be 
+automatically updated each time a new message is logged. Auto-refresh option 
+can be turned off and on at all times by clicking \p Auto-update toggle.
+
+\note
+There are 3 types of messages - informative messages (displayed on white 
+background), warnings (yellow) and errors (light red).
+\endnote
+
+\image html latest_messages.png
+
+The second mode allows to access full system log, as well as search for messages
+based on selected criteria. Select \p Messages option from the main menu, then 
+Click \p Browse link placed in the upper right corner of messages screen. 
+Upper part of the page allows to define message search criteria. 
+The following options are available:
+
+- Message logger - message logger (software component) that produced the
+message. The following loggers are available: \p DEX (data exchange component),
+\p BEAST (data processing component) and \p PGF (product generation framework).
+- Log level - one of the following message types: informative - INFO, 
+warning - \p WARN or error messages - \p ERROR.  
+- Start date - starting date of messages' timespan. Click calendar's icon to 
+pick start date.
+- Start time - starting time of messages' timespan.   
+- End date - end date of messages' timespan. Click calendar's icon to pick 
+end date.
+- End time - end time of messages' timespan.
+- Phrase - phrase to look for in message body.     
+
+\image html browse_messages.png
+
+Once search options are set, click \pSelect button. Navigate through pages 
+either clicking page numbers of scroll buttons. Click \p > sign to move to 
+next page, \p < to move to previous page. Clicking \p << sign will display 
+the first page, and \p >> the last page of system log. Use \p Reset button
+to reset message search options.
+
+\note
+The <tt>Show latest</tt> link in the upper right corner of the page allows 
+to return to \p live messages display mode.
+\endnote
+
+\section sticky_messages Sticky messages
+
+Sticky messages serve as notification system informing user about events 
+that require some kind of interaction. For instance, user is informed about 
+receiving public key from a peer node. Since it is up to the user to approve 
+or reject the key, they have to be aware that the key has been received and
+that it awaits further action. 
+\n
+First, user is informed that sticky messages have been received. This is 
+accomplished with a special message box located in the title bar at the top 
+of each page, as shown in the image below.
+
+\image html sticky_message_notification.png 
+
+The message box will remain visible as long as at least one sticky message is
+available in the system.
+\n
+\n
+In order access and read messages, click the link given in the message box. The 
+system will display sticky messages in a dedicated page as shown below. 
+
+\image html sticky_message_show.png
+
+Sticky message consists of the header containing date and time when the 
+message was received and of actual message content. The content may include 
+some tips on the further actions that should be taken, as in case of receiving
+public key from a peer node.  
+\n
+\n
+Sticky messages should be removed once it is read. To remove a sticky message, 
+click \p Delete button next to it. If there are no messages remaining, 
+notification box will be no longer visible in the title bar and the system will 
+display the following information:
+
+\image html sticky_message_deleted.png
+
+\section more_data_sources More on data sources
+
+Section \ref quick_data_sources showed how to configure and save a data source.
+Existing data sources are available with <tt>Data sources</tt> link located in
+the main menu in <tt>Node status</tt> group. Image below shows list of data 
+sources available in the system. 
+
+\image html data_sources.png 
+
+Data source interface allows to access, browse, display and download data 
+files matching its parameters. Click on a given data source name to list the
+matching files. Use page numbers and scroll buttons to navigate through pages. 
+
+\image html data_source_files.png      
+
+File listing page provides user with access to detailed file information and 
+quick file preview as well as allows to download selected file. User can 
+download selected file clicking \p Download link next to the given file entry. 
+Browser will display standard file download dialog, allowing to select target 
+storage directory. In order to display detailed information about selected file, 
+user clicks \p Details option. File details page is consists of 2 sections. 
+First section, shown in the image below, contains some basic information about 
+data file: file signature, date, time, source ID (ID of the radar station 
+that collected the data), storage time and data type (file object type,
+according to ODIM_H5 radar data information model).
+
+\image html data_source_file_details_info.png
+
+Next section displays data preview for each dataset contained in the file. 
+A thumbnail is generated for each scan and for each data type independently 
+(e.g. dBZH, dBZV, VRAD etc.). The example below presents data preview for volume 
+file consisting of several scans. Each image representing a single scan is 
+associated with information about antenna elevation angle and data type - in 
+this case horizontally polarized reflectivity.
+\image html data_source_file_details_preview.png
+
+\n
+\n
+Next feature is full-sized data preview. Click on any image representing 
+a single scan. The system will generate full size image based on original 
+radar data resolution stored in files's metadata. The image will be 
+displayed as an overlay in Google Maps interface, like in the example below.             
+
+\image html data_source_file_image.png
+
+Use \p Opacity slider to adjust radar data layer's opacity and <tt>Toggle
+visibility</tt> button to turn radar data layer on and off.
+
+\section data_browse Data browsing and access 
+
+Data browsing interface allows user to browse and access radar data files in 
+a flexible way. In order to access file browser interface, click 
+<tt>Browse files</tt> link in <tt>Node status</tt> options group of the main 
+menu.
+\n
+\n
+There are several parameters available to specify while browsing data. 
+The parameters include source radar station, file object type according to 
+ODIM_H5 specification and time span. Select radar station and file object type
+from the drop-down lists, set dates clicking on calendar icon next to 
+<tt>Start date</tt> and <tt>End date</tt> fields. Once parameters are set, 
+click \p Select button. Files matching defined criteria will be fetched 
+from the database.   
+
+\image html browse_files.png
+
+User navigates through the list of selected files in a standard way, clicking 
+page numbers and scroll buttons. File listing can be sorted by date, time,
+source and type. I order to sort the list, user clicks on the header of 
+selected column, e.g. \p Source.
+File listing provides acces to file details page, as described in \ref
+more_data_sources section. Click \p Details to access file details and data 
+preview page, click \p Download to store file on the local disk.  
+
+\section data_processing Data processing
+
+BaltradDex constitutes interface to data processing functionality. Data 
+processing options are grouped in \p Processing tab. Refer to 
+<a href="http://git.baltrad.eu/pgf.html">BALTRAD User Manual</a> for further
+information. 
+
+\section admin Administrative tasks
+
+This section addresses administrative tasks related to node management and 
+settings. Features presented here are available in \p Settings menu group, 
+which is only available for node's administrator.  
+
+\subsection radars Radars
+
+Refer to \ref quick_radars section.
+
+\subsection data_sources Data sources
+
+Refer to \ref quick_data_sources section.
+
+\subsection subscription_settings Subscription settings
+
+Subscription settings is useful feature in case when subscription status between
+two nodes is not synchronized. This situation may occur when e.g. node A 
+subscribes data source X on node B. Then subscription status on node A is erased
+due to some kind of error or faulty database operation. In such case information
+about subscribed data source X still exists on node B, but no longer on node A.
+To get rid of invalid subscription, user at node B should click \p Subscriptions 
+item to expand menu. Two options are available: <tt>Remove downloads</tt> and 
+<tt>Remove uploads</tt>, by analogy to subscription types described in 
+\ref subscription_status. Let's say there invalid subscription of data source 
+X at node B was discovered. User should click <tt>Remove uploads</tt> item. 
+The following page will be displayed.     
+
+\image html subscriptions_remove_upload.png
+
+The page presents information about local data sources and respective 
+subscribers. Click \p Select checkbox next to the desired subscription entry
+and \p OK to remove. User will be asked to confirm subscription removal with 
+the following warning.
+
+\image html subscriptions_remove_upload_warn.png
+
+Click \p OK to confirm. Invalid subscription entries will be deleted.   
+\n
+\n
+The same operation can be performed on data downloads, that is subscriptions of
+data sources at peer nodes. User can remove subscriptions selecting 
+<tt>Remove downloads</tt> option from the menu. The following page presents 
+information about data downloads.   
+
+\image html subscriptions_remove_download.png
+
+The page contains information about subscribed data sources and respective
+operators (peer nodes), as well as about subscription status (active /inactive).
+In order to remove subscription, click \p Select checkbox next to the desired 
+subscription entry and \p OK to remove. User will be asked to confirm 
+subscription removal with the following warning.     
+
+\image html subscriptions_remove_download_warn.png
+
+Click \p OK to confirm. Invalid subscription entries will be deleted.
+
+\note 
+When removing an active download, local node will attempt to stay synchronized
+with the remote node where subscription have been started. This is achieved by 
+checking whether subscriptions (downloads) selected for removal exist on the
+remote node. In case they do, local node will attempt to cancel these 
+subscriptions at the remote node prior to removal. 
+
+\subsection registry_settings Delivery registry settings
+
+<tt>Delivery registry</tt> settings allow to keep track of the number of 
+delivery registry entries stored in the system. Click 
+<tt>Delivery registry</tt> to expand available options. \p Configure option 
+allows to set maximum number of delivery registry entries or maximum age of 
+entries. See the image below.      
+
+\image html registry_settings.png
+
+The <tt>Set active</tt> checkbox activates selected limit. If both checkboxes 
+are checked, delivery registry entries will be deleted based on both maximum 
+number and maximum age of entries, whichever criterion is met. 
+\n
+\n
+\p Clear option allows to immediately remove all delivery registry entries. 
+This option should be used with care. It is recommended to set limit on either 
+number or age of delivery registry entries instead, as described above.     
+
+\image html registry_clear.png
+
+\subsection messages_settings Messages settings 
+
+<tt>System messages</tt> settings allow to keep track of the number of log 
+entries stored in the system. Click \p Messages to expand 
+available options. \p Configure option allows to set maximum number of log
+entries or maximum age of log entries. See the image below.      
+
+\image html messages_settings.png
+
+The <tt>Set active</tt> checkbox activates selected limit. If both checkboxes 
+are checked, log entries will be deleted based on both maximum number and 
+maximum age of log entries, whichever criterion is met. 
+\n
+\n
+\p Clear option allows to immediately remove all log entries. This option should
+be used with care. It is recommended to set limit on either number or age of log 
+entries instead, as described above.     
+
+\image html messages_clear.png
+
+\subsection accounts User account management
+
+	- Adding user account
+
+Click <tt>User accounts</tt> and \p Add to set new user account. System will 
+show user account data form allowing to provide some basic user's credentials 
+as in the example below.  
+
+\image html account_add.png
+
+Fill in the form and click \p Save in order to save new user account. The system 
+will issue an appropriate message depending on the operation status. 
+
+\note
+It is of key importance to select a suitable role for the newly established 
+account. It is achieved by selecting user's role from \p Role selection 
+drop-down list. System functionality available in the GUI is different for users 
+with particular roles. The following roles are available: 
+\n
+- \p user - Basic role with very limited access to the system. User with this role
+can browse data and system messages, access subscription and data source status 
+information.   
+- \p operator - Advanced user that can connect to peer nodes as well as start 
+and stop subscriptions and access data processing tab. This role also extends 
+user-level functionality.    
+- \p admin - Node administrator with unlimited access to system options.
+- \p peer - This role is reserved for data exchange and it is not available 
+in the drop-down list.
+\endnote
+
+	- Modifying user account setttings
+
+Click <tt>User accounts</tt> and \p Edit to modify existing user account. The
+following form will be displayed.
+
+\image html account_edit.png
+
+Click given user's name to access account details page. Edit account settings 
+and click \p Save. The system will confirm operation with suitable message.
+\n
+User's password can be modified independently from the rest of account's 
+settings. Click <tt>User accounts</tt>, \p Edit, then click \p Change option 
+next to the selected account. Type new password, retype to confirm and click
+\p Save. From now on user can sign in using new password. 
+
+\image html account_passwd.png 
+
+\note
+User accounts with peer-type role can't be modified, since this could affect 
+data exchange process. It is still possible to remove this type of account. 
+\endnote
+
+	- Deleting user account 
+
+To remove user account, click <tt>User accounts</tt> and select \p Remove 
+option. The list of user accounts will be displayed.
+
+\image html account_remove.png
+
+Click a checkbox next to the account that is to be removed and click \p OK.
+The system will confirm operation with suitable message.
+
+\subsection node_settings Node settings
+
+Refer to \ref quick_node_settings section.
+
+*/

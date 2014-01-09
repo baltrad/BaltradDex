@@ -1,0 +1,265 @@
+/** \page install Installation
+\date January 2014
+\version 2.0
+
+\page install Installation
+
+\ref main_index
+
+-# \ref prereq
+-# \ref prep
+	-# \ref prep_db
+	-# \ref prep_tomcat
+		-# \ref prep_tomcat_keystore
+		-# \ref prep_tomcat_connectors
+		-# \ref prep_tomcat_admin_account
+	-# \ref prep_app_context
+-# \ref build_dex
+-# \ref test_dex
+
+\attention 
+\n
+Baltrad Data Exchange System (BaltradDex) constitutes an integral part of 
+baltrad node software package. As such, it provides full functionality only
+if installed with node-installer utility. However it is possible to deploy 
+BaltradDex provided that the following BALTRAD software components are 
+installed in the system:
+\attention
+\n
+- \b baltrad-db - Baltrad database management system
+- \b beast - Baltrad message management and data processing interface
+\attention 
+\n
+Please refer to the documentation of the above packages for installation and
+usage instructions.
+\attention
+\n 
+Although the above configuration may work, the functionality it provides will
+be limited and the system operation may be unstable. Therefore it should not
+be used for operational work. It is strongly recommended to perform full
+installation procedure using node-installer utility.
+
+\section prereq Prerequisites
+
+BaltradDex depends on the following software packages:
+- <b>Java Development Kit (JDK)</b> - version 1.6.0_20 or later.
+- <b>Apache Tomcat</b> - version 6.0.26 or later. BaltradDex is implemented as
+Java Web Application. As such, it requires Apache Tomcat JSP and servlet
+container to run.
+- <b>Apache Ant build tool</b> - version 1.7.1 or later. Build, deployment 
+and other tasks are executed and controlled by Apache Ant build tool. 
+- <b>PostgreSQL database server</b> - version 8.4 or later. BaltradDex uses 
+PostgreSQL database server to store its configuration and runtime parameters.
+- <b>HDF Java</b> - HDF5 libraries for Java, version 2.7 or later. HDF Java 
+can be either build from sources or installed as precompiled binaries. 
+For detailed information and download go to:
+http://www.hdfgroup.org/hdf-java-html/ 
+
+\attention
+\n
+BaltradDex makes reference to libraries provided by baltrad-db and beast
+components. Make sure the above software packages are installed on your system 
+and that suitable libraries are available before installing BaltradDex.
+
+\section prep Preparation
+
+\subsection prep_db Create database 
+Before installing the software, you have to create a dedicated database and 
+user in the PostgreSQL server. It can be achieved using psql client 
+or pgAdmin administrative tool as well.
+
+With psql client, use the following commands:
+
+\code
+$ su - postgres
+$ psql
+> CREATE USER baltrad with PASSWORD 'baltrad';
+> CREATE DATABASE baltrad with OWNER baltrad;
+\endcode
+
+\subsection prep_tomcat Configure Tomcat
+
+\note
+Since version 1.7, BaltradDex uses secure communication protocol (HTTPS) for 
+encrypting sensitive data (e.g. passwords, user accounts and node settings).
+This solution requires opening 2 independent ports for handling standard and 
+secure communication between client (browser) and server (BALTRAD node).
+The following is a detailed instruction on how to configure your Apache 
+Tomcat servlet container to enable secure communication with SSL. Please 
+refer to <a href="http://tomcat.apache.org/tomcat-4.0-doc/ssl-howto.html">
+Apache Tomcat documentation</a> for more information about how to configure 
+SSL on Tomcat.
+\endnote
+
+\subsubsection prep_tomcat_keystore Prepare certificate keystore
+
+To create a new keystore from scratch, containing a single self-signed 
+Certificate, execute the following from a terminal command line:
+
+\code
+$ %JAVA_HOME%/bin/keytool -genkey -alias tomcat -keyalg RSA 
+		-keystore /path/to/my/keystore
+\endcode
+
+where \p JAVA_HOME points at your \p JDK installation.
+
+After executing this command, you will first be prompted for the keystore 
+password. The default password used by Tomcat is \p changeit (all lower case), 
+although you can specify a custom password if you like. 
+
+Next, you will be prompted for general information about this Certificate, 
+such as company, contact name, and so on. This information will be displayed 
+to users who attempt to access a secure page in your application, so make sure 
+that the information provided here matches what they will expect.
+
+Finally, you will be prompted for the key password, which is the password 
+specifically for this Certificate (as opposed to any other Certificates stored 
+in the same keystore file). You MUST use the same password here as was used for 
+the keystore password itself.
+
+\subsubsection prep_tomcat_connectors Configure connectors
+  
+Application context is configured in a way allowing to automatically switch
+between secure and standard communication protocols. Such configuration 
+requires to open 2 independent ports for connections between the browser and
+the server. In order to do this, edit server.xml configuration file located 
+in the following directory:
+
+\code
+%CATALINA_HOME%/conf/server.xml
+\endcode  
+
+where \p CATALINA_HOME represents the directory into which you installed Tomcat. 
+
+First, configure SSL connector that will handle secure, encrypted connections: 
+
+\code
+<Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"
+           maxThreads="200" scheme="https" secure="true"
+           clientAuth="false" sslProtocol="TLS" URIEncoding="UTF-8"
+	       keystoreFile="/path/to/my/keystore/keystore.jks" 
+	       keystorePass="s3cret" keystoreAlias="tomcat"/>
+\endcode
+
+The \p port attribute (default value is 8443) is the TCP/IP port number on which 
+Tomcat will listen for secure connections. You can change this to any port 
+number you wish. Assuming that you are upgrading your baltrad-node installation,
+you will probably prefer to use the same port number as you have been using for
+standard, non-secure communication up to now. Make sure that \p keystoreFile
+points at your certificate keystore created in the first step, and that
+\p keystorePass matches the password set for the keystore.  
+
+Next, configure the non-SSL connector that will handle standard (non-secure)
+connections. Please note that the \p redirectPort attribute must match the port 
+number configured in SSL connector. Also, make sure that different port numbers 
+are configured for standard and SSL connectors.
+ 
+\code
+<Connector port="8084" protocol="HTTP/1.1" connectionTimeout="20000"
+           redirectPort="8443" URIEncoding="UTF-8" />
+\endcode  
+
+\subsubsection prep_tomcat_admin_account Configure administrative account
+
+Once Tomcat servlet container is installed, remember to configure
+administrative account to be used at the deployment stage. Edit 
+\p tomcat-users.xml file located in \p TOMCAT_DIR/conf so it looks 
+like the following:
+
+\code
+<?xml version='1.0' encoding='utf-8'?>
+<tomcat-users>
+    <role rolename="tomcat"/>
+    <role rolename="manager"/>
+    <user password="tomcat" roles="tomcat" username="tomcat"/>
+    <user password="tomcat" roles="role1" username="role1"/>
+    <user password="s3cret" roles="manager,admin" username="manager"/>
+</tomcat-users>
+\endcode
+
+\note 
+At this step it is necessary to restart Tomcat servlet container for the 
+configuration changes to take effect.
+\endnote 
+
+\subsection prep_app_context Configure application context
+
+In order to complete security settings, it is necessary to edit application
+context definition file:
+
+\code
+web/WEB-INF/applicationContext.xml
+\endcode 
+
+There is port mapping section located at the top of the file inside 
+\p <security:http> tag. Enter port number for secure and standard connections 
+matching Tomcat connectors configured in the previous as follows:
+
+\code
+<security:http auto-config="true" access-denied-page="/login.htm"> 
+        <security:port-mappings>
+            <security:port-mapping http="8084" https="8443"/>
+        </security:port-mappings> 
+        ...
+</security:http>        
+\endcode
+
+\section build_dex Build & install BaltradDex 
+
+The first step of installation is creating necessary database schema. 
+This is achieved by executing the following build script task:
+
+\code
+$ cd BaltradDex
+$ ant create-full-schema
+\endcode
+
+Next step is preparing a keystore to be used with application. The keystore
+is used to authenticate requests during node-to-node communication. In order 
+to do this, edit some properties in \p etc/dex.properties file:
+
+- \p node.name - the name of your BALTRAD node, e.g. test.baltrad.eu
+- \p keystore.directory - the directory where keystore will be created
+
+Next, call the following build script task:
+
+\code
+$ cd BaltradDex
+$ ant init-keystore
+\endcode
+
+To build and deploy BaltradDex application on Tomcat server:
+
+\code
+$ cd BaltradDex
+$ ant deploy
+\endcode
+
+\attention
+\n
+At this stage it may be necessary to modify appserver.properties file located in
+BaltradDex/etc folder. Note that user's name and password for Tomcat user have
+to match your setup in tomcat-users.xml.
+
+\section test_dex Testing
+
+To run unit tests, execute the following ant task:
+
+\code
+$ cd BaltradDex
+$ ant test
+\endcode
+
+To run integration tests, execute the following ant task:
+
+\code
+$ cd BaltradDex
+$ ant execute-itest
+\endcode
+
+\attention
+\n
+Integration tests require that baltrad-db and beast software packages are 
+installed in your system.
+
+*/

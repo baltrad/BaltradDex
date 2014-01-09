@@ -1,0 +1,28 @@
+/** \page trouble Trouble
+\date January 7, 2014
+\version 2.0
+
+\page trouble Troubleshooting
+
+\ref main_index
+
+This section will be gradually updated, as the list of known problems is build
+based on users' feedback.
+
+\par
+<b>Q:</b> Can't sing in to application locally with a given user name and password.
+\par
+<b>A:</b> Make sure that user credentials are valid. In case user account is correct,
+verify that PostgreSQL server process is running on the node: 
+\code
+ps -ef |grep postgres
+\endcode
+In case PostgreSQL is not present, run server control script in order to launch 
+the process.
+\code
+/opt/PostgreSQL/9.1/scripts/serverctl.sh start
+\endcode 
+Note that PostgreSQL executables might be located elswhere depending on the type
+of installation.
+
+*/

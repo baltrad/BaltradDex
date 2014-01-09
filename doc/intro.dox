@@ -1,0 +1,51 @@
+/** \page intro Introduction
+\date January 7, 2014
+\version 2.0
+
+\page intro Introduction
+
+\ref main_index
+
+\li \ref about
+\li \ref structure
+\li \ref gendocs
+
+\section about About
+
+\par
+BaltradDex is a part of the BALTRAD project, allowing to establish connections 
+between BALTRAD nodes, access and subscribe data sources available on a given 
+node as well as to receive and send radar data. BaltradDex also provides 
+a web interface allowing for integrated access to other system components.    
+
+\section structure Project structure
+\par
+Project directory tree consists of the following:
+
+- \b doc contains project documentation
+- \b doxygen contains Doxygen configuration file
+- \b etc contains configuration files
+- \b extralib contains additional libraries
+- \b itest contains integration tests
+- \b lib contains libraries  
+- \b script contains executable shell scripts and python scripts
+- \b src contains source code files
+- \b test contains tests
+- \b tools contains additional executables
+- \b web contains web interface files
+
+\section gendocs Generating documentation
+
+In order to generate documentation, call the following ant task from 
+build.xml script:
+
+\code
+$ cd BaltradDex
+$ ant doc
+\endcode
+
+Documentation will be stored in dox/build directory. This manual will be 
+available under \p doxygen directory, whereas javadoc source code documentation 
+will be available in \p javadoc folder. 
+
+*/
