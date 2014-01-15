@@ -91,6 +91,8 @@ public class ShowRoutesController {
       return "redirect:route_create_google_map.htm";
     } else if (operation != null && operation.equals("ACRR")) {
       return "redirect:route_create_acrr.htm";
+    } else if (operation != null && operation.equals("Gra")) {
+      return "redirect:route_create_gra.htm";
     } else if (operation != null && operation.equals("WRWP")) {
       return "redirect:route_create_wrwp.htm";
     }
@@ -122,6 +124,8 @@ public class ShowRoutesController {
         result = "redirect:route_show_google_map.htm";
       } else if (type.equals("blt_acrr")) {
         result = "redirect:route_show_acrr.htm";
+      } else if (type.equals("blt_gra")) {
+        result = "redirect:route_show_gra.htm";
       } else if (type.equals("blt_wrwp")) {
         result = "redirect:route_show_wrwp.htm";
       }
