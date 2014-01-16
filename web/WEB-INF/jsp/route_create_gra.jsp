@@ -34,11 +34,10 @@ Creates a gra coefficient route
                      Create GRA routing rule. <br/>
                      <b>This rule is triggered by the scheduler</b> and will determine the files to include in the accumulation as follows: <br/>
                      files per hour gives the interval, e.g. files per hour = 4, gives a 15 minute interval (00,15,30,45).<br/>
-                     First term UTC and interval is used to define how the day is ordered. First Term UTC defines the start of the day and interval defines
-                     how many hours there are in each period. For example, if first term utc = 6 and interval = 12, then the day is divided into two periods,
+                     First term UTC is the offset in hours to the first observation term. This is the time when the term ends. Interval defines
+                     how many hours there are in each term. For example, if first term utc = 6 and interval = 12, then the day is divided into two periods,
                      one between 0600 to 1759 and the other between 1800 and 0559.
-                     When this rule is triggered by the scheduler, the nominal time will be the closest interval time in the present. 
-                     hours specifies how many hours back in time to use.<br/>
+                     When this rule is triggered by the scheduler, the nominal time will be the closest interval time in the present. <br/>
                      The accumulation will either be performed on a COMP or IMAGE product and a quantity, most likely DBZH or TH even
                      if you can specify any quantity.<br/>
                      You might have to specify a distance field depending on how the GRA algorithm has been implemented by the PGF.                     
@@ -105,13 +104,6 @@ Creates a gra coefficient route
                             </div>
                         </div>
                         <div class="row2">
-                            <div class="leftcol">Hours:</div>
-                            <div class="rightcol">
-                                <input type="text" name="hours" value="${hours}"
-                                       title="The number of hours that should be accumulated over."/>
-                            </div>
-                        </div>
-                        <div class="row2">
                             <div class="leftcol">Files per hour:</div>
                             <div class="rightcol">
                                 <input type="text" name="filesPerHour" value="${filesPerHour}"
@@ -150,14 +142,14 @@ Creates a gra coefficient route
                             <div class="leftcol">First Term UTC:</div>
                             <div class="rightcol">
                                 <input type="text" name="firstTermUTC" value="${firstTermUTC}"
-                                       title="The first hour of the grouping of the day."/>
+                                       title="The offset in hours to the first observation term. This is the time when the term ends."/>
                             </div>
                         </div>      
                         <div class="row2">
                             <div class="leftcol">Interval:</div>
                             <div class="rightcol">
                                 <input type="text" name="interval" value="${interval}"
-                                       title="The number of hours for each period of the day."/>
+                                       title="The number of hours of each term."/>
                             </div>
                         </div>      
                                           

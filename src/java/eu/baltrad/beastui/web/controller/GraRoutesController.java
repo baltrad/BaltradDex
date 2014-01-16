@@ -91,7 +91,6 @@ public class GraRoutesController {
     @RequestParam(value = "area", required = false) String area,
     @RequestParam(value = "object_type", required = false) String object_type,
     @RequestParam(value = "quantity", required = false) String quantity,
-    @RequestParam(value = "hours", required = false) Integer hours,
     @RequestParam(value = "filesPerHour", required = false) Integer filesPerHour,
     @RequestParam(value = "acceptableLoss", required = false) Integer acceptableLoss,
     @RequestParam(value = "distanceField", required = false) String distanceField,
@@ -116,10 +115,10 @@ public class GraRoutesController {
     
     if (name == null && author == null && active == null && description == null &&
         recipients == null && area == null && object_type == null && quantity == null &&
-        hours == null && filesPerHour == null && acceptableLoss == null && distanceField == null &&
+        filesPerHour == null && acceptableLoss == null && distanceField == null &&
         zrA == null && zrB == null && firstTermUTC == null && interval == null) {
       return viewCreateRoute(model, name, author, active, description,
-          recipients, area, object_type, quantity, hours, filesPerHour, acceptableLoss,
+          recipients, area, object_type, quantity, filesPerHour, acceptableLoss,
           distanceField, zrA, zrB, firstTermUTC, interval, null);
     }
     
@@ -132,14 +131,13 @@ public class GraRoutesController {
     if (emessage == null) {
       try {
         boolean bactive = (active == null) ? false : active.booleanValue();
-        int ihours = (hours == null) ? 24 : hours.intValue();
         int ifilesPerHour = (filesPerHour == null) ? 4 : filesPerHour.intValue();
         int iacceptableLoss = (acceptableLoss == null) ? 0 : acceptableLoss.intValue();
         double dzra = (zrA == null) ? 200.0 : zrA.doubleValue();
         double dzrb = (zrB == null) ? 1.6 : zrB.doubleValue();
         int iftu = (firstTermUTC == null) ? 6 : firstTermUTC.intValue();
         int iinterval = (interval == null) ? 12 : interval.intValue();
-        GraRule rule = createRule(area, object_type, quantity, ihours, ifilesPerHour, iacceptableLoss, distanceField, dzra, dzrb, iftu, iinterval);
+        GraRule rule = createRule(area, object_type, quantity, ifilesPerHour, iacceptableLoss, distanceField, dzra, dzrb, iftu, iinterval);
         RouteDefinition def = manager.create(name, author, bactive, description, recipients, rule);
         manager.storeDefinition(def);
         return "redirect:routes.htm";
@@ -150,7 +148,7 @@ public class GraRoutesController {
     }
     
     return viewCreateRoute(model, name, author, active, description,
-        recipients, area, object_type, quantity, hours, filesPerHour, acceptableLoss,
+        recipients, area, object_type, quantity, filesPerHour, acceptableLoss,
         distanceField, zrA, zrB, firstTermUTC, interval, emessage);
   }
   
@@ -168,7 +166,6 @@ public class GraRoutesController {
       @RequestParam(value = "area", required = false) String area,
       @RequestParam(value = "object_type", required = false) String object_type,
       @RequestParam(value = "quantity", required = false) String quantity,
-      @RequestParam(value = "hours", required = false) Integer hours,
       @RequestParam(value = "filesPerHour", required = false) Integer filesPerHour,
       @RequestParam(value = "acceptableLoss", required = false) Integer acceptableLoss,
       @RequestParam(value = "distanceField", required = false) String distanceField,
@@ -186,7 +183,7 @@ public class GraRoutesController {
     
     if (operation != null && operation.equals("Save")) {
       //
-      return modifyRoute(model, name, author, active, description, recipients, area, object_type, quantity, hours, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval);
+      return modifyRoute(model, name, author, active, description, recipients, area, object_type, quantity, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -199,7 +196,7 @@ public class GraRoutesController {
         GraRule vrule = (GraRule)def.getRule();
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             def.getRecipients(), vrule.getArea(), vrule.getObjectType(), vrule.getQuantity(),
-            vrule.getHours(), vrule.getFilesPerHour(), vrule.getAcceptableLoss(),
+            vrule.getFilesPerHour(), vrule.getAcceptableLoss(),
             vrule.getDistancefield(), vrule.getZrA(), vrule.getZrB(), vrule.getFirstTermUTC(), vrule.getInterval(), null); 
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is an gra rule");
@@ -220,7 +217,6 @@ public class GraRoutesController {
       String area,
       String object_type,
       String quantity,
-      Integer hours,
       Integer filesPerHour,
       Integer acceptableLoss,
       String distanceField,
@@ -237,7 +233,7 @@ public class GraRoutesController {
     } 
     if (emessage == null) {
       try {
-        GraRule rule = createRule(area, object_type, quantity, hours, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval);
+        GraRule rule = createRule(area, object_type, quantity, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval);
         RouteDefinition def = manager.create(name, author, isactive, description, newrecipients, rule);
         manager.updateDefinition(def);
         return "redirect:routes.htm";
@@ -248,7 +244,7 @@ public class GraRoutesController {
     }
     return viewShowRoute(model, name, author, isactive, description,
         newrecipients, area, object_type, quantity,
-        hours, filesPerHour, acceptableLoss,
+        filesPerHour, acceptableLoss,
         distanceField, zrA, zrB, firstTermUTC, interval, emessage); 
   }
   
@@ -264,7 +260,6 @@ public class GraRoutesController {
       String area, 
       String object_type, 
       String quantity, 
-      Integer hours, 
       Integer filesPerHour, 
       Integer acceptableLoss,
       String distanceField, 
@@ -274,7 +269,7 @@ public class GraRoutesController {
       Integer interval,
       String emessage) {
     return viewRoute(model, name, author, active, description,
-        recipients, area, object_type, quantity, hours, filesPerHour,
+        recipients, area, object_type, quantity, filesPerHour,
         acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, emessage, "route_create_gra");
   }
 
@@ -290,7 +285,6 @@ public class GraRoutesController {
       String area, 
       String object_type, 
       String quantity, 
-      Integer hours, 
       Integer filesPerHour, 
       Integer acceptableLoss,
       String distanceField, 
@@ -300,7 +294,7 @@ public class GraRoutesController {
       Integer interval,
       String emessage) {
     return viewRoute(model, name, author, active, description,
-        recipients, area, object_type, quantity, hours, filesPerHour,
+        recipients, area, object_type, quantity, filesPerHour,
         acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, emessage, "route_show_gra");
   }
   
@@ -316,7 +310,6 @@ public class GraRoutesController {
       String area, 
       String object_type, 
       String quantity, 
-      Integer hours, 
       Integer filesPerHour, 
       Integer acceptableLoss,
       String distanceField, 
@@ -342,7 +335,6 @@ public class GraRoutesController {
     model.addAttribute("area", (area == null)? "" : area);
     model.addAttribute("object_type", (object_type == null)? "IMAGE" : object_type);
     model.addAttribute("quantity", (quantity == null) ? "DBZH" : quantity);
-    model.addAttribute("hours", (hours == null) ? 24 : hours);
     model.addAttribute("filesPerHour", (filesPerHour == null) ? 4 : filesPerHour);
     model.addAttribute("acceptableLoss", (acceptableLoss == null) ? 0 : acceptableLoss);
     model.addAttribute("distanceField", (distanceField == null) ? "eu.baltrad.composite.quality.distance.radar" : distanceField);
@@ -381,7 +373,6 @@ public class GraRoutesController {
       String area, 
       String object_type, 
       String quantity, 
-      int hours, 
       int filesPerHour, 
       int acceptableLoss, 
       String distanceField, 
@@ -393,7 +384,6 @@ public class GraRoutesController {
     rule.setArea(area);
     rule.setObjectType(object_type);
     rule.setQuantity(quantity);
-    rule.setHours(hours);
     rule.setFilesPerHour(filesPerHour);
     rule.setAcceptableLoss(acceptableLoss);
     rule.setDistancefield(distanceField);
