@@ -63,6 +63,7 @@ import org.keyczar.exceptions.KeyczarException;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServlet;
@@ -120,6 +121,8 @@ public class PostFileServlet extends HttpServlet {
     
     protected User localNode;
     
+    private static Logger logger = LogManager.getLogger(PostFileServlet.class); 
+    
     /**
      * Default constructor.
      */
@@ -161,7 +164,7 @@ public class PostFileServlet extends HttpServlet {
                 is.close();
             }   
         } catch (IOException e) {
-          log.error("Caught exception when storing file", e);
+          logger.error("Caught exception when storing file", e);
           return null;
         }
     }
@@ -185,7 +188,8 @@ public class PostFileServlet extends HttpServlet {
                 baos.close();
             }
         } catch (IOException e) {
-            return null;
+          logger.error("Caught exception when getting entry content", e);
+          return null;
         }
     }
     
@@ -255,6 +259,7 @@ public class PostFileServlet extends HttpServlet {
                     log.error(messages.getMessage(
                             PF_INVALID_SUBSCRIPTION_ERROR_KEY,
                             new String[] {e.getMessage()}));
+                    logger.debug("Failed to send message to subscriber", e);
                 } 
             }
         }
@@ -319,7 +324,7 @@ public class PostFileServlet extends HttpServlet {
                         }
                     }   
                 } else {
-                  log.info("Could not store file for some reason");
+                  logger.info("Could not store file for some reason");
                   res.setStatus(HttpServletResponse.SC_NOT_FOUND, 
                   messages.getMessage(PF_GENERIC_POST_FILE_ERROR_KEY));
                 }
@@ -330,19 +335,19 @@ public class PostFileServlet extends HttpServlet {
         } catch (KeyczarException e) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
                     messages.getMessage(PF_MESSAGE_VERIFIER_ERROR_KEY));  
-            log.info("Caught signature exception", e);
+            logger.info("Caught signature exception", e);
         } catch (DuplicateEntry e) {
             res.setStatus(HttpServletResponse.SC_CONFLICT,
                     messages.getMessage(PF_DUPLICATE_ENTRY_ERROR_KEY));
-            log.info("Duplicate entry for file from " + req.getNodeName());
+            logger.info("Duplicate entry for file from " + req.getNodeName());
         } catch (DatabaseError e) {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(PF_DATABASE_ERROR_KEY));
-            log.error("Database error", e);
+            logger.error("Database error", e);
         } catch (Exception e) {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(PF_INTERNAL_SERVER_ERROR_KEY));
-            log.error("Internal server error", e);
+            logger.error("Internal server error", e);
         }
     }
     
