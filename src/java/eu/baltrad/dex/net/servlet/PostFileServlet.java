@@ -161,7 +161,8 @@ public class PostFileServlet extends HttpServlet {
                 is.close();
             }   
         } catch (IOException e) {
-            return null;
+          log.error("Caught exception when storing file", e);
+          return null;
         }
     }
     
@@ -318,8 +319,9 @@ public class PostFileServlet extends HttpServlet {
                         }
                     }   
                 } else {
-                    res.setStatus(HttpServletResponse.SC_NOT_FOUND, 
-                    messages.getMessage(PF_GENERIC_POST_FILE_ERROR_KEY));
+                  log.info("Could not store file for some reason");
+                  res.setStatus(HttpServletResponse.SC_NOT_FOUND, 
+                  messages.getMessage(PF_GENERIC_POST_FILE_ERROR_KEY));
                 }
             } else {
                 res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
@@ -327,16 +329,20 @@ public class PostFileServlet extends HttpServlet {
             }
         } catch (KeyczarException e) {
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
-                    messages.getMessage(PF_MESSAGE_VERIFIER_ERROR_KEY));    
+                    messages.getMessage(PF_MESSAGE_VERIFIER_ERROR_KEY));  
+            log.info("Caught signature exception", e);
         } catch (DuplicateEntry e) {
             res.setStatus(HttpServletResponse.SC_CONFLICT,
                     messages.getMessage(PF_DUPLICATE_ENTRY_ERROR_KEY));
+            log.info("Duplicate entry for file from " + req.getNodeName());
         } catch (DatabaseError e) {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(PF_DATABASE_ERROR_KEY));
+            log.error("Database error", e);
         } catch (Exception e) {
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     messages.getMessage(PF_INTERNAL_SERVER_ERROR_KEY));
+            log.error("Internal server error", e);
         }
     }
     
