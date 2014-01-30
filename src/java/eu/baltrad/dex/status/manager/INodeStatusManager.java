@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2014 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -19,42 +19,36 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.net.model.impl;
+package eu.baltrad.dex.status.manager;
+
+import eu.baltrad.dex.status.model.Status;
+import java.util.List;
+import org.springframework.dao.DataAccessException;
 
 /**
- * Implements data download object.
+ * Node status manager interface.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.6.1
- * @since 1.6.1
+ * @version 1.0
+ * @since 1.0
  */
-public class Download extends Transfer {
+public interface INodeStatusManager {
     
-    private long filesReceived;
+    public List<String> loadNodeNames() throws DataAccessException;
     
-    /**
-     * Constructor.
-     * @param dataSource Data source name
-     * @param timeStamp Timestamp 
-     * @param active Download status
-     * @param filesReceived Number of files received
-     */
-    public Download(String dataSource, long timeStamp, boolean active) {
-        super(dataSource, timeStamp, active);
-    }
+    public Status load(int subscriptionId) throws DataAccessException;
     
-    /**
-     * @return the filesReceived
-     */
-    public long getFilesReceived() {
-        return filesReceived;
-    }
-
-    /**
-     * @param filesReceived the filesReceived to set
-     */
-    public void setFilesReceived(long filesReceived) {
-        this.filesReceived = filesReceived;
-    }
+    public List<Status> load(String peerName, String subscriptionType) 
+            throws DataAccessException;
+    
+    public int store(Status status) throws DataAccessException;
+    
+    public int store(int statusId, int subscriptionId) 
+            throws DataAccessException;
+    
+    public int update(Status status, int subscriptionId) 
+            throws DataAccessException;
+    
+    public int delete(int subscriptionId) throws DataAccessException;
     
 }

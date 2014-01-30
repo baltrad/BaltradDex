@@ -30,6 +30,8 @@ import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.User;
 
@@ -88,6 +90,7 @@ public class UpdateSubscriptionServlet extends HttpServlet {
     private Authenticator authenticator;
     private IJsonUtil jsonUtil;
     private ISubscriptionManager subscriptionManager;
+    private INodeStatusManager nodeStatusManager;
     private MessageResourceUtil messages;
     private Logger log;
     
@@ -185,6 +188,8 @@ public class UpdateSubscriptionServlet extends HttpServlet {
                         current.setSyncronized(true);
                         subscriptionManager.delete(current.getId());
                         subscriptions.add(current);
+                        // delete status
+                        nodeStatusManager.delete(current.getId());
                         log.warn(messages.getMessage(
                             GS_SUBSCRIPTION_CANCEL_SUCCESS_KEY, messageArgs));
                     }
@@ -194,10 +199,14 @@ public class UpdateSubscriptionServlet extends HttpServlet {
                                 Subscription.PEER, req.getNodeName(), 
                                 requested.getDataSource(), requested.isActive(), 
                                 true);
+                        int subscriptionId = subscriptionManager.store(current);
+                        subscriptions.add(current);
+                        // save status
+                        int statusId = nodeStatusManager
+                                .store(new Status(0, 0, 0));
+                        nodeStatusManager.store(statusId, subscriptionId);
                         String[] messageArgs = {current.getUser(), 
                             current.getDataSource()};
-                        subscriptionManager.store(current);
-                        subscriptions.add(current);
                         log.warn(messages.getMessage(
                             GS_SUBSCRIPTION_START_SUCCESS_KEY, messageArgs));
                     }
@@ -299,6 +308,14 @@ public class UpdateSubscriptionServlet extends HttpServlet {
     public void setSubscriptionManager(ISubscriptionManager subscriptionManager) 
     {
         this.subscriptionManager = subscriptionManager;
+    }
+    
+    /**
+     * @param nodeStatusManager the nodeStatusManager to set
+     */
+    @Autowired
+    public void setNodeStatusManager(INodeStatusManager nodeStatusManager) {
+        this.nodeStatusManager = nodeStatusManager;
     }
     
     /**

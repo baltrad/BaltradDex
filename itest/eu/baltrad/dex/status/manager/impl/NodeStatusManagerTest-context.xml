@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+               
+  <!-- Property placeholder configurer for expanding ${} into values -->
+  <bean id="propertyConfigurer" 
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>testdb.properties</value>
+      </list>
+    </property>
+  </bean>
+  
+  <bean id="dataSource" destroy-method="close" 
+        class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="${itest.bdb.driver}"/>
+    <property name="url" value="${itest.bdb.uri}"/>
+    <property name="username" value="${itest.bdb.user}"/>
+    <property name="password" value="${itest.bdb.pwd}"/>
+  </bean>
+  
+  <bean id="jdbcTemplate" 
+        class="org.springframework.jdbc.core.simple.SimpleJdbcTemplate">
+    <constructor-arg ref="dataSource"/>
+  </bean>
+  
+  <bean id="helper" class="eu.baltrad.dex.db.itest.DexDBITestHelper" 
+        autowire="byType" />
+        
+  <bean id="factory" class="org.dbunit.ext.postgresql.PostgresqlDataTypeFactory"/>      
+  
+</beans>

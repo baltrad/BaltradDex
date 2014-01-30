@@ -46,6 +46,8 @@ DROP TABLE IF EXISTS dex_data_source_product_parameter_values;
 DROP TABLE IF EXISTS dex_data_source_radars;
 DROP TABLE IF EXISTS dex_data_source_users;
 DROP TABLE IF EXISTS dex_data_source_filters;
+DROP TABLE IF EXISTS dex_status CASCADE;
+DROP TABLE IF EXISTS dex_status_subscriptions;
 
 DROP FUNCTION IF EXISTS dex_trim_messages_by_number() CASCADE;
 DROP FUNCTION IF EXISTS dex_trim_messages_by_age() CASCADE;
@@ -252,6 +254,21 @@ CREATE TABLE dex_data_source_filters
     id SERIAL NOT NULL PRIMARY KEY,
     data_source_id INT NOT NULL REFERENCES dex_data_sources(id) ON DELETE CASCADE,
     filter_id INT NOT NULL
+);
+
+CREATE TABLE dex_status
+(
+    id SERIAL NOT NULL PRIMARY KEY,
+    downloads BIGINT DEFAULT 0,
+    uploads BIGINT DEFAULT 0,
+    upload_failures BIGINT DEFAULT 0
+);
+
+CREATE TABLE dex_status_subscriptions
+(
+    id SERIAL NOT NULL PRIMARY KEY,
+    status_id INT NOT NULL REFERENCES dex_status(id) ON DELETE CASCADE,
+    subscription_id INT NOT NULL REFERENCES dex_subscriptions(id) ON DELETE CASCADE
 );
 
 CREATE OR REPLACE FUNCTION make_plpgsql()

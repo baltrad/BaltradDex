@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2014 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -45,12 +45,6 @@ public interface IRegistryManager {
             "dex_trim_registry_by_age_tg";
     
     public long count(String type);
-    
-    public long countDownloads(int dataSourceId);
-    
-    public long countSuccessfulUploads(int dataSourceId, int userId);
-    
-    public long countFailedUploads(int dataSourceId, int userId);
     
     public List<RegistryEntry> load(String type, int offset, int limit);
     

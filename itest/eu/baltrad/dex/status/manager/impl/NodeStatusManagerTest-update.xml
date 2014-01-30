@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+    
+    <dex_status downloads="4123412" uploads="0" upload_failures="0"/>
+    <dex_status downloads="8790935" uploads="0" upload_failures="0"/>
+    <dex_status downloads="53453246" uploads="1" upload_failures="1"/>
+    <dex_status downloads="2345234" uploads="0" upload_failures="0"/>
+    <dex_status downloads="0" uploads="543532455" upload_failures="45"/>
+    <dex_status downloads="0" uploads="45634453" upload_failures="55"/>
+    <dex_status downloads="1" uploads="7868770" upload_failures="124"/>
+    <dex_status downloads="0" uploads="987989879" upload_failures="987"/>
+    <dex_status downloads="0" uploads="87687687" upload_failures="632"/>
+            
+    <dex_status_subscriptions status_id="1" subscription_id="1"/>
+    <dex_status_subscriptions status_id="2" subscription_id="2"/> 
+    <dex_status_subscriptions status_id="3" subscription_id="3"/> 
+    <dex_status_subscriptions status_id="4" subscription_id="4"/> 
+    <dex_status_subscriptions status_id="5" subscription_id="5"/> 
+    <dex_status_subscriptions status_id="6" subscription_id="6"/> 
+    <dex_status_subscriptions status_id="7" subscription_id="7"/> 
+    <dex_status_subscriptions status_id="8" subscription_id="8"/> 
+    <dex_status_subscriptions status_id="9" subscription_id="9"/>  
+    
+</dataset>

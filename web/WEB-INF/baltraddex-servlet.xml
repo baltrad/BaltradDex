@@ -77,9 +77,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     
     <!-- Node status controller -->
     <bean id="nodeStatusController" 
-          class="eu.baltrad.dex.auth.controller.NodeStatusController"
+          class="eu.baltrad.dex.status.controller.NodeStatusController"
           autowire="byType"/>       
 
+    <!-- Node status manager -->
+    <bean id="nodeStatusManager" 
+          class="eu.baltrad.dex.status.manager.impl.NodeStatusManager"
+          autowire="byType"/>   
+    
     <!-- Data source file listing controller -->
     <bean id="dataSourceController"
           class="eu.baltrad.dex.datasource.controller.DataSourceFilesController"

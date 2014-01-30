@@ -26,11 +26,7 @@ import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.net.model.impl.Download;
-import eu.baltrad.dex.net.model.impl.Upload;
 import eu.baltrad.dex.net.model.mapper.SubscriptionMapper;
-import eu.baltrad.dex.net.model.mapper.DownloadMapper;
-import eu.baltrad.dex.net.model.mapper.UploadMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
@@ -62,18 +58,14 @@ public class SubscriptionManager implements ISubscriptionManager {
     private IUserManager accountManager;
     private IDataSourceManager dataSourceManager;
     
-    /** Row mappers */
-    private SubscriptionMapper subscriptionMapper;
-    private DownloadMapper downloadMapper;
-    private UploadMapper uploadMapper;
+    /** Row mapper */
+    private SubscriptionMapper mapper;
 
     /**
      * Constructor.
      */
     public SubscriptionManager() {
-        this.subscriptionMapper = new SubscriptionMapper();
-        this.downloadMapper = new DownloadMapper();
-        this.uploadMapper = new UploadMapper();
+        this.mapper = new SubscriptionMapper();
     }
     
     /**
@@ -124,7 +116,7 @@ public class SubscriptionManager implements ISubscriptionManager {
             "sds.subscription_id = s.id AND sds.data_source_id = " + 
             "ds.id AND s.id = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, subscriptionMapper, id);
+            return jdbcTemplate.queryForObject(sql, mapper, id);
         } catch (DataAccessException e) {
             return null;
         }
@@ -143,7 +135,7 @@ public class SubscriptionManager implements ISubscriptionManager {
             "sds.subscription_id = s.id AND sds.data_source_id = " + 
             "ds.id AND s.type = ?";
         try {
-            return jdbcTemplate.query(sql, subscriptionMapper, type);
+            return jdbcTemplate.query(sql, mapper, type);
         } catch (DataAccessException e) {
             return null;
         }
@@ -163,7 +155,7 @@ public class SubscriptionManager implements ISubscriptionManager {
             "sds.subscription_id = s.id AND sds.data_source_id = " + 
             "ds.id AND s.type = ? AND u.name = ?";
         try {
-            return jdbcTemplate.query(sql, subscriptionMapper, type, operator);
+            return jdbcTemplate.query(sql, mapper, type, operator);
         } catch (DataAccessException e) {
             return null;
         }
@@ -184,80 +176,8 @@ public class SubscriptionManager implements ISubscriptionManager {
             "sds.subscription_id = s.id AND sds.data_source_id = ds.id AND " +
             "s.type = ? AND u.name = ? AND ds.name = ?;";
         try {
-            return jdbcTemplate.queryForObject(sql, subscriptionMapper, type, 
+            return jdbcTemplate.queryForObject(sql, mapper, type, 
                     user, dataSource);
-        } catch (DataAccessException e) {
-            return null;
-        }
-    }
-    
-    /**
-     * Count downloads.
-     * @param userId User id
-     * @return Number of downloads for a given user
-     */
-    public int countDownloads(int userId) {
-        String sql = "SELECT count(*) FROM dex_subscriptions s, " + 
-            "dex_data_sources ds, dex_users u, dex_subscriptions_users su, " + 
-            "dex_subscriptions_data_sources sds, dex_data_source_users dsu " +
-            "WHERE su.subscription_id = s.id AND su.user_id = u.id AND " + 
-            "sds.subscription_id = s.id AND sds.data_source_id = ds.id AND " + 
-            "dsu.data_source_id = ds.id AND s.type = 'local' AND " + 
-            "ds.type = 'peer' AND dsu.user_id = ?;";
-        return jdbcTemplate.queryForInt(sql, userId);
-    }
-    
-    /**
-     * Count uploads.
-     * @param userId User id
-     * @return Number of uploads for a given user
-     */
-    public int countUploads(int userId) {
-        String sql = "SELECT count(*) FROM dex_subscriptions s, " + 
-            "dex_data_sources ds, dex_users u, dex_subscriptions_users su, " +
-            "dex_subscriptions_data_sources sds WHERE " + 
-            "su.subscription_id = s.id AND su.user_id = u.id AND " + 
-            "sds.subscription_id = s.id AND sds.data_source_id = ds.id AND " + 
-            "s.type = 'peer' AND ds.type = 'local' AND u.id = ?;";
-        return jdbcTemplate.queryForInt(sql, userId);
-    }
-    
-    /**
-     * Load downloads.
-     * @param userId User id
-     * @return List of current downloads
-     */
-    public List<Download> loadDownloads(int userId) {
-        String sql = "SELECT ds.name AS data_source, s.time_stamp AS " +
-            "start, s.active AS status, s.id FROM dex_subscriptions s, " + 
-            "dex_data_sources ds, dex_users u, dex_subscriptions_users su, " + 
-            "dex_subscriptions_data_sources sds, dex_data_source_users dsu " +
-            "WHERE su.subscription_id = s.id AND su.user_id = u.id AND " + 
-            "sds.subscription_id = s.id AND sds.data_source_id = ds.id AND " + 
-            "dsu.data_source_id = ds.id AND s.type = 'local' AND " + 
-            "ds.type = 'peer' AND dsu.user_id = ?;";
-        try {
-            return jdbcTemplate.query(sql, downloadMapper, userId);
-        } catch (DataAccessException e) {
-            return null;
-        }
-    } 
-    
-    /**
-     * Load uploads.
-     * @param userId User id
-     * @return List of current uploads
-     */
-    public List<Upload> loadUploads(int userId) {
-        String sql = "SELECT ds.name AS data_source, s.time_stamp AS " +
-            "start, s.active AS status, s.id FROM dex_subscriptions s, " + 
-            "dex_data_sources ds, dex_users u, dex_subscriptions_users su, " +
-            "dex_subscriptions_data_sources sds WHERE " + 
-            "su.subscription_id = s.id AND su.user_id = u.id AND " + 
-            "sds.subscription_id = s.id AND sds.data_source_id = ds.id AND " + 
-            "s.type = 'peer' AND ds.type = 'local' AND u.id = ?;";
-        try {
-            return jdbcTemplate.query(sql, uploadMapper, userId);
         } catch (DataAccessException e) {
             return null;
         }

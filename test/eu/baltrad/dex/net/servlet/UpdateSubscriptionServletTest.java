@@ -22,37 +22,31 @@
 package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.util.json.IJsonUtil;
-import eu.baltrad.dex.net.util.json.impl.JsonUtil;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.net.util.json.IJsonUtil;
+import eu.baltrad.dex.net.util.json.impl.JsonUtil;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
-
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
-
-import org.easymock.EasyMock;
-import static org.easymock.EasyMock.*;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
-
-import org.keyczar.exceptions.KeyczarException;
-
-import javax.servlet.http.HttpServletResponse;
-
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
-
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.easymock.EasyMock;
+import static org.easymock.EasyMock.*;
+import org.junit.After;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.keyczar.exceptions.KeyczarException;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 
 /**
  * Post subscription servlet test.
@@ -80,6 +74,7 @@ public class UpdateSubscriptionServletTest {
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
     private ISubscriptionManager subscriptionManagerMock;
+    private INodeStatusManager nodeStatusManagerMock;
     private DateFormat format;
     
     class GSServlet extends UpdateSubscriptionServlet {
@@ -130,6 +125,8 @@ public class UpdateSubscriptionServletTest {
         format = new SimpleDateFormat(DATE_FORMAT);
         subscriptionManagerMock = (ISubscriptionManager)
                 createMock(ISubscriptionManager.class);
+        nodeStatusManagerMock = (INodeStatusManager)
+                createMock(INodeStatusManager.class);
         setAttributes(request);
     }
     
@@ -254,7 +251,6 @@ public class UpdateSubscriptionServletTest {
                 createMock(Authenticator.class);
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-        
         expect(subscriptionManagerMock.load(isA(String.class), 
                 isA(String.class), 
                 isA(String.class))).andReturn(null).anyTimes();
@@ -262,11 +258,16 @@ public class UpdateSubscriptionServletTest {
                 .andReturn(Integer.SIZE).times(2);
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
                 .andThrow(new Exception());
+        expect(nodeStatusManagerMock.store(isA(Status.class)))
+                .andReturn(Integer.SIZE).times(2);
+        expect(nodeStatusManagerMock.store(Integer.SIZE, Integer.SIZE))
+                .andReturn(Integer.SIZE).times(2);
         
         replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         request.setContent(JSON_SUBSCRIPTIONS.getBytes());
         classUnderTest.handleRequest(request, response);
         
@@ -292,11 +293,16 @@ public class UpdateSubscriptionServletTest {
                 isA(String.class))).andReturn(null).anyTimes();
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
                 .andReturn(Integer.SIZE).times(3);
+        expect(nodeStatusManagerMock.store(isA(Status.class)))
+                .andReturn(Integer.SIZE).times(3);
+        expect(nodeStatusManagerMock.store(Integer.SIZE, Integer.SIZE))
+                .andReturn(Integer.SIZE).times(3);
         
         replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         request.setContent(JSON_SUBSCRIPTIONS.getBytes());
         classUnderTest.handleRequest(request, response);
         

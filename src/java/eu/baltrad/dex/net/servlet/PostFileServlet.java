@@ -51,6 +51,9 @@ import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
+import eu.baltrad.dex.keystore.model.Key;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 
 import java.io.ByteArrayOutputStream;
 
@@ -101,6 +104,7 @@ public class PostFileServlet extends HttpServlet {
     
     private IConfigurationManager confManager;
     private IKeystoreManager keystoreManager;
+    private INodeStatusManager nodeStatusManager;
     private Authenticator authenticator;
     private FileCatalog catalog;
     private FileEntryNamer namer;
@@ -202,20 +206,20 @@ public class PostFileServlet extends HttpServlet {
      * Check if file comes from a valid subscription.
      * @param downloads List of subscribed data sources
      * @param entry File entry
-     * @return True if subscription is valid, false otherwise
+     * @return Subscription id if valid, otherwise 0
      */
-    private boolean validateSubscription(List<Subscription> downloads,
+    private int validateSubscription(List<Subscription> downloads,
             FileEntry entry) {
-        boolean isValid = false;
+        int subscriptionId = 0;
         for (Subscription s : downloads) {
             IFilter filter = fileManager.loadFilter(s.getDataSource(), 
                     DataSource.PEER);
             if (filter != null && matcher.match(entry.getMetadata(), 
                     filter.getExpression())) {
-                isValid = true;
+                subscriptionId = s.getId();
             }
         }
-        return isValid;
+        return subscriptionId;
     }
     
     /**
@@ -244,9 +248,9 @@ public class PostFileServlet extends HttpServlet {
                         authenticator.addCredentials(deliveryRequest,
                                 localNode.getName());
                         PostFileTask task = new PostFileTask(registryManager,
-                                subscriptionManager, deliveryRequest, 
-                                entry.getUuid().toString(), receiver, 
-                                dataSource, connTimeout, soTimeout);
+                                subscriptionManager, nodeStatusManager, 
+                                deliveryRequest, entry.getUuid().toString(), 
+                                receiver, dataSource, connTimeout, soTimeout);
                         framePublisherManager.getFramePublisher(
                             receiver.getName()).addTask(task);
                     } 
@@ -290,7 +294,7 @@ public class PostFileServlet extends HttpServlet {
                 log.info("New data file received from " + req.getNodeName());
                 // store entry
                 FileEntry entry = storeFile(req);
-                if (entry != null) {                    
+                if (entry != null) {
                     String name = namer.name(entry);
                     if (keystoreManager.load(req.getNodeName()).isInjector()) {
                         // file sent by injector
@@ -304,10 +308,16 @@ public class PostFileServlet extends HttpServlet {
                         // file sent by peer
                         List<Subscription> downloads = subscriptionManager
                                 .load(Subscription.LOCAL);
-                        if (validateSubscription(downloads, entry)) {
+                        int subscriptionId = 
+                                validateSubscription(downloads, entry);
+                        if (subscriptionId > 0) {
                             log.info("File " + name + " stored with UUID " 
                                     + entry.getUuid().toString());
                             sendMessage(entry);
+                            // update status - increment downloads
+                            Status s = nodeStatusManager.load(subscriptionId);
+                            s.incrementDownloads();
+                            nodeStatusManager.update(s, subscriptionId);
                         } else {
                             log.warn("File " + name + " with UUID " + 
                                     entry.getUuid().toString() +
@@ -354,6 +364,14 @@ public class PostFileServlet extends HttpServlet {
     @Autowired
     public void setKeystoreManager(IKeystoreManager keystoreManager) {
         this.keystoreManager = keystoreManager;
+    }
+    
+    /**
+     * @param nodeStatusManager the nodeStatusManager to set
+     */
+    @Autowired
+    public void setNodeStatusManager(INodeStatusManager nodeStatusManager) {
+        this.nodeStatusManager = nodeStatusManager;
     }
     
      /**

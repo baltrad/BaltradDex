@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2014 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -19,58 +19,48 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.auth.controller;
+package eu.baltrad.dex.status.controller;
 
 import eu.baltrad.dex.auth.manager.SecurityManager;
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
+import eu.baltrad.dex.db.manager.IBltFileManager;
+import eu.baltrad.dex.log.manager.ILogManager;
+import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.registry.manager.IRegistryManager;
+import eu.baltrad.dex.registry.model.impl.RegistryEntry;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.manager.IRoleManager;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
-import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.datasource.manager.IDataSourceManager;
-import eu.baltrad.dex.net.manager.ISubscriptionManager;
-import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.net.model.impl.Download;
-import eu.baltrad.dex.net.model.impl.Upload;
-import eu.baltrad.dex.db.manager.IBltFileManager;
-import eu.baltrad.dex.log.manager.ILogManager;
-import eu.baltrad.dex.registry.manager.IRegistryManager;
-import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.util.ServletContextUtil;
-
+import java.io.File;
+import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.log4j.Logger;
-
-import java.security.Principal;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Date;
-import java.util.Locale;
-import java.util.List;
-import java.util.ArrayList;
-
-import java.text.SimpleDateFormat;
-
-import java.io.File;
 
 /**
  * Node status controller.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.6.1
+ * @version 2.0.0
  * @since 1.6.1
  */
 @Controller
@@ -80,6 +70,7 @@ public class NodeStatusController {
     private static final String LOGIN_MSG = "login.controller.login_message";
     private static final long BYTES_PER_MB = 1024 * 1024;
     
+    private INodeStatusManager statusManager;
     private IUserManager userManager; 
     private IRoleManager roleManager;
     private ConfigurationManager confManager;
@@ -87,7 +78,6 @@ public class NodeStatusController {
     private IBltFileManager bltFileManager;
     private ILogManager logManager;
     private IRegistryManager registryManager;
-    private IDataSourceManager dataSourceManager;
     
     private MessageResourceUtil messages;
     private Logger log;
@@ -95,9 +85,9 @@ public class NodeStatusController {
     private SimpleDateFormat format;
     
     // static arrays holding data transfer information
-    private static Map<String, Boolean> peersStatus;
-    private static Map<String, List<Download>> peersDownloads;
-    private static Map<String, List<Upload>> peersUploads;
+    protected static Map<String, Boolean> nodesStatus;
+    protected static Map<String, List<Status>> downloads;
+    protected static Map<String, List<Status>> uploads;
     
     /**
      * Default constructor.
@@ -106,9 +96,9 @@ public class NodeStatusController {
         this.log = Logger.getLogger("DEX");
         this.format = 
                 new SimpleDateFormat("EEE, MMM d HH:mm:ss z yyyy", Locale.US);
-        peersStatus = new HashMap<String, Boolean>();
-        peersDownloads = new HashMap<String, List<Download>>();
-        peersUploads = new HashMap<String, List<Upload>>();
+        nodesStatus = new HashMap<String, Boolean>();
+        downloads = new HashMap<String, List<Status>>();
+        uploads = new HashMap<String, List<Status>>();
         log.info("BALTRAD system started");
     }
     
@@ -130,56 +120,18 @@ public class NodeStatusController {
      * @return List of peer node names 
      */
     @ModelAttribute("nodes")
-    public List<String> getNodes() {
-        List<String> userNames = new ArrayList<String>();
-        List<User> users = userManager.loadPeers();
-        for (User user : users) {
-            if (subscriptionManager.countDownloads(user.getId()) > 0 ||
-                    subscriptionManager.countUploads(user.getId()) > 0) {
-                userNames.add(user.getName());
-            }
-        }
-        return userNames;
+    public List<String> getNodeNames() {
+        return statusManager.loadNodeNames();
     }
     
     /**
-     * Get list of downloads for a given peer.
-     * @param peerName Peer name
-     * @return List of downloads
+     * Load transfer status for a given peer and transfer type.
+     * @param peerName Peer node name
+     * @param subscriptionType Transfer type - download / upload
+     * @return Transfer status for a selected peer node
      */
-    private List<Download> getPeerDownloads(String peerName) {
-        List<Download> downloads = new ArrayList<Download>();
-        User user = userManager.load(peerName);
-        List<Download> ds = subscriptionManager.loadDownloads(user.getId());
-        for (Download download : ds) {
-            download.setNode(peerName);
-            downloads.add(download);
-        }
-        return downloads;
-    }
-    
-    /**
-     * Get list of uploads for a given peer.
-     * @param peerName Peer name
-     * @return List of uploads
-     */
-    private List<Upload> getPeerUploads(String peerName) {
-        List<Upload> uploads = new ArrayList<Upload>();
-        User user = userManager.load(peerName);
-        List<Upload> us = subscriptionManager.loadUploads(user.getId());
-        for (Upload upload : us) {
-            DataSource dataSource = dataSourceManager
-                        .load(upload.getDataSource(), DataSource.LOCAL);
-            upload.setNode(peerName);
-            upload.setFilesSent(registryManager
-                        .countSuccessfulUploads(dataSource.getId(), 
-                                                user.getId()));
-            upload.setFailures(registryManager
-                        .countFailedUploads(dataSource.getId(),
-                                            user.getId()));
-            uploads.add(upload);
-        }
-        return uploads;
+    private List<Status> loadStatus(String peerName, String subscriptionType) {
+        return statusManager.load(peerName, subscriptionType);
     }
     
     /**
@@ -190,37 +142,36 @@ public class NodeStatusController {
      * @return View name
      */
     @RequestMapping(method = RequestMethod.POST)
-    protected String processSubmit(ModelMap model,
+    protected String processSubmit(Model model,
             @RequestParam(value="peer_name", required=false) String peerName,
             HttpServletRequest request) {
-        
         // show transfers toggle
         Boolean showTransfers = true;
-        if (peersStatus.containsKey(peerName)) {
-            showTransfers = peersStatus.get(peerName);
+        if (nodesStatus.containsKey(peerName)) {
+            showTransfers = nodesStatus.get(peerName);
             showTransfers = !showTransfers;   
-            peersStatus.clear();
-            peersStatus.put(peerName, showTransfers);
+            nodesStatus.clear();
+            nodesStatus.put(peerName, showTransfers);
         } else {
-            peersStatus.clear();
-            peersStatus.put(peerName, true);
+            nodesStatus.clear();
+            nodesStatus.put(peerName, true);
         }
         // don't load transfer information when tree node is collapsed
         if (showTransfers) {
             // load download status for selected peer
-            if (peersDownloads.containsKey(peerName)) {
-                peersDownloads.remove(peerName);
+            if (downloads.containsKey(peerName)) {
+                downloads.remove(peerName);
             }
-            peersDownloads.put(peerName, getPeerDownloads(peerName));
+            downloads.put(peerName, loadStatus(peerName, Subscription.LOCAL));
             // load upload status for selected peer
-            if (peersUploads.containsKey(peerName)) {
-                peersUploads.remove(peerName);
+            if (uploads.containsKey(peerName)) {
+                uploads.remove(peerName);
             }
-            peersUploads.put(peerName, getPeerUploads(peerName));
+            uploads.put(peerName, loadStatus(peerName, Subscription.PEER));
         }
-        model.addAttribute("peers_status", peersStatus);
-        model.addAttribute("peers_downloads", peersDownloads);
-        model.addAttribute("peers_uploads", peersUploads);
+        model.addAttribute("peers_status", nodesStatus);
+        model.addAttribute("peers_downloads", downloads);
+        model.addAttribute("peers_uploads", uploads);
         return "status";
     }
     
@@ -360,6 +311,14 @@ public class NodeStatusController {
     }    
 
     /**
+     * @param statusManager the statusManager to set
+     */
+    @Autowired
+    public void setNodeStatusManager(INodeStatusManager statusManager) {
+        this.statusManager = statusManager;
+    }
+    
+    /**
      * @param userManager the userManager to set
      */
     @Autowired
@@ -422,14 +381,6 @@ public class NodeStatusController {
     @Autowired
     public void setRegistryManager(IRegistryManager registryManager) {
         this.registryManager = registryManager;
-    }
-
-    /**
-     * @param dataSourceManager the dataSourceManager to set
-     */
-    @Autowired
-    public void setDataSourceManager(IDataSourceManager dataSourceManager) {
-        this.dataSourceManager = dataSourceManager;
     }
     
 }

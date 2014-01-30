@@ -42,6 +42,8 @@ import eu.baltrad.dex.util.MessageResourceUtil;
 
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.IFilterManager;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,6 +118,7 @@ public class StartSubscriptionController implements MessageSetter {
     
     private IDataSourceManager dataSourceManager;
     private ISubscriptionManager subscriptionManager;
+    private INodeStatusManager nodeStatusManager;
     private IFilterManager filterManager;
     private IUserManager userManager;
     private RequestFactory requestFactory;
@@ -237,10 +240,18 @@ public class StartSubscriptionController implements MessageSetter {
                 Subscription existing = subscriptionManager.load(
                     Subscription.LOCAL, peerName, ds.getName());
                 if (existing == null) {
-                    subscriptionManager.store(requested);
+                    int subscriptionId = subscriptionManager.store(requested);
+                    // save status
+                    int statusId = nodeStatusManager.store(new Status(0, 0, 0));
+                    nodeStatusManager.store(statusId, subscriptionId);
                 } else {
                     requested.setId(existing.getId());       
+                    int subId = requested.getId();
                     subscriptionManager.update(requested);
+                    // update status - reset downloads
+                    Status s = nodeStatusManager.load(subId);
+                    s.setDownloads(0);
+                    nodeStatusManager.update(s, subId);
                 }
             }
         } catch (Exception e) {
@@ -381,6 +392,14 @@ public class StartSubscriptionController implements MessageSetter {
     public void setSubscriptionManager(ISubscriptionManager subscriptionManager) 
     {
         this.subscriptionManager = subscriptionManager;
+    }
+    
+    /**
+     * @param nodeStatusManager the nodeStatusManager to set
+     */
+    @Autowired
+    public void setNodeStatusManager(INodeStatusManager nodeStatusManager) {
+        this.nodeStatusManager = nodeStatusManager;
     }
     
     /**

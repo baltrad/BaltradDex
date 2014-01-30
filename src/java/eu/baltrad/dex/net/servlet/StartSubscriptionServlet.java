@@ -31,6 +31,8 @@ import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.User;
 
@@ -87,6 +89,7 @@ public class StartSubscriptionServlet extends HttpServlet {
     private Authenticator authenticator;
     private IJsonUtil jsonUtil;
     private ISubscriptionManager subscriptionManager;
+    private INodeStatusManager nodeStatusManager;
     private MessageResourceUtil messages;
     private Logger log;
     
@@ -175,18 +178,28 @@ public class StartSubscriptionServlet extends HttpServlet {
                 String[] msgArgs = {ds.getName(), localNode.getName(), 
                         req.getNodeName()};
                 if (existing == null) {
-                    subscriptionManager.store(requested);
+                    int subscriptionId = subscriptionManager.store(requested);
+                    // save status
+                    int statusId = nodeStatusManager.store(new Status(0, 0, 0));
+                    nodeStatusManager.store(statusId, subscriptionId);
                     subscribedDataSources.add(new DataSource(
                             ds.getName(), ds.getType(), ds.getDescription(),
                             ds.getSource(), ds.getFileObject()));
+                    
                     log.warn(messages.getMessage(PS_SUBSCRIPTION_SUCCESS_KEY, 
                             msgArgs));
                 } else {
-                    requested.setId(existing.getId());
+                    int subId = existing.getId(); 
+                    requested.setId(subId);
                     subscriptionManager.update(requested);
                     subscribedDataSources.add(new DataSource(
                             ds.getName(), ds.getType(), ds.getDescription(),
                             ds.getSource(), ds.getFileObject()));
+                    // update status - reset uploads
+                    Status s = nodeStatusManager.load(subId);
+                    s.setUploads(0);
+                    nodeStatusManager.update(s, subId);
+                    
                     log.warn(messages.getMessage(PS_SUBSCRIPTION_SUCCESS_KEY, 
                             msgArgs));
                 }
@@ -286,6 +299,14 @@ public class StartSubscriptionServlet extends HttpServlet {
     public void setSubscriptionManager(ISubscriptionManager subscriptionManager) 
     {
         this.subscriptionManager = subscriptionManager;
+    }
+    
+    /**
+     * @param nodeStatusManager the nodeStatusManager to set
+     */
+    @Autowired
+    public void setNodeStatusManager(INodeStatusManager nodeStatusManager) {
+        this.nodeStatusManager = nodeStatusManager;
     }
 
     /**

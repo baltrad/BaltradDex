@@ -27,6 +27,8 @@ import eu.baltrad.dex.net.auth.EasyAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
@@ -92,6 +94,7 @@ public class UpdateSubscriptionControllerTest {
     private IHttpClientUtil httpClientMock;
     private IUserManager userManagerMock;
     private ISubscriptionManager subscriptionManagerMock;
+    private INodeStatusManager nodeStatusManagerMock;
     private MessageResourceUtil messages;
     private Logger log;
     private JsonUtil jsonUtil;
@@ -153,6 +156,8 @@ public class UpdateSubscriptionControllerTest {
         userManagerMock = (IUserManager) createMock(IUserManager.class);
         subscriptionManagerMock = (ISubscriptionManager)
                 createMock(ISubscriptionManager.class);
+        nodeStatusManagerMock = (INodeStatusManager)
+                createMock(INodeStatusManager.class);
         
         users = new ArrayList<User>();
         users.add(new User(1, "test1.baltrad.eu", "user", "s3cret", "org", 
@@ -648,6 +653,10 @@ public class UpdateSubscriptionControllerTest {
                 isA(String.class))).andReturn(null).anyTimes();
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
                 .andReturn(Integer.SIZE).anyTimes();
+        expect(nodeStatusManagerMock.store(isA(Status.class)))
+                .andReturn(Integer.SIZE).times(2);
+        expect(nodeStatusManagerMock.store(Integer.SIZE, Integer.SIZE))
+                .andReturn(Integer.SIZE).times(2);
         
         replayAll();
         
@@ -655,6 +664,7 @@ public class UpdateSubscriptionControllerTest {
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         Model model = new ExtendedModelMap();
         String[] activeSubscriptionIds = {"1", "2"};
         String[] inactiveSubscriptionIds = {"3"};
@@ -701,6 +711,10 @@ public class UpdateSubscriptionControllerTest {
                 isA(String.class))).andReturn(null).anyTimes();
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
                 .andReturn(Integer.SIZE).anyTimes();
+        expect(nodeStatusManagerMock.store(isA(Status.class)))
+                .andReturn(Integer.SIZE).times(3);
+        expect(nodeStatusManagerMock.store(Integer.SIZE, Integer.SIZE))
+                .andReturn(Integer.SIZE).times(3);
         
         replayAll();
         
@@ -708,6 +722,7 @@ public class UpdateSubscriptionControllerTest {
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         Model model = new ExtendedModelMap();
         String[] activeSubscriptionIds = {"1", "2"};
         String[] inactiveSubscriptionIds = {"3"};

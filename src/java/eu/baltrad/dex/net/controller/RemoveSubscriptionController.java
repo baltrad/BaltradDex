@@ -34,6 +34,7 @@ import eu.baltrad.dex.net.request.factory.RequestFactory;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
@@ -121,6 +122,7 @@ public class RemoveSubscriptionController {
     private IUserManager userManager;
     private ISubscriptionManager subscriptionManager;
     private IDataSourceManager dataSourceManager;
+    private INodeStatusManager nodeStatusManager;
     private PlatformTransactionManager txManager;
     private RequestFactory requestFactory;
     private MessageResourceUtil messages;
@@ -299,6 +301,8 @@ public class RemoveSubscriptionController {
                 dataSourceManager.delete(dataSourceId);
                 // remove subscriptions
                 subscriptionManager.delete(s.getId());
+                // remove status
+                nodeStatusManager.delete(dataSourceId);
                 String msg = messages.getMessage(
                     REMOVE_SUBSCRIPTION_SUCCESS_MSG_KEY, msgArgs);
                 log.warn(msg);
@@ -359,6 +363,8 @@ public class RemoveSubscriptionController {
             for (Subscription s : selectedUploads) {
                 String[] msgArgs = {s.getDataSource(), s.getUser()};
                 subscriptionManager.delete(s.getId());
+                // remove status
+                nodeStatusManager.delete(s.getId());
                 String msg = messages.getMessage(
                     REMOVE_SUBSCRIPTION_SUCCESS_MSG_KEY, msgArgs);
                 log.warn(msg);
@@ -420,6 +426,14 @@ public class RemoveSubscriptionController {
     @Autowired
     public void setDataSourceManager(IDataSourceManager dataSourceManager) {
         this.dataSourceManager = dataSourceManager;
+    }
+    
+    /**
+     * @param nodeStatusManager the nodeStatusManager to set
+     */
+    @Autowired
+    public void setNodeStatusManager(INodeStatusManager nodeStatusManager) {
+        this.nodeStatusManager = nodeStatusManager;
     }
     
     /**

@@ -21,55 +21,46 @@
 
 package eu.baltrad.dex.net.controller;
 
+import eu.baltrad.beast.db.IFilter;
+import eu.baltrad.beast.db.IFilterManager;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.util.json.impl.JsonUtil;
-import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.net.manager.ISubscriptionManager;
-import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
-
-import eu.baltrad.beast.db.IFilter;
-import eu.baltrad.beast.db.CombinedFilter;
-import eu.baltrad.beast.db.CoreFilterManager;
-import eu.baltrad.beast.db.IFilterManager;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.easymock.EasyMock;
-import static org.easymock.EasyMock.*;
-
-import org.springframework.ui.Model;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.mock.web.MockHttpServletRequest;
-
-import org.apache.http.StatusLine;
-import org.apache.http.message.BasicStatusLine;
-import org.apache.http.HttpResponse;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.StringEntity;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
-
-import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
-
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashSet;
-
+import java.util.List;
+import java.util.Set;
+import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
+import org.apache.log4j.Logger;
+import org.easymock.EasyMock;
+import static org.easymock.EasyMock.*;
+import org.junit.After;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.keyczar.exceptions.KeyczarException;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.ui.ExtendedModelMap;
+import org.springframework.ui.Model;
 
 /**
  * Post subscription request controller test.
@@ -102,6 +93,7 @@ public class StartSubscriptionControllerTest {
     private Authenticator authenticatorMock;
     private ISubscriptionManager subscriptionManagerMock;
     private IDataSourceManager dataSourceManagerMock;
+    private INodeStatusManager nodeStatusManagerMock;
     private IFilterManager filterManagerMock;
     private MessageResourceUtil messages;
     private Logger log;
@@ -162,6 +154,8 @@ public class StartSubscriptionControllerTest {
         authenticatorMock = (Authenticator) createMock(Authenticator.class);
         dataSourceManagerMock = (IDataSourceManager) 
                     createMock(IDataSourceManager.class);
+        nodeStatusManagerMock = (INodeStatusManager) 
+                    createMock(INodeStatusManager.class);
         filterManagerMock = (IFilterManager) createMock(IFilterManager.class);
         filter = (IFilter) createMock(IFilter.class);
         request = new MockHttpServletRequest();
@@ -517,13 +511,18 @@ public class StartSubscriptionControllerTest {
                 isA(String.class))).andReturn(null).times(2);
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
                 .andReturn(Integer.SIZE).times(2);
-        
+        expect(nodeStatusManagerMock.store(isA(Status.class)))
+                .andReturn(Integer.SIZE).times(2);
+        expect(nodeStatusManagerMock.store(Integer.SIZE, Integer.SIZE))
+                .andReturn(Integer.SIZE).times(2);
+                
         replayAll();
         
         classUnderTest.setUserManager(userManagerMock);
         classUnderTest.setAuthenticator(authenticatorMock);
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         classUnderTest.setFilterManager(filterManagerMock);
         
@@ -580,6 +579,10 @@ public class StartSubscriptionControllerTest {
             isA(String.class), isA(String.class))).andReturn(null).times(3);
         expect(subscriptionManagerMock.store(isA(Subscription.class)))
                 .andReturn(Integer.SIZE).times(3);
+        expect(nodeStatusManagerMock.store(isA(Status.class)))
+                .andReturn(Integer.SIZE).times(3);
+        expect(nodeStatusManagerMock.store(Integer.SIZE, Integer.SIZE))
+                .andReturn(Integer.SIZE).times(3);
         
         replayAll();
         
@@ -588,6 +591,7 @@ public class StartSubscriptionControllerTest {
         classUnderTest.setHttpClient(httpClientMock);
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         classUnderTest.setFilterManager(filterManagerMock);
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.startSubscription(request, model, 

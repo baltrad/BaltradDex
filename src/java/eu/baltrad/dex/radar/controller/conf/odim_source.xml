@@ -152,11 +152,16 @@
   <lv CCCC="EVRR" org="236">
     <lvrix plc="Riga" rad="LV93" wmo="26422"></lvrix>
   </lv>
+  <lt CCCC="EYHM" org="238">
+    <ltlau plc="Laukuva" rad="LT40" wmo="26518"></ltlau>
+    <ltvln plc="Vilnius" rad="LT41" wmo="26730"></ltvln>
+  </lt>
   <nl CCCC="EHDB" org="99">
     <nldbl plc="De Bilt" rad="NL50" wmo="06260"></nldbl>
     <nldhl plc="Den Helder" rad="NL51" wmo="06234"></nldhl>
   </nl>
   <no CCCC="ENMI" org="88">
+    <nober plc="Berlevåg" rad="NO40" wmo="01079"></nober>
     <noosl plc="Oslo" rad="NO41" wmo="01499"></noosl>
     <nohgb plc="Hægebostad" rad="NO42" wmo="01438"></nohgb>
     <norsa plc="Rissa" rad="NO43" wmo="01247"></norsa>
@@ -166,7 +171,6 @@
     <nohas plc="Hasvik" rad="NO93" wmo="01042"></nohas>
     <nosta plc="Stad" rad="NO38" wmo="01206"></nosta>
     <nohur plc="Hurum" rad="NO39" wmo="01498"></nohur>
-    <nober plc="Berlevåg" rad="NO40" wmo="01079"></nober>
   </no>
   <pl CCCC="SOWR" org="220">
     <plleg plc="Legionowo" rad="PL41" wmo="12374"></plleg>
@@ -178,10 +182,10 @@
     <plgda plc="Gdańsk" rad="PL47" wmo="12151"></plgda>
     <plbrz plc="Brzuchania" rad="PL48" wmo="12568"></plbrz>
   </pl>
-  <po CCCC="LPMG" org="212">
+  <pt CCCC="LPMG" org="212">
     <ptlea plc="Cruz do Leão" rad="PO41" wmo="08550"></ptlea>
     <ptcal plc="Cavalos do Caldeirão" rad="PO42" wmo="08553"></ptcal>
-  </po>
+  </pt>
   <ro CCCC="YRBK" org="242">
     <robob plc="Bobohalma" rad="RD45" wmo="15166"></robob>
     <robuc plc="Bucuresti" rad="RD40" wmo="15438"></robuc>

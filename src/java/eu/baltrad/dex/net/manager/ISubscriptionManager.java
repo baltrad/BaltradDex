@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2014 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -22,8 +22,6 @@
 package eu.baltrad.dex.net.manager;
 
 import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.net.model.impl.Download;
-import eu.baltrad.dex.net.model.impl.Upload;
 
 import java.util.List;
 
@@ -44,14 +42,6 @@ public interface ISubscriptionManager {
     public Subscription load(int id);
     
     public Subscription load(String type, String user, String dataSource);
-    
-    public int countDownloads(int userId);
-    
-    public int countUploads(int userId);
-    
-    public List<Download> loadDownloads(int userId);
-    
-    public List<Upload> loadUploads(int userId);
     
     public int store(Subscription s) throws Exception ;
     

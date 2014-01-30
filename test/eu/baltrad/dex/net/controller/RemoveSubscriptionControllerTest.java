@@ -21,40 +21,36 @@
 
 package eu.baltrad.dex.net.controller;
 
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
-import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
-
-import org.springframework.ui.Model;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.SimpleTransactionStatus;
-
-import org.easymock.EasyMock;
-import static org.easymock.EasyMock.*;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
-
+import org.easymock.EasyMock;
+import static org.easymock.EasyMock.*;
+import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.After;
 import org.junit.Test;
-
-import java.util.List;
-import java.util.ArrayList;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.SimpleTransactionStatus;
+import org.springframework.ui.ExtendedModelMap;
+import org.springframework.ui.Model;
 
 /**
  * Remove subscription controller test.
@@ -71,6 +67,7 @@ public class RemoveSubscriptionControllerTest {
     private IHttpClientUtil httpClientMock;
     private PlatformTransactionManager txManagerMock;
     private IDataSourceManager dataSourceManagerMock;
+    private INodeStatusManager nodeStatusManagerMock;
     
     private List<Object> mocks;
     private User peer;
@@ -148,6 +145,8 @@ public class RemoveSubscriptionControllerTest {
                 createMock(PlatformTransactionManager.class);
         dataSourceManagerMock = (IDataSourceManager) 
                 createMock(IDataSourceManager.class);
+        nodeStatusManagerMock = (INodeStatusManager) 
+                createMock(INodeStatusManager.class);
         messages = new MessageResourceUtil();
         messages.setBasename("resources/messages");
         classUnderTest.setMessages(messages);
@@ -513,10 +512,13 @@ public class RemoveSubscriptionControllerTest {
         expectLastCall();
         subscriptionManagerMock.delete(5);
         expectLastCall();
+        expect(nodeStatusManagerMock.delete(4)).andReturn(1);
+        expect(nodeStatusManagerMock.delete(5)).andReturn(1);
         
         replayAll();
         
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         classUnderTest.setSelectedUploads(uploads);
         Model model = new ExtendedModelMap();
         String viewName = classUnderTest.removeUploadsStatus(model);

@@ -9,7 +9,7 @@
 <div id="footerwrap">
     <div id="footer">
         <div class="leftcol">
-            2013 &#169 <a href="http://baltrad.eu">BALTRAD Partnership</a>
+            2014 &#169 <a href="http://baltrad.eu">BALTRAD Partnership</a>
         </div>
         <div class="rightcol">
             <a href="#">About</a> | 

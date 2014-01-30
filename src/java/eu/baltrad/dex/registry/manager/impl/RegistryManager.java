@@ -34,11 +34,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+
+import java.util.List;
 
 /**
  * Class implements data delivery register handling functionality..
@@ -77,58 +77,6 @@ public class RegistryManager implements IRegistryManager {
         String sql = "SELECT count(*) FROM dex_delivery_registry " + 
                      "WHERE type = ?;";
         return jdbcTemplate.queryForLong(sql, type);
-    }
-    
-    /**
-     * Count files downloaded from a given data source.
-     * @param dataSourceId Data source id
-     * @return Number of files downloaded from a given data source
-     */
-    public long countDownloads(int dataSourceId) {
-        String sql = "SELECT count(*) FROM dex_delivery_registry dr, " + 
-            "dex_users u, dex_data_sources ds, " + 
-            "dex_delivery_registry_users dru, " + 
-            "dex_delivery_registry_data_sources drds WHERE " +
-            "dru.entry_id = dr.id AND dru.user_id = u.id AND " +
-            "drds.entry_id = dr.id AND drds.data_source_id = ds.id AND " + 
-            "dr.type = 'download' AND ds.id = ?;";
-        return jdbcTemplate.queryForLong(sql, dataSourceId);
-    }
-    
-    /**
-     * Count successful uploads from a given data source.
-     * @param dataSourceId Data source id
-     * @param userId User id
-     * @return Number of files successfully uploaded from a given data source 
-     */
-    public long countSuccessfulUploads(int dataSourceId, int userId) {
-        String sql = "SELECT count(*) FROM dex_delivery_registry dr, " +
-            "dex_users u, dex_data_sources ds, " + 
-            "dex_delivery_registry_users dru, " + 
-            "dex_delivery_registry_data_sources drds WHERE " + 
-            "dru.entry_id = dr.id AND dru.user_id = u.id AND " + 
-            "drds.entry_id = dr.id AND drds.data_source_id = ds.id AND " + 
-            "dr.type = 'upload' AND dr.status = true AND ds.id = ? AND " +
-            "u.id = ?;";
-        return jdbcTemplate.queryForLong(sql, dataSourceId, userId);
-    }
-    
-    /**
-     * Count failed uploads from a given data source.
-     * @param dataSourceId Data source id
-     * @param userId User id
-     * @return Number of upload failures from a given data source 
-     */
-    public long countFailedUploads(int dataSourceId, int userId) {
-        String sql = "SELECT count(*) FROM dex_delivery_registry dr, " + 
-            "dex_users u, dex_data_sources ds, " + 
-            "dex_delivery_registry_users dru, " + 
-            "dex_delivery_registry_data_sources drds WHERE " +
-            "dru.entry_id = dr.id AND dru.user_id = u.id AND " + 
-            "drds.entry_id = dr.id AND drds.data_source_id = ds.id AND " +
-            "dr.type = 'upload' AND dr.status = false AND ds.id = ? AND " + 
-            "u.id = ?;";
-        return jdbcTemplate.queryForLong(sql, dataSourceId, userId);
     }
     
     /**
