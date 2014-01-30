@@ -466,6 +466,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="bdbtrimagemgr" class="eu.baltrad.beast.rules.bdb.BdbTrimAgeRuleManager" autowire="byType"/>
     <bean id="bdbtrimcountmgr" class="eu.baltrad.beast.rules.bdb.BdbTrimCountRuleManager" autowire="byType"/>
     <bean id="bltacrrmgr" class="eu.baltrad.beast.rules.acrr.AcrrRuleManager" autowire="byType" />
+    <bean id="bltgramgr" class="eu.baltrad.beast.rules.gra.GraRuleManager" autowire="byType" />
     <bean id="bltwrwpmgr" class="eu.baltrad.beast.rules.wrwp.WrwpRuleManager" autowire="byType" />
 
     <bean id="log4jalertmessagerule" class="eu.baltrad.beast.rules.system.Log4jAlertMessageRule" autowire="byType"/>
@@ -487,6 +488,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <entry key="bdb_trim_age" value-ref="bdbtrimagemgr"/>
                 <entry key="bdb_trim_count" value-ref="bdbtrimcountmgr"/>
                 <entry key="blt_acrr" value-ref="bltacrrmgr"/>
+                <entry key="blt_gra" value-ref="bltgramgr"/>
                 <entry key="blt_wrwp" value-ref="bltwrwpmgr"/>
                 <entry key="distribution" value-ref="distributionRuleManager"/>
             </map>
@@ -561,6 +563,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="gmapRoutesController" class="eu.baltrad.beastui.web.controller.GoogleMapRoutesController" autowire="byType" />
     <bean id="volumeRoutesController" class="eu.baltrad.beastui.web.controller.VolumeRoutesController" autowire="byType" />
     <bean id="acrrRoutesController" class="eu.baltrad.beastui.web.controller.AcrrRoutesController" autowire="byType" />
+    <bean id="graRoutesController" class="eu.baltrad.beastui.web.controller.GraRoutesController" autowire="byType" />
     <bean id="wrwpRoutesController" class="eu.baltrad.beastui.web.controller.WrwpRoutesController" autowire="byType" />
     <bean id="bdbTrimAgeRoutesController" class="eu.baltrad.beastui.web.controller.BdbTrimAgeRoutesController" autowire="byType" />
     <bean id="bdbTrimCountRoutesController" class="eu.baltrad.beastui.web.controller.BdbTrimCountRoutesController" autowire="byType" />

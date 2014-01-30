@@ -97,6 +97,9 @@ List of routes
                                                 <c:when test="${route.ruleType == 'blt_acrr'}">
                                                     <c:out value="ACRR"/>
                                                 </c:when>
+                                                <c:when test="${route.ruleType == 'blt_gra'}">
+                                                    <c:out value="GRA"/>
+                                                </c:when>
                                                 <c:when test="${route.ruleType == 'blt_wrwp'}">
                                                     <c:out value="WRWP"/>
                                                 </c:when>
