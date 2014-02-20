@@ -100,20 +100,6 @@ public class RegistryManagerTest extends TestCase {
         assertEquals(6, classUnderTest.count(RegistryEntry.UPLOAD));
     }
     
-    public void testCountDownloads() throws Exception {
-        assertEquals(4, classUnderTest.countDownloads(3));
-    }
-    
-    public void testCountSuccessfulUploads() throws Exception {
-        assertEquals(2, classUnderTest.countSuccessfulUploads(1, 1));
-        assertEquals(1, classUnderTest.countSuccessfulUploads(2, 2));
-    }
-    
-    public void testCountFailedUploads() throws Exception {
-        assertEquals(1, classUnderTest.countFailedUploads(1, 1));
-        assertEquals(1, classUnderTest.countFailedUploads(2, 2));
-    }
-    
     public void testLoad() throws Exception {
         List<RegistryEntry> entries = 
                 classUnderTest.load(RegistryEntry.DOWNLOAD, 1, 3);

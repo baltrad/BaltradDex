@@ -234,6 +234,9 @@ public class DexDBITestHelper extends TestCase {
         template.update("DELETE FROM dex_delivery_registry_users");
         template.update("DELETE FROM dex_delivery_registry");
         template.update("DELETE FROM dex_keys");
+        template.update("DELETE FROM dex_status");
+        template.update("DELETE FROM dex_status_subscriptions");
+        template.update("ALTER SEQUENCE dex_status_id_seq RESTART WITH 1");
     }
     
     /**

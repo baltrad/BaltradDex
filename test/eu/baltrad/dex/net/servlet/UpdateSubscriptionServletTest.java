@@ -28,31 +28,33 @@ import eu.baltrad.dex.net.protocol.RequestParserException;
 import eu.baltrad.dex.net.protocol.ResponseWriter;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.net.util.json.IJsonUtil;
+import eu.baltrad.dex.net.util.json.impl.JsonUtil;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
-
+import java.text.DateFormat;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.easymock.EasyMockSupport;
-
-import static org.easymock.EasyMock.*;
-
-import org.apache.log4j.Logger;
-
-import org.keyczar.exceptions.KeyczarException;
-
-import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.log4j.Logger;
+import org.easymock.EasyMock;
+import static org.easymock.EasyMock.*;
+import org.junit.After;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.After;
 import org.junit.Test;
-
-import java.util.List;
-import java.util.ArrayList;
-
+import org.keyczar.exceptions.KeyczarException;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 /**
  * Post subscription servlet test.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
@@ -69,6 +71,7 @@ public class UpdateSubscriptionServletTest extends EasyMockSupport {
     private MessageResourceUtil messages;
     private ISubscriptionManager subscriptionManagerMock;
     private Authenticator authenticator;
+    private INodeStatusManager nodeStatusManagerMock;
     private ProtocolManager protocolManager;
     private MethodMock methods;
     
@@ -93,6 +96,7 @@ public class UpdateSubscriptionServletTest extends EasyMockSupport {
     authenticator = createMock(Authenticator.class);
     protocolManager = createMock(ProtocolManager.class);
     methods = createMock(MethodMock.class);
+    nodeStatusManagerMock = createMock(INodeStatusManager.class);
 
     classUnderTest = new GSServlet();
     classUnderTest.setLog(Logger.getLogger("DEX"));
@@ -100,6 +104,7 @@ public class UpdateSubscriptionServletTest extends EasyMockSupport {
     classUnderTest.setSubscriptionManager(subscriptionManagerMock);
     classUnderTest.setAuthenticator(authenticator);
     classUnderTest.setProtocolManager(protocolManager);
+    classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
   }
     
     @After

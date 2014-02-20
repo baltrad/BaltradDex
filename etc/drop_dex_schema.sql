@@ -46,6 +46,8 @@ DROP TABLE IF EXISTS dex_data_source_product_parameter_values;
 DROP TABLE IF EXISTS dex_data_source_radars;
 DROP TABLE IF EXISTS dex_data_source_users;
 DROP TABLE IF EXISTS dex_data_source_filters;
+DROP TABLE IF EXISTS dex_status CASCADE;
+DROP TABLE IF EXISTS dex_status_subscriptions;
 
 DROP FUNCTION IF EXISTS dex_trim_messages_by_number() CASCADE;
 DROP FUNCTION IF EXISTS dex_trim_messages_by_age() CASCADE;

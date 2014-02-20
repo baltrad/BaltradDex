@@ -36,6 +36,7 @@ import eu.baltrad.dex.net.protocol.RequestFactory;
 import eu.baltrad.dex.net.protocol.ResponseParser;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.user.model.Role;
 
 import org.springframework.ui.Model;
@@ -121,6 +122,7 @@ public class RemoveSubscriptionController {
     private IUserManager userManager;
     private ISubscriptionManager subscriptionManager;
     private IDataSourceManager dataSourceManager;
+    private INodeStatusManager nodeStatusManager;
     private PlatformTransactionManager txManager;
 
     private ModelMessageHelper messageHelper = null;
@@ -294,6 +296,8 @@ public class RemoveSubscriptionController {
                 dataSourceManager.delete(dataSourceId);
                 // remove subscriptions
                 subscriptionManager.delete(s.getId());
+                // remove status
+                nodeStatusManager.delete(dataSourceId);
                 String msg = messageHelper.getMessage(REMOVE_SUBSCRIPTION_SUCCESS_MSG_KEY, msgArgs);
                 log.info(msg);
             }
@@ -353,6 +357,8 @@ public class RemoveSubscriptionController {
             for (Subscription s : selectedUploads) {
                 Object[] msgArgs = {s.getDataSource(), s.getUser()};
                 subscriptionManager.delete(s.getId());
+                // remove status
+                nodeStatusManager.delete(s.getId());
                 String msg = messageHelper.getMessage(REMOVE_SUBSCRIPTION_SUCCESS_MSG_KEY, msgArgs);
                 log.warn(msg);
             }
@@ -412,21 +418,21 @@ public class RemoveSubscriptionController {
     }
     
     /**
+     * @param nodeStatusManager the nodeStatusManager to set
+     */
+    @Autowired
+    public void setNodeStatusManager(INodeStatusManager nodeStatusManager) {
+        this.nodeStatusManager = nodeStatusManager;
+    }
+    
+    /**
      * @param txManager the txManager to set
      */
     @Autowired
     public void setTxManager(PlatformTransactionManager txManager) {
         this.txManager = txManager;
     }
-    
-    /**
-     * @param messages the messages to set
-     */
-//    @Autowired
-//    public void setMessages(MessageResourceUtil messages) {
-//        this.messages = messages;
-//    }
-
+ 
     @Autowired
     public void setProtocolManager(ProtocolManager protocolManager) {
       this.protocolManager = protocolManager;

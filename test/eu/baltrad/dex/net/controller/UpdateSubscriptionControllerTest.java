@@ -30,6 +30,7 @@ import eu.baltrad.dex.net.controller.exception.InternalControllerException;
 import eu.baltrad.dex.net.controller.util.ModelMessageHelper;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.manager.IUserManager;
 
@@ -75,6 +76,7 @@ public class UpdateSubscriptionControllerTest extends EasyMockSupport {
     private IHttpClientUtil httpClientMock;
     private IUserManager userManagerMock;
     private ISubscriptionManager subscriptionManagerMock;
+    private INodeStatusManager nodeStatusManagerMock;
     private Logger log;
     private ModelMessageHelper messageHelper = null;
     private ProtocolManager protocolManager = null;
@@ -124,6 +126,8 @@ public class UpdateSubscriptionControllerTest extends EasyMockSupport {
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         classUnderTest.setMessageHelper(messageHelper);
         classUnderTest.setProtocolManager(protocolManager);
+        nodeStatusManagerMock = (INodeStatusManager)
+                createMock(INodeStatusManager.class);
         
         users = new ArrayList<User>();
         users.add(new User(1, "test1.baltrad.eu", "user", "s3cret", "org", 
@@ -164,26 +168,6 @@ public class UpdateSubscriptionControllerTest extends EasyMockSupport {
         classUnderTest = null;
         resetAll();
     }
-    
-//    private HttpResponse createResponse(int code, String reason, 
-//            String jsonSources) throws Exception {
-//        ProtocolVersion version = new ProtocolVersion("HTTP", 1, 1);
-//        StatusLine statusLine = new BasicStatusLine(version, code, reason);
-//        HttpResponse response = new BasicHttpResponse(statusLine);
-//        response.addHeader("Node-Name", "test.baltrad.eu");
-//        response.setEntity(new StringEntity(jsonSources));
-//        return response;
-//    } 
-//    
-//    private String getResponseBody(HttpResponse response) throws IOException {
-//        InputStream is = null;
-//        try {
-//            is = response.getEntity().getContent();
-//            return IOUtils.toString(is, "UTF-8");
-//        } finally {
-//            is.close();
-//        }
-//    }
     
     @Test
     public void subscribedPeers() {
@@ -541,6 +525,7 @@ public class UpdateSubscriptionControllerTest extends EasyMockSupport {
       List<Subscription> subscriptions = new ArrayList<Subscription>();
       List<Subscription> readSubscriptions = new ArrayList<Subscription>();
       
+      classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
       String[] activeSubscriptionIds = {"1", "2"};
       String[] inactiveSubscriptionIds = {"3"};
 
@@ -560,117 +545,9 @@ public class UpdateSubscriptionControllerTest extends EasyMockSupport {
       replayAll();
       
       String result = classUnderTest.updateSubscription(model, "test.baltrad.eu", activeSubscriptionIds, inactiveSubscriptionIds);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
       
       verifyAll();
       assertEquals("subscription_update_status", result);
     }
-    
-//    
-//    @Test
-//    public void updateSubscription_PartialSubscriptionError() throws Exception {
-//        expect(userManagerMock.load("test.baltrad.eu"))
-//            .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
-//                "unit", "locality", "state", "XX", 
-//                "http://test.baltrad.eu")).anyTimes();
-//        
-//        Authenticator authenticatorMock = (Authenticator) 
-//                createMock(Authenticator.class);
-//        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
-//                isA(String.class));
-//        
-//        HttpResponse response = createResponse(
-//            HttpServletResponse.SC_PARTIAL_CONTENT, null, 
-//                JSON_SUBSCRIPTIONS_PARTIAL);
-//        expect(httpClientMock.post(isA(HttpUriRequest.class)))
-//                .andReturn(response);
-//        expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();
-//        expect(subscriptionManagerMock.load(2)).andReturn(s2).anyTimes();
-//        expect(subscriptionManagerMock.load(3)).andReturn(s3).anyTimes();
-//        expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
-//                isA(String.class))).andReturn(null).anyTimes();
-//        expect(subscriptionManagerMock.store(isA(Subscription.class)))
-//                .andReturn(Integer.SIZE).anyTimes();
-//        
-//        replayAll();
-//        
-//        classUnderTest.setUserManager(userManagerMock);
-//        classUnderTest.setAuthenticator(authenticatorMock);
-//        classUnderTest.setHttpClient(httpClientMock);
-//        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-//        Model model = new ExtendedModelMap();
-//        String[] activeSubscriptionIds = {"1", "2"};
-//        String[] inactiveSubscriptionIds = {"3"};
-//        String viewName = classUnderTest.updateSubscription(model, 
-//            "test.baltrad.eu", activeSubscriptionIds, inactiveSubscriptionIds);
-//        
-//        assertEquals("subscription_update_status", viewName);
-//        assertTrue(model.containsAttribute("peer_name"));
-//        assertTrue(model.containsAttribute("error_message"));
-//        assertEquals(messages.getMessage(
-//                "getsubscription.controller.subscription_server_partial",
-//                    new String[] {"test.baltrad.eu"}),
-//                    model.asMap().get("error_message"));
-//        assertNotNull(getResponseBody(response));
-//        assertEquals(JSON_SUBSCRIPTIONS_PARTIAL, getResponseBody(response));
-//        List<Subscription> subs = jsonUtil.jsonToSubscriptions(
-//                getResponseBody(response));
-//        assertNotNull(subs);
-//        assertEquals(2, subs.size());
-//        
-//        verifyAll();
-//    }      
-//    
-//    @Test
-//    public void updateSubscription_OK() throws Exception {
-//        expect(userManagerMock.load("test.baltrad.eu"))
-//            .andReturn(new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
-//                "unit", "locality", "state", "XX", 
-//                "http://test.baltrad.eu")).anyTimes();
-//        
-//        Authenticator authenticatorMock = (Authenticator) 
-//                createMock(Authenticator.class);
-//        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
-//                isA(String.class));
-//        
-//        HttpResponse response = createResponse(HttpServletResponse.SC_OK, 
-//                null, JSON_SUBSCRIPTIONS_OK);
-//        expect(httpClientMock.post(isA(HttpUriRequest.class)))
-//                .andReturn(response);
-//        expect(subscriptionManagerMock.load(1)).andReturn(s1).anyTimes();
-//        expect(subscriptionManagerMock.load(2)).andReturn(s2).anyTimes();
-//        expect(subscriptionManagerMock.load(3)).andReturn(s3).anyTimes();
-//        expect(subscriptionManagerMock.load(isA(String.class), isA(String.class),
-//                isA(String.class))).andReturn(null).anyTimes();
-//        expect(subscriptionManagerMock.store(isA(Subscription.class)))
-//                .andReturn(Integer.SIZE).anyTimes();
-//        
-//        replayAll();
-//        
-//        classUnderTest.setUserManager(userManagerMock);
-//        classUnderTest.setAuthenticator(authenticatorMock);
-//        classUnderTest.setHttpClient(httpClientMock);
-//        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-//        Model model = new ExtendedModelMap();
-//        String[] activeSubscriptionIds = {"1", "2"};
-//        String[] inactiveSubscriptionIds = {"3"};
-//        String viewName = classUnderTest.updateSubscription(model, 
-//            "test.baltrad.eu", activeSubscriptionIds, inactiveSubscriptionIds);
-//        
-//        assertEquals("subscription_update_status", viewName);
-//        assertTrue(model.containsAttribute("peer_name"));
-//        assertTrue(model.containsAttribute("success_message"));
-//        assertEquals(messages.getMessage(
-//                "getsubscription.controller.subscription_server_success",
-//                    new String[] {"test.baltrad.eu"}),
-//                    model.asMap().get("success_message"));
-//        assertNotNull(getResponseBody(response));
-//        assertEquals(JSON_SUBSCRIPTIONS_OK, getResponseBody(response));
-//        List<Subscription> subs = jsonUtil.jsonToSubscriptions(
-//                getResponseBody(response));
-//        assertNotNull(subs);
-//        assertEquals(3, subs.size());
-//        
-//        verifyAll();
-//    }
-//    
 }

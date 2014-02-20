@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2014 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -21,20 +21,20 @@
 
 package eu.baltrad.dex.net.util;
 
-import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
-import eu.baltrad.dex.registry.manager.IRegistryManager;
-import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
+import eu.baltrad.dex.registry.manager.IRegistryManager;
+import eu.baltrad.dex.registry.model.impl.RegistryEntry;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.model.User;
-
+import javax.servlet.http.HttpServletResponse;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.log4j.Logger;
-import org.apache.http.HttpResponse;
-
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Implements data delivery task executed in a separate thread.
@@ -47,6 +47,7 @@ public class PostFileTask implements Runnable {
     
     protected IRegistryManager registryManager;
     protected ISubscriptionManager subscriptionManager;
+    protected INodeStatusManager nodeStatusManager;
     protected Logger log;
     protected IHttpClientUtil httpClient;
     protected HttpUriRequest request;
@@ -59,6 +60,8 @@ public class PostFileTask implements Runnable {
     /**
      * Constructor.
      * @param registryManager Delivery registry manager
+     * @param subscriptionManager Subscription manager
+     * @param nodeStatusManager Node status manager
      * @param request Data delivery request
      * @param uuid File entry identifier string
      * @param user Recipient
@@ -67,12 +70,14 @@ public class PostFileTask implements Runnable {
      * @param soTimeout Socket timeout
      */
     public PostFileTask(IRegistryManager registryManager, 
-            ISubscriptionManager subscriptionManager, HttpUriRequest request, 
+            ISubscriptionManager subscriptionManager, 
+            INodeStatusManager nodeStatusManager, HttpUriRequest request, 
             String uuid, User user, DataSource dataSource,
             int connTimeout, int soTimeout) {
         this.log = Logger.getLogger("DEX");
         this.registryManager = registryManager;
         this.subscriptionManager = subscriptionManager;
+        this.nodeStatusManager = nodeStatusManager;
         this.request = request;
         this.uuid = uuid;
         this.user = user;
@@ -86,6 +91,10 @@ public class PostFileTask implements Runnable {
      */
     public void run() {
         try {
+            Subscription s = subscriptionManager.load(Subscription.PEER, 
+                    user.getName(), dataSource.getName());
+            int subscriptionId = s.getId();
+            Status status = nodeStatusManager.load(subscriptionId);
             try {
                 HttpResponse response = httpClient.post(request);
                 if (response.getStatusLine().getStatusCode() == 
@@ -94,14 +103,18 @@ public class PostFileTask implements Runnable {
                             user.getId(), dataSource.getId(), 
                             System.currentTimeMillis(), RegistryEntry.UPLOAD,
                             uuid, user.getName(), true);
-                    log.info("File " + uuid + " sent to user " + user.getName());
+                    log.info("File " + uuid + " sent to user " + 
+                            user.getName());
                     registryManager.store(entry);
+                    // update status
+                    status.incrementUploads();
+                    nodeStatusManager.update(status, subscriptionId);
                 } else if (response.getStatusLine().getStatusCode() ==
                         HttpServletResponse.SC_FORBIDDEN) {
                     // remove invalid subscription
-                    Subscription s = subscriptionManager.load(Subscription.PEER, 
-                            user.getName(), dataSource.getName());
-                    subscriptionManager.delete(s.getId());
+                    subscriptionManager.delete(subscriptionId);
+                    // remove respective status
+                    nodeStatusManager.delete(subscriptionId);
                 } else {
                     // don't retry if file is already delivered 
                     if (response.getStatusLine().getStatusCode() 
@@ -118,22 +131,30 @@ public class PostFileTask implements Runnable {
                         if (success) {
                             RegistryEntry entry = new RegistryEntry(
                                 user.getId(), dataSource.getId(), 
-                                System.currentTimeMillis(), RegistryEntry.UPLOAD,
-                                uuid, user.getName(), true);
+                                System.currentTimeMillis(), 
+                                RegistryEntry.UPLOAD, uuid, user.getName(), 
+                                true);
                             log.info("File " + uuid + " sent to user " 
                                     + user.getName());
                             registryManager.store(entry);
+                            // update status
+                            status.incrementUploads();
+                            nodeStatusManager.update(status, subscriptionId);
                         } else {
                             RegistryEntry entry = new RegistryEntry(
                                 user.getId(), dataSource.getId(), 
-                                System.currentTimeMillis(), RegistryEntry.UPLOAD,
-                                uuid, user.getName(), false);
+                                System.currentTimeMillis(), 
+                                RegistryEntry.UPLOAD, uuid, user.getName(), 
+                                false);
                             log.error("Failed to send file " + uuid + " to user " 
                                     + user.getName() + ": " + 
                                     response.getStatusLine().getStatusCode() 
                                     + " - " + response.getStatusLine()
                                         .getReasonPhrase());
                             registryManager.store(entry);
+                            // update status
+                            status.incrementUploadFailures();
+                            nodeStatusManager.update(status, subscriptionId);
                         }
                     }    
                 }

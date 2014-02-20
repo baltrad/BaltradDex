@@ -21,16 +21,19 @@
 
 package eu.baltrad.dex.net.util;
 
+import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
 import eu.baltrad.dex.registry.model.impl.RegistryEntry;
-import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.model.User;
 import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpResponse;
 import org.apache.http.ProtocolVersion;
 import org.apache.http.StatusLine;
@@ -39,19 +42,11 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.apache.log4j.Logger;
-
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
-
-import static org.junit.Assert.*;
-import org.junit.Before;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-
-import javax.servlet.http.HttpServletResponse;
-
-import java.util.List;
-import java.util.ArrayList;
 
 /**
  * Post file task test.
@@ -66,6 +61,7 @@ public class PostFileTaskTest {
     private PFTask classUnderTest;
     private IRegistryManager registryManagerMock;
     private ISubscriptionManager subscriptionManagerMock;
+    private INodeStatusManager nodeStatusManagerMock;
     private IHttpClientUtil httpClientUtilMock;
     
     private List mocks;
@@ -77,11 +73,13 @@ public class PostFileTaskTest {
     protected class PFTask extends PostFileTask {
         
         public PFTask(IRegistryManager registryManager, 
-                ISubscriptionManager subscriptionManager, 
+                ISubscriptionManager subscriptionManager,
+                INodeStatusManager nodeStatusManager,
                 HttpUriRequest request, String uuid, User user, 
                 DataSource dataSource) {
             this.registryManager = registryManager;
             this.subscriptionManager = subscriptionManager;
+            this.nodeStatusManager = nodeStatusManager;
             this.request = request;
             this.uuid = uuid;
             this.user = user;
@@ -158,6 +156,14 @@ public class PostFileTaskTest {
         
         subscriptionManagerMock = (ISubscriptionManager)
                 createMock(ISubscriptionManager.class);
+        expect(subscriptionManagerMock.load(Subscription.PEER, 
+                receiver.getName(), dataSource.getName())).andReturn(s).once();
+        
+        nodeStatusManagerMock = (INodeStatusManager)
+                createMock(INodeStatusManager.class);
+        Status st = new Status(0, 0, 0);
+        expect(nodeStatusManagerMock.load(1)).andReturn(st).once();
+        expect(nodeStatusManagerMock.update(st, 1)).andReturn(1).once();
         
         HttpResponse response = createResponse(HttpServletResponse.SC_OK, "OK");
         httpClientUtilMock = (IHttpClientUtil) 
@@ -169,7 +175,8 @@ public class PostFileTaskTest {
         replayAll();
         
         classUnderTest = new PFTask(registryManagerMock, 
-            subscriptionManagerMock, request, ENTRY_UUID, receiver, dataSource);
+            subscriptionManagerMock, nodeStatusManagerMock, request, ENTRY_UUID, 
+            receiver, dataSource);
         classUnderTest.setHttpClient(httpClientUtilMock);
         classUnderTest.run();
         
@@ -183,6 +190,13 @@ public class PostFileTaskTest {
         
         subscriptionManagerMock = (ISubscriptionManager)
                 createMock(ISubscriptionManager.class);
+       expect(subscriptionManagerMock.load(Subscription.PEER, 
+                receiver.getName(), dataSource.getName())).andReturn(s).once();
+        
+        nodeStatusManagerMock = (INodeStatusManager)
+                createMock(INodeStatusManager.class);
+        Status st = new Status(0, 0, 0);
+        expect(nodeStatusManagerMock.load(1)).andReturn(st).once();
         
         httpClientUtilMock = (IHttpClientUtil) 
                 createMock(IHttpClientUtil.class);
@@ -193,8 +207,9 @@ public class PostFileTaskTest {
         
         replayAll();
         
-        classUnderTest = new PFTask(registryManagerMock, 
-            subscriptionManagerMock, request, ENTRY_UUID, receiver, dataSource);
+        classUnderTest = new PFTask(registryManagerMock,
+            subscriptionManagerMock, nodeStatusManagerMock, request, ENTRY_UUID, 
+            receiver, dataSource);
         classUnderTest.setHttpClient(httpClientUtilMock);
         classUnderTest.run();
         
@@ -213,6 +228,12 @@ public class PostFileTaskTest {
         subscriptionManagerMock.delete(s.getId());
         expectLastCall();
         
+        nodeStatusManagerMock = (INodeStatusManager)
+                createMock(INodeStatusManager.class);
+        Status st = new Status(0, 0, 0);
+        expect(nodeStatusManagerMock.load(1)).andReturn(st).once();
+        expect(nodeStatusManagerMock.delete(1)).andReturn(1).once();
+        
         HttpResponse response = createResponse(HttpServletResponse.SC_FORBIDDEN, 
                 "Subscription invalid");
         httpClientUtilMock = (IHttpClientUtil) 
@@ -224,7 +245,8 @@ public class PostFileTaskTest {
         replayAll();
         
         classUnderTest = new PFTask(registryManagerMock, 
-            subscriptionManagerMock, request, ENTRY_UUID, receiver, dataSource);
+            subscriptionManagerMock, nodeStatusManagerMock, request, ENTRY_UUID, 
+            receiver, dataSource);
         classUnderTest.setHttpClient(httpClientUtilMock);
         classUnderTest.run();
         
@@ -238,6 +260,13 @@ public class PostFileTaskTest {
         
         subscriptionManagerMock = (ISubscriptionManager)
                 createMock(ISubscriptionManager.class);
+        expect(subscriptionManagerMock.load(Subscription.PEER, 
+                receiver.getName(), dataSource.getName())).andReturn(s).once();
+        
+        nodeStatusManagerMock = (INodeStatusManager)
+                createMock(INodeStatusManager.class);
+        Status st = new Status(0, 0, 0);
+        expect(nodeStatusManagerMock.load(1)).andReturn(st).once();
         
         HttpResponse response = createResponse(HttpServletResponse.SC_CONFLICT, 
                 "File exists");
@@ -250,7 +279,8 @@ public class PostFileTaskTest {
         replayAll();
         
         classUnderTest = new PFTask(registryManagerMock, 
-            subscriptionManagerMock, request, ENTRY_UUID, receiver, dataSource);
+            subscriptionManagerMock, nodeStatusManagerMock, request, ENTRY_UUID, 
+            receiver, dataSource);
         classUnderTest.setHttpClient(httpClientUtilMock);
         classUnderTest.run();
         
@@ -266,6 +296,14 @@ public class PostFileTaskTest {
         
         subscriptionManagerMock = (ISubscriptionManager)
                 createMock(ISubscriptionManager.class);
+        expect(subscriptionManagerMock.load(Subscription.PEER, 
+                receiver.getName(), dataSource.getName())).andReturn(s).once();
+        
+        nodeStatusManagerMock = (INodeStatusManager)
+                createMock(INodeStatusManager.class);
+        Status st = new Status(0, 0, 0);
+        expect(nodeStatusManagerMock.load(1)).andReturn(st).once();
+        expect(nodeStatusManagerMock.update(st, 1)).andReturn(1).once();
         
         HttpResponse response = createResponse(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error");
@@ -281,7 +319,8 @@ public class PostFileTaskTest {
         replayAll();
         
         classUnderTest = new PFTask(registryManagerMock, 
-            subscriptionManagerMock, request, ENTRY_UUID, receiver, dataSource);
+            subscriptionManagerMock, nodeStatusManagerMock, request, ENTRY_UUID, 
+            receiver, dataSource);
         classUnderTest.setHttpClient(httpClientUtilMock);
         classUnderTest.run();
         
@@ -292,11 +331,19 @@ public class PostFileTaskTest {
     public void run_RetryFailure() throws Exception {
         registryManagerMock = (IRegistryManager) 
                 createMock(IRegistryManager.class);
-         expect(registryManagerMock.store(isA(RegistryEntry.class)))
+        expect(registryManagerMock.store(isA(RegistryEntry.class)))
                 .andReturn(1);
         
         subscriptionManagerMock = (ISubscriptionManager)
                 createMock(ISubscriptionManager.class);
+        expect(subscriptionManagerMock.load(Subscription.PEER, 
+                receiver.getName(), dataSource.getName())).andReturn(s).once();
+        
+        nodeStatusManagerMock = (INodeStatusManager)
+                createMock(INodeStatusManager.class);
+        Status st = new Status(0, 0, 0);
+        expect(nodeStatusManagerMock.load(1)).andReturn(st).once();
+        expect(nodeStatusManagerMock.update(st, 1)).andReturn(1).once();
         
         HttpResponse response = createResponse(
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error");
@@ -310,7 +357,8 @@ public class PostFileTaskTest {
         replayAll();
         
         classUnderTest = new PFTask(registryManagerMock, 
-            subscriptionManagerMock, request, ENTRY_UUID, receiver, dataSource);
+            subscriptionManagerMock, nodeStatusManagerMock, request, ENTRY_UUID, 
+            receiver, dataSource);
         classUnderTest.setHttpClient(httpClientUtilMock);
         classUnderTest.run();
         

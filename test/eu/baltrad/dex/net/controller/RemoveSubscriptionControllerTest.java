@@ -21,35 +21,33 @@
 
 package eu.baltrad.dex.net.controller;
 
-import eu.baltrad.dex.net.manager.ISubscriptionManager;
-import eu.baltrad.dex.user.manager.IUserManager;
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.controller.util.ModelMessageHelper;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
-import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-
-import org.springframework.ui.Model;
-import org.springframework.ui.ExtendedModelMap;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.User;
+import java.util.ArrayList;
+import java.util.List;
+import org.easymock.EasyMockSupport;
+import static org.easymock.EasyMock.*;
+import org.easymock.EasyMock;
+import static org.easymock.EasyMock.*;
+import org.junit.After;
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.SimpleTransactionStatus;
-
-import org.easymock.EasyMockSupport;
-
-import static org.easymock.EasyMock.*;
-
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.After;
-import org.junit.Test;
-
-import java.util.List;
-import java.util.ArrayList;
+import org.springframework.ui.ExtendedModelMap;
+import org.springframework.ui.Model;
 
 /**
  * Remove subscription controller test.
@@ -71,6 +69,7 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
     private IHttpClientUtil httpClientMock;
     private PlatformTransactionManager txManagerMock;
     private IDataSourceManager dataSourceManagerMock;
+    private INodeStatusManager nodeStatusManagerMock;
     
     private List<User> operators;
     private List<Subscription> downloads;
@@ -135,6 +134,7 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
         dataSourceManagerMock = createMock(IDataSourceManager.class);
         methods = createMock(MethodMock.class);
         messageHelper = createMock(ModelMessageHelper.class);
+        nodeStatusManagerMock = createMock(INodeStatusManager.class);
         
         classUnderTest.setMessageHelper(messageHelper);
         classUnderTest.setUserManager(userManagerMock);
@@ -143,6 +143,7 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
         classUnderTest.setTxManager(txManagerMock);
         classUnderTest.setPeerName("PeerUser");
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         
         operators = new ArrayList<User>();
         operators.add(new User(1, "test1.baltrad.eu", "user", "s3cret", "org", 
@@ -359,12 +360,14 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
       expect(ds1.getId()).andReturn(3);
       expect(dataSourceManagerMock.delete(3)).andReturn(1);
       subscriptionManagerMock.delete(1);
+      expect(nodeStatusManagerMock.delete(3)).andReturn(1);
       expect(messageHelper.getMessage("removesubscription.success", "PeerUser", "DS1")).andReturn("Removed 1");
       
       expect(dataSourceManagerMock.load("DS2", "peer")).andReturn(ds2);
       expect(ds2.getId()).andReturn(4);
       expect(dataSourceManagerMock.delete(4)).andReturn(1);
       subscriptionManagerMock.delete(2);
+      expect(nodeStatusManagerMock.delete(4)).andReturn(1);
       expect(messageHelper.getMessage("removesubscription.success", "PeerUser", "DS2")).andReturn("Removed 2");
       
       txManagerMock.commit(status);
@@ -376,6 +379,7 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
       classUnderTest.setSubscriptionManager(subscriptionManagerMock);
       classUnderTest.setMessageHelper(messageHelper);
       classUnderTest.setDataSourceManager(dataSourceManagerMock);
+      classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
       
       int result = classUnderTest.removeDownloads(downloads);
       
@@ -399,6 +403,7 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
       expect(ds1.getId()).andReturn(3);
       expect(dataSourceManagerMock.delete(3)).andReturn(1);
       subscriptionManagerMock.delete(1);
+      expect(nodeStatusManagerMock.delete(3)).andReturn(1);
       expect(messageHelper.getMessage("removesubscription.success", "PeerUser", "DS1")).andReturn("Removed 1");
       
       expect(dataSourceManagerMock.load("DS2", "peer")).andReturn(ds2);
@@ -416,6 +421,7 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
       classUnderTest.setSubscriptionManager(subscriptionManagerMock);
       classUnderTest.setMessageHelper(messageHelper);
       classUnderTest.setDataSourceManager(dataSourceManagerMock);
+      classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
       
       int result = classUnderTest.removeDownloads(downloads);
       
@@ -483,8 +489,10 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
       Model model = createMock(Model.class);
       
       subscriptionManagerMock.delete(4);
+      expect(nodeStatusManagerMock.delete(4)).andReturn(1);
       expect(messageHelper.getMessage("removesubscription.success", "DataSource4", "PeerUser")).andReturn("Deleted upload 4");
       subscriptionManagerMock.delete(5);
+      expect(nodeStatusManagerMock.delete(5)).andReturn(1);
       expect(messageHelper.getMessage("removesubscription.success", "DataSource5", "PeerUser")).andReturn("Deleted upload 5");
       messageHelper.setKeyMessage(model, "subscription_remove_success", "removesubscription.completed_success");
       

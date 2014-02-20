@@ -21,48 +21,51 @@
 
 package eu.baltrad.dex.net.controller;
 
+import eu.baltrad.beast.db.IFilter;
+import eu.baltrad.beast.db.IFilterManager;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.protocol.RequestFactory;
 import eu.baltrad.dex.net.protocol.ResponseParser;
 import eu.baltrad.dex.net.protocol.ResponseParserException;
-import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.controller.exception.InternalControllerException;
 import eu.baltrad.dex.net.controller.util.ModelMessageHelper;
-import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
-import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
+import eu.baltrad.dex.net.util.json.impl.JsonUtil;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.manager.IUserManager;
-
-import eu.baltrad.beast.db.IFilter;
-import eu.baltrad.beast.db.IFilterManager;
-
+import eu.baltrad.dex.user.model.User;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
-
+import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMockSupport;
 
-import static org.easymock.EasyMock.*;
-
-import org.springframework.ui.Model;
-import org.springframework.mock.web.MockHttpServletRequest;
-
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
 import org.apache.log4j.Logger;
-
+import org.easymock.EasyMock;
+import static org.easymock.EasyMock.*;
+import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
-import org.junit.After;
 import org.junit.Test;
-
-import java.util.Set;
-
-import java.io.IOException;
-import java.util.HashSet;
-
 import org.keyczar.exceptions.KeyczarException;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.ui.ExtendedModelMap;
+import org.springframework.ui.Model;
 
 /**
  * Post subscription request controller test.
@@ -84,6 +87,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
     private Authenticator authenticatorMock;
     private ISubscriptionManager subscriptionManagerMock;
     private IDataSourceManager dataSourceManagerMock;
+    private INodeStatusManager nodeStatusManagerMock;
     private IFilterManager filterManagerMock;
     private ProtocolManager protocolManager;
     private ModelMessageHelper messageHelper;
@@ -117,6 +121,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
         subscriptionManagerMock = createMock(ISubscriptionManager.class);
         authenticatorMock = createMock(Authenticator.class);
         dataSourceManagerMock = createMock(IDataSourceManager.class);
+        nodeStatusManagerMock = createMock(INodeStatusManager.class);
         filterManagerMock = (IFilterManager) createMock(IFilterManager.class);
         protocolManager = createMock(ProtocolManager.class);
         messageHelper = createMock(ModelMessageHelper.class);
@@ -135,6 +140,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
         classUnderTest.setFilterManager(filterManagerMock);
         classUnderTest.setProtocolManager(protocolManager);
         classUnderTest.setMessageHelper(messageHelper);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
     }
     
     @After
@@ -160,11 +166,11 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
     public void storeLocalSubscriptions() throws Exception {
       User usr1 = new User(1, "test.baltrad.eu", "user", "s3cret", "org", 
           "unit", "locality", "state", "XX", "http://test.baltrad.eu:8084");
-      
       Set<DataSource> dataSources = new HashSet<DataSource>();
       DataSource ds1 = createMock(DataSource.class);
       DataSource ds2 = createMock(DataSource.class);
       DataSource eds2 = createMock(DataSource.class);
+      Status statusObject = createMock(Status.class);
       
       Subscription subscription1 = createMock(Subscription.class);
       Subscription subscription2 = createMock(Subscription.class);
@@ -182,6 +188,8 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       expect(methods.createSubscriptionObject("local", "NodeName", "DS1", true, true)).andReturn(subscription1);
       expect(subscriptionManagerMock.load("local", "PeerName", "DS1")).andReturn(null);
       expect(subscriptionManagerMock.store(subscription1)).andReturn(1);
+      expect(nodeStatusManagerMock.store(isA(Status.class))).andReturn(2);
+      expect(nodeStatusManagerMock.store(2, 1)).andReturn(1);
 
       expect(ds2.getName()).andReturn("DS2").anyTimes();
       expect(dataSourceManagerMock.load("DS2", "peer")).andReturn(eds2);
@@ -193,8 +201,11 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       expect(subscriptionManagerMock.load("local", "PeerName", "DS2")).andReturn(existing2);
       expect(existing2.getId()).andReturn(4);
       subscription2.setId(4);
+      expect(subscription2.getId()).andReturn(4);
       subscriptionManagerMock.update(subscription2);
-
+      expect(nodeStatusManagerMock.load(4)).andReturn(statusObject);
+      statusObject.setDownloads(0);
+      expect(nodeStatusManagerMock.update(statusObject, 4)).andReturn(1);
       replayAll();
       
       StartSubscriptionController classUnderTest = new StartSubscriptionController() {
@@ -218,6 +229,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       classUnderTest.setFilterManager(filterManagerMock);
       classUnderTest.setProtocolManager(protocolManager);
       classUnderTest.setMessageHelper(messageHelper);
+      classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
       
       classUnderTest.storeLocalSubscriptions("NodeName", dataSources, "PeerName");
       

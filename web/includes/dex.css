@@ -1515,7 +1515,14 @@ textarea {
     margin-top: 6px;
 }
 .save-radars .buttons {
-    margin-right: 12px;
+    float: right;
+    clear: both;
+}
+
+.save-radars .messagebox {
+    float: left;
+    clear: both;
+    margin: 16px 0 16px 25%;
 }
 .show-radars .messagebox {
     float: left;

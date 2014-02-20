@@ -1,5 +1,5 @@
 /*******************************************************************************
-Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
+Copyright (C) 2009-2014 Institute of Meteorology and Water Management, IMGW
 
 This file is part of the BaltradDex software.
 
@@ -363,6 +363,56 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+/*
+    Create and fill status tables.
+*/
+CREATE OR REPLACE FUNCTION create_status_tables() RETURNS void AS $$
+BEGIN 
+    PERFORM true FROM information_schema.tables WHERE table_name = 'dex_status';
+    IF NOT FOUND THEN
+        CREATE TABLE dex_status
+        (
+            id SERIAL NOT NULL PRIMARY KEY,
+            downloads BIGINT DEFAULT 0,
+            uploads BIGINT DEFAULT 0,
+            upload_failures BIGINT DEFAULT 0
+        );
+    ELSE
+        RAISE NOTICE 'table "dex_status" already exists';
+    END IF;
+
+    PERFORM true FROM information_schema.tables WHERE table_name = 
+            'dex_status_subscriptions';
+    IF NOT FOUND THEN
+        CREATE TABLE dex_status_subscriptions
+        (
+            id SERIAL NOT NULL PRIMARY KEY,
+            status_id INT NOT NULL REFERENCES dex_status(id) ON DELETE CASCADE,
+            subscription_id INT NOT NULL REFERENCES dex_subscriptions(id) ON DELETE CASCADE
+        );
+    ELSE
+        RAISE NOTICE 'table "dex_status_subscriptions" already exists';
+    END IF;
+
+    IF NOT EXISTS (SELECT * FROM dex_status LIMIT 1) THEN
+        IF NOT EXISTS (SELECT * FROM dex_status_subscriptions LIMIT 1) THEN
+            DECLARE 
+                sub RECORD;
+                stat_id INT;
+            BEGIN 
+                FOR sub IN SELECT * FROM dex_subscriptions LOOP
+                    INSERT INTO dex_status (downloads, uploads, upload_failures) 
+                        VALUES (0, 0, 0) RETURNING id INTO stat_id;
+                    INSERT INTO dex_status_subscriptions 
+                            (status_id, subscription_id) 
+                        VALUES (stat_id, sub.id);
+                END LOOP;
+            END;
+        END IF;
+    END IF;
+END
+$$ LANGUAGE plpgsql;
+
 SELECT remove_name_hash_from_dex_users();
 -- SELECT reset_user_passwords();
 SELECT rename_registry_table();
@@ -373,6 +423,7 @@ SELECT update_dex_data_source_users_table();
 SELECT remove_double_index();
 SELECT upgrade_dex_keys_table();
 SELECT upgrade_dex_data_sources_table();
+SELECT create_status_tables();
 
 DROP FUNCTION make_plpgsql(); 
 DROP FUNCTION remove_name_hash_from_dex_users();
@@ -382,3 +433,4 @@ DROP FUNCTION update_dex_data_source_users_table();
 DROP FUNCTION remove_double_index();
 DROP FUNCTION upgrade_dex_keys_table();
 DROP FUNCTION upgrade_dex_data_sources_table();
+DROP FUNCTION create_status_tables();

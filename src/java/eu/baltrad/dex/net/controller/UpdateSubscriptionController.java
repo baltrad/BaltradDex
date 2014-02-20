@@ -36,6 +36,8 @@ import eu.baltrad.dex.net.controller.util.MessageSetter;
 import eu.baltrad.dex.net.controller.util.ModelMessageHelper;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.User;
@@ -132,6 +134,7 @@ public class UpdateSubscriptionController  {
     
     private IConfigurationManager confManager;
     private ISubscriptionManager subscriptionManager;
+    private INodeStatusManager nodeStatusManager;
     private IUserManager userManager;
     private ModelMessageHelper messageHelper;
     private Authenticator authenticator;
@@ -244,7 +247,10 @@ public class UpdateSubscriptionController  {
             Subscription existing = subscriptionManager.load(
                     Subscription.LOCAL, nodeName, s.getDataSource());
             if (existing == null) {
-                subscriptionManager.store(requested);
+                    int subscriptionId = subscriptionManager.store(requested);
+                    // save status
+                    int statusId = nodeStatusManager.store(new Status(0, 0, 0));
+                    nodeStatusManager.store(statusId, subscriptionId);
             } else {       
                 requested.setId(existing.getId());
                 subscriptionManager.update(requested);
@@ -399,6 +405,14 @@ public class UpdateSubscriptionController  {
     public void setSubscriptionManager(ISubscriptionManager subscriptionManager) 
     {
         this.subscriptionManager = subscriptionManager;
+    }
+    
+    /**
+     * @param nodeStatusManager the nodeStatusManager to set
+     */
+    @Autowired
+    public void setNodeStatusManager(INodeStatusManager nodeStatusManager) {
+        this.nodeStatusManager = nodeStatusManager;
     }
     
     /**

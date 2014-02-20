@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Copyright (C) 2009-2013 Institute of Meteorology and Water Management, IMGW
+* Copyright (C) 2009-2014 Institute of Meteorology and Water Management, IMGW
 *
 * This file is part of the BaltradDex software.
 *
@@ -19,36 +19,39 @@
 *
 *******************************************************************************/
 
-package eu.baltrad.dex.net.model.mapper;
+package eu.baltrad.dex.status.model.mapper;
 
-import eu.baltrad.dex.net.model.impl.Upload;
-
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-
+import eu.baltrad.dex.status.model.Status;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 /**
- * Upload object mapper.
+ * Node status object mapper.
  *
  * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.6.1
- * @since 1.6.1
+ * @version 1.0
+ * @since 1.0
  */
-public class UploadMapper implements ParameterizedRowMapper<Upload> 
-{
+public class StatusMapper implements ParameterizedRowMapper<Status> {
     /**
      * Maps records to result set. 
      * @param rs Result set 
      * @param rowNum Row number
-     * @return Upload object
+     * @return Status object
      * @throws SQLException 
      */
-    public Upload mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new Upload(
+    public Status mapRow(ResultSet rs, int rowNum) throws SQLException {
+        return new Status(
+                rs.getInt("id"),
+                rs.getString("node_name"),
                 rs.getString("data_source"),
+                rs.getString("type"),
                 rs.getLong("start"),
-                rs.getBoolean("status"));
+                rs.getBoolean("active"),
+                rs.getLong("downloads"),
+                rs.getLong("uploads"),
+                rs.getLong("upload_failures"));
     }
     
 }

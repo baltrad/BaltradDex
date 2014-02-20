@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dataset>
+
+    <dex_users id="1" name="se.baltrad.eu" password="s3cret" org_name="SMHI" 
+               org_unit="Unit" locality="Norkopping" state="Sweden"
+               country_code="SE"/>
+    <dex_users id="2" name="no.met.beast" password="s3cret" org_name="MET.NO" 
+               org_unit="Unit" locality="Oslo" state="Norway" 
+               country_code="NO"/>
+    <dex_users id="3" name="dk.dmi" password="s3cret" org_name="DMI" 
+               org_unit="Unit" locality="Copenhagen" state="Denmark"
+               country_code="DK"/>
+    <dex_users id="4" name="baltrad.imgw.pl" password="s3cret" org_name="IMGW" 
+               org_unit="Unit" locality="Warsaw" state="Poland"
+               country_code="PL"/>
+    
+    <dex_data_sources id="1" name="LegionowoPVOLs" type="local" 
+                      description="Polar volumes from Legionowo"/>
+    <dex_data_sources id="2" name="PoznańPVOLs" type="local" 
+                      description="Polar volumes from Poznań"/>
+    <dex_data_sources id="3" name="ArlandaSCANs" type="peer" 
+                      description="Polar scans from Arlanda"/>
+    <dex_data_sources id="4" name="KarlskronaSCANs" type="peer" 
+                      description="Polar scans from Karlskrona"/>
+    <dex_data_sources id="5" name="StadPVOLs" type="peer" 
+                      description="Polar volumes from Stad"/>
+    <dex_data_sources id="6" name="Bornholm" type="peer" 
+                      description="Polar volumes from Bornholm"/>
+    
+    <dex_data_source_users data_source_id="1" user_id="1"/>
+    <dex_data_source_users data_source_id="2" user_id="1"/>
+    <dex_data_source_users data_source_id="1" user_id="2"/>
+    <dex_data_source_users data_source_id="2" user_id="2"/>
+    <dex_data_source_users data_source_id="1" user_id="3"/>
+    
+    <dex_subscriptions id="1" time_stamp="1364405277970" type="local" 
+                       active="true" sync="true"/>
+    <dex_subscriptions id="2" time_stamp="1364406277970" type="local" 
+                       active="true" sync="true"/>
+    <dex_subscriptions id="3" time_stamp="1364407277970" type="local" 
+                       active="true" sync="true"/>
+    <dex_subscriptions id="4" time_stamp="1364406677970" type="local" 
+                       active="true" sync="true"/>
+    <dex_subscriptions id="5" time_stamp="1364405477970" type="peer" 
+                       active="true" sync="true"/>
+    <dex_subscriptions id="6" time_stamp="1364408277970" type="peer" 
+                       active="true" sync="true"/>
+    <dex_subscriptions id="7" time_stamp="1364409277970" type="peer" 
+                       active="true" sync="true"/>
+    <dex_subscriptions id="8" time_stamp="1364434527970" type="peer" 
+                       active="true" sync="true"/>
+    <dex_subscriptions id="9" time_stamp="1364407277978" type="peer" 
+                       active="true" sync="true"/>
+    
+    <dex_subscriptions_data_sources subscription_id="1" data_source_id="3"/>
+    <dex_subscriptions_data_sources subscription_id="2" data_source_id="4"/>
+    <dex_subscriptions_data_sources subscription_id="3" data_source_id="5"/>
+    <dex_subscriptions_data_sources subscription_id="4" data_source_id="6"/>
+    <dex_subscriptions_data_sources subscription_id="5" data_source_id="1"/>
+    <dex_subscriptions_data_sources subscription_id="6" data_source_id="2"/>
+    <dex_subscriptions_data_sources subscription_id="7" data_source_id="1"/>
+    <dex_subscriptions_data_sources subscription_id="8" data_source_id="2"/>
+    <dex_subscriptions_data_sources subscription_id="9" data_source_id="1"/>
+             
+    <dex_subscriptions_users subscription_id="1" user_id="1"/> 
+    <dex_subscriptions_users subscription_id="2" user_id="1"/> 
+    <dex_subscriptions_users subscription_id="3" user_id="2"/> 
+    <dex_subscriptions_users subscription_id="4" user_id="3"/> 
+    <dex_subscriptions_users subscription_id="5" user_id="1"/> 
+    <dex_subscriptions_users subscription_id="6" user_id="1"/> 
+    <dex_subscriptions_users subscription_id="7" user_id="2"/> 
+    <dex_subscriptions_users subscription_id="8" user_id="2"/>
+    <dex_subscriptions_users subscription_id="9" user_id="3"/>  
+                
+    <dex_status downloads="4123412" uploads="0" upload_failures="0"/>
+    <dex_status downloads="8790935" uploads="0" upload_failures="0"/>
+    <dex_status downloads="53453245" uploads="0" upload_failures="0"/>
+    <dex_status downloads="2345234" uploads="0" upload_failures="0"/>
+    <dex_status downloads="0" uploads="543532455" upload_failures="45"/>
+    <dex_status downloads="0" uploads="45634453" upload_failures="55"/>
+    <dex_status downloads="0" uploads="7868769" upload_failures="123"/>
+    <dex_status downloads="0" uploads="987989879" upload_failures="987"/>
+    <dex_status downloads="0" uploads="87687687" upload_failures="632"/>
+            
+    <dex_status_subscriptions status_id="1" subscription_id="1"/>
+    <dex_status_subscriptions status_id="2" subscription_id="2"/> 
+    <dex_status_subscriptions status_id="3" subscription_id="3"/> 
+    <dex_status_subscriptions status_id="4" subscription_id="4"/> 
+    <dex_status_subscriptions status_id="5" subscription_id="5"/> 
+    <dex_status_subscriptions status_id="6" subscription_id="6"/> 
+    <dex_status_subscriptions status_id="7" subscription_id="7"/> 
+    <dex_status_subscriptions status_id="8" subscription_id="8"/> 
+    <dex_status_subscriptions status_id="9" subscription_id="9"/>  
+
+</dataset>

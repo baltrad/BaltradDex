@@ -35,6 +35,8 @@ Author     : szewczenko
                     Select radar station and click <i>Save</i> to store settings.  
                 </div>
                 <form:form method="POST" commandName="radar">
+                    <t:message_box errorHeader="Problems encountered."
+                                   errorBody="${odim_load_error}"/>    
                     <div class="row" id="label">
                         <div class="leftcol">Center ID</div>
                         <div class="rightcol">Radar station</div>

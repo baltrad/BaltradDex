@@ -67,6 +67,7 @@ def store_key(user, host, db, pwd, key, checksum, authorized, injector):
 			"VALUES (%s, %s, %s, %s)"
 	conn = None
 	cursor = None
+	key = key[:-4]
 	print "Storing key in the database", db, "..."
 	try:
 		conn = psycopg2.connect(

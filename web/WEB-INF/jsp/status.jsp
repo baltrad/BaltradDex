@@ -17,7 +17,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 --------------------------------------------------------------------------------
 Document   : Node status page
-Created on : Apr 22, 2013, 10:43 AM
+Created on : Apr 22, 2014, 10:43 AM
 Author     : szewczenko
 ------------------------------------------------------------------------------%>
 
@@ -190,20 +190,26 @@ Author     : szewczenko
                                                                         <div class="subscription-status">
                                                                             Subscription status
                                                                         </div>
+                                                                        <div class="files-sent">
+                                                                            Files downloaded
+                                                                        </div>
                                                                     </div>
-                                                                    <c:forEach var="download" items="${peers_downloads[peer]}">
+                                                                    <c:forEach var="status" items="${peers_downloads[peer]}">
                                                                         <div class="data-source">
                                                                             <div class="data-source-name"
-                                                                                 title="${download.dataSource}">
-                                                                                <c:out value="${download.dataSource}"/>
+                                                                                 title="${status.dataSource}">
+                                                                                <c:out value="${status.dataSource}"/>
                                                                             </div>
                                                                             <div class="subscription-start">
-                                                                                <fmt:formatDate value="${download.date}" 
+                                                                                <fmt:formatDate value="${status.subscriptionStartDate}" 
                                                                                                 pattern="yyyy/MM/dd HH:mm:ss"/>
                                                                             </div>
                                                                             <div class="subscription-status">
-                                                                                <c:out value="${download.active == true 
+                                                                                <c:out value="${status.subscriptionActive == true 
                                                                                                 ? 'Active' : 'Off'}"/>
+                                                                            </div>
+                                                                            <div class="files-sent">
+                                                                                <c:out value="${status.downloads}"/>
                                                                             </div>
                                                                         </div>
                                                                     </c:forEach>       
@@ -237,21 +243,21 @@ Author     : szewczenko
                                                                             Upload failures
                                                                         </div>
                                                                     </div>
-                                                                    <c:forEach var="upload" items="${peers_uploads[peer]}">
+                                                                    <c:forEach var="status" items="${peers_uploads[peer]}">
                                                                         <div class="data-source">
                                                                             <div class="data-source-name"
-                                                                                 title="${upload.dataSource}">
-                                                                                <c:out value="${upload.dataSource}"/>
+                                                                                 title="${status.dataSource}">
+                                                                                <c:out value="${status.dataSource}"/>
                                                                             </div>
                                                                             <div class="subscription-start">
-                                                                                <fmt:formatDate value="${upload.date}" 
+                                                                                <fmt:formatDate value="${status.subscriptionStartDate}" 
                                                                                                 pattern="yyyy/MM/dd HH:mm:ss"/>
                                                                             </div>
                                                                             <div class="files-sent">
-                                                                                <c:out value="${upload.filesSent}"/>
+                                                                                <c:out value="${status.uploads}"/>
                                                                             </div>
                                                                             <div class="failures">
-                                                                                <c:out value="${upload.failures}"/>
+                                                                                <c:out value="${status.uploadFailures}"/>
                                                                             </div> 
                                                                         </div> 
                                                                     </c:forEach>
