@@ -25,28 +25,30 @@ import eu.baltrad.dex.net.util.IncomingFileNamer;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.easymock.EasyMockSupport;
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
-import org.easymock.MockControl;
-import org.easymock.classextension.MockClassControl;
+import org.junit.Before;
+import org.junit.Test;
 
 import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.oh5.Attribute;
 import eu.baltrad.bdb.oh5.Group;
 import eu.baltrad.bdb.oh5.Metadata;
 import eu.baltrad.bdb.oh5.Source;
-import eu.baltrad.bdb.util.Date;
-import eu.baltrad.bdb.util.Time;
 
-public class IncomingFileNamerTest extends TestCase {
+public class IncomingFileNamerTest extends EasyMockSupport {
   private IncomingFileNamer classUnderTest;
   private Metadata metadata;
 
+  @Before
   public void setUp() {
     classUnderTest = new IncomingFileNamer();
     metadata = new Metadata();
   }
 
+  @Test
   public void testNameMetadata_Pvol() {
     metadata.addNode("/", new Group("what"));
     metadata.addNode("/what", new Attribute("object", "PVOL"));
@@ -58,6 +60,7 @@ public class IncomingFileNamerTest extends TestCase {
                  classUnderTest.nameMetadata(metadata));
   }
 
+  @Test
   public void testNameMetadata_Scan() {
     metadata.addNode("/", new Group("what"));
     metadata.addNode("/what", new Attribute("object", "SCAN"));
@@ -73,6 +76,7 @@ public class IncomingFileNamerTest extends TestCase {
                  classUnderTest.nameMetadata(metadata));
   }
 
+  @Test
   public void testNameMetadata_ScanWithoutElangle() {
     metadata.addNode("/", new Group("what"));
     metadata.addNode("/what", new Attribute("object", "SCAN"));
@@ -84,6 +88,7 @@ public class IncomingFileNamerTest extends TestCase {
                  classUnderTest.nameMetadata(metadata));
   }
   
+  @Test
   public void testGetSourceRepr() {
     List<String> keyPriorities = new ArrayList<String>();
     keyPriorities.add("PLC");
@@ -95,12 +100,14 @@ public class IncomingFileNamerTest extends TestCase {
     assertEquals("PLC:p", classUnderTest.getSourceRepr(src));
   }
   
+  @Test
   public void testGetSourceRepr_noSourceKey() {
     Source src = new Source();
     src.put("QWE", "asd");
     assertEquals("unknown", classUnderTest.getSourceRepr(src));
   }
 
+  @Test
   public void testName_fileEntry() {
     metadata.addNode("/", new Group("what"));
     metadata.addNode("/what", new Attribute("object", "PVOL"));
@@ -110,17 +117,16 @@ public class IncomingFileNamerTest extends TestCase {
 
     Source src = Source.fromString("NOD:seang");
     
-    MockControl entryControl = MockControl.createControl(FileEntry.class);
-    FileEntry entry = (FileEntry)entryControl.getMock();
+    FileEntry entry = createMock(FileEntry.class);
 
-    entry.getMetadata();
-    entryControl.setReturnValue(metadata, MockControl.ONE_OR_MORE);
-    entry.getSource();
-    entryControl.setReturnValue(src, MockControl.ONE_OR_MORE);
-    entryControl.replay();
+    expect(entry.getMetadata()).andReturn(metadata);
+    expect(entry.getSource()).andReturn(src);
+    
+    replayAll();
 
     assertEquals("PVOL NOD:seang 2011-06-22T13:14:15",
                  classUnderTest.name(entry));
-    entryControl.verify();
+
+    verifyAll();
   }
 }

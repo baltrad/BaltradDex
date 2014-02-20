@@ -3,10 +3,10 @@ package eu.baltrad.beastui.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.easymock.MockControl;
-import org.easymock.classextension.MockClassControl;
+import org.easymock.EasyMockSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
@@ -17,7 +17,10 @@ import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.composite.CompositingRule;
 import eu.baltrad.beast.rules.util.IRuleUtilities;
 
-public class CompositeRoutesControllerTest extends TestCase {
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
+
+public class CompositeRoutesControllerTest extends EasyMockSupport {
   private static interface MethodMocker {
     public String viewCreateRoute(Model model, String name, String author,
         Boolean active, String description, List<String> recipients, Boolean byscan, String method, String prodpar, Integer selection_method,
@@ -32,32 +35,21 @@ public class CompositeRoutesControllerTest extends TestCase {
   }
   
   private CompositeRoutesController classUnderTest = null;
-  private MockControl managerControl = null;
   private IRouterManager manager = null;
-  private MockControl adaptorControl = null;
   private IBltAdaptorManager adaptorManager = null;
-  private MockControl anomalyControl = null;
   private IAnomalyDetectorManager anomalyManager = null;
-  private MockControl utilitiesControl = null;
   private IRuleUtilities utilities = null;
-  private MockControl modelControl = null;
   private Model model = null;
-  private MockControl methodControl = null;
   private MethodMocker method = null;
 
-  protected void setUp() throws Exception {
-    managerControl = MockControl.createControl(IRouterManager.class);
-    manager = (IRouterManager) managerControl.getMock();
-    adaptorControl = MockControl.createControl(IBltAdaptorManager.class);
-    adaptorManager = (IBltAdaptorManager) adaptorControl.getMock();
-    anomalyControl = MockControl.createControl(IAnomalyDetectorManager.class);
-    anomalyManager = (IAnomalyDetectorManager)anomalyControl.getMock();
-    utilitiesControl = MockControl.createControl(IRuleUtilities.class);
-    utilities = (IRuleUtilities)utilitiesControl.getMock();
-    modelControl = MockControl.createControl(Model.class);
-    model = (Model) modelControl.getMock();
-    methodControl = MockControl.createControl(MethodMocker.class);
-    method = (MethodMocker)methodControl.getMock();
+  @Before
+  public void setUp() throws Exception {
+    manager = createMock(IRouterManager.class);
+    adaptorManager = createMock(IBltAdaptorManager.class);
+    anomalyManager = createMock(IAnomalyDetectorManager.class);
+    utilities = createMock(IRuleUtilities.class);
+    model = createMock(Model.class);
+    method = createMock(MethodMocker.class);
     
     classUnderTest = new CompositeRoutesController() {
       protected String viewCreateRoute(Model model, String name, String author,
@@ -76,53 +68,33 @@ public class CompositeRoutesControllerTest extends TestCase {
     classUnderTest.setAnomalyDetectorManager(anomalyManager);
   }
   
+  @After
   public void tearDown() throws Exception {
     classUnderTest = null;
-    managerControl = null;
     manager = null;
-    adaptorControl = null;
     adaptorManager = null;
-    anomalyControl = null;
     anomalyManager = null;
-    modelControl = null;
     model = null;
   }
-  
-  private void replay() {
-    managerControl.replay();
-    adaptorControl.replay();
-    anomalyControl.replay();
-    utilitiesControl.replay();
-    modelControl.replay();
-    methodControl.replay();
-  }
 
-  private void verify() {
-    managerControl.verify();
-    adaptorControl.verify();
-    anomalyControl.verify();
-    utilitiesControl.verify();
-    modelControl.verify();
-    methodControl.verify();
-  }
-  
+  @Test
   public void testCreateRoute_initial() throws Exception {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A");
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
     
-    method.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    methodControl.setReturnValue("somestring");
-    replay();
+    expect(method.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)).andReturn("somestring");
+
+    replayAll();
     
     String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null,
         null, null, null, null, null, null, null);
 
-    verify();
+    verifyAll();
     assertEquals("somestring", result);
   }
   
+  @Test
   public void testCreateRoute() throws Exception {
     CompositingRule rule = new CompositingRule(){};
     RouteDefinition def = new RouteDefinition();
@@ -134,13 +106,10 @@ public class CompositeRoutesControllerTest extends TestCase {
     sources.add("A");
     List<String> detectors = new ArrayList<String>();
     
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
 
-    method.createRule("areaid", 30, sources, detectors, 40, true, CompositingRule.CAPPI, "500", 0);
-    methodControl.setReturnValue(rule);
-    manager.create("aname", "author", true, "a description", recipients, rule);
-    managerControl.setReturnValue(def);
+    expect(method.createRule("areaid", 30, sources, detectors, 40, true, CompositingRule.CAPPI, "500", 0)).andReturn(rule);
+    expect(manager.create("aname", "author", true, "a description", recipients, rule)).andReturn(def);
     manager.storeDefinition(def);
     
     classUnderTest = new CompositeRoutesController() {
@@ -153,32 +122,32 @@ public class CompositeRoutesControllerTest extends TestCase {
     classUnderTest.setManager(manager);
     classUnderTest.setAnomalyDetectorManager(anomalyManager);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.CAPPI, "500", 0, "areaid", 30, 40, sources, detectors);
     
-    verify();
+    verifyAll();
     assertEquals("redirect:routes.htm", result);
   }
   
+  @Test
   public void testCreateRoute_noAdaptors() throws Exception {
     List<String> adaptors = new ArrayList<String>();
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
 
-    model.addAttribute("emessage",
-        "No adaptors defined, please add one before creating a route.");
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("emessage",
+        "No adaptors defined, please add one before creating a route.")).andReturn(null);
 
-    replay();
+    replayAll();
 
     String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null,
         null, null, null, null, null, null, null);
 
-    verify();
+    verifyAll();
     assertEquals("redirect:adaptors.htm", result);
   }
   
+  @Test
   public void testCreateRoute_noName() throws Exception {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A");
@@ -199,21 +168,19 @@ public class CompositeRoutesControllerTest extends TestCase {
     
     String emessage = "Name must be specified.";
     
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
+    expect(method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
     
-    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
-    methodControl.setReturnValue("somestring");
-    
-    replay();
+    replayAll();
     String result = classUnderTest.createRoute(model, name, author, active, description,
         recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors);
     
-    verify();
+    verifyAll();
     assertEquals("somestring", result);
     
   }
 
+  @Test
   public void testCreateRoute_noAreaid() throws Exception {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A");
@@ -233,21 +200,19 @@ public class CompositeRoutesControllerTest extends TestCase {
     List<String> detectors = new ArrayList<String>();
     String emessage = "Areaid must be specified.";
     
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
    
-    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
-    methodControl.setReturnValue("somestring");
+    expect(method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
     
-    replay();
+    replayAll();
     String result = classUnderTest.createRoute(model, name, author, active, description,
         recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors);
     
-    verify();
+    verifyAll();
     assertEquals("somestring", result);
-    
   }
 
+  @Test
   public void testCreateRoute_noSources() throws Exception {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A");
@@ -267,20 +232,18 @@ public class CompositeRoutesControllerTest extends TestCase {
     List<String> detectors = new ArrayList<String>();
     String emessage = "Must specify at least one source.";
     
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
+    expect(method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
     
-    method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
-    methodControl.setReturnValue("somestring");
-    
-    replay();
+    replayAll();
     String result = classUnderTest.createRoute(model, name, author, active, description,
         recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors);
     
-    verify();
+    verifyAll();
     assertEquals("somestring", result);
   }
   
+  @Test
   public void testCreateRoute_pmax() throws Exception {
     CompositingRule rule = new CompositingRule(){};
     RouteDefinition def = new RouteDefinition();
@@ -292,13 +255,10 @@ public class CompositeRoutesControllerTest extends TestCase {
     sources.add("A");
     List<String> detectors = new ArrayList<String>();
     
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
 
-    method.createRule("areaid", 30, sources, detectors, 40, true, CompositingRule.PMAX, "500, 70000.0", 0);
-    methodControl.setReturnValue(rule);
-    manager.create("aname", "author", true, "a description", recipients, rule);
-    managerControl.setReturnValue(def);
+    expect(method.createRule("areaid", 30, sources, detectors, 40, true, CompositingRule.PMAX, "500, 70000.0", 0)).andReturn(rule);
+    expect(manager.create("aname", "author", true, "a description", recipients, rule)).andReturn(def);
     manager.storeDefinition(def);
     
     classUnderTest = new CompositeRoutesController() {
@@ -311,15 +271,15 @@ public class CompositeRoutesControllerTest extends TestCase {
     classUnderTest.setManager(manager);
     classUnderTest.setAnomalyDetectorManager(anomalyManager);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.PMAX, "500, 70000.0", 0, "areaid", 30, 40, sources, detectors);
     
-    verify();
+    verifyAll();
     assertEquals("redirect:routes.htm", result);
-    
   }
 
+  @Test
   public void testCreateRoute_pmax_2() throws Exception {
     CompositingRule rule = new CompositingRule(){};
     RouteDefinition def = new RouteDefinition();
@@ -331,13 +291,9 @@ public class CompositeRoutesControllerTest extends TestCase {
     sources.add("A");
     List<String> detectors = new ArrayList<String>();
     
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
-
-    method.createRule("areaid", 30, sources, detectors, 40, true, CompositingRule.PMAX, "0,1", 0);
-    methodControl.setReturnValue(rule);
-    manager.create("aname", "author", true, "a description", recipients, rule);
-    managerControl.setReturnValue(def);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
+    expect(method.createRule("areaid", 30, sources, detectors, 40, true, CompositingRule.PMAX, "0,1", 0)).andReturn(rule);
+    expect(manager.create("aname", "author", true, "a description", recipients, rule)).andReturn(def);
     manager.storeDefinition(def);
     
     classUnderTest = new CompositeRoutesController() {
@@ -350,18 +306,16 @@ public class CompositeRoutesControllerTest extends TestCase {
     classUnderTest.setManager(manager);
     classUnderTest.setAnomalyDetectorManager(anomalyManager);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.PMAX, "0,1", 0, "areaid", 30, 40, sources, detectors);
     
-    verify();
+    verifyAll();
     assertEquals("redirect:routes.htm", result);
-    
   }
 
+  @Test
   public void testCreateRoute_pmax_badprodpar() throws Exception {
-    CompositingRule rule = new CompositingRule(){};
-    RouteDefinition def = new RouteDefinition();
     String emessage = "Product parameter must be <height>,<range> value for pmax.";
     
     List<String> adaptors = new ArrayList<String>();
@@ -371,19 +325,18 @@ public class CompositeRoutesControllerTest extends TestCase {
     sources.add("A");
     List<String> detectors = new ArrayList<String>();
     
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
     
-    method.viewCreateRoute(model, "name", "author", true, "description", recipients, false, "pmax", ",500000", 0, "areaid", 30, 40, sources, detectors, emessage);
-    methodControl.setReturnValue("somestring");
+    expect(method.viewCreateRoute(model, "name", "author", true, "description", recipients, false, "pmax", ",500000", 0, "areaid", 30, 40, sources, detectors, emessage)).andReturn("somestring");
     
-    replay();
+    replayAll();
     String result = classUnderTest.createRoute(model, "name", "author", true, "description", recipients, false, CompositingRule.PMAX, ",500000", 0, "areaid", 30, 40, sources, detectors);
     
-    verify();
+    verifyAll();
     assertEquals("somestring", result);
   }
 
+  @Test
   public void testViewCreateRoute() throws Exception {
     List<String> adaptornames = new ArrayList<String>();
     List<String> sourceids = new ArrayList<String>();
@@ -407,51 +360,29 @@ public class CompositeRoutesControllerTest extends TestCase {
     
     String emessage = null;
 
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptornames);
-    utilities.getRadarSources();
-    utilitiesControl.setReturnValue(sourceids);
-    method.getIntervals();
-    methodControl.setReturnValue(intervals);
-    anomalyManager.list();
-    anomalyControl.setReturnValue(anomalydetectors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptornames);
+    expect(utilities.getRadarSources()).andReturn(sourceids);
+    expect(method.getIntervals()).andReturn(intervals);
+    expect(anomalyManager.list()).andReturn(anomalydetectors);
 
-    model.addAttribute("adaptors", adaptornames);
-    modelControl.setReturnValue(null);
-    model.addAttribute("sourceids", sourceids);
-    modelControl.setReturnValue(null);
-    model.addAttribute("intervals", intervals);
-    modelControl.setReturnValue(null);
-    model.addAttribute("anomaly_detectors", anomalydetectors);
-    modelControl.setReturnValue(null);
-    model.addAttribute("name", name);
-    modelControl.setReturnValue(null);
-    model.addAttribute("author", author);
-    modelControl.setReturnValue(null);
-    model.addAttribute("active", active);
-    modelControl.setReturnValue(null);
-    model.addAttribute("description", description);
-    modelControl.setReturnValue(null);
-    model.addAttribute("recipients", recipients);
-    modelControl.setReturnValue(null);
-    model.addAttribute("byscan", byscan);
-    modelControl.setReturnValue(null);
-    model.addAttribute("method", pmethod);
-    modelControl.setReturnValue(null);
-    model.addAttribute("prodpar", "500.0");
-    modelControl.setReturnValue(null);
-    model.addAttribute("selection_method", selection_method);
-    modelControl.setReturnValue(null);
-    model.addAttribute("areaid", areaid);
-    modelControl.setReturnValue(null);
-    model.addAttribute("interval", interval);
-    modelControl.setReturnValue(null);
-    model.addAttribute("timeout", timeout);
-    modelControl.setReturnValue(null);
-    model.addAttribute("sources", sources);
-    modelControl.setReturnValue(null);
-    model.addAttribute("detectors", detectors);
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("adaptors", adaptornames)).andReturn(null);
+    expect(model.addAttribute("sourceids", sourceids)).andReturn(null);
+    expect(model.addAttribute("intervals", intervals)).andReturn(null);
+    expect(model.addAttribute("anomaly_detectors", anomalydetectors)).andReturn(null);
+    expect(model.addAttribute("name", name)).andReturn(null);
+    expect(model.addAttribute("author", author)).andReturn(null);
+    expect(model.addAttribute("active", active)).andReturn(null);
+    expect(model.addAttribute("description", description)).andReturn(null);
+    expect(model.addAttribute("recipients", recipients)).andReturn(null);
+    expect(model.addAttribute("byscan", byscan)).andReturn(null);
+    expect(model.addAttribute("method", pmethod)).andReturn(null);
+    expect(model.addAttribute("prodpar", "500.0")).andReturn(null);
+    expect(model.addAttribute("selection_method", selection_method)).andReturn(null);
+    expect(model.addAttribute("areaid", areaid)).andReturn(null);
+    expect(model.addAttribute("interval", interval)).andReturn(null);
+    expect(model.addAttribute("timeout", timeout)).andReturn(null);
+    expect(model.addAttribute("sources", sources)).andReturn(null);
+    expect(model.addAttribute("detectors", detectors)).andReturn(null);
     
     classUnderTest = new CompositeRoutesController() {
       protected List<Integer> getIntervals() {
@@ -462,13 +393,18 @@ public class CompositeRoutesControllerTest extends TestCase {
     classUnderTest.setManager(manager);
     classUnderTest.setRuleUtilities(utilities);
     classUnderTest.setAnomalyDetectorManager(anomalyManager);
-    replay();
+    
+    replayAll();
+    
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
         recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
-    verify();
+    
+    verifyAll();
+    
     assertEquals("route_create_composite", result);
   }
 
+  @Test
   public void testViewCreateRoute_emessage() throws Exception {
     List<String> adaptornames = new ArrayList<String>();
     List<String> sourceids = new ArrayList<String>();
@@ -492,53 +428,30 @@ public class CompositeRoutesControllerTest extends TestCase {
     
     String emessage = "Some message";
 
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptornames);
-    utilities.getRadarSources();
-    utilitiesControl.setReturnValue(sourceids);
-    method.getIntervals();
-    methodControl.setReturnValue(intervals);
-    anomalyManager.list();
-    anomalyControl.setReturnValue(anomalydetectors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptornames);
+    expect(utilities.getRadarSources()).andReturn(sourceids);
+    expect(method.getIntervals()).andReturn(intervals);
+    expect(anomalyManager.list()).andReturn(anomalydetectors);
     
-    model.addAttribute("adaptors", adaptornames);
-    modelControl.setReturnValue(null);
-    model.addAttribute("sourceids", sourceids);
-    modelControl.setReturnValue(null);
-    model.addAttribute("intervals", intervals);
-    modelControl.setReturnValue(null);
-    model.addAttribute("anomaly_detectors", anomalydetectors);
-    modelControl.setReturnValue(null);
-    model.addAttribute("name", name);
-    modelControl.setReturnValue(null);
-    model.addAttribute("author", author);
-    modelControl.setReturnValue(null);
-    model.addAttribute("active", active);
-    modelControl.setReturnValue(null);
-    model.addAttribute("description", description);
-    modelControl.setReturnValue(null);
-    model.addAttribute("recipients", recipients);
-    modelControl.setReturnValue(null);
-    model.addAttribute("byscan", byscan);
-    modelControl.setReturnValue(null);
-    model.addAttribute("method", pmethod);
-    modelControl.setReturnValue(null);
-    model.addAttribute("prodpar", prodpar);
-    modelControl.setReturnValue(null);
-    model.addAttribute("selection_method", selection_method);
-    modelControl.setReturnValue(null);
-    model.addAttribute("areaid", areaid);
-    modelControl.setReturnValue(null);
-    model.addAttribute("interval", interval);
-    modelControl.setReturnValue(null);
-    model.addAttribute("timeout", timeout);
-    modelControl.setReturnValue(null);
-    model.addAttribute("sources", sources);
-    modelControl.setReturnValue(null);
-    model.addAttribute("detectors", detectors);
-    modelControl.setReturnValue(null);
-    model.addAttribute("emessage", emessage);
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("adaptors", adaptornames)).andReturn(null);
+    expect(model.addAttribute("sourceids", sourceids)).andReturn(null);
+    expect(model.addAttribute("intervals", intervals)).andReturn(null);
+    expect(model.addAttribute("anomaly_detectors", anomalydetectors)).andReturn(null);
+    expect(model.addAttribute("name", name)).andReturn(null);
+    expect(model.addAttribute("author", author)).andReturn(null);
+    expect(model.addAttribute("active", active)).andReturn(null);
+    expect(model.addAttribute("description", description)).andReturn(null);
+    expect(model.addAttribute("recipients", recipients)).andReturn(null);
+    expect(model.addAttribute("byscan", byscan)).andReturn(null);
+    expect(model.addAttribute("method", pmethod)).andReturn(null);
+    expect(model.addAttribute("prodpar", prodpar)).andReturn(null);
+    expect(model.addAttribute("selection_method", selection_method)).andReturn(null);
+    expect(model.addAttribute("areaid", areaid)).andReturn(null);
+    expect(model.addAttribute("interval", interval)).andReturn(null);
+    expect(model.addAttribute("timeout", timeout)).andReturn(null);
+    expect(model.addAttribute("sources", sources)).andReturn(null);
+    expect(model.addAttribute("detectors", detectors)).andReturn(null);
+    expect(model.addAttribute("emessage", emessage)).andReturn(null);
     
     classUnderTest = new CompositeRoutesController() {
       protected List<Integer> getIntervals() {
@@ -550,21 +463,23 @@ public class CompositeRoutesControllerTest extends TestCase {
     classUnderTest.setRuleUtilities(utilities);
     classUnderTest.setAnomalyDetectorManager(anomalyManager);
 
-    replay();
+    replayAll();
+    
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
         recipients, byscan, pmethod, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
-    verify();
+    
+    verifyAll();
     assertEquals("route_create_composite", result);
   }
   
+  @Test
   public void testCreateRule() throws Exception {
-    MockControl cruleControl = MockClassControl.createControl(CompositingRule.class);
-    CompositingRule crule = (CompositingRule)cruleControl.getMock();
+    CompositingRule crule = createMock(CompositingRule.class);
     List<String> sources = new ArrayList<String>();
     List<String> detectors = new ArrayList<String>();
     
-    manager.createRule(CompositingRule.TYPE);
-    managerControl.setReturnValue(crule);
+    expect(manager.createRule(CompositingRule.TYPE)).andReturn(crule);
+
     crule.setArea("abc");
     crule.setInterval(1);
     crule.setSources(sources);
@@ -575,13 +490,11 @@ public class CompositeRoutesControllerTest extends TestCase {
     crule.setProdpar("500.0");
     crule.setSelectionMethod(0);
     
-    replay();
-    cruleControl.replay();
+    replayAll();
     
     CompositingRule result = classUnderTest.createRule("abc", 1, sources, detectors, 2, false, CompositingRule.CAPPI, "500.0", 0);
     
-    verify();
-    cruleControl.verify();
+    verifyAll();
     assertSame(crule, result);
   }
 }

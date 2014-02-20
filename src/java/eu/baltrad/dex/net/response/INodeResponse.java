@@ -32,10 +32,23 @@ public interface INodeResponse {
 
     static final String NODE_NAME_HDR = "Node-Name";
     
+    static final String PROTOCOL_VERSION_HDR = "DEX-Protocol-Version";
+
+    static final String NODE_PROTOCOL_VERSION_HDR = "DEX-Node-Protocol-Version";
+
     /**
      * Sets node name.
      * @param nodeName Node name to set
      */
     public void setNodeName(String nodeName);
     
+    /**
+     * @param version the protocol version that this response is defined in.
+     */
+    public void setProtocolVersion(String version);
+    
+    /**
+     * @param version the protocol version that this node is configured to support.
+     */
+    public void setSupportedProtocolVersion(String version);
 }

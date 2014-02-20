@@ -30,12 +30,13 @@ import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
-import eu.baltrad.dex.net.request.factory.RequestFactory;
-import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
+import eu.baltrad.dex.net.controller.util.ModelMessageHelper;
+import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.net.protocol.RequestFactory;
+import eu.baltrad.dex.net.protocol.ResponseParser;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
 import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.util.MessageResourceUtil;
 
 import org.springframework.ui.Model;
 import org.springframework.stereotype.Controller;
@@ -47,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -56,8 +58,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.util.List;
 import java.util.ArrayList;
-
-import java.net.URI;
 
 /**
  * Allows to remove subscriptions.
@@ -122,8 +122,11 @@ public class RemoveSubscriptionController {
     private ISubscriptionManager subscriptionManager;
     private IDataSourceManager dataSourceManager;
     private PlatformTransactionManager txManager;
-    private RequestFactory requestFactory;
-    private MessageResourceUtil messages;
+
+    private ModelMessageHelper messageHelper = null;
+    private ProtocolManager protocolManager = null;
+    
+    //private MessageResourceUtil messages;
     private Logger log;
     
     protected List<Subscription> selectedDownloads;
@@ -132,6 +135,8 @@ public class RemoveSubscriptionController {
 
     protected String peerName;
     protected User localNode;
+    
+    private final static Logger logger = LogManager.getLogger(RemoveSubscriptionController.class);
     
     /**
      * Constructor.
@@ -230,28 +235,19 @@ public class RemoveSubscriptionController {
     @RequestMapping("/subscription_remove_downloads_status.htm")
     public String removeDownloadsStatus(Model model) {
         initConfiguration();
-        int cancel = cancelDownloads(peerName, localNode, 
-                selectedActiveDownloads);
+        int cancel = cancelDownloads(peerName, localNode, selectedActiveDownloads);
         int remove = removeDownloads(selectedDownloads);
         if (cancel == HttpServletResponse.SC_OK && remove == 0) {
-            model.addAttribute(OK_MSG_KEY, 
-                    messages.getMessage(DOWNLOADS_CANCEL_OK_REMOVE_OK));
-            log.warn(messages.getMessage(DOWNLOADS_CANCEL_OK_REMOVE_OK));
+          messageHelper.setKeyMessage(model, OK_MSG_KEY, DOWNLOADS_CANCEL_OK_REMOVE_OK);
         }
         if (cancel != HttpServletResponse.SC_OK && remove == 0) {
-            model.addAttribute(ERROR_MSG_KEY, 
-                    messages.getMessage(DOWNLOADS_CANCEL_FAIL_REMOVE_OK));
-            log.error(messages.getMessage(DOWNLOADS_CANCEL_FAIL_REMOVE_OK));
+          messageHelper.setKeyMessage(model, ERROR_MSG_KEY, DOWNLOADS_CANCEL_FAIL_REMOVE_OK);
         }
         if (cancel == HttpServletResponse.SC_OK && remove == 1) {
-            model.addAttribute(ERROR_MSG_KEY, 
-                    messages.getMessage(DOWNLOADS_CANCEL_OK_REMOVE_FAIL));
-            log.error(messages.getMessage(DOWNLOADS_CANCEL_OK_REMOVE_FAIL));
+          messageHelper.setKeyMessage(model, ERROR_MSG_KEY, DOWNLOADS_CANCEL_OK_REMOVE_FAIL);
         }
         if (cancel != HttpServletResponse.SC_OK && remove == 1) {
-            model.addAttribute(ERROR_MSG_KEY, 
-                    messages.getMessage(DOWNLOADS_CANCEL_FAIL_REMOVE_FAIL));
-            log.error(messages.getMessage(DOWNLOADS_CANCEL_FAIL_REMOVE_FAIL));
+          messageHelper.setKeyMessage(model, ERROR_MSG_KEY, DOWNLOADS_CANCEL_FAIL_REMOVE_FAIL);
         }
         return REMOVE_DOWNLOADS_STATUS_VIEW;
     }
@@ -263,45 +259,43 @@ public class RemoveSubscriptionController {
      * @param downloads Active subscriptions to cancel
      * @return HTTP status code
      */
-    private int cancelDownloads(String peerName, User local, 
-                                    List<Subscription> downloads) {
-        try {
-            User peer = userManager.load(peerName);
-            requestFactory = new DefaultRequestFactory(
-                    URI.create(peer.getNodeAddress()));
-            for (Subscription s : downloads) {
-                s.setActive(false);
-            }
-            HttpUriRequest req = requestFactory
-                .createUpdateSubscriptionRequest(local, downloads);
-            authenticator.addCredentials(req, local.getName());
-            HttpResponse res = httpClient.post(req);
-            return res.getStatusLine().getStatusCode();
-        } catch (Exception e) {
-            return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+    protected int cancelDownloads(String peerName, User local, List<Subscription> downloads) {
+      try {
+        User peer = userManager.load(peerName);
+        RequestFactory factory = protocolManager.getFactory(peer.getNodeAddress());
+        
+        for (Subscription s : downloads) {
+          s.setActive(false);
         }
-    }
-    
+        HttpUriRequest req = factory.createUpdateSubscriptionRequest(local, downloads);
+        authenticator.addCredentials(req, local.getName());
+        HttpResponse res = httpClient.post(req);
+        ResponseParser parser = protocolManager.createParser(res);
+        return parser.getStatusCode();
+      } catch (Exception e) {
+        logger.error("Caught exception when cancelling downloads", e);
+        return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+      }
+  }
+
     /**
      * Remove subscriptions from local registry.
      * @param downloads Subscriptions to remove
      * @return Operation status code: 0 in case of success, otherwise 1
      */
-    private int removeDownloads(List<Subscription> downloads) {
+    protected int removeDownloads(List<Subscription> downloads) {
         TransactionDefinition def = new DefaultTransactionDefinition();
         TransactionStatus status = txManager.getTransaction(def);
         try {    
             for (Subscription s : downloads) {
-                String[] msgArgs = {s.getUser(), s.getDataSource()};
+                Object[] msgArgs = {s.getUser(), s.getDataSource()};
                 // remove peer data sources
-                int dataSourceId = dataSourceManager.load(s.getDataSource(), 
-                        DataSource.PEER).getId();
+                int dataSourceId = dataSourceManager.load(s.getDataSource(), DataSource.PEER).getId();
                 dataSourceManager.delete(dataSourceId);
                 // remove subscriptions
                 subscriptionManager.delete(s.getId());
-                String msg = messages.getMessage(
-                    REMOVE_SUBSCRIPTION_SUCCESS_MSG_KEY, msgArgs);
-                log.warn(msg);
+                String msg = messageHelper.getMessage(REMOVE_SUBSCRIPTION_SUCCESS_MSG_KEY, msgArgs);
+                log.info(msg);
             }
             txManager.commit(status);
             return 0;
@@ -357,19 +351,14 @@ public class RemoveSubscriptionController {
     public String removeUploadsStatus(Model model) {
         try {
             for (Subscription s : selectedUploads) {
-                String[] msgArgs = {s.getDataSource(), s.getUser()};
+                Object[] msgArgs = {s.getDataSource(), s.getUser()};
                 subscriptionManager.delete(s.getId());
-                String msg = messages.getMessage(
-                    REMOVE_SUBSCRIPTION_SUCCESS_MSG_KEY, msgArgs);
+                String msg = messageHelper.getMessage(REMOVE_SUBSCRIPTION_SUCCESS_MSG_KEY, msgArgs);
                 log.warn(msg);
             }
-            model.addAttribute(OK_MSG_KEY, 
-                    messages.getMessage(COMPLETED_OK_MSG_KEY));
-            log.warn(messages.getMessage(COMPLETED_OK_MSG_KEY));
+            messageHelper.setKeyMessage(model, OK_MSG_KEY, COMPLETED_OK_MSG_KEY);
         } catch (Exception e) {
-            model.addAttribute(ERROR_MSG_KEY,
-                    messages.getMessage(COMPLETED_FAILURE_MSG_KEY));
-            log.error(messages.getMessage(COMPLETED_FAILURE_MSG_KEY));
+          messageHelper.setKeyMessage(model, ERROR_MSG_KEY, COMPLETED_FAILURE_MSG_KEY);
         }
         return REMOVE_UPLOADS_STATUS_VIEW;
     }
@@ -433,9 +422,18 @@ public class RemoveSubscriptionController {
     /**
      * @param messages the messages to set
      */
+//    @Autowired
+//    public void setMessages(MessageResourceUtil messages) {
+//        this.messages = messages;
+//    }
+
     @Autowired
-    public void setMessages(MessageResourceUtil messages) {
-        this.messages = messages;
+    public void setProtocolManager(ProtocolManager protocolManager) {
+      this.protocolManager = protocolManager;
+    }
+
+    public void setMessageHelper(ModelMessageHelper messageHelper) {
+      this.messageHelper = messageHelper;
     }
     
 }

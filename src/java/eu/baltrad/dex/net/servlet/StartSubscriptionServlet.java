@@ -22,11 +22,11 @@
 package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.config.manager.IConfigurationManager;
-import eu.baltrad.dex.net.util.json.IJsonUtil;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.request.impl.NodeRequest;
-import eu.baltrad.dex.net.response.impl.NodeResponse;
+import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.net.protocol.RequestParser;
+import eu.baltrad.dex.net.protocol.ResponseWriter;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
@@ -43,20 +43,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import org.keyczar.exceptions.KeyczarException;
 
-import org.apache.commons.io.IOUtils;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.ServletInputStream;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
-import java.io.StringWriter;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
-import java.io.IOException;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -67,6 +60,7 @@ import java.util.HashSet;
  * @version 1.1.0
  * @since 1.1.0
  */
+@SuppressWarnings("serial")
 @Controller
 public class StartSubscriptionServlet extends HttpServlet {
  
@@ -85,10 +79,13 @@ public class StartSubscriptionServlet extends HttpServlet {
     
     private IConfigurationManager confManager;
     private Authenticator authenticator;
-    private IJsonUtil jsonUtil;
     private ISubscriptionManager subscriptionManager;
     private MessageResourceUtil messages;
+    private ProtocolManager protocolManager;
+    
     private Logger log;
+    
+    private final static Logger logger = LogManager.getLogger(StartSubscriptionServlet.class);
     
     protected User localNode;;
     
@@ -115,45 +112,6 @@ public class StartSubscriptionServlet extends HttpServlet {
     }
     
     /**
-     * Reads data source string from http request.
-     * @param request Http request
-     * @return Data source string
-     * @throws IOException 
-     */
-    private String readDataSources(HttpServletRequest request) 
-            throws IOException {
-        ServletInputStream sis = request.getInputStream();
-        StringWriter writer = new StringWriter();
-        String dataSources = "";
-        try {
-            IOUtils.copy(sis, writer, "UTF-8");
-            dataSources = writer.toString();
-        } finally {
-            writer.close();
-            sis.close();
-        }
-        return dataSources;
-    }
-    
-    /**
-     * Writes data source string to http response. 
-     * @param response Http response
-     * @param dataSources Data source string
-     * @throws IOException 
-     */
-    private void writeDataSources(NodeResponse response, String dataSources) 
-            throws IOException {
-        PrintWriter writer = new PrintWriter(
-                new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
-        try {
-            response.setNodeName(localNode.getName());
-            writer.print(dataSources);
-        } finally {
-            writer.close();
-        }    
-    }
-    
-    /**
      * Stores subscriptions requested by peer.
      * @param req Node request
      * @param requestedDataSources Requested data sources
@@ -161,26 +119,20 @@ public class StartSubscriptionServlet extends HttpServlet {
      */
     @Transactional(propagation=Propagation.REQUIRED, 
             rollbackFor=Exception.class)
-    private Set<DataSource> storePeerSubscriptions(NodeRequest req,
-            Set<DataSource> requestedDataSources) {
+    protected Set<DataSource> storePeerSubscriptions(String nodeName, Set<DataSource> requestedDataSources) {
         Set<DataSource> subscribedDataSources = new HashSet<DataSource>();
         try {
             for (DataSource ds : requestedDataSources) {
                 // Save or update depending on whether subscription exists
-                Subscription requested = new Subscription(
-                        System.currentTimeMillis(), Subscription.PEER, 
-                        req.getNodeName(), ds.getName(), true, true);
-                Subscription existing = subscriptionManager.load(
-                        Subscription.PEER, req.getNodeName(), ds.getName());
-                String[] msgArgs = {ds.getName(), localNode.getName(), 
-                        req.getNodeName()};
+                Subscription requested = new Subscription(System.currentTimeMillis(), Subscription.PEER, nodeName, ds.getName(), true, true);
+                Subscription existing = subscriptionManager.load(Subscription.PEER, nodeName, ds.getName());
+                String[] msgArgs = {ds.getName(), localNode.getName(), nodeName};
                 if (existing == null) {
                     subscriptionManager.store(requested);
                     subscribedDataSources.add(new DataSource(
                             ds.getName(), ds.getType(), ds.getDescription(),
                             ds.getSource(), ds.getFileObject()));
-                    log.warn(messages.getMessage(PS_SUBSCRIPTION_SUCCESS_KEY, 
-                            msgArgs));
+                    log.warn(messages.getMessage(PS_SUBSCRIPTION_SUCCESS_KEY, msgArgs));
                 } else {
                     requested.setId(existing.getId());
                     subscriptionManager.update(requested);
@@ -207,6 +159,7 @@ public class StartSubscriptionServlet extends HttpServlet {
     public ModelAndView handleRequest(HttpServletRequest request, 
             HttpServletResponse response) {
         initConfiguration();
+        @SuppressWarnings("unused")
         HttpSession session = request.getSession(true);
         doPost(request, response);
         return new ModelAndView();
@@ -220,39 +173,35 @@ public class StartSubscriptionServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) 
     {
-        NodeRequest req = new NodeRequest(request);
-        NodeResponse res = new NodeResponse(response);
-        try {
-            if (authenticator.authenticate(req.getMessage(), 
-                    req.getSignature(), req.getNodeName())) {
-                String jsonRequested = readDataSources(request);
-                Set<DataSource> requestedDataSources = jsonUtil
-                            .jsonToDataSources(jsonRequested);
-                Set<DataSource> subscribedDataSources = 
-                        storePeerSubscriptions(req, requestedDataSources);
-                String jsonSubscribed = jsonUtil.dataSourcesToJson(
-                        subscribedDataSources);
-                if (subscribedDataSources.equals(requestedDataSources)) {
-                    writeDataSources(res, jsonSubscribed);
-                    res.setStatus(HttpServletResponse.SC_OK);
-                } else if (subscribedDataSources.size() > 0) {
-                    writeDataSources(res, jsonSubscribed);
-                    res.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-                } else {
-                    res.setStatus(HttpServletResponse.SC_NOT_FOUND,
-                        messages.getMessage(PS_GENERIC_SUBSCRIPTION_ERROR));
-                }
-            } else {
-                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
-                    messages.getMessage(PS_UNAUTHORIZED_REQUEST_KEY));
-            }
-        } catch (KeyczarException e) {
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
-                    messages.getMessage(PS_MESSAGE_VERIFIER_ERROR_KEY));
-        } catch (Exception e) {
-            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    messages.getMessage(PS_INTERNAL_SERVER_ERROR_KEY));
+      RequestParser parser = protocolManager.createParser(request);
+      logger.debug("Request arrived using protocol version '" + parser.getProtocolVersion() + "'");
+
+      try {
+        if (parser.isAuthenticated(authenticator)) {
+          Set<DataSource> requestedDataSources = parser.getDataSources();
+          Set<DataSource> subscribedDataSources = storePeerSubscriptions(parser.getNodeName(), requestedDataSources);
+          ResponseWriter responseWriter = parser.getWriter(response);
+          if (subscribedDataSources.equals(requestedDataSources)) {
+            responseWriter.dataSourcesResponse(localNode.getName(), 
+                subscribedDataSources, HttpServletResponse.SC_OK);
+          } else if (subscribedDataSources.size() > 0) {
+            responseWriter.dataSourcesResponse(localNode.getName(), 
+                subscribedDataSources, HttpServletResponse.SC_PARTIAL_CONTENT);
+          } else {
+            responseWriter.messageResponse(
+                messages.getMessage(PS_GENERIC_SUBSCRIPTION_ERROR), HttpServletResponse.SC_NOT_FOUND);
+          }
+        } else {
+          parser.getWriter(response).messageResponse(
+              messages.getMessage(PS_UNAUTHORIZED_REQUEST_KEY), HttpServletResponse.SC_UNAUTHORIZED);
         }
+      } catch (KeyczarException e) {
+        parser.getWriter(response).messageResponse(
+            messages.getMessage(PS_MESSAGE_VERIFIER_ERROR_KEY), HttpServletResponse.SC_UNAUTHORIZED);
+      } catch (Exception e) {
+        parser.getWriter(response).messageResponse(
+            messages.getMessage(PS_INTERNAL_SERVER_ERROR_KEY), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
     }
     
     /**
@@ -271,14 +220,6 @@ public class StartSubscriptionServlet extends HttpServlet {
         this.messages = messages;
     }
 
-    /**
-     * @param jsonUtil the jsonUtil to set
-     */
-    @Autowired
-    public void setJsonUtil(IJsonUtil jsonUtil) {
-        this.jsonUtil = jsonUtil;
-    }
-    
     /**
      * @param subscriptionManager the subscriptionManager to set
      */
@@ -301,5 +242,12 @@ public class StartSubscriptionServlet extends HttpServlet {
     public void setLog(Logger log) {
         this.log = log;
     }
-    
+
+    /**
+     * @param protocolManager the protocol manager to use
+     */
+    @Autowired
+    public void setProtocolManager(ProtocolManager protocolManager) {
+      this.protocolManager = protocolManager;
+    }
 }

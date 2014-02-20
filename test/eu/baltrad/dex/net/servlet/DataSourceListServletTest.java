@@ -22,26 +22,29 @@
 package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.util.json.IJsonUtil;
-import eu.baltrad.dex.net.util.json.impl.JsonUtil;
-import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.net.protocol.RequestParser;
+import eu.baltrad.dex.net.protocol.ResponseWriter;
+import eu.baltrad.dex.user.manager.impl.UserManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.datasource.manager.impl.DataSourceManager;
+import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.web.servlet.ModelAndView;
 
 import org.keyczar.exceptions.KeyczarException;
 
-import org.easymock.EasyMock;
+import org.easymock.EasyMockSupport;
+
 import static org.easymock.EasyMock.*;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -50,11 +53,6 @@ import org.junit.Test;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 /**
  * Data source list servlet test.
@@ -62,31 +60,21 @@ import java.text.SimpleDateFormat;
  * @version 1.1.0
  * @since 1.1.0
  */
-public class DataSourceListServletTest {
+public class DataSourceListServletTest extends EasyMockSupport {
+  interface MethodMock {
+    public void doPost(HttpServletRequest request, HttpServletResponse response);
+  };
     
-    private static final String JSON_ACCOUNT = 
-            "{\"name\":\"test.baltrad.eu\",\"state\":\"state\"," + 
-            "\"nodeAddress\":\"http://localhost:8084\",\"orgName\":\"org\"," + 
-            "\"orgUnit\":\"unit\",\"locality\":\"locality\",\"countryCode\":" + 
-            "\"XX\",\"role\":\"user\",\"password\":\"s3cret\"}";
     
-    private static final String JSON_SOURCES = 
-            "[{\"name\":\"DS1\",\"description\":\"A test "
-            + "data source\"},{\"name\":\"DS2\",\"description\":\"One "
-            + "more test data source\"},{\"name\":\"DS3\",\"description\":" +
-            "\"Yet another test data source\"}]";
-    
-    private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
-    
-    private List<Object> mocks;
-    private DateFormat format;
     private DSLServlet classUnderTest;
     private MessageResourceUtil messages;
-    private MockHttpServletRequest request;
-    private MockHttpServletResponse response;
     private Authenticator authenticatorMock;
-    private User user;
+    private ProtocolManager protocolManager;
+    private UserManager userManager;
+    private DataSourceManager dataSourceManager;
     
+    
+    @SuppressWarnings("serial")
     class DSLServlet extends DataSourceListServlet {
         public DSLServlet() {
             this.localNode = new User(1, "test", "user", "s3cret", "org", 
@@ -96,46 +84,21 @@ public class DataSourceListServletTest {
         public void initConfiguration() {}
     }
     
-    private Object createMock(Class clazz) {
-        Object mock = EasyMock.createMock(clazz);
-        mocks.add(mock);
-        return mock;
-    }
-    
-    private void replayAll() {
-        for (Object mock : mocks) {
-            replay(mock);
-        }
-    }
-    
-    private void verifyAll() {
-        for (Object mock : mocks) {
-            verify(mock);
-        }
-    }
-    
-    private void resetAll() {
-        for (Object mock : mocks) {
-            reset(mock);
-        }
-    }
-    
     @Before
     public void setUp() throws Exception {
-        mocks = new ArrayList<Object>();
-        authenticatorMock = (Authenticator) createMock(Authenticator.class);
-        
+        authenticatorMock = createMock(Authenticator.class);
+        protocolManager = createMock(ProtocolManager.class);
+        userManager = createMock(UserManager.class);
+        dataSourceManager = createMock(DataSourceManager.class);
+        messages = createMock(MessageResourceUtil.class);
+
         classUnderTest = new DSLServlet();
         classUnderTest.setLog(Logger.getLogger("DEX"));
-        messages = new MessageResourceUtil();
-        messages.setBasename("resources/messages");
+        classUnderTest.setProtocolManager(protocolManager);
         classUnderTest.setMessages(messages);
-        user = new User(1, "test.baltrad.eu", "user", "s3cret", "org", "unit", 
-                "locality", "state", "XX", "http://localhost:8084");
-        request = new MockHttpServletRequest();
-        response = new MockHttpServletResponse();
-        format = new SimpleDateFormat(DATE_FORMAT);
-        setRequestAttributes(request);
+        classUnderTest.setAuthenticator(authenticatorMock);
+        classUnderTest.setUserManager(userManager);
+        classUnderTest.setDataSourceManager(dataSourceManager);
     }
     
     @After
@@ -143,168 +106,146 @@ public class DataSourceListServletTest {
         classUnderTest = null;
         resetAll();
     }
-    
-    private void setRequestAttributes(MockHttpServletRequest request) {
-        request.setAttribute("Content-Type", "text/html");  
-        request.setAttribute("Content-MD5", Base64.encodeBase64String(
-                request.getRequestURI().getBytes()));
-        request.setAttribute("Date", format.format(new Date()));
-        request.addHeader("Authorization", "test.baltrad.eu" + ":" + 
-            "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_");   
-        request.addHeader("Node-Name", "test.baltrad.eu");
-        request.addHeader("Node-Address", "http://test.baltrad.eu");
+
+    @SuppressWarnings("serial")
+    @Test
+    public void handleRequest() throws Exception {
+      final MethodMock methods = createMock(MethodMock.class);
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      HttpSession httpSession = createMock(HttpSession.class);
+      
+      classUnderTest = new DSLServlet() {
+        public void doPost(HttpServletRequest request, HttpServletResponse response) {
+          methods.doPost(request, response);
+        }
+      };
+      
+      expect(request.getSession(true)).andReturn(httpSession);
+      methods.doPost(request, response);
+      
+      replayAll();
+      
+      ModelAndView result = classUnderTest.handleRequest(request, response);
+      
+      verifyAll();
+      assertNotNull(result);
     }
     
     @Test
-    public void handleRequest_MessageVerificationError() throws Exception {
-        authenticatorMock.authenticate(isA(String.class), isA(String.class),
-                isA(String.class));
+    public void doPost_createPeerAccount() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter responseWriter = createMock(ResponseWriter.class);
+      User peer = createMock(User.class);
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.0").anyTimes();
+      expect(requestParser.isAuthenticated(authenticatorMock)).andReturn(true);
+      expect(requestParser.getUserAccount()).andReturn(peer);
+      expect(peer.getName()).andReturn("test.baltrad.eu").anyTimes();
+      expect(userManager.load("test.baltrad.eu")).andReturn(null);
+      peer.setRole(Role.PEER);
+      expect(userManager.store(peer)).andReturn(1);
+      expect(requestParser.getWriter(response)).andReturn(responseWriter);
+      responseWriter.userAccountResponse(classUnderTest.localNode.getName(), classUnderTest.localNode, HttpServletResponse.SC_CREATED);
+      
+      replayAll();
         
-        expectLastCall().andThrow(new KeyczarException(
-                "Failed to verify message"));
+      classUnderTest.doPost(request, response);
         
-        replayAll();
+      verifyAll();
+    }
+
+    @Test
+    public void doPost_accountExists() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter responseWriter = createMock(ResponseWriter.class);
+      User peer = createMock(User.class);
+      User loadedPeer = createMock(User.class);
+      List<DataSource> userDataSources = new ArrayList<DataSource>(); 
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.0").anyTimes();
+      expect(requestParser.isAuthenticated(authenticatorMock)).andReturn(true);
+      expect(requestParser.getUserAccount()).andReturn(peer);
+      expect(peer.getName()).andReturn("test.baltrad.eu").anyTimes();
+      expect(userManager.load("test.baltrad.eu")).andReturn(loadedPeer);
+      expect(loadedPeer.getId()).andReturn(10).anyTimes();
+      expect(dataSourceManager.load(10, DataSource.LOCAL)).andReturn(userDataSources);
+      expect(requestParser.getWriter(response)).andReturn(responseWriter);
+      responseWriter.dataSourcesResponse(classUnderTest.localNode.getName(), userDataSources, HttpServletResponse.SC_OK);
+      replayAll();
         
-        classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.handleRequest(request, response);
+      classUnderTest.doPost(request, response);
         
-        verifyAll();
+      verifyAll();
+    }
+
+    @Test
+    public void doPost_MessageVerificationError() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter responseWriter = createMock(ResponseWriter.class);
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.0").anyTimes();
+      expect(requestParser.isAuthenticated(authenticatorMock)).andThrow(new KeyczarException("keyczar exception"));
+      expect(messages.getMessage("datasource.server.message_verifier_error")).andReturn("a message");
+      expect(requestParser.getWriter(response)).andReturn(responseWriter);
+      responseWriter.messageResponse("a message", HttpServletResponse.SC_UNAUTHORIZED);
+      
+      replayAll();
         
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
-        assertEquals(
-                messages.getMessage("datasource.server.message_verifier_error"), 
-                response.getErrorMessage());
+      classUnderTest.doPost(request, response);
+        
+      verifyAll();
     }
     
     @Test
-    public void handleRequest_Unauthorized() throws Exception {
-        expect(authenticatorMock.authenticate(isA(String.class), 
-                isA(String.class), isA(String.class)))
-                .andReturn(Boolean.FALSE).anyTimes();
-        replayAll();
+    public void doPost_Unauthorized() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter responseWriter = createMock(ResponseWriter.class);
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.0").anyTimes();
+      expect(requestParser.isAuthenticated(authenticatorMock)).andReturn(false);
+      expect(messages.getMessage("datasource.server.unauthorized_request")).andReturn("a message");
+      expect(requestParser.getWriter(response)).andReturn(responseWriter);
+      responseWriter.messageResponse("a message", HttpServletResponse.SC_UNAUTHORIZED);
+      
+      replayAll();
         
-        classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.handleRequest(request, response);
+      classUnderTest.doPost(request, response);
         
-        verifyAll();
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
-        assertEquals(
-                messages.getMessage("datasource.server.unauthorized_request"), 
-                response.getErrorMessage());
+      verifyAll();
     }
     
-    @Test 
-    public void handleRequest_InternalServerError() throws Exception {
-        expect(authenticatorMock.authenticate(isA(String.class), 
-                isA(String.class), isA(String.class)))
-                .andReturn(Boolean.TRUE).anyTimes();
-        IUserManager userManagerMock = 
-                (IUserManager) createMock(IUserManager.class);
-        expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
-                .anyTimes();
-        expect(userManagerMock.store(isA(User.class)))
-                .andReturn(Integer.SIZE).anyTimes();
+    @Test
+    public void doPost_InternalServerError() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter responseWriter = createMock(ResponseWriter.class);
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.0").anyTimes();
+      expect(requestParser.isAuthenticated(authenticatorMock)).andReturn(true);
+      expect(requestParser.getUserAccount()).andThrow(new RuntimeException("runtime exception"));
+      expect(messages.getMessage(eq("datasource.server.internal_server_error"), aryEq(new Object[]{"runtime exception"}))).andReturn("a message");
+      expect(requestParser.getWriter(response)).andReturn(responseWriter);
+      responseWriter.messageResponse("a message", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          
+      replayAll();
         
-        IJsonUtil jsonUtilMock = 
-                (IJsonUtil) createMock(IJsonUtil.class);
-        expect(jsonUtilMock.jsonToUserAccount(JSON_ACCOUNT))
-                .andThrow(new RuntimeException("Internal server error"));
+      classUnderTest.doPost(request, response);
         
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setUserManager(userManagerMock);
-        classUnderTest.setJsonUtil(jsonUtilMock);
-        request.setContent(JSON_ACCOUNT.getBytes());
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-                response.getStatus());
-        assertEquals(
-                messages.getMessage("datasource.server.internal_server_error",
-                    new String[] {"Internal server error"}), 
-                response.getErrorMessage());
+      verifyAll();
     }
-    
-    @Test 
-    public void handleRequest_CreatedAccount() throws Exception {
-        expect(authenticatorMock.authenticate(isA(String.class), 
-                isA(String.class), isA(String.class)))
-                .andReturn(Boolean.TRUE).anyTimes();
-        
-        IUserManager userManagerMock = 
-                (IUserManager) createMock(IUserManager.class);
-        expect(userManagerMock.load("test.baltrad.eu")).andReturn(null)
-                .anyTimes();
-        expect(userManagerMock.store(isA(User.class)))
-                .andReturn(Integer.SIZE).anyTimes();
-        
-        IJsonUtil jsonUtilMock = (IJsonUtil) createMock(IJsonUtil.class);
-        expect(jsonUtilMock.jsonToUserAccount(JSON_ACCOUNT))
-                .andReturn(user);
-        
-        expect(jsonUtilMock.userAccountToJson(new User(1, "test", "user", 
-                "s3cret", "org", "unit", "locality", "state", "XX", 
-                "http://localhost:8084") )).andReturn(JSON_ACCOUNT);
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setUserManager(userManagerMock);
-        classUnderTest.setJsonUtil(jsonUtilMock);
-        request.setContent(JSON_ACCOUNT.getBytes());
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_CREATED, response.getStatus());
-    }
-    
-    @Test 
-    public void handleRequest_OK() throws Exception {
-        expect(authenticatorMock.authenticate(isA(String.class), 
-                isA(String.class), isA(String.class)))
-                .andReturn(Boolean.TRUE).anyTimes();
-        
-        IUserManager userManagerMock = 
-                (IUserManager) createMock(IUserManager.class);
-        expect(userManagerMock.load("test.baltrad.eu"))
-                .andReturn(user).anyTimes();
-        expect(userManagerMock.store(isA(User.class)))
-                .andReturn(Integer.SIZE).anyTimes();
-        
-        IJsonUtil jsonUtilMock = (IJsonUtil) createMock(IJsonUtil.class);
-        expect(jsonUtilMock.jsonToUserAccount(JSON_ACCOUNT))
-                .andReturn(user);
-        expect(jsonUtilMock.dataSourcesToJson(isA(HashSet.class)))
-                .andReturn(JSON_SOURCES);
-        
-        IDataSourceManager dataSourceManagerMock = 
-                (IDataSourceManager) createMock(IDataSourceManager.class);
-        expect(dataSourceManagerMock.load(1, DataSource.LOCAL))
-                .andReturn(new ArrayList<DataSource>()).anyTimes();
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setUserManager(userManagerMock);
-        classUnderTest.setJsonUtil(jsonUtilMock);
-        classUnderTest.setDataSourceManager(dataSourceManagerMock);
-        request.setContent(JSON_ACCOUNT.getBytes());
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-        
-        String dataSourceString = response.getContentAsString();
-        JsonUtil jsonUtil = new JsonUtil();
-        Set<DataSource> dataSources = jsonUtil
-                .jsonToDataSources(dataSourceString);
-        assertNotNull(dataSources);
-        assertEquals(3, dataSources.size());
-    }
-    
 }

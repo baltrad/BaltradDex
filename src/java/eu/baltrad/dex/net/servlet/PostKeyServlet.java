@@ -23,6 +23,7 @@ package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.keystore.manager.IKeystoreManager;
+import eu.baltrad.dex.net.protocol.ProtocolManager;
 import eu.baltrad.dex.net.request.impl.NodeRequest;
 import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.util.MessageResourceUtil;
@@ -38,6 +39,7 @@ import org.springframework.web.portlet.ModelAndView;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpSession;
@@ -67,6 +69,9 @@ public class PostKeyServlet extends HttpServlet {
     private IKeystoreManager keystoreManager;
     private MessageResourceUtil messages;
     private Logger log;
+    
+    private ProtocolManager protocolManager = null;
+    private final static Logger logger = LogManager.getLogger(PostKeyServlet.class); 
     
     /**
      * Default constructor.
@@ -144,6 +149,8 @@ public class PostKeyServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
+        logger.debug("Request arrived using protocol version '" + req.getProtocolVersion() + "'");
+        
         try {
             if (keystoreManager.load(req.getNodeName()) == null) {
                 log.info("Public key received from " + req.getNodeName());
@@ -185,5 +192,12 @@ public class PostKeyServlet extends HttpServlet {
     public void setMessages(MessageResourceUtil messages) {
         this.messages = messages;
     }
-    
+
+    /**
+     * @param protocolManager the protocol manager to use
+     */
+    @Autowired
+    public void setProtocolManager(ProtocolManager protocolManager) {
+      this.protocolManager = protocolManager;
+    }
 }

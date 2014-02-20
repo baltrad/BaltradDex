@@ -104,5 +104,13 @@ public class NodeRequest extends HttpServletRequestWrapper
                 getHeader(NODE_NAME_HDR);
         return headerValue;
     }
-    
+
+    @Override
+    public String getProtocolVersion() {
+      String version = getHeader(INodeRequest.PROTOCOL_VERSION_HDR);
+      if (version == null) {
+        return "";
+      }
+      return version;
+    }
 }

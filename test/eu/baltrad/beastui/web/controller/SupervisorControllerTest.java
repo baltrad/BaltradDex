@@ -1,11 +1,7 @@
 package eu.baltrad.beastui.web.controller;
 
-import static org.easymock.EasyMock.aryEq;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
-import static org.easymock.classextension.EasyMock.createMock;
-import static org.easymock.classextension.EasyMock.replay;
-import static org.easymock.classextension.EasyMock.verify;
+import static org.easymock.EasyMock.*;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -19,16 +15,18 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Assert;
+import org.easymock.EasyMockSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.ui.Model;
 
-import junit.framework.TestCase;
 import eu.baltrad.beast.system.ISystemSupervisor;
 import eu.baltrad.beast.system.SystemStatus;
 import eu.baltrad.beast.system.XmlSystemStatusGenerator;
 import eu.baltrad.beast.system.host.IHostFilterManager;
 
-public class SupervisorControllerTest extends TestCase {
+public class SupervisorControllerTest extends EasyMockSupport {
   private interface MethodMock {
     public XmlSystemStatusGenerator getXmlGenerator();
     public boolean isAuthorized(HttpServletRequest request);
@@ -44,7 +42,8 @@ public class SupervisorControllerTest extends TestCase {
   private XmlSystemStatusGenerator generator = null;
   private Model model = null;
   
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     classUnderTest = new SupervisorController() {
       protected XmlSystemStatusGenerator getXmlGenerator() {
         return methods.getXmlGenerator();
@@ -61,7 +60,7 @@ public class SupervisorControllerTest extends TestCase {
     };
     supervisor = createMock(ISystemSupervisor.class);
     hostManager = createMock(IHostFilterManager.class);
-    generator = org.easymock.classextension.EasyMock.createMock(XmlSystemStatusGenerator.class);
+    generator = createMock(XmlSystemStatusGenerator.class);
     response = createMock(HttpServletResponse.class);
     request = createMock(HttpServletRequest.class);
     methods = createMock(MethodMock.class);
@@ -70,7 +69,8 @@ public class SupervisorControllerTest extends TestCase {
     classUnderTest.setHostManager(hostManager);
   }
   
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     classUnderTest = null;
     supervisor = null;
     hostManager = null;
@@ -80,27 +80,8 @@ public class SupervisorControllerTest extends TestCase {
     methods = null;
     model = null;
   }
-  
-  protected void replayAll() {
-    replay(supervisor);
-    replay(hostManager);
-    replay(generator);
-    replay(response);
-    replay(request);
-    replay(methods);
-    replay(model);
-  }
-  
-  protected void verifyAll() {
-    verify(supervisor);
-    verify(hostManager);
-    verify(generator);
-    verify(response);
-    verify(request);
-    verify(methods);
-    verify(model);
-  }
 
+  @Test
   public void testSupervisorSettings() throws Exception {
     List<String> filters = new ArrayList<String>();
     
@@ -113,9 +94,10 @@ public class SupervisorControllerTest extends TestCase {
     String result = classUnderTest.supervisorSettings(model, request);
     
     verifyAll();
-    Assert.assertEquals("supervisor_settings", result);
+    assertEquals("supervisor_settings", result);
   }
   
+  @Test
   public void testAddSupervisorSetting() throws Exception {
     List<String> filters = new ArrayList<String>();
     
@@ -132,9 +114,10 @@ public class SupervisorControllerTest extends TestCase {
     String result = classUnderTest.addSupervisorSetting(model, "192.168.1.1", request);
     
     verifyAll();
-    Assert.assertEquals("supervisor_settings", result);
+    assertEquals("supervisor_settings", result);
   }
   
+  @Test
   public void testAddSupervisorSetting_alreadyRegistered() throws Exception {
     List<String> filters = new ArrayList<String>();
     
@@ -151,9 +134,10 @@ public class SupervisorControllerTest extends TestCase {
     String result = classUnderTest.addSupervisorSetting(model, "192.168.1.1", request);
     
     verifyAll();
-    Assert.assertEquals("supervisor_settings", result);
+    assertEquals("supervisor_settings", result);
   }
 
+  @Test
   public void testRemoveSupervisorSetting() throws Exception {
     List<String> filters = new ArrayList<String>();
     
@@ -169,9 +153,10 @@ public class SupervisorControllerTest extends TestCase {
     String result = classUnderTest.removeSupervisorSetting(model, "192.168.1.1",request);
     
     verifyAll();
-    Assert.assertEquals("supervisor_settings", result);
+    assertEquals("supervisor_settings", result);
   }
 
+  @Test
   public void testRemoveSupervisorSetting_failed() throws Exception {
     List<String> filters = new ArrayList<String>();
     
@@ -188,12 +173,13 @@ public class SupervisorControllerTest extends TestCase {
     String result = classUnderTest.removeSupervisorSetting(model, "192.168.1.1",request);
     
     verifyAll();
-    Assert.assertEquals("supervisor_settings", result);
+    assertEquals("supervisor_settings", result);
   }
   
+  @Test
   public void testSupervisorStatus() throws Exception {
     Set<SystemStatus> status = EnumSet.of(SystemStatus.OK);
-    ServletOutputStream sos = org.easymock.classextension.EasyMock.createMock(ServletOutputStream.class);
+    ServletOutputStream sos = createMock(ServletOutputStream.class);
     Map<String,Object> valuemap = new HashMap<String, Object>();
     
     expect(methods.getXmlGenerator()).andReturn(generator);
@@ -212,17 +198,16 @@ public class SupervisorControllerTest extends TestCase {
     response.setStatus(HttpServletResponse.SC_OK);
     
     replayAll();
-    replay(sos);
     
     classUnderTest.supervisorStatus(null, "r1,r2", "s1,s2", "a1,a2", "o1,o2", "5", request, response);
     
     verifyAll();
-    verify(sos);
   }
   
+  @Test
   public void testSupervisorStatus_default_bdb_db() throws Exception {
     Set<SystemStatus> status = EnumSet.of(SystemStatus.OK);
-    ServletOutputStream sos = org.easymock.classextension.EasyMock.createMock(ServletOutputStream.class);
+    ServletOutputStream sos = createMock(ServletOutputStream.class);
     Map<String,Object> valuemap = new HashMap<String, Object>();
     
     expect(methods.getXmlGenerator()).andReturn(generator);
@@ -241,14 +226,13 @@ public class SupervisorControllerTest extends TestCase {
     response.setStatus(HttpServletResponse.SC_OK);
     
     replayAll();
-    replay(sos);
     
     classUnderTest.supervisorStatus(null, null, null, null, null, null, request, response);
     
     verifyAll();
-    verify(sos);
   }
 
+  @Test
   public void testCreateMap() throws Exception  {
     classUnderTest = new SupervisorController();
     
@@ -259,6 +243,7 @@ public class SupervisorControllerTest extends TestCase {
     assertEquals("5", (String)result.get("minutes"));
   }
   
+  @Test
   public void testCreateValueString() throws Exception {
     classUnderTest = new SupervisorController();
     classUnderTest.setSupervisor(supervisor);
@@ -277,6 +262,7 @@ public class SupervisorControllerTest extends TestCase {
     assertEquals("sources=s1&minutes=10", result);
   }
   
+  @Test
   public void testCreateValueString_2() throws Exception {
     classUnderTest = new SupervisorController();
     classUnderTest.setSupervisor(supervisor);

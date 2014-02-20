@@ -3,10 +3,14 @@ package eu.baltrad.beastui.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import org.easymock.EasyMockSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
-import org.easymock.MockControl;
-import org.easymock.classextension.MockClassControl;
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
+
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
@@ -16,7 +20,7 @@ import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.RuleException;
 import eu.baltrad.beast.rules.volume.VolumeRule;
 
-public class VolumeRoutesControllerTest extends TestCase {
+public class VolumeRoutesControllerTest extends EasyMockSupport {
   private static interface MethodMocker {
     public String viewCreateRoute(Model model,
         String name, 
@@ -77,28 +81,19 @@ public class VolumeRoutesControllerTest extends TestCase {
   };
   
   private VolumeRoutesController classUnderTest = null;
-  private MockControl managerControl = null;
   private IRouterManager manager = null;
-  private MockControl adaptorControl = null;
   private IBltAdaptorManager adaptorManager = null;
-  private MockControl anomalyControl = null;
   private IAnomalyDetectorManager anomalyManager = null;  
-  private MockControl modelControl = null;
   private Model model = null;
-  private MockControl methodMockControl = null;
   private MethodMocker methodMock = null;
-  
+
+  @Before
   public void setUp() throws Exception {
-    managerControl = MockControl.createControl(IRouterManager.class);
-    manager = (IRouterManager) managerControl.getMock();
-    adaptorControl = MockControl.createControl(IBltAdaptorManager.class);
-    adaptorManager = (IBltAdaptorManager) adaptorControl.getMock();
-    anomalyControl = MockControl.createControl(IAnomalyDetectorManager.class);
-    anomalyManager = (IAnomalyDetectorManager)anomalyControl.getMock();    
-    modelControl = MockControl.createControl(Model.class);
-    model = (Model) modelControl.getMock();
-    methodMockControl = MockControl.createControl(MethodMocker.class);
-    methodMock = (MethodMocker)methodMockControl.getMock();
+    manager = createMock(IRouterManager.class);
+    adaptorManager = createMock(IBltAdaptorManager.class);
+    anomalyManager = createMock(IAnomalyDetectorManager.class);    
+    model = createMock(Model.class);
+    methodMock = createMock(MethodMocker.class);
     
     // All creator methods and view methods are mocked to simplify testing
     //
@@ -177,74 +172,54 @@ public class VolumeRoutesControllerTest extends TestCase {
     classUnderTest.setAnomalyDetectorManager(anomalyManager);    
   }
 
+  @After
   public void tearDown() throws Exception {
     classUnderTest = null;
-    managerControl = null;
     manager = null;
-    adaptorControl = null;
     adaptorManager = null;
-    anomalyControl = null;
     anomalyManager = null;
-    modelControl = null;
     model = null;
-    methodMockControl = null;
     methodMock = null;
   }
 
-  private void replay() {
-    managerControl.replay();
-    adaptorControl.replay();
-    modelControl.replay();
-    methodMockControl.replay();
-  }
-
-  private void verify() {
-    managerControl.verify();
-    adaptorControl.verify();
-    modelControl.verify();
-    methodMockControl.verify();
-  }
-  
+  @Test
   public void testCreateRoute_initial() {
     List<String> types = new ArrayList<String>();
     types.add("groovy");
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
-    methodMock.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null);
-    methodMockControl.setReturnValue("route_create_volume");
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
+    expect(methodMock.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null)).andReturn("route_create_volume");
     
-    replay();
+    replayAll();
 
     String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null, null, null, null);
 
-    verify();
+    verifyAll();
     assertEquals("route_create_volume", result);
   }
 
+  @Test
   public void testCreateRoute_noAdaptors() {
     List<String> adaptors = new ArrayList<String>();
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
 
-    model.addAttribute("emessage",
-        "No adaptors defined, please add one before creating a route.");
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("emessage",
+        "No adaptors defined, please add one before creating a route.")).andReturn(null);
 
-    replay();
+    replayAll();
 
     String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null, null, null, null);
 
-    verify();
+    verifyAll();
     assertEquals("redirect:adaptors.htm", result);
   }
 
+  @Test
   public void testCreateRoute_success() {
     RouteDefinition routedef = new RouteDefinition();
     // Constructor for VolumeRule is protected so just mock it
-    MockControl ruleControl = MockClassControl.createControl(VolumeRule.class);
-    VolumeRule rule = (VolumeRule)ruleControl.getMock();
+    VolumeRule rule = createMock(VolumeRule.class);
     
     String name = "MyRoute";
     String author = "nisse";
@@ -264,22 +239,20 @@ public class VolumeRoutesControllerTest extends TestCase {
     recipients.add("A1");
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
-    methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout);
-    methodMockControl.setReturnValue(rule);
-    manager.create(name, author, active, description, recipients, rule);
-    managerControl.setReturnValue(routedef);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
+    expect(methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout)).andReturn(rule);
+    expect(manager.create(name, author, active, description, recipients, rule)).andReturn(routedef);
     manager.storeDefinition(routedef);
 
-    replay();
+    replayAll();
 
     String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
 
-    verify();
+    verifyAll();
     assertEquals("redirect:routes.htm", result);
   }
 
+  @Test
   public void testCreateRoute_noadaptor_selected() {
     String name = "MyRoute";
     String author = "nisse";
@@ -299,20 +272,18 @@ public class VolumeRoutesControllerTest extends TestCase {
     List<String> recipients = new ArrayList<String>();
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
-    methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage);
-    methodMockControl.setReturnValue("somestring");
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
+    expect(methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
 
-    replay();
+    replayAll();
 
     String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
 
-    verify();
+    verifyAll();
     assertEquals("somestring", result);
   }
 
-  
+  @Test
   public void testCreateRoute_noName() {
     String name = null;
     String author = "nisse";
@@ -330,25 +301,22 @@ public class VolumeRoutesControllerTest extends TestCase {
     List<String> recipients = new ArrayList<String>();
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
     
-    methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage);
-    methodMockControl.setReturnValue("somestring");
+    expect(methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
 
-    replay();
+    replayAll();
 
     String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
 
-    verify();
+    verifyAll();
     assertEquals("somestring", result);
   }
   
-  
+  @Test
   public void testCreateRoute_failedCreate() {
     RouteDefinition routedef = new RouteDefinition();
-    MockControl ruleControl = MockClassControl.createControl(VolumeRule.class);
-    VolumeRule rule = (VolumeRule)ruleControl.getMock();
+    VolumeRule rule = createMock(VolumeRule.class);
     
     String name = "MyRoute";
     String author = "nisse";
@@ -367,27 +335,24 @@ public class VolumeRoutesControllerTest extends TestCase {
     recipients.add("A1");
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    adaptorManager.getAdaptorNames();
-    adaptorControl.setReturnValue(adaptors);
-    methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout);
-    methodMockControl.setReturnValue(rule);
-    manager.create(name, author, active, description, recipients, rule);
-    managerControl.setReturnValue(routedef);
+    expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
+    expect(methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout)).andReturn(rule);
+    expect(manager.create(name, author, active, description, recipients, rule)).andReturn(routedef);
     manager.storeDefinition(routedef);
-    managerControl.setThrowable(new RuleException("Duplicate name"));
-    methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, "Failed to create definition: 'Duplicate name'");
-    methodMockControl.setReturnValue("route_create_volume");
-    replay();
+    expectLastCall().andThrow(new RuleException("Duplicate name"));
+    expect(methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, "Failed to create definition: 'Duplicate name'")).andReturn("route_create_volume");
+    
+    replayAll();
 
     String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
 
-    verify();
+    verifyAll();
     assertEquals("route_create_volume", result);
   }
   
+  @Test
   public void testModifyRoute_success() throws Exception {
-    MockControl ruleControl = MockClassControl.createControl(VolumeRule.class);
-    VolumeRule rule = (VolumeRule)ruleControl.getMock();
+    VolumeRule rule = createMock(VolumeRule.class);
     RouteDefinition routedef = new RouteDefinition();
     
     String name = "MyRoute";
@@ -407,10 +372,8 @@ public class VolumeRoutesControllerTest extends TestCase {
     recipients.add("A1");
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout);
-    methodMockControl.setReturnValue(rule);
-    manager.create(name, author, active, description, recipients, rule);
-    managerControl.setReturnValue(routedef);
+    expect(methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout)).andReturn(rule);
+    expect(manager.create(name, author, active, description, recipients, rule)).andReturn(routedef);
     manager.updateDefinition(routedef);
     
     classUnderTest = new VolumeRoutesController() {
@@ -428,14 +391,15 @@ public class VolumeRoutesControllerTest extends TestCase {
     classUnderTest.setManager(manager);
     classUnderTest.setAdaptorManager(adaptorManager);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.modifyRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
     
-    verify();
+    verifyAll();
     assertEquals("redirect:routes.htm", result);
   }
 
+  @Test
   public void testModifyRoute_noadaptorselected() throws Exception {
     String name = "MyRoute";
     String author = "nisse";
@@ -455,8 +419,7 @@ public class VolumeRoutesControllerTest extends TestCase {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
     
-    methodMock.viewShowRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage);
-    methodMockControl.setReturnValue("somestring");
+    expect(methodMock.viewShowRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
     
     classUnderTest = new VolumeRoutesController() {
       protected VolumeRule createRule(
@@ -491,12 +454,11 @@ public class VolumeRoutesControllerTest extends TestCase {
     classUnderTest.setManager(manager);
     classUnderTest.setAdaptorManager(adaptorManager);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.modifyRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
     
-    verify();
+    verifyAll();
     assertEquals("somestring", result);
   }
-
 }

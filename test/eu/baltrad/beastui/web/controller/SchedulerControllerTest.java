@@ -3,10 +3,13 @@ package eu.baltrad.beastui.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
-import org.easymock.MockControl;
-import org.easymock.classextension.MockClassControl;
+import org.easymock.EasyMockSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.router.IRouterManager;
@@ -15,7 +18,7 @@ import eu.baltrad.beast.scheduler.CronEntryUtilities;
 import eu.baltrad.beast.scheduler.IBeastScheduler;
 import eu.baltrad.beast.scheduler.SchedulerException;
 
-public class SchedulerControllerTest extends TestCase {
+public class SchedulerControllerTest extends EasyMockSupport {
   private static interface MockMethods {
     String viewCreateScheduledJob(Model model,
         List<String> seconds,
@@ -40,72 +43,49 @@ public class SchedulerControllerTest extends TestCase {
         String emessage);
   };
   
-  private MockControl managerControl = null;
   private IRouterManager manager = null;
-  private MockControl schedulerControl = null;
   private IBeastScheduler scheduler = null;
-  private MockControl modelControl = null;
   private Model model = null;
   private SchedulerController classUnderTest = null;
   
+  @Before
   public void setUp() throws Exception {
-    managerControl = MockControl.createControl(IRouterManager.class);
-    manager = (IRouterManager)managerControl.getMock();
-    schedulerControl = MockControl.createControl(IBeastScheduler.class);
-    scheduler = (IBeastScheduler)schedulerControl.getMock();
-    modelControl = MockControl.createControl(Model.class);
-    model = (Model)modelControl.getMock();
+    manager = createMock(IRouterManager.class);
+    scheduler = createMock(IBeastScheduler.class);
+    model = createMock(Model.class);
     
     classUnderTest = new SchedulerController();
     classUnderTest.setManager(manager);
     classUnderTest.setScheduler(scheduler);
   }
   
+  @After
   public void tearDown() throws Exception {
     classUnderTest = null;
-    managerControl = null;
     manager = null;
-    schedulerControl = null;
     scheduler = null;
-    modelControl = null;
     model = null;
   }
-  
-  protected void replay() throws Exception {
-    managerControl.replay();
-    schedulerControl.replay();
-    modelControl.replay();
-  }
 
-  protected void verify() throws Exception {
-    managerControl.verify();
-    schedulerControl.verify();
-    modelControl.verify();
-  }
-  
-  
+  @Test
   public void testShowSchedule() throws Exception {
     List<CronEntry> schedule = new ArrayList<CronEntry>();
-    scheduler.getSchedule();
-    schedulerControl.setReturnValue(schedule);
-    model.addAttribute("schedule", schedule);
-    modelControl.setReturnValue(null);
-    model.addAttribute("emessage", null);
-    modelControl.setReturnValue(null);
+    expect(scheduler.getSchedule()).andReturn(schedule);
+    expect(model.addAttribute("schedule", schedule)).andReturn(null);
+    expect(model.addAttribute("emessage", null)).andReturn(null);
     
-    replay();
+    replayAll();
     String result = classUnderTest.showSchedule(model, null);
     
-    verify();
+    verifyAll();
     assertEquals("schedule", result);
   }
  
+  @Test
   public void testCreateScheduledJob_default() throws Exception {
-    MockControl methodsControl = MockControl.createControl(MockMethods.class);
-    final MockMethods methods = (MockMethods)methodsControl.getMock();
+    final MockMethods methods = createMock(MockMethods.class);
     
-    methods.viewCreateScheduledJob(model, null, null, null, null, null, null, null, null);
-    methodsControl.setReturnValue("something");
+    expect(methods.viewCreateScheduledJob(model, null, null, null, null, null, null, null, null)).andReturn("something");
     
     classUnderTest = new SchedulerController() {
       protected String viewCreateScheduledJob(Model model,
@@ -123,21 +103,19 @@ public class SchedulerControllerTest extends TestCase {
     classUnderTest.setManager(manager);
     classUnderTest.setScheduler(scheduler);    
     
-    replay();
-    methodsControl.replay();
+    replayAll();
     
     String result = classUnderTest.createScheduledJob(model, null, null, null, null, null, null, null);
     
-    verify();
-    methodsControl.verify();
+    verifyAll();
+
     assertEquals("something", result);
   }
-  
+
+  @Test
   public void testCreateScheduledJob() throws Exception {
-    MockControl methodsControl = MockControl.createControl(MockMethods.class);
-    final MockMethods methods = (MockMethods)methodsControl.getMock();
-    MockControl cronutilControl = MockClassControl.createControl(CronEntryUtilities.class);
-    CronEntryUtilities cronutil = (CronEntryUtilities)cronutilControl.getMock();
+    final MockMethods methods = createMock(MockMethods.class);
+    CronEntryUtilities cronutil = createMock(CronEntryUtilities.class);
     
     List<String> seconds = new ArrayList<String>();
     List<String> minutes = new ArrayList<String>();
@@ -146,10 +124,8 @@ public class SchedulerControllerTest extends TestCase {
     List<String> months = new ArrayList<String>();
     List<String> daysOfWeek = new ArrayList<String>();
     
-    cronutil.createExpression(seconds, minutes, hours, daysOfMonth, months, daysOfWeek);
-    cronutilControl.setReturnValue("0 * * * * ?");
-    scheduler.register("0 * * * * ?", "DEF");
-    schedulerControl.setReturnValue(10);
+    expect(cronutil.createExpression(seconds, minutes, hours, daysOfMonth, months, daysOfWeek)).andReturn("0 * * * * ?");
+    expect(scheduler.register("0 * * * * ?", "DEF")).andReturn(10);
     
     classUnderTest = new SchedulerController() {
       protected String viewCreateScheduledJob(Model model,
@@ -168,23 +144,19 @@ public class SchedulerControllerTest extends TestCase {
     classUnderTest.setScheduler(scheduler);    
     classUnderTest.setCronEntryUtilities(cronutil);
     
-    replay();
-    methodsControl.replay();
-    cronutilControl.replay();
+    replayAll();
     
     String result = classUnderTest.createScheduledJob(model, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "DEF");
     
-    verify();
-    methodsControl.verify();
-    cronutilControl.verify();
+    verifyAll();
+
     assertEquals("redirect:schedule.htm", result);
   }
 
+  @Test
   public void testCreateScheduledJob_badCron() throws Exception {
-    MockControl methodsControl = MockControl.createControl(MockMethods.class);
-    final MockMethods methods = (MockMethods)methodsControl.getMock();
-    MockControl cronutilControl = MockClassControl.createControl(CronEntryUtilities.class);
-    CronEntryUtilities cronutil = (CronEntryUtilities)cronutilControl.getMock();
+    final MockMethods methods = createMock(MockMethods.class);
+    CronEntryUtilities cronutil = createMock(CronEntryUtilities.class);
     
     List<String> seconds = new ArrayList<String>();
     List<String> minutes = new ArrayList<String>();
@@ -193,12 +165,9 @@ public class SchedulerControllerTest extends TestCase {
     List<String> months = new ArrayList<String>();
     List<String> daysOfWeek = new ArrayList<String>();
 
-    cronutil.createExpression(seconds, minutes, hours, daysOfMonth, months, daysOfWeek);
-    cronutilControl.setReturnValue("0 * * * * ?");
-    scheduler.register("0 * * * * ?", "DEF");
-    schedulerControl.setThrowable(new SchedulerException("abc"));
-    methods.viewCreateScheduledJob(model, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "DEF", "Could not register: abc");
-    methodsControl.setReturnValue("abc.htm");
+    expect(cronutil.createExpression(seconds, minutes, hours, daysOfMonth, months, daysOfWeek)).andReturn("0 * * * * ?");
+    expect(scheduler.register("0 * * * * ?", "DEF")).andThrow(new SchedulerException("abc"));
+    expect(methods.viewCreateScheduledJob(model, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "DEF", "Could not register: abc")).andReturn("abc.htm");
     
     classUnderTest = new SchedulerController() {
       protected String viewCreateScheduledJob(Model model,
@@ -217,25 +186,20 @@ public class SchedulerControllerTest extends TestCase {
     classUnderTest.setScheduler(scheduler);    
     classUnderTest.setCronEntryUtilities(cronutil);
     
-    replay();
-    methodsControl.replay();
-    cronutilControl.replay();
+    replayAll();
     
     String result = classUnderTest.createScheduledJob(model, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "DEF");
     
-    verify();
-    methodsControl.verify();
-    cronutilControl.verify();
+    verifyAll();
+    
     assertEquals("abc.htm", result);
   }
   
   @SuppressWarnings("unchecked")
+  @Test
   public void testShowScheduledJob_initial() throws Exception {
-    MockControl methodsControl = MockControl.createControl(MockMethods.class);
-    final MockMethods methods = (MockMethods)methodsControl.getMock();
-    
-    MockControl cronutilControl = MockClassControl.createControl(CronEntryUtilities.class);
-    CronEntryUtilities cronutil = (CronEntryUtilities)cronutilControl.getMock();
+    final MockMethods methods = createMock(MockMethods.class);
+    CronEntryUtilities cronutil = createMock(CronEntryUtilities.class);
 
     List<String>[] entries = new List[6];
     entries[0] = new ArrayList<String>();
@@ -245,15 +209,12 @@ public class SchedulerControllerTest extends TestCase {
     entries[4] = new ArrayList<String>();
     entries[5] = new ArrayList<String>();
     
-    cronutil.parseAllInExpression("* * * * * *");
-    cronutilControl.setReturnValue(entries);
+    expect(cronutil.parseAllInExpression("* * * * * *")).andReturn(entries);
 
     CronEntry entry = new CronEntry(10, "* * * * * *", "abc");
     
-    scheduler.getEntry(10);
-    schedulerControl.setReturnValue(entry);
-    methods.viewShowScheduledJob(model, 10, entries[0], entries[1], entries[2], entries[3], entries[4], entries[5], "abc", null);
-    methodsControl.setReturnValue("dumdi");
+    expect(scheduler.getEntry(10)).andReturn(entry);
+    expect(methods.viewShowScheduledJob(model, 10, entries[0], entries[1], entries[2], entries[3], entries[4], entries[5], "abc", null)).andReturn("dumdi");
     
     classUnderTest = new SchedulerController() {
       protected String viewShowScheduledJob(Model model,
@@ -272,22 +233,18 @@ public class SchedulerControllerTest extends TestCase {
     classUnderTest.setScheduler(scheduler);
     classUnderTest.setCronEntryUtilities(cronutil);
 
-    replay();
-    methodsControl.replay();
-    cronutilControl.replay();
+    replayAll();
     
     String result = classUnderTest.showScheduledJob(model, 10, null, null, null, null, null, null, null, null);
     
-    verify();
-    methodsControl.verify();
-    cronutilControl.verify();
+    verifyAll();
     
     assertEquals("dumdi", result);
   }
-  
+
+  @Test
   public void testShowScheduledJob_modify() throws Exception {
-    MockControl cronutilControl = MockClassControl.createControl(CronEntryUtilities.class);
-    CronEntryUtilities cronutil = (CronEntryUtilities)cronutilControl.getMock();
+    CronEntryUtilities cronutil = createMock(CronEntryUtilities.class);
     
     List<String> seconds = new ArrayList<String>();
     List<String> minutes = new ArrayList<String>();
@@ -297,23 +254,21 @@ public class SchedulerControllerTest extends TestCase {
     List<String> daysOfWeek = new ArrayList<String>();
     
     CronEntry entry = new CronEntry(10, "* * *", "abc");
-    scheduler.getEntry(10);
-    schedulerControl.setReturnValue(entry);
-    cronutil.createExpression(seconds, minutes, hours, daysOfMonth, months, daysOfWeek);
-    cronutilControl.setReturnValue("* 1 * 2 * 3");
+    expect(scheduler.getEntry(10)).andReturn(entry);
+    expect(cronutil.createExpression(seconds, minutes, hours, daysOfMonth, months, daysOfWeek)).andReturn("* 1 * 2 * 3");
     scheduler.reregister(10, "* 1 * 2 * 3", "BAC");
     
-    replay();
-    cronutilControl.replay();
+    replayAll();
     
     classUnderTest.setCronEntryUtilities(cronutil);
     String result = classUnderTest.showScheduledJob(model, 10, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "BAC", "Save");
     
-    verify();
-    cronutilControl.verify();
+    verifyAll();
+
     assertEquals("redirect:schedule.htm", result);
   }
 
+  @Test
   public void testShowScheduledJob_delete() throws Exception {
     List<String> seconds = new ArrayList<String>();
     List<String> minutes = new ArrayList<String>();
@@ -323,26 +278,22 @@ public class SchedulerControllerTest extends TestCase {
     List<String> daysOfWeek = new ArrayList<String>();
 
     CronEntry entry = new CronEntry(10, "* * *", "abc");
-    scheduler.getEntry(10);
-    schedulerControl.setReturnValue(entry);
+    expect(scheduler.getEntry(10)).andReturn(entry);
     scheduler.unregister(10);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.showScheduledJob(model, 10, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "BAC", "Delete");
     
-    verify();
+    verifyAll();
     assertEquals("redirect:schedule.htm", result);
   }
 
-  
+  @Test
   public void testShowScheduledJob_noSuchId() throws Exception {
-    MockControl methodsControl = MockControl.createControl(MockMethods.class);
-    final MockMethods methods = (MockMethods)methodsControl.getMock();
-    scheduler.getEntry(10);
-    schedulerControl.setReturnValue(null);
-    methods.viewShowSchedule(model, "No such scheduled job");
-    methodsControl.setReturnValue("alfons");
+    final MockMethods methods = createMock(MockMethods.class);
+    expect(scheduler.getEntry(10)).andReturn(null);
+    expect(methods.viewShowSchedule(model, "No such scheduled job")).andReturn("alfons");
     
     classUnderTest = new SchedulerController() {
       protected String viewShowSchedule(Model model,
@@ -352,24 +303,21 @@ public class SchedulerControllerTest extends TestCase {
     };
     classUnderTest.setScheduler(scheduler);
     
-    replay();
-    methodsControl.replay();
+    replayAll();
     
     String result = classUnderTest.showScheduledJob(model, 10, null, null, null, null, null, null, null, "Modify");
     
-    verify();
-    methodsControl.verify();
+    verifyAll();
+
     assertEquals("alfons", result);
   }
 
+  @Test
   public void testShowScheduledJob_unknownOperation() throws Exception {
     CronEntry entry = new CronEntry(10, "* * *", "abc");
-    MockControl methodsControl = MockControl.createControl(MockMethods.class);
-    final MockMethods methods = (MockMethods)methodsControl.getMock();
-    scheduler.getEntry(10);
-    schedulerControl.setReturnValue(entry);
-    methods.viewShowSchedule(model, "Unknown operation");
-    methodsControl.setReturnValue("alfons");
+    final MockMethods methods = createMock(MockMethods.class);
+    expect(scheduler.getEntry(10)).andReturn(entry);
+    expect(methods.viewShowSchedule(model, "Unknown operation")).andReturn("alfons");
     
     classUnderTest = new SchedulerController() {
       protected String viewShowSchedule(Model model,
@@ -379,24 +327,21 @@ public class SchedulerControllerTest extends TestCase {
     };
     classUnderTest.setScheduler(scheduler);
     
-    replay();
-    methodsControl.replay();
+    replayAll();
     
     String result = classUnderTest.showScheduledJob(model, 10, null, null, null, null, null, null, "Data", "DoIt");
     
-    verify();
-    methodsControl.verify();
+    verifyAll();
+
     assertEquals("alfons", result);
   }
 
+  @Test
   public void testShowScheduledJob_nullOperation() throws Exception {
     CronEntry entry = new CronEntry(10, "* * *", "abc");
-    MockControl methodsControl = MockControl.createControl(MockMethods.class);
-    final MockMethods methods = (MockMethods)methodsControl.getMock();
-    scheduler.getEntry(10);
-    schedulerControl.setReturnValue(entry);
-    methods.viewShowSchedule(model, "Unknown operation");
-    methodsControl.setReturnValue("alfons");
+    final MockMethods methods = createMock(MockMethods.class);
+    expect(scheduler.getEntry(10)).andReturn(entry);
+    expect(methods.viewShowSchedule(model, "Unknown operation")).andReturn("alfons");
     
     classUnderTest = new SchedulerController() {
       protected String viewShowSchedule(Model model,
@@ -406,16 +351,16 @@ public class SchedulerControllerTest extends TestCase {
     };
     classUnderTest.setScheduler(scheduler);
     
-    replay();
-    methodsControl.replay();
+    replayAll();
     
     String result = classUnderTest.showScheduledJob(model, 10, null, null, null, null, null, null, "Data", null);
     
-    verify();
-    methodsControl.verify();
+    verifyAll();
+
     assertEquals("alfons", result);
   }
-  
+
+  @Test
   public void testViewCreateScheduledJob() throws Exception {
     List<String> seconds = new ArrayList<String>();
     List<String> minutes = new ArrayList<String>();
@@ -426,47 +371,33 @@ public class SchedulerControllerTest extends TestCase {
     
     List<String> jobnames = new ArrayList<String>();
 
-    manager.getNames();
-    managerControl.setReturnValue(jobnames);
-    model.addAttribute("seconds", seconds);
-    modelControl.setReturnValue(null);
-    model.addAttribute("minutes", minutes);
-    modelControl.setReturnValue(null);
-    model.addAttribute("hours", hours);
-    modelControl.setReturnValue(null);
-    model.addAttribute("daysOfMonth", daysOfMonth);
-    modelControl.setReturnValue(null);
-    model.addAttribute("months", months);
-    modelControl.setReturnValue(null);
-    model.addAttribute("daysOfWeek", daysOfWeek);
-    modelControl.setReturnValue(null);
+    expect(manager.getNames()).andReturn(jobnames);
+    expect(model.addAttribute("seconds", seconds)).andReturn(null);
+    expect(model.addAttribute("minutes", minutes)).andReturn(null);
+    expect(model.addAttribute("hours", hours)).andReturn(null);
+    expect(model.addAttribute("daysOfMonth", daysOfMonth)).andReturn(null);
+    expect(model.addAttribute("months", months)).andReturn(null);
+    expect(model.addAttribute("daysOfWeek", daysOfWeek)).andReturn(null);
 
-    model.addAttribute("selectableSeconds", SchedulerController.SECONDS);
-    modelControl.setReturnValue(null);
-    model.addAttribute("selectableMinutes", SchedulerController.MINUTES);
-    modelControl.setReturnValue(null);
-    model.addAttribute("selectableHours", SchedulerController.HOURS);
-    modelControl.setReturnValue(null);
-    model.addAttribute("selectableDaysOfMonth", SchedulerController.DAYS_OF_MONTH);
-    modelControl.setReturnValue(null);
-    model.addAttribute("selectableMonths", SchedulerController.MONTHS);
-    modelControl.setReturnValue(null);
-    model.addAttribute("selectableDaysOfWeek", SchedulerController.DAYS_OF_WEEK);
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("selectableSeconds", SchedulerController.SECONDS)).andReturn(null);
+    expect(model.addAttribute("selectableMinutes", SchedulerController.MINUTES)).andReturn(null);
+    expect(model.addAttribute("selectableHours", SchedulerController.HOURS)).andReturn(null);
+    expect(model.addAttribute("selectableDaysOfMonth", SchedulerController.DAYS_OF_MONTH)).andReturn(null);
+    expect(model.addAttribute("selectableMonths", SchedulerController.MONTHS)).andReturn(null);
+    expect(model.addAttribute("selectableDaysOfWeek", SchedulerController.DAYS_OF_WEEK)).andReturn(null);
     
-    model.addAttribute("jobnames", jobnames);
-    modelControl.setReturnValue(null);
-    model.addAttribute("jobname", "nisse");
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("jobnames", jobnames)).andReturn(null);
+    expect(model.addAttribute("jobname", "nisse")).andReturn(null);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.viewCreateScheduledJob(model, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "nisse", null);
     
-    verify();
+    verifyAll();
     assertEquals("schedule_create_job", result);
   }
 
+  @Test
   public void testViewShowScheduledJob() throws Exception {
     List<String> seconds = new ArrayList<String>();
     List<String> minutes = new ArrayList<String>();
@@ -477,68 +408,51 @@ public class SchedulerControllerTest extends TestCase {
 
     List<String> jobnames = new ArrayList<String>();
 
-    manager.getNames();
-    managerControl.setReturnValue(jobnames);
-    model.addAttribute("jobnames", jobnames);
-    modelControl.setReturnValue(null);
-    model.addAttribute("id", 10);
-    modelControl.setReturnValue(null);
-    model.addAttribute("seconds", seconds);
-    modelControl.setReturnValue(null);
-    model.addAttribute("minutes", minutes);
-    modelControl.setReturnValue(null);
-    model.addAttribute("hours", hours);
-    modelControl.setReturnValue(null);
-    model.addAttribute("daysOfMonth", daysOfMonth);
-    modelControl.setReturnValue(null);
-    model.addAttribute("months", months);
-    modelControl.setReturnValue(null);
-    model.addAttribute("daysOfWeek", daysOfWeek);
-    modelControl.setReturnValue(null);
+    expect(manager.getNames()).andReturn(jobnames);
+    expect(model.addAttribute("jobnames", jobnames)).andReturn(null);
+    expect(model.addAttribute("id", 10)).andReturn(null);
+    expect(model.addAttribute("seconds", seconds)).andReturn(null);
+    expect(model.addAttribute("minutes", minutes)).andReturn(null);
+    expect(model.addAttribute("hours", hours)).andReturn(null);
+    expect(model.addAttribute("daysOfMonth", daysOfMonth)).andReturn(null);
+    expect(model.addAttribute("months", months)).andReturn(null);
+    expect(model.addAttribute("daysOfWeek", daysOfWeek)).andReturn(null);
 
-    model.addAttribute("selectableSeconds", SchedulerController.SECONDS);
-    modelControl.setReturnValue(null);
-    model.addAttribute("selectableMinutes", SchedulerController.MINUTES);
-    modelControl.setReturnValue(null);
-    model.addAttribute("selectableHours", SchedulerController.HOURS);
-    modelControl.setReturnValue(null);
-    model.addAttribute("selectableDaysOfMonth", SchedulerController.DAYS_OF_MONTH);
-    modelControl.setReturnValue(null);
-    model.addAttribute("selectableMonths", SchedulerController.MONTHS);
-    modelControl.setReturnValue(null);
-    model.addAttribute("selectableDaysOfWeek", SchedulerController.DAYS_OF_WEEK);
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("selectableSeconds", SchedulerController.SECONDS)).andReturn(null);
+    expect(model.addAttribute("selectableMinutes", SchedulerController.MINUTES)).andReturn(null);
+    expect(model.addAttribute("selectableHours", SchedulerController.HOURS)).andReturn(null);
+    expect(model.addAttribute("selectableDaysOfMonth", SchedulerController.DAYS_OF_MONTH)).andReturn(null);
+    expect(model.addAttribute("selectableMonths", SchedulerController.MONTHS)).andReturn(null);
+    expect(model.addAttribute("selectableDaysOfWeek", SchedulerController.DAYS_OF_WEEK)).andReturn(null);
     
-    model.addAttribute("jobname", "nisse");
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("jobname", "nisse")).andReturn(null);
     
-    replay();
+    replayAll();
 
     String result = classUnderTest.viewShowScheduledJob(model, 10, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, "nisse", null);
     
-    verify();
+    verifyAll();
     assertEquals("schedule_show_job", result);
   }
   
   public void testViewShowSchedule() throws Exception {
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.viewShowSchedule(model, null);
     
-    verify();
+    verifyAll();
     assertEquals("schedule", result);
   }
   
   public void testViewShowSchedule_emessage() throws Exception {
-    model.addAttribute("emessage", "an error occured");
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("emessage", "an error occured")).andReturn(null);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.viewShowSchedule(model, "an error occured");
     
-    verify();
+    verifyAll();
     assertEquals("schedule", result);
   }
 }

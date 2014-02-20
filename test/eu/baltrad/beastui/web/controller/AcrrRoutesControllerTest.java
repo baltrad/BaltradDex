@@ -1,18 +1,17 @@
 package eu.baltrad.beastui.web.controller;
 
-import junit.framework.TestCase;
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertSame;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.rules.acrr.AcrrRule;
-import eu.baltrad.beast.rules.acrr.AcrrRuleManager;
 
-public class AcrrRoutesControllerTest extends TestCase {
+public class AcrrRoutesControllerTest extends EasyMockSupport {
   private AcrrRoutesController classUnderTest = null;
   private IRouterManager manager = null;
   
@@ -28,17 +27,9 @@ public class AcrrRoutesControllerTest extends TestCase {
     classUnderTest = null;
   }
 
-  protected void replayAll() {
-    replay(manager);
-  }
-  
-  protected void verifyAll() {
-    verify(manager);
-  }
-  
   @Test
   public void test_createRule() {
-    AcrrRule rule = org.easymock.classextension.EasyMock.createMock(AcrrRule.class);
+    AcrrRule rule = createMock(AcrrRule.class);
     rule.setArea("nrd_swe");
     rule.setObjectType("IMAGE");
     rule.setQuantity("DBZH");
@@ -52,12 +43,10 @@ public class AcrrRoutesControllerTest extends TestCase {
     expect(manager.createRule("blt_acrr")).andReturn(rule);
     
     replayAll();
-    org.easymock.classextension.EasyMock.replay(rule);
     
     AcrrRule result = classUnderTest.createRule("nrd_swe", "IMAGE", "DBZH", 12, 4, 1, "eu.x.y", 100.0, 0.5);
     
     verifyAll();
-    org.easymock.classextension.EasyMock.verify(rule);
+    assertSame(rule, result);
   }
-
 }

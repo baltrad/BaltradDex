@@ -49,5 +49,18 @@ public class NodeResponse extends HttpServletResponseWrapper
     public void setNodeName(String nodeName) {
         this.addHeader(NODE_NAME_HDR, nodeName);
     }
-   
+    
+    /**
+     * @see INodeResponse#setProtocolVersion(String)
+     */
+    public void setProtocolVersion(String version) {
+      this.addHeader(PROTOCOL_VERSION_HDR, version);
+    }
+    
+    /**
+     * @see INodeResponse#setProtocolVersion(String)
+     */
+    public void setSupportedProtocolVersion(String version) {
+      this.addHeader(NODE_PROTOCOL_VERSION_HDR, version);
+    }
 }

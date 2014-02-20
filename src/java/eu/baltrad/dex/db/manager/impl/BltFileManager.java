@@ -104,11 +104,12 @@ public class BltFileManager implements IBltFileManager {
     public IFilter loadFilter(String dsName, String type) {
         IFilter attributeFilter = null;
         try {
+          log.info("Loading filter for " + dsName + ", " + type);
             DataSource dataSource = dataSourceManager.load(dsName, type);
             attributeFilter = coreFilterManager.load(
                     dataSourceManager.loadFilterId(dataSource.getId()));
         } catch (Exception e) {
-            log.error("Failed to load filter: " + e.getMessage());
+            log.error("Failed to load filter: ", e);
         }
         return attributeFilter;
     }

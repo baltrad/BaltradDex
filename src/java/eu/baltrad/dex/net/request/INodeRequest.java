@@ -34,6 +34,7 @@ public interface INodeRequest {
     static final String NODE_NAME_HDR = "Node-Name";
     static final String AUTH_HDR = "Authorization";
     static final String HDR_SEPARATOR = ":";
+    static final String PROTOCOL_VERSION_HDR = "DEX-Protocol-Version";
     
     /**
      * @return Message to be signed
@@ -55,4 +56,8 @@ public interface INodeRequest {
      */
     public String getNodeName();
     
+    /**
+     * @return the protocol version. If nothing found, empty string should be returned. null should never be returned.
+     */
+    public String getProtocolVersion();
 }

@@ -22,37 +22,36 @@
 package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.util.json.IJsonUtil;
-import eu.baltrad.dex.net.util.json.impl.JsonUtil;
+import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.net.protocol.RequestParser;
+import eu.baltrad.dex.net.protocol.RequestParserException;
+import eu.baltrad.dex.net.protocol.ResponseWriter;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.web.servlet.ModelAndView;
 
-import org.easymock.EasyMock;
+import org.easymock.EasyMockSupport;
+
 import static org.easymock.EasyMock.*;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import org.keyczar.exceptions.KeyczarException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
 
-import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 /**
  * Post subscription servlet test.
@@ -60,28 +59,20 @@ import java.text.SimpleDateFormat;
  * @version 1.1.0
  * @since 1.1.0
  */
-public class UpdateSubscriptionServletTest {
-    
-    private static final String JSON_SUBSCRIPTIONS = "[{\"type\":\"" + 
-            "download\",\"date\":1340189763867,\"active\":true,\"user\":" +
-            "\"User1\",\"dataSource\":\"DataSource1\",\"syncronized\":true}," +
-            "{\"type\":\"download\",\"date\":1340189763867," + 
-            "\"active\":true,\"user\":\"User2\",\"dataSource\":" + 
-            "\"DataSource2\",\"syncronized\":false},{\"type\":" + 
-            "\"upload\",\"date\":1340189763867,\"active\":true,\"user\":" + 
-            "\"User3\",\"dataSource\":\"DataSource3\",\"syncronized\":true}]";
-    
-    private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
+public class UpdateSubscriptionServletTest extends EasyMockSupport {
+    interface MethodMock {
+      List<Subscription> storePeerSubscriptions(String nodeName, List<Subscription> requestedSubscription);
+      public void doPost(HttpServletRequest request, HttpServletResponse response);
+    };
     
     private GSServlet classUnderTest;
-    private List<Object> mocks;
-    private JsonUtil jsonUtil;
     private MessageResourceUtil messages;
-    private MockHttpServletRequest request;
-    private MockHttpServletResponse response;
     private ISubscriptionManager subscriptionManagerMock;
-    private DateFormat format;
+    private Authenticator authenticator;
+    private ProtocolManager protocolManager;
+    private MethodMock methods;
     
+    @SuppressWarnings("serial")
     class GSServlet extends UpdateSubscriptionServlet {
         public GSServlet() {
             this.localNode = new User(1, "test", "user", "s3cret", "org", "unit", 
@@ -89,49 +80,27 @@ public class UpdateSubscriptionServletTest {
         }
         @Override
         public void initConfiguration() {}
-    }
-    
-    private Object createMock(Class clazz) {
-        Object mock = EasyMock.createMock(clazz);
-        mocks.add(mock);
-        return mock;
-    }
-    
-    private void replayAll() {
-        for (Object mock : mocks) {
-            replay(mock);
+        @Override
+        protected List<Subscription> storePeerSubscriptions(String nodeName, List<Subscription> requestedSubscription) {
+          return methods.storePeerSubscriptions(nodeName, requestedSubscription);
         }
     }
     
-    private void verifyAll() {
-        for (Object mock : mocks) {
-            verify(mock);
-        }
-    }
-    
-    private void resetAll() {
-        for (Object mock : mocks) {
-            reset(mock);
-        }
-    }
-    
-    @Before
-    public void setUp() {
-        mocks = new ArrayList<Object>();
-        classUnderTest = new GSServlet();
-        classUnderTest.setLog(Logger.getLogger("DEX"));
-        messages = new MessageResourceUtil();
-        messages.setBasename("resources/messages");
-        classUnderTest.setMessages(messages);
-        jsonUtil = new JsonUtil();
-        classUnderTest.setJsonUtil(jsonUtil);
-        request = new MockHttpServletRequest();
-        response = new MockHttpServletResponse();
-        format = new SimpleDateFormat(DATE_FORMAT);
-        subscriptionManagerMock = (ISubscriptionManager)
-                createMock(ISubscriptionManager.class);
-        setAttributes(request);
-    }
+  @Before
+  public void setUp() {
+    messages = createMock(MessageResourceUtil.class);
+    subscriptionManagerMock = createMock(ISubscriptionManager.class);
+    authenticator = createMock(Authenticator.class);
+    protocolManager = createMock(ProtocolManager.class);
+    methods = createMock(MethodMock.class);
+
+    classUnderTest = new GSServlet();
+    classUnderTest.setLog(Logger.getLogger("DEX"));
+    classUnderTest.setMessages(messages);
+    classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+    classUnderTest.setAuthenticator(authenticator);
+    classUnderTest.setProtocolManager(protocolManager);
+  }
     
     @After
     public void tearDown() {
@@ -139,173 +108,183 @@ public class UpdateSubscriptionServletTest {
         resetAll();
     }
     
-    private void setAttributes(MockHttpServletRequest request) {
-        request.setAttribute("Content-Type", "text/html");  
-        request.setAttribute("Content-MD5", Base64.encodeBase64String(
-                request.getRequestURI().getBytes()));
-        request.setAttribute("Date", format.format(new Date()));
-        request.addHeader("Authorization", "test.baltrad.eu" + ":" + 
-            "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_");   
-        request.addHeader("Node-Name", "test.baltrad.eu");
+    @SuppressWarnings("serial")
+    @Test
+    public void handleRequest() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      HttpSession httpSession = createMock(HttpSession.class);
+      
+      expect(request.getSession(true)).andReturn(httpSession);
+      methods.doPost(request, response);
+      
+      classUnderTest = new GSServlet() {
+        public void doPost(HttpServletRequest request, HttpServletResponse response) {
+          methods.doPost(request, response);
+        }
+      };
+      
+      replayAll();
+      
+      ModelAndView result = classUnderTest.handleRequest(request, response);
+      
+      verifyAll();
+      assertNotNull(result);
     }
     
     @Test
-    public void handleRequest_MessageVerificationError() throws Exception {
-        Authenticator authenticatorMock = (Authenticator) 
-                createMock(Authenticator.class);
-        authenticatorMock.authenticate(isA(String.class), isA(String.class),
-                isA(String.class));
-        
-        expectLastCall().andThrow(new KeyczarException(
-                "Failed to verify message"));
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
-        assertEquals(messages
-                .getMessage("postsubscription.server.message_verifier_error"), 
-                    response.getErrorMessage());
+    public void doPost() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter responseWriter = createMock(ResponseWriter.class);
+      
+      List<Subscription> requestedSubscription = new ArrayList<Subscription>();
+      List<Subscription> subscriptions = new ArrayList<Subscription>();
+      requestedSubscription.add(new Subscription());
+      subscriptions.add(new Subscription());
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.1").anyTimes();
+      expect(requestParser.isAuthenticated(authenticator)).andReturn(true);
+      expect(requestParser.getSubscriptions()).andReturn(requestedSubscription);
+      expect(requestParser.getNodeName()).andReturn("NodeName");
+      expect(methods.storePeerSubscriptions("NodeName", requestedSubscription)).andReturn(subscriptions);
+      expect(requestParser.getWriter(response)).andReturn(responseWriter);
+      responseWriter.subscriptionResponse(classUnderTest.localNode.getName(), subscriptions, HttpServletResponse.SC_OK);
+      
+      replayAll();
+      
+      classUnderTest.doPost(request, response);
+      
+      verifyAll();
     }
+
+    @Test
+    public void doPost_partial() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter responseWriter = createMock(ResponseWriter.class);
+      
+      List<Subscription> requestedSubscription = new ArrayList<Subscription>();
+      List<Subscription> subscriptions = new ArrayList<Subscription>();
+      requestedSubscription.add(new Subscription());
+      requestedSubscription.add(new Subscription());
+      subscriptions.add(new Subscription());
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.1").anyTimes();
+      expect(requestParser.isAuthenticated(authenticator)).andReturn(true);
+      expect(requestParser.getSubscriptions()).andReturn(requestedSubscription);
+      expect(requestParser.getNodeName()).andReturn("NodeName");
+      expect(methods.storePeerSubscriptions("NodeName", requestedSubscription)).andReturn(subscriptions);
+      expect(requestParser.getWriter(response)).andReturn(responseWriter);
+      responseWriter.subscriptionResponse(classUnderTest.localNode.getName(), subscriptions, HttpServletResponse.SC_PARTIAL_CONTENT);
+      
+      replayAll();
+      
+      classUnderTest.doPost(request, response);
+      
+      verifyAll();
+    }    
+
+    @Test
+    public void doPost_noSubscriptions() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter responseWriter = createMock(ResponseWriter.class);
+      
+      List<Subscription> requestedSubscription = new ArrayList<Subscription>();
+      List<Subscription> subscriptions = new ArrayList<Subscription>();
+      requestedSubscription.add(new Subscription());
+      requestedSubscription.add(new Subscription());
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.1").anyTimes();
+      expect(requestParser.isAuthenticated(authenticator)).andReturn(true);
+      expect(requestParser.getSubscriptions()).andReturn(requestedSubscription);
+      expect(requestParser.getNodeName()).andReturn("NodeName");
+      expect(methods.storePeerSubscriptions("NodeName", requestedSubscription)).andReturn(subscriptions);
+      expect(requestParser.getWriter(response)).andReturn(responseWriter);
+      expect(messages.getMessage("getsubscription.server.generic_subscription_error")).andReturn("a message");
+      responseWriter.messageResponse("a message", HttpServletResponse.SC_NOT_FOUND);
+      
+      replayAll();
+      
+      classUnderTest.doPost(request, response);
+      
+      verifyAll();
+    }    
+
     
     @Test
-    public void handleRequest_Unauthorized() throws Exception {
-        Authenticator authMock = (Authenticator) 
-                createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.FALSE).anyTimes();
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
-        assertEquals(
-            messages.getMessage("getsubscription.server.unauthorized_request"), 
-            response.getErrorMessage());
-    }
-    
-    @Test 
-    public void handleRequest_InternalServerError() throws Exception {
-        Authenticator authMock = (Authenticator) 
-                createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-        
-        IJsonUtil jsonUtilMock = (IJsonUtil) createMock(IJsonUtil.class);
-        expect(jsonUtilMock.jsonToSubscriptions(JSON_SUBSCRIPTIONS))
-                .andThrow(new RuntimeException());
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setJsonUtil(jsonUtilMock);
-        request.setContent(JSON_SUBSCRIPTIONS.getBytes());
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-                response.getStatus());
-        assertEquals(
-            messages.getMessage("getsubscription.server.internal_server_error"), 
-            response.getErrorMessage());
-    }
+    public void doPost_MessageVerificationError() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter responseWriter = createMock(ResponseWriter.class);
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.1").anyTimes();
+      expect(requestParser.isAuthenticated(authenticator)).andThrow(new KeyczarException("keyczar exception"));
+      expect(requestParser.getWriter(response)).andReturn(responseWriter);
+      expect(messages.getMessage("postsubscription.server.message_verifier_error")).andReturn("a message");
+      responseWriter.messageResponse("a message", HttpServletResponse.SC_UNAUTHORIZED);
+      
+      replayAll();
+      
+      classUnderTest.doPost(request, response);
+      
+      verifyAll();
+    }    
+
+    @Test
+    public void doPost_Unauthorized() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter responseWriter = createMock(ResponseWriter.class);
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.1").anyTimes();
+      expect(requestParser.isAuthenticated(authenticator)).andReturn(false);
+      expect(requestParser.getWriter(response)).andReturn(responseWriter);
+      expect(messages.getMessage("getsubscription.server.unauthorized_request")).andReturn("a message");
+      responseWriter.messageResponse("a message", HttpServletResponse.SC_UNAUTHORIZED);
+      
+      replayAll();
+      
+      classUnderTest.doPost(request, response);
+      
+      verifyAll();
+    }    
     
     @Test
-    public void handleRequest_SubscriptionFailedError() throws Exception {
-        Authenticator authMock = (Authenticator) 
-                createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-        
-        expect(subscriptionManagerMock.load(isA(String.class), 
-                isA(String.class),
-                isA(String.class))).andReturn(null).anyTimes();
-        subscriptionManagerMock.store(isA(Subscription.class));
-        expectLastCall().andThrow(new Exception()).anyTimes();
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-        request.setContent(JSON_SUBSCRIPTIONS.getBytes());
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
-        assertEquals(
-            messages.getMessage(
-                "getsubscription.server.generic_subscription_error"), 
-            response.getErrorMessage());
-    }
-    
-    @Test
-    public void handleRequest_PartialSubscriptionError() throws Exception {
-        Authenticator authMock = (Authenticator)
-                createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-        
-        expect(subscriptionManagerMock.load(isA(String.class), 
-                isA(String.class), 
-                isA(String.class))).andReturn(null).anyTimes();
-        expect(subscriptionManagerMock.store(isA(Subscription.class)))
-                .andReturn(Integer.SIZE).times(2);
-        expect(subscriptionManagerMock.store(isA(Subscription.class)))
-                .andThrow(new Exception());
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-        request.setContent(JSON_SUBSCRIPTIONS.getBytes());
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_PARTIAL_CONTENT, 
-                response.getStatus());
-        assertNotNull(response.getContentAsString());
-        List<Subscription> subs = 
-                jsonUtil.jsonToSubscriptions(response.getContentAsString()); 
-        assertEquals(2, subs.size());
-    }
-    
-    @Test 
-    public void handleRequest_OK() throws Exception {
-        Authenticator authMock = (Authenticator)
-                createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE).anyTimes();
-    
-        expect(subscriptionManagerMock.load(isA(String.class), 
-                isA(String.class),
-                isA(String.class))).andReturn(null).anyTimes();
-        expect(subscriptionManagerMock.store(isA(Subscription.class)))
-                .andReturn(Integer.SIZE).times(3);
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-        request.setContent(JSON_SUBSCRIPTIONS.getBytes());
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-        assertNotNull(response.getContentAsString());
-        List<Subscription> subs = 
-                jsonUtil.jsonToSubscriptions(response.getContentAsString()); 
-        assertEquals(3, subs.size());
+    public void doPost_InternalServerError() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter responseWriter = createMock(ResponseWriter.class);
+      
+      List<Subscription> requestedSubscription = new ArrayList<Subscription>();
+      List<Subscription> subscriptions = new ArrayList<Subscription>();
+      requestedSubscription.add(new Subscription());
+      subscriptions.add(new Subscription());
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.1").anyTimes();
+      expect(requestParser.isAuthenticated(authenticator)).andReturn(true);
+      expect(requestParser.getSubscriptions()).andThrow(new RequestParserException("request error"));
+      expect(requestParser.getWriter(response)).andReturn(responseWriter);
+      expect(messages.getMessage("getsubscription.server.internal_server_error")).andReturn("a message");
+      responseWriter.messageResponse("a message", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      
+      replayAll();
+      
+      classUnderTest.doPost(request, response);
+      
+      verifyAll();
     }
 }

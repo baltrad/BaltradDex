@@ -26,6 +26,8 @@ import eu.baltrad.dex.user.manager.IRoleManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.mapper.UserMapper;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -61,6 +63,8 @@ public class UserManager implements IUserManager {
     
     /** Row mapper */
     private UserMapper mapper;
+    
+    private final static Logger logger = LogManager.getLogger(UserManager.class);
     
     /**
      * Constructor.
@@ -126,6 +130,7 @@ public class UserManager implements IUserManager {
         try {
             return jdbcTemplate.queryForObject(sql, mapper, name);
         } catch (EmptyResultDataAccessException e) {
+          logger.debug("Could not load user", e);
             return null;
         }
     }

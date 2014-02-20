@@ -26,9 +26,10 @@ import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.controller.util.ModelMessageHelper;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
-import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.datasource.model.DataSource;
 
 import org.springframework.ui.Model;
 import org.springframework.ui.ExtendedModelMap;
@@ -38,15 +39,9 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.SimpleTransactionStatus;
 
-import org.easymock.EasyMock;
-import static org.easymock.EasyMock.*;
+import org.easymock.EasyMockSupport;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
+import static org.easymock.EasyMock.*;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -62,7 +57,12 @@ import java.util.ArrayList;
  * @version 1.9.0
  * @since 1.9.0
  */
-public class RemoveSubscriptionControllerTest {
+public class RemoveSubscriptionControllerTest extends EasyMockSupport {
+  interface MethodMock {
+    int cancelDownloads(String peerName, User local, List<Subscription> downloads);
+    int removeDownloads(List<Subscription> downloads);
+  }
+  
 
     private RSController classUnderTest;
     private IUserManager userManagerMock;
@@ -72,15 +72,16 @@ public class RemoveSubscriptionControllerTest {
     private PlatformTransactionManager txManagerMock;
     private IDataSourceManager dataSourceManagerMock;
     
-    private List<Object> mocks;
-    private User peer;
     private List<User> operators;
     private List<Subscription> downloads;
     private List<Subscription> activeDownloads;
     private List<Subscription> uploads;
     private Subscription s1, s2, s3, s4, s5;
     private MockHttpServletRequest request;
-    private MessageResourceUtil messages;
+
+    private ModelMessageHelper messageHelper;
+    
+    private MethodMock methods = null;
     
     class RSController extends RemoveSubscriptionController {
         public RSController() {
@@ -99,6 +100,9 @@ public class RemoveSubscriptionControllerTest {
         public void setSelectedDownloads(List<Subscription> selectedDownloads) {
             this.selectedDownloads = selectedDownloads;
         }
+        public void setSelectedActiveDownloads(List<Subscription> selectedActiveDownloads) {
+          this.selectedActiveDownloads = selectedActiveDownloads;
+        }
         public List<Subscription> getSelectedActiveDownloads() {
             return this.selectedActiveDownloads;
         }
@@ -108,52 +112,37 @@ public class RemoveSubscriptionControllerTest {
         public void setSelectedUploads(List<Subscription> selectedUploads) {
             this.selectedUploads = selectedUploads;
         }
-    }
-    
-    private Object createMock(Class clazz) {
-        Object mock = EasyMock.createMock(clazz);
-        mocks.add(mock);
-        return mock;
-    }
-    
-    private void replayAll() {
-        for (Object mock : mocks) {
-            replay(mock);
+        @Override
+        protected int cancelDownloads(String peerName, User local, List<Subscription> downloads) {
+          return methods.cancelDownloads(peerName, local, downloads);
         }
-    }
-    
-    private void verifyAll() {
-        for (Object mock : mocks) {
-            verify(mock);
+        @Override
+        protected int removeDownloads(List<Subscription> downloads) {
+          return methods.removeDownloads(downloads);
         }
-    }
-    
-    private void resetAll() {
-        for (Object mock : mocks) {
-            reset(mock);
-        }
+        
     }
     
     @Before
     public void setUp() {
         classUnderTest = new RSController();
-        mocks = new ArrayList<Object>();
         request = new MockHttpServletRequest();
-        userManagerMock = (IUserManager) createMock(IUserManager.class);
-        subscriptionManagerMock = (ISubscriptionManager) 
-                createMock(ISubscriptionManager.class);
-        authenticatorMock = (Authenticator) createMock(Authenticator.class);
-        httpClientMock = (IHttpClientUtil) createMock(IHttpClientUtil.class);
-        txManagerMock = (PlatformTransactionManager) 
-                createMock(PlatformTransactionManager.class);
-        dataSourceManagerMock = (IDataSourceManager) 
-                createMock(IDataSourceManager.class);
-        messages = new MessageResourceUtil();
-        messages.setBasename("resources/messages");
-        classUnderTest.setMessages(messages);
+        userManagerMock = createMock(IUserManager.class);
+        subscriptionManagerMock = createMock(ISubscriptionManager.class);
+        authenticatorMock = createMock(Authenticator.class);
+        httpClientMock = createMock(IHttpClientUtil.class);
+        txManagerMock = createMock(PlatformTransactionManager.class);
+        dataSourceManagerMock = createMock(IDataSourceManager.class);
+        methods = createMock(MethodMock.class);
+        messageHelper = createMock(ModelMessageHelper.class);
         
-        peer = new User("peer.baltrad.eu", "user", "s3cret", "org", 
-                "unit", "locality", "state", "XX", "http://peer.baltrad.eu");
+        classUnderTest.setMessageHelper(messageHelper);
+        classUnderTest.setUserManager(userManagerMock);
+        classUnderTest.setAuthenticator(authenticatorMock);
+        classUnderTest.setHttpClient(httpClientMock);
+        classUnderTest.setTxManager(txManagerMock);
+        classUnderTest.setPeerName("PeerUser");
+        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         
         operators = new ArrayList<User>();
         operators.add(new User(1, "test1.baltrad.eu", "user", "s3cret", "org", 
@@ -190,12 +179,15 @@ public class RemoveSubscriptionControllerTest {
         s5 = new Subscription(5, time, "upload", "PeerUser", "DataSource5", 
                 true, false);
         uploads.add(s5);
+        
+        classUnderTest.setSelectedActiveDownloads(activeDownloads);
+        classUnderTest.setSelectedDownloads(downloads);
+        classUnderTest.setSelectedUploads(uploads);
     }
     
     @After
     public void tearDown() {
         classUnderTest = null;
-        peer = null;
         request = null;
         operators = null;
         downloads = null;
@@ -203,15 +195,6 @@ public class RemoveSubscriptionControllerTest {
         uploads = null;
         resetAll();
     }
-    
-    private HttpResponse createResponse(int code, String reason) 
-            throws Exception {
-        ProtocolVersion version = new ProtocolVersion("HTTP", 1, 1);
-        StatusLine statusLine = new BasicStatusLine(version, code, reason);
-        HttpResponse response = new BasicHttpResponse(statusLine);
-        response.addHeader("PeerNode", "peer.baltrad.eu");
-        return response;
-    } 
     
     @Test
     public void subscribedPeers() {
@@ -298,174 +281,162 @@ public class RemoveSubscriptionControllerTest {
     
     @Test
     public void removeDownloadsStatus_OK() throws Exception {
-        expect(userManagerMock.load("PeerUser")).andReturn(peer).once();
-        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
-                isA(String.class));
-        
-        HttpResponse res = createResponse(200, "OK");
-        
-        expect(httpClientMock.post(isA(HttpUriRequest.class))).andReturn(res);
-        
-        TransactionStatus status = new SimpleTransactionStatus();
-        
-        expect(txManagerMock.getTransaction(isA((TransactionDefinition.class))))
-                .andReturn(status);
-        txManagerMock.commit(status);
-        expectLastCall();
-        
-        replayAll();
-        
-        classUnderTest.setUserManager(userManagerMock);
-        classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setHttpClient(httpClientMock);
-        classUnderTest.setTxManager(txManagerMock);
-        classUnderTest.setPeerName("PeerUser");
-        
-        Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.removeDownloadsStatus(model);
-        
-        assertEquals("subscription_remove_downloads_status", viewName);
-        assertTrue(model.containsAttribute("subscription_remove_success"));
-        assertEquals("Successfully removed selected subscriptions.",
-                model.asMap().get("subscription_remove_success"));
-        
-        verifyAll();
+      Model model = createMock(Model.class);
+      
+      expect(methods.cancelDownloads("PeerUser", classUnderTest.localNode, activeDownloads)).andReturn(200);
+      expect(methods.removeDownloads(downloads)).andReturn(0);
+      messageHelper.setKeyMessage(model, "subscription_remove_success", "removesubscription.cancel_ok_remove_ok");
+      
+      replayAll();
+
+      String viewName = classUnderTest.removeDownloadsStatus(model);
+      
+      verifyAll();
+      assertEquals("subscription_remove_downloads_status", viewName);
     }
     
     @Test
     public void removeDownloadsStatus_CancelFailRemoveOK() throws Exception {
-        expect(userManagerMock.load("PeerUser")).andReturn(peer).once();
-        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
-                isA(String.class));
-        
-        HttpResponse res = createResponse(500, "Server failure");
-        
-        expect(httpClientMock.post(isA(HttpUriRequest.class))).andReturn(res);
-        
-        TransactionStatus status = new SimpleTransactionStatus();
-        
-        expect(txManagerMock.getTransaction(isA((TransactionDefinition.class))))
-                .andReturn(status);
-        txManagerMock.commit(status);
-        expectLastCall();
-        
-        replayAll();
-        
-        classUnderTest.setUserManager(userManagerMock);
-        classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setHttpClient(httpClientMock);
-        classUnderTest.setTxManager(txManagerMock);
-        classUnderTest.setPeerName("PeerUser");
-        
-        Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.removeDownloadsStatus(model);
-        
-        assertEquals("subscription_remove_downloads_status", viewName);
-        assertTrue(model.containsAttribute("subscription_remove_error"));
-        assertEquals("Failed to cancel some of the selected subscriptions. " +
-                "This may cause unintended incoming data transfer. " + 
-                "Contact peer node's administrator to verify the problem.", 
-                    model.asMap().get("subscription_remove_error"));
-        
-        verifyAll();
+      Model model = createMock(Model.class);
+      
+      expect(methods.cancelDownloads("PeerUser", classUnderTest.localNode, activeDownloads)).andReturn(500);
+      expect(methods.removeDownloads(downloads)).andReturn(0);
+      messageHelper.setKeyMessage(model, "subscription_remove_error", "removesubscription.cancel_fail_remove_ok");
+      
+      replayAll();
+
+      String viewName = classUnderTest.removeDownloadsStatus(model);
+      
+      verifyAll();
+      assertEquals("subscription_remove_downloads_status", viewName);
     }
     
     @Test
     public void removeDownloadsStatus_CancelOKRemoveFail() throws Exception {
-        expect(userManagerMock.load("PeerUser")).andReturn(peer).once();
-        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
-                isA(String.class));
-        
-        HttpResponse res = createResponse(200, "OK");
-        
-        expect(httpClientMock.post(isA(HttpUriRequest.class))).andReturn(res);
-        
-        TransactionStatus status = new SimpleTransactionStatus();
-        expect(txManagerMock.getTransaction(isA((TransactionDefinition.class))))
-                .andReturn(status);
-        txManagerMock.rollback(status);
-        expectLastCall();
-        
-        expect(dataSourceManagerMock.load(isA(String.class), isA(String.class)))
-                .andReturn(null).anyTimes();
-        
-        replayAll();
-        
-        classUnderTest.setUserManager(userManagerMock);
-        classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setHttpClient(httpClientMock);
-        classUnderTest.setTxManager(txManagerMock);
-        classUnderTest.setDataSourceManager(dataSourceManagerMock);
-        classUnderTest.setPeerName("PeerUser");
-        classUnderTest.setSelectedDownloads(downloads);
-        
-        Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.removeDownloadsStatus(model);
-        
-        assertEquals("subscription_remove_downloads_status", viewName);
-        assertTrue(model.containsAttribute("subscription_remove_error"));
-        assertEquals("Failed to remove subscriptions.",
-                model.asMap().get("subscription_remove_error"));
-        
-        verifyAll();
+      Model model = createMock(Model.class);
+      
+      expect(methods.cancelDownloads("PeerUser", classUnderTest.localNode, activeDownloads)).andReturn(200);
+      expect(methods.removeDownloads(downloads)).andReturn(1);
+      messageHelper.setKeyMessage(model, "subscription_remove_error", "removesubscription.cancel_ok_remove_fail");
+      
+      replayAll();
+
+      String viewName = classUnderTest.removeDownloadsStatus(model);
+      
+      verifyAll();
+      assertEquals("subscription_remove_downloads_status", viewName);
     }
     
     @Test
     public void removeDownloadsStatus_Fail() throws Exception {
-        expect(userManagerMock.load("PeerUser")).andReturn(peer).once();
-        authenticatorMock.addCredentials(isA(HttpUriRequest.class), 
-                isA(String.class));
-        
-        HttpResponse res = createResponse(500, "Server failure");
-        
-        expect(httpClientMock.post(isA(HttpUriRequest.class))).andReturn(res);
-        
-        TransactionStatus status = new SimpleTransactionStatus();
-        expect(txManagerMock.getTransaction(isA((TransactionDefinition.class))))
-                .andReturn(status);
-        txManagerMock.rollback(status);
-        expectLastCall();
-        
-        expect(dataSourceManagerMock.load(isA(String.class), isA(String.class)))
-                .andReturn(null).anyTimes();
-        
-        replayAll();
-        
-        classUnderTest.setUserManager(userManagerMock);
-        classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.setHttpClient(httpClientMock);
-        classUnderTest.setTxManager(txManagerMock);
-        classUnderTest.setDataSourceManager(dataSourceManagerMock);
-        classUnderTest.setPeerName("PeerUser");
-        classUnderTest.setSelectedDownloads(downloads);
-        
-        Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.removeDownloadsStatus(model);
-        
-        assertEquals("subscription_remove_downloads_status", viewName);
-        assertTrue(model.containsAttribute("subscription_remove_error"));
-        assertEquals("Failed to cancel and remove selected subscriptions.",
-                model.asMap().get("subscription_remove_error"));
-        
-        verifyAll();
+      Model model = createMock(Model.class);
+      
+      expect(methods.cancelDownloads("PeerUser", classUnderTest.localNode, activeDownloads)).andReturn(500);
+      expect(methods.removeDownloads(downloads)).andReturn(1);
+      messageHelper.setKeyMessage(model, "subscription_remove_error", "removesubscription.cancel_fail_remove_fail");
+      
+      replayAll();
+
+      String viewName = classUnderTest.removeDownloadsStatus(model);
+      
+      verifyAll();
+      assertEquals("subscription_remove_downloads_status", viewName);
     }
     
     @Test
+    public void removeDownloads() throws Exception {
+      
+      List<Subscription> downloads = new ArrayList<Subscription>();
+      downloads.add(new Subscription(1, 1340189763867L, "downloads", "PeerUser", "DS1", true, true));
+      downloads.add(new Subscription(2, 1340189763867L, "downloads", "PeerUser", "DS2", true, true));
+      
+      TransactionStatus status = new SimpleTransactionStatus();
+      DataSource ds1 = createMock(DataSource.class);
+      DataSource ds2 = createMock(DataSource.class);
+      
+      expect(txManagerMock.getTransaction(isA(TransactionDefinition.class))).andReturn(status);
+      expect(dataSourceManagerMock.load("DS1", "peer")).andReturn(ds1);
+      expect(ds1.getId()).andReturn(3);
+      expect(dataSourceManagerMock.delete(3)).andReturn(1);
+      subscriptionManagerMock.delete(1);
+      expect(messageHelper.getMessage("removesubscription.success", "PeerUser", "DS1")).andReturn("Removed 1");
+      
+      expect(dataSourceManagerMock.load("DS2", "peer")).andReturn(ds2);
+      expect(ds2.getId()).andReturn(4);
+      expect(dataSourceManagerMock.delete(4)).andReturn(1);
+      subscriptionManagerMock.delete(2);
+      expect(messageHelper.getMessage("removesubscription.success", "PeerUser", "DS2")).andReturn("Removed 2");
+      
+      txManagerMock.commit(status);
+      
+      replayAll();
+
+      RemoveSubscriptionController classUnderTest = new RemoveSubscriptionController();
+      classUnderTest.setTxManager(txManagerMock);
+      classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+      classUnderTest.setMessageHelper(messageHelper);
+      classUnderTest.setDataSourceManager(dataSourceManagerMock);
+      
+      int result = classUnderTest.removeDownloads(downloads);
+      
+      verifyAll();
+      assertEquals(0, result);
+    }
+
+    @Test
+    public void removeDownloads_exception() throws Exception {
+      
+      List<Subscription> downloads = new ArrayList<Subscription>();
+      downloads.add(new Subscription(1, 1340189763867L, "downloads", "PeerUser", "DS1", true, true));
+      downloads.add(new Subscription(2, 1340189763867L, "downloads", "PeerUser", "DS2", true, true));
+      
+      TransactionStatus status = new SimpleTransactionStatus();
+      DataSource ds1 = createMock(DataSource.class);
+      DataSource ds2 = createMock(DataSource.class);
+      
+      expect(txManagerMock.getTransaction(isA(TransactionDefinition.class))).andReturn(status);
+      expect(dataSourceManagerMock.load("DS1", "peer")).andReturn(ds1);
+      expect(ds1.getId()).andReturn(3);
+      expect(dataSourceManagerMock.delete(3)).andReturn(1);
+      subscriptionManagerMock.delete(1);
+      expect(messageHelper.getMessage("removesubscription.success", "PeerUser", "DS1")).andReturn("Removed 1");
+      
+      expect(dataSourceManagerMock.load("DS2", "peer")).andReturn(ds2);
+      expect(ds2.getId()).andReturn(4);
+      expect(dataSourceManagerMock.delete(4)).andReturn(1);
+      subscriptionManagerMock.delete(2);
+      expectLastCall().andThrow(new Exception("Failed to delete subscription 2"));
+      
+      txManagerMock.rollback(status);
+      
+      replayAll();
+
+      RemoveSubscriptionController classUnderTest = new RemoveSubscriptionController();
+      classUnderTest.setTxManager(txManagerMock);
+      classUnderTest.setSubscriptionManager(subscriptionManagerMock);
+      classUnderTest.setMessageHelper(messageHelper);
+      classUnderTest.setDataSourceManager(dataSourceManagerMock);
+      
+      int result = classUnderTest.removeDownloads(downloads);
+      
+      verifyAll();
+      assertEquals(1, result);
+    }
+
+    
+    @Test
     public void removeUploads() {
-        expect(subscriptionManagerMock.load(Subscription.PEER))
-                .andReturn(uploads).once();
-        
-        replayAll();
-        
-        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-        Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.removeUploads(model);
-        
-        assertEquals("subscription_remove_uploads", viewName);
-        assertTrue(model.containsAttribute("uploads"));
-        assertEquals(uploads, model.asMap().get("uploads"));
-        
-        verifyAll();
+      Model model = createMock(Model.class);
+      
+      expect(subscriptionManagerMock.load(Subscription.PEER)).andReturn(uploads).once();
+      expect(model.addAttribute("uploads", uploads)).andReturn(null); 
+
+      replayAll();
+      
+      String viewName = classUnderTest.removeUploads(model);
+      
+      verifyAll();
+      assertEquals("subscription_remove_uploads", viewName);
     }
     
     @Test 
@@ -509,46 +480,34 @@ public class RemoveSubscriptionControllerTest {
     
     @Test
     public void removeUploadsStatus_OK() throws Exception {
-        subscriptionManagerMock.delete(4);
-        expectLastCall();
-        subscriptionManagerMock.delete(5);
-        expectLastCall();
-        
-        replayAll();
-        
-        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-        classUnderTest.setSelectedUploads(uploads);
-        Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.removeUploadsStatus(model);
-        
-        assertEquals("subscription_remove_uploads_status", viewName);
-        assertTrue(model
-                .containsAttribute("subscription_remove_success"));
-        assertEquals("Selected subscriptions successfully removed", 
-                model.asMap().get("subscription_remove_success"));
-        
-        verifyAll();
+      Model model = createMock(Model.class);
+      
+      subscriptionManagerMock.delete(4);
+      expect(messageHelper.getMessage("removesubscription.success", "DataSource4", "PeerUser")).andReturn("Deleted upload 4");
+      subscriptionManagerMock.delete(5);
+      expect(messageHelper.getMessage("removesubscription.success", "DataSource5", "PeerUser")).andReturn("Deleted upload 5");
+      messageHelper.setKeyMessage(model, "subscription_remove_success", "removesubscription.completed_success");
+      
+      replayAll();
+      
+      String viewName = classUnderTest.removeUploadsStatus(model);
+      
+      verifyAll();
+      assertEquals("subscription_remove_uploads_status", viewName);
     }
     
     @Test
     public void removeUploadsStatus_Fail() throws Exception {
-        subscriptionManagerMock.delete(4);
-        expectLastCall()
-                .andThrow(new Exception("Failed to remove subscription"));
-        
-        replayAll();
-        
-        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-        classUnderTest.setSelectedUploads(uploads);
-        Model model = new ExtendedModelMap();
-        String viewName = classUnderTest.removeUploadsStatus(model);
-        
-        assertEquals("subscription_remove_uploads_status", viewName);
-        assertTrue(model.containsAttribute("subscription_remove_error"));
-        assertEquals("Failed to remove selected subscriptions",
-                model.asMap().get("subscription_remove_error"));
-        
-        verifyAll();
+      Model model = createMock(Model.class);
+      subscriptionManagerMock.delete(4);
+      expectLastCall().andThrow(new Exception("Failed to remove subscription"));
+      messageHelper.setKeyMessage(model, "subscription_remove_error", "removesubscription.completed_failure");
+
+      replayAll();
+      
+      String viewName = classUnderTest.removeUploadsStatus(model);
+      
+      verifyAll();
+      assertEquals("subscription_remove_uploads_status", viewName);
     }
-    
 }

@@ -2,7 +2,7 @@ package eu.baltrad.dex.auth.ldap;
 
 import static org.junit.Assert.*;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,13 +14,13 @@ import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.User;
 import static org.easymock.EasyMock.*;
 
-public class BaltradUserDetailsServiceTest {
+public class BaltradUserDetailsServiceTest extends EasyMockSupport {
   private BaltradUserDetailsService classUnderTest = null;
   private IUserManager manager = null;
   
   @Before
   public void setUp() throws Exception {
-    manager = EasyMock.createMock(IUserManager.class);
+    manager = createMock(IUserManager.class);
     classUnderTest = new BaltradUserDetailsService();
     classUnderTest.setManager(manager);
   }
@@ -31,14 +31,6 @@ public class BaltradUserDetailsServiceTest {
     classUnderTest = null;
   }
   
-  protected void replay() {
-    EasyMock.replay(manager);
-  }
-  
-  protected void verify() {
-    EasyMock.verify(manager);
-  }
-  
   @Test
   public void test_loadUserByUsername_noPrefix() {
     User user = new User();
@@ -47,11 +39,11 @@ public class BaltradUserDetailsServiceTest {
     
     expect(manager.load("baltrad/admin")).andReturn(user);
     
-    replay();
+    replayAll();
     
     UserDetails details = classUnderTest.loadUserByUsername("baltrad/admin");
     
-    verify();
+    verifyAll();
     GrantedAuthority[] auth = details.getAuthorities();
     assertEquals(3, auth.length);
     assertEquals("ROLE_ADMIN", auth[0].getAuthority());
@@ -67,13 +59,13 @@ public class BaltradUserDetailsServiceTest {
     
     expect(manager.load("admin")).andReturn(user);
     
-    replay();
+    replayAll();
     
     classUnderTest.setUserPrefix("baltrad/");
     
     UserDetails details = classUnderTest.loadUserByUsername("admin");
     
-    verify();
+    verifyAll();
     GrantedAuthority[] auth = details.getAuthorities();
     assertEquals(3, auth.length);
     assertEquals("ROLE_ADMIN", auth[0].getAuthority());
@@ -89,11 +81,11 @@ public class BaltradUserDetailsServiceTest {
     
     expect(manager.load("baltrad/admin")).andReturn(user);
     
-    replay();
+    replayAll();
     
     UserDetails details = classUnderTest.loadUserByUsername("baltrad/admin");
     
-    verify();
+    verifyAll();
     GrantedAuthority[] auth = details.getAuthorities();
     assertEquals(2, auth.length);
     assertEquals("ROLE_OPERATOR", auth[0].getAuthority());
@@ -108,11 +100,11 @@ public class BaltradUserDetailsServiceTest {
     
     expect(manager.load("baltrad/admin")).andReturn(user);
     
-    replay();
+    replayAll();
     
     UserDetails details = classUnderTest.loadUserByUsername("baltrad/admin");
     
-    verify();
+    verifyAll();
     GrantedAuthority[] auth = details.getAuthorities();
     assertEquals(1, auth.length);
     assertEquals("ROLE_USER", auth[0].getAuthority());

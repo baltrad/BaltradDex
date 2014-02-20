@@ -2,7 +2,7 @@ package eu.baltrad.dex.auth.ldap;
 
 import static org.junit.Assert.*;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,13 +10,13 @@ import org.springframework.security.userdetails.UserDetails;
 
 import static org.easymock.EasyMock.*;
 
-public class BaltradUserDetailsContextMapperTest {
+public class BaltradUserDetailsContextMapperTest extends EasyMockSupport {
   private BaltradUserDetailsContextMapper classUnderTest = null;
   private BaltradUserDetailsService service = null;
   
   @Before
   public void setUp() throws Exception {
-    service = EasyMock.createMock(BaltradUserDetailsService.class);
+    service = createMock(BaltradUserDetailsService.class);
     classUnderTest = new BaltradUserDetailsContextMapper();
     classUnderTest.setService(service);
   }
@@ -27,22 +27,16 @@ public class BaltradUserDetailsContextMapperTest {
     classUnderTest = null;
   }
   
-  protected void replay() {
-    EasyMock.replay(service);
-  }
-  
-  protected void verify() {
-    EasyMock.verify(service);
-  }
-  
   @Test
   public void test_mapUserFromContext() {
     UserDetails details = createMock(UserDetails.class);
     expect(service.loadUserByUsername("baltrad/nisse")).andReturn(details);
     
-    replay();
+    replayAll();
+    
     UserDetails result = classUnderTest.mapUserFromContext(null, "baltrad/nisse", null);
-    verify();
+    
+    verifyAll();
     assertSame(details, result);
   }
 

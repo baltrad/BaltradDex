@@ -22,11 +22,11 @@
 package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.config.manager.IConfigurationManager;
-import eu.baltrad.dex.net.util.json.IJsonUtil;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.request.impl.NodeRequest;
-import eu.baltrad.dex.net.response.impl.NodeResponse;
+import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.net.protocol.RequestParser;
+import eu.baltrad.dex.net.protocol.ResponseWriter;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
@@ -40,22 +40,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.apache.commons.io.IOUtils;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.ServletInputStream;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import org.keyczar.exceptions.KeyczarException;
-
-import java.io.StringWriter;
-import java.io.PrintWriter;
-import java.io.OutputStreamWriter;
-import java.io.IOException;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -66,9 +59,9 @@ import java.util.ArrayList;
  * @version 1.1.0
  * @since 1.1.0
  */
+@SuppressWarnings("serial")
 @Controller
 public class UpdateSubscriptionServlet extends HttpServlet {
-    
     private static final String GS_INTERNAL_SERVER_ERROR_KEY = 
             "getsubscription.server.internal_server_error";
     private static final String GS_MESSAGE_VERIFIER_ERROR_KEY = 
@@ -86,13 +79,13 @@ public class UpdateSubscriptionServlet extends HttpServlet {
     
     private IConfigurationManager confManager;
     private Authenticator authenticator;
-    private IJsonUtil jsonUtil;
     private ISubscriptionManager subscriptionManager;
     private MessageResourceUtil messages;
     private Logger log;
-    
     protected User localNode;
-    
+    private ProtocolManager protocolManager = null;
+    private final static Logger logger = LogManager.getLogger(PostMessageServlet.class); 
+
     /**
      * Default constructor.
      */
@@ -116,45 +109,6 @@ public class UpdateSubscriptionServlet extends HttpServlet {
     }
     
     /**
-     * Reads subscripion string from http request.
-     * @param request Http request
-     * @return Subscription string
-     * @throws IOException 
-     */
-    private String readSubscriptions(HttpServletRequest request) 
-            throws IOException {
-        ServletInputStream sis = request.getInputStream();
-        StringWriter writer = new StringWriter();
-        String subscriptions = "";
-        try {
-            IOUtils.copy(sis, writer, "UTF-8");
-            subscriptions = writer.toString();
-        } finally {
-            writer.close();
-            sis.close();
-        }
-        return subscriptions;
-    }
-    
-    /**
-     * Writes subscription string to http response. 
-     * @param response Http response
-     * @param subscriptions Subscriptions string
-     * @throws IOException 
-     */
-    private void writeSubscriptions(NodeResponse response, String subscriptions) 
-            throws IOException {
-        PrintWriter writer = new PrintWriter(
-                new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
-        try {
-            response.setNodeName(localNode.getName());
-            writer.print(subscriptions);
-        } finally {
-            writer.close();
-        }    
-    }
-    
-    /**
      * Stores subscriptions requested by peer. 
      * @param req Node request
      * @param requestedSubscription Requested subscriptions
@@ -162,13 +116,13 @@ public class UpdateSubscriptionServlet extends HttpServlet {
      */
     @Transactional(propagation=Propagation.REQUIRED, 
             rollbackFor=Exception.class)
-    private List<Subscription> storePeerSubscriptions(NodeRequest req,
+    protected List<Subscription> storePeerSubscriptions(String nodeName,
                 List<Subscription> requestedSubscription) {
         List<Subscription> subscriptions = new ArrayList<Subscription>();
         try {
             for (Subscription requested : requestedSubscription) {
                 Subscription current = subscriptionManager.load(
-                        Subscription.PEER, req.getNodeName(), 
+                        Subscription.PEER, nodeName, 
                         requested.getDataSource());
                 if (current != null) {
                     String[] messageArgs = {current.getUser(), 
@@ -191,7 +145,7 @@ public class UpdateSubscriptionServlet extends HttpServlet {
                 } else {
                     if (requested.isActive()) {
                         current = new Subscription(System.currentTimeMillis(), 
-                                Subscription.PEER, req.getNodeName(), 
+                                Subscription.PEER, nodeName, 
                                 requested.getDataSource(), requested.isActive(), 
                                 true);
                         String[] messageArgs = {current.getUser(), 
@@ -219,6 +173,7 @@ public class UpdateSubscriptionServlet extends HttpServlet {
     public ModelAndView handleRequest(HttpServletRequest request, 
             HttpServletResponse response) {
         initConfiguration();
+        @SuppressWarnings("unused")
         HttpSession session = request.getSession(true);
         doPost(request, response);
         return new ModelAndView();
@@ -232,40 +187,34 @@ public class UpdateSubscriptionServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) 
     {
-        NodeRequest req = new NodeRequest(request);
-        NodeResponse res = new NodeResponse(response);
-        try {
-            if (authenticator.authenticate(req.getMessage(), req.getSignature(),
-                    req.getNodeName())) {
-                String jsonRequested = readSubscriptions(request);
-                List<Subscription> requestedSubscription = jsonUtil
-                        .jsonToSubscriptions(jsonRequested); 
-                List<Subscription> subscriptions = storePeerSubscriptions(req, 
-                        requestedSubscription);
-                String jsonSubscribed = jsonUtil.subscriptionsToJson(
-                        subscriptions);
-                if (subscriptions.size() == requestedSubscription.size()) {
-                    writeSubscriptions(res, jsonSubscribed);
-                    res.setStatus(HttpServletResponse.SC_OK);
-                } else if (subscriptions.size() > 0) {
-                    writeSubscriptions(res, jsonSubscribed);
-                    res.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-                } else {
-                    res.setStatus(HttpServletResponse.SC_NOT_FOUND,
-                        messages.getMessage(GS_GENERIC_SUBSCRIPTION_ERROR));
-                }
-            } else {
-                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
-                    messages.getMessage(GS_UNAUTHORIZED_REQUEST_KEY));
-            }
-        } catch (KeyczarException e) {
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
-                    messages.getMessage(GS_MESSAGE_VERIFIER_ERROR_KEY));
-        } catch (Exception e) {
-            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    messages.getMessage(GS_INTERNAL_SERVER_ERROR_KEY));
+      RequestParser requestParser = protocolManager.createParser(request);
+      logger.debug("Request arrived using protocol version '" + requestParser.getProtocolVersion() + "'");
+      try {
+        if (requestParser.isAuthenticated(authenticator)) {
+          List<Subscription> requestedSubscriptions = requestParser.getSubscriptions();
+          List<Subscription> subscriptions = storePeerSubscriptions(requestParser.getNodeName(), requestedSubscriptions);
+          ResponseWriter responseWriter = requestParser.getWriter(response);
+          
+          if (subscriptions.size() == requestedSubscriptions.size()) {
+            responseWriter.subscriptionResponse(localNode.getName(), subscriptions, HttpServletResponse.SC_OK);
+          } else if (subscriptions.size() > 0) {
+            responseWriter.subscriptionResponse(localNode.getName(), subscriptions, HttpServletResponse.SC_PARTIAL_CONTENT);
+          } else {
+            responseWriter.messageResponse(messages.getMessage(GS_GENERIC_SUBSCRIPTION_ERROR), HttpServletResponse.SC_NOT_FOUND);
+          }
+        } else {
+          requestParser.getWriter(response).messageResponse(
+              messages.getMessage(GS_UNAUTHORIZED_REQUEST_KEY), HttpServletResponse.SC_UNAUTHORIZED);
         }
+      } catch (KeyczarException e) {
+        requestParser.getWriter(response).messageResponse(
+            messages.getMessage(GS_MESSAGE_VERIFIER_ERROR_KEY), HttpServletResponse.SC_UNAUTHORIZED);
+      } catch (Exception e) {
+        requestParser.getWriter(response).messageResponse(
+            messages.getMessage(GS_INTERNAL_SERVER_ERROR_KEY), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
     }
+    
     
     /**
      * @param configurationManager 
@@ -281,15 +230,6 @@ public class UpdateSubscriptionServlet extends HttpServlet {
     @Autowired
     public void setMessages(MessageResourceUtil messages) {
         this.messages = messages;
-    }
-
-    /**
-     * @param jsonUtil the jsonUtil to set
-     */
-    @Autowired
-    public void setJsonUtil(IJsonUtil jsonUtil) {
-        this.jsonUtil = jsonUtil;
-
     }
 
     /**
@@ -315,4 +255,11 @@ public class UpdateSubscriptionServlet extends HttpServlet {
         this.authenticator = authenticator;
     }
     
+    /**
+     * @param protocolManager the protocol manager to use
+     */
+    @Autowired
+    public void setProtocolManager(ProtocolManager protocolManager) {
+      this.protocolManager = protocolManager;
+    }
 }

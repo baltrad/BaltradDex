@@ -22,37 +22,31 @@
 package eu.baltrad.dex.net.servlet;
 
 import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.net.protocol.RequestParser;
+import eu.baltrad.dex.net.protocol.RequestParserException;
+import eu.baltrad.dex.net.protocol.ResponseWriter;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.IBltXmlMessage;
-import eu.baltrad.beast.parser.IXmlMessageParser;
 
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpServletResponse;
 
-import org.easymock.EasyMock;
+import org.easymock.EasyMockSupport;
+
 import static org.easymock.EasyMock.*;
-
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.After;
 import org.junit.Test;
 
 import org.keyczar.exceptions.KeyczarException;
+import org.springframework.web.servlet.ModelAndView;
 
-import org.dom4j.Document;
-
-import org.apache.commons.codec.binary.Base64;
-
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-
-import java.util.Date;
-import java.util.List;
-import java.util.ArrayList;
+import javax.servlet.http.HttpSession;
 
 /**
  * Post message servlet test.
@@ -60,70 +54,36 @@ import java.util.ArrayList;
  * @version 1.2.1
  * @since 1.2.1
  */
-public class PostMessageServletTest {
-    
-    private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
+public class PostMessageServletTest extends EasyMockSupport {
+    interface MethodMock {
+      public void doPost(HttpServletRequest request, HttpServletResponse response);
+    };
     
     private PMServlet classUnderTest;
-    private List<Object> mocks;
     private MessageResourceUtil messages;
-    private DateFormat format;
+    private Authenticator authenticator;
+    private ProtocolManager protocolManager;
+    private IBltMessageManager bltMessageManager;
     
-    private MockHttpServletRequest request;
-    private MockHttpServletResponse response;
-    
+    @SuppressWarnings("serial")
     protected class PMServlet extends PostMessageServlet {
         public PMServlet() {}
         @Override
         public void initConfiguration() {}
     }
     
-    private Object createMock(Class clazz) {
-        Object mock = EasyMock.createMock(clazz);
-        mocks.add(mock);
-        return mock;
-    }
-    
-    private void replayAll() {
-        for (Object mock : mocks) {
-            replay(mock);
-        }
-    }
-    
-    private void verifyAll() {
-        for (Object mock : mocks) {
-            verify(mock);
-        }
-    }
-    
-    private void resetAll() {
-        for (Object mock : mocks) {
-            reset(mock);
-        }
-    }
-    
-    private void setAttributes(MockHttpServletRequest request, String content) {
-        request.setAttribute("Content-Type", "text/html");  
-        request.setAttribute("Content-MD5", Base64.encodeBase64String(
-                request.getRequestURI().getBytes()));
-        request.setAttribute("Date", format.format(new Date()));
-        request.addHeader("Authorization", "test.baltrad.eu" + ":" + 
-            "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_");   
-        request.addHeader("Node-Name", "test.baltrad.eu");
-        request.addHeader("Node-Address", "http://test.baltrad.eu");
-        request.setContent(content.getBytes());
-    }
-    
     @Before
     public void setUp() {
+        messages = createMock(MessageResourceUtil.class);
+        authenticator = createMock(Authenticator.class);
+        protocolManager = createMock(ProtocolManager.class);
+        bltMessageManager = createMock(IBltMessageManager.class);
+
         classUnderTest = new PMServlet();
-        mocks = new ArrayList<Object>();
-        messages = new MessageResourceUtil();
-        messages.setBasename("resources/messages");
         classUnderTest.setMessages(messages);
-        request = new MockHttpServletRequest();
-        response = new MockHttpServletResponse();
-        format = new SimpleDateFormat(DATE_FORMAT);
+        classUnderTest.setAuthenticator(authenticator);
+        classUnderTest.setBltMessageManager(bltMessageManager);
+        classUnderTest.setProtocolManager(protocolManager);
     }
     
     @After
@@ -132,125 +92,119 @@ public class PostMessageServletTest {
         resetAll();
     }
     
+    @SuppressWarnings("serial")
     @Test
-    public void handleRequest_MessageVerificationError() throws Exception {
-        Authenticator authenticatorMock = (Authenticator) 
-                createMock(Authenticator.class);
-        authenticatorMock.authenticate(isA(String.class), isA(String.class),
-                isA(String.class));
-        
-        expectLastCall().andThrow(new KeyczarException(
-                "Failed to verify message"));
-        
-        replayAll();
-        
-        setAttributes(request, "Hi there!");
-        classUnderTest.setAuthenticator(authenticatorMock);
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
-        assertEquals(messages
-                .getMessage("postmessage.server.message_verifier_error"), 
-                    response.getErrorMessage());
-    }
-    
-    @Test
-    public void handleRequest_Unauthorized() throws Exception {
-        Authenticator authMock = (Authenticator) createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.FALSE);
-        replayAll();
-        
-        setAttributes(request, "Hi there!");
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.handleRequest(request, response);
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
-        assertEquals(
-            messages.getMessage("postmessage.server.unauthorized_request"), 
-            response.getErrorMessage());
-    }
-    
-    @Test 
-    public void handleRequest_InternalServerError() throws Exception {
-        Authenticator authMock = (Authenticator) createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE);
-        replayAll();
-        
-        setAttributes(request, "Hi there!");
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.handleRequest(request, response);
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-                response.getStatus());
-        assertEquals(
-            messages.getMessage("postmessage.server.internal_server_error"), 
-            response.getErrorMessage());
+    public void handleRequest() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      HttpSession session = createMock(HttpSession.class);
+      
+      final MethodMock methods = createMock(MethodMock.class);
+      expect(request.getSession(true)).andReturn(session);
+      methods.doPost(request, response);
+      
+      classUnderTest = new PMServlet() {
+        @Override
+        public void doPost(HttpServletRequest request, HttpServletResponse response) {
+          methods.doPost(request, response);
+        }
+      };
+      
+      replayAll();
+      
+      ModelAndView result = classUnderTest.handleRequest(request, response);
+      
+      verifyAll();
+      assertNotNull(result);
     }
     
     @Test
-    public void handleRequest_OK() throws Exception {
-        IBltXmlMessage bltmsg = new IBltXmlMessage() {
-            public Document toDocument() { return null; }
-            public void fromDocument(Document arg0) {}
-        };
-        Authenticator authMock = (Authenticator) createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE);
-        IXmlMessageParser xmlMessageParserMock = (IXmlMessageParser) 
-                createMock(IXmlMessageParser.class);
-        expect(xmlMessageParserMock.parse("<bltalert>..</bltalert>"))
-                .andReturn(bltmsg);
-        IBltMessageManager bltMessageMAnagerMock = (IBltMessageManager)
-                createMock(IBltMessageManager.class);
-        bltMessageMAnagerMock.manage(bltmsg);
-        
-        expectLastCall();
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setBltMessageManager(bltMessageMAnagerMock);
-        classUnderTest.setXmlMessageParser(xmlMessageParserMock);
-        setAttributes(request, "<bltalert>..</bltalert>");
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+    public void doPost() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter writer = createMock(ResponseWriter.class);
+      IBltXmlMessage xmlMessage = createMock(IBltXmlMessage.class);
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.1");
+      expect(requestParser.isAuthenticated(authenticator)).andReturn(true);
+      expect(requestParser.getNodeName()).andReturn("NodeName");
+      expect(requestParser.getBltXmlMessage()).andReturn(xmlMessage);
+      expect(requestParser.getWriter(response)).andReturn(writer);
+      writer.statusResponse(HttpServletResponse.SC_OK);
+      
+      bltMessageManager.manage(xmlMessage);
+      
+      replayAll();
+      
+      classUnderTest.doPost(request, response);
+      
+      verifyAll();
     }
     
     @Test
-    public void handleRequest_NotABeastMessage() throws Exception {
-        Authenticator authMock = (Authenticator) createMock(Authenticator.class);
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE);
-        IXmlMessageParser xmlMessageParserMock = (IXmlMessageParser) 
-                createMock(IXmlMessageParser.class);
-        expect(xmlMessageParserMock.parse("not a beast message"))
-                .andThrow(new RuntimeException("Invalid message format"));
-        IBltMessageManager bltMessageMAnagerMock = (IBltMessageManager)
-                createMock(IBltMessageManager.class);
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setBltMessageManager(bltMessageMAnagerMock);
-        classUnderTest.setXmlMessageParser(xmlMessageParserMock);
-        setAttributes(request, "not a beast message");
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-                response.getStatus());
-        assertEquals(
-            messages.getMessage("postmessage.server.internal_server_error"), 
-            response.getErrorMessage());
+    public void doPost_RequestParserException() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter writer = createMock(ResponseWriter.class);
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.1");
+      expect(requestParser.isAuthenticated(authenticator)).andReturn(true);
+      expect(requestParser.getNodeName()).andReturn("NodeName");
+      expect(requestParser.getBltXmlMessage()).andThrow(new RequestParserException("not a beast message"));
+      expect(requestParser.getWriter(response)).andReturn(writer);
+      expect(messages.getMessage("postmessage.server.internal_server_error")).andReturn("a message");
+      writer.messageResponse("a message", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      
+      replayAll();
+      
+      classUnderTest.doPost(request, response);
+      
+      verifyAll();
     }
     
+    @Test
+    public void doPost_MessageVerificationError() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter writer = createMock(ResponseWriter.class);
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.1");
+      expect(requestParser.isAuthenticated(authenticator)).andThrow(new KeyczarException("keyczar exception"));
+      expect(requestParser.getWriter(response)).andReturn(writer);
+      expect(messages.getMessage("postmessage.server.message_verifier_error")).andReturn("a message");
+      writer.messageResponse("a message", HttpServletResponse.SC_UNAUTHORIZED);
+      
+      replayAll();
+      
+      classUnderTest.doPost(request, response);
+      
+      verifyAll();
+    }
+   
+    @Test
+    public void doPost_Unauthorized() throws Exception {
+      HttpServletRequest request = createMock(HttpServletRequest.class);
+      HttpServletResponse response = createMock(HttpServletResponse.class);
+      RequestParser requestParser = createMock(RequestParser.class);
+      ResponseWriter writer = createMock(ResponseWriter.class);
+      
+      expect(protocolManager.createParser(request)).andReturn(requestParser);
+      expect(requestParser.getProtocolVersion()).andReturn("2.1");
+      expect(requestParser.isAuthenticated(authenticator)).andReturn(false);
+      expect(requestParser.getWriter(response)).andReturn(writer);
+      expect(messages.getMessage("postmessage.server.unauthorized_request")).andReturn("a message");
+      writer.messageResponse("a message", HttpServletResponse.SC_UNAUTHORIZED);
+      
+      replayAll();
+      
+      classUnderTest.doPost(request, response);
+      
+      verifyAll();
+    }
 }

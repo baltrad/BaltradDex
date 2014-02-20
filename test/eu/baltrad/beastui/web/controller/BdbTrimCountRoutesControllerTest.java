@@ -21,18 +21,20 @@ package eu.baltrad.beastui.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.easymock.MockControl;
-import org.easymock.classextension.MockClassControl;
+import org.easymock.EasyMockSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.RuleException;
 import eu.baltrad.beast.rules.bdb.BdbTrimCountRule;
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
-public class BdbTrimCountRoutesControllerTest extends TestCase {
+public class BdbTrimCountRoutesControllerTest extends EasyMockSupport {
   private static interface MethodMocker {
     public String viewCreateRoute(Model model,
         String name,
@@ -59,20 +61,15 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
         Boolean active, String description, Integer countLimit);
   };
   private BdbTrimCountRoutesController classUnderTest = null;
-  private MockControl managerControl = null;
   private IRouterManager manager = null;
-  private MockControl modelControl = null;
   private Model model = null;
-  private MockControl methodMockControl = null;
   private MethodMocker methodMock = null;
   
+  @Before
   public void setUp() throws Exception {
-    managerControl = MockControl.createControl(IRouterManager.class);
-    manager = (IRouterManager) managerControl.getMock();
-    modelControl = MockControl.createControl(Model.class);
-    model = (Model) modelControl.getMock();
-    methodMockControl = MockControl.createControl(MethodMocker.class);
-    methodMock = (MethodMocker)methodMockControl.getMock();
+    manager = createMock(IRouterManager.class);
+    model = createMock(Model.class);
+    methodMock = createMock(MethodMocker.class);
     
     // All creator methods and view methods are mocked to simplify testing
     //
@@ -116,41 +113,28 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     classUnderTest.setManager(manager);
   }
 
+  @After
   public void tearDown() throws Exception {
     classUnderTest = null;
-    managerControl = null;
     manager = null;
-    modelControl = null;
     model = null;
-    methodMockControl = null;
     methodMock = null;
   }
 
-  private void replay() {
-    managerControl.replay();
-    modelControl.replay();
-    methodMockControl.replay();
-  }
-
-  private void verify() {
-    managerControl.verify();
-    modelControl.verify();
-    methodMockControl.verify();
-  }
-
+  @Test
   public void testCreateRoute_initial() {
-    methodMock.viewCreateRoute(model, null, null, null, null, null, null);
-    methodMockControl.setReturnValue("route_create_bdb_trim_count");
+    expect(methodMock.viewCreateRoute(model, null, null, null, null, null, null)).andReturn("route_create_bdb_trim_count");
     
-    replay();
+    replayAll();
 
     String result = classUnderTest.createRoute(model, null, null, null,
         null, null);
 
-    verify();
+    verifyAll();
     assertEquals("route_create_bdb_trim_count", result);
   }
 
+  @Test
   public void testCreateRoute_success() {
     RouteDefinition routedef = new RouteDefinition();
     String name = "MyRoute";
@@ -159,26 +143,24 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String description = "some description";
     Integer countLimit = 1;
     // BdbTrimCountRule constructor is protected so mock it
-    MockControl ruleControl = MockClassControl.createControl(BdbTrimCountRule.class);
-    BdbTrimCountRule rule = (BdbTrimCountRule)ruleControl.getMock();
+    BdbTrimCountRule rule = createMock(BdbTrimCountRule.class);
     
     List<String> recipients = new ArrayList<String>();
 
-    methodMock.createRule(countLimit);
-    methodMockControl.setReturnValue(rule);
-    manager.create(name, author, active, description, recipients, rule);
-    managerControl.setReturnValue(routedef);
+    expect(methodMock.createRule(countLimit)).andReturn(rule);
+    expect(manager.create(name, author, active, description, recipients, rule)).andReturn(routedef);
     manager.storeDefinition(routedef);
 
-    replay();
+    replayAll();
 
     String result = classUnderTest.createRoute(model, name, author, active,
         description, countLimit);
 
-    verify();
+    verifyAll();
     assertEquals("redirect:routes.htm", result);
   }
 
+  @Test
   public void testCreateRoute_noName() {
     String name = null;
     String author = "nisse";
@@ -186,18 +168,18 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String description = "some description";
     Integer countLimit = 1;
 
-    methodMock.viewCreateRoute(model, name, "nisse", true, "some description", 1, "Name must be specified.");
-    methodMockControl.setReturnValue("route_create_bdb_trim_count");
+    expect(methodMock.viewCreateRoute(model, name, "nisse", true, "some description", 1, "Name must be specified.")).andReturn("route_create_bdb_trim_count");
 
-    replay();
+    replayAll();
 
     String result = classUnderTest.createRoute(model, name, author, active,
         description, countLimit);
 
-    verify();
+    verifyAll();
     assertEquals("route_create_bdb_trim_count", result);
   }
   
+  @Test
   public void testCreateRoute_noCountLimit() {
     String name = "abc";
     String author = "nisse";
@@ -205,18 +187,18 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String description = "some description";
     Integer countLimit = 0;
 
-    methodMock.viewCreateRoute(model, name, author, active, description, countLimit, "count limit must be specified and greater than 0.");
-    methodMockControl.setReturnValue("createroute");
+    expect(methodMock.viewCreateRoute(model, name, author, active, description, countLimit, "count limit must be specified and greater than 0.")).andReturn("createroute");
 
-    replay();
+    replayAll();
 
     String result = classUnderTest.createRoute(model, name, author, active,
         description, countLimit);
 
-    verify();
+    verifyAll();
     assertEquals("createroute", result);
   }
 
+  @Test
   public void testCreateRoute_failedCreate() {
     RouteDefinition routedef = new RouteDefinition();
     String name = "MyRoute";
@@ -225,28 +207,25 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     String description = "some description";
     Integer countLimit = 1;
     // BdbTrimCountRule constructor is protected so mock it
-    MockControl ruleControl = MockClassControl.createControl(BdbTrimCountRule.class);
-    BdbTrimCountRule rule = (BdbTrimCountRule)ruleControl.getMock();
+    BdbTrimCountRule rule = createMock(BdbTrimCountRule.class);
     
     List<String> recipients = new ArrayList<String>();
-    methodMock.createRule(countLimit);
-    methodMockControl.setReturnValue(rule);
-    manager.create(name, author, active, description, recipients, rule);
-    managerControl.setReturnValue(routedef);
+    expect(methodMock.createRule(countLimit)).andReturn(rule);
+    expect(manager.create(name, author, active, description, recipients, rule)).andReturn(routedef);
     manager.storeDefinition(routedef);
-    managerControl.setThrowable(new RuleException("Duplicate name"));
-    methodMock.viewCreateRoute(model, name, author, active, description, countLimit, "Failed to create definition: 'Duplicate name'");
-    methodMockControl.setReturnValue("route_create_bdb_trim_count");
-    replay();
+    expectLastCall().andThrow(new RuleException("Duplicate name"));
+    expect(methodMock.viewCreateRoute(model, name, author, active, description, countLimit, "Failed to create definition: 'Duplicate name'")).andReturn("route_create_bdb_trim_count");
+
+    replayAll();
 
     String result = classUnderTest.createRoute(model, name, author, active,
         description, countLimit);
 
-    verify();
+    verifyAll();
     assertEquals("route_create_bdb_trim_count", result);
   }
 
-  
+  @Test
   public void testShowRoute_byName() {
     String name = "somename";
     List<String> recipients = new ArrayList<String>();
@@ -262,177 +241,157 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
         return 1;
       }
     });
-    manager.getDefinition(name);
-    managerControl.setReturnValue(routeDefinition);
+    expect(manager.getDefinition(name)).andReturn(routeDefinition);
     
-    methodMock.viewShowRoute(model, name, "nisse", true, "descr", 1, null);
-    methodMockControl.setReturnValue("route_show_bdb_trim_count");
+    expect(methodMock.viewShowRoute(model, name, "nisse", true, "descr", 1, null)).andReturn("route_show_bdb_trim_count");
     
-    replay();
+    replayAll();
 
     String result = classUnderTest.showRoute(model, name, null, null, null, null, null);
     
-    verify();
+    verifyAll();
     assertEquals("route_show_bdb_trim_count", result);
   }
 
+  @Test
   public void testShowRoute_byName_nonExisting() {
     String name = "somename";
-    manager.getDefinition(name);
-    managerControl.setReturnValue(null);
-    methodMock.viewShowRoutes(model, "No route named \"somename\"");
-    methodMockControl.setReturnValue("routes");
+    expect(manager.getDefinition(name)).andReturn(null);
+    expect(methodMock.viewShowRoutes(model, "No route named \"somename\"")).andReturn("routes");
     
-    replay();
+    replayAll();
 
     String result = classUnderTest.showRoute(model, name, null, null, null, null,null);
     
-    verify();
+    verifyAll();
     assertEquals("routes", result);
   }
 
+  @Test
   public void testShowRoute_modify() {
     String name = "somename";
     
     RouteDefinition routeDefinition = new RouteDefinition();
     
-    manager.getDefinition(name);
-    managerControl.setReturnValue(routeDefinition);
-    methodMock.modifyRoute(model, name, "hugga", false, "new descr", 1);
-    methodMockControl.setReturnValue("somedirect");
+    expect(manager.getDefinition(name)).andReturn(routeDefinition);
+    expect(methodMock.modifyRoute(model, name, "hugga", false, "new descr", 1)).andReturn("somedirect");
     
-    replay();
+    replayAll();
 
     String result = classUnderTest.showRoute(model, name, "hugga", false, "new descr", 1, "Save");
     
-    verify();
+    verifyAll();
     assertEquals("somedirect", result);
   }
 
+  @Test
   public void testShowRoute_delete() {
     String name = "somename";
     RouteDefinition routeDefinition = new RouteDefinition();
     
-    manager.getDefinition(name);
-    managerControl.setReturnValue(routeDefinition);
+    expect(manager.getDefinition(name)).andReturn(routeDefinition);
     manager.deleteDefinition("somename");
     
-    replay();
+    replayAll();
 
     String result = classUnderTest.showRoute(model, name, null, null, null, null, "Delete");
     
-    verify();
+    verifyAll();
     assertEquals("redirect:routes.htm", result);
   }
 
+  @Test
   public void testShowRoute_delete_failed() {
     String name = "somename";
     RouteDefinition routeDefinition = new RouteDefinition();
     
-    manager.getDefinition(name);
-    managerControl.setReturnValue(routeDefinition);
+    expect(manager.getDefinition(name)).andReturn(routeDefinition);
     manager.deleteDefinition("somename");
-    managerControl.setThrowable(new RuleException());
-    methodMock.viewShowRoutes(model, "Failed to delete \"somename\", have you verified that there are no reffering scheduled jobs");
-    methodMockControl.setReturnValue("routes");
+    expectLastCall().andThrow(new RuleException());
+    expect(methodMock.viewShowRoutes(model, "Failed to delete \"somename\", have you verified that there are no reffering scheduled jobs")).andReturn("routes");
     
-    replay();
+    replayAll();
 
     String result = classUnderTest.showRoute(model, name, null, null, null, null, "Delete");
     
-    verify();
+    verifyAll();
     assertEquals("routes", result);
   }
 
+  @Test
   public void testViewCreateRoute() {
-    model.addAttribute("name", "somename");
-    modelControl.setReturnValue(null);
-    model.addAttribute("author", "someauthor");
-    modelControl.setReturnValue(null);
-    model.addAttribute("active", true);
-    modelControl.setReturnValue(null);
-    model.addAttribute("description", "descr");
-    modelControl.setReturnValue(null);
-    model.addAttribute("countLimit", 1);
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("name", "somename")).andReturn(null);
+    expect(model.addAttribute("author", "someauthor")).andReturn(null);
+    expect(model.addAttribute("active", true)).andReturn(null);
+    expect(model.addAttribute("description", "descr")).andReturn(null);
+    expect(model.addAttribute("countLimit", 1)).andReturn(null);
 
     classUnderTest = new BdbTrimCountRoutesController();
     
-    replay();
+    replayAll();
 
     String result = classUnderTest.viewCreateRoute(model, "somename", "someauthor", true, "descr", 1, null);
     
-    verify();
+    verifyAll();
     assertEquals("route_create_bdb_trim_count", result);
-    
   }
   
+  @Test
   public void testViewShowRoutes() {
     List<RouteDefinition> definitions = new ArrayList<RouteDefinition>();
     
-    manager.getDefinitions();
-    managerControl.setReturnValue(definitions);
-    
-    model.addAttribute("routes", definitions);
-    modelControl.setReturnValue(null);
+    expect(manager.getDefinitions()).andReturn(definitions);
+    expect(model.addAttribute("routes", definitions)).andReturn(null);
     
     classUnderTest = new BdbTrimCountRoutesController();
     classUnderTest.setManager(manager);
     
-    replay();
+    replayAll();
 
     String result = classUnderTest.viewShowRoutes(model, null);
     
-    verify();
+    verifyAll();
     assertEquals("routes", result);
   }
   
+  @Test
   public void testViewShowRoute() {
-    model.addAttribute("name", "somename");
-    modelControl.setReturnValue(null);
-    model.addAttribute("author", "someauthor");
-    modelControl.setReturnValue(null);
-    model.addAttribute("active", true);
-    modelControl.setReturnValue(null);
-    model.addAttribute("description", "descr");
-    modelControl.setReturnValue(null);
-    model.addAttribute("countLimit", 1);
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("name", "somename")).andReturn(null);
+    expect(model.addAttribute("author", "someauthor")).andReturn(null);
+    expect(model.addAttribute("active", true)).andReturn(null);
+    expect(model.addAttribute("description", "descr")).andReturn(null);
+    expect(model.addAttribute("countLimit", 1)).andReturn(null);
     
     classUnderTest = new BdbTrimCountRoutesController();
     
-    replay();
+    replayAll();
 
     String result = classUnderTest.viewShowRoute(model, "somename", "someauthor", true, "descr", 1, null);
     
-    verify();
+    verifyAll();
     assertEquals("route_show_bdb_trim_count", result);
   }
 
+  @Test
   public void testViewShowRoute_wEmessage() {
-    model.addAttribute("name", "somename");
-    modelControl.setReturnValue(null);
-    model.addAttribute("author", "someauthor");
-    modelControl.setReturnValue(null);
-    model.addAttribute("active", true);
-    modelControl.setReturnValue(null);
-    model.addAttribute("description", "descr");
-    modelControl.setReturnValue(null);
-    model.addAttribute("countLimit", 1);
-    modelControl.setReturnValue(null);
-    model.addAttribute("emessage", "xyz");
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("name", "somename")).andReturn(null);
+    expect(model.addAttribute("author", "someauthor")).andReturn(null);
+    expect(model.addAttribute("active", true)).andReturn(null);
+    expect(model.addAttribute("description", "descr")).andReturn(null);
+    expect(model.addAttribute("countLimit", 1)).andReturn(null);
+    expect(model.addAttribute("emessage", "xyz")).andReturn(null);
     
     classUnderTest = new BdbTrimCountRoutesController();
 
-    replay();
+    replayAll();
 
     String result = classUnderTest.viewShowRoute(model, "somename", "someauthor", true, "descr", 1, "xyz");
     
-    verify();
+    verifyAll();
     assertEquals("route_show_bdb_trim_count", result);
   }
   
+  @Test
   public void testModifyRoute() throws Exception {
     String name = "A";
     String author = "B";
@@ -441,8 +400,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     List<String> recipients = new ArrayList<String>();
     Integer countLimit = 1;
     // BdbTrimCountRule constructor is protected so mock it
-    MockControl ruleControl = MockClassControl.createControl(BdbTrimCountRule.class);
-    BdbTrimCountRule rule = (BdbTrimCountRule)ruleControl.getMock();
+    BdbTrimCountRule rule = createMock(BdbTrimCountRule.class);
     RouteDefinition definition = new RouteDefinition();
     
     classUnderTest = new BdbTrimCountRoutesController() {
@@ -452,20 +410,19 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     };
     classUnderTest.setManager(manager);
     
-    methodMock.createRule(countLimit);
-    methodMockControl.setReturnValue(rule);
-    manager.create(name, author, active, description, recipients, rule);
-    managerControl.setReturnValue(definition);
+    expect(methodMock.createRule(countLimit)).andReturn(rule);
+    expect(manager.create(name, author, active, description, recipients, rule)).andReturn(definition);
     manager.updateDefinition(definition);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.modifyRoute(model, name, author, active, description, countLimit);
     
-    verify();
+    verifyAll();
     assertEquals("redirect:routes.htm", result);
   }
 
+  @Test
   public void testModifyRoute_noCountLimit() throws Exception {
     String name = "A";
     String author = "B";
@@ -491,17 +448,17 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     };
     classUnderTest.setManager(manager);
     
-    methodMock.viewShowRoute(model, name, author, active, description, countLimit, "count limit missing.");
-    methodMockControl.setReturnValue("someredirect");
+    expect(methodMock.viewShowRoute(model, name, author, active, description, countLimit, "count limit missing.")).andReturn("someredirect");
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.modifyRoute(model, name, author, active, description, countLimit);
     
-    verify();
+    verifyAll();
     assertEquals("someredirect", result);
   }
 
+  @Test
   public void testModifyRoute_failedUpdate() throws Exception {
     String name = "A";
     String author = "B";
@@ -510,8 +467,7 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
     List<String> recipients = new ArrayList<String>();
     Integer countLimit = 1;
     // BdbTrimCountRule constructor is protected so mock it
-    MockControl ruleControl = MockClassControl.createControl(BdbTrimCountRule.class);
-    BdbTrimCountRule rule = (BdbTrimCountRule)ruleControl.getMock();
+    BdbTrimCountRule rule = createMock(BdbTrimCountRule.class);
     RouteDefinition definition = new RouteDefinition();
      
     classUnderTest = new BdbTrimCountRoutesController() {
@@ -531,21 +487,17 @@ public class BdbTrimCountRoutesControllerTest extends TestCase {
       
     };
     classUnderTest.setManager(manager);
-    methodMock.createRule(countLimit);
-    methodMockControl.setReturnValue(rule);
-    manager.create(name, author, active, description, recipients, rule);
-    managerControl.setReturnValue(definition);
+    expect(methodMock.createRule(countLimit)).andReturn(rule);
+    expect(manager.create(name, author, active, description, recipients, rule)).andReturn(definition);
     manager.updateDefinition(definition);
-    managerControl.setThrowable(new RuntimeException("Bad..."));
-    methodMock.viewShowRoute(model, name, author, active, description, countLimit, "Failed to update definition: 'Bad...'");
-    methodMockControl.setReturnValue("someredirect");
+    expectLastCall().andThrow(new RuntimeException("Bad..."));
+    expect(methodMock.viewShowRoute(model, name, author, active, description, countLimit, "Failed to update definition: 'Bad...'")).andReturn("someredirect");
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.modifyRoute(model, name, author, active, description, countLimit);
     
-    verify();
+    verifyAll();
     assertEquals("someredirect", result);
   }
-  
 }

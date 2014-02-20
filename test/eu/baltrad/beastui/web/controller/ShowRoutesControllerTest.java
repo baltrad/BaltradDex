@@ -21,232 +21,196 @@ package eu.baltrad.beastui.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
-import org.easymock.MockControl;
-import org.easymock.classextension.MockClassControl;
+import org.easymock.EasyMockSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 
-public class ShowRoutesControllerTest extends TestCase {
+public class ShowRoutesControllerTest extends EasyMockSupport {
   private ShowRoutesController classUnderTest = null;
-  private MockControl managerControl = null;
   private IRouterManager manager = null;
-  private MockControl modelControl = null;
   private Model model = null;
 
-  protected void setUp() throws Exception {
-    managerControl = MockControl.createControl(IRouterManager.class);
-    manager = (IRouterManager) managerControl.getMock();
-    modelControl = MockControl.createControl(Model.class);
-    model = (Model) modelControl.getMock();
+  @Before
+  public void setUp() throws Exception {
+    manager = createMock(IRouterManager.class);
+    model = createMock(Model.class);
     classUnderTest = new ShowRoutesController();
     classUnderTest.setManager(manager);
   }  
-  
-  protected void tearDown() throws Exception {
+
+  @After
+  public void tearDown() throws Exception {
     classUnderTest = null;
-    managerControl = null;
     manager = null;
-    modelControl = null;
     model = null;
   }
 
-  private void replay() {
-    managerControl.replay();
-    modelControl.replay();
-  }
-
-  private void verify() {
-    managerControl.verify();
-    modelControl.verify();
-  }
-  
+  @Test
   public void testShowRoutes() {
     List<RouteDefinition> definitions = new ArrayList<RouteDefinition>();
-    manager.getDefinitions();
-    managerControl.setReturnValue(definitions);
-    model.addAttribute("routes", definitions);
-    modelControl.setReturnValue(null);
+    expect(manager.getDefinitions()).andReturn(definitions);
+    expect(model.addAttribute("routes", definitions)).andReturn(null);
 
-    replay();
+    replayAll();
 
     String result = classUnderTest.showRoutes(model);
 
-    verify();
+    verifyAll();
     assertEquals("routes", result);
   }
   
+  @Test
   public void testCreateRoute_Script() {
-    replay();
+    replayAll();
     
     String result = classUnderTest.createRoute(model, "Script");
     
-    verify();
+    verifyAll();
     assertEquals("redirect:route_create_groovy.htm", result);
   }
 
+  @Test
   public void testCreateRoute_Composite() {
-    replay();
+    replayAll();
     
     String result = classUnderTest.createRoute(model, "Composite");
     
-    verify();
+    verifyAll();
     assertEquals("redirect:route_create_composite.htm", result);
   }
 
+  @Test
   public void testCreateRoute_BdbTrimAge() {
-    replay();
+    replayAll();
     
     String result = classUnderTest.createRoute(model, "BdbTrimAge");
     
-    verify();
+    verifyAll();
     assertEquals("redirect:route_create_bdb_trim_age.htm", result);
   }
 
+  @Test
   public void testCreateRoute_BdbTrimCount() {
-    replay();
+    replayAll();
     
     String result = classUnderTest.createRoute(model, "BdbTrimCount");
     
-    verify();
+    verifyAll();
     assertEquals("redirect:route_create_bdb_trim_count.htm", result);
   }
   
+  @Test
   public void testCreateRoute_GoogleMap() {
-    replay();
+    replayAll();
     
     String result = classUnderTest.createRoute(model, "GoogleMap");
     
-    verify();
+    verifyAll();
     assertEquals("redirect:route_create_google_map.htm", result);
   }
   
+  @Test
   public void testCreateRoute_Unknown() {
-    model.addAttribute("emessage", "Unknown operation: 'Unknown'");
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("emessage", "Unknown operation: 'Unknown'")).andReturn(null);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.createRoute(model, "Unknown");
     
-    verify();
+    verifyAll();
     assertEquals("redirect:routes.htm", result);
   }
   
+  @Test
   public void testShowRoute_Script() {
-    MockControl defControl = MockClassControl.createControl(RouteDefinition.class);
-    RouteDefinition def = (RouteDefinition)defControl.getMock();
+    RouteDefinition def = createMock(RouteDefinition.class);
     
-    manager.getDefinition("Nisse");
-    managerControl.setReturnValue(def);
-    def.getRuleType();
-    defControl.setReturnValue("groovy");
+    expect(manager.getDefinition("Nisse")).andReturn(def);
+    expect(def.getRuleType()).andReturn("groovy");
     
-    model.addAttribute("name", "Nisse");
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("name", "Nisse")).andReturn(null);
 
-    replay();
-    defControl.replay();
+    replayAll();
     
     String result = classUnderTest.showRoute(model, "Nisse");
     
-    verify();
-    defControl.verify();
+    verifyAll();
     
     assertEquals("redirect:route_show_groovy.htm", result);
   }
 
+  @Test
   public void testShowRoute_Composite() {
-    MockControl defControl = MockClassControl.createControl(RouteDefinition.class);
-    RouteDefinition def = (RouteDefinition)defControl.getMock();
+    RouteDefinition def = createMock(RouteDefinition.class);
     
-    manager.getDefinition("Nisse");
-    managerControl.setReturnValue(def);
-    def.getRuleType();
-    defControl.setReturnValue("blt_composite");
-    
-    model.addAttribute("name", "Nisse");
-    modelControl.setReturnValue(null);
+    expect(manager.getDefinition("Nisse")).andReturn(def);
+    expect(def.getRuleType()).andReturn("blt_composite");
+    expect(model.addAttribute("name", "Nisse")).andReturn(null);
 
-    replay();
-    defControl.replay();
+    replayAll();
     
     String result = classUnderTest.showRoute(model, "Nisse");
     
-    verify();
-    defControl.verify();
+    verifyAll();
     
     assertEquals("redirect:route_show_composite.htm", result);
   }
 
+  @Test
   public void testShowRoute_BdbTrimAge() {
-    MockControl defControl = MockClassControl.createControl(RouteDefinition.class);
-    RouteDefinition def = (RouteDefinition)defControl.getMock();
+    RouteDefinition def = createMock(RouteDefinition.class);
     
-    manager.getDefinition("Nisse");
-    managerControl.setReturnValue(def);
-    def.getRuleType();
-    defControl.setReturnValue("bdb_trim_age");
-    
-    model.addAttribute("name", "Nisse");
-    modelControl.setReturnValue(null);
+    expect(manager.getDefinition("Nisse")).andReturn(def);
+    expect(def.getRuleType()).andReturn("bdb_trim_age");
+    expect(model.addAttribute("name", "Nisse")).andReturn(null);
 
-    replay();
-    defControl.replay();
+    replayAll();
     
     String result = classUnderTest.showRoute(model, "Nisse");
     
-    verify();
-    defControl.verify();
+    verifyAll();
     
     assertEquals("redirect:route_show_bdb_trim_age.htm", result);
   }
 
+  @Test
   public void testShowRoute_BdbTrimCount() {
-    MockControl defControl = MockClassControl.createControl(RouteDefinition.class);
-    RouteDefinition def = (RouteDefinition)defControl.getMock();
+    RouteDefinition def = createMock(RouteDefinition.class);
     
-    manager.getDefinition("Nisse");
-    managerControl.setReturnValue(def);
-    def.getRuleType();
-    defControl.setReturnValue("bdb_trim_count");
-    
-    model.addAttribute("name", "Nisse");
-    modelControl.setReturnValue(null);
+    expect(manager.getDefinition("Nisse")).andReturn(def);
+    expect(def.getRuleType()).andReturn("bdb_trim_count");
+    expect(model.addAttribute("name", "Nisse")).andReturn(null);
 
-    replay();
-    defControl.replay();
+    replayAll();
     
     String result = classUnderTest.showRoute(model, "Nisse");
     
-    verify();
-    defControl.verify();
+    verifyAll();
     
     assertEquals("redirect:route_show_bdb_trim_count.htm", result);
   }
 
+  @Test
   public void testShowRoute_GoogleMap() {
-    MockControl defControl = MockClassControl.createControl(RouteDefinition.class);
-    RouteDefinition def = (RouteDefinition)defControl.getMock();
+    RouteDefinition def = createMock(RouteDefinition.class);
     
-    manager.getDefinition("Nisse");
-    managerControl.setReturnValue(def);
-    def.getRuleType();
-    defControl.setReturnValue("blt_gmap");
-    
-    model.addAttribute("name", "Nisse");
-    modelControl.setReturnValue(null);
+    expect(manager.getDefinition("Nisse")).andReturn(def);
+    expect(def.getRuleType()).andReturn("blt_gmap");
+    expect(model.addAttribute("name", "Nisse")).andReturn(null);
 
-    replay();
-    defControl.replay();
+    replayAll();
     
     String result = classUnderTest.showRoute(model, "Nisse");
     
-    verify();
-    defControl.verify();
+    verifyAll();
     
     assertEquals("redirect:route_show_google_map.htm", result);
   }

@@ -18,86 +18,76 @@ along with the beast-ui package library.  If not, see <http://www.gnu.org/licens
 ------------------------------------------------------------------------*/
 package eu.baltrad.beastui.web.controller;
 
+import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.easymock.MockControl;
+import org.easymock.EasyMockSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.ui.Model;
 
+import eu.baltrad.beast.adaptor.IAdaptor;
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
 import eu.baltrad.beast.adaptor.xmlrpc.XmlRpcAdaptor;
-
-import junit.framework.TestCase;
 
 /**
  * @author Anders Henja
  */
-public class AdaptorsControllerTest extends TestCase {
+public class AdaptorsControllerTest extends EasyMockSupport {
   private AdaptorsController classUnderTest = null;
-  private MockControl managerControl = null;
   private IBltAdaptorManager manager = null;
-  private MockControl modelControl = null;
   private Model model = null;
   
+  @Before
   public void setUp() throws Exception {
-    managerControl = MockControl.createControl(IBltAdaptorManager.class);
-    manager = (IBltAdaptorManager)managerControl.getMock();
-    modelControl = MockControl.createControl(Model.class);
-    model = (Model)modelControl.getMock();
+    manager = createMock(IBltAdaptorManager.class);
+    model = createMock(Model.class);
     classUnderTest = new AdaptorsController();
     classUnderTest.setManager(manager);
   }
   
+  @After
   public void tearDown() throws Exception {
     classUnderTest = null;
-    managerControl = null;
     manager = null;
-    modelControl = null;
     model = null;
   }
   
-  private void replay() {
-    managerControl.replay();
-    modelControl.replay();
-  }
-  
-  private void verify() {
-    managerControl.verify();
-    modelControl.verify();
-  }
-  
+  @Test
   public void testShowAdaptors() throws Exception {
-    List<String> adaptors = new ArrayList<String>();
-    manager.getRegisteredAdaptors();
-    managerControl.setReturnValue(adaptors);
-    model.addAttribute("emessage", null);
-    modelControl.setReturnValue(null);
-    model.addAttribute("adaptors", adaptors);
-    modelControl.setReturnValue(null);
-    replay();
+    List<IAdaptor> adaptors = new ArrayList<IAdaptor>();
+    expect(manager.getRegisteredAdaptors()).andReturn(adaptors);
+    expect(model.addAttribute("emessage", null)).andReturn(null);
+    expect(model.addAttribute("adaptors", adaptors)).andReturn(null);
+    
+    replayAll();
     
     String result = classUnderTest.showAdaptors(model,null);
     
-    verify();
+    verifyAll();
     assertEquals(result, "adaptors");
   }
 
+  @Test
   public void testShowAdaptors_withErrorMessage() throws Exception {
-    List<String> adaptors = new ArrayList<String>();
-    manager.getRegisteredAdaptors();
-    managerControl.setReturnValue(adaptors);
-    model.addAttribute("emessage", "a bad error");
-    modelControl.setReturnValue(null);
-    model.addAttribute("adaptors", adaptors);
-    modelControl.setReturnValue(null);
-    replay();
+    List<IAdaptor> adaptors = new ArrayList<IAdaptor>();
+    expect(manager.getRegisteredAdaptors()).andReturn(adaptors);
+    expect(model.addAttribute("emessage", "a bad error")).andReturn(null);
+    expect(model.addAttribute("adaptors", adaptors)).andReturn(null);
+
+    replayAll();
     
     String result = classUnderTest.showAdaptors(model, "a bad error");
     
-    verify();
+    verifyAll();
     assertEquals(result, "adaptors");
   }
   
+  @Test
   public void testShowAdaptor() throws Exception {
     XmlRpcAdaptor adaptor = new XmlRpcAdaptor();
     adaptor.setName("A1");
@@ -105,26 +95,19 @@ public class AdaptorsControllerTest extends TestCase {
     adaptor.setUrl("http://somewhere/somehow");
     List<String> types = new ArrayList<String>();
     
-    manager.getAdaptor("A1");
-    managerControl.setReturnValue(adaptor);
-    manager.getAvailableTypes();
-    managerControl.setReturnValue(types);
-    model.addAttribute("types", types);
-    modelControl.setReturnValue(null);
-    model.addAttribute("name", "A1");
-    modelControl.setReturnValue(null);
-    model.addAttribute("type", "XMLRPC");
-    modelControl.setReturnValue(null);
-    model.addAttribute("uri", "http://somewhere/somehow");
-    modelControl.setReturnValue(null);
-    model.addAttribute("timeout", new Long(6000));
-    modelControl.setReturnValue(null);
+    expect(manager.getAdaptor("A1")).andReturn(adaptor);
+    expect(manager.getAvailableTypes()).andReturn(types);
+    expect(model.addAttribute("types", types)).andReturn(null);
+    expect(model.addAttribute("name", "A1")).andReturn(null);
+    expect(model.addAttribute("type", "XMLRPC")).andReturn(null);
+    expect(model.addAttribute("uri", "http://somewhere/somehow")).andReturn(null);
+    expect(model.addAttribute("timeout", new Long(6000))).andReturn(null);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.showAdaptor(model, "A1");
     
-    verify();
+    verifyAll();
     assertEquals(result, "adaptor_show");
   }
 }

@@ -83,8 +83,8 @@ public class CompressDataUtil {
                 zos.closeEntry();
                 zos.close();
                 bos.close();
-                return bos.toByteArray();
             }
+            return bos.toByteArray();
         } catch (Exception e) {
             throw new RuntimeException("Failed to create ZIP archive", e);
         }

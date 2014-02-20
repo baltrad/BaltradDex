@@ -3,9 +3,13 @@ package eu.baltrad.beastui.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
-import org.easymock.MockControl;
+import org.easymock.EasyMockSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
@@ -13,7 +17,7 @@ import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.gmap.GoogleMapRule;
 
-public class GoogleMapRoutesControllerTest extends TestCase {
+public class GoogleMapRoutesControllerTest extends EasyMockSupport {
   private static interface MethodMocker {
     public String viewCreateRoute(Model model,
         String name,
@@ -27,25 +31,18 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     public GoogleMapRule createRule(String area, String path);
   };
   
-  private MockControl methodControl = null;
   private MethodMocker method = null;
   private GoogleMapRoutesController classUnderTest = null;
-  private MockControl managerControl = null;
   private IRouterManager manager = null;
-  private MockControl adaptorManagerControl = null;
   private IBltAdaptorManager adaptorManager = null;
-  private MockControl modelControl = null;
   private Model model = null;
-  
+
+  @Before
   public void setUp() throws Exception {
-    methodControl = MockControl.createControl(MethodMocker.class);
-    method = (MethodMocker)methodControl.getMock();
-    managerControl = MockControl.createControl(IRouterManager.class);
-    manager = (IRouterManager)managerControl.getMock();
-    adaptorManagerControl = MockControl.createControl(IBltAdaptorManager.class);
-    adaptorManager = (IBltAdaptorManager)adaptorManagerControl.getMock();
-    modelControl = MockControl.createControl(Model.class);
-    model = (Model)modelControl.getMock();
+    method = createMock(MethodMocker.class);
+    manager = createMock(IRouterManager.class);
+    adaptorManager = createMock(IBltAdaptorManager.class);
+    model = createMock(Model.class);
     classUnderTest = new GoogleMapRoutesController() {
       protected String viewCreateRoute(Model model, String name, String author,
           Boolean active, String description, List<String> recipients,
@@ -59,36 +56,19 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     classUnderTest.setManager(manager);
     classUnderTest.setAdaptorManager(adaptorManager);
   }
-  
+
+  @After
   public void tearDown() throws Exception {
-    methodControl = null;
     method = null;
-    managerControl = null;
     manager = null;
-    adaptorManagerControl = null;
     adaptorManager = null;
-    modelControl = null;
     model = null;
     classUnderTest = null;
   }
   
-  protected void replayAll() {
-    methodControl.replay();
-    managerControl.replay();
-    adaptorManagerControl.replay();
-    modelControl.replay();
-  }
-
-  protected void verifyAll() {
-    methodControl.verify();
-    managerControl.verify();
-    adaptorManagerControl.verify();
-    modelControl.verify();
-  }
-
+  @Test
   public void testCreateRoute_initial() throws Exception {
-    method.viewCreateRoute(model, null, null, null, null, null, null, null, null);
-    methodControl.setReturnValue("route_create_google_map");
+    expect(method.viewCreateRoute(model, null, null, null, null, null, null, null, null)).andReturn("route_create_google_map");
     
     replayAll();
     
@@ -98,14 +78,15 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     assertEquals("route_create_google_map", result);
   }
 
+  @Test
   public void testCreateRoute() throws Exception {
     List<String> recipients = new ArrayList<String>();
     recipients.add("NISSE");
     GoogleMapRule rule = new GoogleMapRule();
     RouteDefinition routedef = new RouteDefinition();
     
-    method.createRule("sswe", "/tmp"); methodControl.setReturnValue(rule);
-    manager.create("name", "author", true, "test", recipients, rule); managerControl.setReturnValue(routedef);
+    expect(method.createRule("sswe", "/tmp")).andReturn(rule);
+    expect(manager.create("name", "author", true, "test", recipients, rule)).andReturn(routedef);
     manager.storeDefinition(routedef);
     
     replayAll();
@@ -115,13 +96,12 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     verifyAll();
     assertEquals("redirect:routes.htm", result);
   }
-  
+
+  @Test
   public void testViewShowRoutes() throws Exception {
     List<RouteDefinition> definitions = new ArrayList<RouteDefinition>();
-    manager.getDefinitions();
-    managerControl.setReturnValue(definitions);
-    model.addAttribute("routes", definitions);
-    modelControl.setReturnValue(null);
+    expect(manager.getDefinitions()).andReturn(definitions);
+    expect(model.addAttribute("routes", definitions)).andReturn(null);
     
     replayAll();
     
@@ -131,20 +111,19 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     assertEquals("routes", result);
   }
   
+  @Test
   public void testViewCreateRoute_allNull() throws Exception {
     List<String> names = new ArrayList<String>();
     
-    adaptorManager.getAdaptorNames();
-    adaptorManagerControl.setReturnValue(names);
-    model.addAttribute("adaptors", names);
-    modelControl.setReturnValue(null);
-    model.addAttribute("name", ""); modelControl.setReturnValue(null);
-    model.addAttribute("author", ""); modelControl.setReturnValue(null);
-    model.addAttribute("active", true); modelControl.setReturnValue(null);
-    model.addAttribute("description", ""); modelControl.setReturnValue(null);
-    model.addAttribute("recipients", new ArrayList<String>()); modelControl.setReturnValue(null);
-    model.addAttribute("area", ""); modelControl.setReturnValue(null);
-    model.addAttribute("path", ""); modelControl.setReturnValue(null);
+    expect(adaptorManager.getAdaptorNames()).andReturn(names);
+    expect(model.addAttribute("adaptors", names)).andReturn(null);
+    expect(model.addAttribute("name", "")).andReturn(null);
+    expect(model.addAttribute("author", "")).andReturn(null);
+    expect(model.addAttribute("active", true)).andReturn(null);
+    expect(model.addAttribute("description", "")).andReturn(null);
+    expect(model.addAttribute("recipients", new ArrayList<String>())).andReturn(null);
+    expect(model.addAttribute("area", "")).andReturn(null);
+    expect(model.addAttribute("path", "")).andReturn(null);
 
     classUnderTest = new GoogleMapRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);
@@ -158,21 +137,20 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     assertEquals("route_create_google_map", result);
   }
 
+  @Test
   public void testViewCreateRoute() throws Exception {
     List<String> names = new ArrayList<String>();
     List<String> recipients = new ArrayList<String>();
     
-    adaptorManager.getAdaptorNames();
-    adaptorManagerControl.setReturnValue(names);
-    model.addAttribute("adaptors", names);
-    modelControl.setReturnValue(null);
-    model.addAttribute("name", "name"); modelControl.setReturnValue(null);
-    model.addAttribute("author", "author"); modelControl.setReturnValue(null);
-    model.addAttribute("active", true); modelControl.setReturnValue(null);
-    model.addAttribute("description", "a test"); modelControl.setReturnValue(null);
-    model.addAttribute("recipients", recipients); modelControl.setReturnValue(null);
-    model.addAttribute("area", "sswe"); modelControl.setReturnValue(null);
-    model.addAttribute("path", "/tmp"); modelControl.setReturnValue(null);
+    expect(adaptorManager.getAdaptorNames()).andReturn(names);
+    expect(model.addAttribute("adaptors", names)).andReturn(null);
+    expect(model.addAttribute("name", "name")).andReturn(null);
+    expect(model.addAttribute("author", "author")).andReturn(null);
+    expect(model.addAttribute("active", true)).andReturn(null);
+    expect(model.addAttribute("description", "a test")).andReturn(null);
+    expect(model.addAttribute("recipients", recipients)).andReturn(null);;
+    expect(model.addAttribute("area", "sswe")).andReturn(null);
+    expect(model.addAttribute("path", "/tmp")).andReturn(null);
 
     classUnderTest = new GoogleMapRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);
@@ -186,21 +164,20 @@ public class GoogleMapRoutesControllerTest extends TestCase {
     assertEquals("route_create_google_map", result);
   }
 
+  @Test
   public void testViewShowRoute() throws Exception {
     List<String> names = new ArrayList<String>();
     List<String> recipients = new ArrayList<String>();
     
-    adaptorManager.getAdaptorNames();
-    adaptorManagerControl.setReturnValue(names);
-    model.addAttribute("adaptors", names);
-    modelControl.setReturnValue(null);
-    model.addAttribute("name", "name"); modelControl.setReturnValue(null);
-    model.addAttribute("author", "author"); modelControl.setReturnValue(null);
-    model.addAttribute("active", true); modelControl.setReturnValue(null);
-    model.addAttribute("description", "a test"); modelControl.setReturnValue(null);
-    model.addAttribute("recipients", recipients); modelControl.setReturnValue(null);
-    model.addAttribute("area", "sswe"); modelControl.setReturnValue(null);
-    model.addAttribute("path", "/tmp"); modelControl.setReturnValue(null);
+    expect(adaptorManager.getAdaptorNames()).andReturn(names);
+    expect(model.addAttribute("adaptors", names)).andReturn(null);
+    expect(model.addAttribute("name", "name")).andReturn(null);
+    expect(model.addAttribute("author", "author")).andReturn(null);
+    expect(model.addAttribute("active", true)).andReturn(null);
+    expect(model.addAttribute("description", "a test")).andReturn(null);
+    expect(model.addAttribute("recipients", recipients)).andReturn(null);
+    expect(model.addAttribute("area", "sswe")).andReturn(null);
+    expect(model.addAttribute("path", "/tmp")).andReturn(null);
 
     classUnderTest = new GoogleMapRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);

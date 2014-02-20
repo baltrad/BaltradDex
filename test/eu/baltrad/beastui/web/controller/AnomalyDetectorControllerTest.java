@@ -21,112 +21,92 @@ package eu.baltrad.beastui.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.easymock.MockControl;
+import org.easymock.EasyMockSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.qc.AnomalyDetector;
 import eu.baltrad.beast.qc.AnomalyException;
 import eu.baltrad.beast.qc.IAnomalyDetectorManager;
+import static org.junit.Assert.*;
+import static org.easymock.EasyMock.*;
 
 /**
  * @author Anders Henja
  */
-public class AnomalyDetectorControllerTest extends TestCase {
+public class AnomalyDetectorControllerTest extends EasyMockSupport {
   interface MethodMock {
     public AnomalyDetector createDetector(String name, String description);
   }
   private AnomalyDetectorController classUnderTest = null;
-  private MockControl managerControl = null;
   private IAnomalyDetectorManager manager = null;
-  private MockControl modelControl = null;
   private Model model = null;
-  private MockControl methodControl = null;
   private MethodMock method = null;
-  
+
+  @Before
   public void setUp() throws Exception {
-    super.setUp();
-    managerControl = MockControl.createControl(IAnomalyDetectorManager.class);
-    manager = (IAnomalyDetectorManager)managerControl.getMock();
-    modelControl = MockControl.createControl(Model.class);
-    model = (Model)modelControl.getMock();
-    methodControl = MockControl.createControl(MethodMock.class);
-    method = (MethodMock)methodControl.getMock();
+    manager = createMock(IAnomalyDetectorManager.class);
+    model = createMock(Model.class);
+    method = createMock(MethodMock.class);
     
     classUnderTest = new AnomalyDetectorController();
     classUnderTest.setManager(manager);
   }
   
+  @After
   public void tearDown() throws Exception {
-    super.tearDown();
-    managerControl = null;
     manager = null;
-    methodControl = null;
     method = null;
     classUnderTest = null;
   }
-  
-  protected void replay() throws Exception {
-    managerControl.replay();
-    modelControl.replay();
-    methodControl.replay();
-  }
 
-  protected void verify() throws Exception {
-    managerControl.verify();
-    modelControl.verify();
-    methodControl.verify();
-  }
-
+  @Test
   public void testShowAnomalyDetectors() throws Exception {
     List<AnomalyDetector> detectors = new ArrayList<AnomalyDetector>();
-    manager.list();
-    managerControl.setReturnValue(detectors);
-    model.addAttribute("emessage", null);
-    modelControl.setReturnValue(null);
-    model.addAttribute("anomaly_detectors", detectors);
-    modelControl.setReturnValue(null);
+    expect(manager.list()).andReturn(detectors);
+    expect(model.addAttribute("emessage", null)).andReturn(null);
+    expect(model.addAttribute("anomaly_detectors", detectors)).andReturn(null);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.showAnomalyDetectors(model, null);
     
-    verify();
+    verifyAll();
     assertEquals("anomaly_detectors", result);
   }
   
+  @Test
   public void testShowAnomalyDetectors_withEmessage() throws Exception {
     List<AnomalyDetector> detectors = new ArrayList<AnomalyDetector>();
-    manager.list();
-    managerControl.setReturnValue(detectors);
-    model.addAttribute("emessage", "a message");
-    modelControl.setReturnValue(null);
-    model.addAttribute("anomaly_detectors", detectors);
-    modelControl.setReturnValue(null);
+    expect(manager.list()).andReturn(detectors);
+    expect(model.addAttribute("emessage", "a message")).andReturn(null);
+    expect(model.addAttribute("anomaly_detectors", detectors)).andReturn(null);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.showAnomalyDetectors(model, "a message");
     
-    verify();
+    verifyAll();
     assertEquals("anomaly_detectors", result);
   }
   
+  @Test
   public void testCreateAnomalyDetector_show() throws Exception {
-    replay();
+    replayAll();
     
     String result = classUnderTest.createAnomalyDetector(model, null, null, null);
     
-    verify();
+    verifyAll();
     assertEquals("anomaly_detector_create", result);
   }
 
+  @Test
   public void testCreateAnomalyDetector_create() throws Exception {
     AnomalyDetector detector = new AnomalyDetector();
     
-    method.createDetector("aname", "a description");
-    methodControl.setReturnValue(detector);
+    expect(method.createDetector("aname", "a description")).andReturn(detector);
     manager.add(detector);
     
     classUnderTest = new AnomalyDetectorController() {
@@ -136,36 +116,34 @@ public class AnomalyDetectorControllerTest extends TestCase {
     };
     classUnderTest.setManager(manager);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.createAnomalyDetector(model, "aname", "a description", "Add");
     
-    verify();
+    verifyAll();
     assertEquals("redirect:anomaly_detectors.htm", result);
   }
 
+  @Test
   public void testCreateAnomalyDetector_unknownOperation() throws Exception {
-    replay();
+    replayAll();
     
     String result = classUnderTest.createAnomalyDetector(model, "aname", "a description", "Unknown");
     
-    verify();
+    verifyAll();
     assertEquals("anomaly_detector_create", result);
   }
   
+  @Test
   public void testCreateAnomalyDetector_failedAdd() throws Exception {
     AnomalyDetector detector = new AnomalyDetector();
     
-    method.createDetector("aname", "a description");
-    methodControl.setReturnValue(detector);
+    expect(method.createDetector("aname", "a description")).andReturn(detector);
     manager.add(detector);
-    managerControl.setThrowable(new AnomalyException("bummer"));
-    model.addAttribute("name", "aname");
-    modelControl.setReturnValue(null);
-    model.addAttribute("description", "a description");
-    modelControl.setReturnValue(null);
-    model.addAttribute("emessage", "Failed to register anomaly detector: bummer");
-    modelControl.setReturnValue(null);
+    expectLastCall().andThrow(new AnomalyException("bummer"));
+    expect(model.addAttribute("name", "aname")).andReturn(null);
+    expect(model.addAttribute("description", "a description")).andReturn(null);
+    expect(model.addAttribute("emessage", "Failed to register anomaly detector: bummer")).andReturn(null);
     
     classUnderTest = new AnomalyDetectorController() {
       protected AnomalyDetector createDetector(String name, String description) {
@@ -174,89 +152,83 @@ public class AnomalyDetectorControllerTest extends TestCase {
     };
     classUnderTest.setManager(manager);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.createAnomalyDetector(model, "aname", "a description", "Add");
     
-    verify();
+    verifyAll();
     assertEquals("anomaly_detector_create", result);
   }
 
+  @Test
   public void testShowAnomalyDetector() throws Exception {
     AnomalyDetector detector = new AnomalyDetector();
     detector.setName("aname");
     detector.setDescription("a description");
     
-    manager.get("aname");
-    managerControl.setReturnValue(detector);
-    model.addAttribute("name", "aname");
-    modelControl.setReturnValue(null);
-    model.addAttribute("description", "a description");
-    modelControl.setReturnValue(null);
+    expect(manager.get("aname")).andReturn(detector);
+    expect(model.addAttribute("name", "aname")).andReturn(null);
+    expect(model.addAttribute("description", "a description")).andReturn(null);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.showAnomalyDetector(model, "aname");
     
-    verify();
+    verifyAll();
     assertEquals("anomaly_detector_show", result);
   }
 
+  @Test
   public void testShowAnomalyDetector_noSuchDetector() throws Exception {
     List<AnomalyDetector> detectors = new ArrayList<AnomalyDetector>();
-    manager.get("aname");
-    managerControl.setThrowable(new AnomalyException("bad"));
-    manager.list();
-    managerControl.setReturnValue(detectors);
-    model.addAttribute("anomaly_detectors", detectors);
-    modelControl.setReturnValue(null);
-    model.addAttribute("emessage", "Failed to locate anomaly detector 'aname': bad");
-    modelControl.setReturnValue(null);
+    expect(manager.get("aname")).andThrow(new AnomalyException("bad"));
+    expect(manager.list()).andReturn(detectors);
+    expect(model.addAttribute("anomaly_detectors", detectors)).andReturn(null);
+    expect(model.addAttribute("emessage", "Failed to locate anomaly detector 'aname': bad")).andReturn(null);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.showAnomalyDetector(model, "aname");
     
-    verify();
+    verifyAll();
     assertEquals("anomaly_detectors", result);
   }
 
+  @Test
   public void testModifyAnomalyDetector_delete() throws Exception {
     manager.remove("aname");
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.modifyAnomalyDetector(model, "aname", "a description", "Delete");
     
-    verify();
+    verifyAll();
     assertEquals("redirect:anomaly_detectors.htm", result);
   }
   
+  @Test
   public void testModifyAnomalyDetector_delete_failure() throws Exception {
     List<AnomalyDetector> detectors = new ArrayList<AnomalyDetector>();
     manager.remove("aname");
-    managerControl.setThrowable(new AnomalyException("bad"));
-    manager.list();
-    managerControl.setReturnValue(detectors);
+    expectLastCall().andThrow(new AnomalyException("bad"));
+    expect(manager.list()).andReturn(detectors);
     
-    model.addAttribute("anomaly_detectors", detectors);
-    modelControl.setReturnValue(null);
-    model.addAttribute("emessage", "Failed to delete 'aname': bad");
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("anomaly_detectors", detectors)).andReturn(null);
+    expect(model.addAttribute("emessage", "Failed to delete 'aname': bad")).andReturn(null);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.modifyAnomalyDetector(model, "aname", "a description", "Delete");
     
-    verify();
+    verifyAll();
     assertEquals("anomaly_detectors", result);
   }
 
+  @Test
   public void testModifyAnomalyDetector_modify() throws Exception {
     AnomalyDetector detector = new AnomalyDetector();
     
-    method.createDetector("aname", "a description");
-    methodControl.setReturnValue(detector);
+    expect(method.createDetector("aname", "a description")).andReturn(detector);
     manager.update(detector);
     
     classUnderTest = new AnomalyDetectorController() {
@@ -266,27 +238,24 @@ public class AnomalyDetectorControllerTest extends TestCase {
     };
     classUnderTest.setManager(manager);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.modifyAnomalyDetector(model, "aname", "a description", "Modify");
     
-    verify();
+    verifyAll();
     assertEquals("redirect:anomaly_detectors.htm", result);
   }
 
+  @Test
   public void testModifyAnomalyDetector_modify_failed() throws Exception {
     AnomalyDetector detector = new AnomalyDetector();
-    method.createDetector("aname", "a description");
-    methodControl.setReturnValue(detector);
+    expect(method.createDetector("aname", "a description")).andReturn(detector);
     manager.update(detector);
-    managerControl.setThrowable(new AnomalyException("bad"));
+    expectLastCall().andThrow(new AnomalyException("bad"));
     
-    model.addAttribute("name", "aname");
-    modelControl.setReturnValue(null);
-    model.addAttribute("description", "a description");
-    modelControl.setReturnValue(null);
-    model.addAttribute("emessage", "Failed to update anomaly detector 'aname': bad");
-    modelControl.setReturnValue(null);
+    expect(model.addAttribute("name", "aname")).andReturn(null);
+    expect(model.addAttribute("description", "a description")).andReturn(null);
+    expect(model.addAttribute("emessage", "Failed to update anomaly detector 'aname': bad")).andReturn(null);
     
     classUnderTest = new AnomalyDetectorController() {
       protected AnomalyDetector createDetector(String name, String description) {
@@ -295,15 +264,15 @@ public class AnomalyDetectorControllerTest extends TestCase {
     };
     classUnderTest.setManager(manager);
     
-    replay();
+    replayAll();
     
     String result = classUnderTest.modifyAnomalyDetector(model, "aname", "a description", "Modify");
     
-    verify();
+    verifyAll();
     assertEquals("anomaly_detector_show", result);
   }
 
-  
+  @Test
   public void testCreateDetector() throws Exception {
     AnomalyDetector result = classUnderTest.createDetector("aname", "a description");
     assertEquals("aname", result.getName());

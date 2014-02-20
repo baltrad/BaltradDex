@@ -1,22 +1,22 @@
 package eu.baltrad.dex.auth.ldap;
 
-import org.easymock.classextension.EasyMock;
+import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.springframework.security.GrantedAuthority;
 import org.springframework.security.userdetails.UserDetails;
 
+import static org.junit.Assert.*;
 import static org.easymock.EasyMock.*;
 
-public class BaltradUserAuthoritiesPopulatorTest {
+public class BaltradUserAuthoritiesPopulatorTest extends EasyMockSupport {
   private BaltradUserAuthoritiesPopulator classUnderTest = null;
   private BaltradUserDetailsService service = null;
   
   @Before
   public void setUp() throws Exception {
-    service = EasyMock.createMock(BaltradUserDetailsService.class);
+    service = createMock(BaltradUserDetailsService.class);
     classUnderTest = new BaltradUserAuthoritiesPopulator();
     classUnderTest.setService(service);
   }
@@ -26,15 +26,7 @@ public class BaltradUserAuthoritiesPopulatorTest {
     service = null;
     classUnderTest = null;
   }
-  
-  protected void replay() {
-    EasyMock.replay(service);
-  }
-  
-  protected void verify() {
-    EasyMock.verify(service);
-  }
-  
+
   @Test
   public void test_getGrantedAuthorities() {
     UserDetails details = createMock(UserDetails.class);
@@ -43,13 +35,11 @@ public class BaltradUserAuthoritiesPopulatorTest {
     expect(service.loadUserByUsername("baltrad/admin")).andReturn(details);
     expect(details.getAuthorities()).andReturn(auths);
     
-    replay();
-    EasyMock.replay(details);
+    replayAll();
     
     GrantedAuthority[] result = classUnderTest.getGrantedAuthorities(null, "baltrad/admin");
     
-    verify();
-    EasyMock.verify(details);
+    verifyAll();
     
     assertSame(auths, result);
   }

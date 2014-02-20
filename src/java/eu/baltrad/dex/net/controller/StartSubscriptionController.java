@@ -24,21 +24,20 @@ package eu.baltrad.dex.net.controller;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.net.controller.exception.InternalControllerException;
-import eu.baltrad.dex.net.request.factory.RequestFactory;
-import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
+import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.net.protocol.RequestFactory;
+import eu.baltrad.dex.net.protocol.ResponseParser;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
-import eu.baltrad.dex.net.util.json.IJsonUtil;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.controller.util.MessageSetter;
+import eu.baltrad.dex.net.controller.util.ModelMessageHelper;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.util.MessageResourceUtil;
 
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.IFilterManager;
@@ -55,18 +54,15 @@ import org.keyczar.exceptions.KeyczarException;
 
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.HttpResponse;
-import org.apache.commons.io.IOUtils;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.net.URI;
-
 import java.util.Set;
 import java.util.HashSet;
 
-import java.io.InputStream;
 import java.io.IOException;
 
 /**
@@ -76,7 +72,7 @@ import java.io.IOException;
  * @since 1.1.0
  */
 @Controller
-public class StartSubscriptionController implements MessageSetter {
+public class StartSubscriptionController {
     
     /** Initial view */
     private static final String SUBSCRIBE_VIEW = "subscription_start_status";
@@ -112,17 +108,20 @@ public class StartSubscriptionController implements MessageSetter {
     private IConfigurationManager confManager;
     private Authenticator authenticator;
     private IHttpClientUtil httpClient;
-    private IJsonUtil jsonUtil;
     
     private IDataSourceManager dataSourceManager;
     private ISubscriptionManager subscriptionManager;
     private IFilterManager filterManager;
     private IUserManager userManager;
-    private RequestFactory requestFactory;
-    private MessageResourceUtil messages;
+    private ModelMessageHelper messageHelper;
+    //private MessageResourceUtil messages;
     private Logger log;
     
+    private Logger logger = LogManager.getLogger(StartSubscriptionController.class);
+    
+    private ProtocolManager protocolManager = null;
     protected User localNode;
+    
     
     /**
      * Default constructor.
@@ -150,103 +149,73 @@ public class StartSubscriptionController implements MessageSetter {
     }
     
     /**
-     * Sets message.
-     * @param model Model
-     * @param messageKey Message key 
-     * @param message Message 
-     */
-    public void setMessage(Model model, String messageKey, String message) {
-        model.addAttribute(messageKey, message);
-    }
-    
-    /**
-     * Sets detailed message.
-     * @param model Model
-     * @param messageKey Message key
-     * @param detailsKey Details key
-     * @param message Message
-     * @param details Detailed message
-     */
-    public void setMessage(Model model, String messageKey, String detailsKey,
-            String message, String details) 
-    {
-        model.addAttribute(messageKey, message);
-        model.addAttribute(detailsKey, details);
-    }
-    
-    /**
-     * Reads data sources from http response.
-     * @param response Http response
-     * @return Data source string
-     * @throws IOException 
-     */
-    private String readDataSources(HttpResponse response) 
-            throws InternalControllerException {
-        try {
-            InputStream is = null;
-            try {
-                is = response.getEntity().getContent();
-                return IOUtils.toString(is, "UTF-8");
-            } finally {
-                is.close();
-            }
-        } catch (IOException e) {
-            throw new InternalControllerException("Failed to read server "
-                    + "response");
-        }
-    }
-    
-    /**
      * Stores local subscriptions.
      * @param res Http response
      * @param dataSourceString Data sources Json string
      * @param peerName Peer node name
      * @return True if subscriptions are successfully saved 
      */
-    @Transactional(propagation=Propagation.REQUIRED, 
-            rollbackFor=Exception.class)
-    private void storeLocalSubscriptions(HttpResponse response, 
-            String dataSourceString, String peerName) 
-                throws InternalControllerException {
-        try {
-            Set<DataSource> dataSources = jsonUtil
-                    .jsonToDataSources(dataSourceString);
-            for (DataSource ds : dataSources) {
-                // save peer data sources
-                DataSource dataSource = dataSourceManager.load(ds.getName(), 
-                        DataSource.PEER);
-                User user = userManager.load(peerName);
-                if (dataSource == null) {
-                    int id = dataSourceManager.store(ds);
-                    // save peer data source user (operator) 
-                    dataSourceManager.storeUser(id, user.getId());
-                    // save peer data source filter
-                    IFilter filter = dataSourceManager
-                            .createFilter(ds.getSource(), ds.getFileObject());
-                    filterManager.store(filter);
-                    dataSourceManager.storeFilter(id, filter.getId());
-                } else {
-                    ds.setId(dataSource.getId());
-                    dataSourceManager.update(ds);
-                }
-                // save subscriptions
-                Subscription requested = new Subscription(
-                        System.currentTimeMillis(), Subscription.LOCAL,
-                        response.getFirstHeader("Node-Name").getValue(), 
-                        ds.getName(), true, true);
-                Subscription existing = subscriptionManager.load(
-                    Subscription.LOCAL, peerName, ds.getName());
-                if (existing == null) {
-                    subscriptionManager.store(requested);
-                } else {
-                    requested.setId(existing.getId());       
-                    subscriptionManager.update(requested);
-                }
-            }
-        } catch (Exception e) {
-            throw new InternalControllerException("Failed to read server "
-                    + "response");
+    @Transactional(propagation=Propagation.REQUIRED, rollbackFor=Exception.class)
+    protected void storeLocalSubscriptions(String nodeName, Set<DataSource> dataSources, String peerName) 
+        throws InternalControllerException {
+      try {
+        for (DataSource ds : dataSources) {
+          // save peer data sources
+          DataSource dataSource = dataSourceManager.load(ds.getName(), DataSource.PEER);
+          User user = userManager.load(peerName);
+
+          if (dataSource == null) {
+            int id = dataSourceManager.store(ds);
+            // save peer data source user (operator)
+            dataSourceManager.storeUser(id, user.getId());
+            
+            // save peer data source filter
+            createDataSourceFilter(id, ds);
+          } else {
+            ds.setId(dataSource.getId());
+            dataSourceManager.update(ds);
+          }
+          // save subscriptions
+          Subscription requested = createSubscriptionObject(Subscription.LOCAL, nodeName, ds.getName(), true, true);
+          Subscription existing = subscriptionManager.load(Subscription.LOCAL, peerName, ds.getName());
+          if (existing == null) {
+            subscriptionManager.store(requested);
+          } else {
+            requested.setId(existing.getId());
+            subscriptionManager.update(requested);
+          }
         }
+      } catch (Exception e) {
+        logger.debug("Failed to read server response", e);
+        throw new InternalControllerException("Failed to read server response");
+      }
+    }
+    
+    /**
+     * Creates a data source filter if possible
+     * @param id the id to store the filter with
+     * @param ds the data source
+     * @return true if filter was created otherwise false
+     */
+    protected boolean createDataSourceFilter(int id, DataSource ds) {
+      String dsName = ds.getSource();
+      String foName = ds.getFileObject();
+      if (dsName != null && foName != null) {
+        IFilter filter = dataSourceManager.createFilter(dsName, foName);
+        filterManager.store(filter);
+        dataSourceManager.storeFilter(id, filter.getId());
+        return true;
+      } else {
+        log.info("Source and file object was missing in data source, could not create filter");
+      }
+      return false;
+    }
+    
+    /**
+     * @return the created subscription object
+     */
+    protected Subscription createSubscriptionObject(String type, String nodeName, String dsName, boolean active, boolean sync) {
+      return new Subscription(System.currentTimeMillis(), type, nodeName, dsName, active, sync);
     }
     
     /**userManager
@@ -260,86 +229,43 @@ public class StartSubscriptionController implements MessageSetter {
     public String startSubscription(HttpServletRequest request, Model model,
             @RequestParam(value="peer_name", required=true) String peerName) {
         initConfiguration();
-        Set<DataSource> selectedPeerDataSources = (HashSet<DataSource>) 
-                request.getSession().getAttribute(DS_SELECTED);
+        @SuppressWarnings("unchecked")
+        Set<DataSource> selectedPeerDataSources = (HashSet<DataSource>)request.getSession().getAttribute(DS_SELECTED);
         request.getSession().removeAttribute(DS_SELECTED);
+        logger.debug("Loading user '" + peerName + "'");
         User node = userManager.load(peerName);
+        
         if (node == null) {
-            String errorMsg = messages.getMessage(PS_PEER_NOT_FOUND_ERROR_KEY,
-                            new String[] {peerName});
-            setMessage(model, ERROR_MSG_KEY, errorMsg);      
-            log.error(errorMsg + ": " + errorMsg );
+          messageHelper.setErrorMessage(model, PS_PEER_NOT_FOUND_ERROR_KEY, new Object[]{peerName});
         } else {
-            requestFactory = new DefaultRequestFactory(
-                URI.create(node.getNodeAddress()));
-            HttpUriRequest req = requestFactory
-                    .createStartSubscriptionRequest(localNode, 
-                                                    selectedPeerDataSources);
-            try {
-                authenticator.addCredentials(req, localNode.getName());
-                HttpResponse res = httpClient.post(req);
-                if (res.getStatusLine().getStatusCode() == 
-                        HttpServletResponse.SC_OK) {
-                    String okMsg = messages.getMessage(PS_SERVER_SUCCESS_KEY,
-                            new String[] {peerName});
-                    storeLocalSubscriptions(res, readDataSources(res), 
-                            peerName);
-                    setMessage(model, SUCCESS_MSG_KEY, okMsg);
-                    log.warn(okMsg);
-                } else if (res.getStatusLine().getStatusCode() == 
-                        HttpServletResponse.SC_PARTIAL_CONTENT) {
-                    String errorMsg = messages.getMessage(
-                        PS_SERVER_PARTIAL_SUBSCRIPTION, 
-                        new String[] {peerName});
-                    storeLocalSubscriptions(res, readDataSources(res), 
-                            peerName);
-                    setMessage(model, ERROR_MSG_KEY, errorMsg);
-                    log.error(errorMsg);
-                } else if (res.getStatusLine().getStatusCode() == 
-                        HttpServletResponse.SC_NOT_FOUND) {
-                    String errorMsg = messages.getMessage(PS_SERVER_ERROR_KEY,
-                            new String[] {peerName});
-                    String errorDetails = res.getStatusLine().getReasonPhrase();
-                    setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, 
-                            errorMsg, errorDetails);      
-                    log.error(errorMsg + ": " + errorDetails);
-                } else {
-                    String errorMsg = messages.getMessage(PS_SERVER_ERROR_KEY,
-                            new String[] {peerName});
-                    String errorDetails = res.getStatusLine().getReasonPhrase();
-                    setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, 
-                            errorMsg, errorDetails);
-                    log.error(errorMsg + ": " + errorDetails);
-                }  
-            } catch (KeyczarException e) { 
-                String errorMsg = messages
-                        .getMessage(PS_MESSAGE_SIGNER_ERROR_KEY);     
-                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                        e.getMessage());
-                log.error(errorMsg + ": " + e.getMessage());
-            } catch (InternalControllerException e) {
-                String errorMsg = messages.getMessage(
-                        PS_INTERNAL_CONTROLLER_ERROR_KEY, 
-                        new String[] {peerName});
-                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                        e.getMessage());
-                log.error(errorMsg + ": " + e.getMessage());
-            } catch (IOException e) {
-                String errorMsg = messages.getMessage(
-                        PS_HTTP_CONN_ERROR_KEY, new String[] {peerName});
-                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                        e.getMessage());
-                log.error(errorMsg + ": " + e.getMessage());
-            } catch (Exception e) {
-                String errorMsg = messages.getMessage(
-                        PS_GENERIC_CONN_ERROR_KEY, new String[] {peerName});
-                setMessage(model, ERROR_MSG_KEY, ERROR_DETAILS_KEY, errorMsg,
-                        e.getMessage());
-                log.error(errorMsg + ": " + e.getMessage());
+          RequestFactory requestFactory = protocolManager.getFactory(node.getNodeAddress());
+          HttpUriRequest req = requestFactory.createStartSubscriptionRequest(localNode, selectedPeerDataSources);
+          try {
+            authenticator.addCredentials(req, localNode.getName());
+            HttpResponse res = httpClient.post(req);
+            ResponseParser parser = protocolManager.createParser(res);
+            if (parser.getStatusCode() == HttpServletResponse.SC_OK) {
+              messageHelper.setSuccessMessage(model, PS_SERVER_SUCCESS_KEY, new Object[] {peerName});
+              storeLocalSubscriptions(parser.getNodeName(), parser.getDataSources(), peerName);
+            } else if (parser.getStatusCode() == HttpServletResponse.SC_PARTIAL_CONTENT) {
+              messageHelper.setErrorMessage(model, PS_SERVER_PARTIAL_SUBSCRIPTION, new Object[] {peerName});
+              storeLocalSubscriptions(parser.getNodeName(), parser.getDataSources(), peerName);
+            } else {
+              messageHelper.setErrorDetailsMessage(model, PS_SERVER_ERROR_KEY, parser.getReasonPhrase(), new Object[] {peerName});
             }
-            model.addAttribute(PEER_NAME_KEY, peerName);   
+          } catch (KeyczarException e) { 
+            messageHelper.setErrorDetailsMessage(model, PS_MESSAGE_SIGNER_ERROR_KEY, e.getMessage());
+          } catch (InternalControllerException e) {
+            messageHelper.setErrorDetailsMessage(model, PS_INTERNAL_CONTROLLER_ERROR_KEY, e.getMessage(), new Object[]{peerName});
+          } catch (IOException e) {
+            messageHelper.setErrorDetailsMessage(model, PS_HTTP_CONN_ERROR_KEY, e.getMessage(), new Object[]{peerName});
+          } catch (Exception e) {
+            messageHelper.setErrorDetailsMessage(model, PS_GENERIC_CONN_ERROR_KEY, e.getMessage(), new Object[]{peerName});
+          }
+          model.addAttribute(PEER_NAME_KEY, peerName);               
         }
-        return SUBSCRIBE_VIEW;
+
+      return SUBSCRIBE_VIEW;
     }
     
     /**
@@ -348,22 +274,6 @@ public class StartSubscriptionController implements MessageSetter {
     @Autowired
     public void setConfigurationManager(IConfigurationManager confManager) {
         this.confManager = confManager;
-    }
-
-    /**
-     * @param jsonUtil the jsonUtil to set
-     */
-    @Autowired
-    public void setJsonUtil(IJsonUtil jsonUtil) {
-        this.jsonUtil = jsonUtil;
-    }
-
-    /**
-     * @param messages the messages to set
-     */
-    @Autowired
-    public void setMessages(MessageResourceUtil messages) {
-        this.messages = messages;
     }
 
     /**
@@ -418,5 +328,20 @@ public class StartSubscriptionController implements MessageSetter {
     public void setLog(Logger log) {
         this.log = log;
     }
-    
+
+    /**
+     * @param requestManager the request manager to set
+     */
+    @Autowired
+    public void setProtocolManager(ProtocolManager protocolManager) {
+      this.protocolManager = protocolManager;
+    }
+
+    /**
+     * @param messageHelper the model message helper
+     */
+    @Autowired
+    public void setMessageHelper(ModelMessageHelper messageHelper) {
+      this.messageHelper = messageHelper;
+    }
 }

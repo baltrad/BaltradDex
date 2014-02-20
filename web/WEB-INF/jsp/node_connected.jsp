@@ -38,6 +38,11 @@ Author     : szewczenko
                             and <i>OK</i> to subscribe.
                         </div>
                         <form action="node_datasources.htm" method="POST">
+                    		<t:message_box msgHeader="Success."	
+                            	       msgBody="${success_message}"
+                                	   errorHeader="Problems encountered."
+                                   	errorBody="${error_message}"/>                        
+                            <input type="hidden" name="peer_name" value="${peer_name}" />
                             <div class="body">
                                 <div class="header-row">
                                     <div class="count">&nbsp;</div>

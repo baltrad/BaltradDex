@@ -21,7 +21,8 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.net.request.factory.RequestFactory;
+import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.net.protocol.RequestFactory;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
@@ -120,8 +121,9 @@ public class PostFileServlet extends HttpServlet {
     private int soTimeout;
     
     protected User localNode;
-    
-    private static Logger logger = LogManager.getLogger(PostFileServlet.class); 
+
+    private ProtocolManager protocolManager = null;
+    private final static Logger logger = LogManager.getLogger(PostFileServlet.class); 
     
     /**
      * Default constructor.
@@ -290,6 +292,8 @@ public class PostFileServlet extends HttpServlet {
     {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
+        logger.debug("Request arrived using protocol version '" + req.getProtocolVersion() + "'");
+        
         try {
             if (authenticator.authenticate(req.getMessage(), 
                     req.getSignature(), req.getNodeName())) {
@@ -300,16 +304,13 @@ public class PostFileServlet extends HttpServlet {
                     String name = namer.name(entry);
                     if (keystoreManager.load(req.getNodeName()).isInjector()) {
                         // file sent by injector
-                        log.info("File " + name + " stored with UUID " 
-                                    + entry.getUuid().toString());
+                        log.info("File " + name + " stored with UUID " + entry.getUuid().toString());
                         sendMessage(entry);
-                        List<Subscription> uploads = subscriptionManager.load(
-                                Subscription.PEER);
+                        List<Subscription> uploads = subscriptionManager.load(Subscription.PEER);
                         sendToSubscribers(uploads, entry);                        
                     } else {
                         // file sent by peer
-                        List<Subscription> downloads = subscriptionManager
-                                .load(Subscription.LOCAL);
+                        List<Subscription> downloads = subscriptionManager.load(Subscription.LOCAL);
                         if (validateSubscription(downloads, entry)) {
                             log.info("File " + name + " stored with UUID " 
                                     + entry.getUuid().toString());
@@ -470,5 +471,12 @@ public class PostFileServlet extends HttpServlet {
     public void setDataSourceManager(IDataSourceManager dataSourceManager) {
         this.dataSourceManager = dataSourceManager;
     }
-    
+
+    /**
+     * @param protocolManager the protocol manager to use
+     */
+    @Autowired
+    public void setProtocolManager(ProtocolManager protocolManager) {
+      this.protocolManager = protocolManager;
+    }
 }

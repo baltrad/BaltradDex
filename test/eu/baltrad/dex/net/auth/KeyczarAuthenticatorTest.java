@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.net.auth;
 
+import eu.baltrad.dex.net.protocol.RequestFactory;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
-import eu.baltrad.dex.net.request.factory.RequestFactory;
 import eu.baltrad.dex.net.request.impl.NodeRequest;
 import eu.baltrad.dex.auth.util.Signer;
 import eu.baltrad.dex.auth.util.KeyczarCryptoFactory;

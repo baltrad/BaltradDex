@@ -21,42 +21,32 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.config.manager.IConfigurationManager;
-import eu.baltrad.dex.net.util.json.IJsonUtil;
-import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
-import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.request.impl.NodeRequest;
-import eu.baltrad.dex.net.response.impl.NodeResponse;
-import eu.baltrad.dex.user.manager.IUserManager;
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.datasource.manager.IDataSourceManager;
-import eu.baltrad.dex.util.MessageResourceUtil;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.ServletInputStream;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
-import org.apache.commons.io.IOUtils;
-
 import org.keyczar.exceptions.KeyczarException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.OutputStreamWriter;
-import java.io.IOException;
-import java.util.List;
-import java.util.HashSet;
+import eu.baltrad.dex.config.manager.IConfigurationManager;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
+import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.net.protocol.RequestParser;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.Role;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.util.MessageResourceUtil;
 
 /**
  * Receives and handles data source listing requests.
@@ -64,6 +54,7 @@ import java.util.HashSet;
  * @version 1.1.0
  * @since 1.1.0
  */
+@SuppressWarnings("serial")
 @Controller
 public class DataSourceListServlet extends HttpServlet {
     /** Unauthorized request error key */
@@ -80,9 +71,11 @@ public class DataSourceListServlet extends HttpServlet {
     private Authenticator authenticator;
     private IUserManager userManager;
     private IDataSourceManager dataSourceManager;
-    private IJsonUtil jsonUtil;
     private MessageResourceUtil messages;
     private Logger log;
+    private final static Logger logger = LogManager.getLogger(DataSourceListServlet.class);
+    
+    private ProtocolManager protocolManager = null;
     
     protected User localNode;
     
@@ -109,47 +102,6 @@ public class DataSourceListServlet extends HttpServlet {
     }
     
     /**
-     * Read http request body.
-     * @param request Http request
-     * @return JSON string
-     * @throws IOException 
-     */
-    private String readRequest(HttpServletRequest request) 
-            throws IOException {
-        ServletInputStream sis = request.getInputStream();
-        StringWriter writer = new StringWriter();
-        String json = "";
-        try {
-            IOUtils.copy(sis, writer, "UTF-8");
-            json = writer.toString();
-        } finally {
-            writer.close();
-            sis.close();
-        }
-        return json;
-    }
-    
-    /**
-     * Write to http response output stream.
-     * @param response Http response 
-     * @param body Response body
-     * @param status Status code
-     * @throws IOException 
-     */
-    private void writeResponse(NodeResponse response, String body, int status) 
-            throws IOException {
-        PrintWriter writer = new PrintWriter(
-                new OutputStreamWriter(response.getOutputStream(), "UTF-8"));
-        try {
-            writer.print(body);
-            response.setStatus(status);
-            response.setNodeName(localNode.getName());
-        } finally {
-            writer.close();
-        }
-    }
-    
-    /**
      * Implements Controller interface.
      * @param request Http servlet request
      * @param response Http servlet response
@@ -159,6 +111,7 @@ public class DataSourceListServlet extends HttpServlet {
     public ModelAndView handleRequest(HttpServletRequest request, 
             HttpServletResponse response) {
         initConfiguration();
+        @SuppressWarnings("unused")
         HttpSession session = request.getSession(true);
         doPost(request, response);
         return new ModelAndView();
@@ -172,48 +125,34 @@ public class DataSourceListServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) 
     {
-        NodeRequest req = new NodeRequest(request);
-        NodeResponse res = new NodeResponse(response);
-        try {
-            if (authenticator.authenticate(req.getMessage(), req.getSignature(),
-                    req.getNodeName())) {
-                // TODO User account will be created when 
-                // keys are exchanged
-                String json = readRequest(request);
-                User peer = jsonUtil.jsonToUserAccount(json);
-                // account not found
-                if (userManager.load(peer.getName()) == null) {
-                    peer.setRole(Role.PEER);
-                    try {
-                        userManager.store(peer);
-                        log.warn("New peer account created: " + peer.getName());
-                    } catch (Exception e) {
-                        throw e;
-                    }
-                    writeResponse(res, jsonUtil.userAccountToJson(localNode),
-                            HttpServletResponse.SC_CREATED);
-                } else {
-                    // account exists
-                    User user = userManager.load(peer.getName());
-                    List<DataSource> userDataSources = dataSourceManager
-                            .load(user.getId(), DataSource.LOCAL);
-                    writeResponse(res, jsonUtil.dataSourcesToJson(
-                            new HashSet<DataSource>(userDataSources)),
-                            HttpServletResponse.SC_OK);
-                }
-            } else {
-                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
-                        messages.getMessage(DS_UNAUTHORIZED_REQUEST_KEY));
-            }
-        } catch (KeyczarException e) {
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
-                    messages.getMessage(DS_MESSAGE_VERIFIER_ERROR_KEY));
-        } catch (Exception e) {
-            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    messages.getMessage(DS_INTERNAL_SERVER_ERROR_KEY,
-                        new String[] {e.getMessage()}));
+      RequestParser parser = protocolManager.createParser(request);
+      logger.debug("Request arrived using protocol version '" + parser.getProtocolVersion() + "'");
+        
+      try {
+        if (parser.isAuthenticated(authenticator)) {
+          User peer = parser.getUserAccount();
+          User loadedPeer = userManager.load(peer.getName());
+          if (loadedPeer == null) {
+            peer.setRole(Role.PEER);
+            userManager.store(peer);
+            log.warn("New peer account created: " + peer.getName());
+            parser.getWriter(response).userAccountResponse(localNode.getName(), localNode, HttpServletResponse.SC_CREATED);
+          } else {
+            List<DataSource> dataSources = dataSourceManager.load(loadedPeer.getId(), DataSource.LOCAL);
+            parser.getWriter(response).dataSourcesResponse(localNode.getName(), dataSources, HttpServletResponse.SC_OK);
+          }
+        } else {
+          String msg = messages.getMessage(DS_UNAUTHORIZED_REQUEST_KEY);
+          parser.getWriter(response).messageResponse(msg, HttpServletResponse.SC_UNAUTHORIZED);
         }
-    }
+      } catch (KeyczarException e) {
+        String msg = messages.getMessage(DS_MESSAGE_VERIFIER_ERROR_KEY);
+        parser.getWriter(response).messageResponse(msg, HttpServletResponse.SC_UNAUTHORIZED);
+      } catch (Exception e) {
+        String msg = messages.getMessage(DS_INTERNAL_SERVER_ERROR_KEY, new Object[]{e.getMessage()});
+        parser.getWriter(response).messageResponse(msg, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
+    }    
     
     /**
      * @param configurationManager 
@@ -240,14 +179,6 @@ public class DataSourceListServlet extends HttpServlet {
     }
 
     /**
-     * @param jsonUtil the jsonUtil to set
-     */
-    @Autowired
-    public void setJsonUtil(IJsonUtil jsonUtil) {
-        this.jsonUtil = jsonUtil;
-    }
-
-    /**
      * @param messages the messages to set
      */
     @Autowired
@@ -268,5 +199,12 @@ public class DataSourceListServlet extends HttpServlet {
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
     }
-    
+
+    /**
+     * @param protocolManager the protocol manager to use
+     */
+    @Autowired
+    public void setProtocolManager(ProtocolManager protocolManager) {
+      this.protocolManager = protocolManager;
+    }
 }
