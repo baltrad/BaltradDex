@@ -297,7 +297,7 @@ public class RemoveSubscriptionController {
                 // remove subscriptions
                 subscriptionManager.delete(s.getId());
                 // remove status
-                nodeStatusManager.delete(dataSourceId);
+                nodeStatusManager.delete(s.getId());
                 String msg = messageHelper.getMessage(REMOVE_SUBSCRIPTION_SUCCESS_MSG_KEY, msgArgs);
                 log.info(msg);
             }

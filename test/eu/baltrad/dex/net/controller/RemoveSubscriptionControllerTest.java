@@ -360,14 +360,14 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
       expect(ds1.getId()).andReturn(3);
       expect(dataSourceManagerMock.delete(3)).andReturn(1);
       subscriptionManagerMock.delete(1);
-      expect(nodeStatusManagerMock.delete(3)).andReturn(1);
+      expect(nodeStatusManagerMock.delete(1)).andReturn(1);
       expect(messageHelper.getMessage("removesubscription.success", "PeerUser", "DS1")).andReturn("Removed 1");
       
       expect(dataSourceManagerMock.load("DS2", "peer")).andReturn(ds2);
       expect(ds2.getId()).andReturn(4);
       expect(dataSourceManagerMock.delete(4)).andReturn(1);
       subscriptionManagerMock.delete(2);
-      expect(nodeStatusManagerMock.delete(4)).andReturn(1);
+      expect(nodeStatusManagerMock.delete(2)).andReturn(1);
       expect(messageHelper.getMessage("removesubscription.success", "PeerUser", "DS2")).andReturn("Removed 2");
       
       txManagerMock.commit(status);
@@ -403,7 +403,7 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
       expect(ds1.getId()).andReturn(3);
       expect(dataSourceManagerMock.delete(3)).andReturn(1);
       subscriptionManagerMock.delete(1);
-      expect(nodeStatusManagerMock.delete(3)).andReturn(1);
+      expect(nodeStatusManagerMock.delete(1)).andReturn(1);
       expect(messageHelper.getMessage("removesubscription.success", "PeerUser", "DS1")).andReturn("Removed 1");
       
       expect(dataSourceManagerMock.load("DS2", "peer")).andReturn(ds2);
