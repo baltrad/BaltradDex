@@ -117,6 +117,9 @@ public class CompositeRoutesController {
    * @param areaid the composite area to be generated
    * @param interval the interval
    * @param timeout the timeout
+   * @param applygra if gra correction should be applied or not
+   * @param ZR_A the ZR A coefficient to use when converting between reflectivity and MM/H
+   * @param ZR_b the ZR b coefficient to use when converting between reflectivity and MM/H
    * @param sources the sources this rule should affect
    * @param detectors the detectors that should be used for this rule
    * @return a jsp page string or redirect
@@ -136,6 +139,9 @@ public class CompositeRoutesController {
       @RequestParam(value = "areaid", required = false) String areaid,
       @RequestParam(value = "interval", required = false) Integer interval,
       @RequestParam(value = "timeout", required = false) Integer timeout,
+      @RequestParam(value = "applygra", required = false) Boolean applygra,
+      @RequestParam(value = "ZR_A", required = false) Double ZR_A,
+      @RequestParam(value = "ZR_b", required = false) Double ZR_b,
       @RequestParam(value = "sources", required = false) List<String> sources,
       @RequestParam(value = "detectors", required = false) List<String> detectors) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
@@ -149,11 +155,11 @@ public class CompositeRoutesController {
     
     if (name == null && author == null && active == null && description == null && byscan == null &&
         method == null && prodpar == null && selection_method == null && recipients == null && 
-        areaid == null && interval == null && timeout == null &&
+        areaid == null && interval == null && timeout == null && applygra == null && ZR_A == null && ZR_b == null &&
         sources == null && detectors == null) {
       return viewCreateRoute(model, name, author, active, description,
           recipients, byscan, method, prodpar, selection_method, areaid, 
-          interval, timeout, sources, detectors, null);
+          interval, timeout, applygra, ZR_A, ZR_b, sources, detectors, null);
     }
     
     if (name == null || name.trim().equals("")) {
@@ -195,7 +201,10 @@ public class CompositeRoutesController {
         int itimeout = (timeout == null) ? 15*60 : timeout.intValue();
         boolean bbyscan = (byscan == null) ? false : byscan.booleanValue();
         int iselection_method = (selection_method == null) ? 0 : selection_method.intValue();
-        CompositingRule rule = createRule(areaid, iinterval, sources, detectors, itimeout, bbyscan, method, prodpar, iselection_method);
+        boolean bapplygra = (applygra == null) ? false : applygra.booleanValue();
+        double dZR_A = (ZR_A == null) ? 200.0 : ZR_A.doubleValue();
+        double dZR_b = (ZR_b == null) ? 1.6 : ZR_b.doubleValue();
+        CompositingRule rule = createRule(areaid, iinterval, sources, detectors, itimeout, bbyscan, method, prodpar, iselection_method, bapplygra, dZR_A, dZR_b);
         List<String> recip = (recipients == null) ? new ArrayList<String>() : recipients;
         RouteDefinition def = manager.create(name, author, bactive, description, recip, rule);
         manager.storeDefinition(def);
@@ -207,7 +216,7 @@ public class CompositeRoutesController {
     }
     
     return viewCreateRoute(model, name, author, active, description,
-        recipients, byscan, method, prodpar, selection_method, areaid, interval, timeout, sources, detectors, emessage);
+        recipients, byscan, method, prodpar, selection_method, areaid, interval, timeout,applygra, ZR_A, ZR_b, sources, detectors, emessage);
   }
   
   /**
@@ -240,6 +249,9 @@ public class CompositeRoutesController {
       @RequestParam(value = "areaid", required = false) String areaid,
       @RequestParam(value = "interval", required = false) Integer interval,
       @RequestParam(value = "timeout", required = false) Integer timeout,
+      @RequestParam(value = "applygra", required = false) Boolean applygra,
+      @RequestParam(value = "ZR_A", required = false) Double ZR_A,
+      @RequestParam(value = "ZR_b", required = false) Double ZR_b,
       @RequestParam(value = "sources", required = false) List<String> sources,
       @RequestParam(value = "detectors", required = false) List<String> detectors,
       @RequestParam(value = "submitButton", required = false) String operation) {
@@ -248,7 +260,7 @@ public class CompositeRoutesController {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
     if (operation != null && operation.equals("Save")) {
-      return modifyRoute(model, name, author, active, description, byscan, method, prodpar, selection_method, recipients, areaid, interval, timeout, sources, detectors);
+      return modifyRoute(model, name, author, active, description, byscan, method, prodpar, selection_method, recipients, areaid, interval, timeout, applygra, ZR_A, ZR_b, sources, detectors);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -260,7 +272,7 @@ public class CompositeRoutesController {
       if (def.getRule() instanceof CompositingRule) {
         CompositingRule crule = (CompositingRule)def.getRule();
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
-            def.getRecipients(), crule.isScanBased(), crule.getMethod(), crule.getProdpar(), crule.getSelectionMethod(), crule.getArea(), crule.getInterval(), crule.getTimeout(), crule.getSources(), crule.getDetectors(), null);
+            def.getRecipients(), crule.isScanBased(), crule.getMethod(), crule.getProdpar(), crule.getSelectionMethod(), crule.getArea(), crule.getInterval(), crule.getTimeout(), crule.isApplyGRA(), crule.getZR_A(), crule.getZR_b(), crule.getSources(), crule.getDetectors(), null);
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a compositing rule");
       }
@@ -286,7 +298,8 @@ public class CompositeRoutesController {
   protected String viewCreateRoute(Model model, String name, String author,
       Boolean active, String description, List<String> recipients, Boolean byscan, 
       String method, String prodpar, Integer selection_method, String areaid, 
-      Integer interval, Integer timeout, List<String> sources, List<String> detectors, String emessage) {
+      Integer interval, Integer timeout, Boolean applygra, Double ZR_A, Double ZR_b,
+      List<String> sources, List<String> detectors, String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
@@ -305,6 +318,9 @@ public class CompositeRoutesController {
     model.addAttribute("areaid", (areaid == null) ? "" : areaid);
     model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
     model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
+    model.addAttribute("applygra", (applygra == null) ? new Boolean(false) : applygra);
+    model.addAttribute("ZR_A", (ZR_A == null) ? new Double(200.0) : ZR_A);
+    model.addAttribute("ZR_b", (ZR_b == null) ? new Double(1.6) : ZR_b);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
@@ -329,6 +345,9 @@ public class CompositeRoutesController {
       String areaid,
       Integer interval,
       Integer timeout,
+      Boolean applygra,
+      Double ZR_A,
+      Double ZR_b,
       List<String> sources,
       List<String> detectors,
       String emessage) {
@@ -352,6 +371,9 @@ public class CompositeRoutesController {
     model.addAttribute("areaid", (areaid == null) ? "" : areaid);
     model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
     model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
+    model.addAttribute("applygra", (applygra == null) ? new Boolean(false) : applygra);
+    model.addAttribute("ZR_A", (ZR_A == null) ? new Double(200.0) : ZR_A);
+    model.addAttribute("ZR_b", (ZR_b == null) ? new Double(1.6) : ZR_b);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
@@ -405,6 +427,9 @@ public class CompositeRoutesController {
       String area,
       Integer interval,
       Integer timeout,
+      Boolean applygra,
+      Double ZR_A,
+      Double ZR_b,
       List<String> sources,
       List<String> detectors) {
     List<String> newrecipients = (recipients == null) ? new ArrayList<String>() : recipients;
@@ -417,6 +442,9 @@ public class CompositeRoutesController {
     String emessage = null;
     boolean bbyscan = (byscan != null) ? byscan.booleanValue() : false;
     int iselection_method = (selection_method != null) ? selection_method.intValue() : 0;
+    boolean bapplygra = (applygra != null) ? applygra.booleanValue() : false;
+    double dZR_A = (ZR_A != null) ? ZR_A.doubleValue() : 200.0;
+    double dZR_b = (ZR_b != null) ? ZR_b.doubleValue() : 1.6;
     if (area == null || area.trim().equals("")) {
       emessage = "You must specify an area.";
     }
@@ -449,7 +477,7 @@ public class CompositeRoutesController {
     }
     if (emessage == null) {
       try {
-        CompositingRule rule = createRule(area, iinterval, newsources, newdetectors, itimeout, bbyscan, method, prodpar, iselection_method);
+        CompositingRule rule = createRule(area, iinterval, newsources, newdetectors, itimeout, bbyscan, method, prodpar, iselection_method, bapplygra, dZR_A, dZR_b);
         RouteDefinition def = manager.create(name, author, isactive, description,
             newrecipients, rule);
         manager.updateDefinition(def);
@@ -461,7 +489,7 @@ public class CompositeRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        newrecipients,byscan, method, prodpar, selection_method, area, interval, timeout, sources, detectors, emessage);
+        newrecipients,byscan, method, prodpar, selection_method, area, interval, timeout, applygra, ZR_A, ZR_b, sources, detectors, emessage);
   }
   
   protected List<Integer> getIntervals() {
@@ -475,7 +503,7 @@ public class CompositeRoutesController {
   
   protected CompositingRule createRule(String areaid, int interval,
       List<String> sources, List<String> detectors, int timeout, boolean byscan, 
-      String method, String prodpar, int selection_method) {
+      String method, String prodpar, int selection_method, boolean applygra, double ZR_A, double ZR_b) {
     CompositingRule rule = (CompositingRule)manager.createRule(CompositingRule.TYPE);
     rule.setArea(areaid);
     rule.setInterval(interval);
@@ -486,6 +514,9 @@ public class CompositeRoutesController {
     rule.setSelectionMethod(selection_method);
     rule.setMethod(method);
     rule.setProdpar(prodpar);
+    rule.setApplyGRA(applygra);
+    rule.setZR_A(ZR_A);
+    rule.setZR_b(ZR_b);
     return rule;
   }
 }

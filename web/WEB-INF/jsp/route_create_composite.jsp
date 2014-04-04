@@ -144,6 +144,30 @@ Creates a composite route
                             </div>        
                         </div>
                         <div class="row2">
+                            <div class="leftcol">Apply GRA:</div>
+                            <div class="rightcol">
+                                <input type="checkbox" name="applygra" 
+                                       title="Check to select tha GRA correction should be applied"
+                                       <c:if test="${applygra == true}">checked</c:if> />
+                            </div>        
+                        </div> 
+                        <div class="row2">
+                            <div class="leftcol">ZR A:</div>
+                            <div class="rightcol">
+                                <input type="text" name="ZR_A" 
+                                       value="${ZR_A}"
+                                       title="The ZR_A coefficient when converting from reflectivity to MM/H"/>
+                            </div>        
+                        </div>                                               
+                        <div class="row2">
+                            <div class="leftcol">ZR b:</div>
+                            <div class="rightcol">
+                                <input type="text" name="ZR_b" 
+                                       value="${ZR_b}"
+                                       title="The ZR_b coefficient when converting from reflectivity to MM/H"/>
+                            </div>        
+                        </div>                                               
+                        <div class="row2">
                             <div class="leftcol">Sources:</div>
                             <div class="rightcol">
                                 <select id="sources" multiple size="6" 
