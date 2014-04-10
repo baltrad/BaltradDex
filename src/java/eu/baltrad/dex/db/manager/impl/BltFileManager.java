@@ -45,6 +45,7 @@ import eu.baltrad.dex.db.model.BltQueryParameter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -89,6 +90,8 @@ public class BltFileManager implements IBltFileManager {
     /** Logger */
     private Logger log;
 
+    private final static Logger logger = LogManager.getLogger(BltFileManager.class);
+    
     /**
      * Constructor
      */
@@ -104,10 +107,8 @@ public class BltFileManager implements IBltFileManager {
     public IFilter loadFilter(String dsName, String type) {
         IFilter attributeFilter = null;
         try {
-          log.info("Loading filter for " + dsName + ", " + type);
-            DataSource dataSource = dataSourceManager.load(dsName, type);
-            attributeFilter = coreFilterManager.load(
-                    dataSourceManager.loadFilterId(dataSource.getId()));
+            int filterId = dataSourceManager.loadFilterId(dsName, type);
+            attributeFilter = coreFilterManager.load(filterId);
         } catch (Exception e) {
             log.error("Failed to load filter: ", e);
         }

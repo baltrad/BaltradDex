@@ -21,7 +21,6 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.net.protocol.ProtocolManager;
 import eu.baltrad.dex.net.protocol.RequestFactory;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
@@ -52,7 +51,6 @@ import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.db.IFilter;
-import eu.baltrad.dex.keystore.model.Key;
 import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.status.model.Status;
 
@@ -126,7 +124,6 @@ public class PostFileServlet extends HttpServlet {
     
     protected User localNode;
 
-    private ProtocolManager protocolManager = null;
     private final static Logger logger = LogManager.getLogger(PostFileServlet.class); 
     
     /**
@@ -238,6 +235,7 @@ public class PostFileServlet extends HttpServlet {
     {
         if (uploads.size() > 0) {
             byte[] fileContent = getEntryContent(entry);
+            long t = System.currentTimeMillis();
             for (Subscription s : uploads) {
                 try {
                     IFilter filter = fileManager.loadFilter(s.getDataSource(),
@@ -260,14 +258,16 @@ public class PostFileServlet extends HttpServlet {
                                 receiver, dataSource, connTimeout, soTimeout);
                         framePublisherManager.getFramePublisher(
                             receiver.getName()).addTask(task);
-                    } 
+                    }
                 } catch (Exception e) {
                     log.error(messages.getMessage(
                             PF_INVALID_SUBSCRIPTION_ERROR_KEY,
                             new String[] {e.getMessage()}));
-                    logger.debug("Failed to send message to subscriber", e);
+                    logger.info("Failed to send message to subscriber", e);
                 } 
             }
+            t = System.currentTimeMillis() - t;
+            logger.info("Finished publishing to subscribers: took " + t + " ms");
         }
     } 
     
@@ -297,13 +297,16 @@ public class PostFileServlet extends HttpServlet {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
         logger.debug("Request arrived using protocol version '" + req.getProtocolVersion() + "'");
-        
+        long st = System.currentTimeMillis();
+        long fileStored = 0, sentToSubscribers = 0;  
         try {
             if (authenticator.authenticate(req.getMessage(), 
                     req.getSignature(), req.getNodeName())) {
                 log.info("New data file received from " + req.getNodeName());
                 // store entry
                 FileEntry entry = storeFile(req);
+                fileStored = System.currentTimeMillis();
+                
                 if (entry != null) {
                     String name = namer.name(entry);
                     if (keystoreManager.load(req.getNodeName()).isInjector()) {
@@ -311,7 +314,9 @@ public class PostFileServlet extends HttpServlet {
                         log.info("File " + name + " stored with UUID " + entry.getUuid().toString());
                         sendMessage(entry);
                         List<Subscription> uploads = subscriptionManager.load(Subscription.PEER);
-                        sendToSubscribers(uploads, entry);                        
+                        sendToSubscribers(uploads, entry);   
+                        sentToSubscribers = System.currentTimeMillis();
+                        logger.debug("PostFile from injector: File stored after " + (fileStored-st) + " ms, finished with subscribers after " + (sentToSubscribers - st) + " ms");
                     } else {
                         // file sent by peer
                         List<Subscription> downloads = subscriptionManager.load(Subscription.LOCAL);
@@ -488,13 +493,5 @@ public class PostFileServlet extends HttpServlet {
     @Autowired
     public void setDataSourceManager(IDataSourceManager dataSourceManager) {
         this.dataSourceManager = dataSourceManager;
-    }
-
-    /**
-     * @param protocolManager the protocol manager to use
-     */
-    @Autowired
-    public void setProtocolManager(ProtocolManager protocolManager) {
-      this.protocolManager = protocolManager;
     }
 }

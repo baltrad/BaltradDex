@@ -106,13 +106,7 @@ public class GraRoutesController {
           "No adaptors defined, please add one before creating a route.");
       return "redirect:adaptors.htm";
     }
-    
-    if (recipients != null) {
-      for (String r : recipients) {
-        logger.info("CHOOSEN RECIPIENT: " + r);
-      }
-    }
-    
+
     if (name == null && author == null && active == null && description == null &&
         recipients == null && area == null && object_type == null && quantity == null &&
         filesPerHour == null && acceptableLoss == null && distanceField == null &&

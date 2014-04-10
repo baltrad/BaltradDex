@@ -328,6 +328,23 @@ public class DataSourceManager implements IDataSourceManager {
     }
     
     /**
+     * Load filter by data source name and type matches
+     * @param name the name of the data source
+     * @param type the type of the data source
+     * @return the filter id
+     */
+    public int loadFilterId(String name, String type) {
+      String sql = "SELECT ddsf.filter_id FROM dex_data_source_filters ddsf, dex_data_sources dds " +
+                   " WHERE dds.id = ddsf.data_source_id " +
+                   " AND dds.name=? AND dds.type=?";
+      try {
+        return jdbcTemplate.queryForInt(sql, new Object[]{name, type});
+      } catch (EmptyResultDataAccessException e) {
+        return 0;
+      }
+    }
+    
+    /**
      * Save data source filter parameter.
      * @param dataSourceId Data source id
      * @param filterId Filter id
