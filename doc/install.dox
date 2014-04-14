@@ -13,6 +13,7 @@
 		-# \ref prep_tomcat_keystore
 		-# \ref prep_tomcat_connectors
 		-# \ref prep_tomcat_admin_account
+		-# \ref prep_tomcat_logrotate
 	-# \ref prep_app_context
 -# \ref build_dex
 -# \ref test_dex
@@ -181,6 +182,26 @@ like the following:
 At this step it is necessary to restart Tomcat servlet container for the 
 configuration changes to take effect.
 \endnote 
+
+\subsection prep_tomcat_logrotate Add logrotate on the tomcat logs
+The application can produce a lot of debug or informative messages in the log files. These files
+can in turn become very large so it might be a good idea to add a logrotate rule to keep the
+log files in check.
+
+Add a file, /etc/logrotate.d/tomcat or similar and add the following information in the configuration file.
+
+\verbatim
+/opt/baltrad/third_party/tomcat/logs/catalina.out {  
+  copytruncate  
+  daily  
+  rotate 7  
+  compress  
+  missingok  
+  size 5M  
+}
+\endverbatim  
+
+
 
 \subsection prep_app_context Configure application context
 
