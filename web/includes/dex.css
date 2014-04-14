@@ -2174,7 +2174,15 @@ textarea {
 .schedule .id {
     float: left;
     padding: 4px 2px 0 2px;
+    width: 100px;
 }
+
+.schedule .routename {
+    float: left;
+    padding: 4px 2px 0 2px;
+    width: 180px;
+}
+
 .schedule .leftcol {
     float: left;
     width: 160px;

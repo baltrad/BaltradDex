@@ -55,6 +55,7 @@ Schedule
                                 <div class="header-row">
                                     <div class="count">&nbsp;</div>
                                     <div class="id">Job ID</div>
+                                    <div class="routename">Route</div>
                                 </div>
                                 <c:set var="count" scope="page" value="1"/>
                                 <c:forEach var="job" items="${schedule}">
@@ -67,6 +68,9 @@ Schedule
                                             <a href="schedule_show_job.htm?id=${job.id}">
                                                 <c:out value="${job.id}"/>
                                             </a>                                        
+                                        </div>
+                                        <div class="routename">
+                                            <c:out value="${job.name}"/>
                                         </div>
                                   </div>
                                 </c:forEach>
