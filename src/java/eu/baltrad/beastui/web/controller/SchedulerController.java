@@ -157,10 +157,15 @@ public class SchedulerController {
         scheduler.register(expression, jobname);
         result = "redirect:schedule.htm";
       } catch (Throwable t) {
+        logger.info("Caught exception", t);
         result = viewCreateScheduledJob(model, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, jobname, "Could not register: "+t.getMessage());
       }
     } else {
-      result = viewCreateScheduledJob(model, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, jobname, null);
+      if (seconds == null && minutes == null && hours == null && daysOfMonth == null && months == null && daysOfWeek == null) {
+        result = viewCreateScheduledJob(model, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, jobname, null);
+      } else {
+        result = viewCreateScheduledJob(model, seconds, minutes, hours, daysOfMonth, months, daysOfWeek, jobname, "No jobname provided");
+      }
     }
     return result;
   }
@@ -477,5 +482,4 @@ public class SchedulerController {
     result.add(new CronEntryMapping("7", "Saturday"));
     return result;    
   }
-
 }

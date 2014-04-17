@@ -22,6 +22,7 @@ Modifies a scheduled job
 ------------------------------------------------------------------------------%>
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
+<%@ taglib prefix="defun" uri="/WEB-INF/tags/functions.tld" %>
 
 <t:generic_page pageTitle="Schedule">
     <jsp:body>
@@ -44,7 +45,7 @@ Modifies a scheduled job
                                 <select multiple size="4" name="seconds" 
                                         title="Seconds">
                                     <c:forEach var="entry" items="${selectableSeconds}">
-                                        <option value="${entry.value}" <c:if test="${ fn:contains(seconds, entry.value) }">selected</c:if> >${entry.name}</option>
+                                        <option value="${entry.value}" <c:if test="${ defun:listContains(seconds, entry.value) }">selected</c:if> >${entry.name}</option>
                                     </c:forEach>
                                 </select>
                             </div>        
@@ -55,7 +56,7 @@ Modifies a scheduled job
                                 <select multiple size="4" name="minutes"
                                         title="Minutes">
                                     <c:forEach var="entry" items="${selectableMinutes}">
-                                        <option value="${entry.value}" <c:if test="${ fn:contains(minutes, entry.value) }">selected</c:if> >${entry.name}</option>
+                                        <option value="${entry.value}" <c:if test="${ defun:listContains(minutes, entry.value) }">selected</c:if> >${entry.name}</option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -66,7 +67,7 @@ Modifies a scheduled job
                                 <select multiple size="4" name="hours"
                                         title="Hours">
                                     <c:forEach var="entry" items="${selectableHours}">
-                                        <option value="${entry.value}" <c:if test="${ fn:contains(hours, entry.value) }">selected</c:if> >${entry.name}</option>
+                                        <option value="${entry.value}" <c:if test="${ defun:listContains(hours, entry.value) }">selected</c:if> >${entry.name}</option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -77,7 +78,7 @@ Modifies a scheduled job
                                 <select multiple size="4" name="daysOfMonth"
                                         title="Days of month">
                                     <c:forEach var="entry" items="${selectableDaysOfMonth}">
-                                        <option value="${entry.value}" <c:if test="${ fn:contains(daysOfMonth, entry.value) }">selected</c:if> >${entry.name}</option>
+                                        <option value="${entry.value}" <c:if test="${ defun:listContains(daysOfMonth, entry.value) }">selected</c:if> >${entry.name}</option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -88,7 +89,7 @@ Modifies a scheduled job
                                 <select multiple size="4" name="months"
                                         title="Months">
                                     <c:forEach var="entry" items="${selectableMonths}">
-                                        <option value="${entry.value}" <c:if test="${ fn:contains(months, entry.value) }">selected</c:if> >${entry.name}</option>
+                                        <option value="${entry.value}" <c:if test="${ defun:listContains(months, entry.value) }">selected</c:if> >${entry.name}</option>
                                     </c:forEach>
                                 </select>
                             </div>
@@ -99,7 +100,7 @@ Modifies a scheduled job
                                 <select multiple size="4" name="daysOfWeek"
                                         title="Days of week">
                                     <c:forEach var="entry" items="${selectableDaysOfWeek}">
-                                        <option value="${entry.value}" <c:if test="${ fn:contains(daysOfWeek, entry.value) }">selected</c:if> >${entry.name}</option>
+                                        <option value="${entry.value}" <c:if test="${ defun:listContains(daysOfWeek, entry.value) }">selected</c:if> >${entry.name}</option>
                                     </c:forEach>
                                 </select>
                             </div>
