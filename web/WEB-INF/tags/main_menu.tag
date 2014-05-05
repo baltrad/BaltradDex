@@ -88,6 +88,9 @@
                         <a href="route_create_wrwp.htm">Create WRWP</a>
                     </li>
                     <li>
+                        <a href="route_create_scansun.htm">Create ScanSun</a>
+                    </li>
+                    <li>
                         <a href="route_create_bdb_trim_count.htm">
                             Create DB trim count</a>
                     </li>

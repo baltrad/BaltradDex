@@ -478,7 +478,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="bltacrrmgr" class="eu.baltrad.beast.rules.acrr.AcrrRuleManager" autowire="byType" />
     <bean id="bltgramgr" class="eu.baltrad.beast.rules.gra.GraRuleManager" autowire="byType" />
     <bean id="bltwrwpmgr" class="eu.baltrad.beast.rules.wrwp.WrwpRuleManager" autowire="byType" />
-
+	<bean id="bltscansunmgr" class="eu.baltrad.beast.rules.scansun.ScansunRuleManager" autowire="byType" />
+	
     <bean id="log4jalertmessagerule" class="eu.baltrad.beast.rules.system.Log4jAlertMessageRule" autowire="byType"/>
     <bean id="systemrules" class="eu.baltrad.beast.router.SystemRulesDefinition">
       <property name="rules">
@@ -500,6 +501,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                 <entry key="blt_acrr" value-ref="bltacrrmgr"/>
                 <entry key="blt_gra" value-ref="bltgramgr"/>
                 <entry key="blt_wrwp" value-ref="bltwrwpmgr"/>
+                <entry key="blt_scansun" value-ref="bltscansunmgr"/>
                 <entry key="distribution" value-ref="distributionRuleManager"/>
             </map>
         </property>
@@ -575,6 +577,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="acrrRoutesController" class="eu.baltrad.beastui.web.controller.AcrrRoutesController" autowire="byType" />
     <bean id="graRoutesController" class="eu.baltrad.beastui.web.controller.GraRoutesController" autowire="byType" />
     <bean id="wrwpRoutesController" class="eu.baltrad.beastui.web.controller.WrwpRoutesController" autowire="byType" />
+    <bean id="scansunRoutesController" class="eu.baltrad.beastui.web.controller.ScansunRoutesController" autowire="byType" />
     <bean id="bdbTrimAgeRoutesController" class="eu.baltrad.beastui.web.controller.BdbTrimAgeRoutesController" autowire="byType" />
     <bean id="bdbTrimCountRoutesController" class="eu.baltrad.beastui.web.controller.BdbTrimCountRoutesController" autowire="byType" />
     <bean id="distributionRoutesController" class="eu.baltrad.beastui.web.controller.DistributionRoutesController" autowire="byType" />

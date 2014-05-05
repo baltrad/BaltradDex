@@ -91,10 +91,12 @@ public class ShowRoutesController {
       return "redirect:route_create_google_map.htm";
     } else if (operation != null && operation.equals("ACRR")) {
       return "redirect:route_create_acrr.htm";
-    } else if (operation != null && operation.equals("Gra")) {
+    } else if (operation != null && operation.equals("GRA")) {
       return "redirect:route_create_gra.htm";
     } else if (operation != null && operation.equals("WRWP")) {
       return "redirect:route_create_wrwp.htm";
+    } else if (operation != null && operation.equals("ScanSun")) {
+      return "redirect:route_create_scansun.htm";
     }
     model.addAttribute("emessage", "Unknown operation: '"+operation+"'");
     return "redirect:routes.htm";
@@ -128,6 +130,8 @@ public class ShowRoutesController {
         result = "redirect:route_show_gra.htm";
       } else if (type.equals("blt_wrwp")) {
         result = "redirect:route_show_wrwp.htm";
+      } else if (type.equals("blt_scansun")) {
+        result = "redirect:route_show_scansun.htm";
       }
 
       if (result != null) {

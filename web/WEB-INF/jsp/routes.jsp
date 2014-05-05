@@ -103,6 +103,9 @@ List of routes
                                                 <c:when test="${route.ruleType == 'blt_wrwp'}">
                                                     <c:out value="WRWP"/>
                                                 </c:when>
+                                                <c:when test="${route.ruleType == 'blt_scansun'}">
+                                                    <c:out value="ScanSun"/>
+                                                </c:when>
                                                 <c:otherwise>
                                                     <c:out value="${route.ruleType}"/>
                                                 </c:otherwise>
