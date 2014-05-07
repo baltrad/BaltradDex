@@ -196,7 +196,15 @@ Modify a composite route
                                        value="${ZR_b}"
                                        title="The ZR_b coefficient when converting from reflectivity to MM/H"/>
                             </div>        
-                        </div>                                               
+                        </div>       
+                        <div class="row2">
+                            <div class="leftcol">Ignore malfunc:</div>
+                            <div class="rightcol">
+                                <input type="checkbox" name="ignore_malfunc" 
+                                       title="Check to select that scans/volumes with how/malfunc=True should be ignored"
+                                       <c:if test="${ignore_malfunc == true}">checked</c:if> />
+                            </div>        
+                        </div> 
                         <div class="row2">
                             <div class="leftcol">Sources:</div>
                             <div class="rightcol">
