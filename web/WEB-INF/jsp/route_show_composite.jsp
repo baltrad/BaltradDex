@@ -206,6 +206,14 @@ Modify a composite route
                             </div>        
                         </div> 
                         <div class="row2">
+                            <div class="leftcol">CT-filter:</div>
+                            <div class="rightcol">
+                                <input type="checkbox" name="ctfilter" 
+                                       title="Check to select that ct-filtering should be performed"
+                                       <c:if test="${ctfilter == true}">checked</c:if> />
+                            </div>        
+                        </div>                         
+                        <div class="row2">
                             <div class="leftcol">Sources:</div>
                             <div class="rightcol">
                                 <select id="sources" multiple size="6" 
