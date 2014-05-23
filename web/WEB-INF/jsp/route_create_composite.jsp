@@ -211,7 +211,14 @@ Creates a composite route
                                        title="Check to select that ct-filtering should be performed"
                                        <c:if test="${ctfilter == true}">checked</c:if> />
                             </div>        
-                        </div>                         
+                        </div>
+                        <div class="row2">
+                            <div class="leftcol">QI-total Field:</div>
+                            <div class="rightcol">
+                                <input type="text" name="qitotal_field" 
+                                       value="${qitotal_field}" title="QI total field. If not empty, then compositing will be based on quality field"/>
+                            </div>
+                        </div>
                         <div class="row2">
                             <div class="leftcol">Sources:</div>
                             <div class="rightcol">
