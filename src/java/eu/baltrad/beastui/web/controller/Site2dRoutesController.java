@@ -166,12 +166,15 @@ public class Site2dRoutesController {
         ignore_malfunc == null && ctfilter == null && sources == null && detectors == null) {
       return viewCreateRoute(model, name, author, active, description,
           recipients, byscan, method, prodpar, areaid, 
-          interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, sources, detectors, null);
+          interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, null);
     }
+    
+    logger.info("areaid=" + areaid + ", pcsid=" + pcsid);
     
     if (name == null || name.trim().equals("")) {
       emessage = "Name must be specified.";
-    } else if (areaid == null && pcsid == null) {
+    } else if ((areaid == null || areaid.trim().equals("")) && 
+        (pcsid == null || pcsid.trim().equals(""))) {
       emessage = "Must specify either areaid or pcsid";
     } else if (sources == null || sources.size() <= 0) {
       emessage = "Must specify at least one source.";
@@ -225,7 +228,7 @@ public class Site2dRoutesController {
     }
     
     return viewCreateRoute(model, name, author, active, description,
-        recipients, byscan, method, prodpar, areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, sources, detectors, emessage);
+        recipients, byscan, method, prodpar, areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, emessage);
   }
   
   /**
@@ -312,7 +315,7 @@ public class Site2dRoutesController {
       Boolean active, String description, List<String> recipients, Boolean byscan, 
       String method, String prodpar, String areaid, 
       Integer interval, Boolean applygra, Double ZR_A, Double ZR_b, Boolean ignore_malfunc,
-      Boolean ctfilter, List<String> sources, List<String> detectors, String emessage) {
+      Boolean ctfilter, String pcsid, Double xscale, Double yscale, List<String> sources, List<String> detectors, String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
@@ -334,6 +337,10 @@ public class Site2dRoutesController {
     model.addAttribute("ZR_b", (ZR_b == null) ? new Double(1.6) : ZR_b);
     model.addAttribute("ignore_malfunc", (ignore_malfunc == null) ? new Boolean(false) : ignore_malfunc);
     model.addAttribute("ctfilter", (ctfilter == null) ? new Boolean(false) : ctfilter);
+    model.addAttribute("pcsid", (pcsid == null) ? "" : pcsid);
+    model.addAttribute("xscale", (xscale == null) ? new Double(2000.0) : xscale);
+    model.addAttribute("yscale", (yscale == null) ? new Double(2000.0) : yscale);
+    
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
@@ -500,7 +507,8 @@ public class Site2dRoutesController {
     double dyscale = (yscale != null) ? yscale.doubleValue() : 2000.0;
     if (newsources.size() <= 0) {
       emessage = "You must specify at least one source.";
-    } else if (area == null && pcsid == null) {
+    } else if ((area == null || area.trim().equals("")) && 
+        (pcsid == null || pcsid.trim().equals(""))) {
       emessage = "You must specify one of pcsid or area";
     }
     if (prodpar != null) {
