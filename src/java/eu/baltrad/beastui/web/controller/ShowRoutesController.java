@@ -97,6 +97,8 @@ public class ShowRoutesController {
       return "redirect:route_create_wrwp.htm";
     } else if (operation != null && operation.equals("ScanSun")) {
       return "redirect:route_create_scansun.htm";
+    } else if (operation != null && operation.equals("Site2D")) {
+      return "redirect:route_create_site2d.htm";
     }
     model.addAttribute("emessage", "Unknown operation: '"+operation+"'");
     return "redirect:routes.htm";
@@ -132,6 +134,8 @@ public class ShowRoutesController {
         result = "redirect:route_show_wrwp.htm";
       } else if (type.equals("blt_scansun")) {
         result = "redirect:route_show_scansun.htm";
+      } else if (type.equals("blt_site2d")) {
+        result = "redirect:route_show_site2d.htm";
       }
 
       if (result != null) {

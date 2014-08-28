@@ -106,6 +106,9 @@ List of routes
                                                 <c:when test="${route.ruleType == 'blt_scansun'}">
                                                     <c:out value="ScanSun"/>
                                                 </c:when>
+                                                <c:when test="${route.ruleType == 'blt_site2d'}">
+                                                    <c:out value="Site2D"/>
+                                                </c:when>
                                                 <c:otherwise>
                                                     <c:out value="${route.ruleType}"/>
                                                 </c:otherwise>

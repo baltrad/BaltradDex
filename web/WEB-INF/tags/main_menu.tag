@@ -68,6 +68,9 @@
                             Create composite</a>
                     </li>
                     <li>
+                        <a href="route_create_site2d.htm">Create Site2D</a>
+                    </li>
+                    <li>
                         <a href="route_create_google_map.htm">
                             Create Google map</a>
                     </li>
