@@ -160,7 +160,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fail unless="javahdf.lib.available" 
             message="javahdf.path must specify the installation dir of hdf-java" />   
 </target>        
-        
+
 <target name="init" depends="dep-check">
     <!-- create directory structure -->
     <delete dir="${build.dir}"/>
@@ -301,7 +301,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="authenticationContext.xml" />
         <include name="baltraddex-servlet.xml" />
         <include name="web.xml" />
-	<include name="bdb.xml" />
+        <include name="bdb.xml" />
         <include name="jsp/**/*.jsp" />
         <include name="tags/**/*.tag" />
         <include name="**/*.tld" />
@@ -316,10 +316,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </fileset>
     </copy>
 
-    <!-- First copy the dex version of the beast-log messages.xml into the classpath -->
+    <!-- First copy the dex version of the beast-log-messages.xml and the odim_quantities.xml into the classpath -->
     <copy todir="${build.classes.dir}">
       <fileset dir="${etc.dir}">
-        <include name="beast-log-messages.xml"/>
+        <include name="beast-log-messages.xml" />
+      	<include name="odim_quantities.xml" />
       </fileset>
     </copy>
   	
@@ -327,6 +328,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <copy todir="${build.classes.dir}" overwrite="true">
       <fileset dir="${beast.path}/etc"> 
     	<include name="beast-log-messages.xml"/>
+    	<include name="odim_quantities.xml"/>
       </fileset>
     </copy>
 </target>
@@ -378,7 +380,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <arg value="${hostname}"/>    
     </exec>
   </target>
-
 
   <!-- UNIT TEST PART -->
   

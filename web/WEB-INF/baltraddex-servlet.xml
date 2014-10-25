@@ -467,13 +467,28 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- The beast reporter that will send error messages so that they are presented in dex system messages -->
     <bean id="alertreporter" class="eu.baltrad.beast.log.AlertMessageReporter" autowire="byType" /> 
 
+    <!-- To get proper naming support in the distribution rule -->
+    <bean name="quantityHexNameCreator" class="eu.baltrad.beast.rules.namer.QuantityHexNameCreator">
+      <constructor-arg value="classpath:odim_quantities.xml"/>
+    </bean>
+
+    <bean name="metadataNameCreatorFactory" class="eu.baltrad.beast.rules.namer.MetadataNameCreatorFactory">
+      <property name="creators">
+        <list>
+          <ref bean="quantityHexNameCreator"/>
+        </list>
+      </property>
+    </bean>    
+
     <!-- Create the router -->
     <bean id="groovymgr" class="eu.baltrad.beast.rules.groovy.GroovyRuleManager" autowire="byType"/>
     <bean id="bltcompositemgr" class="eu.baltrad.beast.rules.composite.CompositingRuleManager" autowire="byType"/>
     <bean id="bltsite2dmgr" class="eu.baltrad.beast.rules.site2d.Site2DRuleManager" autowire="byType"/>
     <bean id="bltgmapmgr" class="eu.baltrad.beast.rules.gmap.GoogleMapRuleManager" autowire="byType" />
     <bean id="bltvolumemgr" class="eu.baltrad.beast.rules.volume.VolumeRuleManager" autowire="byType"/>
-    <bean id="distributionRuleManager" class="eu.baltrad.beast.rules.dist.DistributionRuleManager" autowire="byType"/>
+    <bean id="distributionRuleManager" class="eu.baltrad.beast.rules.dist.DistributionRuleManager" autowire="byType">
+      <property name="metadataNameCreatorFactory" ref="metadataNameCreatorFactory"/>
+    </bean>
     <bean id="bdbtrimagemgr" class="eu.baltrad.beast.rules.bdb.BdbTrimAgeRuleManager" autowire="byType"/>
     <bean id="bdbtrimcountmgr" class="eu.baltrad.beast.rules.bdb.BdbTrimCountRuleManager" autowire="byType"/>
     <bean id="bltacrrmgr" class="eu.baltrad.beast.rules.acrr.AcrrRuleManager" autowire="byType" />
