@@ -471,11 +471,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="quantityHexNameCreator" class="eu.baltrad.beast.rules.namer.QuantityHexNameCreator">
       <constructor-arg value="classpath:odim_quantities.xml"/>
     </bean>
-
+	<bean name="formattableDateTimeNameCreator" class="eu.baltrad.beast.rules.namer.FormattableDateTimeNameCreator" />
+	
     <bean name="metadataNameCreatorFactory" class="eu.baltrad.beast.rules.namer.MetadataNameCreatorFactory">
       <property name="creators">
         <list>
           <ref bean="quantityHexNameCreator"/>
+          <ref bean="formattableDateTimeNameCreator"/>
         </list>
       </property>
     </bean>    
