@@ -53,7 +53,7 @@ import java.util.List;
  */
 public class LogManager implements ILogManager {
     
-    private final static String DATE_FORMAT = "yyyy/MM/dd HH:mm:ss";
+    private final static String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
     
     /** JDBC template */
     private SimpleJdbcOperations jdbcTemplate;

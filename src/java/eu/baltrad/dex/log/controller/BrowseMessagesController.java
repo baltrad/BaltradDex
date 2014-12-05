@@ -108,40 +108,9 @@ public class BrowseMessagesController {
             @RequestParam(value="phrase", required=false) String phrase)
                 throws Exception {
         
-        LogParameter logParameter = new LogParameter();
-        if (logger != null) {
-            logParameter.setLogger(logger);
-        }
-        if (level != null) {
-            logParameter.setLevel(level);
-        }
-        if (startDate != null) {
-            logParameter.setStartDate(startDate);
-        }
-        if (startHour != null) {
-            logParameter.setStartHour(startHour);
-        }
-        if (startMinutes != null) {
-            logParameter.setStartMinutes(startMinutes);
-        }
-        if (startSeconds != null) {
-            logParameter.setStartSeconds(startSeconds);
-        }
-        if (endDate != null) {
-            logParameter.setEndDate(endDate);
-        }
-        if (endHour != null) {
-            logParameter.setEndHour(endHour);
-        }
-        if (endMinutes != null) {
-            logParameter.setEndMinutes(endMinutes);
-        }
-        if (endSeconds != null) {
-            logParameter.setEndSeconds(endSeconds);
-        }
-        if (phrase != null) {
-            logParameter.setPhrase(phrase);
-        }
+        LogParameter logParameter = createLogParameter(logger, level,
+            startDate, startHour, startMinutes, startSeconds, endDate, endHour,
+            endMinutes, endSeconds, phrase);
         
         List<LogEntry> entries = null;
         
@@ -181,6 +150,47 @@ public class BrowseMessagesController {
         model.addAttribute(MESSAGES_KEY, entries);
         model.addAttribute(LOG_PARAMETER_KEY, logParameter);
         return FORM_VIEW;
+    }
+
+    protected LogParameter createLogParameter(String logger, String level,
+        String startDate, String startHour, String startMinutes,
+        String startSeconds, String endDate, String endHour, String endMinutes,
+        String endSeconds, String phrase) {
+      LogParameter logParameter = new LogParameter();
+      if (logger != null) {
+          logParameter.setLogger(logger);
+      }
+      if (level != null) {
+          logParameter.setLevel(level);
+      }
+      if (startDate != null) {
+          logParameter.setStartDate(startDate);
+      }
+      if (startHour != null) {
+          logParameter.setStartHour(startHour);
+      }
+      if (startMinutes != null) {
+          logParameter.setStartMinutes(startMinutes);
+      }
+      if (startSeconds != null) {
+          logParameter.setStartSeconds(startSeconds);
+      }
+      if (endDate != null) {
+          logParameter.setEndDate(endDate);
+      }
+      if (endHour != null) {
+          logParameter.setEndHour(endHour);
+      }
+      if (endMinutes != null) {
+          logParameter.setEndMinutes(endMinutes);
+      }
+      if (endSeconds != null) {
+          logParameter.setEndSeconds(endSeconds);
+      }
+      if (phrase != null) {
+          logParameter.setPhrase(phrase);
+      }
+      return logParameter;
     }
     
     /**
@@ -224,7 +234,7 @@ public class BrowseMessagesController {
      * @param param Log parameter
      * @return Numbers of first, last and current page for a log parameter 
      */
-    private int[] getPages(LogParameter param) throws Exception {
+    protected int[] getPages(LogParameter param) throws Exception {
         long numEntries = logManager.count(logManager.createQuery(param, true));
         int numPages = (int) Math.ceil(numEntries / ENTRIES_PER_PAGE);
         if ((numPages * ENTRIES_PER_PAGE) < numEntries) {

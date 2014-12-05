@@ -23,6 +23,28 @@ Author     : szewczenko
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 
+<script type="text/javascript">
+function validateForm() {
+    var start_date = document.getElementById("start_date").value;
+    var end_date = document.getElementById("end_date").value;
+    var pattern = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
+    
+    if (Date.parse(start_date) === NaN || !pattern.test(start_date)) {
+      alert("Start date must be in the format yyyy-MM-dd");
+      document.getElementById("start_date").focus();
+      return false;
+    }
+    
+    if (Date.parse(end_date) === NaN || !pattern.test(end_date)) {
+      alert("End date must be in the format yyyy-MM-dd");
+      document.getElementById("end_date").focus();
+      return false;
+    }
+    
+    return true;
+}
+</script>
+
 <t:generic_page pageTitle="Browse messages">
     <jsp:body>
         <div class="system-log">
@@ -39,7 +61,7 @@ Author     : szewczenko
                     Use parameters below to define search criteria and browse
                     messages.
                 </div>
-                <form:form method="POST" commandName="log_parameter">
+                <form:form name="messages_browser_form" method="POST" commandName="log_parameter" onsubmit="return validateForm()">
                     <div class="row">
                         <div class="leftcol">
                             <div class="label">
@@ -56,8 +78,7 @@ Author     : szewczenko
                                 Start date
                             </div>
                             <form:input path="startDate" id="start_date"
-                                    title="Start date of message timespan" 
-                                    readonly="true"/>
+                                    title="Start date of message timespan"/>
                             <img src="includes/images/cal.gif" 
                                  onclick="javascript:NewCssCal(
                                  'start_date','yyyyMMdd','arrow',false,'24',false)" 
@@ -96,8 +117,7 @@ Author     : szewczenko
                                 End date
                             </div>
                             <form:input path="endDate" id="end_date"
-                                    title="End date of message timespan"
-                                    readonly="true"/>
+                                    title="End date of message timespan"/>
                             <img src="includes/images/cal.gif" 
                                  onclick="javascript:NewCssCal(
                                  'end_date','yyyyMMdd','arrow',false,'24',false)" 
