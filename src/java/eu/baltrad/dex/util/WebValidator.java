@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.util;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -154,6 +156,24 @@ public class WebValidator {
             }
         }
         return result;
+    }
+    
+    /**
+     * Validates a date string
+     * @param dateFormat the expected date format
+     * @param dateString the date string that should match the format
+     * @return True if successful
+     */
+    public static boolean validateDateString(String dateFormat, String dateString) {
+      boolean result = validate(dateString);
+      if (result) {
+        try {
+          new SimpleDateFormat(dateFormat).parse(dateString);
+        } catch (ParseException pe) {
+          result = false;
+        }
+      }
+      return result;
     }
     
 }

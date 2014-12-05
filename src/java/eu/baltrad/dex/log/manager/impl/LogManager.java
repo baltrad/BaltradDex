@@ -26,6 +26,7 @@ import eu.baltrad.dex.log.model.mapper.LogEntryMapper;
 import eu.baltrad.dex.log.model.impl.LogEntry;
 import eu.baltrad.dex.log.model.impl.LogParameter;
 import static eu.baltrad.dex.util.WebValidator.validate;
+import static eu.baltrad.dex.util.WebValidator.validateDateString;
 
 import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -52,8 +53,9 @@ import java.util.List;
  * @since 0.6.6
  */
 public class LogManager implements ILogManager {
+    private final static String DATE_FORMAT = "yyyy-MM-dd";
     
-    private final static String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private final static String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     
     /** JDBC template */
     private SimpleJdbcOperations jdbcTemplate;
@@ -67,7 +69,7 @@ public class LogManager implements ILogManager {
      */
     public LogManager() {
         this.mapper = new LogEntryMapper();
-        this.format = new SimpleDateFormat(DATE_FORMAT); 
+        this.format = new SimpleDateFormat(DATE_TIME_FORMAT); 
     }
     
     /**
@@ -106,7 +108,7 @@ public class LogManager implements ILogManager {
                 hasParameters = true;
             }
         }
-        if (validate(param.getStartDate())) {
+        if (validateDateString(DATE_FORMAT, param.getStartDate())) {
             String startDate = param.getStartDate();
             if (validate(param.getStartHour())) {
                 startDate += " " + param.getStartHour() + ":";
@@ -132,7 +134,7 @@ public class LogManager implements ILogManager {
                 hasParameters = true;
             }
         }
-        if (validate(param.getEndDate())) {
+        if (validateDateString(DATE_FORMAT, param.getEndDate())) {
             String endDate = param.getEndDate();
             if (validate(param.getEndHour())) {
                 endDate += " " + param.getEndHour() + ":";

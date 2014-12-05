@@ -187,11 +187,11 @@ public class LogManagerTest extends TestCase {
     
     public void testLoadByDate() throws Exception {
         LogParameter param = new LogParameter();
-        param.setStartDate("2012/08/24");
+        param.setStartDate("2012-08-24");
         param.setStartHour("11");
         param.setStartMinutes("0");
         param.setStartSeconds("0");
-        param.setEndDate("2012/08/24");
+        param.setEndDate("2012-08-24");
         param.setEndHour("11");
         param.setEndMinutes("30");
         param.setEndSeconds("0");
@@ -220,11 +220,11 @@ public class LogManagerTest extends TestCase {
         LogParameter param = new LogParameter();
         param.setLogger("DEX");
         param.setLevel("INFO");
-        param.setStartDate("2012/08/24");
+        param.setStartDate("2012-08-24");
         param.setStartHour("10");
         param.setStartMinutes("40");
         param.setStartSeconds("0");
-        param.setEndDate("2012/08/24");
+        param.setEndDate("2012-08-24");
         param.setEndHour("11");
         param.setEndMinutes("30");
         param.setEndSeconds("0");
