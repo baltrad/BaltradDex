@@ -24,23 +24,25 @@ Author     : szewczenko
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
 
 <script type="text/javascript">
+var navigation_button_clicked=false;
+
 function validateForm() {
     var start_date = document.getElementById("start_date").value;
     var end_date = document.getElementById("end_date").value;
     var pattern = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
+    if (!navigation_button_clicked) {
+        if (start_date && (Date.parse(start_date) === NaN || !pattern.test(start_date))) {
+            alert("Start date must be in the format yyyy-MM-dd");
+            document.getElementById("start_date").focus();
+            return false;
+        }
     
-    if (Date.parse(start_date) === NaN || !pattern.test(start_date)) {
-      alert("Start date must be in the format yyyy-MM-dd");
-      document.getElementById("start_date").focus();
-      return false;
+        if (end_date && (Date.parse(end_date) === NaN || !pattern.test(end_date))) {
+            alert("End date must be in the format yyyy-MM-dd");
+            document.getElementById("end_date").focus();
+            return false;
+        }
     }
-    
-    if (Date.parse(end_date) === NaN || !pattern.test(end_date)) {
-      alert("End date must be in the format yyyy-MM-dd");
-      document.getElementById("end_date").focus();
-      return false;
-    }
-    
     return true;
 }
 </script>
@@ -159,9 +161,9 @@ function validateForm() {
                     </div>
                     <div id="scroll">
                         <div class="leftcol">
-                            <input type="submit" name="selected_page" value="<<"
+                            <input type="submit" name="selected_page" onclick="navigation_button_clicked=true;" value="<<"
                                    title="First page">
-                            <input type="submit" name="selected_page" value="<"
+                            <input type="submit" name="selected_page" onclick="navigation_button_clicked=true;" value="<"
                                    title="Previous page">
 						</div>
 						<div class="midcol">
@@ -174,20 +176,22 @@ function validateForm() {
                                                       font-size: 14px;" 
                                                type="submit" 
                                                name="selected_page" 
+                                               onclick="navigation_button_clicked=true;"
                                                value="${i}">
                                     </c:when>
                                     <c:otherwise>
                                         <input type="submit" 
-                                               name="selected_page" 
+                                               name="selected_page"
+                                               onclick="navigation_button_clicked=true;" 
                                                value="${i}">
                                     </c:otherwise>
                                 </c:choose>
                             </c:forEach>
 						</div>
 						<div class="rightcol">
-                            <input type="submit" name="selected_page" value=">"
+                            <input type="submit" name="selected_page" onclick="navigation_button_clicked=true;" value=">"
                                    title="Next page">
-                            <input type="submit" name="selected_page" value=">>"
+                            <input type="submit" name="selected_page" onclick="navigation_button_clicked=true;" value=">>"
                                    title="Last page">
 						</div>
                     </div>
