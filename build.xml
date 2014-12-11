@@ -731,12 +731,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     
     
     <!-- Generate source code documentation -->
-    <target name="doc" description="Generates source code documentation">
-        <taskdef name="doxygen"  classname="org.doxygen.tools.DoxygenTask" 
-                 classpathref="doxygen.classpath"/>
-        <mkdir dir="${doxygen.dir}"/>
+    <target name="doxygen-doc" description="Generates doxygen documentation">
+      <taskdef name="doxygen"  classname="org.doxygen.tools.DoxygenTask" classpathref="doxygen.classpath"/>
+      <mkdir dir="${doxygen.dir}"/>
+      <doxygen configFilename="${basedir}/doxygen/dex_doxygen.cfg"/>
+      <echo message="Doxygen documentation created in ${doxygen.dir}"/>
+    </target>
+  
+    <target name="javadoc-doc" description="Generates source code documentation">
         <mkdir dir="${javadoc.dir}"/>
-        <doxygen configFilename="${basedir}/doxygen/dex_doxygen.cfg"/>
         <javadoc packagenames="eu.baltrad.*" 
                  sourcepath="${src.dir}"
                  destdir="${javadoc.dir}"
@@ -752,8 +755,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
                     and Water Management</i>]]></bottom>
             <classpath refid="lib.path"/>         
         </javadoc>
-        <echo message="Doxygen documentation created in ${doxygen.dir}"/>
         <echo message="Javadoc documentation created in ${javadoc.dir}"/>
     </target>
+  
+    <target name="doc" depends="javadoc-doc,doxygen-doc" />
 </project>
 
