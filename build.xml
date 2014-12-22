@@ -245,7 +245,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="jackson-core-lgpl-1.8.2.jar"/>
         <include name="jackson-mapper-lgpl-1.8.2.jar"/>
         <include name="quartz-1.8.3.jar"/>
-        <include name="sshj-0.3.1.jar"/>
+        <include name="sshj-0.8.1.jar"/>
         <include name="ws-commons-util-1.0.2.jar"/>
         <include name="xmlrpc-client-3.1.2.jar"/>
         <include name="xmlrpc-common-3.1.2.jar"/>
