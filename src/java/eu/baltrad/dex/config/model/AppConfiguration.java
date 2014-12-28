@@ -415,6 +415,5 @@ public class AppConfiguration {
     public void setConnTimeout(String connTimeout) {
         this.connTimeout = connTimeout;
     }
-  
 }
 

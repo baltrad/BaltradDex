@@ -21,6 +21,9 @@
 
 package eu.baltrad.dex.config.controller;
 
+import java.util.Arrays;
+import java.util.List;
+
 import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.config.validator.MessagesConfigurationValidator;
@@ -136,6 +139,11 @@ public class MessagesConfigurationController {
         return FORM_VIEW;
     }
 
+    @ModelAttribute("scroll_ranges")
+    public List<String> getNodeTypes() {
+        return Arrays.asList(new String[]{"5","7","9","11"});
+    }
+    
     /**
      * @param configManager the configManager to set
      */

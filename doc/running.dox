@@ -799,13 +799,18 @@ number or age of delivery registry entries instead, as described above.
 <tt>System messages</tt> settings allow to keep track of the number of log 
 entries stored in the system. Click \p Messages to expand 
 available options. \p Configure option allows to set maximum number of log
-entries or maximum age of log entries. See the image below.      
+entries or maximum age of log entries. You are also able to configure the
+number of pages to see in the message browser scroll bar. See the image below.      
 
 \image html messages_settings.png
 
 The <tt>Set active</tt> checkbox activates selected limit. If both checkboxes 
 are checked, log entries will be deleted based on both maximum number and 
 maximum age of log entries, whichever criterion is met. 
+\n
+If you are having problems seeing the full navigation bar in the browse messages 
+view you are able to configure the number of selectable pages in the navigation
+bar by changing the \p Scroll \p range setting.
 \n
 \n
 \p Clear option allows to immediately remove all log entries. This option should

@@ -38,7 +38,8 @@ public class LogConfiguration {
     public static final String MAX_DAYS = "messages.max_age_days";
     public static final String MAX_HOURS = "messages.max_age_hours";
     public static final String MAX_MINUTES = "messages.max_age_minutes";
-    
+    public static final String MESSAGE_BROWSER_SCROLL_RANGE = "messages.browser.scroll.range";
+
     /** Trim by number toggle */
     private String msgTrimByNumber;
     /** Trim by age toggle */
@@ -51,6 +52,8 @@ public class LogConfiguration {
     private String msgMaxAgeHours;
     /** Age limit - number of minutes */
     private String msgMaxAgeMinutes;
+    /** Scroll range in the messages browser window */
+    private String messageBrowserScrollRange = "11";
 
     /**
      * Constructor.
@@ -68,6 +71,7 @@ public class LogConfiguration {
         this.msgMaxAgeDays = props.getProperty(MAX_DAYS);
         this.msgMaxAgeHours = props.getProperty(MAX_HOURS);
         this.msgMaxAgeMinutes = props.getProperty(MAX_MINUTES);
+        this.setMessageBrowserScrollRange(props.getProperty(MESSAGE_BROWSER_SCROLL_RANGE, "11"));
     }
     
     /**
@@ -93,7 +97,9 @@ public class LogConfiguration {
                 this.getMsgMaxAgeHours() != null && 
                 this.getMsgMaxAgeHours().equals(conf.getMsgMaxAgeHours()) &&
                 this.getMsgMaxAgeMinutes() != null &&
-                this.getMsgMaxAgeMinutes().equals(conf.getMsgMaxAgeMinutes());
+                this.getMsgMaxAgeMinutes().equals(conf.getMsgMaxAgeMinutes()) &&
+                this.getMessageBrowserScrollRange() != null &&
+                this.getMessageBrowserScrollRange().equals(conf.getMessageBrowserScrollRange());
     }
     
     /**
@@ -116,6 +122,9 @@ public class LogConfiguration {
                 0 : this.getMsgMaxAgeHours().hashCode());
         result = prime * result + (this.getMsgMaxAgeMinutes() == null ? 
                 0 : this.getMsgMaxAgeMinutes().hashCode());
+        result = prime * result + ((this.getMessageBrowserScrollRange() == null) ?
+            0 : this.getMessageBrowserScrollRange().hashCode());
+        
         return result;
     }
 
@@ -202,5 +211,13 @@ public class LogConfiguration {
     public void setMsgMaxAgeMinutes(String msgMaxAgeMinutes) {
         this.msgMaxAgeMinutes = msgMaxAgeMinutes;
     }
-    
+
+    public String getMessageBrowserScrollRange() {
+      return messageBrowserScrollRange;
+    }
+
+    public void setMessageBrowserScrollRange(String messageBrowserScrollRange) {
+      this.messageBrowserScrollRange = messageBrowserScrollRange;
+    }
+  
 }

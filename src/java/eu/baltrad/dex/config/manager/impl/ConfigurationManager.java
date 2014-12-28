@@ -258,6 +258,10 @@ public class ConfigurationManager implements IConfigurationManager,
                     conf.getMsgMaxAgeHours());
             props.setProperty(LogConfiguration.MAX_MINUTES, 
                     conf.getMsgMaxAgeMinutes());
+            props.setProperty(LogConfiguration.MESSAGE_BROWSER_SCROLL_RANGE,
+                conf.getMessageBrowserScrollRange() == null ?
+                    props.getProperty(LogConfiguration.MESSAGE_BROWSER_SCROLL_RANGE)
+                    : conf.getMessageBrowserScrollRange());
             saveProperties(props);
             this.logConf = new LogConfiguration(props);
         } catch( Exception e ) {

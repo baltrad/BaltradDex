@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.log.controller;
 
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
+import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.log.manager.impl.LogManager;
 import eu.baltrad.dex.log.model.impl.LogEntry;
 import eu.baltrad.dex.log.model.impl.LogParameter;
@@ -51,6 +53,7 @@ public class BrowseMessagesController {
     public final static int ENTRIES_PER_PAGE = 20;
     /** Number of pages in the scroll bar, must be an odd number >= 3 */
     public final static int SCROLL_RANGE = 11;
+    
     /** Drop down lists */ 
     private static final String[] LEVELS = {"INFO", "WARN", "ERROR"};
     private static final String[] LOGGERS = {"DEX", "BEAST", "PGF"};
@@ -66,6 +69,7 @@ public class BrowseMessagesController {
     private static final String CURRENT_PAGE_KEY = "current_page";
     
     private LogManager logManager;
+    private ConfigurationManager configManager;
     
     /** Current page number */
     private static int currentPage;
@@ -240,28 +244,41 @@ public class BrowseMessagesController {
         if ((numPages * ENTRIES_PER_PAGE) < numEntries) {
             ++numPages;
         }
+        int scrollRange = getMessageBrowserScrollRange();
         if (numPages < 1) {
             numPages = 1;
         }
         int curPage = getCurrentPage();
-        int scrollStart = (SCROLL_RANGE - 1) / 2;
+        int scrollStart = (scrollRange - 1) / 2;
         int firstPage = 1;
-        int lastPage = SCROLL_RANGE;
-        if (numPages <= SCROLL_RANGE && curPage <= SCROLL_RANGE) {
+        int lastPage = scrollRange;
+        if (numPages <= scrollRange && curPage <= scrollRange) {
             firstPage = 1;
             lastPage = numPages;
         }
-        if (numPages > SCROLL_RANGE && curPage > scrollStart 
+        if (numPages > scrollRange && curPage > scrollStart 
                 && curPage < numPages - scrollStart) {
             firstPage = curPage - scrollStart;
             lastPage = curPage + scrollStart;
         }
-        if (numPages > SCROLL_RANGE && curPage > scrollStart 
-                && curPage >= numPages - (SCROLL_RANGE - 1)) {
-            firstPage = numPages - (SCROLL_RANGE - 1);
+        if (numPages > scrollRange && curPage > scrollStart 
+                && curPage >= numPages - (scrollRange - 1)) {
+            firstPage = numPages - (scrollRange - 1);
             lastPage = numPages;
         }
         return new int[] {firstPage, lastPage, curPage};
+    }
+    
+    public int getMessageBrowserScrollRange() {
+      LogConfiguration conf = configManager.getLogConf();
+      if (conf != null) {
+        try {
+          return Integer.parseInt(conf.getMessageBrowserScrollRange());
+        } catch (Exception e) {
+          // pass
+        }
+      }
+      return SCROLL_RANGE;
     }
     
     /**
@@ -333,4 +350,11 @@ public class BrowseMessagesController {
         this.logManager = logManager;
     }
     
+    /**
+     * @param configManager the configManager to set
+     */
+    @Autowired
+    public void setConfigManager(ConfigurationManager configManager) {
+        this.configManager = configManager;
+    }
 }

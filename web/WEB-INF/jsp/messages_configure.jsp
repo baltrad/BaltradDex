@@ -95,6 +95,25 @@ Author     : szewczenko
                                                value="true"/>
                             </div>
                         </div>
+                        <div class="section" id="messagebrowsersettings">Browse message settings</div>
+                        <div class="row">
+                            <div class="leftcol">Scroll range:</div>
+                            <div class="rightcol">
+<!--
+                                <form:input path="messageBrowserScrollRange" 
+                                            title="The scroll range, must be an odd number &ge; 3"/>
+-->
+                                <form:select path="messageBrowserScrollRange" 
+                                             title="Select browser scroll range">
+                                    <form:options items="${scroll_ranges}"/>
+                                </form:select>
+
+                                <form:errors path="messageBrowserScrollRange" 
+                                             cssClass="error"/>
+                                             
+                            </div>
+                        </div>
+                        
                     </div>
                     <div class="table-footer">
                         <div class="buttons">
