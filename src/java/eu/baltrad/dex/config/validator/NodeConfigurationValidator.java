@@ -83,9 +83,6 @@ public class NodeConfigurationValidator implements Validator {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "countryCode", 
                 "saveconf.missing.organization_address",
                 messages.getMessage("saveconf.missing.country_code"));
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "timeZone", 
-                "saveconf.missing.time_zone",
-                messages.getMessage("saveconf.missing.time_zone"));
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "workDir", 
                 "saveconf.missing.work_directory",
                 messages.getMessage("saveconf.missing.work_directory"));

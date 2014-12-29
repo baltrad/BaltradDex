@@ -56,7 +56,6 @@ public class ConfigurationManagerTest extends TestCase {
         props.setProperty("organization.locality", "Locality"); 
         props.setProperty("organization.state", "State");
         props.setProperty("organization.country_code", "XX");
-        props.setProperty("time.zone", "CEST Central European Time UTC+1");
         props.setProperty("work.directory", "work");
         props.setProperty("images.directory", "images");
         props.setProperty("thumbnails.directory", "thumbs");

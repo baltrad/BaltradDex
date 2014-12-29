@@ -63,7 +63,6 @@ public class NodeConfigurationController {
     private static final String FORM_VIEW = "node_settings";
     private static final String CONF_KEY = "config";
     
-    private static final String TIMEZONES_FILE = "conf/timezones_eu.txt";
     private static final String[] NODE_TYPES = {"Primary", "Backup"};
     
     private static final String SAVE_CONF_OK_MSG_KEY = "saveconf.success";
@@ -167,27 +166,6 @@ public class NodeConfigurationController {
         return Arrays.asList(NODE_TYPES);
     }
     
-    /**
-     * Get time zones.
-     * @return List of European time zones
-     */
-    @ModelAttribute("time_zones")
-    public List<String> getTimeZones() {
-        List<String> timeZones = new ArrayList<String>();
-        try {
-            InputStreamReader isr = new InputStreamReader(
-                    this.getClass().getResource(TIMEZONES_FILE).openStream());
-            BufferedReader br = new BufferedReader(isr);
-            String strLine;
-            while ((strLine = br.readLine()) != null) {
-                timeZones.add(strLine);
-            }
-        } catch (IOException e) {
-            log.error("Failed to load time zones configuration file", e);
-        }
-        return timeZones;
-    }
-   
     /**
      * @param configurationManager 
      */

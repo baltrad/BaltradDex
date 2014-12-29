@@ -40,7 +40,6 @@ public class AppConfiguration {
     public static final String LOCALITY = "organization.locality";
     public static final String STATE = "organization.state";
     public static final String COUNTRY_CODE = "organization.country_code";
-    public static final String TIME_ZONE = "time.zone";
     public static final String ADMIN_EMAIL = "admin.email";
     public static final String WORK_DIR = "work.directory";
     public static final String IMAGES_DIR = "images.directory";
@@ -58,7 +57,6 @@ public class AppConfiguration {
     private String locality;
     private String state;
     private String countryCode;
-    private String timeZone;
     private String adminEmail;
     private String workDir;
     private String imagesDir;
@@ -86,7 +84,6 @@ public class AppConfiguration {
         this.locality = props.getProperty(LOCALITY);
         this.state = props.getProperty(STATE);
         this.countryCode = props.getProperty(COUNTRY_CODE);
-        this.timeZone = props.getProperty(TIME_ZONE);
         this.adminEmail = props.getProperty(ADMIN_EMAIL);
         this.workDir = props.getProperty(WORK_DIR);
         this.imagesDir = props.getProperty(IMAGES_DIR);
@@ -125,8 +122,6 @@ public class AppConfiguration {
                 this.getState().equals(conf.getState()) &&
                 this.getCountryCode() != null &&
                 this.getCountryCode().equals(conf.getCountryCode()) &&
-                this.getTimeZone() != null &&
-                this.getTimeZone().equals(conf.getTimeZone()) &&
                 this.getAdminEmail() != null &&
                 this.getAdminEmail().equals(conf.getAdminEmail()) &&
                 this.getWorkDir() != null &&
@@ -157,8 +152,6 @@ public class AppConfiguration {
                 0 : this.getState().hashCode());
         result = prime * result + ((this.getCountryCode() == null) ? 
                 0 : this.getCountryCode().hashCode());
-        result = prime * result + ((this.getTimeZone() == null) ? 
-                0 : this.getTimeZone().hashCode());
         result = prime * result + ((this.getAdminEmail() == null) ? 
                 0 : this.getAdminEmail().hashCode());
         result = prime * result + ((this.getWorkDir() == null) ? 
@@ -288,20 +281,6 @@ public class AppConfiguration {
      */
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
-    }
-
-    /**
-     * @return the timeZone
-     */
-    public String getTimeZone() {
-        return timeZone;
-    }
-
-    /**
-     * @param timeZone the timeZone to set
-     */
-    public void setTimeZone(String timeZone) {
-        this.timeZone = timeZone;
     }
 
     /**

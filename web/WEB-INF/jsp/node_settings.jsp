@@ -119,18 +119,6 @@ Author     : szewczenko
                                             title="2-letter country code"/>
                                 <form:errors path="countryCode" cssClass="error"/>
                             </div>
-                        </div>         
-                        <div class="row">
-                            <div class="leftcol">
-                                Time zone:
-                            </div>
-                            <div class="rightcol">
-                                <form:select path="timeZone" 
-                                             title="Select time zone">
-                                    <form:options items="${time_zones}"/>
-                                </form:select> 
-                                <form:errors path="timeZone" cssClass="error" />
-                            </div>
                         </div>
                         <div class="row">
                             <div class="leftcol">

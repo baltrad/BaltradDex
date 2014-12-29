@@ -202,8 +202,6 @@ public class ConfigurationManager implements IConfigurationManager,
             props.setProperty(AppConfiguration.STATE, conf.getState());
             props.setProperty(AppConfiguration.COUNTRY_CODE, 
                     conf.getCountryCode());
-            props.setProperty(AppConfiguration.TIME_ZONE, 
-                    conf.getTimeZone());
             props.setProperty(AppConfiguration.ADMIN_EMAIL, 
                     conf.getAdminEmail());
             props.setProperty(AppConfiguration.WORK_DIR, conf.getWorkDir());
