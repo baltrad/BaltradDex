@@ -89,7 +89,15 @@ Modifie or delete a volume route
                                 <input type="text" name="maxe" value="${maxe}"
                                        title="Specify maximum elevation angle"/>
                             </div>
-                        </div>         
+                        </div>
+                        <div class="row2">
+                            <div class="leftcol">Elevation angles:</div>
+                            <div class="rightcol">
+                                <input type="text" name="elangles" 
+                                       value="${elangles}"
+                                       title="Comma separated list of elevation angles in format x.y"/>
+                            </div>
+                        </div>                                 
                         <div class="row2">
                             <div class="leftcol">Recipients:</div>
                             <div class="rightcol">

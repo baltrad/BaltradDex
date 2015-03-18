@@ -30,6 +30,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
         Boolean ascending, 
         Double mine, 
         Double maxe,
+        String elangles,
         List<String> recipients, 
         Integer interval, 
         Integer timeout, 
@@ -48,6 +49,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
         Boolean ascending, 
         Double mine, 
         Double maxe,
+        String elangles,
         List<String> recipients,
         Integer interval,
         Integer timeout,
@@ -59,6 +61,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
         boolean ascending, 
         double mine, 
         double maxe, 
+        String elangles,
         int interval, 
         List<String> sources, 
         List<String> detectors, 
@@ -73,6 +76,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
         Boolean ascending,
         Double mine,
         Double maxe,
+        String elangles,
         List<String> recipients,
         Integer interval,
         Integer timeout,
@@ -106,13 +110,14 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
           Boolean ascending, 
           Double mine, 
           Double maxe,
+          String elangles,
           List<String> recipients, 
           Integer interval, 
           Integer timeout, 
           List<String> sources,
           List<String> detectors,
           String emessage) {
-        return methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage);
+        return methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, emessage);
       }
       
       protected String viewShowRoutes(Model model,
@@ -129,6 +134,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
           Boolean ascending, 
           Double mine, 
           Double maxe,
+          String elangles,
           List<String> recipients,
           Integer interval,
           Integer timeout,
@@ -136,18 +142,19 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
           List<String> detectors, 
           String emessage) {
         return methodMock.viewShowRoute(model, name, author, active,
-            description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage);
+            description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, emessage);
       }
       
       protected VolumeRule createRule(
           boolean ascending, 
           double mine, 
           double maxe, 
+          String elangles,
           int interval, 
           List<String> sources, 
           List<String> detectors, 
           int timeout) {
-        return methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout);
+        return methodMock.createRule(ascending, mine, maxe, elangles, interval, sources, detectors, timeout);
       }
       
       protected String modifyRoute(
@@ -159,12 +166,13 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
           Boolean ascending,
           Double mine,
           Double maxe,
+          String elangles,
           List<String> recipients,
           Integer interval,
           Integer timeout,
           List<String> sources,
           List<String> detectors) {
-        return methodMock.modifyRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
+        return methodMock.modifyRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors);
       }
     };
     classUnderTest.setManager(manager);
@@ -189,11 +197,11 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
-    expect(methodMock.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null)).andReturn("route_create_volume");
+    expect(methodMock.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null, null)).andReturn("route_create_volume");
     
     replayAll();
 
-    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null, null, null, null);
+    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
     verifyAll();
     assertEquals("route_create_volume", result);
@@ -209,7 +217,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
 
     replayAll();
 
-    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null, null, null, null);
+    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
     verifyAll();
     assertEquals("redirect:adaptors.htm", result);
@@ -228,6 +236,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     Boolean ascending = true;
     Double mine = 0.5;
     Double maxe = 0.5;
+    String elangles = "1.5,2.5";
     Integer interval = 10;
     Integer timeout = 10000;
     List<String> sources = new ArrayList<String>();
@@ -240,13 +249,13 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
-    expect(methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout)).andReturn(rule);
+    expect(methodMock.createRule(ascending, mine, maxe, elangles, interval, sources, detectors, timeout)).andReturn(rule);
     expect(manager.create(name, author, active, description, recipients, rule)).andReturn(routedef);
     manager.storeDefinition(routedef);
 
     replayAll();
 
-    String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
+    String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors);
 
     verifyAll();
     assertEquals("redirect:routes.htm", result);
@@ -261,6 +270,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     Boolean ascending = true;
     Double mine = 0.5;
     Double maxe = 0.5;
+    String elangles = "1.5, 2.5";
     Integer interval = 10;
     Integer timeout = 10000;
     String emessage = "You must specify at least one recipient";
@@ -273,11 +283,11 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
-    expect(methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
+    expect(methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
 
     replayAll();
 
-    String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
+    String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors);
 
     verifyAll();
     assertEquals("somestring", result);
@@ -292,6 +302,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     Boolean ascending = true;
     Double mine = 0.5;
     Double maxe = 0.5;
+    String elangles = "1.5,2.5";
     Integer interval = 10;
     Integer timeout = 10000;
     List<String> sources = new ArrayList<String>();
@@ -303,11 +314,11 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     adaptors.add("A1");
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
     
-    expect(methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
+    expect(methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
 
     replayAll();
 
-    String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
+    String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors);
 
     verifyAll();
     assertEquals("somestring", result);
@@ -325,6 +336,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     Boolean ascending = true;
     Double mine = 0.5;
     Double maxe = 0.5;
+    String elangles = "1.5, 2.5";
     Integer interval = 10;
     Integer timeout = 10000;
     List<String> sources = new ArrayList<String>();
@@ -336,15 +348,15 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
-    expect(methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout)).andReturn(rule);
+    expect(methodMock.createRule(ascending, mine, maxe, elangles, interval, sources, detectors, timeout)).andReturn(rule);
     expect(manager.create(name, author, active, description, recipients, rule)).andReturn(routedef);
     manager.storeDefinition(routedef);
     expectLastCall().andThrow(new RuleException("Duplicate name"));
-    expect(methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, "Failed to create definition: 'Duplicate name'")).andReturn("route_create_volume");
+    expect(methodMock.viewCreateRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, "Failed to create definition: 'Duplicate name'")).andReturn("route_create_volume");
     
     replayAll();
 
-    String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
+    String result = classUnderTest.createRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors);
 
     verifyAll();
     assertEquals("route_create_volume", result);
@@ -362,6 +374,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     Boolean ascending = true;
     Double mine = 0.5;
     Double maxe = 0.5;
+    String elangles = "1.5,2.5";
     Integer interval = 10;
     Integer timeout = 10000;
     List<String> sources = new ArrayList<String>();
@@ -372,7 +385,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     recipients.add("A1");
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
-    expect(methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout)).andReturn(rule);
+    expect(methodMock.createRule(ascending, mine, maxe, elangles, interval, sources, detectors, timeout)).andReturn(rule);
     expect(manager.create(name, author, active, description, recipients, rule)).andReturn(routedef);
     manager.updateDefinition(routedef);
     
@@ -381,11 +394,12 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
           boolean ascending, 
           double mine, 
           double maxe, 
+          String elangles,
           int interval, 
           List<String> sources, 
           List<String> detectors,
           int timeout) {
-        return methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout);
+        return methodMock.createRule(ascending, mine, maxe, elangles, interval, sources, detectors, timeout);
       }      
     };
     classUnderTest.setManager(manager);
@@ -393,7 +407,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    String result = classUnderTest.modifyRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
+    String result = classUnderTest.modifyRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors);
     
     verifyAll();
     assertEquals("redirect:routes.htm", result);
@@ -408,6 +422,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     Boolean ascending = true;
     Double mine = 0.5;
     Double maxe = 0.5;
+    String elangles = "1.5,2.5";
     Integer interval = 10;
     Integer timeout = 10000;
     List<String> sources = new ArrayList<String>();
@@ -419,18 +434,19 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
     
-    expect(methodMock.viewShowRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
+    expect(methodMock.viewShowRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, emessage)).andReturn("somestring");
     
     classUnderTest = new VolumeRoutesController() {
       protected VolumeRule createRule(
           boolean ascending, 
           double mine, 
           double maxe, 
+          String elangles,
           int interval, 
           List<String> sources, 
           List<String> detectors,
           int timeout) {
-        return methodMock.createRule(ascending, mine, maxe, interval, sources, detectors, timeout);
+        return methodMock.createRule(ascending, mine, maxe, elangles, interval, sources, detectors, timeout);
       }
       protected String viewShowRoute(
           Model model,
@@ -441,6 +457,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
           Boolean ascending, 
           Double mine, 
           Double maxe,
+          String elangles,
           List<String> recipients,
           Integer interval,
           Integer timeout,
@@ -448,7 +465,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
           List<String> detectors,
           String emessage) {
         return methodMock.viewShowRoute(model, name, author, active,
-            description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors, emessage);
+            description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, emessage);
       }      
     };
     classUnderTest.setManager(manager);
@@ -456,7 +473,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    String result = classUnderTest.modifyRoute(model, name, author, active, description, ascending, mine, maxe, recipients, interval, timeout, sources, detectors);
+    String result = classUnderTest.modifyRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors);
     
     verifyAll();
     assertEquals("somestring", result);
