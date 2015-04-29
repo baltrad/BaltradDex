@@ -270,11 +270,7 @@ public class BltFileBrowserController {
      */
     private int[] getPages(BltQueryParameter param) {
         int numPages = (int) Math.ceil(
-                fileManager.count(param) / BltFileManager.ENTRIES_PER_PAGE);
-        if ((numPages * BltFileManager.ENTRIES_PER_PAGE ) 
-                < fileManager.count(param)) {
-            ++numPages;
-        }
+                (double) fileManager.count(param) / BltFileManager.ENTRIES_PER_PAGE);
         if (numPages < 1) {
             numPages = 1;
         }
@@ -318,11 +314,7 @@ public class BltFileBrowserController {
      */
     public void nextPage(BltQueryParameter param) {
         int lastPage = (int) Math.ceil(
-                fileManager.count(param) / BltFileManager.ENTRIES_PER_PAGE);
-        if ((lastPage * BltFileManager.ENTRIES_PER_PAGE) 
-                < fileManager.count(param)) {
-            ++lastPage;
-        }
+                (double) fileManager.count(param) / BltFileManager.ENTRIES_PER_PAGE);
         if (lastPage == 0) {
             ++lastPage;
         }
@@ -350,11 +342,7 @@ public class BltFileBrowserController {
      */
     public void lastPage(BltQueryParameter param) {
         int lastPage = (int) Math.ceil( 
-                fileManager.count(param) / BltFileManager.ENTRIES_PER_PAGE);
-        if ((lastPage * BltFileManager.ENTRIES_PER_PAGE ) 
-                < fileManager.count(param)) {
-            ++lastPage;
-        }
+                (double)fileManager.count(param) / BltFileManager.ENTRIES_PER_PAGE);
         if (lastPage == 0) {
             ++lastPage;
         }

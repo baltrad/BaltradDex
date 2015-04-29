@@ -240,10 +240,8 @@ public class BrowseMessagesController {
      */
     protected int[] getPages(LogParameter param) throws Exception {
         long numEntries = logManager.count(logManager.createQuery(param, true));
-        int numPages = (int) Math.ceil(numEntries / ENTRIES_PER_PAGE);
-        if ((numPages * ENTRIES_PER_PAGE) < numEntries) {
-            ++numPages;
-        }
+        int numPages = (int) Math.ceil((double) numEntries / ENTRIES_PER_PAGE);
+
         int scrollRange = getMessageBrowserScrollRange();
         if (numPages < 1) {
             numPages = 1;
@@ -297,12 +295,8 @@ public class BrowseMessagesController {
      * @param param Log parameter
      */
     public void nextPage(LogParameter param) throws Exception {
-        int lastPage = (int) Math.ceil(logManager.count(
+        int lastPage = (int) Math.ceil((double) logManager.count(
             logManager.createQuery(param, true)) / ENTRIES_PER_PAGE);
-        if ((lastPage * ENTRIES_PER_PAGE) 
-                < logManager.count(logManager.createQuery(param, true))) {
-            ++lastPage;
-        }
         if (lastPage == 0) {
             ++lastPage;
         }
@@ -331,11 +325,7 @@ public class BrowseMessagesController {
      */
     public void lastPage(LogParameter param) throws Exception {
         long numEntries = logManager.count(logManager.createQuery(param, true));
-        int lastPage = (int) Math.ceil(numEntries / ENTRIES_PER_PAGE);
-        if ((lastPage * ENTRIES_PER_PAGE) 
-                < logManager.count(logManager.createQuery(param, true))) {
-            ++lastPage;
-        }
+        int lastPage = (int) Math.ceil((double) numEntries / ENTRIES_PER_PAGE);
         if (lastPage == 0) {
             ++lastPage;
         }

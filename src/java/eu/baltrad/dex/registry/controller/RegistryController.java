@@ -84,10 +84,7 @@ public class RegistryController {
     private int[] getPages() {
         long numEntries = registryManager.count(RegistryEntry.UPLOAD);
         int numPages = (int) Math.ceil(
-                numEntries / RegistryManager.ENTRIES_PER_PAGE);
-        if ((numPages * RegistryManager.ENTRIES_PER_PAGE) < numEntries) {
-            ++numPages;
-        }
+                (double) numEntries / RegistryManager.ENTRIES_PER_PAGE);
         if (numPages < 1) {
             numPages = 1;
         }
@@ -208,12 +205,8 @@ public class RegistryController {
      */
     public void nextPage() {
         int lastPage = (int) Math.ceil(
-                registryManager.count(RegistryEntry.UPLOAD) 
+                (double) registryManager.count(RegistryEntry.UPLOAD) 
                 / RegistryManager.ENTRIES_PER_PAGE);
-        if ((lastPage * RegistryManager.ENTRIES_PER_PAGE) 
-                < registryManager.count(RegistryEntry.UPLOAD)) {
-            ++lastPage;
-        }
         if (lastPage == 0) {
             ++lastPage;
         }
@@ -240,12 +233,8 @@ public class RegistryController {
      */
     public void lastPage() {
         long numEntries = registryManager.count(RegistryEntry.UPLOAD);
-        int lastPage = (int) Math.ceil(numEntries 
+        int lastPage = (int) Math.ceil((double) numEntries 
                 / RegistryManager.ENTRIES_PER_PAGE);
-        if ((lastPage * RegistryManager.ENTRIES_PER_PAGE) 
-                < registryManager.count(RegistryEntry.UPLOAD)) {
-            ++lastPage;
-        }
         if (lastPage == 0) {
             ++lastPage;
         }
