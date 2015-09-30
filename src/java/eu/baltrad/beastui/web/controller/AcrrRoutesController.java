@@ -227,7 +227,14 @@ public class AcrrRoutesController {
     } 
     if (emessage == null) {
       try {
-        AcrrRule rule = createRule(area, object_type, quantity, hours, filesPerHour, acceptableLoss, distanceField, zrA, zrB, applygra);
+        int ihours = (hours == null) ? 24 : hours.intValue();
+        int ifilesPerHour = (filesPerHour == null) ? 4 : filesPerHour.intValue();
+        int iacceptableLoss = (acceptableLoss == null) ? 0 : acceptableLoss.intValue();
+        double dzra = (zrA == null) ? 200.0 : zrA.doubleValue();
+        double dzrb = (zrB == null) ? 1.6 : zrB.doubleValue();
+        boolean bapplygra = (applygra == null) ? false: applygra.booleanValue();
+        
+        AcrrRule rule = createRule(area, object_type, quantity, ihours, ifilesPerHour, iacceptableLoss, distanceField, dzra, dzrb, bapplygra);
         RouteDefinition def = manager.create(name, author, isactive, description, newrecipients, rule);
         manager.updateDefinition(def);
         return "redirect:routes.htm";
