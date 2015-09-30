@@ -130,6 +130,14 @@ Creates a google map route
                             </div>
                         </div>
                         <div class="row2">
+                            <div class="leftcol">Apply GRA:</div>
+                            <div class="rightcol">
+                                <input type="checkbox" name="applygra" 
+                                       title="Check to select tha GRA correction should be applied"
+                                       <c:if test="${applygra == true}">checked</c:if> />
+                            </div>        
+                        </div>                         
+                        <div class="row2">
                             <div class="leftcol">Zr A:</div>
                             <div class="rightcol">
                                 <input type="text" name="zrA" value="${zrA}"
