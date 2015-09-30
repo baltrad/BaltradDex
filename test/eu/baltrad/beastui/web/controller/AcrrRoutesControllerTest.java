@@ -39,12 +39,13 @@ public class AcrrRoutesControllerTest extends EasyMockSupport {
     rule.setDistancefield("eu.x.y");
     rule.setZrA(100.0);
     rule.setZrB(0.5);
+    rule.setApplyGRA(true);
     
     expect(manager.createRule("blt_acrr")).andReturn(rule);
     
     replayAll();
     
-    AcrrRule result = classUnderTest.createRule("nrd_swe", "IMAGE", "DBZH", 12, 4, 1, "eu.x.y", 100.0, 0.5);
+    AcrrRule result = classUnderTest.createRule("nrd_swe", "IMAGE", "DBZH", 12, 4, 1, "eu.x.y", 100.0, 0.5, true);
     
     verifyAll();
     assertSame(rule, result);
