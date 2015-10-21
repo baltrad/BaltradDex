@@ -21,12 +21,12 @@
 
 package eu.baltrad.dex.user.model.mapper;
 
-import eu.baltrad.dex.user.model.User;
-
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import eu.baltrad.dex.user.model.User;
 
 /**
  * Row mapper for user account object.
@@ -35,7 +35,7 @@ import java.sql.SQLException;
  * @version 1.2.2
  * @since 1.2.2
  */
-public class UserMapper implements ParameterizedRowMapper<User> { 
+public class UserMapper implements RowMapper<User> { 
    /**
     * Maps records to result set. 
     * @param rs Result set 

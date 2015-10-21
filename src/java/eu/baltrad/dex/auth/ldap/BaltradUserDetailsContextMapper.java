@@ -18,14 +18,16 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 ------------------------------------------------------------------------*/
 package eu.baltrad.dex.auth.ldap;
 
+import java.util.Collection;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.DirContextOperations;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.userdetails.ldap.UserDetailsContextMapper;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.ldap.userdetails.UserDetailsContextMapper;
 
 /**
  * Context mapper that makes it possible to map a ldap user to a user details. Just forwards
@@ -49,7 +51,7 @@ public class BaltradUserDetailsContextMapper implements UserDetailsContextMapper
    */
   @Override
   public UserDetails mapUserFromContext(DirContextOperations arg0, String username,
-      GrantedAuthority[] arg2) {
+      Collection<? extends GrantedAuthority> authorities) {
     logger.debug("mapUserFromContext("+username+")");
     return service.loadUserByUsername(username);
   }

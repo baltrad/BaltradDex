@@ -21,12 +21,12 @@
 
 package eu.baltrad.dex.datasource.model.mapper;
 
-import eu.baltrad.dex.datasource.model.FileObject;
-
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import eu.baltrad.dex.datasource.model.FileObject;
 
 /**
  * File object mapper.
@@ -35,7 +35,7 @@ import java.sql.SQLException;
  * @version 1.2.2
  * @since 1.2.2
  */
-public class FileObjectMapper implements ParameterizedRowMapper<FileObject> {
+public class FileObjectMapper implements RowMapper<FileObject> {
    /**
     * Maps records to result set. 
     * @param rs Result set 

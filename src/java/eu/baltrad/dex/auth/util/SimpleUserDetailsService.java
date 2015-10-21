@@ -21,15 +21,18 @@
 
 package eu.baltrad.dex.auth.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.baltrad.dex.user.manager.impl.UserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.userdetails.UserDetailsService;
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 /**
  * Implements role-based user details service for authentication.
@@ -65,20 +68,22 @@ public class SimpleUserDetailsService implements UserDetailsService  {
         if (user == null) {
             return null;
         } else {
-            GrantedAuthority[] authorities = null;
+            List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
             if (user.getRole().equals(Role.ADMIN)) {
-                authorities = new GrantedAuthority[] {authAdmin, authOperator, 
-                    authUser};
+              authorities.add(authAdmin);
+              authorities.add(authOperator);
+              authorities.add(authUser);
             }
             if (user.getRole().equals(Role.OPERATOR)) {
-                authorities = new GrantedAuthority[] {authOperator, authUser};
+              authorities.add(authOperator);
+              authorities.add(authUser);
             }
             if (user.getRole().equals(Role.USER)) {
-                authorities = new GrantedAuthority[] {authUser};
+              authorities.add(authUser);
             }
-            org.springframework.security.userdetails.UserDetails userDetails = 
-                    new org.springframework.security.userdetails.User(
-                        user.getName(), user.getPassword(), true, authorities);
+            UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                        user.getName(), user.getPassword(), authorities);
+            
             return userDetails;
         }
     }

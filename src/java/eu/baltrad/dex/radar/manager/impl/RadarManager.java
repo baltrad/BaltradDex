@@ -21,15 +21,15 @@
 
 package eu.baltrad.dex.radar.manager.impl;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
+
 import eu.baltrad.dex.radar.manager.IRadarManager;
 import eu.baltrad.dex.radar.model.Radar;
 import eu.baltrad.dex.radar.model.mapper.RadarMapper;
-
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 /**
  * Radar manager.
@@ -41,7 +41,7 @@ import java.util.List;
 public class RadarManager implements IRadarManager {
 
     /** JDBC template */
-    private SimpleJdbcOperations jdbcTemplate;
+    private JdbcOperations jdbcTemplate;
     /** Row mapper */
     private RadarMapper mapper;
     
@@ -56,7 +56,7 @@ public class RadarManager implements IRadarManager {
      * @param jdbcTemplate the jdbcTemplate to set
      */
     @Autowired
-    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     

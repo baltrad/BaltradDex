@@ -21,12 +21,12 @@
 
 package eu.baltrad.dex.registry.model.mapper;
 
-import eu.baltrad.dex.registry.model.impl.RegistryEntry;
-
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 
 /**
  * Row mapper for delivery registry entry object.
@@ -36,7 +36,7 @@ import java.sql.SQLException;
  * @since 1.2.2
  */
 public class RegistryEntryMapper 
-            implements ParameterizedRowMapper<RegistryEntry> {
+            implements RowMapper<RegistryEntry> {
    /**
     * Maps records to result set. 
     * @param rs Result set 

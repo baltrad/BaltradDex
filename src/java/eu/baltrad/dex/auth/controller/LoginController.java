@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpSession;
@@ -52,7 +53,7 @@ public class LoginController {
     private ConfigurationManager confManager;
     private MessageResourceUtil messages;
     private Logger log;
-    
+    private Logger logger = LogManager.getLogger(LoginController.class);
     /**
      * Default constructor.
      */
@@ -68,6 +69,7 @@ public class LoginController {
      */
     @RequestMapping("/login.htm")
     public String login(Model model) {
+      logger.info("Entering /login.htm");
         return "login";
     }    
     

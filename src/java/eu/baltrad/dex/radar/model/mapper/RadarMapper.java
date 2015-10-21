@@ -21,12 +21,12 @@
 
 package eu.baltrad.dex.radar.model.mapper;
 
-import eu.baltrad.dex.radar.model.Radar;
-
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import eu.baltrad.dex.radar.model.Radar;
 
 /**
  * Row mapper for radar object.
@@ -35,7 +35,7 @@ import java.sql.SQLException;
  * @version 1.2.2
  * @since 1.2.2
  */
-public class RadarMapper implements ParameterizedRowMapper<Radar> {
+public class RadarMapper implements RowMapper<Radar> {
     /**
     * Maps records to result set. 
     * @param rs Result set 

@@ -21,24 +21,20 @@
 
 package eu.baltrad.dex.log.manager.impl;
 
-import eu.baltrad.dex.log.manager.impl.LogManager;
-import eu.baltrad.dex.db.itest.DexDBITestHelper;
-import eu.baltrad.dex.log.model.impl.LogEntry;
-import eu.baltrad.dex.log.model.impl.LogParameter;
-
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.dbunit.dataset.ITable;
 import org.dbunit.Assertion;
+import org.dbunit.dataset.ITable;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.jdbc.core.JdbcOperations;
 
-import java.util.List;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import eu.baltrad.dex.db.itest.DexDBITestHelper;
+import eu.baltrad.dex.log.model.impl.LogEntry;
+import eu.baltrad.dex.log.model.impl.LogParameter;
 
 /**
  * Log manager integration test.
@@ -66,7 +62,7 @@ public class LogManagerTest extends TestCase {
         helper = (DexDBITestHelper) context.getBean("helper");
         helper.cleanInsert(this, null);
         classUnderTest = new LogManager();
-        SimpleJdbcOperations jdbcTemplate = (SimpleJdbcOperations) 
+        JdbcOperations jdbcTemplate = (JdbcOperations) 
                 context.getBean("jdbcTemplate");
         classUnderTest.setJdbcTemplate(jdbcTemplate);
         format = new SimpleDateFormat(DATE_FORMAT);

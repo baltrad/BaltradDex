@@ -21,27 +21,26 @@
 
 package eu.baltrad.dex.net.manager.impl;
 
-import eu.baltrad.dex.net.manager.ISubscriptionManager;
-import eu.baltrad.dex.datasource.manager.IDataSourceManager;
-import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.user.manager.IUserManager;
-import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.net.model.mapper.SubscriptionMapper;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.dao.DataAccessException;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.net.model.mapper.SubscriptionMapper;
+import eu.baltrad.dex.user.manager.IUserManager;
 
 /**
  * Subscription manager implementing subscription handling functionality.
@@ -53,7 +52,7 @@ import java.util.List;
 public class SubscriptionManager implements ISubscriptionManager {
 
     /** JDBC template */
-    private SimpleJdbcOperations jdbcTemplate;
+    private JdbcOperations jdbcTemplate;
     /** Dependent managers */
     private IUserManager accountManager;
     private IDataSourceManager dataSourceManager;
@@ -72,7 +71,7 @@ public class SubscriptionManager implements ISubscriptionManager {
      * @param jdbcTemplate the jdbcTemplate to set
      */
     @Autowired
-    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     
@@ -100,7 +99,7 @@ public class SubscriptionManager implements ISubscriptionManager {
     public long count(String type) {
         String sql = "SELECT count(*) FROM dex_subscriptions s WHERE " + 
                 "s.type = ? AND s.active = true";
-        return jdbcTemplate.queryForLong(sql, type);
+        return jdbcTemplate.queryForObject(sql, long.class, type);
     }
     
     /**
@@ -199,7 +198,7 @@ public class SubscriptionManager implements ISubscriptionManager {
         
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcTemplate.getJdbcOperations().update(
+            jdbcTemplate.update(
                 new PreparedStatementCreator() {
                     public PreparedStatement createPreparedStatement(
                             Connection conn) throws SQLException {

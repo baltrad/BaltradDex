@@ -21,12 +21,12 @@
 
 package eu.baltrad.dex.log.model.mapper;
 
-import eu.baltrad.dex.log.model.impl.LogEntry;
-
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import eu.baltrad.dex.log.model.impl.LogEntry;
 
 /**
  * Row mapper for system log entry object.
@@ -35,7 +35,7 @@ import java.sql.SQLException;
  * @version 1.2.2
  * @since 1.2.2
  */
-public class LogEntryMapper implements ParameterizedRowMapper<LogEntry> {
+public class LogEntryMapper implements RowMapper<LogEntry> {
     /**
     * Maps records to result set. 
     * @param rs Result set 

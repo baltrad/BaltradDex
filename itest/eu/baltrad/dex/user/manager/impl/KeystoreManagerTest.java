@@ -21,19 +21,18 @@
 
 package eu.baltrad.dex.user.manager.impl;
 
-import eu.baltrad.dex.keystore.manager.impl.KeystoreManager;
-import eu.baltrad.dex.db.itest.DexDBITestHelper;
-import eu.baltrad.dex.keystore.model.Key;
-
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.dbunit.dataset.ITable;
 import org.dbunit.Assertion;
+import org.dbunit.dataset.ITable;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.jdbc.core.JdbcOperations;
 
-import java.util.List;
+import eu.baltrad.dex.db.itest.DexDBITestHelper;
+import eu.baltrad.dex.keystore.manager.impl.KeystoreManager;
+import eu.baltrad.dex.keystore.model.Key;
 
 /**
  * Keystore manager integration test.
@@ -54,7 +53,7 @@ public class KeystoreManagerTest extends TestCase {
         helper = (DexDBITestHelper) context.getBean("helper");
         helper.cleanInsert(this, null);
         classUnderTest = new KeystoreManager();
-        SimpleJdbcOperations jdbcTemplate = (SimpleJdbcOperations) context
+        JdbcOperations jdbcTemplate = (JdbcOperations) context
                 .getBean("jdbcTemplate");
         classUnderTest.setJdbcTemplate(jdbcTemplate);
     }

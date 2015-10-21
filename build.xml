@@ -193,6 +193,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="lib/spring">
         <include name="*.jar"/>
       </fileset>
+      <fileset dir="lib/aopallicance">
+        <include name="*.jar"/>
+      </fileset>
       <fileset dir="lib/log4j">
         <include name="*.jar"/>
       </fileset>
@@ -237,14 +240,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="commons-dbcp.jar"/>
         <include name="commons-pool.jar"/>
         <include name="commons-net-2.2.jar"/>
-	<include name="httpclient-4.1.2.jar"/>
-	<include name="httpclient-cache-4.1.2.jar"/>
-	<include name="httpcore-4.1.2.jar"/>
-	<include name="httpmime-4.1.2.jar"/>
+	    <include name="httpclient-4.1.2.jar"/>
+	    <include name="httpclient-cache-4.1.2.jar"/>
+	    <include name="httpcore-4.1.2.jar"/>
+	    <include name="httpmime-4.1.2.jar"/>
         <include name="groovy-all-1.6.4.jar"/>
         <include name="jackson-core-lgpl-1.8.2.jar"/>
         <include name="jackson-mapper-lgpl-1.8.2.jar"/>
-        <include name="quartz-1.8.3.jar"/>
+        <include name="quartz-2.2.2.jar"/>
         <include name="sshj-0.8.1.jar"/>
         <include name="ws-commons-util-1.0.2.jar"/>
         <include name="xmlrpc-client-3.1.2.jar"/>

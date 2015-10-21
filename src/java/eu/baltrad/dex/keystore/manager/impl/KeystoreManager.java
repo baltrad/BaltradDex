@@ -21,23 +21,22 @@
 
 package eu.baltrad.dex.keystore.manager.impl;
 
-import eu.baltrad.dex.keystore.manager.IKeystoreManager;
-import eu.baltrad.dex.keystore.model.mapper.KeyMapper;
-import eu.baltrad.dex.keystore.model.Key;
-
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.dao.EmptyResultDataAccessException;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+
+import eu.baltrad.dex.keystore.manager.IKeystoreManager;
+import eu.baltrad.dex.keystore.model.Key;
+import eu.baltrad.dex.keystore.model.mapper.KeyMapper;
 
 /**
  * Keystore manager.
@@ -49,7 +48,7 @@ import java.util.List;
 public class KeystoreManager implements IKeystoreManager {
     
     /** JDBC template */
-    private SimpleJdbcOperations jdbcTemplate;
+    private JdbcOperations jdbcTemplate;
     
     /** Row mapper */
     private KeyMapper mapper;
@@ -65,7 +64,7 @@ public class KeystoreManager implements IKeystoreManager {
      * @param jdbcTemplate the jdbcTemplate to set
      */
     @Autowired
-    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     
@@ -120,7 +119,7 @@ public class KeystoreManager implements IKeystoreManager {
         
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcTemplate.getJdbcOperations().update(
+            jdbcTemplate.update(
                 new PreparedStatementCreator() {
                     public PreparedStatement createPreparedStatement(
                             Connection conn) throws SQLException {

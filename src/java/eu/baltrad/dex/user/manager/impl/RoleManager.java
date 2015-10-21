@@ -21,14 +21,14 @@
 
 package eu.baltrad.dex.user.manager.impl;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcOperations;
+
 import eu.baltrad.dex.user.manager.IRoleManager;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.mapper.RoleMapper;
-
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 /**
  * Role manager.
@@ -40,7 +40,7 @@ import java.util.List;
 public class RoleManager implements IRoleManager {
     
     /** JDBC template */
-    private SimpleJdbcOperations jdbcTemplate;
+    private JdbcOperations jdbcTemplate;
     /** Row mapper */
     private RoleMapper mapper;
     
@@ -55,7 +55,7 @@ public class RoleManager implements IRoleManager {
      * @param jdbcTemplate the jdbcTemplate to set
      */
     @Autowired
-    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     

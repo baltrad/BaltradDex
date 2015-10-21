@@ -21,19 +21,17 @@
 
 package eu.baltrad.dex.datasource.manager.impl;
 
-import eu.baltrad.dex.datasource.manager.impl.FileObjectManager;
-import eu.baltrad.dex.datasource.model.FileObject;
-import eu.baltrad.dex.db.itest.DexDBITestHelper;
-
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-
-import org.dbunit.dataset.ITable;
-import org.dbunit.Assertion;
+import java.util.List;
 
 import junit.framework.TestCase;
 
-import java.util.List;
+import org.dbunit.Assertion;
+import org.dbunit.dataset.ITable;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.jdbc.core.JdbcOperations;
+
+import eu.baltrad.dex.datasource.model.FileObject;
+import eu.baltrad.dex.db.itest.DexDBITestHelper;
 
 /**
  * File object manager integration test.
@@ -54,7 +52,7 @@ public class FileObjectManagerTest extends TestCase {
         helper = (DexDBITestHelper) context.getBean("helper");
         helper.cleanInsert(this, null);
         classUnderTest = new FileObjectManager();
-        SimpleJdbcOperations jdbcTemplate = (SimpleJdbcOperations) context
+        JdbcOperations jdbcTemplate = (JdbcOperations) context
                 .getBean("jdbcTemplate");
         classUnderTest.setJdbcTemplate(jdbcTemplate);
     }

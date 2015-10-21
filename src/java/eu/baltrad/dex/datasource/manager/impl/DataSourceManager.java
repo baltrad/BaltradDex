@@ -21,31 +21,29 @@
 
 package eu.baltrad.dex.datasource.manager.impl;
 
-import eu.baltrad.beast.db.AttributeFilter;
-import eu.baltrad.beast.db.CombinedFilter;
-import eu.baltrad.beast.db.IFilter;
-import eu.baltrad.dex.datasource.manager.IDataSourceManager;
-import eu.baltrad.dex.datasource.model.mapper.DataSourceMapper;
-import eu.baltrad.dex.datasource.model.mapper.FileObjectMapper;
-import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.datasource.model.FileObject;
-import eu.baltrad.dex.radar.model.Radar;
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.mapper.UserMapper;
-import eu.baltrad.dex.radar.model.mapper.RadarMapper;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
 
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import java.util.List;
+import eu.baltrad.beast.db.AttributeFilter;
+import eu.baltrad.beast.db.CombinedFilter;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.datasource.model.FileObject;
+import eu.baltrad.dex.datasource.model.mapper.DataSourceMapper;
+import eu.baltrad.dex.datasource.model.mapper.FileObjectMapper;
+import eu.baltrad.dex.radar.model.Radar;
+import eu.baltrad.dex.radar.model.mapper.RadarMapper;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.model.mapper.UserMapper;
 
 /**
  * Data source manager. 
@@ -62,7 +60,7 @@ public class DataSourceManager implements IDataSourceManager {
     private static final String DS_OBJECT_ATTR_STR = "what/object";
     
     /** JDBC template */
-    private SimpleJdbcOperations jdbcTemplate;
+    private JdbcOperations jdbcTemplate;
     /** Row mappers */
     private DataSourceMapper dataSourceMapper;
     private RadarMapper radarMapper;
@@ -83,7 +81,7 @@ public class DataSourceManager implements IDataSourceManager {
      * @param jdbcTemplate the jdbcTemplate to set
      */
     @Autowired
-    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     
@@ -155,7 +153,7 @@ public class DataSourceManager implements IDataSourceManager {
         final DataSource ds = dataSource;
         
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.getJdbcOperations().update(
+        jdbcTemplate.update(
             new PreparedStatementCreator() {
                 public PreparedStatement createPreparedStatement(
                         Connection conn) throws SQLException {
@@ -321,7 +319,7 @@ public class DataSourceManager implements IDataSourceManager {
         String sql = "SELECT filter_id FROM dex_data_source_filters WHERE " + 
                 "data_source_id = ?";
         try {
-            return jdbcTemplate.queryForInt(sql, new Object[] {dataSourceId});
+            return jdbcTemplate.queryForObject(sql, int.class, dataSourceId);
         } catch (EmptyResultDataAccessException e) {
             return 0;
         }
@@ -338,7 +336,7 @@ public class DataSourceManager implements IDataSourceManager {
                    " WHERE dds.id = ddsf.data_source_id " +
                    " AND dds.name=? AND dds.type=?";
       try {
-        return jdbcTemplate.queryForInt(sql, new Object[]{name, type});
+        return jdbcTemplate.queryForObject(sql, int.class, name, type);
       } catch (EmptyResultDataAccessException e) {
         return 0;
       }

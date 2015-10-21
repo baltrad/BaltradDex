@@ -3,15 +3,17 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
         http://www.springframework.org/schema/security
-        http://www.springframework.org/schema/security/spring-security-2.0.1.xsd" 
+        http://www.springframework.org/schema/security/spring-security-3.2.xsd" 
         xmlns:aop="http://www.springframework.org/schema/aop">
-        
-    <security:authentication-provider 
-                user-service-ref="simpleUserDetailsService">
+    <security:global-method-security secured-annotations="enabled" pre-post-annotations="enabled"/>
+    <security:authentication-manager>
+      <security:authentication-provider user-service-ref="simpleUserDetailsService">
         <security:password-encoder hash="md5"/>
-    </security:authentication-provider>
+      </security:authentication-provider>
+    </security:authentication-manager>
+      
     
     <beans:bean id="simpleUserDetailsService" 
                 class="eu.baltrad.dex.auth.util.SimpleUserDetailsService"

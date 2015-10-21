@@ -1,11 +1,14 @@
 package eu.baltrad.dex.auth.ldap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import static org.junit.Assert.*;
 import static org.easymock.EasyMock.*;
@@ -30,14 +33,14 @@ public class BaltradUserAuthoritiesPopulatorTest extends EasyMockSupport {
   @Test
   public void test_getGrantedAuthorities() {
     UserDetails details = createMock(UserDetails.class);
-    GrantedAuthority[] auths = new GrantedAuthority[0];
+    List<GrantedAuthority> auths = new ArrayList<GrantedAuthority>();
     
     expect(service.loadUserByUsername("baltrad/admin")).andReturn(details);
-    expect(details.getAuthorities()).andReturn(auths);
+    expect(details.getAuthorities()).andReturn((List)auths);
     
     replayAll();
     
-    GrantedAuthority[] result = classUnderTest.getGrantedAuthorities(null, "baltrad/admin");
+    List<GrantedAuthority> result = (List)classUnderTest.getGrantedAuthorities(null, "baltrad/admin");
     
     verifyAll();
     

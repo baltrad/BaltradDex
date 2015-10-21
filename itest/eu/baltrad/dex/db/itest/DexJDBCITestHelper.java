@@ -80,8 +80,7 @@ public class DexJDBCITestHelper {
     public int getCombinedFilterId(int dataSourceId) {
         String sql = "SELECT filter_id FROM dex_data_source_filters WHERE " +
                     " data_source_id = ?";
-        int filterId = this.jdbcTemplate.queryForInt(sql, 
-                                                   new Integer[]{dataSourceId});
+        int filterId = this.jdbcTemplate.queryForObject(sql, int.class, dataSourceId);
         return filterId;
     }
     

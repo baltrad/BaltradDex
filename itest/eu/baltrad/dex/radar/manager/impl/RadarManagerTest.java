@@ -21,18 +21,17 @@
 
 package eu.baltrad.dex.radar.manager.impl;
 
-import eu.baltrad.dex.radar.model.Radar;
-import eu.baltrad.dex.db.itest.DexDBITestHelper;
-
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.dbunit.dataset.ITable;
 import org.dbunit.Assertion;
+import org.dbunit.dataset.ITable;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.jdbc.core.JdbcOperations;
 
-import java.util.List;
+import eu.baltrad.dex.db.itest.DexDBITestHelper;
+import eu.baltrad.dex.radar.model.Radar;
 
 /**
  * Radar manager integration test.
@@ -53,7 +52,7 @@ public class RadarManagerTest extends TestCase {
         helper = (DexDBITestHelper) context.getBean("helper");
         helper.cleanInsert(this, null);
         classUnderTest = new RadarManager();
-        SimpleJdbcOperations jdbcTemplate = (SimpleJdbcOperations) context
+        JdbcOperations jdbcTemplate = (JdbcOperations) context
                 .getBean("jdbcTemplate");
         classUnderTest.setJdbcTemplate(jdbcTemplate);
     }

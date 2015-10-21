@@ -21,28 +21,27 @@
 
 package eu.baltrad.dex.log.manager.impl;
 
-import eu.baltrad.dex.log.manager.ILogManager;
-import eu.baltrad.dex.log.model.mapper.LogEntryMapper;
-import eu.baltrad.dex.log.model.impl.LogEntry;
-import eu.baltrad.dex.log.model.impl.LogParameter;
 import static eu.baltrad.dex.util.WebValidator.validate;
 import static eu.baltrad.dex.util.WebValidator.validateDateString;
-
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+
+import eu.baltrad.dex.log.manager.ILogManager;
+import eu.baltrad.dex.log.model.impl.LogEntry;
+import eu.baltrad.dex.log.model.impl.LogParameter;
+import eu.baltrad.dex.log.model.mapper.LogEntryMapper;
 
 
 /**
@@ -58,7 +57,7 @@ public class LogManager implements ILogManager {
     private final static String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     
     /** JDBC template */
-    private SimpleJdbcOperations jdbcTemplate;
+    private JdbcOperations jdbcTemplate;
     /** Row mapper */
     private LogEntryMapper mapper;
     
@@ -76,7 +75,7 @@ public class LogManager implements ILogManager {
      * @param jdbcTemplate the jdbcTemplate to set
      */
     @Autowired
-    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     
@@ -186,7 +185,7 @@ public class LogManager implements ILogManager {
      */
     public long count() {
         String sql = "SELECT count(*) FROM dex_messages WHERE level <> 'STICKY'";
-        return jdbcTemplate.queryForLong(sql);
+        return jdbcTemplate.queryForObject(sql, long.class);
     }
     
     /**
@@ -194,7 +193,7 @@ public class LogManager implements ILogManager {
      * @return Total number of entries in the log
      */
     public long count(String sql) {
-        return jdbcTemplate.queryForLong(sql);
+        return jdbcTemplate.queryForObject(sql, long.class);
     }
     
     /**
@@ -203,8 +202,8 @@ public class LogManager implements ILogManager {
      */
     public List<LogEntry> load() {
         String sql = "SELECT * FROM dex_messages WHERE level <> 'STICKY'";
-	List<LogEntry> entries = jdbcTemplate.query(sql, mapper);
-	return entries;
+        List<LogEntry> entries = jdbcTemplate.query(sql, mapper);
+        return entries;
     }
     
     /**
@@ -280,7 +279,7 @@ public class LogManager implements ILogManager {
         final LogEntry entry = logEntry;
         
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.getJdbcOperations().update(
+        jdbcTemplate.update(
             new PreparedStatementCreator() {
                 public PreparedStatement createPreparedStatement(
                         Connection conn) throws SQLException {

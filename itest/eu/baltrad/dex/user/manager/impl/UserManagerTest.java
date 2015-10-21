@@ -21,19 +21,18 @@
 
 package eu.baltrad.dex.user.manager.impl;
 
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.db.itest.DexDBITestHelper;
-import eu.baltrad.dex.user.model.Role;
-
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.dbunit.dataset.ITable;
 import org.dbunit.Assertion;
+import org.dbunit.dataset.ITable;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.jdbc.core.JdbcOperations;
 
-import java.util.List;
+import eu.baltrad.dex.db.itest.DexDBITestHelper;
+import eu.baltrad.dex.user.model.Role;
+import eu.baltrad.dex.user.model.User;
 
 /**
  * User manager integration test.
@@ -55,7 +54,7 @@ public class UserManagerTest extends TestCase{
         helper = (DexDBITestHelper) context.getBean("helper");
         helper.cleanInsert(this, null);
         classUnderTest = new UserManager();
-        SimpleJdbcOperations jdbcTemplate = (SimpleJdbcOperations) context
+        JdbcOperations jdbcTemplate = (JdbcOperations) context
                 .getBean("jdbcTemplate");
         classUnderTest.setJdbcTemplate(jdbcTemplate);
         roleManager = new RoleManager();

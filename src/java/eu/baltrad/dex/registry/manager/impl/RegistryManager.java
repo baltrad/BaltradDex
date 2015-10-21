@@ -21,24 +21,23 @@
 
 package eu.baltrad.dex.registry.manager.impl;
 
-import eu.baltrad.dex.registry.manager.IRegistryManager;
-import eu.baltrad.dex.registry.model.impl.RegistryEntry;
-import eu.baltrad.dex.registry.model.mapper.RegistryEntryMapper;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.dao.DataAccessException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import eu.baltrad.dex.registry.manager.IRegistryManager;
+import eu.baltrad.dex.registry.model.impl.RegistryEntry;
+import eu.baltrad.dex.registry.model.mapper.RegistryEntryMapper;
 
 /**
  * Class implements data delivery register handling functionality..
@@ -50,7 +49,7 @@ import java.util.List;
 public class RegistryManager implements IRegistryManager {
     
     /** JDBC template */
-    private SimpleJdbcOperations jdbcTemplate;
+    private JdbcOperations jdbcTemplate;
     /** Row mapper */
     private RegistryEntryMapper mapper;
     
@@ -65,7 +64,7 @@ public class RegistryManager implements IRegistryManager {
      * @param jdbcTemplate the jdbcTemplate to set
      */
     @Autowired
-    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     
@@ -76,7 +75,7 @@ public class RegistryManager implements IRegistryManager {
     public long count(String type) {
         String sql = "SELECT count(*) FROM dex_delivery_registry " + 
                      "WHERE type = ?;";
-        return jdbcTemplate.queryForLong(sql, type);
+        return jdbcTemplate.queryForObject(sql, long.class, type);
     }
     
     /**
@@ -114,7 +113,7 @@ public class RegistryManager implements IRegistryManager {
         
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcTemplate.getJdbcOperations().update(
+            jdbcTemplate.update(
                 new PreparedStatementCreator() {
                     public PreparedStatement createPreparedStatement(
                             Connection conn) throws SQLException {

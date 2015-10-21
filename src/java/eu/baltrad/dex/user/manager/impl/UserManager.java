@@ -21,30 +21,29 @@
 
 package eu.baltrad.dex.user.manager.impl;
 
-import eu.baltrad.dex.user.manager.IUserManager;
-import eu.baltrad.dex.user.manager.IRoleManager;
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.mapper.UserMapper;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.dao.DataAccessException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.util.List;
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import eu.baltrad.dex.user.manager.IRoleManager;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.user.model.mapper.UserMapper;
 
 /**
  * User manager.
@@ -56,7 +55,7 @@ import java.util.List;
 public class UserManager implements IUserManager {
 
     /** JDBC template */
-    private SimpleJdbcOperations jdbcTemplate;
+    private JdbcOperations jdbcTemplate;
     
     /** Dependent manager */
     private IRoleManager roleManager;
@@ -77,7 +76,7 @@ public class UserManager implements IUserManager {
      * @param jdbcTemplate the jdbcTemplate to set
      */
     @Autowired
-    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     
@@ -144,7 +143,7 @@ public class UserManager implements IUserManager {
                 "FROM dex_users u, dex_roles r, dex_users_roles ur " + 
                 "WHERE ur.user_id = u.id AND ur.role_id = r.id " + 
                 "AND r.name = 'peer';";			
-        return jdbcTemplate.query(sql, new ParameterizedRowMapper<String>() {
+        return jdbcTemplate.query(sql, new RowMapper<String>() {
                 public String mapRow(ResultSet rs, int i) throws SQLException {
                     return rs.getString("user_name");
                 }
@@ -208,7 +207,7 @@ public class UserManager implements IUserManager {
         
         try {
             KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcTemplate.getJdbcOperations().update(
+            jdbcTemplate.update(
                 new PreparedStatementCreator() {
                     public PreparedStatement createPreparedStatement(
                             Connection conn) throws SQLException {

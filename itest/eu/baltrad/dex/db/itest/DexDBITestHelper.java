@@ -22,33 +22,32 @@
 package eu.baltrad.dex.db.itest;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.FileInputStream;
-import java.util.Map;
+import java.io.FilenameFilter;
+import java.sql.Connection;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
 
 import junit.framework.TestCase;
-
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
-import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.ITable;
+import org.dbunit.dataset.datatype.IDataTypeFactory;
 import org.dbunit.dataset.xml.FlatXmlDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
 import org.dbunit.operation.DatabaseOperation;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceUtils;
 
-import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.db.Database;
+import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.db.rest.RestfulDatabase;
 
 /**
@@ -216,7 +215,7 @@ public class DexDBITestHelper extends TestCase {
      * Delete test data from database.
      */
     private void deleteFromDB() {
-        SimpleJdbcTemplate template = new SimpleJdbcTemplate(dataSource);
+        JdbcTemplate template = new JdbcTemplate(dataSource);
         template.update("DELETE FROM dex_data_source_radars");
         template.update("DELETE FROM dex_data_source_filters");
         template.update("DELETE FROM dex_data_source_file_objects");

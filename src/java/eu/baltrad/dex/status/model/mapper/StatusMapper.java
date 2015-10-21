@@ -21,10 +21,12 @@
 
 package eu.baltrad.dex.status.model.mapper;
 
-import eu.baltrad.dex.status.model.Status;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import eu.baltrad.dex.status.model.Status;
 
 /**
  * Node status object mapper.
@@ -33,7 +35,7 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
  * @version 1.0
  * @since 1.0
  */
-public class StatusMapper implements ParameterizedRowMapper<Status> {
+public class StatusMapper implements RowMapper<Status> {
     /**
      * Maps records to result set. 
      * @param rs Result set 

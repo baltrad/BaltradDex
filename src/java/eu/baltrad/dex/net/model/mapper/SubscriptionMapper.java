@@ -21,12 +21,12 @@
 
 package eu.baltrad.dex.net.model.mapper;
 
-import eu.baltrad.dex.net.model.impl.Subscription;
-
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import eu.baltrad.dex.net.model.impl.Subscription;
 
 /**
  * Subscription object mapper.
@@ -35,7 +35,7 @@ import java.sql.SQLException;
  * @version 1.2.2
  * @since 1.2.2
  */
-public class SubscriptionMapper implements ParameterizedRowMapper<Subscription> 
+public class SubscriptionMapper implements RowMapper<Subscription> 
 {
     /**
      * Maps records to result set. 

@@ -21,21 +21,23 @@
 
 package eu.baltrad.dex.status.manager.impl;
 
-import eu.baltrad.dex.status.manager.INodeStatusManager;
-import eu.baltrad.dex.status.model.Status;
-import eu.baltrad.dex.status.model.mapper.StatusMapper;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
+import eu.baltrad.dex.status.model.mapper.StatusMapper;
 
 /**
  * Implements node status manager.
@@ -46,7 +48,7 @@ import org.springframework.jdbc.support.KeyHolder;
  */
 public class NodeStatusManager implements INodeStatusManager {
     
-    private SimpleJdbcOperations jdbcTemplate;
+    private JdbcOperations jdbcTemplate;
     private StatusMapper mapper;
     
     /**
@@ -60,7 +62,7 @@ public class NodeStatusManager implements INodeStatusManager {
      * @param jdbcTemplate the jdbcTemplate to set
      */
     @Autowired
-    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     
@@ -82,7 +84,7 @@ public class NodeStatusManager implements INodeStatusManager {
                 "AND sds.subscription_id = s.id " +
                 "AND sds.data_source_id = ds.id;";
         
-        return jdbcTemplate.query(sql, new ParameterizedRowMapper<String>() {
+        return jdbcTemplate.query(sql, new RowMapper<String>() {
                 public String mapRow(ResultSet rs, int i) throws SQLException {
                     return rs.getString("user_name");
                 }
@@ -150,7 +152,7 @@ public class NodeStatusManager implements INodeStatusManager {
                     "upload_failures) VALUES (?,?,?)";
         final Status s = status;
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.getJdbcOperations().update(
+        jdbcTemplate.update(
             new PreparedStatementCreator() {
                 public PreparedStatement createPreparedStatement(
                         Connection conn) throws SQLException {

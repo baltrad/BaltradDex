@@ -21,22 +21,21 @@
 
 package eu.baltrad.dex.datasource.manager.impl;
 
-import eu.baltrad.dex.datasource.manager.IFileObjectManager;
-import eu.baltrad.dex.datasource.model.mapper.FileObjectMapper;
-import eu.baltrad.dex.datasource.model.FileObject;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-import java.util.List;
+import eu.baltrad.dex.datasource.manager.IFileObjectManager;
+import eu.baltrad.dex.datasource.model.FileObject;
+import eu.baltrad.dex.datasource.model.mapper.FileObjectMapper;
 
 /**
  * File object manager.
@@ -48,7 +47,7 @@ import java.util.List;
 public class FileObjectManager implements IFileObjectManager {
 
     /** JDBC template */
-    private SimpleJdbcOperations jdbcTemplate;
+    private JdbcOperations jdbcTemplate;
     /** Row mapper */
     private FileObjectMapper mapper;
 
@@ -63,7 +62,7 @@ public class FileObjectManager implements IFileObjectManager {
      * @param jdbcTemplate the jdbcTemplate to set
      */
     @Autowired
-    public void setJdbcTemplate(SimpleJdbcOperations jdbcTemplate) {
+    public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
     
@@ -116,7 +115,7 @@ public class FileObjectManager implements IFileObjectManager {
         final FileObject fObject = fileObject;
         
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.getJdbcOperations().update(
+        jdbcTemplate.update(
             new PreparedStatementCreator() {
                 public PreparedStatement createPreparedStatement(
                         Connection conn) throws SQLException {

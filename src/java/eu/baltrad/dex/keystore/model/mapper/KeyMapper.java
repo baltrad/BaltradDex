@@ -21,12 +21,12 @@
 
 package eu.baltrad.dex.keystore.model.mapper;
 
-import eu.baltrad.dex.keystore.model.Key;
-
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
+import org.springframework.jdbc.core.RowMapper;
+
+import eu.baltrad.dex.keystore.model.Key;
 
 /**
  * Row mapper for key object.
@@ -34,7 +34,7 @@ import java.sql.SQLException;
  * @version 1.6.0
  * @since 1.6.0
  */
-public class KeyMapper implements ParameterizedRowMapper<Key> {
+public class KeyMapper implements RowMapper<Key> {
     /**
     * Maps records to result set. 
     * @param rs Result set 

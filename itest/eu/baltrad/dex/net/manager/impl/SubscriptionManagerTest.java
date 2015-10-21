@@ -21,22 +21,21 @@
 
 package eu.baltrad.dex.net.manager.impl;
 
-import eu.baltrad.dex.datasource.manager.impl.DataSourceManager;
-import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.db.itest.DexDBITestHelper;
-import eu.baltrad.dex.user.manager.impl.UserManager;
-
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
-
-import org.dbunit.dataset.ITable;
-import org.dbunit.Assertion;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 import junit.framework.TestCase;
 
-import java.util.List;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import org.dbunit.Assertion;
+import org.dbunit.dataset.ITable;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.jdbc.core.JdbcOperations;
+
+import eu.baltrad.dex.datasource.manager.impl.DataSourceManager;
+import eu.baltrad.dex.db.itest.DexDBITestHelper;
+import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.user.manager.impl.UserManager;
 
 /**
  * Subscription manager integration test.
@@ -63,7 +62,7 @@ public class SubscriptionManagerTest extends TestCase {
         helper.cleanInsert(this, null);
         format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         classUnderTest = new SubscriptionManager();
-        SimpleJdbcOperations jdbcTemplate = (SimpleJdbcOperations) context
+        JdbcOperations jdbcTemplate = (JdbcOperations) context
                 .getBean("jdbcTemplate");
         classUnderTest.setJdbcTemplate(jdbcTemplate);
         

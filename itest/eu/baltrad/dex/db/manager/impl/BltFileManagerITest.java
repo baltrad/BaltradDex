@@ -21,33 +21,38 @@
 
 package eu.baltrad.dex.db.manager.impl;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.JdbcOperations;
 
+import eu.baltrad.bdb.db.AttributeQuery;
+import eu.baltrad.bdb.db.AttributeResult;
+import eu.baltrad.bdb.db.FileEntry;
+import eu.baltrad.bdb.db.FileQuery;
+import eu.baltrad.bdb.db.FileResult;
 import eu.baltrad.bdb.db.rest.RestfulDatabase;
 import eu.baltrad.bdb.expr.Expression;
 import eu.baltrad.bdb.expr.ExpressionFactory;
-import eu.baltrad.bdb.db.AttributeQuery;
-import eu.baltrad.bdb.db.AttributeResult;
-import eu.baltrad.bdb.db.FileQuery;
-import eu.baltrad.bdb.db.FileResult;
-import eu.baltrad.bdb.db.FileEntry;
-
-import eu.baltrad.beast.db.*;
-
+import eu.baltrad.beast.db.AlwaysMatchFilterManager;
+import eu.baltrad.beast.db.AttributeFilter;
+import eu.baltrad.beast.db.AttributeFilterManager;
+import eu.baltrad.beast.db.CombinedFilter;
+import eu.baltrad.beast.db.CombinedFilterManager;
+import eu.baltrad.beast.db.CoreFilterManager;
+import eu.baltrad.beast.db.IFilter;
+import eu.baltrad.beast.db.IFilterManager;
 import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.db.itest.DexJDBCITestHelper;
 import eu.baltrad.dex.db.itest.DexDBITestHelper;
+import eu.baltrad.dex.db.itest.DexJDBCITestHelper;
 
 /**
  * Integration test for baltrad-db and Beast.
@@ -66,7 +71,7 @@ public class BltFileManagerITest extends TestCase {
     private IFilterManager attributeFilterManager = null;
     private IFilterManager combinedFilterManager = null;
     private IFilterManager alwaysMatchFilterManager = null;
-    private SimpleJdbcOperations template = null;
+    private JdbcOperations template = null;
     private int dsLegId = 0;
     private int dsBrzId = 0;
     private int fltrLegId = 0;
@@ -84,7 +89,7 @@ public class BltFileManagerITest extends TestCase {
                                        context.getBean("combinedFilterManager"); 
         alwaysMatchFilterManager = (AlwaysMatchFilterManager) 
                                     context.getBean("alwaysMatchFilterManager");
-        template = (SimpleJdbcOperations)context.getBean("jdbcTemplate");
+        template = (JdbcOperations)context.getBean("jdbcTemplate");
         Map<String, IFilterManager> subManagers = 
                                           new HashMap<String, IFilterManager>();
         subManagers.put("attr", attributeFilterManager);

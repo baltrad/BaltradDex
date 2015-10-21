@@ -21,14 +21,17 @@
 
 package eu.baltrad.dex.status.manager.impl;
 
-import eu.baltrad.dex.db.itest.DexDBITestHelper;
-import eu.baltrad.dex.status.model.Status;
 import java.util.List;
+
 import junit.framework.TestCase;
+
 import org.dbunit.Assertion;
 import org.dbunit.dataset.ITable;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import org.springframework.jdbc.core.JdbcOperations;
+
+import eu.baltrad.dex.db.itest.DexDBITestHelper;
+import eu.baltrad.dex.status.model.Status;
 
 /**
  * Node status manager integration test.
@@ -49,7 +52,7 @@ public class NodeStatusManagerTest extends TestCase {
         helper = (DexDBITestHelper) context.getBean("helper");
         helper.cleanInsert(this, null);
         classUnderTest = new NodeStatusManager();
-        SimpleJdbcOperations jdbcTemplate = (SimpleJdbcOperations) context
+        JdbcOperations jdbcTemplate = (JdbcOperations) context
                 .getBean("jdbcTemplate");
         classUnderTest.setJdbcTemplate(jdbcTemplate);
     }

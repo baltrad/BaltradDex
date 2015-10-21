@@ -18,12 +18,15 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 ------------------------------------------------------------------------*/
 package eu.baltrad.dex.auth.ldap;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.ldap.core.DirContextOperations;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.ldap.LdapAuthoritiesPopulator;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
 /**
  * The authorities populator required by the LdapAuthenticationProvider.
@@ -42,12 +45,12 @@ public class BaltradUserAuthoritiesPopulator implements LdapAuthoritiesPopulator
   private final static Logger logger = LogManager.getLogger(BaltradUserAuthoritiesPopulator.class);
   
   @Override
-  public GrantedAuthority[] getGrantedAuthorities(DirContextOperations arg0, String user) {
+  public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations arg0, String user) {
     logger.debug("getGrantedAuthorities(" + user + ")");
     try {
       return service.loadUserByUsername(user).getAuthorities();
     } catch (Exception e) {
-      return new GrantedAuthority[0];
+      return new ArrayList<GrantedAuthority>();
     }
   }
   

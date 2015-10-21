@@ -21,21 +21,19 @@
 
 package eu.baltrad.dex.registry.manager.impl;
 
-import eu.baltrad.dex.registry.model.impl.RegistryEntry;
-import eu.baltrad.dex.db.itest.DexDBITestHelper;
-
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.jdbc.core.simple.SimpleJdbcOperations;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.dbunit.dataset.ITable;
 import org.dbunit.Assertion;
+import org.dbunit.dataset.ITable;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.jdbc.core.JdbcOperations;
 
-import java.util.List;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import eu.baltrad.dex.db.itest.DexDBITestHelper;
+import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 
 /**
  * Data delivery registry manager integration test.
@@ -63,7 +61,7 @@ public class RegistryManagerTest extends TestCase {
         helper = (DexDBITestHelper) context.getBean("helper");
         helper.cleanInsert(this, null);
         classUnderTest = new RegistryManager();
-        SimpleJdbcOperations jdbcTemplate = (SimpleJdbcOperations) context
+        JdbcOperations jdbcTemplate = (JdbcOperations) context
                 .getBean("jdbcTemplate");
         classUnderTest.setJdbcTemplate(jdbcTemplate);
         

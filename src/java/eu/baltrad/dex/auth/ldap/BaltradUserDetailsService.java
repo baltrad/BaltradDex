@@ -18,15 +18,18 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 ------------------------------------------------------------------------*/
 package eu.baltrad.dex.auth.ldap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.GrantedAuthorityImpl;
-import org.springframework.security.userdetails.UserDetails;
-import org.springframework.security.userdetails.UserDetailsService;
-import org.springframework.security.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.Role;
@@ -90,21 +93,24 @@ public class BaltradUserDetailsService implements UserDetailsService, Initializi
       loaduser = loaduser.replaceFirst(userPrefix, "");
     }
     User dbuser = manager.load(loaduser);
-    GrantedAuthority[] authorities = null;
+    List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
     if (dbuser.getRole().equals(Role.ADMIN)) {
       logger.debug("ADMIN,OPERATOR,USER");
-        authorities = new GrantedAuthority[] {ADMIN_AUTH, OPERATOR_AUTH, USER_AUTH};
+      authorities.add(ADMIN_AUTH);
+      authorities.add(OPERATOR_AUTH);
+      authorities.add(USER_AUTH);
     }
     if (dbuser.getRole().equals(Role.OPERATOR)) {
       logger.debug("OPERATOR,USER");
-        authorities = new GrantedAuthority[] {OPERATOR_AUTH, USER_AUTH};
+      authorities.add(OPERATOR_AUTH);
+      authorities.add(USER_AUTH);
     }
     if (dbuser.getRole().equals(Role.USER)) {
       logger.debug("USER");
-        authorities = new GrantedAuthority[] {USER_AUTH};
+      authorities.add(USER_AUTH);
     }
 
-    return new org.springframework.security.userdetails.User(dbuser.getName(), " ", true, true, true, true, authorities);
+    return new org.springframework.security.core.userdetails.User(dbuser.getName(), " ", true, true, true, true, authorities);
   }
 
   /**

@@ -31,6 +31,9 @@ import ncsa.hdf.object.Attribute;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.imageio.ImageIO;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import java.awt.image.BufferedImage;
 import java.awt.Image;
 import java.awt.Graphics2D;
@@ -109,6 +112,8 @@ public class BltDataProcessor {
     
     private Dataset h5Dataset;
     private Attribute h5Attribute;
+    
+    private final static Logger logger = LogManager.getLogger(BltDataProcessor.class);
     
     /**
      * Default constructor.
@@ -272,6 +277,7 @@ public class BltDataProcessor {
      */
     public Object getH5AttributeValue() {
         Object value = null;
+        
         if (getH5Attribute().getType().getDatatypeClass() == 
                 Datatype.CLASS_INTEGER) {
             try {

@@ -1,18 +1,23 @@
 package eu.baltrad.dex.auth.ldap;
 
-import static org.junit.Assert.*;
+import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Set;
 
 import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.security.GrantedAuthority;
-import org.springframework.security.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.User;
-import static org.easymock.EasyMock.*;
 
 public class BaltradUserDetailsServiceTest extends EasyMockSupport {
   private BaltradUserDetailsService classUnderTest = null;
@@ -44,11 +49,11 @@ public class BaltradUserDetailsServiceTest extends EasyMockSupport {
     UserDetails details = classUnderTest.loadUserByUsername("baltrad/admin");
     
     verifyAll();
-    GrantedAuthority[] auth = details.getAuthorities();
-    assertEquals(3, auth.length);
-    assertEquals("ROLE_ADMIN", auth[0].getAuthority());
-    assertEquals("ROLE_OPERATOR", auth[1].getAuthority());
-    assertEquals("ROLE_USER", auth[2].getAuthority());
+    Set<GrantedAuthority> auth = (Set)details.getAuthorities();
+    assertEquals(3, auth.size());
+    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_ADMIN")));
+    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_OPERATOR")));
+    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_USER")));
   }
   
   @Test
@@ -66,11 +71,11 @@ public class BaltradUserDetailsServiceTest extends EasyMockSupport {
     UserDetails details = classUnderTest.loadUserByUsername("admin");
     
     verifyAll();
-    GrantedAuthority[] auth = details.getAuthorities();
-    assertEquals(3, auth.length);
-    assertEquals("ROLE_ADMIN", auth[0].getAuthority());
-    assertEquals("ROLE_OPERATOR", auth[1].getAuthority());
-    assertEquals("ROLE_USER", auth[2].getAuthority());
+    Set<GrantedAuthority> auth = (Set)details.getAuthorities();
+    assertEquals(3, auth.size());
+    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_ADMIN")));
+    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_OPERATOR")));
+    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_USER")));
   }
   
   @Test
@@ -86,10 +91,10 @@ public class BaltradUserDetailsServiceTest extends EasyMockSupport {
     UserDetails details = classUnderTest.loadUserByUsername("baltrad/admin");
     
     verifyAll();
-    GrantedAuthority[] auth = details.getAuthorities();
-    assertEquals(2, auth.length);
-    assertEquals("ROLE_OPERATOR", auth[0].getAuthority());
-    assertEquals("ROLE_USER", auth[1].getAuthority());
+    Set<GrantedAuthority> auth = (Set)details.getAuthorities();
+    assertEquals(2, auth.size());
+    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_OPERATOR")));
+    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_USER")));
   }
   
   @Test
@@ -105,9 +110,9 @@ public class BaltradUserDetailsServiceTest extends EasyMockSupport {
     UserDetails details = classUnderTest.loadUserByUsername("baltrad/admin");
     
     verifyAll();
-    GrantedAuthority[] auth = details.getAuthorities();
-    assertEquals(1, auth.length);
-    assertEquals("ROLE_USER", auth[0].getAuthority());
+    Set<GrantedAuthority> auth = (Set)details.getAuthorities();
+    assertEquals(1, auth.size());
+    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_USER")));
   }
   
   @Test
