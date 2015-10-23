@@ -24,7 +24,7 @@ Creates a distribution route
 <t:generic_page pageTitle="${create ? 'Create' : 'Edit'} route">
     <jsp:attribute name="extraHeader">
         <script type="text/javascript"
-                src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js">
+                src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js">
         </script>
         <script type="text/javascript"
                 src="includes/js/jquery.serializeJSON.js">

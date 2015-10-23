@@ -26,7 +26,7 @@ Modify a site2d route
 <t:generic_page pageTitle="Edit route">
     <jsp:attribute name="extraHeader">
         <script type="text/javascript"
-                src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js">
+                src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js">
         </script>
 
         <script type="text/javascript">
