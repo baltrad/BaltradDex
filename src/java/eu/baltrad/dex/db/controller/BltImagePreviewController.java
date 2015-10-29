@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.db.controller;
 
+import eu.baltrad.dex.db.util.BltAttribute;
 import eu.baltrad.dex.db.util.BltDataProcessor;
 
 import eu.baltrad.bdb.FileCatalog;
@@ -133,6 +134,7 @@ public class BltImagePreviewController {
             }
             // Create image from Cartesian composite object
             if (fileObject.equals(BltDataProcessor.ODIMH5_COMP_OBJ)) {
+                BltAttribute battr;
                 bltDataProcessor.getH5Attribute(root, datasetWhere, 
                     BltDataProcessor.H5_XSIZE_ATTR );
                 long xsize = (Long) bltDataProcessor.getH5AttributeValue();
@@ -142,9 +144,14 @@ public class BltImagePreviewController {
                 String dataSpecificWhat = datasetPath.substring(0, 
                         datasetPath.lastIndexOf(BltDataProcessor.H5_PATH_SEPARATOR) 
                             + 1) + BltDataProcessor.H5_WHAT_GROUP_PREFIX;
-                bltDataProcessor.getH5Attribute(root, dataSpecificWhat, 
-                        BltDataProcessor.H5_NODATA_ATTR);
-                double noData = (Double) bltDataProcessor.getH5AttributeValue();
+//                bltDataProcessor.getH5Attribute(root, dataSpecificWhat, 
+//                        BltDataProcessor.H5_NODATA_ATTR);
+//                double noData = (Double) bltDataProcessor.getH5AttributeValue();
+                double noData = 0.0;
+                battr = bltDataProcessor.findAttribute(root, dataSpecificWhat, BltDataProcessor.H5_NODATA_ATTR);
+                if (battr != null && battr.isDouble()) {
+                  noData = battr.getDouble();
+                }
                 bltDataProcessor.getH5Dataset(root, datasetPath);
                 Dataset dataset = bltDataProcessor.getH5Dataset();
                 BufferedImage bi = bltDataProcessor.cart2Image(xsize, ysize, 
