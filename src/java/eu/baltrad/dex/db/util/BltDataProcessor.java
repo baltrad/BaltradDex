@@ -278,8 +278,7 @@ public class BltDataProcessor {
     public Object getH5AttributeValue() {
         Object value = null;
         
-        if (getH5Attribute().getType().getDatatypeClass() == 
-                Datatype.CLASS_INTEGER) {
+        if (getH5Attribute().getType().getDatatypeClass() == Datatype.CLASS_INTEGER) {
             try {
                 int attrInt[] = (int[]) getH5Attribute().getValue();
                 Integer i = attrInt[0];
@@ -291,8 +290,7 @@ public class BltDataProcessor {
                 value = l;
             }
         }
-        if (getH5Attribute().getType().getDatatypeClass() == 
-                Datatype.CLASS_FLOAT) {
+        if (getH5Attribute().getType().getDatatypeClass() == Datatype.CLASS_FLOAT) {
             try {
                 float attrFloat[] = (float[]) getH5Attribute().getValue();
                 Float f = attrFloat[0];
@@ -310,6 +308,34 @@ public class BltDataProcessor {
             value = attrString[0];
         }
         return value;
+    }
+    
+    public BltAttribute findAttribute(Group root, String groupPath, String attributeName)  throws RuntimeException {
+      BltAttribute attrResult = null;
+      try {
+        List members = root.getMemberList();
+        for (int i = 0; i < members.size() && attrResult == null; i++) {
+          if (members.get(i) instanceof Group) {
+            Group group = (Group) members.get(i);
+            String grpPath = group.getFullName();
+            if (grpPath.equals(groupPath)) {   
+              List metadata = group.getMetadata();
+              for (int j = 0; j < metadata.size(); j++) {
+                Attribute attr = (Attribute) metadata.get(j);
+                if(attr.getName().equals(attributeName)) {
+                  attrResult = new BltAttribute(attr);
+                }
+              }
+            }
+            if(group.getMemberList().size() > 0) {
+              attrResult = findAttribute(group, groupPath, attributeName);
+            }
+          }
+        }
+      } catch (Exception e) {
+        throw new RuntimeException("Failed to access attribute", e);
+      }
+      return attrResult;
     }
     
     /**

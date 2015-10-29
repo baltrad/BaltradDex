@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.db.controller;
 
+import eu.baltrad.dex.db.util.BltAttribute;
 import eu.baltrad.dex.db.util.BltDataProcessor;
 import eu.baltrad.dex.db.manager.impl.BltFileManager;
 import eu.baltrad.dex.db.model.BltFile;
@@ -372,6 +373,7 @@ public class BltFileDetailsController {
                         .split(BltDataProcessor.H5_PATH_SEPARATOR);
                 String datasetSpecificHow = "";
                 String dataSpecificWhat = "";
+                BltAttribute battr = null;
                 for (int j = 0; j < nameParts.length; j++) {
                     if (nameParts[j]
                             .startsWith(BltDataProcessor.H5_DATASET_PREFIX)) {
@@ -397,19 +399,22 @@ public class BltFileDetailsController {
                 String nodesList = nodes.replaceAll("'", "").replaceAll(",",
                         ", ");
                 // get data quantity
-                bltDataProcessor.getH5Attribute(root, dataSpecificWhat,
-                        BltDataProcessor.H5_QUANTITY_ATTR);
-                String quantity_val = (String) bltDataProcessor
-                        .getH5AttributeValue();
+                String quantity_val = null;
+                battr = bltDataProcessor.findAttribute(root, dataSpecificWhat, BltDataProcessor.H5_QUANTITY_ATTR);
+                if (battr != null && battr.isString()) {
+                  quantity_val = battr.getString();
+                }
                 bltDataProcessor.getH5Attribute(root, whereGroup,
                         BltDataProcessor.H5_XSIZE_ATTR);
                 long xsize = (Long) bltDataProcessor.getH5AttributeValue();
                 bltDataProcessor.getH5Attribute(root, whereGroup,
                         BltDataProcessor.H5_YSIZE_ATTR);
                 long ysize = (Long) bltDataProcessor.getH5AttributeValue();
-                bltDataProcessor.getH5Attribute(root, dataSpecificWhat,
-                        BltDataProcessor.H5_NODATA_ATTR);
-                double noData = (Double) bltDataProcessor.getH5AttributeValue();
+                double noData = 0.0;
+                battr = bltDataProcessor.findAttribute(root, dataSpecificWhat, BltDataProcessor.H5_NODATA_ATTR);
+                if (battr != null && battr.isDouble()) {
+                  noData = battr.getDouble();
+                }
                 bltDataProcessor.getH5Attribute(root, whereGroup,
                         BltDataProcessor.H5_LL_LON_ATTR);
                 double llLon = (Double) bltDataProcessor.getH5AttributeValue();
