@@ -48,16 +48,16 @@ Author     : szewczenko
                                 <c:forEach items="${centers}" 
                                            var="center">
                                     <c:choose>
-                                        <c:when test="${center == center_selected}">
-                                            <option value="${center}" selected 
+                                        <c:when test="${center.key == center_selected}">
+                                            <option value="${center.key}" selected 
                                                     title="Country - GTS code - Center number">    
-                                                <c:out value="${center}"/>
+                                                <c:out value="${center.value}"/>
                                             </option>    
                                         </c:when>
                                         <c:otherwise>
-                                            <option value="${center}"
+                                            <option value="${center.key}"
                                                     title="Country - GTS code - Center number">    
-                                                <c:out value="${center}"/>
+                                                <c:out value="${center.value}"/>
                                             </option>
                                         </c:otherwise>
                                     </c:choose>
@@ -68,9 +68,9 @@ Author     : szewczenko
                             <select name="radar_id" size="10" multiple>
                                 <c:forEach items="${radars}" 
                                            var="radar">
-                                    <option value="${radar}"
+                                    <option value="${radar.key}"
                                             title="Place - Code - WMO number">    
-                                        <c:out value="${radar}"/>
+                                        <c:out value="${radar.value}"/>
                                     </option>
                                 </c:forEach>
                             <select>

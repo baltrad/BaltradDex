@@ -21,21 +21,13 @@
 
 package eu.baltrad.dex.radar.controller;
 
-import eu.baltrad.dex.radar.manager.impl.RadarManager;
-import eu.baltrad.dex.radar.model.Radar;
-import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.util.ServletContextUtil;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.dom4j.Attribute;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -43,6 +35,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
+
+import eu.baltrad.bdb.db.Database;
+import eu.baltrad.bdb.db.SourceManager;
+import eu.baltrad.bdb.oh5.Source;
+import eu.baltrad.dex.radar.manager.impl.RadarManager;
+import eu.baltrad.dex.radar.model.Radar;
+import eu.baltrad.dex.util.MessageResourceUtil;
 
 /**
  * Save radar controller.
@@ -58,8 +57,6 @@ public class SaveRadarController {
 
     private static final String FORM_VIEW = "radars_save";
     private static final String SUCCESS_VIEW = "radars_save_status";
-    private static final String THIRD_PARTY_PATH = "third_party";
-    private static final String ODIM_SRC_PATH = "rave/config/odim_source.xml";
     
     private static final String ODIM_LOAD_ERROR = "odim_load_error";
     
@@ -74,32 +71,22 @@ public class SaveRadarController {
     private RadarManager radarManager;
     private MessageResourceUtil messages;
     private Logger log;
-    private String odimSourcePth;
-
+    
+    /**
+     * The BDB database that keeps track of the sources
+     */
+    private Database database;
+    
+    /**
+     * The logger 
+     */
+    private final static Logger logger = LogManager.getLogger(SaveRadarController.class);
+    
     /**
      * Constructor.
      */
     public SaveRadarController() {
         this.log = Logger.getLogger("DEX");
-    }
-    
-    /**
-     * Load XML document from file.
-     * @return XML document object
-     * @throws Exception 
-     */
-    private Document loadXmlDoc() {
-        Document xmlDoc = null;
-        try {    
-            String ctx = ServletContextUtil.getServletContextPath();
-            odimSourcePth = ctx.substring(0, ctx.indexOf(THIRD_PARTY_PATH, 0)) 
-                    + ODIM_SRC_PATH;
-            SAXReader reader = new SAXReader();
-            xmlDoc = reader.read(new File(odimSourcePth));
-        } catch (DocumentException e) {
-            log.error("Failed to load odim sources definition file", e);
-        }
-        return xmlDoc;
     }
     
     /**
@@ -129,27 +116,30 @@ public class SaveRadarController {
             viewName = FORM_VIEW;
         }
         if (centerId != null && radarId != null) {
-            Radar radar = null;
-            try {
-                String[] centerParms = centerId.split(" - ");
-                String[] radarParms = radarId.split(" - ");
-                radar = new Radar(centerParms[0], centerParms[1], 
-                        Integer.parseInt(centerParms[2]), 
-                        radarParms[0], radarParms[1], radarParms[2]);
-                radarManager.store(radar);
-                String msg = messages.getMessage(SAVE_RADAR_OK_MSG_KEY, 
-                            new Object[] {radar.getRadarPlace(), 
-                                radar.getRadarCode(), radar.getRadarWmo()});
-                model.addAttribute(OK_MSG_KEY, msg);
-                log.warn(msg);
-            } catch (Exception e) {
-                String msg = messages.getMessage(SAVE_RADAR_ERROR_MSG_KEY, 
-                            new Object[] {radar.getRadarPlace(), 
-                                radar.getRadarCode(), radar.getRadarWmo()});
-                model.addAttribute(ERROR_MSG_KEY, msg);
-                log.error(msg, e);
+          SourceManager sourceManager = database.getSourceManager();
+          Radar radar = null;
+          try {
+            Source cSource = sourceManager.getSource(centerId);
+            Source rSource = sourceManager.getSource(radarId);
+            radar = createRadar(cSource.getName().toUpperCase(), cSource.get("CCCC"), Integer.parseInt(cSource.get("ORG")), rSource.get("PLC"), rSource.get("RAD"), rSource.get("WMO"));
+            radarManager.store(radar);
+            String msg = messages.getMessage(SAVE_RADAR_OK_MSG_KEY, new Object[] {radar.getRadarPlace(), radar.getRadarCode(), radar.getRadarWmo()});
+            model.addAttribute(OK_MSG_KEY, msg);
+            log.warn(msg);
+          } catch (Exception e) {
+            if (radar != null) {
+              String msg = messages.getMessage(SAVE_RADAR_ERROR_MSG_KEY, 
+                  new Object[] {radar.getRadarPlace(), radar.getRadarCode(), radar.getRadarWmo()});
+              model.addAttribute(ERROR_MSG_KEY, msg);
+              log.error(msg, e);
+            } else {
+              String msg = messages.getMessage(SAVE_RADAR_ERROR_MSG_KEY, 
+                  new Object[] {centerId, radarId, ""});
+              model.addAttribute(ERROR_MSG_KEY, msg);
+              log.error(msg, e);
             }
-            viewName = SUCCESS_VIEW;
+          }
+          viewName = SUCCESS_VIEW;
         }
         return viewName;
     }
@@ -159,27 +149,27 @@ public class SaveRadarController {
      * @return List containing center names
      */
     @ModelAttribute("centers")
-    public List<String> loadCenters(ModelMap model) {
-        Document xmlDoc = loadXmlDoc();
-        List<String> centers = null;
-        if (xmlDoc != null) {
-            Element root = xmlDoc.getRootElement();
-            centers = new ArrayList<String>();
-            for (Iterator i = root.elementIterator(); i.hasNext();) {   
-                Element element = (Element) i.next();
-                String centerCode = element.getName();
-                for (Iterator j = element.attributeIterator(); j.hasNext();) {
-                    Attribute attribute = (Attribute) j.next();
-                    centerCode += " - " + attribute.getValue();
-                }
-                centers.add(centerCode.toUpperCase());   
-            }
-        } else {
-            model.addAttribute(ODIM_LOAD_ERROR, 
-                    messages.getMessage(ODIM_LOAD_ERROR_MSG_KEY, 
-                    new Object[] {odimSourcePth}));
+    public List<KeyValuePair> loadCenters(ModelMap model) {
+      List<KeyValuePair> centers = new ArrayList<KeyValuePair>();
+      try {
+        List<Source> parentSources = database.getSourceManager()
+            .getParentSources();
+        for (Source src : parentSources) {
+          String centerCode = src.getName();
+          if (src.has("CCCC")) {
+            centerCode = centerCode + " - " + src.get("CCCC");
+          }
+          if (src.has("ORG")) {
+            centerCode = centerCode + " - " + src.get("ORG");
+          }
+          centers.add(new KeyValuePair(src.getName(), centerCode.toUpperCase()));
         }
-        return centers;
+      } catch (Exception e) {
+        model.addAttribute(ODIM_LOAD_ERROR, messages.getMessage(ODIM_LOAD_ERROR_MSG_KEY));
+        logger.error("Failed to load odim", e);
+      }
+      
+      return centers;
     }
     
     /**
@@ -188,41 +178,36 @@ public class SaveRadarController {
      * @return List containing radar names
      */
     @ModelAttribute("radars")
-    public List<String> loadRadars(HttpServletRequest request, ModelMap model) {
-        Document xmlDoc = loadXmlDoc();
-        List<String> radars = null;
-        if (xmlDoc != null) {
-            String centerId = request.getParameter("center_id"); 
-            radars = new ArrayList<String>();
-            if (centerId != null) {
-                String countryCode = centerId.substring(0, 2).toLowerCase();
-                Element root = xmlDoc.getRootElement();
-                for (Iterator i = root.elementIterator(countryCode); 
-                        i.hasNext();) {
-                    Element element = (Element) i.next();
-                        for (Iterator j = element.elementIterator(); 
-                                j.hasNext();) {
-                        Element elem = (Element) j.next();
-                        String radar = "";
-                        for (Iterator k = elem.attributeIterator(); 
-                                k.hasNext();) {
-                            Attribute attribute = (Attribute) k.next();
-                            radar += attribute.getValue();
-                            radar += " - ";
-                        }
-                        radars.add(radar.trim()
-                                .substring(0, radar.length() - 2));
-                    }
-                }
+    public List<KeyValuePair> loadRadars(HttpServletRequest request, ModelMap model) {
+      List<KeyValuePair> radars = new ArrayList<KeyValuePair>();
+      try {
+        String centerId = request.getParameter("center_id");
+        if (centerId != null) { 
+          String countryCode = centerId.toLowerCase().trim();
+          List<Source> sources = database.getSourceManager().getSourcesWithParent(countryCode);
+          for (Source src : sources) {
+            String radar = "";
+            if (src.has("PLC")) {
+              radar = src.get("PLC");
             }
-        } else {
-            model.addAttribute(ODIM_LOAD_ERROR, 
-                    messages.getMessage(ODIM_LOAD_ERROR_MSG_KEY, 
-                    new Object[] {odimSourcePth}));
+            if (src.has("RAD")) {
+              radar = radar + " - " + src.get("RAD");
+            }
+            if (src.has("WMO")) {
+              radar = radar + " - " + src.get("WMO");
+            }
+            radars.add(new KeyValuePair(src.getName(), radar));
+          }
         }
-        return radars;
+      } catch (Exception e) {
+        model.addAttribute(ODIM_LOAD_ERROR, messages.getMessage(ODIM_LOAD_ERROR_MSG_KEY));
+      }
+      return radars;
     }
     
+    protected Radar createRadar(String countryid, String cccc, int org, String plc, String rad, String wmo) {
+      return new Radar(countryid, cccc, org, plc, rad, wmo);
+    }
     /**
      * @param radarManager 
      */
@@ -237,6 +222,11 @@ public class SaveRadarController {
     @Autowired
     public void setMessages(MessageResourceUtil messages) {
         this.messages = messages;
+    }
+    
+    @Autowired
+    public void setRestfulDatabase(Database database) {
+      this.database = database;
     }
     
 }
