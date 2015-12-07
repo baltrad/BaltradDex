@@ -99,14 +99,65 @@ public class SaveRadarControllerTest extends EasyMockSupport {
     seangSource.put("WMO", "02606");
     
     expect(request.getParameter("center_id")).andReturn("se");
-    expect(request.getParameter("radar_id")).andReturn("seang");
+    //expect(request.getParameter("radar_id")).andReturn("seang");
+    expect(request.getParameterValues("radar_id")).andReturn(new String[]{"seang"});
     expect(database.getSourceManager()).andReturn(sourceManager);
     expect(sourceManager.getSource("se")).andReturn(seSource);
     expect(sourceManager.getSource("seang")).andReturn(seangSource);
     expect(methods.createRadar("SE", "ESWI", 82, "Ängelholm", "SE50", "02606")).andReturn(radar);
     expect(radarManager.store(radar)).andReturn(1);
     expect(messages.getMessage(eq("saveradar.success"), aryEq(new Object[] {"Ängelholm","SE50", "02606"}))).andReturn("yupp");
-    expect(modelMap.addAttribute("radar_save_success", "yupp")).andReturn(null);
+    expect(modelMap.addAttribute("radar_save_success", "yupp ")).andReturn(null);
+    
+    replayAll();
+    String view = classUnderTest.processSubmit(request, modelMap);
+    verifyAll();
+    assertEquals("radars_save_status", view);
+  }
+
+  @Test
+  public void processSubmit_multipleSources() throws Exception {
+    ModelMap modelMap = createMock(ModelMap.class);
+    HttpServletRequest request = createMock(HttpServletRequest.class);
+    SourceManager sourceManager = createMock(SourceManager.class);
+    
+    Radar radarAse = new Radar("SE", "ESWI", 82, "Ase", "SE47", "02588");
+    Radar radarVilebo = new Radar("SE", "ESWI", 82, "Vilebo", "SE48", "02570");
+    Radar radarAngelholm = new Radar("SE", "ESWI", 82, "Ängelholm", "SE50", "02606");
+    
+    Source seSource = new Source("se", null);
+    seSource.put("CCCC", "ESWI");
+    seSource.put("ORG", "82");
+    Source seaseSource = new Source("sease", "se");
+    seaseSource.put("PLC", "Ase");
+    seaseSource.put("RAD", "SE47");
+    seaseSource.put("WMO", "02588");
+    Source sevilSource = new Source("sevil", "se");
+    sevilSource.put("PLC", "Vilebo");
+    sevilSource.put("RAD", "SE48");
+    sevilSource.put("WMO", "02570");
+    Source seangSource = new Source("seang", "se");
+    seangSource.put("PLC", "Ängelholm");
+    seangSource.put("RAD", "SE50");
+    seangSource.put("WMO", "02606");
+    
+    expect(request.getParameter("center_id")).andReturn("se");
+    expect(request.getParameterValues("radar_id")).andReturn(new String[]{"sease", "sevil", "seang"});
+    expect(database.getSourceManager()).andReturn(sourceManager);
+    expect(sourceManager.getSource("se")).andReturn(seSource);
+    expect(sourceManager.getSource("sease")).andReturn(seaseSource);
+    expect(methods.createRadar("SE", "ESWI", 82, "Ase", "SE47", "02588")).andReturn(radarAse);
+    expect(radarManager.store(radarAse)).andReturn(1);
+    expect(messages.getMessage(eq("saveradar.success"), aryEq(new Object[] {"Ase","SE47", "02588"}))).andReturn("yupp");
+    expect(sourceManager.getSource("sevil")).andReturn(sevilSource);
+    expect(methods.createRadar("SE", "ESWI", 82, "Vilebo", "SE48", "02570")).andReturn(radarVilebo);
+    expect(radarManager.store(radarVilebo)).andReturn(1);
+    expect(messages.getMessage(eq("saveradar.success"), aryEq(new Object[] {"Vilebo","SE48", "02570"}))).andReturn("yupp");
+    expect(sourceManager.getSource("seang")).andReturn(seangSource);
+    expect(methods.createRadar("SE", "ESWI", 82, "Ängelholm", "SE50", "02606")).andReturn(radarAngelholm);
+    expect(radarManager.store(radarAngelholm)).andReturn(1);
+    expect(messages.getMessage(eq("saveradar.success"), aryEq(new Object[] {"Ängelholm","SE50", "02606"}))).andReturn("yupp");
+    expect(modelMap.addAttribute("radar_save_success", "yupp yupp yupp ")).andReturn(null);
     
     replayAll();
     String view = classUnderTest.processSubmit(request, modelMap);

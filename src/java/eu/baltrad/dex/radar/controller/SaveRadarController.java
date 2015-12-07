@@ -106,38 +106,58 @@ public class SaveRadarController {
     @RequestMapping(method = RequestMethod.POST)
     public String processSubmit(HttpServletRequest request, ModelMap model) {
         String centerId = request.getParameter("center_id");
-        String radarId = request.getParameter("radar_id");
+        String[] radarIds = request.getParameterValues("radar_id");
         String viewName = "";
-        if (centerId == null && radarId == null) {
+        String okmsg = "";
+        String errormsg = "";
+        if (centerId == null && radarIds == null) {
             viewName = FORM_VIEW;
         }
-        if (centerId != null && radarId == null) {
+        if (centerId != null && radarIds == null) {
             request.setAttribute("center_selected", centerId);
             viewName = FORM_VIEW;
         }
-        if (centerId != null && radarId != null) {
+        if (centerId != null && radarIds != null) {
           SourceManager sourceManager = database.getSourceManager();
           Radar radar = null;
+          Source cSource = null;
           try {
-            Source cSource = sourceManager.getSource(centerId);
-            Source rSource = sourceManager.getSource(radarId);
-            radar = createRadar(cSource.getName().toUpperCase(), cSource.get("CCCC"), Integer.parseInt(cSource.get("ORG")), rSource.get("PLC"), rSource.get("RAD"), rSource.get("WMO"));
-            radarManager.store(radar);
-            String msg = messages.getMessage(SAVE_RADAR_OK_MSG_KEY, new Object[] {radar.getRadarPlace(), radar.getRadarCode(), radar.getRadarWmo()});
-            model.addAttribute(OK_MSG_KEY, msg);
-            log.warn(msg);
+            cSource = sourceManager.getSource(centerId);
           } catch (Exception e) {
-            if (radar != null) {
-              String msg = messages.getMessage(SAVE_RADAR_ERROR_MSG_KEY, 
-                  new Object[] {radar.getRadarPlace(), radar.getRadarCode(), radar.getRadarWmo()});
-              model.addAttribute(ERROR_MSG_KEY, msg);
-              log.error(msg, e);
-            } else {
-              String msg = messages.getMessage(SAVE_RADAR_ERROR_MSG_KEY, 
-                  new Object[] {centerId, radarId, ""});
-              model.addAttribute(ERROR_MSG_KEY, msg);
-              log.error(msg, e);
+            log.error("Failed to fetch source: " + e.getMessage());
+            logger.error("Failed to fetch source: ", e);
+            String msg = messages.getMessage(SAVE_RADAR_ERROR_MSG_KEY, 
+              new Object[] {"", "", ""});
+            model.addAttribute(ERROR_MSG_KEY, msg);
+          }
+
+          for (String radarId : radarIds) {
+            try {
+              Source rSource = sourceManager.getSource(radarId);
+              radar = createRadar(cSource.getName().toUpperCase(), cSource.get("CCCC"), Integer.parseInt(cSource.get("ORG")), rSource.get("PLC"), rSource.get("RAD"), rSource.get("WMO"));
+              radarManager.store(radar);
+              String msg = messages.getMessage(SAVE_RADAR_OK_MSG_KEY, new Object[] {radar.getRadarPlace(), radar.getRadarCode(), radar.getRadarWmo()});
+              okmsg = okmsg + msg + " " ;
+              log.warn(msg);
+            } catch (Exception e) {
+              if (radar != null) {
+                String msg = messages.getMessage(SAVE_RADAR_ERROR_MSG_KEY, 
+                    new Object[] {radar.getRadarPlace(), radar.getRadarCode(), radar.getRadarWmo()});
+                log.error(msg, e);
+                errormsg = errormsg + msg + " " ;
+              } else {
+                String msg = messages.getMessage(SAVE_RADAR_ERROR_MSG_KEY, 
+                    new Object[] {centerId, radarId, ""});
+                log.error(msg, e);
+                errormsg = errormsg + msg + " " ;
+              }
             }
+          }
+          if (okmsg.length() > 0) {
+            model.addAttribute(OK_MSG_KEY, okmsg);
+          }
+          if (errormsg.length() > 0) {
+            model.addAttribute(ERROR_MSG_KEY, errormsg);
           }
           viewName = SUCCESS_VIEW;
         }
