@@ -29,6 +29,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
        http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
        http://www.springframework.org/schema/tx
        http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+       
+    <!--
+      bdb.xml provides the following beans:
+        bdb_db: a eu.baltrad.bdb.db.Database implementation
+        bdb_storage: a eu.baltrad.bdb.storage.LocalStorage implementetation
+        bdb_file_catalog: a eu.baltrad.bdb.FileCatalog implementation
+    -->
+    <import resource="bdb.xml"/>
+    
     <!-- 
         All non-annotated controllers should be mapped here. 
     --> 
@@ -541,21 +550,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- Nice to have a cron-like scheduler -->
     <bean id="beastscheduler" class="eu.baltrad.beast.scheduler.BeastScheduler" autowire="byType"/>
 
-    <!-- and the file catalog -->
-    <bean id="bdb_db" class="eu.baltrad.bdb.db.rest.RestfulDatabase" >
-        <constructor-arg index="0" value="${database.uri}" />
-        <constructor-arg index="1" value="20" />
-    </bean>
-    
-    <bean id="bdb_storage" class="eu.baltrad.bdb.storage.CacheDirStorage">
-        <constructor-arg index="0" value="${data.storage.folder}" />
-        <constructor-arg index="1" value="1000" /> <!-- cache size -->
-    </bean>
-    <bean id="fileCatalog" class="eu.baltrad.bdb.BasicFileCatalog">
-        <constructor-arg ref="bdb_db" />
-        <constructor-arg ref="bdb_storage" />
-    </bean>
-    
     <!-- and the abstraction of the catalog -->
     <bean id="catalog" class="eu.baltrad.beast.db.Catalog" autowire="byType" />
 
