@@ -116,6 +116,7 @@ public class CompositeRoutesController {
    * @param recipients the recipients
    * @param byscan if composite should affect scans or volumes
    * @param areaid the composite area to be generated
+   * @param quantity the quantity to be used in the composite
    * @param interval the interval
    * @param timeout the timeout
    * @param applygra if gra correction should be applied or not
@@ -140,6 +141,7 @@ public class CompositeRoutesController {
       @RequestParam(value = "prodpar", required = false) String prodpar,
       @RequestParam(value = "selection_method", required = false) Integer selection_method,
       @RequestParam(value = "areaid", required = false) String areaid,
+      @RequestParam(value = "quantity", required = false) String quantity,
       @RequestParam(value = "interval", required = false) Integer interval,
       @RequestParam(value = "timeout", required = false) Integer timeout,
       @RequestParam(value = "applygra", required = false) Boolean applygra,
@@ -161,10 +163,10 @@ public class CompositeRoutesController {
     
     if (name == null && author == null && active == null && description == null && byscan == null &&
         method == null && prodpar == null && selection_method == null && recipients == null && 
-        areaid == null && interval == null && timeout == null && applygra == null && ZR_A == null && ZR_b == null &&
+        areaid == null && quantity == null && interval == null && timeout == null && applygra == null && ZR_A == null && ZR_b == null &&
         ignore_malfunc == null && ctfilter == null && qitotal_field == null && sources == null && detectors == null) {
       return viewCreateRoute(model, name, author, active, description,
-          recipients, byscan, method, prodpar, selection_method, areaid, 
+          recipients, byscan, method, prodpar, selection_method, areaid, quantity,
           interval, timeout, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotal_field, sources, detectors, null);
     }
     
@@ -175,6 +177,7 @@ public class CompositeRoutesController {
     } else if (sources == null || sources.size() <= 0) {
       emessage = "Must specify at least one source.";
     }
+
     if (prodpar != null) {
       logger.info("prodpar != null");
       if (method != null && method.equals(CompositingRule.PMAX)) {
@@ -212,7 +215,7 @@ public class CompositeRoutesController {
         double dZR_b = (ZR_b == null) ? 1.6 : ZR_b.doubleValue();
         boolean bignore_malfunc = (ignore_malfunc == null) ? false : ignore_malfunc.booleanValue();
         boolean bctfilter = (ctfilter == null) ? false : ctfilter.booleanValue();
-        CompositingRule rule = createRule(areaid, iinterval, sources, detectors, itimeout, bbyscan, method, prodpar, iselection_method, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, qitotal_field);
+        CompositingRule rule = createRule(areaid, quantity, iinterval, sources, detectors, itimeout, bbyscan, method, prodpar, iselection_method, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, qitotal_field);
         List<String> recip = (recipients == null) ? new ArrayList<String>() : recipients;
         RouteDefinition def = manager.create(name, author, bactive, description, recip, rule);
         manager.storeDefinition(def);
@@ -224,7 +227,7 @@ public class CompositeRoutesController {
     }
     
     return viewCreateRoute(model, name, author, active, description,
-        recipients, byscan, method, prodpar, selection_method, areaid, interval, timeout,applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotal_field, sources, detectors, emessage);
+        recipients, byscan, method, prodpar, selection_method, areaid, quantity, interval, timeout,applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotal_field, sources, detectors, emessage);
   }
   
   /**
@@ -255,6 +258,7 @@ public class CompositeRoutesController {
       @RequestParam(value = "prodpar", required = false) String prodpar,
       @RequestParam(value = "selection_method", required = false) Integer selection_method,
       @RequestParam(value = "areaid", required = false) String areaid,
+      @RequestParam(value = "quantity", required = false) String quantity,
       @RequestParam(value = "interval", required = false) Integer interval,
       @RequestParam(value = "timeout", required = false) Integer timeout,
       @RequestParam(value = "applygra", required = false) Boolean applygra,
@@ -271,7 +275,7 @@ public class CompositeRoutesController {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
     if (operation != null && operation.equals("Save")) {
-      return modifyRoute(model, name, author, active, description, byscan, method, prodpar, selection_method, recipients, areaid, interval, timeout, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotal_field, sources, detectors);
+      return modifyRoute(model, name, author, active, description, byscan, method, prodpar, selection_method, recipients, areaid, quantity, interval, timeout, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotal_field, sources, detectors);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -283,7 +287,7 @@ public class CompositeRoutesController {
       if (def.getRule() instanceof CompositingRule) {
         CompositingRule crule = (CompositingRule)def.getRule();
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
-            def.getRecipients(), crule.isScanBased(), crule.getMethod(), crule.getProdpar(), crule.getSelectionMethod(), crule.getArea(), crule.getInterval(), crule.getTimeout(), crule.isApplyGRA(), crule.getZR_A(), crule.getZR_b(), crule.isIgnoreMalfunc(), crule.isCtFilter(), crule.getQitotalField(), crule.getSources(), crule.getDetectors(), null);
+            def.getRecipients(), crule.isScanBased(), crule.getMethod(), crule.getProdpar(), crule.getSelectionMethod(), crule.getArea(), crule.getQuantity(), crule.getInterval(), crule.getTimeout(), crule.isApplyGRA(), crule.getZR_A(), crule.getZR_b(), crule.isIgnoreMalfunc(), crule.isCtFilter(), crule.getQitotalField(), crule.getSources(), crule.getDetectors(), null);
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a compositing rule");
       }
@@ -308,7 +312,7 @@ public class CompositeRoutesController {
    */
   protected String viewCreateRoute(Model model, String name, String author,
       Boolean active, String description, List<String> recipients, Boolean byscan, 
-      String method, String prodpar, Integer selection_method, String areaid, 
+      String method, String prodpar, Integer selection_method, String areaid, String quantity,
       Integer interval, Integer timeout, Boolean applygra, Double ZR_A, Double ZR_b, Boolean ignore_malfunc,
       Boolean ctfilter, String qitotal_field, List<String> sources, List<String> detectors, String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
@@ -327,6 +331,7 @@ public class CompositeRoutesController {
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
     model.addAttribute("areaid", (areaid == null) ? "" : areaid);
+    model.addAttribute("quantity", (quantity == null) ? "" : quantity);
     model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
     model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
     model.addAttribute("applygra", (applygra == null) ? new Boolean(false) : applygra);
@@ -357,6 +362,7 @@ public class CompositeRoutesController {
       String prodpar,
       Integer selection_method,
       String areaid,
+      String quantity,
       Integer interval,
       Integer timeout,
       Boolean applygra,
@@ -386,6 +392,7 @@ public class CompositeRoutesController {
     model.addAttribute("prodpar", (prodpar == null) ? "1000" : prodpar);
     model.addAttribute("selection_method", (selection_method == null) ? new Integer(0) : selection_method);
     model.addAttribute("areaid", (areaid == null) ? "" : areaid);
+    model.addAttribute("quantity", (quantity == null) ? "" : quantity);
     model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
     model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
     model.addAttribute("applygra", (applygra == null) ? new Boolean(false) : applygra);
@@ -474,6 +481,7 @@ public class CompositeRoutesController {
       Integer selection_method,
       List<String> recipients,
       String area,
+      String quantity,
       Integer interval,
       Integer timeout,
       Boolean applygra,
@@ -532,7 +540,7 @@ public class CompositeRoutesController {
     }
     if (emessage == null) {
       try {
-        CompositingRule rule = createRule(area, iinterval, newsources, newdetectors, itimeout, bbyscan, method, prodpar, iselection_method, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, qitotal_field);
+        CompositingRule rule = createRule(area, quantity, iinterval, newsources, newdetectors, itimeout, bbyscan, method, prodpar, iselection_method, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, qitotal_field);
         RouteDefinition def = manager.create(name, author, isactive, description,
             newrecipients, rule);
         manager.updateDefinition(def);
@@ -544,7 +552,7 @@ public class CompositeRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        newrecipients,byscan, method, prodpar, selection_method, area, interval, timeout, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotal_field, sources, detectors, emessage);
+        newrecipients,byscan, method, prodpar, selection_method, area, quantity, interval, timeout, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotal_field, sources, detectors, emessage);
   }
   
   protected List<Integer> getIntervals() {
@@ -556,12 +564,13 @@ public class CompositeRoutesController {
     return result;
   }
   
-  protected CompositingRule createRule(String areaid, int interval,
+  protected CompositingRule createRule(String areaid, String quantity, int interval,
       List<String> sources, List<String> detectors, int timeout, boolean byscan, 
       String method, String prodpar, int selection_method, boolean applygra, double ZR_A, double ZR_b, boolean ignore_malfunc, boolean ctfilter,
       String qitotalField) {
     CompositingRule rule = (CompositingRule)manager.createRule(CompositingRule.TYPE);
     rule.setArea(areaid);
+    rule.setQuantity(quantity);
     rule.setInterval(interval);
     rule.setSources(sources);
     rule.setDetectors(detectors);

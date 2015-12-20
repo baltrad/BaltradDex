@@ -156,6 +156,13 @@ Modify a composite route
                             </div>
                         </div>
                         <div class="row2">
+                            <div class="leftcol">Quantity:</div>
+                            <div class="rightcol">
+                                <input type="text" name="quantity" 
+                                       value="${quantity}" title="The quantity that should be be used for compositing."/>
+                            </div>
+                        </div>                        
+                        <div class="row2">
                             <div class="leftcol">Interval:</div>
                             <div class="rightcol">
                                 <select name="interval" title="Select interval">
