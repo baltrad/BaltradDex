@@ -2060,6 +2060,11 @@ textarea {
     float: left;
     padding: 4px 2px 2px 12px;
 }
+.quality-controls .import {
+    width: 50px;
+    float: left;
+    padding: 4px 2px 2px 12px;
+}
 .quality-controls .leftcol {
     float: left;
     width: 160px;
@@ -2077,6 +2082,59 @@ textarea {
     font-size: 12px;
 }
 .quality-controls .messagebox {
+    margin: 12px 0 12px 25%;
+}
+
+.qc-import {
+	width: 674px;
+	float: left; 
+	clear: both;
+	margin: 20px 8px 80px 8px;
+}
+.qc-import .body .row,
+.qc-import .body .row2 {
+    width: 670px;
+    float: left;
+    margin: 0 2px 0 2px;
+    border-bottom: 1px solid #B4CAE8;
+}
+.qc-import .adaptorname {
+    width: 130px;
+    float: left;
+    padding: 4px 2px 2px 12px;
+}
+.qc-import .name {
+    width: 150px;
+    float: left;
+    padding: 4px 2px 2px 12px;
+}
+.qc-import .description {
+    width: 250px;
+    float: left;
+    padding: 4px 2px 2px 12px;
+}
+.qc-import .import {
+    width: 50px;
+    float: left;
+    padding: 4px 2px 2px 12px;
+}
+.qc-import .leftcol {
+    float: left;
+    width: 160px;
+    text-align: right;
+    font-weight: bold;
+    padding: 4px 4px 0 0;
+}
+.qc-import .rightcol {
+    float: left;
+    padding: 2px 0 2px 4px;
+}
+.qc-import .rightcol input {
+    width: 240px;
+    height: 14px;
+    font-size: 12px;
+}
+.qc-import .messagebox {
     margin: 12px 0 12px 25%;
 }
 

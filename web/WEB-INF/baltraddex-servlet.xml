@@ -559,6 +559,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- And we should have an application context to get hold of relevant managers -->
     <bean id="managercontext" class="eu.baltrad.beast.ManagerContext" autowire="byType" />
 
+    <!-- Communication with pgf for fetching quality controls and areas -->
+    <bean id="pgfClientHelper" class="eu.baltrad.beast.pgf.PgfClientHelper" autowire="byType" />
+
     <bean id="ruleFilterManager" class="eu.baltrad.beast.rules.RuleFilterManager" autowire="byType">
       <property name="filterManager">
         <ref bean="coreFilterManager"/>

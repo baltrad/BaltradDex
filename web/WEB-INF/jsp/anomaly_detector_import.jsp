@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 --------------------------------------------------------------------------------
-List of anomaly detectors
+Create anomaly detectors
 @date 2011-09-22
 @author Anders Henja
 ------------------------------------------------------------------------------%>
@@ -26,67 +26,66 @@ List of anomaly detectors
 <%@ page import="java.util.List" %>
 
 <%
-    // Check if there are adaptors available to display
-    List detectors = ( List )request.getAttribute("anomaly_detectors");
-    if( detectors == null || detectors.size() <= 0 ) {
-        request.getSession().setAttribute( "detectors_status", 0 );
+    // Check if there are routes available to display
+    List qcs = ( List )request.getAttribute( "qcs" );
+    if( qcs == null || qcs.size() <= 0 ) {
+        request.getSession().setAttribute( "qcs_status", 0 );
     } else {
-        request.getSession().setAttribute( "detectors_status", 1 );
+        request.getSession().setAttribute( "qcs_status", 1 );
     }
 %>
 
-<t:generic_page pageTitle="Quality controls">
+<t:generic_page pageTitle="Anomaly Detector Import">
     <jsp:body>
-        <div class="quality-controls">
+        <div class="qc-import">
             <div class="table">
                 <div class="header">
-                    <div class="row">Quality controls</div>
+                    <div class="row">Anomaly detectors</div>
                 </div>
-                <div class="header-text">
-                    Click on control's name to modify or delete or click
-                    <i>Create</i> to create a new quality control. 
-                </div>
-                <form name="createAnomalyDetectorForm" 
-                      action="anomaly_detector_create.htm">
+                <form name="importAnomalyDetectors" action="anomaly_detector_import.htm">
                     <t:message_box errorHeader="Problems encountered."
                                    errorBody="${emessage}"/>
                     <c:choose>
-                        <c:when test="${detectors_status == 1}">
+                        <c:when test="${qcs_status == 1}">
+                            <div class="header-text">
+                                Click on route name in order to modify 
+                                route settings.
+                            </div>
                             <div class="body">
                                 <div class="header-row">
-                                    <div class="count">&nbsp;</div>
+                                    <div class="adaptorname">Adaptor</div>
                                     <div class="name">Name</div>
                                     <div class="description">Description</div>
+                                    <div class="import">Import</div>
                                 </div>
-                                <c:set var="count" scope="page" value="1"/>
-                                <c:set var="count" scope="page" value="1"/>
-                                <c:forEach var="detector" 
-                                           items="${anomaly_detectors}">
+                                <c:forEach var="qc" items="${qcs}">
                                     <div class="row">
-                                        <div class="count">
-                                            <c:out value="${count}"/>
-                                            <c:set var="count" value="${count + 1}"/>
+                                        <div class="adaptorname">
+                                          <c:out value="${qc.adaptorName}" />
                                         </div>
                                         <div class="name">
-                                            <a href="anomaly_detector_show.htm?name=${detector.name}">
-                                                <c:out value="${detector.name}"/>
-                                            </a>
+                                          <c:out value="${qc.name}" />
                                         </div>
                                         <div class="description">
-                                            <c:out value="${detector.description}"/>
+                                          <c:out value="${qc.description}"/>
+                                        </div>    
+                                        <div class="import">
+                                          <input type="checkbox" name="imported" value="${qc.name}"/> 
                                         </div>
                                     </div>
                                 </c:forEach>
                             </div>  
                         </c:when>
+                        <c:otherwise>
+                            <div class="header-text">
+                                No anomaly detectors to import.
+                            </div>    
+                        </c:otherwise>                            
                     </c:choose>
                     <div class="table-footer">
                         <div class="buttons">
                             <div class="button-wrap">
-                                <input class="button" name="submitButton" type="submit" 
-                                       value="Import"/>
-                                <input class="button" name="submitButton" type="submit" 
-                                       value="Create"/>
+                                <input class="button" name="submitButton" type="submit" value="Import"/>
                             </div>
                         </div>
                     </div>                      
@@ -95,3 +94,4 @@ List of anomaly detectors
         </div>
     </jsp:body>
 </t:generic_page>
+

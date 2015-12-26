@@ -19,6 +19,8 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 
 package eu.baltrad.beastui.web.controller;
 
+import java.util.List;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import eu.baltrad.beast.pgf.IPgfClientHelper;
+import eu.baltrad.beast.pgf.QualityControlInformation;
 import eu.baltrad.beast.qc.AnomalyDetector;
 import eu.baltrad.beast.qc.AnomalyException;
 import eu.baltrad.beast.qc.IAnomalyDetectorManager;
@@ -42,6 +46,8 @@ public class AnomalyDetectorController {
    * The anomaly detector manager
    */
   private IAnomalyDetectorManager manager = null;
+
+  private IPgfClientHelper pgfClient = null;
   
   /**
    * We need a logger here
@@ -63,7 +69,13 @@ public class AnomalyDetectorController {
     logger.debug("setManager(IAnomalyDetectorManager)");
     this.manager = manager;
   }
-  
+
+  @Autowired
+  public void setPgfClientHelper(IPgfClientHelper pgfClient) {
+    logger.debug("setPgfClientHelper(IPgfClientHelper)");
+    this.pgfClient = pgfClient;
+  }
+
   /**
    * Shows the list of anomaly detectors
    * @param model the model to fill
@@ -103,6 +115,14 @@ public class AnomalyDetectorController {
         model.addAttribute("name", name);
         model.addAttribute("description", description);
         model.addAttribute("emessage", "Failed to register anomaly detector: " + e.getMessage());
+      }
+    } else if (op != null && op.equals("Import")) {
+      try {
+        List<QualityControlInformation> qcInfo = pgfClient.getQualityControls();
+        model.addAttribute("qcs", qcInfo);
+        return "anomaly_detector_import";
+      } catch (Exception e) {
+        logger.error("Failed to import quality control information from PGFs", e);
       }
     }
     return "anomaly_detector_create";
@@ -172,7 +192,41 @@ public class AnomalyDetectorController {
     }
     return result;
   }
-
+  
+  @RequestMapping("/anomaly_detector_import.htm")
+  public String importAnomalyDetectors(Model model,
+      @RequestParam(value = "imported", required=false) String[] imported) {
+    if (imported != null) {
+      List<QualityControlInformation> qcs = pgfClient.getQualityControls();
+      List<AnomalyDetector> ads = manager.list();
+      for (String x : imported) {
+        QualityControlInformation qci = getQCI(qcs, x);
+        if (qci != null && !hasDetector(ads, qci.getName())) {
+          manager.add(createDetector(qci.getName(), qci.getDescription()));
+        }
+      }
+    }
+    return "redirect:anomaly_detectors.htm";
+  }
+  
+  protected QualityControlInformation getQCI(List<QualityControlInformation> qcs, String name) {
+    for (QualityControlInformation qci : qcs) {
+      if (qci.getName().equals(name)) {
+        return qci;
+      }
+    }
+    return null;
+  }
+  
+  protected boolean hasDetector(List<AnomalyDetector> ads, String name) {
+    for (AnomalyDetector ad: ads) {
+      if (ad.getName().equals(name)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
   /**
    * Creates an anomaly detector
    * @param name the name of the detector

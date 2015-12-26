@@ -108,6 +108,9 @@
         <security:intercept-url pattern="/anomaly_detectors.htm" 
                                 access="ROLE_OPERATOR" 
                                 requires-channel="http"/>
+        <security:intercept-url pattern="/anomaly_detector_import.htm" 
+                                access="ROLE_OPERATOR" 
+                                requires-channel="http"/>
         
         <security:intercept-url pattern="/routes.htm" 
                                 access="ROLE_OPERATOR"
