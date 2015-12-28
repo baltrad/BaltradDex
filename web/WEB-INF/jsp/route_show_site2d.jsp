@@ -151,10 +151,15 @@ Modify a site2d route
                             </div>
                         </div>
                         <div class="row2">
+                            <datalist id="pcslist">
+                              <c:forEach var="pid" items="${pcslist}">
+                                <option value="${pid}"><c:out value="${pid}"/></option>
+                              </c:forEach>
+                            </datalist>                          
                             <div class="leftcol">Pcs ID:</div>
                             <div class="rightcol">
                                 <input type="text" name="pcsid" 
-                                       value="${pcsid}" title="Pcs ID to use for best-fit"/>
+                                       value="${pcsid}" title="Pcs ID to use for best-fit" list="pcslist"/>
                             </div>
                         </div>
                         <div class="row2">

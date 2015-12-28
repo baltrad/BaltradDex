@@ -355,6 +355,7 @@ public class Site2dRoutesController {
     model.addAttribute("ZR_b", (ZR_b == null) ? new Double(1.6) : ZR_b);
     model.addAttribute("ignore_malfunc", (ignore_malfunc == null) ? new Boolean(false) : ignore_malfunc);
     model.addAttribute("ctfilter", (ctfilter == null) ? new Boolean(false) : ctfilter);
+    model.addAttribute("pcslist", pgfClientHelper.getUniquePcsIds());
     model.addAttribute("pcsid", (pcsid == null) ? "" : pcsid);
     model.addAttribute("xscale", (xscale == null) ? new Double(2000.0) : xscale);
     model.addAttribute("yscale", (yscale == null) ? new Double(2000.0) : yscale);
@@ -416,6 +417,7 @@ public class Site2dRoutesController {
     model.addAttribute("ZR_b", (ZR_b == null) ? new Double(1.6) : ZR_b);
     model.addAttribute("ignore_malfunc", (ignore_malfunc == null) ? new Boolean(false) : ignore_malfunc);
     model.addAttribute("ctfilter", (ctfilter == null) ? new Boolean(false) : ctfilter);
+    model.addAttribute("pcslist", pgfClientHelper.getUniquePcsIds());
     model.addAttribute("pcsid", (pcsid == null) ? "" : pcsid);
     model.addAttribute("xscale", (xscale == null)?new Double(2000.0) : xscale);
     model.addAttribute("yscale", (yscale == null)?new Double(2000.0) : yscale);
