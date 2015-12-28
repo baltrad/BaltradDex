@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.pgf.IPgfClientHelper;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.gra.GraRule;
@@ -51,6 +52,11 @@ public class GraRoutesController {
    * The adaptor manager
    */
   private IBltAdaptorManager adaptormanager = null;
+
+  /**
+   * The PGF client helper
+   */
+  private IPgfClientHelper pgfClientHelper = null;
 
   /**
    * The logger
@@ -78,6 +84,14 @@ public class GraRoutesController {
   @Autowired
   public void setAdaptorManager(IBltAdaptorManager adaptormanager) {
     this.adaptormanager = adaptormanager;
+  }
+  
+  /**
+   * @param pgfClientHelper the pgf client helpler
+   */
+  @Autowired
+  public void setPgfClientHelper(IPgfClientHelper pgfClientHelper) {
+    this.pgfClientHelper = pgfClientHelper;
   }
   
   @RequestMapping("/route_create_gra.htm")
@@ -326,6 +340,7 @@ public class GraRoutesController {
     model.addAttribute("description", (description == null) ? "" : description);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
+    model.addAttribute("arealist", pgfClientHelper.getUniqueAreaIds());    
     model.addAttribute("area", (area == null)? "" : area);
     model.addAttribute("object_type", (object_type == null)? "IMAGE" : object_type);
     model.addAttribute("quantity", (quantity == null) ? "DBZH" : quantity);

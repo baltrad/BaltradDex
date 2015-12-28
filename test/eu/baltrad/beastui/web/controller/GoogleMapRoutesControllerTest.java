@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.pgf.IPgfClientHelper;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.gmap.GoogleMapRule;
@@ -35,6 +36,7 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
   private GoogleMapRoutesController classUnderTest = null;
   private IRouterManager manager = null;
   private IBltAdaptorManager adaptorManager = null;
+  private IPgfClientHelper pgfClientHelper = null;
   private Model model = null;
 
   @Before
@@ -42,6 +44,8 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     method = createMock(MethodMocker.class);
     manager = createMock(IRouterManager.class);
     adaptorManager = createMock(IBltAdaptorManager.class);
+    pgfClientHelper = createMock(IPgfClientHelper.class);
+    
     model = createMock(Model.class);
     classUnderTest = new GoogleMapRoutesController() {
       protected String viewCreateRoute(Model model, String name, String author,
@@ -55,6 +59,7 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     };
     classUnderTest.setManager(manager);
     classUnderTest.setAdaptorManager(adaptorManager);
+    classUnderTest.setPgfClientHelper(pgfClientHelper);
   }
 
   @After
@@ -114,6 +119,7 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
   @Test
   public void testViewCreateRoute_allNull() throws Exception {
     List<String> names = new ArrayList<String>();
+    List<String> areas = new ArrayList<String>();
     
     expect(adaptorManager.getAdaptorNames()).andReturn(names);
     expect(model.addAttribute("adaptors", names)).andReturn(null);
@@ -122,12 +128,15 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("active", true)).andReturn(null);
     expect(model.addAttribute("description", "")).andReturn(null);
     expect(model.addAttribute("recipients", new ArrayList<String>())).andReturn(null);
+    expect(pgfClientHelper.getUniqueAreaIds()).andReturn(areas);
+    expect(model.addAttribute("arealist", areas)).andReturn(null);
     expect(model.addAttribute("area", "")).andReturn(null);
     expect(model.addAttribute("path", "")).andReturn(null);
 
     classUnderTest = new GoogleMapRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);
     classUnderTest.setManager(manager);
+    classUnderTest.setPgfClientHelper(pgfClientHelper);
     
     replayAll();
     
@@ -140,6 +149,7 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
   @Test
   public void testViewCreateRoute() throws Exception {
     List<String> names = new ArrayList<String>();
+    List<String> areas = new ArrayList<String>();
     List<String> recipients = new ArrayList<String>();
     
     expect(adaptorManager.getAdaptorNames()).andReturn(names);
@@ -149,12 +159,15 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("active", true)).andReturn(null);
     expect(model.addAttribute("description", "a test")).andReturn(null);
     expect(model.addAttribute("recipients", recipients)).andReturn(null);;
+    expect(pgfClientHelper.getUniqueAreaIds()).andReturn(areas);
+    expect(model.addAttribute("arealist", areas)).andReturn(null);
     expect(model.addAttribute("area", "sswe")).andReturn(null);
     expect(model.addAttribute("path", "/tmp")).andReturn(null);
 
     classUnderTest = new GoogleMapRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);
     classUnderTest.setManager(manager);
+    classUnderTest.setPgfClientHelper(pgfClientHelper);
     
     replayAll();
     
@@ -167,6 +180,7 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
   @Test
   public void testViewShowRoute() throws Exception {
     List<String> names = new ArrayList<String>();
+    List<String> areas = new ArrayList<String>();
     List<String> recipients = new ArrayList<String>();
     
     expect(adaptorManager.getAdaptorNames()).andReturn(names);
@@ -176,12 +190,15 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("active", true)).andReturn(null);
     expect(model.addAttribute("description", "a test")).andReturn(null);
     expect(model.addAttribute("recipients", recipients)).andReturn(null);
+    expect(pgfClientHelper.getUniqueAreaIds()).andReturn(areas);
+    expect(model.addAttribute("arealist", areas)).andReturn(null);
     expect(model.addAttribute("area", "sswe")).andReturn(null);
     expect(model.addAttribute("path", "/tmp")).andReturn(null);
 
     classUnderTest = new GoogleMapRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);
     classUnderTest.setManager(manager);
+    classUnderTest.setPgfClientHelper(pgfClientHelper);
     
     replayAll();
     

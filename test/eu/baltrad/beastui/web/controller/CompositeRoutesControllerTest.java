@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.springframework.ui.Model;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.pgf.IPgfClientHelper;
 import eu.baltrad.beast.qc.AnomalyDetector;
 import eu.baltrad.beast.qc.IAnomalyDetectorManager;
 import eu.baltrad.beast.router.IRouterManager;
@@ -30,7 +31,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     public List<String> getSources();
     
     public List<Integer> getIntervals();
-    
+
     public CompositingRule createRule(String areaid, String quantity, int interval,
         List<String> sources, List<String> detectors, int timeout, boolean byscan, String method, String prodpar, int selection_method,
         boolean applygra, double ZR_A, double ZR_b, boolean ignore_malfunc, boolean ctfilter, String qitotalField);
@@ -41,6 +42,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
   private IBltAdaptorManager adaptorManager = null;
   private IAnomalyDetectorManager anomalyManager = null;
   private IRuleUtilities utilities = null;
+  private IPgfClientHelper pgfClientHelper = null;
   private Model model = null;
   private MethodMocker method = null;
 
@@ -50,6 +52,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     adaptorManager = createMock(IBltAdaptorManager.class);
     anomalyManager = createMock(IAnomalyDetectorManager.class);
     utilities = createMock(IRuleUtilities.class);
+    pgfClientHelper = createMock(IPgfClientHelper.class);
     model = createMock(Model.class);
     method = createMock(MethodMocker.class);
     
@@ -70,6 +73,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     classUnderTest.setAdaptorManager(adaptorManager);
     classUnderTest.setManager(manager);
     classUnderTest.setAnomalyDetectorManager(anomalyManager);
+    classUnderTest.setPgfClientHelper(pgfClientHelper);
   }
   
   @After
@@ -398,7 +402,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     
     List<String> sources = new ArrayList<String>();
     List<String> detectors = new ArrayList<String>();
-    
+    List<String> areas = new ArrayList<String>();
     String emessage = null;
 
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptornames);
@@ -419,6 +423,8 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("method", pmethod)).andReturn(null);
     expect(model.addAttribute("prodpar", "500.0")).andReturn(null);
     expect(model.addAttribute("selection_method", selection_method)).andReturn(null);
+    expect(pgfClientHelper.getUniqueAreaIds()).andReturn(areas);
+    expect(model.addAttribute("arealist", areas)).andReturn(null);
     expect(model.addAttribute("areaid", areaid)).andReturn(null);
     expect(model.addAttribute("quantity", quantity)).andReturn(null);
     expect(model.addAttribute("interval", interval)).andReturn(null);
@@ -433,14 +439,17 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("detectors", detectors)).andReturn(null);
     
     classUnderTest = new CompositeRoutesController() {
+      @Override
       protected List<Integer> getIntervals() {
         return method.getIntervals();
-      }      
+      }
     };
+    
     classUnderTest.setAdaptorManager(adaptorManager);
     classUnderTest.setManager(manager);
     classUnderTest.setRuleUtilities(utilities);
     classUnderTest.setAnomalyDetectorManager(anomalyManager);
+    classUnderTest.setPgfClientHelper(pgfClientHelper);
     
     replayAll();
     
@@ -459,6 +468,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     List<String> sourceids = new ArrayList<String>();
     List<Integer> intervals = new ArrayList<Integer>();
     List<AnomalyDetector> anomalydetectors = new ArrayList<AnomalyDetector>();
+    List<String> areas = new ArrayList<String>();
     
     String name = "A";
     String author = "B";
@@ -503,6 +513,8 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("method", pmethod)).andReturn(null);
     expect(model.addAttribute("prodpar", prodpar)).andReturn(null);
     expect(model.addAttribute("selection_method", selection_method)).andReturn(null);
+    expect(pgfClientHelper.getUniqueAreaIds()).andReturn(areas);
+    expect(model.addAttribute("arealist", areas)).andReturn(null);
     expect(model.addAttribute("areaid", areaid)).andReturn(null);
     expect(model.addAttribute("quantity", quantity)).andReturn(null);
     expect(model.addAttribute("interval", interval)).andReturn(null);
@@ -518,6 +530,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("emessage", emessage)).andReturn(null);
     
     classUnderTest = new CompositeRoutesController() {
+      @Override
       protected List<Integer> getIntervals() {
         return method.getIntervals();
       }      
@@ -526,7 +539,8 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     classUnderTest.setManager(manager);
     classUnderTest.setRuleUtilities(utilities);
     classUnderTest.setAnomalyDetectorManager(anomalyManager);
-
+    classUnderTest.setPgfClientHelper(pgfClientHelper);
+    
     replayAll();
     
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,

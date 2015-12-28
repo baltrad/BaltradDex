@@ -149,10 +149,15 @@ Modify a composite route
                             </div>
                         </div>
                         <div class="row2">
+                            <datalist id="arealist">
+                              <c:forEach var="areaid" items="${arealist}">
+                                <option value="${areaid}"><c:out value="${areaid}"/></option>
+                              </c:forEach>
+                            </datalist>                          
                             <div class="leftcol">Area ID:</div>
                             <div class="rightcol">
                                 <input type="text" name="areaid" 
-                                       value="${areaid}" title="Select area ID"/>
+                                       value="${areaid}" title="Select area ID" list="arealist"/>
                             </div>
                         </div>
                         <div class="row2">

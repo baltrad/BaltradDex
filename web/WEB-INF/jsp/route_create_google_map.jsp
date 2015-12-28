@@ -70,10 +70,15 @@ Creates a google map route
                             </div>
                         </div>
                         <div class="row2">
+                            <datalist id="arealist">
+                              <c:forEach var="areaid" items="${arealist}">
+                                <option value="${areaid}"><c:out value="${areaid}"/></option>
+                              </c:forEach>
+                            </datalist>                          
                             <div class="leftcol">Area:</div>
                             <div class="rightcol">
                                 <input type="text" name="area" value="${area}"
-                                       title="An area defining the region for which this route should be triggered"/>
+                                       title="An area defining the region for which this route should be triggered" list="arealist" />
                             </div>
                         </div>
                         <div class="row2">

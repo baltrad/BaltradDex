@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.pgf.IPgfClientHelper;
 import eu.baltrad.beast.qc.AnomalyDetector;
 import eu.baltrad.beast.qc.IAnomalyDetectorManager;
 import eu.baltrad.beast.router.IRouterManager;
@@ -68,6 +69,14 @@ public class Site2dRoutesController {
    */
   private IAnomalyDetectorManager anomalymanager = null;
   
+  /**
+   * The pgf client helper
+   */
+  private IPgfClientHelper pgfClientHelper = null;
+  
+  /**
+   * Logger
+   */
   private static Logger logger = LogManager.getLogger(Site2dRoutesController.class); 
   
   /**
@@ -107,7 +116,15 @@ public class Site2dRoutesController {
   public void setAnomalyDetectorManager(IAnomalyDetectorManager anomalymanager) {
     this.anomalymanager = anomalymanager;
   }
-
+  
+  /**
+   * @param pgfClientHelper the pgf client helpler
+   */
+  @Autowired
+  public void setPgfClientHelper(IPgfClientHelper pgfClientHelper) {
+    this.pgfClientHelper = pgfClientHelper;
+  }
+  
   /**
    * Handles create route requests 
    * @param model the model
@@ -330,6 +347,7 @@ public class Site2dRoutesController {
     model.addAttribute("description", (description == null) ? "" : description);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
+    model.addAttribute("arealist", pgfClientHelper.getUniqueAreaIds());    
     model.addAttribute("areaid", (areaid == null) ? "" : areaid);
     model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
     model.addAttribute("applygra", (applygra == null) ? new Boolean(false) : applygra);
@@ -390,6 +408,7 @@ public class Site2dRoutesController {
     model.addAttribute("byscan", (byscan == null) ? new Boolean(false) : byscan);
     model.addAttribute("method", (method == null) ? CompositingRule.PCAPPI : method);
     model.addAttribute("prodpar", (prodpar == null) ? "1000" : prodpar);
+    model.addAttribute("arealist", pgfClientHelper.getUniqueAreaIds());    
     model.addAttribute("areaid", (areaid == null) ? "" : areaid);
     model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
     model.addAttribute("applygra", (applygra == null) ? new Boolean(false) : applygra);

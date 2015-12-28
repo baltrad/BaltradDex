@@ -30,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.pgf.AreaInformation;
+import eu.baltrad.beast.pgf.IPgfClientHelper;
 import eu.baltrad.beast.qc.AnomalyDetector;
 import eu.baltrad.beast.qc.IAnomalyDetectorManager;
 import eu.baltrad.beast.router.IRouterManager;
@@ -66,6 +68,14 @@ public class CompositeRoutesController {
    */
   private IAnomalyDetectorManager anomalymanager = null;
   
+  /**
+   * The pgf client helper
+   */
+  private IPgfClientHelper pgfClientHelper = null;
+  
+  /**
+   * The logger
+   */
   private static Logger logger = LogManager.getLogger(CompositeRoutesController.class); 
   
   /**
@@ -106,6 +116,14 @@ public class CompositeRoutesController {
     this.anomalymanager = anomalymanager;
   }
 
+  /**
+   * @param pgfClientHelper the pgf client helpler
+   */
+  @Autowired
+  public void setPgfClientHelper(IPgfClientHelper pgfClientHelper) {
+    this.pgfClientHelper = pgfClientHelper;
+  }
+  
   /**
    * Handles create route requests 
    * @param model the model
@@ -331,6 +349,7 @@ public class CompositeRoutesController {
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
     model.addAttribute("areaid", (areaid == null) ? "" : areaid);
+    model.addAttribute("arealist", pgfClientHelper.getUniqueAreaIds());
     model.addAttribute("quantity", (quantity == null) ? "" : quantity);
     model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
     model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
@@ -391,6 +410,7 @@ public class CompositeRoutesController {
     model.addAttribute("method", (method == null) ? CompositingRule.PCAPPI : method);
     model.addAttribute("prodpar", (prodpar == null) ? "1000" : prodpar);
     model.addAttribute("selection_method", (selection_method == null) ? new Integer(0) : selection_method);
+    model.addAttribute("arealist", pgfClientHelper.getUniqueAreaIds());
     model.addAttribute("areaid", (areaid == null) ? "" : areaid);
     model.addAttribute("quantity", (quantity == null) ? "" : quantity);
     model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
