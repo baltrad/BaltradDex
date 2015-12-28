@@ -24,6 +24,35 @@ Modifie or delete a volume route
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
 <t:generic_page pageTitle="Create route">
+    <jsp:attribute name="extraHeader">
+        <script type="text/javascript"
+                src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js">
+        </script>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('#btn-up').bind('click', function() {
+                    $('#quality-controls option:selected').each( function() {
+                        var newPos = $('#quality-controls option').index(this) - 1;
+                        if (newPos > -1) {
+                            $('#quality-controls option').eq(newPos).before("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+                            $(this).remove();
+                        }
+                    });
+                });
+                $('#btn-down').bind('click', function() {
+                    var countOptions = $('#quality-controls option').size();
+                    $('#quality-controls option:selected').each( function() {
+                        var newPos = $('#quality-controls option').index(this) + 1;
+                        if (newPos < countOptions) {
+                            $('#quality-controls option').eq(newPos).after("<option value='"+$(this).val()+"' selected='selected'>"+$(this).text()+"</option>");
+                            $(this).remove();
+                        }
+                    });
+                });
+            });
+        </script>
+    </jsp:attribute> 
     <jsp:body>
         <div class="routes">
             <div class="table">
@@ -150,6 +179,8 @@ Modifie or delete a volume route
                                         <option value="${detector.name}" <c:if test="${ fn:contains(detectors, detector.name) }">selected</c:if> >${detector.name}</option>
                                     </c:forEach>
                                 </select>
+                                <a href="JavaScript:void(0);" id="btn-up"><img src="includes/images/up.png" alt="Up"/></a>
+                                <a href="JavaScript:void(0);" id="btn-down"><img src="includes/images/down.png" alt="Down"/></a>                                
                             </div>
                         </div>
                     </div>
