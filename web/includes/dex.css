@@ -717,6 +717,29 @@ textarea {
 	padding: 2px;
 }
 
+/* node address status warning */ 
+
+.status-addresswarning {
+	width: 674px;
+	float: left;
+	clear: both;
+	margin: 10px 0 10px 8px;
+}
+
+.status-addresswarning .table {
+        border: 2px solid #FF0000;
+}
+
+.status-addresswarning .table .header {
+        color: #AA0000;
+}
+
+.status-addresswarning .table .header-text {
+        border-top: 2px solid #FF0000;
+        color: #AA0000;
+}
+
+
 /* data exchange status */
 
 .status-exchange {

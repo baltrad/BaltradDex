@@ -26,7 +26,7 @@ Author     : szewczenko
 <t:generic_page pageTitle="Status">
     <jsp:body>
         <div class="status-info">
-            <div class="table">	
+            <div class="table">
                 <div class="header">
                     <div class="row">System information</div>
                 </div>
@@ -129,7 +129,25 @@ Author     : szewczenko
                     </div>
                 </div>
             </div>
-        </div>            
+        </div>
+        <c:choose>
+            <c:when test="${is_node_address_local}">
+                <div class="status-addresswarning">
+                    <div class="table"> 
+                        <div class="header">
+                            <div class="row">Warning!</div>
+                        </div>
+                        <div class="header-text">
+                            Node address set to localhost, meaning 
+                            it will cause loopback behaviour. Go to 
+                            <a href="node_settings.htm">node 
+                            settings</a> and update it to a correct 
+                            setting!
+                        </div>
+                     </div>
+                </div> 
+            </c:when>
+        </c:choose>
         <div class="status-exchange">
             <div class="table">
                 <div class="header">

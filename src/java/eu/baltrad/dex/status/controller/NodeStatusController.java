@@ -21,6 +21,27 @@
 
 package eu.baltrad.dex.status.controller;
 
+import java.io.File;
+import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import eu.baltrad.dex.auth.manager.SecurityManager;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.db.manager.IBltFileManager;
@@ -36,25 +57,7 @@ import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.util.ServletContextUtil;
-import java.io.File;
-import java.security.Principal;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import eu.baltrad.dex.util.WebValidator;
 
 /**
  * Node status controller.
@@ -227,6 +230,17 @@ public class NodeStatusController {
     @ModelAttribute("active_uploads")
     public long getActiveUploads() {
         return subscriptionManager.count(Subscription.PEER);
+    }
+    
+    /**
+     * Returns a boolean indicating whether or not the node address 
+     * stored in the app configuration is 'localhost' or not.
+     * @return isNodeAddressLocal
+     */
+    @ModelAttribute("is_node_address_local")
+    public boolean isNodeAddressLocal() {
+    	String nodeAddress = confManager.getAppConf().getNodeAddress();
+    	return WebValidator.isUrlLocal(nodeAddress);
     }
     
     /**

@@ -21,6 +21,8 @@
 
 package eu.baltrad.dex.util;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -35,9 +37,6 @@ import java.util.List;
 public class WebValidator {
 
     private static final String ET = "@";
-    private static final String DOT = "\\.";
-    private static final String HTTP_PREFIX = "http://";
-    private static final String HTTPS_PREFIX = "https://";
 
     /**
      * Validates URL address.
@@ -45,64 +44,62 @@ public class WebValidator {
      * @param url URL address to validate. 
      * @return True if given address is a valid URL address, false otherwise
      */
-    public boolean validateUrl(String url) {
-        boolean res = false;
-        if (url != null) {
-            if (!url.trim().isEmpty()) {
-                res = hasProtocol(url) && hasDomain(url);
-            }
+    public static boolean validateUrl(String urlString) {
+    	URL url;
+    	try {
+            url = new URL(urlString);
+        } catch (MalformedURLException malformedURLException) {
+            return false;
         }
-        return res;
+    	
+    	if (url.getHost().equals(""))
+    	{
+    		return false;
+    	}
+    	
+    	return true;
     }
+    
     /**
      * Validates email address.
      * 
      * @param email Email address to validate. 
      * @return True if given address is a valid email address, false otherwise
      */
-    public boolean validateEmail(String email) {
-         boolean res = false;
-        if (email != null) {
-            if (!email.trim().isEmpty()) {
-                res = hasUserAndDomain(email);
-            }
-        }
-        return res;
+    public static boolean validateEmail(String email) {
+    	boolean res = false;
+    	if (email != null) {
+    		if (!email.trim().isEmpty()) {
+    			res = hasUserAndDomain(email);
+    		}
+    	}
+    	return res;
     }
-    /**
-     * Checks if a given URL contains protocol string.
-     * 
-     * @param url URL address to validate.
-     * @return True if a given URL contains protocol string.
-     */
-    private boolean hasProtocol(String url) {
-        boolean res = false;
-        if (url.startsWith(HTTP_PREFIX) || url.startsWith(HTTPS_PREFIX)) {
-            res = true;
-        }
-        return res;
+    
+    public static boolean isUrlLocal(String urlString) {
+    	URL url;
+    	try {
+    		url = new URL(urlString);
+    	} catch (MalformedURLException malformedURLException) {
+    		return false;
+    	}
+
+    	String host = url.getHost();
+    	if (host.equals("127.0.0.1") || host.equals("localhost"))
+    	{
+    		return true;
+    	}
+
+    	return false;
     }
-    /**
-     * Checks if a given URL contains a domain name.
-     * 
-     * @param url URL address to validate
-     * @return True if a given address contains domain name
-     */
-    private boolean hasDomain(String url) {
-        boolean res = false;
-        String[] tokens = url.split(DOT);
-        if (tokens.length >= 2) {
-            res = hasTextContent(tokens);
-        }
-        return res;
-    }
+
     /**
      * Check if a given email address contains user name and domain.
      * 
      * @param email Email address to validate
      * @return True if a given email address contains user name and domain
      */
-    private boolean hasUserAndDomain(String email) {
+    private static boolean hasUserAndDomain(String email) {
         boolean res = false;
         String[] tokens = email.split(ET);
         if (tokens.length == 2) {
@@ -116,7 +113,7 @@ public class WebValidator {
      * @param tokens Array of string parameters
      * @return True if all parameters are not empty
      */
-    private boolean hasTextContent(String[] tokens) {
+    private static boolean hasTextContent(String[] tokens) {
         boolean res = true;
         int i = 0;
         while (tokens[i] != null) {

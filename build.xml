@@ -43,7 +43,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="compile.debug" value="true"/>
   <property name="compile.includeAntRuntime" value="no"/>
   <property name="compile.optimize" value="true"/>
-  <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java"/>
   <property name="include.dir" value="${web.dir}/includes"/>
   <property name="doc.dir" value="${root.dir}/doc"/>
   <property name="doc.build.dir" value="${doc.dir}/build"/>
@@ -66,6 +65,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
   <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
   <property name="beast.path" value="/opt/baltrad/beast" />
+  <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java"/>
 
   <!-- Configure ant tasks for tomcat deployment -->
   <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"

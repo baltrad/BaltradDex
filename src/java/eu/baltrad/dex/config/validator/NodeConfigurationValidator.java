@@ -43,7 +43,6 @@ public class NodeConfigurationValidator implements Validator {
     private static final int COUNTRY_CODE_LENGTH = 2;
 
     private MessageResourceUtil messages;
-    private WebValidator webValidator;
 
     /**
      * Declares classes supported by this validator.
@@ -94,12 +93,12 @@ public class NodeConfigurationValidator implements Validator {
             errors.rejectValue("nodeName", "saveconf.invalid.node_name",
                     messages.getMessage("saveconf.invalid.node_name"));
         }*/
-        if (!webValidator.validateUrl(conf.getNodeAddress())) {
+        if (!WebValidator.validateUrl(conf.getNodeAddress())) {
             errors.rejectValue("nodeAddress", "saveconf.invalid.node_address",
                     messages.getMessage("saveconf.invalid.node_address"));
         }
         if (!conf.getAdminEmail().isEmpty() && 
-                !webValidator.validateEmail(conf.getAdminEmail())) {
+                !WebValidator.validateEmail(conf.getAdminEmail())) {
             errors.rejectValue("adminEmail", "saveconf.invalid.admin_email",
                     messages.getMessage("saveconf.invalid.admin_email"));
         }
@@ -109,14 +108,6 @@ public class NodeConfigurationValidator implements Validator {
                     "saveconf.invalid.country_code",
                     messages.getMessage("saveconf.invalid.country_code"));
         }
-    }
-   
-    /**
-     * @param webValidator the webValidator to set
-     */
-    @Autowired
-    public void setWebValidator(WebValidator webValidator) {
-        this.webValidator = webValidator;
     }
 
     /**

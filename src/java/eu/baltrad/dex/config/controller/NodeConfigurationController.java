@@ -21,33 +21,28 @@
 
 package eu.baltrad.dex.config.controller;
 
-import eu.baltrad.dex.config.model.AppConfiguration;
-import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
-import eu.baltrad.dex.config.validator.NodeConfigurationValidator;
-import eu.baltrad.dex.user.manager.IUserManager;
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.util.MessageResourceUtil;
+import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import org.apache.log4j.Logger;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
+import eu.baltrad.dex.config.model.AppConfiguration;
+import eu.baltrad.dex.config.validator.NodeConfigurationValidator;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.Role;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.util.WebValidator;
 
 /**
  * Save or modify system configuration.
@@ -84,6 +79,16 @@ public class NodeConfigurationController {
         this.log = Logger.getLogger("DEX");
     }
     
+    private void updateAddressWarning(ModelMap model, String nodeAddress)
+    {
+    	String warningString = "";
+    	if(WebValidator.isUrlLocal(nodeAddress))
+    	{
+    		warningString = "Loopback node address";
+    	}
+    	model.addAttribute("address_warning", warningString);
+    }
+    
     /**
      * Load form backing object and render form.
      * @param model Model map 
@@ -92,6 +97,9 @@ public class NodeConfigurationController {
     @RequestMapping(method = RequestMethod.GET)
     protected String setupForm(ModelMap model) {
         model.addAttribute(CONF_KEY, configurationManager.getAppConf());
+        
+        updateAddressWarning(model, configurationManager.getAppConf().getNodeAddress());
+        
         return FORM_VIEW;
     }
     
@@ -107,8 +115,12 @@ public class NodeConfigurationController {
     protected String processSubmit(
             @ModelAttribute("config") AppConfiguration conf, 
                 BindingResult result, ModelMap model) {
-        validator.validate(conf, result);
-        if (result.hasErrors()) {
+    	
+    	updateAddressWarning(model, conf.getNodeAddress());
+
+    	validator.validate(conf, result);
+        
+    	if (result.hasErrors()) {
             return FORM_VIEW;
         }
         try {

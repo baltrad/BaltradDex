@@ -55,9 +55,12 @@ Author     : szewczenko
                                 Node address:
                             </div>
                             <div class="rightcol">
-                                <form:input path="nodeAddress" 
-                                            title="Node address, e.g. http://baltrad.eu:8084"/>
-                                <form:errors path="nodeAddress" cssClass="error"/>
+                                <form:input path="nodeAddress"
+                                    title="Node address, e.g. http://baltrad.eu:8084" />
+                                <form:errors path="nodeAddress"
+                                    cssClass="error" />
+                                                                
+                                <span class="error"><c:out value="${address_warning}" /></span>
                             </div>
                         </div>
                         <div class="row">
