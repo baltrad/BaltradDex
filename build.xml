@@ -235,7 +235,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </fileset>
       <!-- Also, include neccesary libs from beast-lib -->
       <fileset dir="${beast.path}/libs">
-        <include name="bcprov-jdk16-146.jar"/>
+        <include name="bcpkix-jdk15on-154.jar"/>
+        <include name="bcprov-jdk15on-154.jar"/>
         <include name="cglib-nodep-2.2.jar"/>
         <include name="commons-dbcp.jar"/>
         <include name="commons-pool.jar"/>
@@ -248,7 +249,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="jackson-core-lgpl-1.8.2.jar"/>
         <include name="jackson-mapper-lgpl-1.8.2.jar"/>
         <include name="quartz-2.2.2.jar"/>
-        <include name="sshj-0.8.1.jar"/>
+        <include name="ecc-25519-java.jar"/>
+        <include name="sshj-0.15.0.jar"/>
         <include name="ws-commons-util-1.0.2.jar"/>
         <include name="xmlrpc-client-3.1.2.jar"/>
         <include name="xmlrpc-common-3.1.2.jar"/>
