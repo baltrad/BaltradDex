@@ -21,6 +21,8 @@ package eu.baltrad.beastui.web.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.qc.AnomalyDetector;
 import eu.baltrad.beast.qc.IAnomalyDetectorManager;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
@@ -279,7 +282,7 @@ public class VolumeRoutesController {
     model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
     model.addAttribute("adaptors", adaptors);
-    model.addAttribute("anomaly_detectors", anomalymanager.list());    
+    model.addAttribute("anomaly_detectors", createOrderedDetectorList(anomalymanager.list(), detectors));
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
     model.addAttribute("active", (active == null) ? new Boolean(true) : active);
@@ -340,8 +343,7 @@ public class VolumeRoutesController {
     model.addAttribute("adaptors", adaptors);
     model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
-    model.addAttribute("anomaly_detectors", anomalymanager.list());
-    
+    model.addAttribute("anomaly_detectors", createOrderedDetectorList(anomalymanager.list(), detectors));
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
     model.addAttribute("active", (active == null) ? new Boolean(true) : active);
@@ -454,6 +456,35 @@ public class VolumeRoutesController {
     int[] valid = {1,2,3,4,5,6,10,12,15,20,30,60};
     for (int x : valid) {
       result.add(x);
+    }
+    return result;
+  }
+  
+  /**
+   * Organizes so that the selected detectors comes in order in the list of anomaly detectors. We are doing it like this since
+   * we don't want to have 2 different select lists where one contains the "not selected" and another containing the selected.
+   * @param detectors all anomaly detectors
+   * @param selectedDetectors the selected detectors
+   * @return a reorganized list of detectors
+   */
+  protected List<AnomalyDetector> createOrderedDetectorList(List<AnomalyDetector> detectors, List<String> selectedDetectors) {
+    List<AnomalyDetector> result = new ArrayList<AnomalyDetector>();
+    for (AnomalyDetector x : detectors) {
+      result.add(x);
+    }
+    if (selectedDetectors != null) {
+      int sdlen = selectedDetectors.size();
+      for (int i = sdlen - 1; i >= 0; i--) {
+        String sdname = selectedDetectors.get(i);
+        for (int j = 0; j < result.size(); j++) {
+          AnomalyDetector ad = result.get(j);
+          if (ad.getName().equals(sdname)) {
+            result.remove(j);
+            result.add(0, ad);
+            break;
+          }
+        }
+      }
     }
     return result;
   }
