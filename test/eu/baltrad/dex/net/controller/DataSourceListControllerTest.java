@@ -25,6 +25,7 @@ import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -206,6 +207,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
         expect(requestFactory.createPostKeyRequest(classUnderTest.localNode, keyContent)).andReturn(request);
         expect(httpClientMock.post(request)).andReturn(res);
         expect(protocolManager.createParser(res)).andReturn(responseParser);
+        expect(responseParser.isRedirected()).andReturn(false);        
         expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).anyTimes();
         expect(responseParser.getReasonPhrase()).andReturn("Internal server error");
         messageHelper.setErrorDetailsMessage(model, "datasource.controller.send_key_server_error", "Internal server error");
@@ -239,6 +241,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
         expect(requestFactory.createPostKeyRequest(classUnderTest.localNode, keyContent)).andReturn(request);
         expect(httpClientMock.post(request)).andReturn(res);
         expect(protocolManager.createParser(res)).andReturn(responseParser);
+        expect(responseParser.isRedirected()).andReturn(false);        
         expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_UNAUTHORIZED).anyTimes();
         messageHelper.setErrorMessage(model, "datasource.controller.send_key_unauthorized");
         expect(userManagerMock.loadPeerNames()).andReturn(peers);
@@ -272,6 +275,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
         expect(requestFactory.createPostKeyRequest(classUnderTest.localNode, keyContent)).andReturn(request);
         expect(httpClientMock.post(request)).andReturn(res);
         expect(protocolManager.createParser(res)).andReturn(responseParser);
+        expect(responseParser.isRedirected()).andReturn(false);
         expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_CONFLICT).anyTimes();
         messageHelper.setErrorMessage(model, "datasource.controller.send_key_exists");
         expect(userManagerMock.loadPeerNames()).andReturn(peers);
@@ -305,8 +309,97 @@ public class DataSourceListControllerTest extends EasyMockSupport {
         expect(requestFactory.createPostKeyRequest(classUnderTest.localNode, keyContent)).andReturn(request);
         expect(httpClientMock.post(request)).andReturn(res);
         expect(protocolManager.createParser(res)).andReturn(responseParser);
+        expect(responseParser.isRedirected()).andReturn(false);        
         expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
         messageHelper.setSuccessMessage(model, "datasource.controller.send_key_server_msg");
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
+        expect(model.addAttribute("nodes", peers)).andReturn(null);
+        
+        replayAll();
+        
+        String viewName = classUnderTest.nodeConnected(model, null, 
+                "http://test.baltrad.eu", null, "send_key");
+        
+        verifyAll();
+        
+        assertEquals("node_connect", viewName);
+    }
+    
+    @Test
+    public void extractBaseUrlFromRedirect() {
+    	String result = classUnderTest.extractBaseUrlFromRedirect("http://localhost:1234", "http://localhost:1234/BaltradDex/post.htm", "http://localhost-2:1234/BaltradDex/post.htm");
+    	assertEquals("http://localhost-2:1234", result);
+    	
+      result = classUnderTest.extractBaseUrlFromRedirect("http://localhost:1234/", "http://localhost:1234/BaltradDex/post.htm", "http://localhost-2:1234/BaltradDex/post.htm");
+      assertEquals("http://localhost-2:1234", result);
+
+      result = classUnderTest.extractBaseUrlFromRedirect("http://localhost", "http://localhost/BaltradDex/post.htm", "http://localhost-2:1234/BaltradDex/post.htm");
+      assertEquals("http://localhost-2:1234", result);
+    }
+    
+    @Test
+    public void nodeConnected_isRedirected() throws Exception {
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        RequestFactory requestFactory = createMock(RequestFactory.class);
+        ResponseParser responseParser = createMock(ResponseParser.class);
+
+        Model model = createMock(Model.class);
+        HttpResponse res = createMock(HttpResponse.class);
+        byte[] keyContent = new byte[]{}; 
+        HttpUriRequest request = createMock(HttpUriRequest.class);
+      
+        expect(protocolManager.getFactory("http://test.baltrad.eu")).andReturn(requestFactory);
+        expect(methods.createLocalPubKeyZip()).andReturn(keyContent);
+        expect(requestFactory.createPostKeyRequest(classUnderTest.localNode, keyContent)).andReturn(request);
+        expect(httpClientMock.post(request)).andReturn(res);
+        expect(protocolManager.createParser(res)).andReturn(responseParser);
+        expect(responseParser.isRedirected()).andReturn(true);
+        expect(request.getURI()).andReturn(new URI("http://localhost:9876/BaltradDex/post_key.htm"));
+        expect(responseParser.getRedirectURL()).andReturn("http://localhost:1234/BaltradDex/post_key.htm");
+        messageHelper.setErrorDetailsMessage(model, 
+        	"datasource.controller.send_key_server_redirect", 
+        	"",
+          "http://localhost:1234");
+        expect(userManagerMock.loadPeerNames()).andReturn(peers);
+        expect(model.addAttribute("nodes", peers)).andReturn(null);
+        
+        replayAll();
+        
+        String viewName = classUnderTest.nodeConnected(model, null, 
+                "http://test.baltrad.eu", null, "send_key");
+        
+        verifyAll();
+        
+        assertEquals("node_connect", viewName);
+    }
+    
+    @Test
+    public void nodeConnected_isRedirected_2() throws Exception {
+        List<String> peers = Arrays.asList(new String[] {"test.baltrad.eu", 
+            "peer.baltrad.eu"});
+        
+        RequestFactory requestFactory = createMock(RequestFactory.class);
+        ResponseParser responseParser = createMock(ResponseParser.class);
+
+        Model model = createMock(Model.class);
+        HttpResponse res = createMock(HttpResponse.class);
+        byte[] keyContent = new byte[]{}; 
+        HttpUriRequest request = createMock(HttpUriRequest.class);
+      
+        expect(protocolManager.getFactory("http://test.baltrad.eu")).andReturn(requestFactory);
+        expect(methods.createLocalPubKeyZip()).andReturn(keyContent);
+        expect(requestFactory.createPostKeyRequest(classUnderTest.localNode, keyContent)).andReturn(request);
+        expect(httpClientMock.post(request)).andReturn(res);
+        expect(protocolManager.createParser(res)).andReturn(responseParser);
+        expect(responseParser.isRedirected()).andReturn(true);
+        expect(request.getURI()).andReturn(new URI("http://localhost:9876/BaltradDex/post_key.htm"));
+        expect(responseParser.getRedirectURL()).andReturn("http://localhost:1234/slurp/BaltradDex/post_key.htm");
+        messageHelper.setErrorDetailsMessage(model, 
+          "datasource.controller.send_key_server_redirect", 
+          "",
+          "http://localhost:1234/slurp");
         expect(userManagerMock.loadPeerNames()).andReturn(peers);
         expect(model.addAttribute("nodes", peers)).andReturn(null);
         
@@ -362,6 +455,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
       expect(protocolManager.createParser(res)).andReturn(responseParser);
       expect(responseParser.getProtocolVersion()).andReturn("2.0");
       expect(responseParser.getConfiguredProtocolVersion()).andReturn("2.0");
+      expect(responseParser.isRedirected()).andReturn(false);
       expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_NOT_FOUND).anyTimes();
       expect(responseParser.getReasonPhrase()).andReturn("Not approved");
       messageHelper.setErrorDetailsMessage(model, "datasource.controller.key_not_approved", "Not approved");
@@ -389,6 +483,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
       expect(protocolManager.createParser(res)).andReturn(responseParser);
       expect(responseParser.getProtocolVersion()).andReturn("2.0");
       expect(responseParser.getConfiguredProtocolVersion()).andReturn("2.0");
+      expect(responseParser.isRedirected()).andReturn(false);
       expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_UNAUTHORIZED).anyTimes();
       expect(responseParser.getReasonPhrase()).andReturn("Not approved");
       messageHelper.setErrorDetailsMessage(model, "datasource.controller.connection_unauthorized", "Not approved");
@@ -417,6 +512,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
       expect(protocolManager.createParser(res)).andReturn(responseParser);
       expect(responseParser.getProtocolVersion()).andReturn("2.0");
       expect(responseParser.getConfiguredProtocolVersion()).andReturn("2.0");
+      expect(responseParser.isRedirected()).andReturn(false);
       expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).anyTimes();
       expect(responseParser.getReasonPhrase()).andReturn("Not approved");
       messageHelper.setErrorDetailsMessage(model, "datasource.controller.server_error", "Not approved");
@@ -510,6 +606,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
       expect(protocolManager.createParser(res)).andReturn(responseParser);
       expect(responseParser.getProtocolVersion()).andReturn("2.0").anyTimes();
       expect(responseParser.getConfiguredProtocolVersion()).andReturn("2.0");
+      expect(responseParser.isRedirected()).andReturn(false);
       expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
 
       expect(responseParser.getNodeName()).andReturn("MyName");
@@ -545,6 +642,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
       expect(protocolManager.createParser(res)).andReturn(responseParser);
       expect(responseParser.getProtocolVersion()).andReturn("2.1").anyTimes();
       expect(responseParser.getConfiguredProtocolVersion()).andReturn("2.1");
+      expect(responseParser.isRedirected()).andReturn(false);
       expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
 
       expect(responseParser.getNodeName()).andReturn("MyName");
@@ -583,6 +681,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
       expect(protocolManager.createParser(res)).andReturn(responseParser);
       expect(responseParser.getProtocolVersion()).andReturn("2.1").anyTimes();
       expect(responseParser.getConfiguredProtocolVersion()).andReturn("2.1");
+      expect(responseParser.isRedirected()).andReturn(false);
       expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
 
       expect(responseParser.getNodeName()).andReturn("MyName");
@@ -621,6 +720,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
         expect(protocolManager.createParser(res)).andReturn(responseParser);
         expect(responseParser.getProtocolVersion()).andReturn("2.1").anyTimes();
         expect(responseParser.getConfiguredProtocolVersion()).andReturn("2.1");
+        expect(responseParser.isRedirected()).andReturn(false);
         expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
 
         expect(responseParser.getNodeName()).andReturn("MyName");
@@ -659,6 +759,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
         expect(protocolManager.createParser(res)).andReturn(responseParser);
         expect(responseParser.getProtocolVersion()).andReturn("2.1").anyTimes();
         expect(responseParser.getConfiguredProtocolVersion()).andReturn("2.1");
+        expect(responseParser.isRedirected()).andReturn(false);
         expect(responseParser.getStatusCode()).andReturn(HttpServletResponse.SC_OK).anyTimes();
 
         expect(responseParser.getNodeName()).andReturn("MyName");

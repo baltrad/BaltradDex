@@ -45,6 +45,11 @@ public class User implements Comparable<User> {
     private String nodeAddress;
     
     /**
+     * If for some reason the nodeAddress has to be changed, set this attribute to the wanted address.
+     */
+    private String redirectedAddress;
+    
+    /**
      * Default constructor.
      */
     public User() {}
@@ -136,8 +141,6 @@ public class User implements Comparable<User> {
                this.getName().equals(user.getName()) &&
                this.getRole() != null && 
                this.getRole().equals(user.getRole()) && 
-               //this.getPassword() != null && 
-               //this.getPassword().equals(user.getPassword()) && 
                this.getOrgName() != null &&
                this.getOrgName().equals(user.getOrgName()) &&
                this.getOrgUnit() != null && 
@@ -149,7 +152,9 @@ public class User implements Comparable<User> {
                this.getCountryCode() != null &&
                this.getCountryCode().equals(user.getCountryCode()) &&
                this.getNodeAddress() != null && 
-               this.getNodeAddress().equals(user.getNodeAddress());
+               this.getNodeAddress().equals(user.getNodeAddress()) &&
+               this.getRedirectedAddress() != null &&
+               this.getRedirectedAddress().equals(user.getRedirectedAddress());
     }
     
     /**
@@ -178,6 +183,8 @@ public class User implements Comparable<User> {
                 0 : this.getCountryCode().hashCode());
         result = prime * result + ((this.getNodeAddress() == null) ? 
                 0 : this.getNodeAddress().hashCode());
+        result = prime * result + ((this.getRedirectedAddress() == null) ? 
+            0 : this.getRedirectedAddress().hashCode());
         return result;
     }
     
@@ -311,6 +318,20 @@ public class User implements Comparable<User> {
      */
     public final void setNodeAddress(String nodeAddress) {
         this.nodeAddress = nodeAddress;
+    }
+
+    /**
+     * @return the redirected address that is should be used for this user
+     */
+    public String getRedirectedAddress() {
+      return redirectedAddress;
+    }
+
+    /**
+     * @param redirectedAddress the redirected address that is should be used for this user
+     */
+    public void setRedirectedAddress(String redirectedAddress) {
+      this.redirectedAddress = redirectedAddress;
     }
     
 }

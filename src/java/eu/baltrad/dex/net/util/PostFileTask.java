@@ -21,6 +21,13 @@
 
 package eu.baltrad.dex.net.util;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
@@ -31,10 +38,6 @@ import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.model.User;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.log4j.Logger;
 
 /**
  * Implements data delivery task executed in a separate thread.
@@ -54,7 +57,9 @@ public class PostFileTask implements Runnable {
     protected String uuid;
     protected User user;
     protected DataSource dataSource;
-
+    
+    private PostFileRedirectHandler redirectHandler;
+    
     public PostFileTask() {}
     
     /**
@@ -84,6 +89,7 @@ public class PostFileTask implements Runnable {
         this.dataSource = dataSource;
         this.httpClient = new HttpClientUtil(connTimeout, soTimeout);
     }
+
     
     /**
      * Implements Runnable interface. Runs data delivery task in a 
@@ -117,17 +123,25 @@ public class PostFileTask implements Runnable {
                     nodeStatusManager.delete(subscriptionId);
                 } else {
                     // don't retry if file is already delivered 
-                    if (response.getStatusLine().getStatusCode() 
-                            != HttpServletResponse.SC_CONFLICT) {
+                    int statusCode = response.getStatusLine().getStatusCode(); 
+                    if (statusCode != HttpServletResponse.SC_CONFLICT) {
                         boolean success = false;
-                        for (int i = 0; i < 3; i++) {
-                            response = httpClient.post(request);
-                            if (response.getStatusLine().getStatusCode() ==
+                        if (redirectHandler.canHandle(response)) {
+                          response = redirectHandler.handle(httpClient, request, response);
+                          if (response != null && response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+                            success = true;
+                          }
+                        } else {
+                            for (int i = 0; i < 3; i++) {
+                                response = httpClient.post(request);
+                                if (response.getStatusLine().getStatusCode() ==
                                     HttpServletResponse.SC_OK) {
-                                success = true;
-                                break;
+                                    success = true;
+                                    break;
+                                }
                             }
                         }
+                        
                         if (success) {
                             RegistryEntry entry = new RegistryEntry(
                                 user.getId(), dataSource.getId(), 
@@ -165,6 +179,14 @@ public class PostFileTask implements Runnable {
             log.error("Problems encountered while sending file " + uuid + 
                     " to user " + user.getName() + ": " + e.getMessage(), e);
         }
+    }
+
+    public PostFileRedirectHandler getRedirectHandler() {
+      return redirectHandler;
+    }
+
+    public void setRedirectHandler(PostFileRedirectHandler redirectHandler) {
+      this.redirectHandler = redirectHandler;
     }
 }
 

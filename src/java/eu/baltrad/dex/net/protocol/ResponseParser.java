@@ -77,4 +77,14 @@ public interface ResponseParser {
    */
   public List<Subscription> getSubscriptions();
   
+  /**
+   * @return if the response indicates that it is redirected
+   */
+  public boolean isRedirected();
+  
+  /**
+   * @return the redirect URL is isRedirected returns true
+   */
+  public String getRedirectURL();
+  
 }

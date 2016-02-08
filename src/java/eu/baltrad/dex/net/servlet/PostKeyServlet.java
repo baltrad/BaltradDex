@@ -121,6 +121,7 @@ public class PostKeyServlet extends HttpServlet {
                 baos.close();
             }
         } catch (Exception e) {
+          logger.error("storeKey failed: " + e.getMessage(), e);
             throw new RuntimeException("Failed to extract key from " +
                     "input stream", e);
         }
@@ -163,6 +164,7 @@ public class PostKeyServlet extends HttpServlet {
                 res.setStatus(HttpServletResponse.SC_CONFLICT);
             }
         } catch (Exception e) {
+            logger.error("doPost failed: " + e.getMessage(), e);
             log.error(messages.getMessage(PK_INTERNAL_SERVER_ERROR_KEY));
             res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                     messages.getMessage(PK_INTERNAL_SERVER_ERROR_KEY));

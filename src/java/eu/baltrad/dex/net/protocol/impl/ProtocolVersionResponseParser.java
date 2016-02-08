@@ -195,6 +195,24 @@ public class ProtocolVersionResponseParser implements ResponseParser {
   }
   
   /**
+   * @see eu.baltrad.dex.net.protocol.ResponseParser#isRedirected()
+   */
+  @Override
+  public boolean isRedirected() {
+    return (statusCode == 301 || statusCode == 302);
+  }
+  
+  /**
+   * @return the redirect URL is isRedirected returns true
+   */
+  public String getRedirectURL() {
+    if (isRedirected()) {
+      return httpResponse.getFirstHeader("location").getValue();
+    }
+    return null;
+  }
+  
+  /**
    * Parses the status code from the response
    * @param response the response
    * @return the status code

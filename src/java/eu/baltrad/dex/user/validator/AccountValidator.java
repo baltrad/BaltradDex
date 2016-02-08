@@ -28,6 +28,9 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -116,6 +119,15 @@ public class AccountValidator {
             errors.rejectValue("countryCode", 
                     "saveaccount.invalid.country_code",
                     messages.getMessage("saveaccount.invalid.country_code"));
+        }
+        if (user.getNodeAddress() != null && user.getNodeAddress().length() > 0) {
+            try {
+              new URL(user.getNodeAddress());
+            } catch (MalformedURLException malformedURLException) {
+              errors.rejectValue("nodeAddress", 
+                  "saveaccount.invalid.url",
+                  messages.getMessage("saveaccount.invalid.url"));
+            }
         }
     }
 

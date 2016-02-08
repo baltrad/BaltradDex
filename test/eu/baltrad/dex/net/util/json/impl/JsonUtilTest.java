@@ -43,7 +43,7 @@ public class JsonUtilTest {
             "{\"name\":\"test\",\"state\":\"state\",\"nodeAddress\"" +
             ":\"http://localhost:8084\",\"orgName\":\"org\",\"orgUnit\":" +
             "\"unit\",\"locality\":\"locality\",\"countryCode\":\"XX\"," +
-            "\"role\":\"user\",\"password\":\"s3cret\"}";
+            "\"role\":\"user\",\"password\":\"s3cret\",\"redirectedAddress\":null}";
     
     private static final String JSON_SOURCES = 
             "[{\"name\":\"DS1\",\"type\":\"local\",\"description\":" + 

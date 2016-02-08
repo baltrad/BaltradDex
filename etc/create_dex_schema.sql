@@ -66,6 +66,7 @@ CREATE TABLE dex_users
     id SERIAL NOT NULL PRIMARY KEY,
     name VARCHAR (64) NOT NULL UNIQUE,
     node_address VARCHAR (256),
+    redirected_address VARCHAR(256),    
     password VARCHAR (32),
     org_name VARCHAR (256),
     org_unit VARCHAR (256),

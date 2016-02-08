@@ -115,10 +115,15 @@ public class SaveAccountController  {
         if (result.hasErrors()) {
             return FORM_VIEW;
         }
-        user.setPassword(MessageDigestUtil
-                .createHash("MD5", user.getPassword()));
+
+        if (user.getPassword() != null) {
+          user.setPassword(MessageDigestUtil
+              .createHash("MD5", user.getPassword()));
+        }
+        
         try {
             if (user.getId() > 0) {
+                user.setRedirectedAddress(null); // Everytime we save the user, remove redirected address
                 userManager.update(user);
             } else {
                 userManager.store(user);

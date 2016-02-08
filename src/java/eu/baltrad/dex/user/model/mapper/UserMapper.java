@@ -44,7 +44,7 @@ public class UserMapper implements RowMapper<User> {
     * @throws SQLException 
     */
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return new User(
+        User user = new User(
                 rs.getInt("id"),
                 rs.getString("name"),
                 rs.getString("role"),
@@ -55,6 +55,8 @@ public class UserMapper implements RowMapper<User> {
                 rs.getString("state"),
                 rs.getString("country_code"),
                 rs.getString("node_address"));
+        user.setRedirectedAddress(rs.getString("redirected_address"));
+        return user;
     }
     
 }

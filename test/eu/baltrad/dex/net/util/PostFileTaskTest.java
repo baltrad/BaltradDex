@@ -43,6 +43,8 @@ import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
+import org.easymock.EasyMockSupport;
+
 import static org.easymock.EasyMock.*;
 import org.junit.After;
 import org.junit.Before;
@@ -54,7 +56,7 @@ import org.junit.Test;
  * @version 1.9.0
  * @since 1.1.0
  */
-public class PostFileTaskTest {
+public class PostFileTaskTest extends EasyMockSupport {
     private final static String ENTRY_UUID = 
             "ca30c41a-76c2-45c9-ac01-0f4a67a148b9";
     
@@ -64,11 +66,12 @@ public class PostFileTaskTest {
     private INodeStatusManager nodeStatusManagerMock;
     private IHttpClientUtil httpClientUtilMock;
     
-    private List mocks;
+    //private List mocks;
     private HttpUriRequest request;
     private User receiver;
     private DataSource dataSource;
     private Subscription s;
+    private PostFileRedirectHandler redirectHandler;
     
     protected class PFTask extends PostFileTask {
         
@@ -92,29 +95,29 @@ public class PostFileTaskTest {
         }
     }
     
-    private Object createMock(Class clazz) {
-        Object mock = EasyMock.createMock(clazz);
-        mocks.add(mock);
-        return mock;
-    }
-    
-    private void replayAll() {
-        for (Object mock : mocks) {
-            replay(mock);
-        }
-    }
-    
-    private void verifyAll() {
-        for (Object mock : mocks) {
-            verify(mock);
-        }
-    }
-    
-    private void resetAll() {
-        for (Object mock : mocks) {
-            reset(mock);
-        }
-    }
+//    private Object createMock(Class clazz) {
+//        Object mock = EasyMock.createMock(clazz);
+//        mocks.add(mock);
+//        return mock;
+//    }
+//    
+//    private void replayAll() {
+//        for (Object mock : mocks) {
+//            replay(mock);
+//        }
+//    }
+//    
+//    private void verifyAll() {
+//        for (Object mock : mocks) {
+//            verify(mock);
+//        }
+//    }
+//    
+//    private void resetAll() {
+//        for (Object mock : mocks) {
+//            reset(mock);
+//        }
+//    }
     
     private HttpResponse createResponse(int code, String reason) 
             throws Exception {
@@ -126,12 +129,13 @@ public class PostFileTaskTest {
     
     @Before
     public void setUp() {
-        mocks = new ArrayList();
+        //mocks = new ArrayList();
         request = new HttpPost();
         receiver = new User(1, "test", "user", "s3cret", "org", "unit", 
                 "locality", "state", "XX", "http://test.baltrad.eu:8084");
         dataSource = new DataSource(1, "DS1", DataSource.PEER, "A data source",
                 "12374", "SCAN");
+        redirectHandler = createMock(PostFileRedirectHandler.class);
         s = new Subscription(1, 1340189763867L, Subscription.PEER, 
                 receiver.getName(), dataSource.getName(), true, true);
     }
@@ -140,7 +144,7 @@ public class PostFileTaskTest {
     public void tearDown() {
         resetAll();
         classUnderTest = null;
-        mocks = null;
+        //mocks = null;
         request = null;
         receiver = null;
         dataSource = null;
@@ -309,6 +313,7 @@ public class PostFileTaskTest {
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Server error");
         httpClientUtilMock = (IHttpClientUtil) 
                 createMock(IHttpClientUtil.class);
+        expect(redirectHandler.canHandle(response)).andReturn(false);
         expect(httpClientUtilMock.post(request)).andReturn(response).times(2);
         response = createResponse(HttpServletResponse.SC_OK, "OK");
         expect(httpClientUtilMock.post(request)).andReturn(response).once();
@@ -322,6 +327,7 @@ public class PostFileTaskTest {
             subscriptionManagerMock, nodeStatusManagerMock, request, ENTRY_UUID, 
             receiver, dataSource);
         classUnderTest.setHttpClient(httpClientUtilMock);
+        classUnderTest.setRedirectHandler(redirectHandler);
         classUnderTest.run();
         
         verifyAll();
@@ -350,6 +356,7 @@ public class PostFileTaskTest {
         httpClientUtilMock = (IHttpClientUtil) 
                 createMock(IHttpClientUtil.class);
         expect(httpClientUtilMock.post(request)).andReturn(response).times(4);
+        expect(redirectHandler.canHandle(response)).andReturn(false);
         
         httpClientUtilMock.shutdown();
         expectLastCall();
@@ -360,9 +367,54 @@ public class PostFileTaskTest {
             subscriptionManagerMock, nodeStatusManagerMock, request, ENTRY_UUID, 
             receiver, dataSource);
         classUnderTest.setHttpClient(httpClientUtilMock);
+        classUnderTest.setRedirectHandler(redirectHandler);
         classUnderTest.run();
         
         verifyAll();
     }
+
+    @Test
+    public void run_Redirect() throws Exception {
+        registryManagerMock = (IRegistryManager) 
+                createMock(IRegistryManager.class);
+        expect(registryManagerMock.store(isA(RegistryEntry.class)))
+                .andReturn(1);
+        
+        subscriptionManagerMock = (ISubscriptionManager)
+                createMock(ISubscriptionManager.class);
+        expect(subscriptionManagerMock.load(Subscription.PEER, 
+                receiver.getName(), dataSource.getName())).andReturn(s).once();
+        
+        nodeStatusManagerMock = (INodeStatusManager)
+                createMock(INodeStatusManager.class);
+        Status st = new Status(0, 0, 0);
+        expect(nodeStatusManagerMock.load(1)).andReturn(st).once();
+        expect(nodeStatusManagerMock.update(st, 1)).andReturn(1).once();
+        
+        HttpResponse response = createResponse(
+                HttpServletResponse.SC_MOVED_PERMANENTLY, "Redirected");
+        httpClientUtilMock = (IHttpClientUtil) 
+                createMock(IHttpClientUtil.class);
+        expect(httpClientUtilMock.post(request)).andReturn(response).times(1);
+        expect(redirectHandler.canHandle(response)).andReturn(true);
+        HttpResponse redirectResponse = createResponse(
+            HttpServletResponse.SC_OK, "OK");
+        expect(redirectHandler.handle(httpClientUtilMock, request, response)).andReturn(redirectResponse);
+        
+        httpClientUtilMock.shutdown();
+        expectLastCall();
+        
+        replayAll();
+        
+        classUnderTest = new PFTask(registryManagerMock, 
+            subscriptionManagerMock, nodeStatusManagerMock, request, ENTRY_UUID, 
+            receiver, dataSource);
+        classUnderTest.setHttpClient(httpClientUtilMock);
+        classUnderTest.setRedirectHandler(redirectHandler);
+        classUnderTest.run();
+        
+        verifyAll();
+    }
+        
     
 }

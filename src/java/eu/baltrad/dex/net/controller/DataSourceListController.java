@@ -44,6 +44,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.log.StickyLevel;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.controller.util.ModelMessageHelper;
@@ -58,6 +59,7 @@ import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.CompressDataUtil;
+import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.util.WebValidator;
 
 /**
@@ -89,6 +91,10 @@ public class DataSourceListController {
     /** Send key server error */
     private static final String DS_SEND_KEY_SERVER_ERROR_KEY = 
             "datasource.controller.send_key_server_error";
+
+    private static final String DS_SEND_KEY_SERVER_REDIRECT_KEY = 
+        "datasource.controller.send_key_server_redirect";
+    
     /** Send key server OK message */
     private static final String DS_SEND_KEY_SERVER_MSG_KEY = 
             "datasource.controller.send_key_server_msg";
@@ -122,13 +128,19 @@ public class DataSourceListController {
             "datasource.controller.connection_unauthorized";
     /** Data source general connection error */
     private static final String DS_GENERIC_CONN_ERROR_KEY = 
-            "datasource.controller.generic_connection_error"; 
+            "datasource.controller.generic_connection_error";
+    /** If connection is responded with a redirect */
+    private static final String DS_CONNECTION_SERVER_REDIRECT_KEY = 
+        "datasource.controller.connection_server_redirect";
+    private static final String DS_CONNECTION_UPDATE_REDIRECTED_KEY =
+        "datasource.controller.connection_server_update_redirected";
     
     private IConfigurationManager confManager;
     private IUserManager userManager;
     private Authenticator authenticator;
     private UrlValidatorUtil urlValidator;
     private ProtocolManager protocolManager = null;
+    private MessageResourceUtil messages;
     
     private IHttpClientUtil httpClient;
     private ModelMessageHelper messageHelper;
@@ -202,16 +214,23 @@ public class DataSourceListController {
                     HttpUriRequest req = requestFactory.createPostKeyRequest(localNode, createLocalPubKeyZip());
                     HttpResponse res = httpClient.post(req);
                     ResponseParser parser = protocolManager.createParser(res);
-                    if (parser.getStatusCode() == HttpServletResponse.SC_OK) {
-                      messageHelper.setSuccessMessage(model, DS_SEND_KEY_SERVER_MSG_KEY);
-                    } else if (parser.getStatusCode() == HttpServletResponse.SC_CONFLICT) {
-                      messageHelper.setErrorMessage(model, DS_SEND_KEY_EXISTS_MSG_KEY);
-                    } else if (parser.getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
-                      messageHelper.setErrorMessage(model,DS_SEND_KEY_UNATHORIZED_MSG_KEY);                      
-                    } else {
+                    if (parser.isRedirected()) {
                       messageHelper.setErrorDetailsMessage(model, 
-                          DS_SEND_KEY_SERVER_ERROR_KEY, 
-                          parser.getReasonPhrase());
+                          DS_SEND_KEY_SERVER_REDIRECT_KEY,
+                          "",
+                          extractBaseUrlFromRedirect(urlInput, req.getURI().toString(), parser.getRedirectURL()));
+                    } else {
+                      if (parser.getStatusCode() == HttpServletResponse.SC_OK) {
+                        messageHelper.setSuccessMessage(model, DS_SEND_KEY_SERVER_MSG_KEY);
+                      } else if (parser.getStatusCode() == HttpServletResponse.SC_CONFLICT) {
+                        messageHelper.setErrorMessage(model, DS_SEND_KEY_EXISTS_MSG_KEY);
+                      } else if (parser.getStatusCode() == HttpServletResponse.SC_UNAUTHORIZED) {
+                        messageHelper.setErrorMessage(model,DS_SEND_KEY_UNATHORIZED_MSG_KEY);                      
+                      } else {
+                        messageHelper.setErrorDetailsMessage(model, 
+                            DS_SEND_KEY_SERVER_ERROR_KEY, 
+                            parser.getReasonPhrase());
+                      }
                     }
                 } catch (Exception e) {
                   messageHelper.setErrorDetailsMessage(model, DS_SEND_KEY_CONTROLLER_ERROR_KEY, e.getMessage());
@@ -268,6 +287,18 @@ public class DataSourceListController {
         return viewName;
     }
     
+    protected String extractBaseUrlFromRedirect(String baseURI, String originURI, String redirectURI) {
+      String appended = originURI.substring(baseURI.length());
+      if (redirectURI.endsWith(appended)) {
+        String result = redirectURI.substring(0, redirectURI.length() - appended.length());
+        if (result.endsWith("/")) {
+          result = result.substring(0, result.length()-1);
+        }
+        return result;
+      }
+      return redirectURI;
+    }
+    
     /**
      * Handles when connect is pressed
      * @param model the model
@@ -277,11 +308,11 @@ public class DataSourceListController {
      */
     protected String nodeConnected_connect(Model model, String nodeSelect, String urlInput) {
       String viewName = DS_CONNECT_VIEW;
-
+      User user = null;
       //Validate node's URL address 
       String urlSelect = null;
       if (WebValidator.validate(nodeSelect)) {
-        User user = userManager.load(nodeSelect);
+        user = userManager.load(nodeSelect);
         urlSelect = user.getNodeAddress();
       }
       String url = urlValidator.validate(urlInput) ? urlInput : urlSelect;
@@ -301,8 +332,20 @@ public class DataSourceListController {
 
         logger.debug("Got a response message of version " + parser.getProtocolVersion());
         logger.debug("Answering node supports version " + parser.getConfiguredProtocolVersion());
-        
-        if (parser.getStatusCode() == HttpServletResponse.SC_OK) {
+        if (parser.isRedirected()) {
+          String redirectedAddress = extractBaseUrlFromRedirect(url, req.getURI().toString(), parser.getRedirectURL());
+          messageHelper.setErrorDetailsMessage(model, 
+              DS_CONNECTION_SERVER_REDIRECT_KEY,
+              "",
+              redirectedAddress);
+          if (user != null) {
+            if (user.getRedirectedAddress() == null) {
+              user.setRedirectedAddress(redirectedAddress);
+              userManager.update(user);
+              log.log(StickyLevel.STICKY, messages.getMessage(DS_CONNECTION_UPDATE_REDIRECTED_KEY, new String[] {user.getName(), redirectedAddress}));
+            }
+          }
+        } else if (parser.getStatusCode() == HttpServletResponse.SC_OK) {
           model.addAttribute(PEER_NAME_KEY, parser.getNodeName());
           Set<DataSource> dataSources = parser.getDataSources();
           model.addAttribute(DATA_SOURCES_KEY, dataSources);
@@ -409,5 +452,13 @@ public class DataSourceListController {
     @Autowired
     public void setProtocolManager(ProtocolManager protocolManager) {
       this.protocolManager = protocolManager;
+    }
+
+    public MessageResourceUtil getMessages() {
+      return messages;
+    }
+
+    public void setMessages(MessageResourceUtil messages) {
+      this.messages = messages;
     }    
 }

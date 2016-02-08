@@ -33,7 +33,7 @@ Author     : szewczenko
                             <div class="row">Peer account details</div>
                         </div>
                         <div class="header-text">
-                            Peer account settings are read-only.  
+                            Address can only be changed on peer accounts.  
                         </div>
                         <form:form method="POST" commandName="user_account">
                             <div class="body">
@@ -67,8 +67,7 @@ Author     : szewczenko
                                     </div>
                                     <div class="rightcol">
                                         <form:input path="nodeAddress"
-                                                        title="Node URL address"
-                                                        readonly="true"/> 
+                                                        title="Node URL address" />
                                         <form:errors path="nodeAddress" 
                                                      cssClass="error"/>
                                     </div>
@@ -137,9 +136,8 @@ Author     : szewczenko
                             <div class="table-footer">
                                 <div class="buttons">
                                     <div class="button-wrap">
-                                        <input class="button" type="button" 
-                                               value="OK"
-                                               onclick="window.location.href='user_edit.htm'"/>
+                                        <input class="button" type="submit" 
+                                               value="Save"/>
                                     </div>
                                 </div>
                             </div>                                   

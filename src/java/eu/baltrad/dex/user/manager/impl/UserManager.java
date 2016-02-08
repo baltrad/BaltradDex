@@ -202,7 +202,7 @@ public class UserManager implements IUserManager {
         
         final String sql = "INSERT INTO dex_users (name, password, " +
                     "org_name, org_unit, locality, state, country_code, " + 
-                    "node_address) VALUES (?,?,?,?,?,?,?,?)";
+                    "node_address, redirected_address) VALUES (?,?,?,?,?,?,?,?,?)";
         final User usr = user;
         
         try {
@@ -221,6 +221,7 @@ public class UserManager implements IUserManager {
                         ps.setString(6, usr.getState());
                         ps.setString(7, usr.getCountryCode());
                         ps.setString(8, usr.getNodeAddress());
+                        ps.setString(9, usr.getRedirectedAddress());
                         return ps;
                     }
                 }, keyHolder);
@@ -244,7 +245,7 @@ public class UserManager implements IUserManager {
         try {
             jdbcTemplate.update("UPDATE dex_users SET name = ?, " + 
                     "org_name = ?, org_unit = ?, locality = ?, "
-                    + "state = ?, country_code = ?, node_address = ? "
+                    + "state = ?, country_code = ?, node_address = ?, redirected_address = ? "
                     + "WHERE id = ?",
                 user.getName(),
                 user.getOrgName(),
@@ -253,6 +254,7 @@ public class UserManager implements IUserManager {
                 user.getState(),
                 user.getCountryCode(),
                 user.getNodeAddress(),
+                user.getRedirectedAddress(),
                 user.getId());
             int roleId = roleManager.load(user.getRole()).getId();
             roleManager.update(roleId, user.getId());

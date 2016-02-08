@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.net.servlet;
 
+import eu.baltrad.dex.net.protocol.ProtocolManager;
 import eu.baltrad.dex.net.protocol.RequestFactory;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
@@ -118,7 +119,7 @@ public class PostFileServlet extends HttpServlet {
     private IDataSourceManager dataSourceManager;
     private MessageResourceUtil messages;
     private Logger log;
-    
+    private ProtocolManager protocolManager;
     private int connTimeout;
     private int soTimeout;
     
@@ -256,6 +257,8 @@ public class PostFileServlet extends HttpServlet {
                                 subscriptionManager, nodeStatusManager, 
                                 deliveryRequest, entry.getUuid().toString(), 
                                 receiver, dataSource, connTimeout, soTimeout);
+                        task.setRedirectHandler(createPostFileRedirectHandler(receiver, fileContent));
+                        
                         framePublisherManager.getFramePublisher(
                             receiver.getName()).addTask(task);
                     }
@@ -270,6 +273,18 @@ public class PostFileServlet extends HttpServlet {
             logger.info("Finished publishing to subscribers: took " + t + " ms");
         }
     } 
+    
+    protected PostFileRedirectHandler createPostFileRedirectHandler(User peerUser, byte[] fileContent) {
+      PostFileRedirectHandler handler = new PostFileRedirectHandler();
+      handler.setAuthenticator(authenticator);
+      handler.setFileContent(fileContent);
+      handler.setLocalUser(localNode);
+      handler.setMessages(messages);
+      handler.setPeerUser(peerUser);
+      handler.setProtocolManager(protocolManager);
+      handler.setUserManager(userManager);
+      return handler;
+    }
     
     /**
      * Implements Controller interface.
@@ -493,5 +508,13 @@ public class PostFileServlet extends HttpServlet {
     @Autowired
     public void setDataSourceManager(IDataSourceManager dataSourceManager) {
         this.dataSourceManager = dataSourceManager;
+    }
+
+    public ProtocolManager getProtocolManager() {
+      return protocolManager;
+    }
+
+    public void setProtocolManager(ProtocolManager protocolManager) {
+      this.protocolManager = protocolManager;
     }
 }

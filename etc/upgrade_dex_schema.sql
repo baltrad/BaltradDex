@@ -413,6 +413,18 @@ BEGIN
 END
 $$ LANGUAGE plpgsql;
 
+/*
+    Add redirected_address to the dex_users table
+*/
+CREATE OR REPLACE FUNCTION update_dex_users_with_redirected_address() RETURNS VOID AS $$
+BEGIN
+  PERFORM true FROM information_schema.columns WHERE table_name = 'dex_users' AND column_name = 'redirected_address';
+  IF NOT FOUND THEN
+    ALTER TABLE dex_users ADD COLUMN redirected_address VARCHAR(256);
+  END IF; 
+END;
+$$ LANGUAGE plpgsql;
+
 SELECT remove_name_hash_from_dex_users();
 -- SELECT reset_user_passwords();
 SELECT rename_registry_table();
@@ -424,6 +436,7 @@ SELECT remove_double_index();
 SELECT upgrade_dex_keys_table();
 SELECT upgrade_dex_data_sources_table();
 SELECT create_status_tables();
+SELECT update_dex_users_with_redirected_address();
 
 DROP FUNCTION make_plpgsql(); 
 DROP FUNCTION remove_name_hash_from_dex_users();
@@ -434,3 +447,4 @@ DROP FUNCTION remove_double_index();
 DROP FUNCTION upgrade_dex_keys_table();
 DROP FUNCTION upgrade_dex_data_sources_table();
 DROP FUNCTION create_status_tables();
+DROP FUNCTION update_dex_users_with_redirected_address();
