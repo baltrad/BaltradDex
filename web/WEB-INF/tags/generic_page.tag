@@ -27,6 +27,7 @@
 
 <%
     Role role = (Role) securityManager.getSessionRole(session);
+    request.getSession().removeAttribute("sessionInvalid");
     if (role == null) {
         request.getSession().setAttribute("sessionInvalid", 1);
     } else {
