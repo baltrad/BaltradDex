@@ -27,7 +27,6 @@
 
 <%
     Role role = (Role) securityManager.getSessionRole(session);
-    request.getSession().removeAttribute("sessionInvalid");
     if (role == null) {
         request.getSession().setAttribute("sessionInvalid", 1);
     } else {
@@ -65,6 +64,9 @@
         <div id="container">
             <c:choose>
                 <c:when test="${sessionInvalid == 1}">
+                    <% 
+                      request.getSession().invalidate(); 
+                    %>
                     <div id="header"></div>
                     <div id="sidebar">
                         <div id="logo-init"></div>
