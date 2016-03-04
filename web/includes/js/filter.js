@@ -190,6 +190,7 @@ BdbAttributeFilter.prototype.OPERATORS = [
   {name: ">", value: "GT"},
   {name: ">=", value: "GE"},
   {name: "in", value: "IN"},
+  {name: "like", value: "LIKE"},
 ];
   
 BdbAttributeFilter.prototype.VALUE_TYPES = [
