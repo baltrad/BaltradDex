@@ -5,13 +5,16 @@
 <%@attribute name="adaptors" type="java.util.List"%>
 
 <%@attribute name="extraBottom" fragment="true"%>
+<%@attribute name="extraButtons_pre" fragment="true"%>
+<%@attribute name="extraButtons_post" fragment="true"%>
 
 <%@attribute name="formAction"%>
+<%@attribute name="encodingType"%>
 <%@attribute name="formMethod"%>
 <%@attribute name="create" type="java.lang.Boolean"
              description="set true if creating (not modifying) the rule"%>
 
-<form action="${formAction}" method="${formMethod ? formMethod : 'POST'}">
+<form action="${formAction}" method="${formMethod ? formMethod : 'POST'}" enctype="${encodingType != null ? encodingType : 'application/x-www-form-urlencoded'}">
     <div class="body">
         <div class="row2">
             <div class="leftcol">Name:</div>
@@ -72,13 +75,16 @@
         <div class="buttons">
             <c:choose>
                 <c:when test="${create}">
+                    <jsp:invoke fragment="extraButtons_pre"/>                     
                     <div class="button-wrap">
                         <input class="button" type="submit" name="submitButton"
                                value="Add"/>
                     </div>
+                    <jsp:invoke fragment="extraButtons_post"/>                     
                  </c:when>
                  <c:otherwise>
-                     <div class="button-wrap">
+                    <jsp:invoke fragment="extraButtons_pre"/>
+                    <div class="button-wrap">
                          <input class="button" type="submit" name="submitButton"
                                 value="Save"/>
                      </div>
@@ -86,6 +92,7 @@
                         <input class="button" type="submit" name="submitButton"
                                value="Delete"/>
                      </div> 
+                    <jsp:invoke fragment="extraButtons_post"/>                     
                  </c:otherwise>
             </c:choose>
         </div>

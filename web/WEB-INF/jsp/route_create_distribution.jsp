@@ -23,9 +23,11 @@ Creates a distribution route
 
 <t:generic_page pageTitle="${create ? 'Create' : 'Edit'} route">
     <jsp:attribute name="extraHeader">
+        <!--
         <script type="text/javascript"
                 src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js">
         </script>
+        -->
         <script type="text/javascript"
                 src="includes/js/jquery.serializeJSON.js">
         </script>
@@ -70,10 +72,42 @@ Creates a distribution route
                         $("#filter").empty();
                       }
                     });
+                    // This function is for generating a form that can be used for testing a filter against a matches a file. You might want to 
+                    // 
+                    var testb = $("[name='testButton']");
+                    testb.click(function(evt) {
+                      filter.updateDataFromDom();
+                      if (!isValidBdbFilter(filter.data)) {
+                        evt.preventDefault();
+                        alert("invalid filter");
+                      } else {
+                        var fd = new FormData($('form')[0]);
+                        fd.append("jsonTestFilter", JSON.stringify(filter.data));
+                        $.ajax({url: 'test_distribution_filter.htm',
+                                type: 'POST',
+                                data: fd,
+                                cache: false,
+                                processData:false,
+                                contentType:false,
+                                success: function(data, textStatus, xhr) {
+                                  var msg = "Not matching";
+                                  var color = "#AA0000";
+                                  if (data == "OK") {
+                                    msg = "Matching";
+                                    color = "#00AA00";
+                                  }
+                                  $('#testResult').html(msg);
+                                  $('#testResult').css("color",color);
+                                },
+                                error: function(xhr, textStatus, errorThrown) {
+                                  $('#testResult').html("Not matching");
+                                }});
+                      }
+                    });
                     ready = true;
                 }
             });
-        </script>    
+        </script> 
     </jsp:attribute>
         
     <jsp:body>
@@ -88,7 +122,7 @@ Creates a distribution route
                 <t:message_box errorHeader="Problems encountered."
                                errorBody="${emessage}"/>
                 <t:form_route_common route="${route}" create="${create}"
-                                     formAction="route_create_distribution.htm">
+                                     formAction="route_create_distribution.htm" encodingType="multipart/form-data">
                     <jsp:attribute name="extraBottom">
                         <div class="row2">
                             <div class="leftcol">Destination:</div>
@@ -115,7 +149,17 @@ Creates a distribution route
                                 <input type="hidden" name="filterJson" 
                                        id="filterJson" />
                             </div> 
-                        </div>                 
+                        </div>
+                        <div class="row2">
+                          <div class="bdb-filter-matching-text">
+                            Test file matching
+                          </div>
+                          <div class="bdb-filter-matching">
+                            <input type="file" id="testFile" name="datafile" size="60" title="Example file that should be tested against filter" />
+                            <input class="button" type="button" name="testButton" value="Test" />
+                            <div style="height: 26px; display: inline; white-space: nowrap; padding-left: 30px; font-size: 16px;" id="testResult" />
+                          </div>
+                        </div>               
                     </jsp:attribute>
                 </t:form_route_common>
             </div>

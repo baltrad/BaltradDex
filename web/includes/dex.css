@@ -2317,3 +2317,21 @@ textarea {
     border: none;
     margin: 0 4px -3px 0;
 }
+
+.routes .bdb-filter-matching-text {
+    width: 100%;
+    float: left;
+    clear: both;
+    margin: 8px 0 8px 0;
+    padding-left: 8px;
+    font-weight: bold;
+}
+.routes .bdb-filter-matching {
+    width: 100%;
+    height: 26px;
+    display: inline;
+    white-space: nowrap;
+    float: left;
+    clear: both;
+    padding: 0 8px 8px 8px;
+}

@@ -47,8 +47,12 @@ function updateMessages() {
     xmlHttp = createXMLHttpObject();
     loadXMLDoc(xmlHttp,"messages_table.htm", function() {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-            document.getElementById("message-table").innerHTML = 
-                xmlHttp.responseText;
+        	var el = document.getElementById("message-table");
+        	if (el != null) {
+                el.innerHTML = xmlHttp.responseText;
+        	}
+            //document.getElementById("message-table").innerHTML = 
+            //    xmlHttp.responseText;
         }
     });
     timeoutID = setTimeout("updateMessages()", 1000);

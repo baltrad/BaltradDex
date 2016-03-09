@@ -30,8 +30,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
+import eu.baltrad.bdb.db.Database;
+import eu.baltrad.bdb.expr.Expression;
+import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
@@ -45,10 +52,13 @@ import eu.baltrad.beast.rules.dist.DistributionRule;
 public class DistributionRoutesController {
   private IRouterManager manager = null;
   private ObjectMapper jsonMapper = new ObjectMapper();
+  private MetadataMatcher matcher = new MetadataMatcher();
   private static Logger logger = LogManager.getLogger(DistributionRoutesController.class);
-
   protected enum Operation { Add, Save, Delete, View };
  
+  @Autowired
+  protected Database bdb = null;
+  
   /**
    * Set the router manager instance
    */
@@ -57,7 +67,27 @@ public class DistributionRoutesController {
     this.manager = manager;
   }
 
-  @RequestMapping("/route_create_distribution.htm")
+  @RequestMapping(value = "/test_distribution_filter.htm", method = { RequestMethod.POST })
+  @ResponseBody
+  public String testRoute(
+      Model model,
+      @RequestParam(value="jsonTestFilter", required=false) String jsonTestFilter,
+      @RequestParam(value="datafile", required=false) MultipartFile datafile)
+  {
+    try {
+      logger.info("FILTER: " + jsonTestFilter);
+      Expression xpr = jsonMapper.readValue(jsonTestFilter, IFilter.class).getExpression();
+      boolean result = matcher.match(bdb.queryFileMetadata(datafile.getInputStream()), xpr);
+      if (result) {
+        return "OK";
+      }
+    } catch (Throwable t) {
+      logger.error("Failure", t);
+    }
+    return "FAIL";
+  }
+  
+  @RequestMapping(value = "/route_create_distribution.htm", method = { RequestMethod.GET, RequestMethod.POST })
   public String distributionRoute(
       Model model,
       @RequestParam(value="name", required=false) String name,
@@ -67,6 +97,7 @@ public class DistributionRoutesController {
       @RequestParam(value="destination", required=false) String destination,
       @RequestParam(value="namingTemplate", required=false) String namingTemplate,
       @RequestParam(value="filterJson", required=false) String filterJson,
+      @RequestParam(value="datafile", required=false) MultipartFile datafile,
       @RequestParam(value="submitButton", required=false) String opString) {
     
     Operation op = null;
@@ -75,7 +106,9 @@ public class DistributionRoutesController {
     } catch (Exception e) {
       op = Operation.View;
     }
-
+    logger.info("FILTER: " + filterJson);
+    
+    
     RouteDefinition routeDef = null;
     if (op == Operation.View && name != null) {
       routeDef = manager.getDefinition(name);
@@ -261,5 +294,17 @@ public class DistributionRoutesController {
     if (route.getName() == null || route.getName().equals("")) {
       throw new RuleException("name must be specified");
     }
+  }
+  
+  @Autowired
+  public void setDatabase(Database database) {
+    bdb = database;
+  }
+  // For test purpose
+  protected void setObjectMapper(ObjectMapper mapper) {
+    this.jsonMapper = mapper;
+  }
+  protected void setMetadataMatcher(MetadataMatcher matcher) {
+    this.matcher = matcher;
   }
 }
