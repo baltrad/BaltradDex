@@ -18,9 +18,14 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 ------------------------------------------------------------------------*/
 package eu.baltrad.beastui.web.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -37,13 +42,21 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import eu.baltrad.bdb.db.Database;
+import eu.baltrad.bdb.db.FileEntry;
+import eu.baltrad.bdb.db.rest.RestfulFileEntry;
 import eu.baltrad.bdb.expr.Expression;
+import eu.baltrad.bdb.oh5.Metadata;
 import eu.baltrad.bdb.oh5.MetadataMatcher;
+import eu.baltrad.bdb.oh5.Source;
+import eu.baltrad.bdb.util.Date;
+import eu.baltrad.bdb.util.Time;
 import eu.baltrad.beast.db.IFilter;
+import eu.baltrad.beast.message.mo.BltDataMessage;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.RuleException;
 import eu.baltrad.beast.rules.dist.DistributionRule;
+import eu.baltrad.beast.rules.dist.DistributionRuleManager;
 
 /**
  * Manages DistributionRule instances
@@ -55,7 +68,7 @@ public class DistributionRoutesController {
   private MetadataMatcher matcher = new MetadataMatcher();
   private static Logger logger = LogManager.getLogger(DistributionRoutesController.class);
   protected enum Operation { Add, Save, Delete, View };
- 
+  
   @Autowired
   protected Database bdb = null;
   
@@ -67,22 +80,64 @@ public class DistributionRoutesController {
     this.manager = manager;
   }
 
+  protected void copyInputStreamToFile(InputStream src, File dst) {
+    try {
+      FileUtils.copyInputStreamToFile(src, dst);
+    } catch (IOException e) {
+      throw new RuntimeException("failed to copy InputStream to " + dst, e);
+    }
+  }
+  
   @RequestMapping(value = "/test_distribution_filter.htm", method = { RequestMethod.POST })
   @ResponseBody
   public String testRoute(
       Model model,
       @RequestParam(value="jsonTestFilter", required=false) String jsonTestFilter,
+      @RequestParam(value="testType", required=false) String testType,
+      @RequestParam(value="destination", required=false) String destination,
+      @RequestParam(value="namingTemplate", required=false) String namingTemplate,
       @RequestParam(value="datafile", required=false) MultipartFile datafile)
   {
-    try {
-      logger.info("FILTER: " + jsonTestFilter);
-      Expression xpr = jsonMapper.readValue(jsonTestFilter, IFilter.class).getExpression();
-      boolean result = matcher.match(bdb.queryFileMetadata(datafile.getInputStream()), xpr);
-      if (result) {
+    if (testType != null && testType.equals("UploadTest")) {
+      File temp = null;
+      InputStream is = null;
+      try {
+        DistributionRule rule = createRule(destination, namingTemplate, jsonTestFilter);
+        temp = File.createTempFile("dist-test-file", ".h5");
+        copyInputStreamToFile(datafile.getInputStream(), temp);
+        is = new FileInputStream(temp);
+        FileEntry fe = new RestfulFileEntry(bdb, bdb.queryFileMetadata(is));
+        rule.upload(temp, fe);
         return "OK";
+      } catch (Throwable t) {
+        logger.error("Failure", t);
+      } finally {
+        if (temp != null) {
+          try {
+            temp.delete();
+          } catch (Throwable t) {
+            // pass
+          }
+        }
+        if (is != null) {
+          try {
+            is.close();
+          } catch (Throwable t) {
+            // pass
+          }
+        }
       }
-    } catch (Throwable t) {
-      logger.error("Failure", t);
+    } else { 
+      try {
+        logger.info("FILTER: " + jsonTestFilter);
+        Expression xpr = jsonMapper.readValue(jsonTestFilter, IFilter.class).getExpression();
+        boolean result = matcher.match(bdb.queryFileMetadata(datafile.getInputStream()), xpr);
+        if (result) {
+          return "OK";
+        }
+      } catch (Throwable t) {
+        logger.error("Failure", t);
+      }
     }
     return "FAIL";
   }

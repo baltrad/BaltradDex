@@ -89,7 +89,7 @@ public class DistributionRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    String result = classUnderTest.testRoute(model, "{}", multipartFile);
+    String result = classUnderTest.testRoute(model, "{}", null, null, null, multipartFile);
     
     verifyAll();
     assertEquals("OK", result);
@@ -112,7 +112,7 @@ public class DistributionRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    String result = classUnderTest.testRoute(model, "{}", multipartFile);
+    String result = classUnderTest.testRoute(model, "{}", null, null, null, multipartFile);
     
     verifyAll();
     assertEquals("FAIL", result);
@@ -134,7 +134,7 @@ public class DistributionRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    String result = classUnderTest.testRoute(model, "{}", multipartFile);
+    String result = classUnderTest.testRoute(model, "{}", null, null, null, multipartFile);
     
     verifyAll();
     assertEquals("FAIL", result);

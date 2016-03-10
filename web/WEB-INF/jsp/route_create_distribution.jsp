@@ -101,6 +101,39 @@ Creates a distribution route
                                 },
                                 error: function(xhr, textStatus, errorThrown) {
                                   $('#testResult').html("Not matching");
+                                  $('#testResult').css("color","#AA0000");
+                                }});
+                      }
+                    });
+                    var testub = $("[name='testUploadButton']");
+                    testub.click(function(evt) {
+                      filter.updateDataFromDom();
+                      if (!isValidBdbFilter(filter.data)) {
+                        evt.preventDefault();
+                        alert("invalid filter");
+                      } else {
+                        var fd = new FormData($('form')[0]);
+                        fd.append("jsonTestFilter", JSON.stringify(filter.data));
+                        fd.append("testType", "UploadTest");
+                        $.ajax({url: 'test_distribution_filter.htm',
+                                type: 'POST',
+                                data: fd,
+                                cache: false,
+                                processData:false,
+                                contentType:false,
+                                success: function(data, textStatus, xhr) {
+                                  var msg = "FAIL";
+                                  var color = "#AA0000";
+                                  if (data == "OK") {
+                                    msg = "OK";
+                                    color = "#00AA00";
+                                  }                                
+                                  $('#testResult').html(msg);
+                                  $('#testResult').css("color",color);
+                                },
+                                error: function(xhr, textStatus, errorThrown) {
+                                  $('#testResult').html("FAIL");
+                                  $('#testResult').css("color","#AA0000");
                                 }});
                       }
                     });
@@ -152,11 +185,12 @@ Creates a distribution route
                         </div>
                         <div class="row2">
                           <div class="bdb-filter-matching-text">
-                            Test file matching
+                            Test distribution
                           </div>
                           <div class="bdb-filter-matching">
                             <input type="file" id="testFile" name="datafile" size="60" title="Example file that should be tested against filter" />
-                            <input class="button" type="button" name="testButton" value="Test" />
+                            <input class="button" type="button" name="testButton" value="Match" />
+                            <input class="button" type="button" name="testUploadButton" value="Upload" />
                             <div style="height: 26px; display: inline; white-space: nowrap; padding-left: 30px; font-size: 16px;" id="testResult" />
                           </div>
                         </div>               
