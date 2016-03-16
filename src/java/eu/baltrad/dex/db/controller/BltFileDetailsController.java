@@ -210,7 +210,7 @@ public class BltFileDetailsController {
                 BltDataProcessor.H5_PATH_SEPARATOR
                         + BltDataProcessor.H5_WHAT_GROUP_PREFIX,
                 BltDataProcessor.H5_OBJECT_ATTR);
-        String object = (String) bltDataProcessor.getH5AttributeValue();
+        String object = bltDataProcessor.getH5AttributeValue().toString();
 
         try {
             // iterate through datasets
@@ -242,8 +242,8 @@ public class BltFileDetailsController {
                 // get data quantity
                 bltDataProcessor.getH5Attribute(root, whatGroup,
                         BltDataProcessor.H5_QUANTITY_ATTR);
-                String quantity_val = (String) bltDataProcessor
-                        .getH5AttributeValue();
+                String quantity_val = bltDataProcessor
+                        .getH5AttributeValue().toString();
 
                 // get elevation angles
                 bltDataProcessor.getH5Attribute(root, whereGroup,
@@ -362,7 +362,7 @@ public class BltFileDetailsController {
                 BltDataProcessor.H5_PATH_SEPARATOR
                         + BltDataProcessor.H5_WHAT_GROUP_PREFIX,
                 BltDataProcessor.H5_OBJECT_ATTR);
-        String object = (String) bltDataProcessor.getH5AttributeValue();
+        String object = bltDataProcessor.getH5AttributeValue().toString();
 
         try {
             // iterate through datasets
@@ -395,7 +395,7 @@ public class BltFileDetailsController {
                 // get nodes
                 bltDataProcessor.getH5Attribute(root, datasetSpecificHow,
                         BltDataProcessor.H5_NODES_ATTR);
-                String nodes = (String) bltDataProcessor.getH5AttributeValue();
+                String nodes = bltDataProcessor.getH5AttributeValue().toString();
                 String nodesList = nodes.replaceAll("'", "").replaceAll(",",
                         ", ");
                 // get data quantity
