@@ -51,9 +51,18 @@ Author     : szewczenko
                                         Radar station
                                     </div>
                                     <form:select path="radar" 
-                                                 title="Select radar station">
+                                                 title="Select radar station">                  
                                         <form:option value="" label="..."/>
-                                        <form:options items="${radars}"/>
+                                        <c:forEach var="radar" items="${radars}">
+                                        	<c:choose>
+		                                       	<c:when test="${radar == selected_radar}">
+			                                        <form:option value="${radar}" selected="true"/>
+		                                       	</c:when>
+										        <c:otherwise>
+		                                       		<form:option value="${radar}"/>
+		                                       	</c:otherwise>
+	                                       	</c:choose>
+                                        </c:forEach>
                                     </form:select>  
                                 </div>
                                 <div class="rightcol">
@@ -63,9 +72,16 @@ Author     : szewczenko
                                     <form:select path="fileObject" 
                                                  title="Select file object type">
                                         <form:option value="" label="..."/>
-                                        <form:options items="${file_objects}" 
-                                                  itemValue="name"
-                                                  itemLabel="description"/>
+                                        <c:forEach var="file_object" items="${file_objects}">
+                                        	<c:choose>
+		                                       	<c:when test="${file_object.name == selected_file_object}">
+			                                        <form:option value="${file_object.name}" label="${file_object.description}" selected="true"/>
+		                                       	</c:when>
+										        <c:otherwise>
+		                                       		<form:option value="${file_object.name}" label="${file_object.description}"/>
+		                                       	</c:otherwise>
+	                                       	</c:choose>
+                                        </c:forEach>
                                     </form:select>   
                                 </div>    
                             </div>
@@ -76,7 +92,8 @@ Author     : szewczenko
                                     </div>
                                     <form:input path="startDate" id="start_date"
                                             title="Start date of dataset timespan" 
-                                            readonly="true"/>
+                                            readonly="false"
+                                            value="${selected_start_date}"/>
                                     <img src="includes/images/cal.gif" 
                                          onclick="javascript:NewCssCal(
                                          'start_date','yyyyMMdd','arrow',false,'24',false)" 
@@ -88,14 +105,17 @@ Author     : szewczenko
                                     </div>
                                     <form:input path="startHour" id="start_hour"
                                                 title="Start hour (24 hour format)"
+                                                value="${selected_start_hours}"
                                                 onchange="validateHour('start_hour')"/>
                                     <div id="separator">:</div> 
                                     <form:input path="startMinute" id="start_minute"
                                                 title="Start minutes"
+                                                value="${selected_start_minutes}"
                                                 onchange="validateMinSec('start_minute')"/>
                                     <div id="separator">:</div> 
                                     <form:input path="startSecond" id="start_second"
                                                 title="Start seconds"
+                                                value="${selected_start_seconds}"
                                                 onchange="validateMinSec('start_second')"/>
                                 </div>
                             </div>                           
@@ -106,7 +126,8 @@ Author     : szewczenko
                                     </div>
                                     <form:input path="endDate" id="end_date"
                                             title="End date of dataset timespan"
-                                            readonly="true"/>
+                                            readonly="false"
+                                            value="${selected_end_date}"/>
                                     <img src="includes/images/cal.gif" 
                                          onclick="javascript:NewCssCal(
                                          'end_date','yyyyMMdd','arrow',false,'24',false)" 
@@ -118,14 +139,17 @@ Author     : szewczenko
                                     </div>
                                     <form:input path="endHour" id="end_hour" 
                                                 title="End hour (24 hour format)"
+                                                value="${selected_end_hours}"
                                                 onchange="validateHour('end_hour')"/>
                                     <div id="separator">:</div>
                                     <form:input path="endMinute" id="end_minute"
-                                                title="End minutes" 
+                                                title="End minutes"
+                                                value="${selected_end_minutes}"
                                                 onchange="validateMinSec('end_minute')"/>
                                     <div id="separator">:</div>
                                     <form:input path="endSecond" id="end_second"
                                                 title="End seconds"
+                                                value="${selected_end_seconds}"
                                                 onchange="validateMinSec('end_second')"/>
                                 </div>
                             </div>    
@@ -133,7 +157,7 @@ Author     : szewczenko
                                 <div class="buttons">
                                     <div class="button-wrap">
                                         <input class="button" type="reset" 
-                                               value="Clear"></input>
+                                               value="Reset"></input>
                                     </div>
                                     <div class="button-wrap">
                                         <input class="button" type="submit" 
@@ -235,7 +259,7 @@ Author     : szewczenko
                                     </div>
                                 </c:when> 
                                 <c:otherwise>
-                                    No matching data files found.
+                                    ${no_match_msg}
                                 </c:otherwise>
                             </c:choose>                           
                         </form:form>                                                                               

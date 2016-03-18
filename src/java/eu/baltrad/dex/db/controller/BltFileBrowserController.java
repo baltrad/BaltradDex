@@ -30,6 +30,8 @@ import eu.baltrad.dex.db.model.BltFile;
 import eu.baltrad.dex.db.model.BltQueryParameter;
 
 import org.springframework.stereotype.Controller;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -65,6 +67,20 @@ public class BltFileBrowserController {
     private static final String FIRST_PAGE_KEY = "first_page";
     private static final String LAST_PAGE_KEY = "last_page";
     private static final String CURRENT_PAGE_KEY = "current_page";
+    private static final String SELECTED_RADAR_KEY = "selected_radar";
+    private static final String SELECTED_FILE_OBJECT_KEY = "selected_file_object";
+    private static final String SELECTED_START_DATE_KEY = "selected_start_date";
+    private static final String SELECTED_END_DATE_KEY = "selected_end_date";
+    private static final String SELECTED_START_HOURS_KEY = "selected_start_hours";
+    private static final String SELECTED_START_MINUTES_KEY = "selected_start_minutes";
+    private static final String SELECTED_START_SECONDS_KEY = "selected_start_seconds";
+    private static final String SELECTED_END_HOURS_KEY = "selected_end_hours";
+    private static final String SELECTED_END_MINUTES_KEY = "selected_end_minutes";
+    private static final String SELECTED_END_SECONDS_KEY = "selected_end_seconds";
+    
+    private static final String NO_MATCH_MSG_KEY = "no_match_msg";
+    private static final String DEFAULT_NO_MATCH_MSG = "No matching data files found.";
+    private static final String INVALID_DATE_MSG = "Invalid date format entered.";
     
     /** Sort by date parameter */
     private static final String SORT_BY_DATE_PARAM = "sortByDate";
@@ -98,6 +114,19 @@ public class BltFileBrowserController {
     private BltFileManager fileManager;
     private MessageResourceUtil messages;
     
+    private String currentSelectedPage;
+    private BltQueryParameter currentQueryParameter;
+    private String currentSelectedRadar = "";
+    private String currentSelectedFileObject = "";
+    private String selectedStartDate = "";
+    private String selectedEndDate = "";
+    private String selectedStartTimeHours = "";
+    private String selectedStartTimeMinutes = "";
+    private String selectedStartTimeSeconds = "";
+    private String selectedEndTimeHours = "";
+    private String selectedEndTimeMinutes = "";
+    private String selectedEndTimeSeconds = "";
+    
     /**
      * Create form backing object.
      * @param model Model map 
@@ -106,6 +135,12 @@ public class BltFileBrowserController {
     @RequestMapping(method = RequestMethod.GET)
     public String setupForm(ModelMap model) {
         model.addAttribute(QUERY_PARAMETER_KEY, new BltQueryParameter());
+        model.addAttribute(NO_MATCH_MSG_KEY, "");
+        
+        if (currentQueryParameter != null) {
+        	updateSearchResults(model, currentQueryParameter, currentSelectedPage);
+        }
+        
         return FORM_VIEW;
     }
     
@@ -122,59 +157,96 @@ public class BltFileBrowserController {
             @ModelAttribute(value="query_param") BltQueryParameter param,
             @RequestParam(value="selected_page", required=false) 
                     String selectedPage) {
-        try {
-            List<BltFile> files = null;
-            param.setLimit(Integer.toString(BltFileManager.ENTRIES_PER_PAGE));
-            
-            setSortByDate(request);
-            param.setSortByDate(sortByDateKey);
-            setSortByTime(request);
-            param.setSortByTime(sortByTimeKey);
-            setSortBySource(request);
-            param.setSortBySource(sortBySourceKey);
-            setSortByObject(request);
-            param.setSortByObject(sortByObjectKey);
-            
-            if (selectedPage != null) {
-                if (selectedPage.matches("<<")) {
-                    firstPage();
-                    param.setOffset(Integer.toString(0));
-                    files = fileManager.load(param);
-                } else {
-                    if (selectedPage.matches(">>")) {
-                        lastPage(param);
-                    } else if (selectedPage.matches(">")) {
-                        nextPage(param);
-                    } else if (selectedPage.matches("<")) {
-                        previousPage();
-                    } else {
-                        int page = Integer.parseInt(selectedPage);
-                        setCurrentPage(page);
-                    }
-                    int offset = (getCurrentPage() 
-                            * BltFileManager.ENTRIES_PER_PAGE)
-                            - BltFileManager.ENTRIES_PER_PAGE;
-                    param.setOffset(Integer.toString(offset));
-                    files = fileManager.load(param);
-                }
-            } else {
-                setCurrentPage(1);
-                param.setOffset(Integer.toString(0));
-                files = fileManager.load(param);
-            }
-
-            int[] pages = getPages(param);
-            
-            model.addAttribute(FIRST_PAGE_KEY, pages[0]);
-            model.addAttribute(LAST_PAGE_KEY, pages[1]);
-            model.addAttribute(CURRENT_PAGE_KEY, pages[2]);
-            model.addAttribute(FILE_ENTRIES_KEY, files);
-        } catch (Exception e) {
-            model.addAttribute(FC_ERROR_KEY, 
-                    messages.getMessage(FC_ERROR_MESSAGE_KEY, 
-                        new String[] {e.getMessage()}));
-        }
+    		
+		setSortByDate(request);
+		setSortByTime(request);
+		setSortBySource(request);
+		setSortByObject(request);
+		
+		updateSearchResults(model, param, selectedPage);
+        
         return FORM_VIEW;
+    }
+    
+    /**
+     * Evaluates and executes search based on parameters in the search form. If valid parameters, 
+     * search results will be updated and search parameters stored.
+     * @param model Model map 
+     * @param param Query parameters
+     * @param selectedPage Currently selected page number
+     */
+    private void updateSearchResults(ModelMap model, BltQueryParameter param, String selectedPage) {
+    	
+    	boolean invalidDate = false;
+    	
+    	if (!isValidDate(param.getStartDate())) {
+    		invalidDate = true;
+    		selectedStartDate = "";
+		}
+    	
+    	if (!isValidDate(param.getEndDate())) {
+    		invalidDate = true;
+    		selectedEndDate = "";
+		}
+    	
+    	if (invalidDate) {
+    		model.addAttribute(NO_MATCH_MSG_KEY, INVALID_DATE_MSG);
+    		return;
+    	}
+    	
+    	try {
+    		List<BltFile> files = null;
+    		param.setLimit(Integer.toString(BltFileManager.ENTRIES_PER_PAGE));
+
+    		param.setSortByDate(sortByDateKey);
+    		param.setSortByTime(sortByTimeKey);
+    		param.setSortBySource(sortBySourceKey);
+    		param.setSortByObject(sortByObjectKey);
+
+    		if (selectedPage != null) {
+    			if (selectedPage.matches("<<")) {
+    				firstPage();
+    				param.setOffset(Integer.toString(0));
+    				files = fileManager.load(param);
+    			} else {
+    				if (selectedPage.matches(">>")) {
+    					lastPage(param);
+    				} else if (selectedPage.matches(">")) {
+    					nextPage(param);
+    				} else if (selectedPage.matches("<")) {
+    					previousPage();
+    				} else {
+    					int page = Integer.parseInt(selectedPage);
+    					setCurrentPage(page);
+    				}
+    				int offset = (getCurrentPage() 
+    						* BltFileManager.ENTRIES_PER_PAGE)
+    						- BltFileManager.ENTRIES_PER_PAGE;
+    				param.setOffset(Integer.toString(offset));
+    				files = fileManager.load(param);
+    			}
+    		} else {
+    			setCurrentPage(1);
+    			param.setOffset(Integer.toString(0));
+    			files = fileManager.load(param);
+    		}
+
+    		int[] pages = getPages(param);
+
+    		model.addAttribute(FIRST_PAGE_KEY, pages[0]);
+    		model.addAttribute(LAST_PAGE_KEY, pages[1]);
+    		model.addAttribute(CURRENT_PAGE_KEY, pages[2]);
+    		model.addAttribute(FILE_ENTRIES_KEY, files);
+    		
+    		model.addAttribute(NO_MATCH_MSG_KEY, DEFAULT_NO_MATCH_MSG);
+    		
+    		storeSelection(model, param, selectedPage);
+    		
+    	} catch (Exception e) {
+    		model.addAttribute(FC_ERROR_KEY, 
+    				messages.getMessage(FC_ERROR_MESSAGE_KEY, 
+    						new String[] {e.getMessage()}));
+    	}
     }
     
     /**
@@ -201,6 +273,63 @@ public class BltFileBrowserController {
                         new String[] {e.getMessage()}));
             return null;        
         }
+    }
+    
+    /**
+     * Stores selected parameters in search form. The stored parameters will be 
+     * showed in search fields when returning to page. 
+     * @param model Model map 
+     * @param param Query parameters
+     * @param selectedPage Currently selected page number
+     */
+    private void storeSelection(ModelMap model, BltQueryParameter param, String selectedPage) {
+    	currentQueryParameter = param;
+		currentSelectedPage = selectedPage;
+		currentSelectedRadar = param.getRadar();
+		currentSelectedFileObject = param.getFileObject();
+
+		selectedStartDate = param.getStartDate();
+		selectedEndDate = param.getEndDate();
+		
+		selectedStartTimeHours = param.getStartHour();
+		selectedStartTimeMinutes = param.getStartMinute();
+		selectedStartTimeSeconds = param.getStartSecond();
+		selectedEndTimeHours = param.getEndHour();
+		selectedEndTimeMinutes = param.getEndMinute();
+		selectedEndTimeSeconds = param.getEndSecond();
+		
+		model.addAttribute(SELECTED_RADAR_KEY, currentSelectedRadar);
+		model.addAttribute(SELECTED_FILE_OBJECT_KEY, currentSelectedFileObject);
+		
+		model.addAttribute(SELECTED_START_DATE_KEY, selectedStartDate);
+		model.addAttribute(SELECTED_END_DATE_KEY, selectedEndDate);
+		
+		model.addAttribute(SELECTED_START_HOURS_KEY, selectedStartTimeHours);
+		model.addAttribute(SELECTED_START_MINUTES_KEY, selectedStartTimeMinutes);
+		model.addAttribute(SELECTED_START_SECONDS_KEY, selectedStartTimeSeconds);
+		model.addAttribute(SELECTED_END_HOURS_KEY, selectedEndTimeHours);
+		model.addAttribute(SELECTED_END_MINUTES_KEY, selectedEndTimeMinutes);
+		model.addAttribute(SELECTED_END_SECONDS_KEY, selectedEndTimeSeconds);
+    }
+    
+    /**
+     * Determines whether a string is a date provided in the correct format. Correct 
+     * format is here 'yyy-MM-dd'.
+     * @param date String containing date to be evaluated
+     * @return isValid True if date in correct format is input, false otherwise.
+     */
+    private static boolean isValidDate(String date) {
+        boolean valid = true;
+        if (date != null && !date.equals(""))
+        {
+        	try {
+        		DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+        		formatter.parseDateTime(date);
+        	} catch (Exception e) {
+        		valid = false;
+        	}	
+        }
+        return valid;
     }
     
     /**
