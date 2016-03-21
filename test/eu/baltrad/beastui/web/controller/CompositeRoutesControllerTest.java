@@ -110,6 +110,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A");
     List<String> recipients = new ArrayList<String>();
+    recipients.add("A");
     List<String> sources = new ArrayList<String>();
     sources.add("A");
     List<String> detectors = new ArrayList<String>();
@@ -286,6 +287,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A");
     List<String> recipients = new ArrayList<String>();
+    recipients.add("A");
     List<String> sources = new ArrayList<String>();
     sources.add("A");
     List<String> detectors = new ArrayList<String>();
@@ -323,6 +325,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A");
     List<String> recipients = new ArrayList<String>();
+    recipients.add("A");
     List<String> sources = new ArrayList<String>();
     sources.add("A");
     List<String> detectors = new ArrayList<String>();

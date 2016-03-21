@@ -173,6 +173,7 @@ public class GroovyRoutesControllerTest extends EasyMockSupport {
     GroovyRule rule = createMock(GroovyRule.class);
     
     List<String> recipients = new ArrayList<String>();
+    recipients.add("A");
     expect(methodMock.createRule(def)).andReturn(rule);
     expect(manager.create(name, author, active, description, recipients, rule)).andReturn(routedef);
     manager.storeDefinition(routedef);
@@ -244,6 +245,7 @@ public class GroovyRoutesControllerTest extends EasyMockSupport {
     GroovyRule rule = createMock(GroovyRule.class);
     
     List<String> recipients = new ArrayList<String>();
+    recipients.add("A");
     expect(methodMock.createRule(def)).andReturn(rule);
     expect(manager.create(name, author, active, description, recipients, rule)).andReturn(routedef);
     manager.storeDefinition(routedef);
