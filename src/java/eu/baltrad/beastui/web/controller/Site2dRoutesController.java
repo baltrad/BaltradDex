@@ -195,6 +195,8 @@ public class Site2dRoutesController {
       emessage = "Must specify either areaid or pcsid";
     } else if (sources == null || sources.size() <= 0) {
       emessage = "Must specify at least one source.";
+    } else if (recipients == null || recipients.size() == 0) {
+      emessage = "Must at least specify one recipient";
     }
     if (prodpar != null) {
       logger.info("prodpar != null");

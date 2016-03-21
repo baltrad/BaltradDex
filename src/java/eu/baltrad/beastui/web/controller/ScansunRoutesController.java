@@ -121,6 +121,8 @@ public class ScansunRoutesController {
       emessage = "Name must be specified.";
     } else if (sources == null || sources.size() == 0) {
       emessage = "Must specify at least one source";
+    } else if (recipients == null || recipients.size() == 0) {
+      emessage = "Must at least specify one recipient";
     }
     
     if (emessage == null) {

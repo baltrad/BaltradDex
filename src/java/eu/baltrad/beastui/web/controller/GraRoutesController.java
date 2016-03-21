@@ -134,6 +134,8 @@ public class GraRoutesController {
       emessage = "Name must be specified.";
     } else if (area == null || area.trim().equals("")) {
       emessage = "Area must be specified.";
+    } else if (recipients == null || recipients.size() == 0) {
+      emessage = "Must at least specify one recipient";
     }
     
     if (emessage == null) {

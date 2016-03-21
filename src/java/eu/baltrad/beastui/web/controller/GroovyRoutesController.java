@@ -107,6 +107,8 @@ public class GroovyRoutesController {
       emessage = "Name must be specified.";
     } else if (typdef == null || typdef.trim().equals("")) {
       emessage = "Can not create a groovy rule when script is empty.";
+    } else if (recipients == null || recipients.size() == 0) {
+      emessage = "Must at least specify one recipient";
     }
     
     if (emessage == null) {
