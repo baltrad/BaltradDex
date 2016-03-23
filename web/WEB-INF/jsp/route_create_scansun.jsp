@@ -75,7 +75,13 @@ Creates a scansun route
                                         name="recipients" 
                                         title="Select target adaptors">
                                     <c:forEach var="adaptor" items="${adaptors}">
-                                        <option value="${adaptor}" <c:if test="${ fn:contains(recipients, adaptor) }">selected</c:if> >${adaptor}</option>
+                                        <c:set var="adaptor_selected" value="false" />
+                                        <c:forEach var="recipient" items="${recipients}">
+                                            <c:if test="${recipient eq adaptor}">
+                                                <c:set var="adaptor_selected" value="true" />
+                                            </c:if>
+                                        </c:forEach>
+                                        <option value="${adaptor}" <c:if test="${adaptor_selected}">selected</c:if> >${adaptor}</option>
                                     </c:forEach>
                                 </select>
                             </div>
