@@ -62,6 +62,36 @@ public class JsonProtocol20Test extends EasyMockSupport {
   }
 
   @Test
+  public void userAccountToJson_noRedirect() throws Exception {
+    User user = new User();
+    user.setCountryCode("CC");
+    user.setLocality("LOC");
+    user.setName("MyName");
+    user.setNodeAddress("http://localhost:8080");
+    user.setOrgName("ORG");
+    user.setOrgUnit("OU");
+    user.setPassword("xxx");
+    user.setRole("ADMIN");
+    user.setState("STATE");
+    user.setRedirectedAddress("http://slask.se");
+    
+    String result = classUnderTest.userAccountToJson(user);
+    
+    User resultUser = new ObjectMapper().readValue(result, new TypeReference<User>(){});
+    
+    assertEquals("CC", resultUser.getCountryCode());
+    assertEquals("LOC", resultUser.getLocality());
+    assertEquals("MyName", resultUser.getName());
+    assertEquals("http://localhost:8080", resultUser.getNodeAddress());
+    assertEquals("ORG", resultUser.getOrgName());
+    assertEquals("OU", resultUser.getOrgUnit());
+    assertEquals("xxx", resultUser.getPassword());
+    assertEquals("ADMIN", resultUser.getRole());
+    assertEquals("STATE", resultUser.getState());
+    assertEquals(null, resultUser.getRedirectedAddress());
+  }
+  
+  @Test
   public void jsonToUserAccount() throws Exception {
     String json = "{\"name\":\"MyName\",\"state\":\"STATE\",\"password\":\"xxx\",\"role\":\"ADMIN\",\"orgName\":\"ORG\",\"orgUnit\":\"OU\",\"locality\":\"LOC\",\"countryCode\":\"CC\",\"nodeAddress\":\"http://localhost:8080\"}";
     

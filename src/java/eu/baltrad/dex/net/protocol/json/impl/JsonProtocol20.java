@@ -61,7 +61,7 @@ public class JsonProtocol20 implements JsonProtocol {
     dataSourcefilter = new SimpleFilterProvider().addFilter("filter properties by name",   
         SimpleBeanPropertyFilter.serializeAllExcept(ignorableFieldNames));
     userFilter = new SimpleFilterProvider().addFilter("filter properties by name",
-        SimpleBeanPropertyFilter.serializeAllExcept(new String[]{}));
+        SimpleBeanPropertyFilter.serializeAllExcept(new String[]{"redirectedAddress"}));
     subscriptionFilter = new SimpleFilterProvider().addFilter("filter properties by name",
         SimpleBeanPropertyFilter.serializeAllExcept(new String[]{}));
   }
@@ -119,5 +119,7 @@ public class JsonProtocol20 implements JsonProtocol {
       throw new RuntimeException("Failed to parse json string into subscriptions", e);
     }
   }
-
+  public static void main(String[] args) {
+    
+  }
 }
