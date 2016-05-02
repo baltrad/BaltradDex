@@ -110,9 +110,10 @@ public class UserManager implements IUserManager {
                 "WHERE ur.user_id = u.id AND ur.role_id = r.id " +
                 "AND u.id = ?;";
         try {
-            return jdbcTemplate.queryForObject(sql, mapper, id);
+          return jdbcTemplate.queryForObject(sql, mapper, id);
         } catch (EmptyResultDataAccessException e) {
-            return null;
+          logger.debug("Could not load user", e);
+          return null;
         }
     }
     
@@ -127,10 +128,10 @@ public class UserManager implements IUserManager {
                 "WHERE ur.user_id = u.id AND ur.role_id = r.id " +
                 "AND u.name = ?;";
         try {
-            return jdbcTemplate.queryForObject(sql, mapper, name);
+          return jdbcTemplate.queryForObject(sql, mapper, name);
         } catch (EmptyResultDataAccessException e) {
           logger.debug("Could not load user", e);
-            return null;
+          return null;
         }
     }
     

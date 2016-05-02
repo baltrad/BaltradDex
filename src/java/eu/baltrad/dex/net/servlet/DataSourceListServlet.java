@@ -129,27 +129,34 @@ public class DataSourceListServlet extends HttpServlet {
       logger.debug("Request arrived using protocol version '" + parser.getProtocolVersion() + "'");
         
       try {
+        logger.debug("doPost: Authenticating request");
         if (parser.isAuthenticated(authenticator)) {
+          logger.debug("doPost: Request authenticated");
           User peer = parser.getUserAccount();
           User loadedPeer = userManager.load(peer.getName());
           if (loadedPeer == null) {
+            logger.debug("doPost: " + peer.getName() + " not found, creating account");
             peer.setRole(Role.PEER);
             userManager.store(peer);
             log.warn("New peer account created: " + peer.getName());
             parser.getWriter(response).userAccountResponse(localNode.getName(), localNode, HttpServletResponse.SC_CREATED);
           } else {
+            logger.debug("doPost: " + peer.getName() + " already exists, returning available sources");
             List<DataSource> dataSources = dataSourceManager.load(loadedPeer.getId(), DataSource.LOCAL);
             parser.getWriter(response).dataSourcesResponse(localNode.getName(), dataSources, HttpServletResponse.SC_OK);
           }
         } else {
+          logger.debug("doPost: Could not authenticate request");
           String msg = messages.getMessage(DS_UNAUTHORIZED_REQUEST_KEY);
           parser.getWriter(response).messageResponse(msg, HttpServletResponse.SC_UNAUTHORIZED);
         }
       } catch (KeyczarException e) {
         String msg = messages.getMessage(DS_MESSAGE_VERIFIER_ERROR_KEY);
+        logger.error("doPost", e);
         parser.getWriter(response).messageResponse(msg, HttpServletResponse.SC_UNAUTHORIZED);
       } catch (Exception e) {
         String msg = messages.getMessage(DS_INTERNAL_SERVER_ERROR_KEY, new Object[]{e.getMessage()});
+        logger.error("doPost", e);
         parser.getWriter(response).messageResponse(msg, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
     }    
