@@ -18,11 +18,13 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 ------------------------------------------------------------------------*/
 package eu.baltrad.beastui.web.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.qc.AnomalyDetector;
 import eu.baltrad.beast.qc.IAnomalyDetectorManager;
 import eu.baltrad.beast.router.IRouterManager;
@@ -65,6 +68,13 @@ public class VolumeRoutesController {
    */
   private IAnomalyDetectorManager anomalymanager = null;
   
+  private final static Logger logger = LogManager.getLogger(VolumeRoutesController.class);
+  
+  /**
+   * The translator from string to json and vice versa
+   */
+  private ObjectMapper jsonMapper = new ObjectMapper();
+
   /**
    * Default constructor
    */
@@ -139,7 +149,8 @@ public class VolumeRoutesController {
       @RequestParam(value = "interval", required = false) Integer interval,
       @RequestParam(value = "timeout", required = false) Integer timeout,
       @RequestParam(value = "sources", required = false) List<String> sources,
-      @RequestParam(value = "detectors", required = false) List<String> detectors) {
+      @RequestParam(value = "detectors", required = false) List<String> detectors,
+      @RequestParam(value = "filterJson", required=false) String filterJson) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     String emessage = null;
     
@@ -148,13 +159,13 @@ public class VolumeRoutesController {
           "No adaptors defined, please add one before creating a route.");
       return "redirect:adaptors.htm";
     }
-    
+
     if (name == null && author == null && active == null && description == null &&
         ascending == null && mine == null && maxe == null && elangles == null &&
         recipients == null && interval == null && timeout == null &&
         sources == null && detectors == null) {
       return viewCreateRoute(model, name, author, active, description,
-          ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, null);
+          ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, filterJson, null);
     }
     
     if (name == null || name.trim().equals("")) {
@@ -173,7 +184,7 @@ public class VolumeRoutesController {
         double dmaxe = (maxe == null) ? 90.0 : maxe.doubleValue();
         int iinterval = (interval == null) ? 15 : interval.intValue();
         int itimeout = (timeout == null) ? 15*60 : timeout.intValue();
-        VolumeRule rule = createRule(bascending, dmine, dmaxe, elangles, iinterval, sources, detectors, itimeout);
+        VolumeRule rule = createRule(bascending, dmine, dmaxe, elangles, iinterval, sources, detectors, itimeout, filterJson);
         List<String> recip = (recipients == null) ? new ArrayList<String>() : recipients;
         RouteDefinition def = manager.create(name, author, bactive, description, recip, rule);
         manager.storeDefinition(def);
@@ -185,7 +196,7 @@ public class VolumeRoutesController {
     }
     
     return viewCreateRoute(model, name, author, active, description,
-        ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, emessage);
+        ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, filterJson, emessage);
   }
 
   /**
@@ -220,13 +231,14 @@ public class VolumeRoutesController {
       @RequestParam(value = "timeout", required = false) Integer timeout,
       @RequestParam(value = "sources", required = false) List<String> sources,
       @RequestParam(value = "detectors", required = false) List<String> detectors,
+      @RequestParam(value = "filterJson", required = false) String filterJson,
       @RequestParam(value = "submitButton", required = false) String operation) {
     RouteDefinition def = manager.getDefinition(name);
     if (def == null) {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
     if (operation != null && operation.equals("Save")) {
-      return modifyRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors);
+      return modifyRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, filterJson);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -237,9 +249,16 @@ public class VolumeRoutesController {
     } else {
       if (def.getRule() instanceof VolumeRule) {
         VolumeRule vrule = (VolumeRule)def.getRule();
+        String filterstr = null;
+        try {
+          filterstr = jsonMapper.writeValueAsString(vrule.getFilter());
+        } catch (IOException e) {
+          logger.error("failed to create JSON string from filter", e);
+        }
+        
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             vrule.isAscending(), vrule.getElevationMin(), vrule.getElevationMax(), vrule.getElevationAngles(), def.getRecipients(), 
-            vrule.getInterval(), vrule.getTimeout(), vrule.getSources(), vrule.getDetectors(), null);
+            vrule.getInterval(), vrule.getTimeout(), vrule.getSources(), vrule.getDetectors(), filterstr, null);
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a volume rule");
       }
@@ -277,6 +296,7 @@ public class VolumeRoutesController {
       Integer timeout, 
       List<String> sources,
       List<String> detectors,
+      String jsonFilter,
       String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     model.addAttribute("sourceids", utilities.getRadarSources());
@@ -299,6 +319,7 @@ public class VolumeRoutesController {
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
         (detectors == null) ? new ArrayList<String>() : detectors);
+    model.addAttribute("filterJson", jsonFilter);
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
@@ -337,6 +358,7 @@ public class VolumeRoutesController {
       Integer timeout,
       List<String> sources,
       List<String> detectors,
+      String jsonFilter,
       String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     
@@ -360,6 +382,9 @@ public class VolumeRoutesController {
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
         (detectors == null) ? new ArrayList<String>() : detectors);
+    if (jsonFilter != null && !jsonFilter.equals("")) {
+      model.addAttribute("filterJson", jsonFilter);
+    }
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
@@ -411,7 +436,8 @@ public class VolumeRoutesController {
       Integer interval,
       Integer timeout,
       List<String> sources,
-      List<String> detectors) {
+      List<String> detectors,
+      String jsonFilter) {
     List<String> newrecipients = (recipients == null) ? new ArrayList<String>() : recipients;
     List<String> newsources = (sources == null) ? new ArrayList<String>() : sources;
     List<String> newdetectors = (detectors == null) ? new ArrayList<String>() : detectors;
@@ -428,10 +454,10 @@ public class VolumeRoutesController {
     } else if (newrecipients.size() <= 0) {
       emessage = "You must specify at least one recipient.";
     }
-    
+
     if (emessage == null) {
       try {
-        VolumeRule rule = createRule(bascending, dmine, dmaxe, elangles, iinterval, newsources, newdetectors, itimeout);
+        VolumeRule rule = createRule(bascending, dmine, dmaxe, elangles, iinterval, newsources, newdetectors, itimeout, jsonFilter);
         RouteDefinition def = manager.create(name, author, isactive, description,
             newrecipients, rule);
         manager.updateDefinition(def);
@@ -443,7 +469,7 @@ public class VolumeRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        ascending, mine, maxe, elangles, newrecipients, interval, timeout, sources, detectors, emessage);
+        ascending, mine, maxe, elangles, newrecipients, interval, timeout, sources, detectors, jsonFilter, emessage);
   }
 
   
@@ -498,7 +524,7 @@ public class VolumeRoutesController {
    * @param byscan
    * @return
    */
-  protected VolumeRule createRule(boolean ascending, double mine, double maxe, String elangles, int interval, List<String> sources, List<String> detectors, int timeout) {
+  protected VolumeRule createRule(boolean ascending, double mine, double maxe, String elangles, int interval, List<String> sources, List<String> detectors, int timeout, String jsonFilter) {
     VolumeRule rule = (VolumeRule)manager.createRule(VolumeRule.TYPE);
     rule.setAscending(ascending);
     rule.setElevationMin(mine);
@@ -508,6 +534,13 @@ public class VolumeRoutesController {
     rule.setSources(sources);
     rule.setDetectors(detectors);
     rule.setTimeout(timeout);
+    if (jsonFilter != null && !jsonFilter.equals("")) {
+      try {
+        rule.setFilter(jsonMapper.readValue(jsonFilter, IFilter.class));
+      } catch (Exception e) {
+        logger.error("Failed to translate json to filter", e);
+      }
+    }
     return rule;
   }
 }
