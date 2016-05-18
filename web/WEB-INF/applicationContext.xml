@@ -177,7 +177,7 @@
     </beans:bean>
     
     <beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> 
-       <beans:property name="maxUploadSize" value="10000000"/> <!-- File size in bytes. -->
+       <beans:property name="maxUploadSize" value="50000000"/> <!-- File size in bytes. -->
     </beans:bean> 
 
 </beans:beans>
