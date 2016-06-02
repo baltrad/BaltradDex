@@ -66,10 +66,18 @@ List of routes
                                             <c:out value="${count}"/>
                                             <c:set var="count" value="${count + 1}"/>
                                         </div>
+                                        <c:url var="url" value="route.htm">
+                                          <c:param name="name" value="${route.name}" />
+                                        </c:url>                                        
                                         <div class="name">
+                                            <a href="${url}">
+                                                <c:out value="${route.name}"/>
+                                            </a>
+                                        <!--
                                             <a href="route.htm?name=${route.name}">
                                                 <c:out value="${route.name}"/>
                                             </a>
+                                        -->
                                         </div>
                                         <div class="description">
                                             <c:out value="${route.description}"/>

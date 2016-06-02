@@ -108,6 +108,7 @@ public class ShowRoutesController {
   public String showRoute(
       Model model,
       @RequestParam(value = "name") String name) {
+    logger.debug("showRoute("+name+")");
     RouteDefinition def = manager.getDefinition(name);
     String result = null;
     if (def != null) {
