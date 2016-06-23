@@ -210,7 +210,7 @@ public class VolumeRoutesControllerTest extends EasyMockSupport {
     List<String> adaptors = new ArrayList<String>();
     adaptors.add("A1");
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
-    expect(methodMock.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)).andReturn("route_create_volume");
+    expect(methodMock.viewCreateRoute(model, null, null, null, null, true, null, null, null, null, null, null, null, null, null, null)).andReturn("route_create_volume");
     
     replayAll();
 

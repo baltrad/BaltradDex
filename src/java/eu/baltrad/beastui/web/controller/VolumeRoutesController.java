@@ -165,7 +165,7 @@ public class VolumeRoutesController {
         recipients == null && interval == null && timeout == null &&
         sources == null && detectors == null) {
       return viewCreateRoute(model, name, author, active, description,
-          ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, filterJson, null);
+          true, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, filterJson, null);
     }
     
     if (name == null || name.trim().equals("")) {
@@ -179,7 +179,7 @@ public class VolumeRoutesController {
     if (emessage == null) {
       try {
         boolean bactive = (active == null) ? false : active.booleanValue();
-        boolean bascending = (ascending == null) ? true : ascending.booleanValue();
+        boolean bascending = (ascending == null) ? false : ascending.booleanValue();
         double dmine = (mine == null) ? -90.0 : mine.doubleValue();
         double dmaxe = (maxe == null) ? 90.0 : maxe.doubleValue();
         int iinterval = (interval == null) ? 15 : interval.intValue();
@@ -307,7 +307,7 @@ public class VolumeRoutesController {
     model.addAttribute("author", (author == null) ? "" : author);
     model.addAttribute("active", (active == null) ? new Boolean(true) : active);
     model.addAttribute("description", (description == null) ? "" : description);
-    model.addAttribute("ascending", (ascending == null) ? new Boolean(true) : ascending);
+    model.addAttribute("ascending", (ascending == null) ? new Boolean(false) : ascending);
     model.addAttribute("mine", (mine == null) ? new Double(-90.0) : mine);
     model.addAttribute("maxe", (maxe == null) ? new Double(90.0) : maxe);
     model.addAttribute("elangles", (elangles == null) ? "" : elangles);
@@ -370,7 +370,7 @@ public class VolumeRoutesController {
     model.addAttribute("author", (author == null) ? "" : author);
     model.addAttribute("active", (active == null) ? new Boolean(true) : active);
     model.addAttribute("description", (description == null) ? "" : description);
-    model.addAttribute("ascending", (ascending == null) ? new Boolean(true) : ascending);
+    model.addAttribute("ascending", (ascending == null) ? new Boolean(false) : ascending);
     model.addAttribute("mine", (mine == null) ? new Double(-90.0) : mine);
     model.addAttribute("maxe", (maxe == null) ? new Double(90.0) : maxe);
     model.addAttribute("elangles", (elangles == null) ? "" : elangles);
@@ -445,7 +445,7 @@ public class VolumeRoutesController {
     int iinterval = (interval != null) ? interval.intValue() : 15;
     int itimeout = (timeout != null) ? timeout.intValue() : 15*60;
     String emessage = null;
-    boolean bascending = (ascending != null) ? ascending.booleanValue() : true;
+    boolean bascending = (ascending != null) ? ascending.booleanValue() : false;
     double dmine = (mine != null) ? mine.doubleValue() : -90.0;
     double dmaxe = (maxe != null) ? maxe.doubleValue() : 90.0;
     
