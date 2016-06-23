@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.Role;
@@ -113,6 +114,22 @@ public class BaltradUserDetailsServiceTest extends EasyMockSupport {
     Set<GrantedAuthority> auth = (Set)details.getAuthorities();
     assertEquals(1, auth.size());
     assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_USER")));
+  }
+  
+  @Test
+  public void test_loadUserByUsername_notExisting() {
+    expect(manager.load("baltrad/admin")).andReturn(null);
+    
+    replayAll();
+
+    try {
+      classUnderTest.loadUserByUsername("baltrad/admin");
+      fail("Expected UsernameNotFoundException");
+    } catch (UsernameNotFoundException e) {
+      // pass
+    }
+    
+    verifyAll();
   }
   
   @Test

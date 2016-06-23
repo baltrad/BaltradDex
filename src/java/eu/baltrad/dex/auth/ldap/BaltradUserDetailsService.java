@@ -93,6 +93,9 @@ public class BaltradUserDetailsService implements UserDetailsService, Initializi
       loaduser = loaduser.replaceFirst(userPrefix, "");
     }
     User dbuser = manager.load(loaduser);
+    if (dbuser == null) {
+      throw new UsernameNotFoundException("Failed to load user " + userName + " from user tables");
+    }
     List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
     if (dbuser.getRole().equals(Role.ADMIN)) {
       logger.debug("ADMIN,OPERATOR,USER");
