@@ -22,9 +22,29 @@ Author     : szewczenko
 ------------------------------------------------------------------------------%>
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
+clearform
 
 <t:generic_page pageTitle="Browse files">
     <jsp:body>
+        <script type="text/javascript"
+                src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js">
+        </script>    
+        <script type="text/javascript">
+        	$(document).ready(function() {
+                $('#clearButton').bind('click', function() {
+                    $('#radar').find($('option')).attr('selected',false);
+                    $('#fileObject').find($('option')).attr('selected',false);
+                    $('#start_date').val('');
+                    $('#start_hour').val('');
+                    $('#start_minute').val('');
+                    $('#start_second').val('');
+                    $('#end_date').val('');
+                    $('#end_hour').val('');
+                    $('#end_minute').val('');
+                    $('#end_second').val('');                    
+                });	
+        	});
+        </script>
         <div class="file-browser">
             <div class="table">
                 <div class="header">
@@ -156,8 +176,8 @@ Author     : szewczenko
                             <div class="row">
                                 <div class="buttons">
                                     <div class="button-wrap">
-                                        <input class="button" type="reset" 
-                                               value="Reset"></input>
+                                        <input class="button" type="button" id="clearButton" 
+                                               value="Clear"></input>
                                     </div>
                                     <div class="button-wrap">
                                         <input class="button" type="submit" 
