@@ -148,6 +148,7 @@ public class VolumeRoutesController {
       @RequestParam(value = "recipients", required = false) List<String> recipients,
       @RequestParam(value = "interval", required = false) Integer interval,
       @RequestParam(value = "timeout", required = false) Integer timeout,
+      @RequestParam(value = "nominal_timeout", required = false) Boolean nominal_timeout,
       @RequestParam(value = "sources", required = false) List<String> sources,
       @RequestParam(value = "detectors", required = false) List<String> detectors,
       @RequestParam(value = "filterJson", required=false) String filterJson) {
@@ -162,10 +163,10 @@ public class VolumeRoutesController {
 
     if (name == null && author == null && active == null && description == null &&
         ascending == null && mine == null && maxe == null && elangles == null &&
-        recipients == null && interval == null && timeout == null &&
+        recipients == null && interval == null && timeout == null && nominal_timeout == null &&
         sources == null && detectors == null) {
       return viewCreateRoute(model, name, author, active, description,
-          true, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, filterJson, null);
+          true, mine, maxe, elangles, recipients, interval, timeout, nominal_timeout, sources, detectors, filterJson, null);
     }
     
     if (name == null || name.trim().equals("")) {
@@ -184,7 +185,8 @@ public class VolumeRoutesController {
         double dmaxe = (maxe == null) ? 90.0 : maxe.doubleValue();
         int iinterval = (interval == null) ? 15 : interval.intValue();
         int itimeout = (timeout == null) ? 15*60 : timeout.intValue();
-        VolumeRule rule = createRule(bascending, dmine, dmaxe, elangles, iinterval, sources, detectors, itimeout, filterJson);
+        boolean bnominal_timeout = (nominal_timeout == null) ? false : nominal_timeout.booleanValue();
+        VolumeRule rule = createRule(bascending, dmine, dmaxe, elangles, iinterval, sources, detectors, itimeout, bnominal_timeout, filterJson);
         List<String> recip = (recipients == null) ? new ArrayList<String>() : recipients;
         RouteDefinition def = manager.create(name, author, bactive, description, recip, rule);
         manager.storeDefinition(def);
@@ -196,7 +198,7 @@ public class VolumeRoutesController {
     }
     
     return viewCreateRoute(model, name, author, active, description,
-        ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, filterJson, emessage);
+        ascending, mine, maxe, elangles, recipients, interval, timeout, nominal_timeout, sources, detectors, filterJson, emessage);
   }
 
   /**
@@ -229,6 +231,7 @@ public class VolumeRoutesController {
       @RequestParam(value = "recipients", required = false) List<String> recipients,
       @RequestParam(value = "interval", required = false) Integer interval,
       @RequestParam(value = "timeout", required = false) Integer timeout,
+      @RequestParam(value = "nominal_timeout", required = false) Boolean nominal_timeout,
       @RequestParam(value = "sources", required = false) List<String> sources,
       @RequestParam(value = "detectors", required = false) List<String> detectors,
       @RequestParam(value = "filterJson", required = false) String filterJson,
@@ -238,7 +241,7 @@ public class VolumeRoutesController {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
     if (operation != null && operation.equals("Save")) {
-      return modifyRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, sources, detectors, filterJson);
+      return modifyRoute(model, name, author, active, description, ascending, mine, maxe, elangles, recipients, interval, timeout, nominal_timeout, sources, detectors, filterJson);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -258,7 +261,7 @@ public class VolumeRoutesController {
         
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             vrule.isAscending(), vrule.getElevationMin(), vrule.getElevationMax(), vrule.getElevationAngles(), def.getRecipients(), 
-            vrule.getInterval(), vrule.getTimeout(), vrule.getSources(), vrule.getDetectors(), filterstr, null);
+            vrule.getInterval(), vrule.getTimeout(), vrule.isNominalTimeout(), vrule.getSources(), vrule.getDetectors(), filterstr, null);
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a volume rule");
       }
@@ -294,6 +297,7 @@ public class VolumeRoutesController {
       List<String> recipients, 
       Integer interval, 
       Integer timeout, 
+      Boolean nominal_timeout,
       List<String> sources,
       List<String> detectors,
       String jsonFilter,
@@ -315,6 +319,7 @@ public class VolumeRoutesController {
         (recipients == null) ? new ArrayList<String>() : recipients);
     model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
     model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
+    model.addAttribute("nominal_timeout", (nominal_timeout == null) ? new Boolean(false) : nominal_timeout);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
@@ -356,6 +361,7 @@ public class VolumeRoutesController {
       List<String> recipients,
       Integer interval,
       Integer timeout,
+      Boolean nominal_timeout,
       List<String> sources,
       List<String> detectors,
       String jsonFilter,
@@ -378,6 +384,7 @@ public class VolumeRoutesController {
         (recipients == null) ? new ArrayList<String>() : recipients);
     model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
     model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
+    model.addAttribute("nominal_timeout", (nominal_timeout == null) ? new Boolean(false) : nominal_timeout);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
@@ -435,6 +442,7 @@ public class VolumeRoutesController {
       List<String> recipients,
       Integer interval,
       Integer timeout,
+      Boolean nominal_timeout,
       List<String> sources,
       List<String> detectors,
       String jsonFilter) {
@@ -444,6 +452,8 @@ public class VolumeRoutesController {
     boolean isactive = (active != null) ? active.booleanValue() : false;
     int iinterval = (interval != null) ? interval.intValue() : 15;
     int itimeout = (timeout != null) ? timeout.intValue() : 15*60;
+    boolean bnominal_timeout = (nominal_timeout == null) ? false : nominal_timeout.booleanValue();
+    
     String emessage = null;
     boolean bascending = (ascending != null) ? ascending.booleanValue() : false;
     double dmine = (mine != null) ? mine.doubleValue() : -90.0;
@@ -457,7 +467,7 @@ public class VolumeRoutesController {
 
     if (emessage == null) {
       try {
-        VolumeRule rule = createRule(bascending, dmine, dmaxe, elangles, iinterval, newsources, newdetectors, itimeout, jsonFilter);
+        VolumeRule rule = createRule(bascending, dmine, dmaxe, elangles, iinterval, newsources, newdetectors, itimeout, bnominal_timeout, jsonFilter);
         RouteDefinition def = manager.create(name, author, isactive, description,
             newrecipients, rule);
         manager.updateDefinition(def);
@@ -469,7 +479,7 @@ public class VolumeRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        ascending, mine, maxe, elangles, newrecipients, interval, timeout, sources, detectors, jsonFilter, emessage);
+        ascending, mine, maxe, elangles, newrecipients, interval, timeout, nominal_timeout, sources, detectors, jsonFilter, emessage);
   }
 
   
@@ -524,7 +534,7 @@ public class VolumeRoutesController {
    * @param byscan
    * @return
    */
-  protected VolumeRule createRule(boolean ascending, double mine, double maxe, String elangles, int interval, List<String> sources, List<String> detectors, int timeout, String jsonFilter) {
+  protected VolumeRule createRule(boolean ascending, double mine, double maxe, String elangles, int interval, List<String> sources, List<String> detectors, int timeout, boolean nominal_timeout, String jsonFilter) {
     VolumeRule rule = (VolumeRule)manager.createRule(VolumeRule.TYPE);
     rule.setAscending(ascending);
     rule.setElevationMin(mine);
@@ -534,6 +544,8 @@ public class VolumeRoutesController {
     rule.setSources(sources);
     rule.setDetectors(detectors);
     rule.setTimeout(timeout);
+    rule.setNominalTimeout(nominal_timeout);
+    
     if (jsonFilter != null && !jsonFilter.equals("")) {
       try {
         rule.setFilter(jsonMapper.readValue(jsonFilter, IFilter.class));

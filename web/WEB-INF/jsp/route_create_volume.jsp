@@ -212,6 +212,14 @@ Creates a volume route
                             </div>        
                         </div>
                         <div class="row2">
+                            <div class="leftcol">Nominal timeout:</div>
+                            <div class="rightcol">
+                                <input type="checkbox" name="nominal_timeout" 
+                                       title="If nominal time should be used as base for timeouts"
+                                       <c:if test="${nominal_timeout == true}">checked</c:if> />
+                            </div>
+                        </div>                        
+                        <div class="row2">
                             <div class="leftcol">Sources:</div>
                             <div class="rightcol">
                                 <select id="sources" multiple size="6" 
