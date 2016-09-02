@@ -83,6 +83,8 @@ Creates a distribution route
                       } else {
                         var fd = new FormData($('form')[0]);
                         fd.append("jsonTestFilter", JSON.stringify(filter.data));
+                        $('#testResult').html("Checking ...");
+                        $('#testResult').css("color","#000000");
                         $.ajax({url: 'test_distribution_filter.htm',
                                 type: 'POST',
                                 data: fd,
@@ -115,6 +117,8 @@ Creates a distribution route
                         var fd = new FormData($('form')[0]);
                         fd.append("jsonTestFilter", JSON.stringify(filter.data));
                         fd.append("testType", "UploadTest");
+                        $('#testResult').html("Checking ...");
+                        $('#testResult').css("color","#000000");
                         $.ajax({url: 'test_distribution_filter.htm',
                                 type: 'POST',
                                 data: fd,
@@ -127,7 +131,9 @@ Creates a distribution route
                                   if (data == "OK") {
                                     msg = "OK";
                                     color = "#00AA00";
-                                  }                                
+                                  } else if (data == "TIMEOUT") {
+                                	  msg = "TIMEOUT";
+                                  }                      
                                   $('#testResult').html(msg);
                                   $('#testResult').css("color",color);
                                 },
@@ -187,11 +193,11 @@ Creates a distribution route
                           <div class="bdb-filter-matching-text">
                             Test distribution
                           </div>
-                          <div class="bdb-filter-matching">
-                            <input type="file" id="testFile" name="datafile" size="60" title="Example file that should be tested against filter" />
+                          <div class="bdb-filter-matching" style="height: 50px;">
+                            <input type="file" id="testFile" name="datafile" size="60" title="Example file that should be tested against filter" style="height: 30px;"/>
                             <input class="button" type="button" name="testButton" value="Match" />
                             <input class="button" type="button" name="testUploadButton" value="Upload" />
-                            <div style="height: 26px; display: inline; white-space: nowrap; padding-left: 30px; font-size: 16px;" id="testResult" />
+                            <div style="height: 26px; display: inline; white-space: nowrap; padding-left: 30px; font-size: 16px;" id="testResult" > </div>
                           </div>
                         </div>               
                     </jsp:attribute>
