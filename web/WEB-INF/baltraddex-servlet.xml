@@ -573,6 +573,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="dbConnectionStatusReporter" class="eu.baltrad.beast.system.DbConnectionStatusReporter" autowire="byType" />
     <bean id="radarStatusReporter" class="eu.baltrad.beast.system.RadarConnectionStatusReporter" autowire="byType" />
     <bean id="bdbObjectStatusReporter" class="eu.baltrad.beast.system.BdbObjectStatusReporter" autowire="byType" />
+
+    <bean id="peerStatusReporter" class="eu.baltrad.dex.reporter.PeerStatusReporter" autowire="byType" />
  
     <bean id="hostManager" class="eu.baltrad.beast.system.host.HostFilterManager" autowire="byType"/>
  
@@ -583,6 +585,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           <entry key="bdb.status" value-ref="bdbConnectionStatusReporter"/>
           <entry key="radar.connection.status" value-ref="radarStatusReporter"/>
           <entry key="bdb.object.status" value-ref="bdbObjectStatusReporter"/>
+          <entry key="peer.status" value-ref="peerStatusReporter"/>
         </map>     
       </property>
     </bean>
