@@ -183,9 +183,7 @@ public class SupervisorController {
         + "', objects='" + objects + "', minutes='" + minutes);
 
     XmlSystemStatusGenerator generator = getXmlGenerator();
-    logger.info("IS AUTHORIZED?");
     if (isAuthorized(request)) {
-      logger.info("YES");
       if (reportersstr == null) {
         reportersstr = "bdb.status,db.status"; // The minimum information the user should get
       }
@@ -195,12 +193,9 @@ public class SupervisorController {
       for (String s : reporters) {
         String str = s.trim();
         String statusvalue = createValueString(str, sources, areas, objects, minutes);
-        logger.info("TRYING: " + str);
         if (supervisor.supportsMappableStatus(str)) {
-          logger.info("SUPPORTS MAPPABLE STATUS: " + str);
           generator.add(str, supervisor.getMappedStatus(str, values).get(str));
         } else {
-          logger.info("DOES NOT SUPPORT MAPPABLE STATUS: " + str);
           generator.add(str, statusvalue, supervisor.getStatus(str, values));
         }
       }
@@ -213,42 +208,9 @@ public class SupervisorController {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); 
       }
     } else {
-      logger.info("NO");
       response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
   }
-
-//  @RequestMapping(value = "/peer_status.htm")
-//  public void peerStatus(Model model, HttpServletRequest request) {
-//    List<User> users = userManager.loadUsers();
-//    for (User u: users) {
-//      logger.info("Name: " + u.getName() + ", address: " + u.getNodeAddress() + ", redirected: " + u.getRedirectedAddress());
-//      String adr = u.getNodeAddress();
-//      if (u.getRedirectedAddress() != null) {
-//        adr = u.getRedirectedAddress();
-//      }
-//      HttpClient httpClient = new DefaultHttpClient();
-//      HttpPost httpPost = new HttpPost(adr + "/BaltradDex/supervisor.htm");
-//      httpClient.getParams().setParameter(CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
-//      try {
-//        HttpResponse response = httpClient.execute( httpPost );
-//        if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-//          // Ok, this one is supporting the alive question. Must be > 2.2.1
-//        } else if (response.getStatusLine().getStatusCode() == HttpStatus.SC_UNAUTHORIZED) {
-//          // Probably a node that supports supervisor questions but not alive question.. >= 2.0 
-//        } else {
-//          // Any other reason. Most likely we wont get files from them...
-//        }
-//        logger.info("RESPONSE: " + response.getStatusLine().getStatusCode() + ", " + response.getStatusLine().getReasonPhrase());
-//      } catch (Exception e) {
-//        logger.error(e);
-//      } finally {
-//        httpClient.getConnectionManager().shutdown();
-//      }
-//    }
-//  }
-  
-  
   
   /**
    * Creates a hash map to be used for passing values to the supervisor

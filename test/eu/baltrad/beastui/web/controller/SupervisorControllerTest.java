@@ -186,12 +186,13 @@ public class SupervisorControllerTest extends EasyMockSupport {
     expect(methods.isAuthorized(request)).andReturn(true);
     expect(methods.createMap("s1,s2", "a1,a2", "o1,o2", "5")).andReturn(valuemap);
     expect(methods.createValueString("r1","s1,s2", "a1,a2", "o1,o2", "5")).andReturn("cvs1");
+    expect(supervisor.supportsMappableStatus("r1")).andReturn(false);
     expect(supervisor.getStatus("r1", valuemap)).andReturn(status);
     generator.add("r1", "cvs1", status);
     expect(methods.createValueString("r2","s1,s2", "a1,a2", "o1,o2", "5")).andReturn("cvs2");
+    expect(supervisor.supportsMappableStatus("r2")).andReturn(false);
     expect(supervisor.getStatus("r2", valuemap)).andReturn(status);
     generator.add("r2", "cvs2", status);
-    
     expect(generator.getXmlString()).andReturn("xmlstring");
     expect(response.getOutputStream()).andReturn(sos);
     sos.write(aryEq("xmlstring".getBytes("UTF-8")));
@@ -214,9 +215,11 @@ public class SupervisorControllerTest extends EasyMockSupport {
     expect(methods.isAuthorized(request)).andReturn(true);
     expect(methods.createMap(null, null, null, null)).andReturn(valuemap);
     expect(methods.createValueString("db.status",null, null, null, null)).andReturn("cvs1");
+    expect(supervisor.supportsMappableStatus("db.status")).andReturn(false);
     expect(supervisor.getStatus("db.status", valuemap)).andReturn(status);
     generator.add("db.status", "cvs1", status);
     expect(methods.createValueString("bdb.status",null, null, null, null)).andReturn("cvs2");
+    expect(supervisor.supportsMappableStatus("bdb.status")).andReturn(false);
     expect(supervisor.getStatus("bdb.status", valuemap)).andReturn(status);
     generator.add("bdb.status", "cvs2", status);
     
