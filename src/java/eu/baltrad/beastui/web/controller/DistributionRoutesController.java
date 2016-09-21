@@ -23,21 +23,17 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-
 import org.codehaus.jackson.map.ObjectMapper;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,18 +41,13 @@ import eu.baltrad.bdb.db.Database;
 import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.db.rest.RestfulFileEntry;
 import eu.baltrad.bdb.expr.Expression;
-import eu.baltrad.bdb.oh5.Metadata;
 import eu.baltrad.bdb.oh5.MetadataMatcher;
-import eu.baltrad.bdb.oh5.Source;
-import eu.baltrad.bdb.util.Date;
-import eu.baltrad.bdb.util.Time;
 import eu.baltrad.beast.db.IFilter;
-import eu.baltrad.beast.message.mo.BltDataMessage;
+import eu.baltrad.beast.net.FileDistribution.FileDistributionStateContainer;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.RuleException;
 import eu.baltrad.beast.rules.dist.DistributionRule;
-import eu.baltrad.beast.rules.dist.DistributionRuleManager;
 
 /**
  * Manages DistributionRule instances
@@ -68,6 +59,8 @@ public class DistributionRoutesController {
   private MetadataMatcher matcher = new MetadataMatcher();
   private static Logger logger = LogManager.getLogger(DistributionRoutesController.class);
   protected enum Operation { Add, Save, Delete, View };
+  private final int UPLOAD_TIMEOUT_IN_MS = 30000; // 30 s 
+  private final int UPLOAD_WAIT_INTERVAL_IN_MS = 50;
   
   @Autowired
   protected Database bdb = null;
@@ -107,8 +100,22 @@ public class DistributionRoutesController {
         copyInputStreamToFile(datafile.getInputStream(), temp);
         is = new FileInputStream(temp);
         FileEntry fe = new RestfulFileEntry(bdb, bdb.queryFileMetadata(is));
-        rule.upload(temp, fe);
-        return "OK";
+        
+        FileDistributionStateContainer distributionState = rule.upload(temp, fe);
+        
+        // wait until distribution done ...
+        int waitedMs = 0;
+        while (!distributionState.isDone() && (waitedMs < UPLOAD_TIMEOUT_IN_MS)) {
+          Thread.sleep(UPLOAD_WAIT_INTERVAL_IN_MS);
+          waitedMs +=  UPLOAD_WAIT_INTERVAL_IN_MS;
+        }
+        
+        if (waitedMs >= UPLOAD_TIMEOUT_IN_MS) {
+          return "TIMEOUT";
+        } else if (distributionState.isSuccessful()) {
+          return "OK";
+        }
+
       } catch (Throwable t) {
         logger.error("Failure", t);
       } finally {
@@ -139,6 +146,7 @@ public class DistributionRoutesController {
         logger.error("Failure", t);
       }
     }
+    
     return "FAIL";
   }
   

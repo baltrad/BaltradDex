@@ -38,6 +38,7 @@ import eu.baltrad.bdb.oh5.Metadata;
 import eu.baltrad.bdb.oh5.MetadataMatcher;
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.router.IRouterManager;
+
 import static org.easymock.EasyMock.*;
 
 /**
@@ -125,7 +126,6 @@ public class DistributionRoutesControllerTest extends EasyMockSupport {
     IFilter filter = createMock(IFilter.class);
     Expression xpr = createMock(Expression.class);
     InputStream inputStream = createMock(InputStream.class);
-    Metadata metadata = createMock(Metadata.class);
     
     expect(jsonMapper.readValue("{}", IFilter.class)).andReturn(filter);
     expect(filter.getExpression()).andReturn(xpr);
