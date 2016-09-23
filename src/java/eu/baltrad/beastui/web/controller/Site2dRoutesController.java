@@ -19,11 +19,13 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 
 package eu.baltrad.beastui.web.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.pgf.IPgfClientHelper;
 import eu.baltrad.beast.qc.AnomalyDetector;
 import eu.baltrad.beast.qc.IAnomalyDetectorManager;
@@ -77,7 +80,12 @@ public class Site2dRoutesController {
   /**
    * Logger
    */
-  private static Logger logger = LogManager.getLogger(Site2dRoutesController.class); 
+  private static Logger logger = LogManager.getLogger(Site2dRoutesController.class);
+  
+  /**
+   * The translator from string to json and vice versa
+   */
+  private ObjectMapper jsonMapper = new ObjectMapper();
   
   /**
    * Default constructor
@@ -167,7 +175,8 @@ public class Site2dRoutesController {
       @RequestParam(value = "xscale", required = false) Double xscale,
       @RequestParam(value = "yscale", required = false) Double yscale,
       @RequestParam(value = "sources", required = false) List<String> sources,
-      @RequestParam(value = "detectors", required = false) List<String> detectors) {
+      @RequestParam(value = "detectors", required = false) List<String> detectors,
+      @RequestParam(value = "filterJson", required=false) String filterJson) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     String emessage = null;
     
@@ -183,7 +192,7 @@ public class Site2dRoutesController {
         ignore_malfunc == null && ctfilter == null && sources == null && detectors == null) {
       return viewCreateRoute(model, name, author, active, description,
           recipients, byscan, method, prodpar, areaid, 
-          interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, null);
+          interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, filterJson, null);
     }
     
     logger.info("areaid=" + areaid + ", pcsid=" + pcsid);
@@ -235,7 +244,7 @@ public class Site2dRoutesController {
         boolean bctfilter = (ctfilter == null) ? false : ctfilter.booleanValue();
         double dxscale = (xscale == null) ? 2000.0 : xscale.doubleValue();
         double dyscale = (xscale == null) ? 2000.0 : yscale.doubleValue();
-        Site2DRule rule = createRule(areaid, iinterval, sources, detectors, bbyscan, method, prodpar, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, pcsid, dxscale, dyscale);
+        Site2DRule rule = createRule(areaid, iinterval, sources, detectors, bbyscan, method, prodpar, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, pcsid, dxscale, dyscale, filterJson);
         List<String> recip = (recipients == null) ? new ArrayList<String>() : recipients;
         RouteDefinition def = manager.create(name, author, bactive, description, recip, rule);
         manager.storeDefinition(def);
@@ -247,7 +256,7 @@ public class Site2dRoutesController {
     }
     
     return viewCreateRoute(model, name, author, active, description,
-        recipients, byscan, method, prodpar, areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, emessage);
+        recipients, byscan, method, prodpar, areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, filterJson, emessage);
   }
   
   /**
@@ -287,13 +296,14 @@ public class Site2dRoutesController {
       @RequestParam(value = "yscale", required = false) Double yscale,
       @RequestParam(value = "sources", required = false) List<String> sources,
       @RequestParam(value = "detectors", required = false) List<String> detectors,
+      @RequestParam(value = "filterJson", required = false) String filterJson,
       @RequestParam(value = "submitButton", required = false) String operation) {
     RouteDefinition def = manager.getDefinition(name);
     if (def == null) {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
     if (operation != null && operation.equals("Save")) {
-      return modifyRoute(model, name, author, active, description, byscan, method, prodpar, recipients, areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors);
+      return modifyRoute(model, name, author, active, description, byscan, method, prodpar, recipients, areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, filterJson);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -304,11 +314,19 @@ public class Site2dRoutesController {
     } else {
       if (def.getRule() instanceof Site2DRule) {
         Site2DRule crule = (Site2DRule)def.getRule();
+        
+        String filterstr = null;
+        try {
+          filterstr = jsonMapper.writeValueAsString(crule.getFilter());
+        } catch (IOException e) {
+          logger.error("failed to create JSON string from filter", e);
+        }
+        
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             def.getRecipients(), crule.isScanBased(), crule.getMethod(), crule.getProdpar(), 
             crule.getArea(), crule.getInterval(), crule.isApplyGRA(), crule.getZR_A(), crule.getZR_b(), 
             crule.isIgnoreMalfunc(), crule.isCtFilter(), crule.getPcsid(), crule.getXscale(), crule.getYscale(), 
-            crule.getSources(), crule.getDetectors(), null);
+            crule.getSources(), crule.getDetectors(), filterstr, null);
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a site2d rule");
       }
@@ -330,11 +348,30 @@ public class Site2dRoutesController {
    * @param emessage if a message should be shown
    * @return compositeroute_create
    */
-  protected String viewCreateRoute(Model model, String name, String author,
-      Boolean active, String description, List<String> recipients, Boolean byscan, 
-      String method, String prodpar, String areaid, 
-      Integer interval, Boolean applygra, Double ZR_A, Double ZR_b, Boolean ignore_malfunc,
-      Boolean ctfilter, String pcsid, Double xscale, Double yscale, List<String> sources, List<String> detectors, String emessage) {
+  protected String viewCreateRoute(Model model, 
+                                   String name, 
+                                   String author,
+                                   Boolean active, 
+                                   String description, 
+                                   List<String> recipients, 
+                                   Boolean byscan, 
+                                   String method, 
+                                   String prodpar, 
+                                   String areaid, 
+                                   Integer interval, 
+                                   Boolean applygra, 
+                                   Double ZR_A, 
+                                   Double ZR_b, 
+                                   Boolean ignore_malfunc,
+                                   Boolean ctfilter, 
+                                   String pcsid, 
+                                   Double xscale, 
+                                   Double yscale, 
+                                   List<String> sources, 
+                                   List<String> detectors, 
+                                   String jsonFilter, 
+                                   String emessage) {
+    
     List<String> adaptors = adaptormanager.getAdaptorNames();
     model.addAttribute("sourceids", utilities.getRadarSources());
     model.addAttribute("intervals", getIntervals());
@@ -361,6 +398,7 @@ public class Site2dRoutesController {
     model.addAttribute("pcsid", (pcsid == null) ? "" : pcsid);
     model.addAttribute("xscale", (xscale == null) ? new Double(2000.0) : xscale);
     model.addAttribute("yscale", (yscale == null) ? new Double(2000.0) : yscale);
+    model.addAttribute("filterJson", jsonFilter);
     
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
@@ -394,6 +432,7 @@ public class Site2dRoutesController {
       Double yscale,
       List<String> sources,
       List<String> detectors,
+      String jsonFilter,
       String emessage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     
@@ -429,6 +468,9 @@ public class Site2dRoutesController {
         (detectors == null) ? new ArrayList<String>() : detectors);
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
+    }
+    if (jsonFilter != null && !jsonFilter.equals("")) {
+      model.addAttribute("filterJson", jsonFilter);
     }
     return "route_show_site2d";
   }
@@ -512,7 +554,8 @@ public class Site2dRoutesController {
       Double xscale,
       Double yscale,
       List<String> sources,
-      List<String> detectors) {
+      List<String> detectors,
+      String jsonFilter) {
     List<String> newrecipients = (recipients == null) ? new ArrayList<String>() : recipients;
     List<String> newsources = (sources == null) ? new ArrayList<String>() : sources;
     List<String> newdetectors = (detectors == null) ? new ArrayList<String>() : detectors;
@@ -560,7 +603,7 @@ public class Site2dRoutesController {
     }
     if (emessage == null) {
       try {
-        Site2DRule rule = createRule(area, iinterval, newsources, newdetectors, bbyscan, method, prodpar, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, pcsid, dxscale, dyscale);
+        Site2DRule rule = createRule(area, iinterval, newsources, newdetectors, bbyscan, method, prodpar, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, pcsid, dxscale, dyscale, jsonFilter);
         RouteDefinition def = manager.create(name, author, isactive, description,
             newrecipients, rule);
         manager.updateDefinition(def);
@@ -572,7 +615,7 @@ public class Site2dRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        newrecipients,byscan, method, prodpar, area, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, emessage);
+        newrecipients,byscan, method, prodpar, area, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, emessage, jsonFilter);
   }
   
   protected List<Integer> getIntervals() {
@@ -588,7 +631,9 @@ public class Site2dRoutesController {
       List<String> sources, List<String> detectors, boolean byscan, 
       String method, String prodpar, boolean applygra, double ZR_A, double ZR_b, 
       boolean ignore_malfunc, boolean ctfilter,
-      String pcsid, double xscale, double yscale) {
+      String pcsid, double xscale, double yscale,
+      String jsonFilter) {
+    
     Site2DRule rule = (Site2DRule)manager.createRule(Site2DRule.TYPE);
     rule.setArea(areaid);
     rule.setInterval(interval);
@@ -605,6 +650,15 @@ public class Site2dRoutesController {
     rule.setPcsid(pcsid);
     rule.setXscale(xscale);
     rule.setYscale(yscale);
+    
+    if (jsonFilter != null && !jsonFilter.equals("")) {
+      try {
+        rule.setFilter(jsonMapper.readValue(jsonFilter, IFilter.class));
+      } catch (Exception e) {
+        logger.error("Failed to translate json to filter", e);
+      }
+    }
+    
     return rule;
   }
 }
