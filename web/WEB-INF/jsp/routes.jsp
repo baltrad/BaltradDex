@@ -42,7 +42,7 @@ List of routes
                 <div class="header">
                     <div class="row">Routes</div>
                 </div>
-                <form name="createRouteForm" action="route_create.htm">
+                <form name="createRouteForm" action="routes.htm">
                     <t:message_box errorHeader="Problems encountered."
                                    errorBody="${emessage}"/>
                     <c:choose>
@@ -54,10 +54,22 @@ List of routes
                             <div class="body">
                                 <div class="header-row">
                                     <div class="count">&nbsp;</div>
-                                    <div class="name">Name</div>
-                                    <div class="description">Description</div>
-                                    <div class="type">Type</div>
-                                    <div class="active">Active</div>
+                                    <div class="name">
+                                        <input name="sortBy"
+                                            type="submit" value="Name" title="Sort routes by name">                                        
+                                        </div>
+                                    <div class="description">
+                                        <input name="sortBy"
+                                            type="submit" value="Description" title="Sort routes by description">                                        
+                                        </div>
+                                    <div class="type">
+                                        <input name="sortBy"
+                                            type="submit" value="Type" title="Sort routes by type">                                        
+                                        </div>
+                                    <div class="active">
+                                        <input name="sortBy"
+                                            type="submit" value="Active" title="Sort routes by actived/de-activated">                                        
+                                        </div>
                                 </div>
                                 <c:set var="count" scope="page" value="1"/>
                                 <c:forEach var="route" items="${routes}">

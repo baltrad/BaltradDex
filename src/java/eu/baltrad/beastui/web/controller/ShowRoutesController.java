@@ -18,7 +18,11 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 ------------------------------------------------------------------------*/
 package eu.baltrad.beastui.web.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -47,6 +51,13 @@ public class ShowRoutesController {
    * We need a logger here
    */
   private static Logger logger = LogManager.getLogger(AdaptorsController.class);
+  
+  public static final String ROUTES_COMPARATORS_ATTR = "routes:comparators";
+  
+  public static final String SORT_BY_NAME_TAG = "Name";
+  public static final String SORT_BY_TYPE_TAG = "Type";
+  public static final String SORT_BY_ACTIVE_TAG = "Active";
+  public static final String SORT_BY_DESCRIPTION_TAG = "Description";
 
   /**
    * Constructor
@@ -65,12 +76,92 @@ public class ShowRoutesController {
     this.manager = manager;
   }
   
+  @SuppressWarnings("unchecked")
   @RequestMapping("/routes.htm")
-  public String showRoutes(Model model) {
+  public String showRoutes(Model model, 
+      HttpServletRequest request,
+      HttpSession httpSession,
+      @RequestParam(value = "sortBy", required = false) String sortBy) {
+    
     logger.debug("showRoutes(Model)");
+
     List<RouteDefinition> definitions = manager.getDefinitions();
-    model.addAttribute("routes", definitions);
+    
+    Object orderingObject = httpSession.getAttribute(ROUTES_COMPARATORS_ATTR);
+    
+    ArrayList<RouteDefinition.RouteComparator> routeComparators;
+    
+    if (orderingObject == null) {
+      routeComparators = createDefaultComparators();
+    } else if (orderingObject instanceof ArrayList) {
+      routeComparators = (ArrayList<RouteDefinition.RouteComparator>) orderingObject;
+    } else {
+      logger.warn("Invalid ordering information in HttpSession. Cannot perform ordering of routes.");
+      model.addAttribute("routes", definitions); 
+      return "routes";
+    }
+    
+    if (sortBy != null) {
+      updateOrdering(routeComparators, sortBy);
+    }
+ 
+    sortRouteDefinitions(definitions, routeComparators);
+    httpSession.setAttribute(ROUTES_COMPARATORS_ATTR, routeComparators);
+    
+    model.addAttribute("routes", definitions); 
+    
     return "routes";
+  }
+  
+  private void updateOrdering(ArrayList<RouteDefinition.RouteComparator> comparators, String sortOnCategory) {
+    RouteDefinition.RouteComparator newComparator = getRouteDefinitinoComparator(sortOnCategory);
+    
+    boolean comparatorExists = false;
+    int comparatorIndex = 0;
+    for (RouteDefinition.RouteComparator comparator : comparators) {
+      if (comparator.getClass().equals(newComparator.getClass())) {
+        comparatorExists = true;
+        comparatorIndex = comparators.indexOf(comparator);
+        break;
+      }
+    }
+    
+    if (comparatorExists) {
+      newComparator = comparators.remove(comparatorIndex);
+      newComparator.switchOrder();      
+    }
+    
+    comparators.add(newComparator);
+  }
+  
+  private ArrayList<RouteDefinition.RouteComparator> createDefaultComparators() {
+    ArrayList<RouteDefinition.RouteComparator> routeComparators = new ArrayList<RouteDefinition.RouteComparator>();
+    
+    routeComparators.add(new RouteDefinition.NameComparator());
+    routeComparators.add(new RouteDefinition.TypeComparator());
+    routeComparators.add(new RouteDefinition.ActiveComparator());
+    
+    return routeComparators;
+  }
+  
+  private void sortRouteDefinitions(List<RouteDefinition> definitions, ArrayList<RouteDefinition.RouteComparator> comparators) {
+    for (RouteDefinition.RouteComparator comparator : comparators) {
+      definitions.sort(comparator);
+    }
+  }
+  
+  private RouteDefinition.RouteComparator getRouteDefinitinoComparator(String category) {
+    if (category.equals(SORT_BY_NAME_TAG)) {
+      return new RouteDefinition.NameComparator();
+    } else if (category.equals(SORT_BY_DESCRIPTION_TAG)) {
+      return new RouteDefinition.DescriptionComparator();
+    } else if (category.equals(SORT_BY_TYPE_TAG)) {
+      return new RouteDefinition.TypeComparator();
+    } else if (category.equals(SORT_BY_ACTIVE_TAG)) {
+      return new RouteDefinition.ActiveComparator();
+    }
+    
+    return null;
   }
   
   @RequestMapping("/route_create.htm")
