@@ -19,6 +19,7 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 package eu.baltrad.beastui.web.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -146,7 +147,7 @@ public class ShowRoutesController {
   
   private void sortRouteDefinitions(List<RouteDefinition> definitions, ArrayList<RouteDefinition.RouteComparator> comparators) {
     for (RouteDefinition.RouteComparator comparator : comparators) {
-      definitions.sort(comparator);
+      Collections.sort(definitions, comparator);
     }
   }
   
