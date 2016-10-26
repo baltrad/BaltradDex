@@ -106,11 +106,11 @@ public class Site2dRoutesControllerTest extends EasyMockSupport {
     String author = "test_author";
     boolean active = true;
     String description = "test_desc";
-    List<String> recipients = null;
+    List<String> recipients = new ArrayList<String>();
     String areaid = "test_area";
     int interval = 10;
-    List<String> sources = null;
-    List<String> detectors = null;
+    List<String> sources = new ArrayList<String>();
+    List<String> detectors = new ArrayList<String>();
     boolean byscan = false;
     String method = "test_method";
     String prodpar = "test_prodpar";
@@ -123,19 +123,18 @@ public class Site2dRoutesControllerTest extends EasyMockSupport {
     double xscale = 3.0;
     double yscale = 5.0;
     String jsonFilter = "";
-    List<String> adaptorNames = null;
-    List<String> radarSources = null;
+    List<String> adaptorNames = new ArrayList<String>();
+    List<String> radarSources = new ArrayList<String>();
     List<AnomalyDetector> anomalyDetectors = new ArrayList<AnomalyDetector>();
-    List<String> uniqueAreaIds = null;
-    List<String> uniquePcsIds = null;
+    List<String> uniqueAreaIds = new ArrayList<String>();
+    List<String> uniquePcsIds = new ArrayList<String>();
     
     String operation = "Duplicate";
     
     Model model = createMock(Model.class);
     RouteDefinition routeDef = createMock(RouteDefinition.class);
     
-    model.addAttribute(anyObject(), anyObject());
-    expectLastCall().andReturn(null).anyTimes();
+    expect(model.addAttribute(isA(String.class), isA(Object.class))).andReturn(null).anyTimes();
     
     expect(manager.getDefinition(name)).andReturn(routeDef);
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptorNames);
