@@ -327,6 +327,10 @@ Modify a site2d route
                                 <input class="button" name="submitButton"
                                        type="submit" value="Delete"/>
                             </div>
+                            <div class="button-wrap">
+                                <input class="button" name="submitButton"
+                                       type="submit" value="Duplicate"/>
+                            </div>
                         </div>
                     </div>                      
                 </form>    

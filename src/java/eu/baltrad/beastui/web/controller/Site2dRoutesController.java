@@ -87,6 +87,13 @@ public class Site2dRoutesController {
    */
   private ObjectMapper jsonMapper = new ObjectMapper();
   
+  private enum SubmitOperation {
+    NONE,
+    SAVE,
+    DELETE,
+    DUPLICATE
+  }
+  
   /**
    * Default constructor
    */
@@ -250,8 +257,12 @@ public class Site2dRoutesController {
         manager.storeDefinition(def);
         return "redirect:routes.htm";
       } catch (Throwable t) {
-        t.printStackTrace();
-        emessage = "Failed to create definition: '" + t.getMessage() + "'";
+        if (t.toString().contains("(" + name + ") already exists")) {
+          emessage = "Failed to create definition. Rule with name '" + name + "' already exists. Enter another name.";
+        } else {
+          logger.warn("Failed to create Site2DRule.", t);
+          emessage = "Failed to create definition: '" + t.getMessage() + "'";          
+        }
       }
     }
     
@@ -302,16 +313,24 @@ public class Site2dRoutesController {
     if (def == null) {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
-    if (operation != null && operation.equals("Save")) {
+    
+    switch (getSubmitOperation(operation)) {
+    case SAVE:
       return modifyRoute(model, name, author, active, description, byscan, method, prodpar, recipients, areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, filterJson);
-    } else if (operation != null && operation.equals("Delete")) {
+    case DELETE:
       try {
         manager.deleteDefinition(name);
         return "redirect:routes.htm";
       } catch (Throwable t) {
         return viewShowRoutes(model, "Failed to delete \"" + name + "\", have you verified that there are no reffering scheduled jobs");
       }
-    } else {
+    case DUPLICATE:
+      logger.info("Duplicating Site2DRule '" + name + "'");
+      return viewCreateRoute(model, name + " (copy)", author, active, description, recipients, byscan, method, prodpar, 
+                             areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, 
+                             sources, detectors, filterJson, null);
+          
+    default:
       if (def.getRule() instanceof Site2DRule) {
         Site2DRule crule = (Site2DRule)def.getRule();
         
@@ -660,5 +679,21 @@ public class Site2dRoutesController {
     }
     
     return rule;
+  }
+  
+  private SubmitOperation getSubmitOperation(String operationString) {
+    SubmitOperation submitOperation = SubmitOperation.NONE;
+    
+    if (operationString != null) {
+      if (operationString.equals("Save")) {
+        submitOperation = SubmitOperation.SAVE;
+      } else if (operationString.equals("Delete")) {
+        submitOperation = SubmitOperation.DELETE;
+      } else if (operationString.equals("Duplicate")) {
+        submitOperation = SubmitOperation.DUPLICATE;
+      }
+    }
+    
+    return submitOperation;
   }
 }
