@@ -125,7 +125,7 @@ public class Site2dRoutesControllerTest extends EasyMockSupport {
     String jsonFilter = "";
     List<String> adaptorNames = null;
     List<String> radarSources = null;
-    List<AnomalyDetector> anomalyDetectors = new ArrayList<>();
+    List<AnomalyDetector> anomalyDetectors = new ArrayList<AnomalyDetector>();
     List<String> uniqueAreaIds = null;
     List<String> uniquePcsIds = null;
     
