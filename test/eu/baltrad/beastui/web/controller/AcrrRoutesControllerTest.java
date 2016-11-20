@@ -45,7 +45,7 @@ public class AcrrRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    AcrrRule result = classUnderTest.createRule("nrd_swe", "IMAGE", "DBZH", 12, 4, 1, "eu.x.y", 100.0, 0.5, true);
+    AcrrRule result = classUnderTest.createRule("nrd_swe", "IMAGE", "DBZH", 12, 4, 1, "eu.x.y", 100.0, 0.5, true, null);
     
     verifyAll();
     assertSame(rule, result);
