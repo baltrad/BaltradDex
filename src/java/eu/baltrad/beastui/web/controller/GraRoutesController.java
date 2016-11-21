@@ -19,11 +19,13 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 
 package eu.baltrad.beastui.web.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,9 +33,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.pgf.IPgfClientHelper;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
+import eu.baltrad.beast.rules.acrr.AcrrRule;
 import eu.baltrad.beast.rules.gra.GraRule;
 
 /**
@@ -58,6 +62,11 @@ public class GraRoutesController {
    */
   private IPgfClientHelper pgfClientHelper = null;
 
+  /**
+   * The translator from string to json and vice versa
+   */
+  private ObjectMapper jsonMapper = new ObjectMapper();
+  
   /**
    * The logger
    */
@@ -111,7 +120,8 @@ public class GraRoutesController {
     @RequestParam(value = "zrA", required = false) Double zrA,
     @RequestParam(value = "zrB", required = false) Double zrB,
     @RequestParam(value = "firstTermUTC", required = false) Integer firstTermUTC,
-    @RequestParam(value = "interval", required = false) Integer interval) {
+    @RequestParam(value = "interval", required = false) Integer interval,
+    @RequestParam(value = "filterJson", required=false) String filterJson) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     String emessage = null;
     
@@ -127,7 +137,7 @@ public class GraRoutesController {
         zrA == null && zrB == null && firstTermUTC == null && interval == null) {
       return viewCreateRoute(model, name, author, active, description,
           recipients, area, object_type, quantity, filesPerHour, acceptableLoss,
-          distanceField, zrA, zrB, firstTermUTC, interval, null);
+          distanceField, zrA, zrB, firstTermUTC, interval, filterJson, null);
     }
     
     if (name == null || name.trim().equals("")) {
@@ -147,7 +157,7 @@ public class GraRoutesController {
         double dzrb = (zrB == null) ? 1.6 : zrB.doubleValue();
         int iftu = (firstTermUTC == null) ? 6 : firstTermUTC.intValue();
         int iinterval = (interval == null) ? 12 : interval.intValue();
-        GraRule rule = createRule(area, object_type, quantity, ifilesPerHour, iacceptableLoss, distanceField, dzra, dzrb, iftu, iinterval);
+        GraRule rule = createRule(area, object_type, quantity, ifilesPerHour, iacceptableLoss, distanceField, dzra, dzrb, iftu, iinterval, filterJson);
         RouteDefinition def = manager.create(name, author, bactive, description, recipients, rule);
         manager.storeDefinition(def);
         return "redirect:routes.htm";
@@ -159,7 +169,7 @@ public class GraRoutesController {
     
     return viewCreateRoute(model, name, author, active, description,
         recipients, area, object_type, quantity, filesPerHour, acceptableLoss,
-        distanceField, zrA, zrB, firstTermUTC, interval, emessage);
+        distanceField, zrA, zrB, firstTermUTC, interval, filterJson, emessage);
   }
   
   /**
@@ -182,7 +192,8 @@ public class GraRoutesController {
       @RequestParam(value = "zrA", required = false) Double zrA,
       @RequestParam(value = "zrB", required = false) Double zrB,
       @RequestParam(value = "firstTermUTC", required = false) Integer firstTermUTC,
-      @RequestParam(value = "interval", required = false) Integer interval,      
+      @RequestParam(value = "interval", required = false) Integer interval,
+      @RequestParam(value = "filterJson", required=false) String filterJson,      
       @RequestParam(value = "submitButton", required = false) String operation) {
     logger.debug("showRoute(Model)");
 
@@ -193,7 +204,7 @@ public class GraRoutesController {
     
     if (operation != null && operation.equals("Save")) {
       //
-      return modifyRoute(model, name, author, active, description, recipients, area, object_type, quantity, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval);
+      return modifyRoute(model, name, author, active, description, recipients, area, object_type, quantity, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, filterJson);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -204,10 +215,18 @@ public class GraRoutesController {
     } else {
       if (def.getRule() instanceof GraRule) {
         GraRule vrule = (GraRule)def.getRule();
+        String filterstr = null;
+        if (vrule.getFilter() != null) {
+          try {
+            filterstr = jsonMapper.writeValueAsString(vrule.getFilter());
+          } catch (IOException e) {
+            logger.error("failed to create JSON string from filter", e);
+          }
+        }        
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             def.getRecipients(), vrule.getArea(), vrule.getObjectType(), vrule.getQuantity(),
             vrule.getFilesPerHour(), vrule.getAcceptableLoss(),
-            vrule.getDistancefield(), vrule.getZrA(), vrule.getZrB(), vrule.getFirstTermUTC(), vrule.getInterval(), null); 
+            vrule.getDistancefield(), vrule.getZrA(), vrule.getZrB(), vrule.getFirstTermUTC(), vrule.getInterval(), filterstr, null); 
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is an gra rule");
       }
@@ -233,7 +252,8 @@ public class GraRoutesController {
       Double zrA,
       Double zrB,
       Integer firstTermUTC,
-      Integer interval) {
+      Integer interval,
+      String filterJson) {
     List<String> newrecipients = (recipients == null) ? new ArrayList<String>() : recipients;
     boolean isactive = (active != null) ? active.booleanValue() : false;
     String emessage = null;
@@ -243,7 +263,7 @@ public class GraRoutesController {
     } 
     if (emessage == null) {
       try {
-        GraRule rule = createRule(area, object_type, quantity, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval);
+        GraRule rule = createRule(area, object_type, quantity, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, filterJson);
         RouteDefinition def = manager.create(name, author, isactive, description, newrecipients, rule);
         manager.updateDefinition(def);
         return "redirect:routes.htm";
@@ -255,7 +275,7 @@ public class GraRoutesController {
     return viewShowRoute(model, name, author, isactive, description,
         newrecipients, area, object_type, quantity,
         filesPerHour, acceptableLoss,
-        distanceField, zrA, zrB, firstTermUTC, interval, emessage); 
+        distanceField, zrA, zrB, firstTermUTC, interval, filterJson, emessage); 
   }
   
   /**
@@ -277,10 +297,11 @@ public class GraRoutesController {
       Double zrB,
       Integer firstTermUTC,
       Integer interval,
+      String jsonFilter,
       String emessage) {
     return viewRoute(model, name, author, active, description,
         recipients, area, object_type, quantity, filesPerHour,
-        acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, emessage, "route_create_gra");
+        acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, jsonFilter, emessage, "route_create_gra");
   }
 
   /**
@@ -302,10 +323,11 @@ public class GraRoutesController {
       Double zrB,
       Integer firstTermUTC,
       Integer interval,
+      String jsonFilter,
       String emessage) {
     return viewRoute(model, name, author, active, description,
         recipients, area, object_type, quantity, filesPerHour,
-        acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, emessage, "route_show_gra");
+        acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, jsonFilter, emessage, "route_show_gra");
   }
   
   /**
@@ -327,6 +349,7 @@ public class GraRoutesController {
       Double zrB,
       Integer firstTermUTC,
       Integer interval,
+      String jsonFilter,
       String emessage,
       String jsppagename) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
@@ -353,6 +376,10 @@ public class GraRoutesController {
     model.addAttribute("zrB", (zrB == null) ? 1.6 : zrB);
     model.addAttribute("firstTermUTC", (firstTermUTC == null) ? 6 : firstTermUTC);
     model.addAttribute("interval", (interval == null) ? 12 : interval);
+    model.addAttribute("filterJson", jsonFilter);
+    
+    logger.info("jsonFilter: " + jsonFilter);
+    
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
@@ -390,7 +417,8 @@ public class GraRoutesController {
       double zrA, 
       double zrB,
       int firstTermUTC,
-      int interval) {
+      int interval,
+      String jsonFilter) {
     GraRule rule = (GraRule)manager.createRule(GraRule.TYPE);
     rule.setArea(area);
     rule.setObjectType(object_type);
@@ -402,6 +430,13 @@ public class GraRoutesController {
     rule.setZrB(zrB);
     rule.setFirstTermUTC(firstTermUTC);
     rule.setInterval(interval);
+    if (jsonFilter != null && !jsonFilter.equals("")) {
+      try {
+        rule.setFilter(jsonMapper.readValue(jsonFilter, IFilter.class));
+      } catch (Exception e) {
+        logger.error("Failed to translate json to filter", e);
+      }
+    }        
     return rule;
   }
 

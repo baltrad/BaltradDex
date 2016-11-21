@@ -24,6 +24,59 @@ Creates a gra route
 <%@include file="/WEB-INF/jsp/include.jsp"%>
 
 <t:generic_page pageTitle="Create route">
+    <jsp:attribute name="extraHeader">
+        <script type="text/javascript"
+                src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js">
+        </script>
+        <script type="text/javascript"
+                src="includes/js/jquery.serializeJSON.js">
+        </script>
+        <script type="text/javascript"
+                src="includes/js/json2.js">
+        </script>
+        <script type="text/javascript"
+                src="includes/js/jquery.postJSON.js">
+        </script>
+        <script type="text/javascript"
+                src="includes/js/filter.js">
+        </script>
+        <script type="text/javascript">
+            // prevent executing the function twice
+            var ready;
+            $(document).ready(function() {
+                if (!ready) {
+                    var filter = null;
+                    <c:choose>
+                      <c:when test="${!empty filterJson}">
+                        filter = createBdbFilter(${filterJson});
+                      </c:when>
+                      <c:otherwise>
+                        filter = createBdbFilter({
+                          type: "combined",
+                          matchType: "ALL",
+                          childFilters: [{
+                            type: "always"
+                          }]
+                        });
+                      </c:otherwise>
+                    </c:choose>
+                    $("#filter").append(filter.dom);
+                    var submit = $("[name='submitButton']");
+                    submit.click(function(evt) {
+                      filter.updateDataFromDom();
+                      if (!isValidBdbFilter(filter.data)) {
+                        evt.preventDefault();
+                        alert("invalid filter");
+                      } else {
+                        $("#filterJson").val(JSON.stringify(filter.data));
+                        $("#filter").empty();
+                      }
+                    });
+                    ready = true;
+                }
+            });
+        </script>         
+    </jsp:attribute>
     <jsp:body>
         <div class="routes">
             <div class="table">
@@ -175,6 +228,16 @@ Creates a gra route
                                 </select>
                             </div>
                         </div>
+                        <div class="row2">
+                            <div class="bdb-filter-text">
+                                Select filter parameters
+                            </div> 
+                            <div class="bdb-filter">
+                                <div id="filter"></div>
+                                <input type="hidden" name="filterJson" 
+                                       id="filterJson" />
+                            </div> 
+                        </div>                        
                     </div>
                     <div class="table-footer">
                         <div class="buttons">

@@ -45,7 +45,7 @@ public class GraRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    GraRule result = classUnderTest.createRule("nrd_swe", "IMAGE", "DBZH", 4, 1, "eu.x.y", 100.0, 0.5, 6, 12);
+    GraRule result = classUnderTest.createRule("nrd_swe", "IMAGE", "DBZH", 4, 1, "eu.x.y", 100.0, 0.5, 6, 12, null);
     
     verifyAll();
     assertNotNull(result);
