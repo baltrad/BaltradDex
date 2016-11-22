@@ -253,10 +253,12 @@ public class VolumeRoutesController {
       if (def.getRule() instanceof VolumeRule) {
         VolumeRule vrule = (VolumeRule)def.getRule();
         String filterstr = null;
-        try {
-          filterstr = jsonMapper.writeValueAsString(vrule.getFilter());
-        } catch (IOException e) {
-          logger.error("failed to create JSON string from filter", e);
+        if (vrule.getFilter() != null) {
+          try {
+            filterstr = jsonMapper.writeValueAsString(vrule.getFilter());
+          } catch (IOException e) {
+            logger.error("failed to create JSON string from filter", e);
+          }
         }
         
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
