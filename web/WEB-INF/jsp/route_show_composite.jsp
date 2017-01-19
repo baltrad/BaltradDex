@@ -272,6 +272,16 @@ Modify a composite route
                                 <a href="JavaScript:void(0);" id="btn-down"><img src="includes/images/down.png" alt="Down"/></a>
                             </div>
                         </div>
+                        <div class="row2">
+                            <div class="leftcol">Quality controls mode</div>
+                            <div class="rightcol">
+                                <select name="quality_control_mode" 
+                                        title="Choose a quality control mode">
+                                    <option value="0" <c:if test="${quality_control_mode == 0}">selected</c:if> >Analyze &amp; Apply</option>
+                                    <option value="1" <c:if test="${quality_control_mode == 1}">selected</c:if> >Analyze only</option>
+                                </select>
+                            </div>
+                        </div>                        
                     </div>
                     <div class="table-footer">
                         <div class="buttons">
