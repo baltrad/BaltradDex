@@ -158,14 +158,14 @@ public class BltFileBrowserController {
             @RequestParam(value="selected_page", required=false) 
                     String selectedPage) {
     		
-		setSortByDate(request);
-		setSortByTime(request);
-		setSortBySource(request);
-		setSortByObject(request);
-		
-		updateSearchResults(model, param, selectedPage);
-        
-        return FORM_VIEW;
+      setSortByDate(request);
+      setSortByTime(request);
+      setSortBySource(request);
+      setSortByObject(request);
+
+      updateSearchResults(model, param, selectedPage);
+
+      return FORM_VIEW;
     }
     
     /**

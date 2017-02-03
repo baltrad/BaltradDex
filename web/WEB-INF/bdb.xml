@@ -5,7 +5,8 @@
        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd">
     <bean id="bdb_db" class="eu.baltrad.bdb.db.rest.RestfulDatabase" >
         <constructor-arg index="0" value="${database.uri}" />
-        <constructor-arg index="1" value="20" />        
+        <constructor-arg index="1" value="20" />
+        <constructor-arg value="0" /> <!-- file entry cache size -->
     </bean>
     <bean id="bdb_storage"
           class="eu.baltrad.bdb.storage.CacheDirStorage"

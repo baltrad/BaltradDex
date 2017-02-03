@@ -22,7 +22,6 @@ Author     : szewczenko
 ------------------------------------------------------------------------------%>
 
 <%@ include file="/WEB-INF/jsp/include.jsp" %>
-clearform
 
 <t:generic_page pageTitle="Browse files">
     <jsp:body>
