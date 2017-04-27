@@ -32,14 +32,33 @@ import java.util.HashMap;
  * @since 0.1.6
  */
 public class FramePublisherManager {
+  
+    private static final int DEFAULT_QUEUE_SIZE = 20;
+    private static final int DEFAULT_CORE_POOL_SIZE = 2;
+    private static final int DEFAULT_MAX_POOL_SIZE = 10;
 
     private static HashMap<String, FramePublisher> framePublishers;
+    
+    private int queueSize;
+    private int corePoolSize;
+    private int maxPoolSize;
 
     /**
      * Constructor.
      */
     public FramePublisherManager(){
+        this(DEFAULT_QUEUE_SIZE, DEFAULT_CORE_POOL_SIZE, DEFAULT_MAX_POOL_SIZE);
+    }
+    
+    /**
+     * Constructor.
+     */
+    public FramePublisherManager(int queueSize, int corePoolSize, int maxPoolSize){
         framePublishers = new HashMap<String, FramePublisher>();
+        
+        this.queueSize = queueSize;
+        this.corePoolSize = corePoolSize;
+        this.maxPoolSize = maxPoolSize;
     }
     
     /**
@@ -58,8 +77,8 @@ public class FramePublisherManager {
      * @return New or existing FramePublisher object
      */
     public synchronized FramePublisher getFramePublisher(String userName) {
-        if(!framePublishers.containsKey(userName)) {
-            FramePublisher publisher = new FramePublisher();
+        if (!framePublishers.containsKey(userName)) {
+            FramePublisher publisher = new FramePublisher(queueSize, corePoolSize, maxPoolSize);
             framePublishers.put(userName, publisher);
         }
         return framePublishers.get(userName);

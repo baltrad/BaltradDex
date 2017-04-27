@@ -25,7 +25,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import eu.baltrad.dex.datasource.model.DataSource;
@@ -101,6 +100,7 @@ public class PostFileTask implements Runnable {
                     user.getName(), dataSource.getName());
             int subscriptionId = s.getId();
             Status status = nodeStatusManager.load(subscriptionId);
+            
             try {
                 HttpResponse response = httpClient.post(request);
                 if (response.getStatusLine().getStatusCode() == 
@@ -121,10 +121,14 @@ public class PostFileTask implements Runnable {
                     subscriptionManager.delete(subscriptionId);
                     // remove respective status
                     nodeStatusManager.delete(subscriptionId);
+                    
+                    log.error("Failed to send file " + uuid + 
+                              " to user " + user.getName() + ": Forbidden - HTTP STATUS 403");
                 } else {
                     // don't retry if file is already delivered 
                     int statusCode = response.getStatusLine().getStatusCode(); 
                     if (statusCode != HttpServletResponse.SC_CONFLICT) {
+                        int noOfRetries = 0;
                         boolean success = false;
                         if (redirectHandler.canHandle(response)) {
                           response = redirectHandler.handle(httpClient, request, response);
@@ -132,7 +136,7 @@ public class PostFileTask implements Runnable {
                             success = true;
                           }
                         } else {
-                            for (int i = 0; i < 3; i++) {
+                            for (noOfRetries = 1; noOfRetries <= 3; noOfRetries++) {
                                 response = httpClient.post(request);
                                 if (response.getStatusLine().getStatusCode() ==
                                     HttpServletResponse.SC_OK) {
@@ -149,7 +153,7 @@ public class PostFileTask implements Runnable {
                                 RegistryEntry.UPLOAD, uuid, user.getName(), 
                                 true);
                             log.info("File " + uuid + " sent to user " 
-                                    + user.getName());
+                                    + user.getName() + ". Succeeded after " + noOfRetries + " retries.");
                             registryManager.store(entry);
                             // update status
                             status.incrementUploads();
@@ -170,7 +174,10 @@ public class PostFileTask implements Runnable {
                             status.incrementUploadFailures();
                             nodeStatusManager.update(status, subscriptionId);
                         }
-                    }    
+                    } else {
+                        log.error("Failed to send file " + uuid + 
+                                  " to user " + user.getName() + ": Conflict - HTTP STATUS 409");
+                    }
                 }
             } finally {
                 httpClient.shutdown();

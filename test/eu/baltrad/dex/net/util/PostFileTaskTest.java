@@ -21,6 +21,27 @@
 
 package eu.baltrad.dex.net.util;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
+import static org.easymock.EasyMock.isA;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
+import org.apache.log4j.Logger;
+import org.easymock.EasyMockSupport;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
@@ -30,25 +51,6 @@ import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.model.User;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
-import org.apache.log4j.Logger;
-import org.easymock.EasyMock;
-import org.easymock.EasyMockSupport;
-
-import static org.easymock.EasyMock.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * Post file task test.

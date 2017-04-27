@@ -27,6 +27,9 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 /**
  * Implements ThreadPoolExecutor used to execute concurrent tasks.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
@@ -35,22 +38,58 @@ import java.util.concurrent.TimeUnit;
  */
 public class FramePublisher {
 
-    private static final int POOL_SIZE = 20;
-    private static final int KEEP_ALIVE_TIME = 60;
+    private static final int DEFAULT_KEEP_ALIVE_TIME = 60;
 
     private ThreadPoolExecutor executor;
-    // Task queue
-    private ArrayBlockingQueue<Runnable> queue;
+    
+    private int maxPoolSize;
+    private int minPoolSize;
+    
+    private final static Logger logger = LogManager.getLogger(FramePublisher.class);
+    
+    protected class FrameRejectedExecutionHandler extends ThreadPoolExecutor.DiscardOldestPolicy {
+
+      @Override
+      public void rejectedExecution(Runnable runnable, ThreadPoolExecutor executor) {
+        super.rejectedExecution(runnable, executor);
+        
+        logger.error("Discarded PostFile-task due to full work queue for thread pool. " + 
+                     "Data will not be sent to subscriber. No of queued tasks: " + executor.getQueue().size() + 
+                     ". No of active threads: " + executor.getActiveCount());   
+      }
+      
+    }
+    
+    /**
+     * Constructor
+     */    
+    public FramePublisher(int queueSize, int corePoolSize, int maxPoolSize) {
+      this(queueSize, corePoolSize, maxPoolSize, DEFAULT_KEEP_ALIVE_TIME);
+    }
 
     /**
      * Constructor
+     * 
+     * @param queueSize     The size of the queue to use for the thread pool executor.
+     * @param corePoolSize  The core pool size of the thread pool, i.e., the number for 
+     *                      threads that will always be available there. 
+     * @param maxPoolSize   The maximum pool size of the thread pool. Threads above the 
+     *                      core pool size will be created up to this level when the number 
+     *                      of tasks in the the thread pool queue reaches 'queueSize'.
+     * @param keepAliveTime The maximum time in seconds that excess idle threads in the pool 
+     *                      will wait for new tasks before terminating.
+     * 
      */
-    public FramePublisher() {
-        queue = new ArrayBlockingQueue<Runnable>(POOL_SIZE);
-        // use single thread to execute the tasks. We might raise the maximum 
-        // a bit, to handle concurrent transfers.
-        executor = new ThreadPoolExecutor(
-                1, 1, KEEP_ALIVE_TIME, TimeUnit.SECONDS, queue);
+    public FramePublisher(int queueSize, int corePoolSize, int maxPoolSize, int keepAliveTime) {
+        
+        this.maxPoolSize = maxPoolSize;
+        this.minPoolSize = corePoolSize;
+        
+        logger.info("Creating FramePublisher - queueSize: " + queueSize + ", corePoolSize: " + corePoolSize + ", maxPoolSize: " + maxPoolSize);
+        
+        ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(queueSize);
+
+        executor = new ThreadPoolExecutor(1, maxPoolSize, keepAliveTime, TimeUnit.SECONDS, queue);
         executor.setThreadFactory(
             new ThreadFactory() {
                 @Override
@@ -61,8 +100,9 @@ public class FramePublisher {
                 }
             });
         executor.setRejectedExecutionHandler(
-                new ThreadPoolExecutor.DiscardOldestPolicy());
+                new FrameRejectedExecutionHandler());
         executor.prestartCoreThread();
+        
     }
     
     /**
@@ -71,7 +111,36 @@ public class FramePublisher {
      * @param task Task class implementing Runnable interface
      */
     public void addTask(Runnable task) {
+        int currentPoolSize = executor.getCorePoolSize();
+        
+        int queueSize = executor.getQueue().size();
+  
+        logger.info("Adding frame publisher task. Queued tasks: " + queueSize + ". Active threads in pool: " + executor.getActiveCount() + ". Core pool size: " + currentPoolSize);
+        
+        int newPoolSize = currentPoolSize;
+        if (queueSize == 0) {
+            newPoolSize = Math.max(minPoolSize, currentPoolSize / 2);
+        } else if (queueSize >= executor.getActiveCount()) {
+            if (currentPoolSize < maxPoolSize) {
+                newPoolSize = Math.min(maxPoolSize, currentPoolSize * 2);
+            }
+        }
+        
+        if (newPoolSize != currentPoolSize) {
+            logger.info("Adjusting core pool size from " + currentPoolSize + " to " + newPoolSize);
+            executor.setCorePoolSize(newPoolSize);
+        }
+        
         executor.execute(task);
-    }  
+    }
+    
+    /**
+     * Sets the thread pool executor to use. Usable for testing purposes.
+     *
+     * @param executor The thread pool executor
+     */
+    public void setThreadPoolExecutor(ThreadPoolExecutor executor) {
+      this.executor = executor;
+    }
 }
 

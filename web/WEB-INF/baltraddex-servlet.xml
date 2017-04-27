@@ -162,13 +162,14 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="bltFileManager" 
           class="eu.baltrad.dex.db.manager.impl.BltFileManager" 
           autowire="byType"/>
-   
-    <!-- Frame publisher manager -->
-    <bean id="framePublisherManager" 
-          class="eu.baltrad.dex.net.util.FramePublisherManager"/>
-
-    <!-- Frame publisher -->
-    <bean id="framePublisher" class="eu.baltrad.dex.net.util.FramePublisher"/>
+          
+     <!-- Frame publisher manager -->     
+    <bean id="framePublisherManager"
+          class="eu.baltrad.dex.net.util.FramePublisherManager">
+        <constructor-arg index="0" value="100" /> <!-- queue size -->
+        <constructor-arg index="1" value="1" />   <!-- minimum pool size -->
+        <constructor-arg index="2" value="5" />  <!-- maximum pool size -->
+    </bean>
     
     <!-- User settings controller -->
     <bean id="userSettingsController"

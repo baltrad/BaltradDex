@@ -21,63 +21,60 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.net.protocol.ProtocolManager;
-import eu.baltrad.dex.net.protocol.RequestFactory;
-import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
-import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
-import eu.baltrad.dex.net.auth.Authenticator;
-import eu.baltrad.dex.net.request.impl.NodeRequest;
-import eu.baltrad.dex.net.response.impl.NodeResponse;
-import eu.baltrad.dex.net.util.*;
-import eu.baltrad.dex.util.MessageResourceUtil;
-import eu.baltrad.dex.net.model.impl.Subscription;
-import eu.baltrad.dex.net.manager.ISubscriptionManager;
-import eu.baltrad.dex.db.manager.IBltFileManager;
-import eu.baltrad.dex.registry.manager.IRegistryManager;
-import eu.baltrad.dex.user.manager.IUserManager;
-import eu.baltrad.dex.user.model.User;
-import eu.baltrad.dex.config.manager.IConfigurationManager;
-import eu.baltrad.dex.keystore.manager.IKeystoreManager;
-import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.datasource.model.DataSource;
-import eu.baltrad.dex.datasource.manager.IDataSourceManager;
-
-import eu.baltrad.bdb.FileCatalog;
-import eu.baltrad.bdb.db.FileEntry;
-import eu.baltrad.bdb.db.DuplicateEntry;
-import eu.baltrad.bdb.db.DatabaseError;
-import eu.baltrad.bdb.util.FileEntryNamer;
-import eu.baltrad.bdb.oh5.MetadataMatcher;
-
-import eu.baltrad.beast.message.mo.BltDataMessage;
-import eu.baltrad.beast.manager.IBltMessageManager;
-import eu.baltrad.beast.db.IFilter;
-import eu.baltrad.dex.status.manager.INodeStatusManager;
-import eu.baltrad.dex.status.model.Status;
-
 import java.io.ByteArrayOutputStream;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.keyczar.exceptions.KeyczarException;
-
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.List;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import java.io.InputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.keyczar.exceptions.KeyczarException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import eu.baltrad.bdb.FileCatalog;
+import eu.baltrad.bdb.db.DatabaseError;
+import eu.baltrad.bdb.db.DuplicateEntry;
+import eu.baltrad.bdb.db.FileEntry;
+import eu.baltrad.bdb.oh5.MetadataMatcher;
+import eu.baltrad.bdb.util.FileEntryNamer;
+import eu.baltrad.beast.db.IFilter;
+import eu.baltrad.beast.manager.IBltMessageManager;
+import eu.baltrad.beast.message.mo.BltDataMessage;
+import eu.baltrad.dex.config.manager.IConfigurationManager;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
+import eu.baltrad.dex.datasource.model.DataSource;
+import eu.baltrad.dex.db.manager.IBltFileManager;
+import eu.baltrad.dex.keystore.manager.IKeystoreManager;
+import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
+import eu.baltrad.dex.net.manager.ISubscriptionManager;
+import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.net.protocol.RequestFactory;
+import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
+import eu.baltrad.dex.net.request.impl.NodeRequest;
+import eu.baltrad.dex.net.response.impl.NodeResponse;
+import eu.baltrad.dex.net.util.FramePublisherManager;
+import eu.baltrad.dex.net.util.PostFileRedirectHandler;
+import eu.baltrad.dex.net.util.PostFileTask;
+import eu.baltrad.dex.registry.manager.IRegistryManager;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
+import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.dex.user.model.Role;
+import eu.baltrad.dex.user.model.User;
+import eu.baltrad.dex.util.MessageResourceUtil;
 
 /**
  * Receives and handles post file requests.
@@ -168,7 +165,7 @@ public class PostFileServlet extends HttpServlet {
                 is.close();
             }   
         } catch (IOException e) {
-          logger.error("Caught exception when storing file", e);
+          logger.error("Caught IOException when storing file", e);
           return null;
         }
     }
@@ -313,7 +310,7 @@ public class PostFileServlet extends HttpServlet {
         NodeResponse res = new NodeResponse(response);
         logger.debug("Request arrived using protocol version '" + req.getProtocolVersion() + "'");
         long st = System.currentTimeMillis();
-        long fileStored = 0, sentToSubscribers = 0;  
+        long fileStored = 0, sentToSubscribers = 0;
         try {
             if (authenticator.authenticate(req.getMessage(), 
                     req.getSignature(), req.getNodeName())) {
@@ -329,7 +326,8 @@ public class PostFileServlet extends HttpServlet {
                         log.info("File " + name + " stored with UUID " + entry.getUuid().toString());
                         sendMessage(entry);
                         List<Subscription> uploads = subscriptionManager.load(Subscription.PEER);
-                        sendToSubscribers(uploads, entry);   
+                        sendToSubscribers(uploads, entry);
+                        
                         sentToSubscribers = System.currentTimeMillis();
                         logger.debug("PostFile from injector: File stored after " + (fileStored-st) + " ms, finished with subscribers after " + (sentToSubscribers - st) + " ms");
                     } else {
@@ -345,6 +343,7 @@ public class PostFileServlet extends HttpServlet {
                             Status s = nodeStatusManager.load(subscriptionId);
                             s.incrementDownloads();
                             nodeStatusManager.update(s, subscriptionId);
+                            logger.debug("PostFile from peer: File stored after " + (fileStored-st) + " ms. Total time to handle post: " + (System.currentTimeMillis() - st) + " ms");
                         } else {
                             log.warn("File " + name + " with UUID " + 
                                     entry.getUuid().toString() +
