@@ -120,7 +120,7 @@ public class FramePublisherTest extends EasyMockSupport {
   public void testDecreasePoolSize_poolSize5() throws InterruptedException {
     int poolSize = 5;
     // when no of queued is 0, the pool size is decreased by 50%
-    doChangingPoolSizeTest(poolSize, 0, 1, Math.floorDiv(poolSize, 2));  
+    doChangingPoolSizeTest(poolSize, 0, 1, poolSize / 2);  
   }
   
   @Test
