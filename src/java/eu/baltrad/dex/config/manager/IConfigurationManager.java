@@ -25,8 +25,6 @@ import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.config.model.RegistryConfiguration;
 
-import java.util.Date;
-
 /**
  * Configuration manager interface.
  *

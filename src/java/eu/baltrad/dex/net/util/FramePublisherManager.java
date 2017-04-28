@@ -23,6 +23,10 @@ package eu.baltrad.dex.net.util;
 
 import java.util.HashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import eu.baltrad.dex.config.manager.IConfigurationManager;
+
 /**
  * Implements functionality allowing to assign frame publisher object to the 
  * user identified by name, allowing to access publisher tasks executed 
@@ -32,33 +36,16 @@ import java.util.HashMap;
  * @since 0.1.6
  */
 public class FramePublisherManager {
-  
-    private static final int DEFAULT_QUEUE_SIZE = 20;
-    private static final int DEFAULT_CORE_POOL_SIZE = 2;
-    private static final int DEFAULT_MAX_POOL_SIZE = 10;
 
     private static HashMap<String, FramePublisher> framePublishers;
     
-    private int queueSize;
-    private int corePoolSize;
-    private int maxPoolSize;
-
+    private IConfigurationManager confManager;
+    
     /**
      * Constructor.
      */
     public FramePublisherManager(){
-        this(DEFAULT_QUEUE_SIZE, DEFAULT_CORE_POOL_SIZE, DEFAULT_MAX_POOL_SIZE);
-    }
-    
-    /**
-     * Constructor.
-     */
-    public FramePublisherManager(int queueSize, int corePoolSize, int maxPoolSize){
         framePublishers = new HashMap<String, FramePublisher>();
-        
-        this.queueSize = queueSize;
-        this.corePoolSize = corePoolSize;
-        this.maxPoolSize = maxPoolSize;
     }
     
     /**
@@ -78,10 +65,22 @@ public class FramePublisherManager {
      */
     public synchronized FramePublisher getFramePublisher(String userName) {
         if (!framePublishers.containsKey(userName)) {
-            FramePublisher publisher = new FramePublisher(queueSize, corePoolSize, maxPoolSize);
+            int queueSize = Integer.parseInt(confManager.getAppConf().getFramePublisherQueueSize());
+            int minPoolSize = Integer.parseInt(confManager.getAppConf().getFramePublisherMinPoolSize());
+            int maxPoolSize = Integer.parseInt(confManager.getAppConf().getFramePublisherMaxPoolSize());
+            
+            FramePublisher publisher = new FramePublisher(queueSize, minPoolSize, maxPoolSize);
             framePublishers.put(userName, publisher);
         }
         return framePublishers.get(userName);
+    }
+    
+    /**
+     * @param configurationManager 
+     */
+    @Autowired
+    public void setConfigurationManager(IConfigurationManager confManager) {
+        this.confManager = confManager;
     }
 }
 

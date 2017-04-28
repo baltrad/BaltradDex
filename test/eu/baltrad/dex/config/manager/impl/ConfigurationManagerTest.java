@@ -74,6 +74,9 @@ public class ConfigurationManagerTest extends TestCase {
         props.setProperty("registry.max_age_hours", "7");
         props.setProperty("registry.max_age_minutes", "16");
         props.setProperty("keystore.directory", "keystore");
+        props.setProperty("framepublisher.min_poolsize", "1");
+        props.setProperty("framepublisher.max_poolsize", "5");
+        props.setProperty("framepublisher.queuesize", "100");
         
         this.appConf = new AppConfiguration(props);
         this.logConf = new LogConfiguration(props);

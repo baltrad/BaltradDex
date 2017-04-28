@@ -48,6 +48,9 @@ public class AppConfiguration {
     public static final String VERSION = "software.version";
     public static final String SO_TIMEOUT = "socket.timeout";
     public static final String CONN_TIMEOUT = "connection.timeout";
+    public static final String FRAMEPUBLISHER_MIN_POOL_SIZE = "framepublisher.min_poolsize";
+    public static final String FRAMEPUBLISHER_MAX_POOL_SIZE = "framepublisher.max_poolsize";
+    public static final String FRAMEPUBLISHER_QUEUE_SIZE = "framepublisher.queuesize";
     
     private String nodeName;
     private String nodeAddress;
@@ -65,6 +68,12 @@ public class AppConfiguration {
     private String version;
     private String soTimeout;
     private String connTimeout;
+    /**
+     * 
+     */
+    private String framePublisherMinPoolSize;
+    private String framePublisherMaxPoolSize;
+    private String framePublisherQueueSize;
     
     /**
      * Default constructor.
@@ -92,6 +101,9 @@ public class AppConfiguration {
         this.version = props.getProperty(VERSION);
         this.soTimeout = props.getProperty(SO_TIMEOUT);
         this.connTimeout = props.getProperty(CONN_TIMEOUT);
+        this.framePublisherMinPoolSize = props.getProperty(FRAMEPUBLISHER_MIN_POOL_SIZE);
+        this.framePublisherMaxPoolSize = props.getProperty(FRAMEPUBLISHER_MAX_POOL_SIZE);
+        this.framePublisherQueueSize = props.getProperty(FRAMEPUBLISHER_QUEUE_SIZE);
     }
 
     /**
@@ -393,6 +405,48 @@ public class AppConfiguration {
      */
     public void setConnTimeout(String connTimeout) {
         this.connTimeout = connTimeout;
+    }
+
+    /**
+     * @return the framePublisherMinPoolSize
+     */
+    public String getFramePublisherMinPoolSize() {
+      return framePublisherMinPoolSize;
+    }
+
+    /**
+     * @param framePublisherMinPoolSize the framePublisherMinPoolSize to set
+     */
+    public void setFramePublisherMinPoolSize(String framePublisherMinPoolSize) {
+      this.framePublisherMinPoolSize = framePublisherMinPoolSize;
+    }
+
+    /**
+     * @return the framePublisherMaxPoolSize
+     */
+    public String getFramePublisherMaxPoolSize() {
+      return framePublisherMaxPoolSize;
+    }
+
+    /**
+     * @param framePublisherMaxPoolSize the framePublisherMaxPoolSize to set
+     */
+    public void setFramePublisherMaxPoolSize(String framePublisherMaxPoolSize) {
+      this.framePublisherMaxPoolSize = framePublisherMaxPoolSize;
+    }
+
+    /**
+     * @return the framePublisherQueueSize
+     */
+    public String getFramePublisherQueueSize() {
+      return framePublisherQueueSize;
+    }
+
+    /**
+     * @param framePublisherQueueSize the framePublisherQueueSize to set
+     */
+    public void setFramePublisherQueueSize(String framePublisherQueueSize) {
+      this.framePublisherQueueSize = framePublisherQueueSize;
     }
 }
 
