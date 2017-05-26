@@ -331,6 +331,14 @@ Modify a composite route
                             </div>
                         </div>
                         <div class="row2">
+                            <div class="leftcol">Reprocess QCs:</div>
+                            <div class="rightcol">
+                                <input type="checkbox" name="reprocess_quality" 
+                                       title="Check to select quality controls are always reporcessed, even if already included in source."
+                                       <c:if test="${reprocess_quality == true}">checked</c:if> />
+                            </div>        
+                        </div>
+                        <div class="row2">
                             <div class="bdb-filter-text">
                                 Select filter parameters
                             </div> 
