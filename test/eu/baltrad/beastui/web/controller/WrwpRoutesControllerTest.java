@@ -46,7 +46,7 @@ public class WrwpRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
 
-    classUnderTest.createRule(5, 10, 55, 333, 1.5, 2.5, sources);
+    classUnderTest.createRule(5, 10, 55, 333, 1.5, 2.5, sources, null);
     
     verifyAll();
   }

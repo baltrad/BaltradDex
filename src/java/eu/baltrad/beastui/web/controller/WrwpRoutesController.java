@@ -1,10 +1,12 @@
 package eu.baltrad.beastui.web.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
 import eu.baltrad.beast.rules.util.IRuleUtilities;
@@ -43,6 +46,11 @@ public class WrwpRoutesController {
    * The logger
    */
   private static Logger logger = LogManager.getLogger(WrwpRoutesController.class);
+  
+  /**
+   * The translator from string to json and vice versa
+   */
+  private ObjectMapper jsonMapper = new ObjectMapper();
   
   /**
    * @param manager the manager to set
@@ -99,7 +107,8 @@ public class WrwpRoutesController {
     @RequestParam(value = "minelangle", required = false) Double minelangle,
     @RequestParam(value = "minvelocitythreshold", required = false) Double minvelocitythreshold,
     @RequestParam(value = "recipients", required = false) List<String> recipients,
-    @RequestParam(value = "sources", required = false) List<String> sources) {
+    @RequestParam(value = "sources", required = false) List<String> sources,
+    @RequestParam(value = "filterJson", required=false) String filterJson) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     String emessage = null;
   
@@ -117,7 +126,7 @@ public class WrwpRoutesController {
       logger.info("Everything is null");
       return viewCreateRoute(model, name, author, active, description,
                 interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold,
-                recipients, sources, null);
+                recipients, sources, filterJson, null);
     }
     
     if (name == null || name.trim().equals("")) {
@@ -137,7 +146,7 @@ public class WrwpRoutesController {
         int imaxdistance = (maxdistance == null) ? 40000 : maxdistance.intValue();
         double dminelangle = (minelangle == null) ? 2.5 : minelangle.doubleValue();
         double dminvelocity = (minvelocitythreshold == null) ? 2.0 : minvelocitythreshold.doubleValue();
-        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dminvelocity, sources);
+        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dminvelocity, sources, filterJson);
         RouteDefinition def = manager.create(name, author, bactive, description, recipients, rule);
         manager.storeDefinition(def);
         return "redirect:routes.htm";
@@ -149,7 +158,7 @@ public class WrwpRoutesController {
 
     return viewCreateRoute(model, name, author, active, description,
         interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold,
-        recipients, sources, emessage);
+        recipients, sources, filterJson, emessage);
   }
   
   /**
@@ -183,13 +192,14 @@ public class WrwpRoutesController {
       @RequestParam(value = "minvelocitythreshold", required = false) Double minvelocitythreshold,
       @RequestParam(value = "recipients", required = false) List<String> recipients,
       @RequestParam(value = "sources", required = false) List<String> sources,
+      @RequestParam(value = "filterJson", required = false) String filterJson,
       @RequestParam(value = "submitButton", required = false) String operation) {
     RouteDefinition def = manager.getDefinition(name);
     if (def == null) {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
     if (operation != null && operation.equals("Save")) {
-      return modifyRoute(model, name, author, active, description, interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, recipients, sources);
+      return modifyRoute(model, name, author, active, description, interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, recipients, sources, filterJson);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -200,9 +210,19 @@ public class WrwpRoutesController {
     } else {
       if (def.getRule() instanceof WrwpRule) {
         WrwpRule vrule = (WrwpRule)def.getRule();
+        
+        String filterstr = null;
+        if (vrule.getFilter() != null) {
+          try {
+            filterstr = jsonMapper.writeValueAsString(vrule.getFilter());
+          } catch (IOException e) {
+            logger.error("failed to create JSON string from filter", e);
+          }
+        }
+        
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             vrule.getInterval(), vrule.getMaxheight(), vrule.getMindistance(), vrule.getMaxdistance(), 
-            vrule.getMinelevationangle(), vrule.getMinvelocitythreshold(), def.getRecipients(), vrule.getSources(), null);
+            vrule.getMinelevationangle(), vrule.getMinvelocitythreshold(), def.getRecipients(), vrule.getSources(), filterstr, null);
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a wrwp rule");
       }
@@ -239,7 +259,8 @@ public class WrwpRoutesController {
       Double minelangle, 
       Double minvelocitythreshold, 
       List<String> recipients, 
-      List<String> sources) {
+      List<String> sources, 
+      String jsonFilter) {
     List<String> newrecipients = (recipients == null) ? new ArrayList<String>() : recipients;
     List<String> newsources = (sources == null) ? new ArrayList<String>() : sources;
     boolean isactive = (active != null) ? active.booleanValue() : false;
@@ -259,7 +280,7 @@ public class WrwpRoutesController {
     
     if (emessage == null) {
       try {
-        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dminvelocity, newsources);
+        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dminvelocity, newsources, jsonFilter);
         RouteDefinition def = manager.create(name, author, isactive, description, newrecipients, rule);
         manager.updateDefinition(def);
         return "redirect:routes.htm";
@@ -270,7 +291,7 @@ public class WrwpRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, recipients, newsources, emessage);
+        interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, recipients, newsources, jsonFilter, emessage);
   }
   
   /**
@@ -304,7 +325,8 @@ public class WrwpRoutesController {
       Double minelangle, 
       Double minvelocitythreshold,
       List<String> recipients, 
-      List<String> sources, 
+      List<String> sources,
+      String jsonFilter,
       String emessage) {
     return viewJspRoute(
         model,
@@ -320,6 +342,7 @@ public class WrwpRoutesController {
         minvelocitythreshold,
         recipients,
         sources,
+        jsonFilter,
         emessage,
         "route_create_wrwp");    
   }
@@ -355,7 +378,8 @@ public class WrwpRoutesController {
       Double minelangle, 
       Double minvelocitythreshold,
       List<String> recipients, 
-      List<String> sources, 
+      List<String> sources,
+      String filterJson,
       String emessage) {
     return viewJspRoute(
         model,
@@ -371,6 +395,7 @@ public class WrwpRoutesController {
         minvelocitythreshold,
         recipients,
         sources,
+        filterJson,
         emessage,
         "route_show_wrwp");
   }
@@ -407,7 +432,8 @@ public class WrwpRoutesController {
       Double minelangle, 
       Double minvelocitythreshold,
       List<String> recipients, 
-      List<String> sources, 
+      List<String> sources,
+      String jsonFilter,
       String emessage,
       String jsppage) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
@@ -427,9 +453,15 @@ public class WrwpRoutesController {
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("adaptors", adaptors);
     model.addAttribute("sourceids", utilities.getRadarSources());
+    
+    if (jsonFilter != null && !jsonFilter.equals("")) {
+      model.addAttribute("filterJson", jsonFilter);
+    }
+    
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
     }
+    
     return jsppage;
   }
   
@@ -460,7 +492,7 @@ public class WrwpRoutesController {
    * @param velocitythreshold
    * @return the wrwp rule
    */
-  protected WrwpRule createRule(int interval, int maxheight, int mindistance, int maxdistance, double elangle, double velocitythreshold, List<String> sources) {
+  protected WrwpRule createRule(int interval, int maxheight, int mindistance, int maxdistance, double elangle, double velocitythreshold, List<String> sources, String jsonFilter) {
     WrwpRule rule = (WrwpRule)manager.createRule(WrwpRule.TYPE);
     rule.setInterval(interval);
     rule.setMaxheight(maxheight);
@@ -469,6 +501,13 @@ public class WrwpRoutesController {
     rule.setMinelevationangle(elangle);
     rule.setMinvelocitythreshold(velocitythreshold);
     rule.setSources(sources);
+    if (jsonFilter != null && !jsonFilter.equals("")) {
+      try {
+        rule.setFilter(jsonMapper.readValue(jsonFilter, IFilter.class));
+      } catch (Exception e) {
+        logger.error("Failed to translate json to filter", e);
+      }
+    }
     return rule;
   }
 }
