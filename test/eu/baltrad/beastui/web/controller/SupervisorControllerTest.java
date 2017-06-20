@@ -276,7 +276,7 @@ public class SupervisorControllerTest extends EasyMockSupport {
     String result = classUnderTest.createValueString("a.status", "s1", "a1", "o1", "10", optionals);
     
     verifyAll();
-    assertEquals("sources=s1&minutes=10&where/elangle=1.0&how/malfunc=True", result);
+    assertTrue (result.equals("sources=s1&minutes=10&where/elangle=1.0&how/malfunc=True") || result.equals("sources=s1&minutes=10&how/malfunc=True&where/elangle=1.0"));
   }
   
   @Test
