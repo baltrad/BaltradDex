@@ -266,7 +266,7 @@ public class SupervisorControllerTest extends EasyMockSupport {
     Set<String> supset = new HashSet<String>();
     supset.add("sources");
     supset.add("minutes");
-    Map<String, String> optionals = new HashMap<>();
+    Map<String, String> optionals = new HashMap<String,String>();
     optionals.put("where/elangle", "1.0");
     optionals.put("how/malfunc", "True");
     expect(supervisor.getSupportedAttributes("a.status")).andReturn(supset);
@@ -288,7 +288,7 @@ public class SupervisorControllerTest extends EasyMockSupport {
     supset.add("sources");
     supset.add("areas");
     supset.add("minutes");
-    Map<String, String> optionals = new HashMap<>();
+    Map<String, String> optionals = new HashMap<String,String>();
 
     expect(supervisor.getSupportedAttributes("a.status")).andReturn(supset);
     
