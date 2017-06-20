@@ -18,6 +18,8 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 ------------------------------------------------------------------------*/
 package eu.baltrad.beastui.web.controller;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -188,11 +190,28 @@ public class SupervisorController {
         reportersstr = "bdb.status,db.status"; // The minimum information the user should get
       }
       String[] reporters = reportersstr.split(",");
+      
       Map<String, Object> values = createMap(sources, areas, objects, minutes);
+
+      // Add dynamic attributes from the odim information model that resides in what,where and how.
+      //
+      Enumeration<String> names = request.getParameterNames();
+      Map<String, String> optional = new HashMap<String,String>();
+      
+      while (names.hasMoreElements()) {
+        String n = names.nextElement();
+        String lcn = n.toLowerCase();
+        if (lcn.startsWith("where/") || lcn.startsWith("what/") || lcn.startsWith("how/")) {
+          String v = request.getParameter(n);
+          optional.put(lcn, v);
+          values.put(lcn,  v);
+        }
+        logger.info("Parameter name (" + n + ") = " + request.getParameter(n));
+      }
       
       for (String s : reporters) {
         String str = s.trim();
-        String statusvalue = createValueString(str, sources, areas, objects, minutes);
+        String statusvalue = createValueString(str, sources, areas, objects, minutes, optional);
         if (supervisor.supportsMappableStatus(str)) {
           generator.add(str, supervisor.getMappedStatus(str, values).get(str));
         } else {
@@ -247,7 +266,7 @@ public class SupervisorController {
    * @param minutes the minutes if any
    * @return the string
    */
-  protected String createValueString(String reporter, String sources, String areas, String objects, String minutes) {
+  protected String createValueString(String reporter, String sources, String areas, String objects, String minutes, Map<String, String> optional) {
     StringBuffer vbuf = new StringBuffer();
     Set<String> attrs = supervisor.getSupportedAttributes(reporter);
     if (attrs != null) {
@@ -271,6 +290,14 @@ public class SupervisorController {
           vbuf.append("&");
         }
         vbuf.append("minutes=").append(minutes);
+      }
+      for (String v : optional.keySet()) {
+        if (optional.get(v) != null) {
+          if (vbuf.length() > 0) {
+            vbuf.append("&");
+          }
+          vbuf.append(v + "=" + optional.get(v));
+        }
       }
     }
     return vbuf.toString();

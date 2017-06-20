@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,7 +32,7 @@ public class SupervisorControllerTest extends EasyMockSupport {
     public XmlSystemStatusGenerator getXmlGenerator();
     public boolean isAuthorized(HttpServletRequest request);
     public Map<String, Object> createMap(String sources, String areas, String objects, String minutes);
-    public String createValueString(String reporter, String sources, String areas, String objects, String minutes);
+    public String createValueString(String reporter, String sources, String areas, String objects, String minutes, Map<String, String> optional);
   }
   private SupervisorController classUnderTest = null;
   private ISystemSupervisor supervisor = null;
@@ -45,17 +46,21 @@ public class SupervisorControllerTest extends EasyMockSupport {
   @Before
   public void setUp() throws Exception {
     classUnderTest = new SupervisorController() {
+      @Override
       protected XmlSystemStatusGenerator getXmlGenerator() {
         return methods.getXmlGenerator();
       }
+      @Override
       protected boolean isAuthorized(HttpServletRequest request) {
         return methods.isAuthorized(request);
       }
+      @Override
       protected Map<String, Object> createMap(String sources, String areas, String objects, String minutes) {
         return methods.createMap(sources, areas, objects, minutes);
       }
-      protected String createValueString(String reporter, String sources, String areas, String objects, String minutes) {
-        return methods.createValueString(reporter, sources, areas, objects, minutes);
+      @Override
+      protected String createValueString(String reporter, String sources, String areas, String objects, String minutes, Map<String, String> optional) {
+        return methods.createValueString(reporter, sources, areas, objects, minutes, optional);
       }
     };
     supervisor = createMock(ISystemSupervisor.class);
@@ -181,15 +186,19 @@ public class SupervisorControllerTest extends EasyMockSupport {
     Set<SystemStatus> status = EnumSet.of(SystemStatus.OK);
     ServletOutputStream sos = createMock(ServletOutputStream.class);
     Map<String,Object> valuemap = new HashMap<String, Object>();
+    Enumeration<String> namesEnum = createMock(Enumeration.class);
     
     expect(methods.getXmlGenerator()).andReturn(generator);
     expect(methods.isAuthorized(request)).andReturn(true);
     expect(methods.createMap("s1,s2", "a1,a2", "o1,o2", "5")).andReturn(valuemap);
-    expect(methods.createValueString("r1","s1,s2", "a1,a2", "o1,o2", "5")).andReturn("cvs1");
+    expect(request.getParameterNames()).andReturn(namesEnum);
+    expect(namesEnum.hasMoreElements()).andReturn(false);
+    
+    expect(methods.createValueString("r1","s1,s2", "a1,a2", "o1,o2", "5", new HashMap<String,String>())).andReturn("cvs1");
     expect(supervisor.supportsMappableStatus("r1")).andReturn(false);
     expect(supervisor.getStatus("r1", valuemap)).andReturn(status);
     generator.add("r1", "cvs1", status);
-    expect(methods.createValueString("r2","s1,s2", "a1,a2", "o1,o2", "5")).andReturn("cvs2");
+    expect(methods.createValueString("r2","s1,s2", "a1,a2", "o1,o2", "5", new HashMap<String,String>())).andReturn("cvs2");
     expect(supervisor.supportsMappableStatus("r2")).andReturn(false);
     expect(supervisor.getStatus("r2", valuemap)).andReturn(status);
     generator.add("r2", "cvs2", status);
@@ -210,15 +219,18 @@ public class SupervisorControllerTest extends EasyMockSupport {
     Set<SystemStatus> status = EnumSet.of(SystemStatus.OK);
     ServletOutputStream sos = createMock(ServletOutputStream.class);
     Map<String,Object> valuemap = new HashMap<String, Object>();
+    Enumeration<String> namesEnum = createMock(Enumeration.class);
     
     expect(methods.getXmlGenerator()).andReturn(generator);
     expect(methods.isAuthorized(request)).andReturn(true);
     expect(methods.createMap(null, null, null, null)).andReturn(valuemap);
-    expect(methods.createValueString("db.status",null, null, null, null)).andReturn("cvs1");
+    expect(request.getParameterNames()).andReturn(namesEnum);
+    expect(namesEnum.hasMoreElements()).andReturn(false);
+    expect(methods.createValueString("db.status",null, null, null, null, new HashMap<String,String>())).andReturn("cvs1");
     expect(supervisor.supportsMappableStatus("db.status")).andReturn(false);
     expect(supervisor.getStatus("db.status", valuemap)).andReturn(status);
     generator.add("db.status", "cvs1", status);
-    expect(methods.createValueString("bdb.status",null, null, null, null)).andReturn("cvs2");
+    expect(methods.createValueString("bdb.status",null, null, null, null, new HashMap<String,String>())).andReturn("cvs2");
     expect(supervisor.supportsMappableStatus("bdb.status")).andReturn(false);
     expect(supervisor.getStatus("bdb.status", valuemap)).andReturn(status);
     generator.add("bdb.status", "cvs2", status);
@@ -254,15 +266,17 @@ public class SupervisorControllerTest extends EasyMockSupport {
     Set<String> supset = new HashSet<String>();
     supset.add("sources");
     supset.add("minutes");
-    
+    Map<String, String> optionals = new HashMap<>();
+    optionals.put("where/elangle", "1.0");
+    optionals.put("how/malfunc", "True");
     expect(supervisor.getSupportedAttributes("a.status")).andReturn(supset);
     
     replayAll();
     
-    String result = classUnderTest.createValueString("a.status", "s1", "a1", "o1", "10");
+    String result = classUnderTest.createValueString("a.status", "s1", "a1", "o1", "10", optionals);
     
     verifyAll();
-    assertEquals("sources=s1&minutes=10", result);
+    assertEquals("sources=s1&minutes=10&where/elangle=1.0&how/malfunc=True", result);
   }
   
   @Test
@@ -274,12 +288,13 @@ public class SupervisorControllerTest extends EasyMockSupport {
     supset.add("sources");
     supset.add("areas");
     supset.add("minutes");
-    
+    Map<String, String> optionals = new HashMap<>();
+
     expect(supervisor.getSupportedAttributes("a.status")).andReturn(supset);
     
     replayAll();
     
-    String result = classUnderTest.createValueString("a.status", "s1", "a1", "o1", "10");
+    String result = classUnderTest.createValueString("a.status", "s1", "a1", "o1", "10", optionals);
     
     verifyAll();
     assertEquals("sources=s1&areas=a1&minutes=10", result);
