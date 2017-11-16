@@ -55,7 +55,7 @@ public class WrwpRoutesController {
   /**
    * Available fields
    */
-  private List<String> availableFields = new ArrayList<>();
+  private List<String> availableFields = new ArrayList<String>();
   
   /**
    * @param manager the manager to set
