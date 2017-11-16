@@ -33,20 +33,23 @@ public class WrwpRoutesControllerTest extends EasyMockSupport {
   @Test
   public void test_createRule() {
     List<String> sources = new ArrayList<String>();
+    List<String> fields = new ArrayList<String>();
     WrwpRule rule = createMock(WrwpRule.class);
 
     expect(manager.createRule("blt_wrwp")).andReturn(rule);
+    
     rule.setInterval(5);
     rule.setMaxheight(10);
     rule.setMindistance(55);
     rule.setMaxdistance(333);
     rule.setMinelevationangle(1.5);
     rule.setMinvelocitythreshold(2.5);
+    expect(rule.setFields((List<String>)fields)).andReturn(true);
     rule.setSources(sources);
     
     replayAll();
 
-    classUnderTest.createRule(5, 10, 55, 333, 1.5, 2.5, sources, null);
+    classUnderTest.createRule(5, 10, 55, 333, 1.5, 2.5, fields, sources, null);
     
     verifyAll();
   }

@@ -161,7 +161,25 @@ Modify or delete a wrwp route
                                 <input type="text" name="minvelocitythreshold" value="${minvelocitythreshold}"
                                        title="Radial velocity threshold [m/s]"/>
                             </div>
-                        </div>         
+                        </div>
+                        <div class="row2">
+                            <div class="leftcol">Fields:</div>
+                            <div class="rightcol">
+                                <select id="fields" multiple size="4" 
+                                        name="fields" 
+                                        title="Select fields">
+                                    <c:forEach var="available_field" items="${available_fields}">
+                                        <c:set var="field_selected" value="false" />
+                                        <c:forEach var="field" items="${fields}">
+                                            <c:if test="${field eq available_field}">
+                                                <c:set var="field_selected" value="true" />
+                                            </c:if>
+                                        </c:forEach>
+                                        <option value="${available_field}" <c:if test="${field_selected}">selected</c:if> >${available_field}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                        </div>                              
                         <div class="row2">
                             <div class="leftcol">Recipients:</div>
                             <div class="rightcol">

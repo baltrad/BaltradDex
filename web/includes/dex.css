@@ -2226,6 +2226,9 @@ textarea {
 .routes .rightcol select#recipients {
     height: 80px;
 }
+.routes .rightcol select#fields {
+    height: 80px;
+}
 .routes .rightcol textarea {
     width: 497px;
     height: 400px;

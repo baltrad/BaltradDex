@@ -53,6 +53,11 @@ public class WrwpRoutesController {
   private ObjectMapper jsonMapper = new ObjectMapper();
   
   /**
+   * Available fields
+   */
+  private List<String> availableFields = new ArrayList<>();
+  
+  /**
    * @param manager the manager to set
    */
   @Autowired
@@ -74,6 +79,15 @@ public class WrwpRoutesController {
   @Autowired
   public void setRuleUtilities(IRuleUtilities utils) {
     this.utilities = utils;
+  }
+  
+  /**
+   * @param fields the available fields
+   */
+  @Autowired
+  public void setAvailableFields(List<String> fields) {
+    logger.info("Setting available fields");
+    this.availableFields = fields;
   }
   
   /**
@@ -106,6 +120,7 @@ public class WrwpRoutesController {
     @RequestParam(value = "maxdistance", required = false) Integer maxdistance,
     @RequestParam(value = "minelangle", required = false) Double minelangle,
     @RequestParam(value = "minvelocitythreshold", required = false) Double minvelocitythreshold,
+    @RequestParam(value = "fields", required = false) List<String> fields,
     @RequestParam(value = "recipients", required = false) List<String> recipients,
     @RequestParam(value = "sources", required = false) List<String> sources,
     @RequestParam(value = "filterJson", required=false) String filterJson) {
@@ -122,10 +137,10 @@ public class WrwpRoutesController {
   
     if (name == null && author == null && active == null && description == null &&
         interval == null && maxheight == null && mindistance == null && maxdistance == null &&
-        minelangle == null && minvelocitythreshold == null && recipients == null && sources == null) {
+        minelangle == null && minvelocitythreshold == null && recipients == null && sources == null && fields == null) {
       logger.info("Everything is null");
       return viewCreateRoute(model, name, author, active, description,
-                interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold,
+                interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, fields,
                 recipients, sources, filterJson, null);
     }
     
@@ -146,7 +161,7 @@ public class WrwpRoutesController {
         int imaxdistance = (maxdistance == null) ? 40000 : maxdistance.intValue();
         double dminelangle = (minelangle == null) ? 2.5 : minelangle.doubleValue();
         double dminvelocity = (minvelocitythreshold == null) ? 2.0 : minvelocitythreshold.doubleValue();
-        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dminvelocity, sources, filterJson);
+        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dminvelocity, fields, sources, filterJson);
         RouteDefinition def = manager.create(name, author, bactive, description, recipients, rule);
         manager.storeDefinition(def);
         return "redirect:routes.htm";
@@ -157,7 +172,7 @@ public class WrwpRoutesController {
     }
 
     return viewCreateRoute(model, name, author, active, description,
-        interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold,
+        interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, fields,
         recipients, sources, filterJson, emessage);
   }
   
@@ -190,6 +205,7 @@ public class WrwpRoutesController {
       @RequestParam(value = "maxdistance", required = false) Integer maxdistance,
       @RequestParam(value = "minelangle", required = false) Double minelangle,
       @RequestParam(value = "minvelocitythreshold", required = false) Double minvelocitythreshold,
+      @RequestParam(value = "fields", required = false) List<String> fields,
       @RequestParam(value = "recipients", required = false) List<String> recipients,
       @RequestParam(value = "sources", required = false) List<String> sources,
       @RequestParam(value = "filterJson", required = false) String filterJson,
@@ -199,7 +215,7 @@ public class WrwpRoutesController {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
     if (operation != null && operation.equals("Save")) {
-      return modifyRoute(model, name, author, active, description, interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, recipients, sources, filterJson);
+      return modifyRoute(model, name, author, active, description, interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, fields, recipients, sources, filterJson);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -222,7 +238,7 @@ public class WrwpRoutesController {
         
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             vrule.getInterval(), vrule.getMaxheight(), vrule.getMindistance(), vrule.getMaxdistance(), 
-            vrule.getMinelevationangle(), vrule.getMinvelocitythreshold(), def.getRecipients(), vrule.getSources(), filterstr, null);
+            vrule.getMinelevationangle(), vrule.getMinvelocitythreshold(), vrule.getFields(), def.getRecipients(), vrule.getSources(), filterstr, null);
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a wrwp rule");
       }
@@ -258,11 +274,13 @@ public class WrwpRoutesController {
       Integer maxdistance, 
       Double minelangle, 
       Double minvelocitythreshold, 
+      List<String> fields,
       List<String> recipients, 
       List<String> sources, 
       String jsonFilter) {
     List<String> newrecipients = (recipients == null) ? new ArrayList<String>() : recipients;
     List<String> newsources = (sources == null) ? new ArrayList<String>() : sources;
+    List<String> newfields = (fields == null) ? new ArrayList<String>() : fields;
     boolean isactive = (active != null) ? active.booleanValue() : false;
     int iinterval = (interval != null) ? interval.intValue() : 200;
     int imaxheight = (maxheight != null) ? maxheight.intValue() : 12000;
@@ -280,7 +298,7 @@ public class WrwpRoutesController {
     
     if (emessage == null) {
       try {
-        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dminvelocity, newsources, jsonFilter);
+        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dminvelocity, newfields, newsources, jsonFilter);
         RouteDefinition def = manager.create(name, author, isactive, description, newrecipients, rule);
         manager.updateDefinition(def);
         return "redirect:routes.htm";
@@ -291,7 +309,7 @@ public class WrwpRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, recipients, newsources, jsonFilter, emessage);
+        interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, newfields, recipients, newsources, jsonFilter, emessage);
   }
   
   /**
@@ -324,6 +342,7 @@ public class WrwpRoutesController {
       Integer maxdistance, 
       Double minelangle, 
       Double minvelocitythreshold,
+      List<String> fields,
       List<String> recipients, 
       List<String> sources,
       String jsonFilter,
@@ -340,6 +359,7 @@ public class WrwpRoutesController {
         maxdistance,
         minelangle,
         minvelocitythreshold,
+        fields,
         recipients,
         sources,
         jsonFilter,
@@ -377,6 +397,7 @@ public class WrwpRoutesController {
       Integer maxdistance, 
       Double minelangle, 
       Double minvelocitythreshold,
+      List<String> fields,
       List<String> recipients, 
       List<String> sources,
       String filterJson,
@@ -393,6 +414,7 @@ public class WrwpRoutesController {
         maxdistance,
         minelangle,
         minvelocitythreshold,
+        fields,
         recipients,
         sources,
         filterJson,
@@ -431,6 +453,7 @@ public class WrwpRoutesController {
       Integer maxdistance, 
       Double minelangle, 
       Double minvelocitythreshold,
+      List<String> fields,
       List<String> recipients, 
       List<String> sources,
       String jsonFilter,
@@ -447,12 +470,15 @@ public class WrwpRoutesController {
     model.addAttribute("maxdistance", (maxdistance == null) ? new Integer(40000) : maxdistance);
     model.addAttribute("minelangle", (minelangle == null) ? new Double(2.5) : minelangle);
     model.addAttribute("minvelocitythreshold", (minvelocitythreshold == null) ? new Double(2.0) : minvelocitythreshold);
+    model.addAttribute("fields", (fields==null) ? new ArrayList<String>() : fields);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("adaptors", adaptors);
     model.addAttribute("sourceids", utilities.getRadarSources());
+    logger.info("Setting available_fields in model: " + availableFields.size());
+    model.addAttribute("available_fields", availableFields);
     
     if (jsonFilter != null && !jsonFilter.equals("")) {
       model.addAttribute("filterJson", jsonFilter);
@@ -492,7 +518,7 @@ public class WrwpRoutesController {
    * @param velocitythreshold
    * @return the wrwp rule
    */
-  protected WrwpRule createRule(int interval, int maxheight, int mindistance, int maxdistance, double elangle, double velocitythreshold, List<String> sources, String jsonFilter) {
+  protected WrwpRule createRule(int interval, int maxheight, int mindistance, int maxdistance, double elangle, double velocitythreshold, List<String> fields, List<String> sources, String jsonFilter) {
     WrwpRule rule = (WrwpRule)manager.createRule(WrwpRule.TYPE);
     rule.setInterval(interval);
     rule.setMaxheight(maxheight);
@@ -500,7 +526,9 @@ public class WrwpRoutesController {
     rule.setMaxdistance(maxdistance);
     rule.setMinelevationangle(elangle);
     rule.setMinvelocitythreshold(velocitythreshold);
+    rule.setFields(fields);
     rule.setSources(sources);
+    
     if (jsonFilter != null && !jsonFilter.equals("")) {
       try {
         rule.setFilter(jsonMapper.readValue(jsonFilter, IFilter.class));
