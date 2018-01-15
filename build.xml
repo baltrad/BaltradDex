@@ -230,7 +230,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="*.jar"/>
       </fileset>
       <fileset dir="lib">
-        <include name="postgresql-8.4-701.jdbc4.jar"/> 
+        <include name="postgresql-42.1.4.jre6.jar"/> 
         <include name="apache-mime4j-0.6.jar"/>
       </fileset>
       <!-- Also, include neccesary libs from beast-lib -->
