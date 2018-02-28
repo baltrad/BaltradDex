@@ -245,7 +245,15 @@ Creates a composite route
                                        title="Check to select that nominal time should be used as beginning of timeout period"
                                        <c:if test="${nominal_timeout == true}">checked</c:if> />
                             </div>        
-                        </div>                         
+                        </div>
+                        <div class="row2">
+                            <div class="leftcol">Max age limit:</div>
+                            <div class="rightcol">
+                                <input type="text" name="max_age_limit" 
+                                       value="${max_age_limit}"
+                                       title="Maximum age for incoming data, in minutes."/>
+                            </div>        
+                        </div>                        
                         <div class="row2">
                             <div class="leftcol">Apply GRA:</div>
                             <div class="rightcol">
