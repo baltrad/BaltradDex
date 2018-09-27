@@ -21,6 +21,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 <project name="BaltradDex" basedir="." default="dist">
   <description>Builds and deploys BaltradDex application</description>
   <property name="app.name" value="BaltradDex | Data Exchange System"/>
+  <property name="app.dist.dir.name" value="BaltradDex" />
   <property name="root.dir" value="${basedir}"/>
   <property name="script.dir" value="${root.dir}/script"/>
   <property name="lib.dir" value="lib"/>
@@ -64,8 +65,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <!-- Specify jksfile on command line and we will use that file -->
 
   <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
+  <property name="baltrad.db.java.path" value="${baltrad.db.path}/share/baltrad-bdb/java" />
   <property name="beast.path" value="/opt/baltrad/beast" />
-  <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java"/>
+  <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java/lib"/>
 
   <!-- Configure ant tasks for tomcat deployment -->
   <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"
@@ -97,10 +99,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   
   <!-- initialize dependent library path -->
   <path id="dep.lib.path">
-    <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java">
+    <fileset dir="${baltrad.db.java.path}">
         <include name="baltrad-bdb-client.jar"/>
     </fileset>
-    <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java/libs">
+    <fileset dir="${baltrad.db.java.path}/libs">
         <include name="*.jar"/>
     </fileset>
     <fileset dir="${beast.path}/bin">
@@ -109,8 +111,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fileset dir="${beast.path}/libs">
         <include name="*.jar"/>
     </fileset>
-    <fileset dir="${javahdf.path}/lib">
-        <include name="*.jar"/>
+    <fileset dir="${javahdf.path}">
+        <include name="jhdf*.jar"/>
     </fileset>
   </path>     
 
@@ -145,11 +147,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 	
 <!-- separate target for dependency check -->
 <target name="dep-check">
-    <available file="${baltrad.db.path}/share/baltrad-bdb/java/baltrad-bdb-client.jar" 
+    <available file="${baltrad.db.java.path}/baltrad-bdb-client.jar" 
              property="baltrad-bdb-client.jar.available" />
     <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
     <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
-    <available file="${javahdf.path}/lib/jhdf5.jar" property="javahdf.lib.available"/>
+    <available file="${javahdf.path}/jhdf5.jar" property="javahdf.lib.available"/>
 
     <fail unless="baltrad-bdb-client.jar.available" 
             message="baltrad.db.path must specify the installation dir of baltrad-db" />
@@ -158,7 +160,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fail unless="beast.libs.available" 
             message="beast.path must specify the installation dir of beast" />
     <fail unless="javahdf.lib.available" 
-            message="javahdf.path must specify the installation dir of hdf-java" />   
+            message="javahdf.path must specify the library installation dir of hdf-java" />
 </target>        
 
 <target name="init" depends="dep-check">
@@ -259,11 +261,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="${beast.path}/bin">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java/libs">
+      <fileset dir="${baltrad.db.java.path}/libs">
         <include name="commons-lang3-3.1.jar"/>
 	<include name="joda-time-2.0.jar"/>
       </fileset>
-      <fileset dir="${baltrad.db.path}/share/baltrad-bdb/java/">
+      <fileset dir="${baltrad.db.java.path}/">
         <include name="*.jar"/>
       </fileset>
     </copy>
@@ -352,15 +354,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
   <!-- installs BaltradDex as library -->
   <target name="install" depends="dist">
-    <mkdir dir="${install.prefix}/BaltradDex"/>
-    <mkdir dir="${install.prefix}/BaltradDex/sql"/>
-    <mkdir dir="${install.prefix}/BaltradDex/bin"/>
-    <copy todir="${install.prefix}/BaltradDex/sql">
+    <mkdir dir="${install.prefix}/${app.dist.dir.name}"/>
+    <mkdir dir="${install.prefix}/${app.dist.dir.name}/sql"/>
+    <mkdir dir="${install.prefix}/${app.dist.dir.name}/bin"/>
+    <copy todir="${install.prefix}/${app.dist.dir.name}/sql">
       <fileset dir="${etc.dir}">
         <include name="**/*.sql"/>
       </fileset>
     </copy>
-    <copy todir="${install.prefix}/BaltradDex/bin">
+    <copy todir="${install.prefix}/${app.dist.dir.name}/bin">
       <fileset dir="${dist.dir}">
         <include name="BaltradDex.war"/>
       </fileset>
