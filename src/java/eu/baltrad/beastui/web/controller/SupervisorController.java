@@ -177,6 +177,7 @@ public class SupervisorController {
       @RequestParam(value = "reporters", required = false) String reportersstr,
       @RequestParam(value = "sources", required = false) String sources,
       @RequestParam(value = "areas", required = false) String areas,
+      @RequestParam(value = "peers", required = false) String peers,
       @RequestParam(value = "objects", required = false) String objects,
       @RequestParam(value = "minutes", required = false) String minutes,
       HttpServletRequest request, HttpServletResponse response) {
@@ -191,7 +192,7 @@ public class SupervisorController {
       }
       String[] reporters = reportersstr.split(",");
       
-      Map<String, Object> values = createMap(sources, areas, objects, minutes);
+      Map<String, Object> values = createMap(sources, areas, peers, objects, minutes);
 
       // Add dynamic attributes from the odim information model that resides in what,where and how.
       //
@@ -211,7 +212,7 @@ public class SupervisorController {
       
       for (String s : reporters) {
         String str = s.trim();
-        String statusvalue = createValueString(str, sources, areas, objects, minutes, optional);
+        String statusvalue = createValueString(str, sources, areas, peers, objects, minutes, optional);
         if (supervisor.supportsMappableStatus(str)) {
           generator.add(str, supervisor.getMappedStatus(str, values).get(str));
         } else {
@@ -235,18 +236,21 @@ public class SupervisorController {
    * Creates a hash map to be used for passing values to the supervisor
    * @param sources the sources
    * @param areas the areas
+   * @param peers the peers
    * @param objects the objects
    * @param minutes the minutes
    * @return the map
    */
-  protected Map<String, Object> createMap(String sources, String areas,
-      String objects, String minutes) {
+  protected Map<String, Object> createMap(String sources, String areas, String peers, String objects, String minutes) {
     Map<String, Object> values = new HashMap<String, Object>();
     if (sources != null) {
       values.put("sources", sources);
     }
     if (areas != null) {
       values.put("areas", areas);
+    }
+    if (peers != null) {
+      values.put("peers", peers);
     }
     if (objects != null) {
       values.put("objects", objects);
@@ -262,11 +266,12 @@ public class SupervisorController {
    * @param reporter the reporter
    * @param sources the sources if any
    * @param areas the areas if any
+   * @param peers the peers if any
    * @param objects the objects if any
    * @param minutes the minutes if any
    * @return the string
    */
-  protected String createValueString(String reporter, String sources, String areas, String objects, String minutes, Map<String, String> optional) {
+  protected String createValueString(String reporter, String sources, String areas, String peers, String objects, String minutes, Map<String, String> optional) {
     StringBuffer vbuf = new StringBuffer();
     Set<String> attrs = supervisor.getSupportedAttributes(reporter);
     if (attrs != null) {
@@ -278,6 +283,12 @@ public class SupervisorController {
           vbuf.append("&");
         }
         vbuf.append("areas=").append(areas);
+      }
+      if (peers != null && attrs.contains("peers")) {
+        if (vbuf.length()>0) {
+          vbuf.append("&");
+        }
+        vbuf.append("peers=").append(peers);
       }
       if (objects != null && attrs.contains("objects")) {
         if (vbuf.length()>0) {

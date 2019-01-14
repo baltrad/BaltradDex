@@ -19,6 +19,8 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 
 package eu.baltrad.dex.reporter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,19 +30,13 @@ import java.util.Set;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.CoreProtocolPNames;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.baltrad.beast.system.IMappableStatusReporter;
-import eu.baltrad.beast.system.ISystemStatusReporter;
 import eu.baltrad.beast.system.SystemStatus;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.net.auth.Authenticator;
@@ -155,10 +151,23 @@ public class PeerStatusReporter implements IMappableStatusReporter, Initializing
   public Map<String, Map<Object, SystemStatus>> getMappedStatus(Map<String, Object> arg) {
     Map<String, Map<Object, SystemStatus>> result = new HashMap<String, Map<Object,SystemStatus>>();
     Map<Object, SystemStatus> peers = new HashMap<Object, SystemStatus>();
+    List<String> searchedPeers = new ArrayList<String>();
+    ArrayList<String> requestedPeers = new ArrayList<String>(); // Used to keep track on any searched peers that doesn't have any peer entry
+    if (arg.containsKey("peers")) {
+      searchedPeers = Arrays.asList(((String)arg.get("peers")).split(","));
+      for (String s: searchedPeers)
+        requestedPeers.add(s);
+    }
+    
     result.put(getName(), peers);
     List<User> users = userManager.loadPeers();
     for (User u: users) {
       logger.info("Name: " + u.getName() + ", adr:" + u.getNodeAddress() + ", red: " + u.getRedirectedAddress());
+      if (requestedPeers.contains(u.getName())) {
+        requestedPeers.remove(u.getName());
+      }
+      if (searchedPeers.size() > 0 && !searchedPeers.contains(u.getName()))
+        continue;
       String adr = u.getNodeAddress();
       if (u.getRedirectedAddress() != null) {
         adr = u.getRedirectedAddress();
@@ -167,6 +176,13 @@ public class PeerStatusReporter implements IMappableStatusReporter, Initializing
       logger.info("Name: " + u.getName() + ", result: " + s);
       peers.put(u.getName(), s);
     }
+
+    if (requestedPeers.size() > 0) {
+      for (String n: requestedPeers) {
+        peers.put(n, SystemStatus.UNDEFINED);
+      }
+    }
+    
     return result;
   }
   
@@ -188,7 +204,9 @@ public class PeerStatusReporter implements IMappableStatusReporter, Initializing
    */
   @Override
   public Set<String> getSupportedAttributes() {
-    return new HashSet<String>();
+    Set<String> attrs = new HashSet<String>();
+    attrs.add("peers");
+    return attrs;
   }
 
   /**
