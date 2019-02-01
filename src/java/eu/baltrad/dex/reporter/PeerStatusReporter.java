@@ -121,11 +121,12 @@ public class PeerStatusReporter implements IMappableStatusReporter, Initializing
    * @return the status
    */
   protected SystemStatus getPeerStatus(String url) {
-    RequestFactory requestFactory = protocolManager.getFactory(url);
-    HttpUriRequest req = requestFactory.createDataSourceListingRequest(localNode);
     SystemStatus status = SystemStatus.COMMUNICATION_PROBLEM;
     try {
+      RequestFactory requestFactory = protocolManager.getFactory(url);
+      HttpUriRequest req = requestFactory.createDataSourceListingRequest(localNode);
       authenticator.addCredentials(req, localNode.getName());
+
       HttpResponse res = httpClient.post(req);
       ResponseParser parser = protocolManager.createParser(res);
       logger.debug("Got a response message of version " + parser.getProtocolVersion());
@@ -141,6 +142,8 @@ public class PeerStatusReporter implements IMappableStatusReporter, Initializing
       logger.info("Failed to retrieve peer status for " + url);
     }
     
+    logger.debug("getPeerStatus: returning status: " + status);
+
     return status;
   }
   
@@ -158,16 +161,18 @@ public class PeerStatusReporter implements IMappableStatusReporter, Initializing
       for (String s: searchedPeers)
         requestedPeers.add(s);
     }
-    
+
     result.put(getName(), peers);
     List<User> users = userManager.loadPeers();
+    logger.info("Number of peers " + users.size());
     for (User u: users) {
       logger.info("Name: " + u.getName() + ", adr:" + u.getNodeAddress() + ", red: " + u.getRedirectedAddress());
       if (requestedPeers.contains(u.getName())) {
         requestedPeers.remove(u.getName());
       }
-      if (searchedPeers.size() > 0 && !searchedPeers.contains(u.getName()))
+      if (searchedPeers.size() > 0 && !searchedPeers.contains(u.getName())) {
         continue;
+      }
       String adr = u.getNodeAddress();
       if (u.getRedirectedAddress() != null) {
         adr = u.getRedirectedAddress();
