@@ -103,6 +103,7 @@ public class PostFileTask implements Runnable {
             
             try {
                 HttpResponse response = httpClient.post(request);
+                nodeStatusManager.setRuntimeNodeStatus(user.getName(), response.getStatusLine().getStatusCode());
                 if (response.getStatusLine().getStatusCode() == 
                         HttpServletResponse.SC_OK) {
                     RegistryEntry entry = new RegistryEntry(
@@ -156,6 +157,7 @@ public class PostFileTask implements Runnable {
                                     + user.getName() + ". Succeeded after " + noOfRetries + " retries.");
                             registryManager.store(entry);
                             // update status
+                            nodeStatusManager.setRuntimeNodeStatus(user.getName(), HttpServletResponse.SC_OK);
                             status.incrementUploads();
                             nodeStatusManager.update(status, subscriptionId);
                         } else {
@@ -171,6 +173,8 @@ public class PostFileTask implements Runnable {
                                         .getReasonPhrase());
                             registryManager.store(entry);
                             // update status
+                            nodeStatusManager.setRuntimeNodeStatus(user.getName(), response.getStatusLine().getStatusCode());
+
                             status.incrementUploadFailures();
                             nodeStatusManager.update(status, subscriptionId);
                         }
@@ -183,6 +187,7 @@ public class PostFileTask implements Runnable {
                 httpClient.shutdown();
             }
         } catch (Exception e) {
+          nodeStatusManager.setRuntimeNodeStatus(user.getName(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             log.error("Problems encountered while sending file " + uuid + 
                     " to user " + user.getName() + ": " + e.getMessage(), e);
         }

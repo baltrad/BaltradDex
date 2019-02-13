@@ -19,18 +19,21 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 
 package eu.baltrad.dex.reporter;
 
+import static org.easymock.EasyMock.expect;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpUriRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
@@ -42,10 +45,9 @@ import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.protocol.ProtocolManager;
-import eu.baltrad.dex.net.protocol.RequestFactory;
-import eu.baltrad.dex.net.protocol.ResponseParser;
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.util.httpclient.impl.HttpClientUtil;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.User;
@@ -53,58 +55,38 @@ import eu.baltrad.dex.user.model.User;
 /**
  * @author Anders Henja
  */
-public class PeerStatusReporter implements IMappableStatusReporter, InitializingBean {
+public class PeerStatusReporter
+    implements IMappableStatusReporter, InitializingBean {
   /**
    * User manager, for getting information about peer users.
    */
   private IUserManager userManager = null;
-  
+
+  /**
+   * Keeps track on status of the different nodes
+   */
+  private INodeStatusManager statusManager = null;
+
   /**
    * The logger
    */
-  private final static Logger logger = LogManager.getLogger(PeerStatusReporter.class);
+  private final static Logger logger = LogManager
+      .getLogger(PeerStatusReporter.class);
+
+  /**
+   * The supported attributes
+   */
+  private static Set<String> SUPPORTED_ATTRIBUTES=new HashSet<String>();
+  static {
+    SUPPORTED_ATTRIBUTES.add("peers");
+    SUPPORTED_ATTRIBUTES.add("minutes");
+  }
   
-  /**
-   * The configuration manager
-   */
-  private IConfigurationManager confManager;
-
-  /**
-   * The authenticator / signer.
-   */
-  private Authenticator authenticator;
-
-  /**
-   * The protocol manager
-   */
-  private ProtocolManager protocolManager = null;
-
-  /**
-   * The http client
-   */
-  private IHttpClientUtil httpClient;  
-  
-  /**
-   * The node
-   */
-  protected User localNode;
-
   /**
    * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
    */
   @Override
   public void afterPropertiesSet() throws Exception {
-    authenticator = new KeyczarAuthenticator(confManager.getAppConf().getKeystoreDir());
-    httpClient = new HttpClientUtil(
-        Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
-        Integer.parseInt(confManager.getAppConf().getSoTimeout()));
-    localNode = new User(confManager.getAppConf().getNodeName(),
-        Role.NODE, null, confManager.getAppConf().getOrgName(),
-        confManager.getAppConf().getOrgUnit(),
-        confManager.getAppConf().getLocality(),
-        confManager.getAppConf().getState(),
-        confManager.getAppConf().getCountryCode(),
-        confManager.getAppConf().getNodeAddress());
   }
 
   /**
@@ -116,140 +98,148 @@ public class PeerStatusReporter implements IMappableStatusReporter, Initializing
   }
 
   /**
+   * Tests if the specified date is within x minutes of now according to the
+   * calendar
+   * 
+   * @param testedDate
+   * @param minutes
+   * @return true
+   */
+  protected boolean isWithinMinutes(Date testedDate, int minutes) {
+    Calendar c = Calendar.getInstance();
+    c.add(Calendar.MINUTE, -minutes);
+    if (testedDate.after(c.getTime()))
+      return true;
+    return false;
+  }
+
+  /**
    * Returns the status for the specified URL.
    * @param url the url to the supervisor on the peer node
+   * @param minutesBackInTime number of minutes back in time we want to check
    * @return the status
    */
-  protected SystemStatus getPeerStatus(String url) {
+  protected SystemStatus getPeerStatus(String nodeName, int minutesBackInTime) {
     SystemStatus status = SystemStatus.COMMUNICATION_PROBLEM;
     try {
-      RequestFactory requestFactory = protocolManager.getFactory(url);
-      HttpUriRequest req = requestFactory.createDataSourceListingRequest(localNode);
-      authenticator.addCredentials(req, localNode.getName());
-
-      HttpResponse res = httpClient.post(req);
-      ResponseParser parser = protocolManager.createParser(res);
-      logger.debug("Got a response message of version " + parser.getProtocolVersion());
-      logger.debug("Answering node supports version " + parser.getConfiguredProtocolVersion());
-      if (parser.getStatusCode() != HttpStatus.SC_OK)  {
-        if (parser.isRedirected()) {
-          logger.info("The URL: " + url + " has been redirected but it isn't marked as redirected. Please verify connection");
+      logger.info("Node: " + nodeName + ", status: "
+          + statusManager.getRuntimeNodeStatus(nodeName));
+      Date statusDate = statusManager.getRuntimeNodeDate(nodeName);
+      if (isWithinMinutes(statusDate, minutesBackInTime)) {
+        int httpStatus = statusManager.getRuntimeNodeStatus(nodeName);
+        if (httpStatus == HttpServletResponse.SC_OK) {
+          status = SystemStatus.OK;
         }
-      } else {
-        status = SystemStatus.OK;
       }
     } catch (Exception e) {
-      logger.info("Failed to retrieve peer status for " + url);
+      logger.info("Failed to retrieve peer status for " + nodeName);
     }
-    
-    logger.debug("getPeerStatus: returning status: " + status);
-
     return status;
   }
-  
+
   /**
    * @see eu.baltrad.beast.system.IMappableStatusReporter#getMappedStatus(java.util.Map)
    */
   @Override
-  public Map<String, Map<Object, SystemStatus>> getMappedStatus(Map<String, Object> arg) {
-    Map<String, Map<Object, SystemStatus>> result = new HashMap<String, Map<Object,SystemStatus>>();
+  public Map<String, Map<Object, SystemStatus>> getMappedStatus(
+      Map<String, Object> arg) {
+    int minutesBackInTime = 5;
+    
+    Map<String, Map<Object, SystemStatus>> result = new HashMap<String, Map<Object, SystemStatus>>();
     Map<Object, SystemStatus> peers = new HashMap<Object, SystemStatus>();
     List<String> searchedPeers = new ArrayList<String>();
-    ArrayList<String> requestedPeers = new ArrayList<String>(); // Used to keep track on any searched peers that doesn't have any peer entry
+    ArrayList<String> requestedPeers = new ArrayList<String>(); // Used to keep
+                                                                // track on any
+                                                                // searched
+                                                                // peers that
+                                                                // doesn't have
+                                                                // any peer
+                                                                // entry
+
+    result.put(getName(), peers);
+
+    if (arg.containsKey("minutes")) {
+      Object tlimit = arg.get("minutes");
+      if (tlimit != null) {
+        if (tlimit instanceof String) {
+          try {
+            minutesBackInTime = Integer.parseInt((String)tlimit);
+          } catch (Exception e) {
+          }
+        } else if (tlimit instanceof Long) {
+          // downcast ok
+          minutesBackInTime = ((Long)tlimit).intValue();
+        } else if (tlimit instanceof Integer) {
+          minutesBackInTime = (Integer)tlimit;
+        } // else use default value        
+      }
+    }
+    
+    
     if (arg.containsKey("peers")) {
-      searchedPeers = Arrays.asList(((String)arg.get("peers")).split(","));
-      for (String s: searchedPeers)
+      searchedPeers = Arrays.asList(((String) arg.get("peers")).split(","));
+      for (String s : searchedPeers)
         requestedPeers.add(s);
     }
 
-    result.put(getName(), peers);
-    List<User> users = userManager.loadPeers();
-    logger.info("Number of peers " + users.size());
-    for (User u: users) {
-      logger.info("Name: " + u.getName() + ", adr:" + u.getNodeAddress() + ", red: " + u.getRedirectedAddress());
-      if (requestedPeers.contains(u.getName())) {
-        requestedPeers.remove(u.getName());
+    List<String> names = userManager.loadPeerNames();
+    logger.info("Number of peers " + names.size());
+    for (String nodeName: names) {
+      if (requestedPeers.contains(nodeName)) {
+        requestedPeers.remove(nodeName);
       }
-      if (searchedPeers.size() > 0 && !searchedPeers.contains(u.getName())) {
+      if (searchedPeers.size() > 0 && !searchedPeers.contains(nodeName)) {
         continue;
       }
-      String adr = u.getNodeAddress();
-      if (u.getRedirectedAddress() != null) {
-        adr = u.getRedirectedAddress();
-      }
-      SystemStatus s = getPeerStatus(adr);
-      logger.info("Name: " + u.getName() + ", result: " + s);
-      peers.put(u.getName(), s);
+      SystemStatus s = getPeerStatus(nodeName, minutesBackInTime);
+      logger.info("Name: " + nodeName + ", result: " + s);
+      peers.put(nodeName, s);
     }
 
     if (requestedPeers.size() > 0) {
-      for (String n: requestedPeers) {
-        peers.put(n, SystemStatus.UNDEFINED);
+      for (String n : requestedPeers) {
+        if (statusManager.getRuntimeNodeNames().contains(n)) {
+          peers.put(n, getPeerStatus(n, minutesBackInTime));
+        } else {
+          peers.put(n, SystemStatus.UNDEFINED);
+        }
       }
     }
     
     return result;
   }
-  
-  
+
   /**
    * @see eu.baltrad.beast.system.ISystemStatusReporter#getStatus(java.util.Map)
    */
   @Override
   public Set<SystemStatus> getStatus(Map<String, Object> values) {
     Set<SystemStatus> result = new HashSet<SystemStatus>();
-    Collection<SystemStatus> c = getMappedStatus(values).get(getName()).values();
+    Collection<SystemStatus> c = getMappedStatus(values).get(getName())
+        .values();
     result.addAll(c);
     return result;
   }
-
 
   /**
    * @see eu.baltrad.beast.system.ISystemStatusReporter#getSupportedAttributes()
    */
   @Override
   public Set<String> getSupportedAttributes() {
-    Set<String> attrs = new HashSet<String>();
-    attrs.add("peers");
-    return attrs;
+    return SUPPORTED_ATTRIBUTES;
   }
 
   /**
-   * @param manager the user manager
+   * @param manager
+   *          the user manager
    */
   @Autowired
   public void setUserManager(IUserManager manager) {
     this.userManager = manager;
   }
   
-  /**
-   * @param configurationManager the config manager 
-   */
   @Autowired
-  public void setConfigurationManager(IConfigurationManager confManager) {
-      this.confManager = confManager;
-  }
-  
-  /**
-   * @param authenticator the authenticator to set
-   */
-  @Autowired
-  public void setAuthenticator(Authenticator authenticator) {
-      this.authenticator = authenticator;
-  }
-  
-  /**
-   * @param protocolManager the protocol manager to use
-   */
-  @Autowired
-  public void setProtocolManager(ProtocolManager protocolManager) {
-    this.protocolManager = protocolManager;
-  }
-  
-  /**
-   * @param client the http client
-   */
-  protected void setHttpClient(IHttpClientUtil client) {
-    httpClient = client;
+  public void setNodeStatusManager(INodeStatusManager statusManager) {
+    this.statusManager = statusManager;
   }
 }

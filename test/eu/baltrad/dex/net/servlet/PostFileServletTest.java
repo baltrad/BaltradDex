@@ -31,6 +31,7 @@ import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.util.FramePublisherManager;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
+import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.keystore.model.Key;
@@ -95,6 +96,7 @@ public class PostFileServletTest {
     private PFServlet classUnderTest;
     private Authenticator authMock;
     private IKeystoreManager keystoreManagerMock;
+    private INodeStatusManager nodeStatusManagerMock;
     private FileCatalog fileCatalogMock;
     private IBltMessageManager messageManagerMock;
     private ISubscriptionManager subscriptionManagerMock;
@@ -215,7 +217,7 @@ public class PostFileServletTest {
         fileManagerMock = (IBltFileManager) 
                 createMock(IBltFileManager.class);
         filterMock = (IFilter) createMock(IFilter.class);
-        
+        nodeStatusManagerMock = (INodeStatusManager)createMock(INodeStatusManager.class); 
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         format = new SimpleDateFormat(DATE_FORMAT);
@@ -261,6 +263,7 @@ public class PostFileServletTest {
         filterMock = null;
         entryMock = null;
         namerMock = null;
+        nodeStatusManagerMock = null;
         injectorKey = null;
         peerKey = null;
         s1 = s2 = s3 = s4 = null;
@@ -310,11 +313,13 @@ public class PostFileServletTest {
     public void handleRequest_GenericError() throws Exception {
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
+        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
         expect(fileCatalogMock.store(isA(InputStream.class))).andReturn(null);
         replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setCatalog(fileCatalogMock);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         classUnderTest.handleRequest(request, response);
         verifyAll();
         
@@ -328,12 +333,14 @@ public class PostFileServletTest {
     public void handleRequest_DuplicateEntry() throws Exception {
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
+        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
         expect(fileCatalogMock.store(isA(InputStream.class)))
                 .andThrow(new DuplicateEntry());
         replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setCatalog(fileCatalogMock);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         classUnderTest.handleRequest(request, response);
         verifyAll();
         
@@ -347,12 +354,14 @@ public class PostFileServletTest {
     public void handleRequest_DatabaseError() throws Exception {    
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
+        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
         expect(fileCatalogMock.store(isA(InputStream.class)))
                 .andThrow(new DatabaseError());
         replayAll();
         
         classUnderTest.setAuthenticator(authMock);
         classUnderTest.setCatalog(fileCatalogMock);
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         classUnderTest.handleRequest(request, response);
         verify(authMock);
         verify(fileCatalogMock);
@@ -368,6 +377,7 @@ public class PostFileServletTest {
     public void handleRequest_InjectorNoMatch() throws Exception {
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
+        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
         expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
                 .anyTimes();
         expect(entryMock.getMetadata()).andReturn(null).anyTimes();
@@ -399,6 +409,7 @@ public class PostFileServletTest {
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         classUnderTest.setFileManager(fileManagerMock);
         classUnderTest.setMatcher(new ImpossibleMetadataMatcher());
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         classUnderTest.handleRequest(request, response);
         
         verifyAll();
@@ -408,6 +419,8 @@ public class PostFileServletTest {
     public void handleRequest_InjectorSendToSubscribers() throws Exception {
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
+        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
+        
         authMock.addCredentials(isA(HttpUriRequest.class), isA(String.class));
         expectLastCall().times(2);
         expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
@@ -451,6 +464,8 @@ public class PostFileServletTest {
         classUnderTest.setMatcher(new EasyMetadataMatcher());
         classUnderTest.setRegistryManager(registryManagerMock);
         classUnderTest.setFramePublisherManager(new FramePublisherManager());
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
+        
         classUnderTest.handleRequest(request, response);
         
         verifyAll();
@@ -461,6 +476,8 @@ public class PostFileServletTest {
             throws Exception {
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
+        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
+        
         expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
                 .anyTimes();
         expect(entryMock.getMetadata()).andReturn(null).anyTimes();
@@ -491,6 +508,8 @@ public class PostFileServletTest {
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         classUnderTest.setFileManager(fileManagerMock);
         classUnderTest.setMatcher(new EasyMetadataMatcher());
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
+        
         classUnderTest.handleRequest(request, response);
         
         verifyAll();
@@ -500,6 +519,8 @@ public class PostFileServletTest {
     public void handleRequest_PeerSubscriptonInvalid() throws Exception {
         expect(authMock.authenticate(isA(String.class), isA(String.class), 
                 isA(String.class))).andReturn(Boolean.TRUE);
+        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
+        
         expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
                 .anyTimes();
         expect(entryMock.getMetadata()).andReturn(null).anyTimes();
@@ -530,6 +551,7 @@ public class PostFileServletTest {
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         classUnderTest.setFileManager(fileManagerMock);
         classUnderTest.setMatcher(new ImpossibleMetadataMatcher());
+        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         classUnderTest.handleRequest(request, response);
         
         verifyAll();

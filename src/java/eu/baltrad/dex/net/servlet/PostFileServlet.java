@@ -315,6 +315,9 @@ public class PostFileServlet extends HttpServlet {
             if (authenticator.authenticate(req.getMessage(), 
                     req.getSignature(), req.getNodeName())) {
                 log.info("New data file received from " + req.getNodeName());
+                
+                nodeStatusManager.setRuntimeNodeStatus(req.getNodeName(), HttpServletResponse.SC_OK);
+                
                 // store entry
                 FileEntry entry = storeFile(req);
                 fileStored = System.currentTimeMillis();

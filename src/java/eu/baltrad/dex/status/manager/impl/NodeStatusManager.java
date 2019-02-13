@@ -25,7 +25,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -218,6 +222,82 @@ public class NodeStatusManager implements INodeStatusManager {
                     "AND ss.subscription_id = ?);";
         
         return jdbcTemplate.update(sql, subscriptionId);
+    }
+    
+    /**
+     * Below is the handling of the runtime status information (that currently isn't stored in the database)
+     */
+    private class NodeRuntimeStatus {
+      private int status;
+      private Date date;
+      
+      public NodeRuntimeStatus(int status, Date date) {
+        this.status = status;
+        this.date = date;
+      }
+      
+      public void update(int status, Date date) {
+        this.status = status;
+        this.date = date;
+      }
+      
+      public int getStatus() {
+        return status;
+      }
+      
+      public Date getDate() {
+        return date;
+      }
+    };
+    
+    /**
+     * The runtime status information
+     */
+    private HashMap<String, NodeRuntimeStatus> runtimeStatusInformation = new HashMap<String,NodeRuntimeStatus>();
+    
+    /**
+     * @see eu.baltrad.dex.status.manager.INodeStatusManager#getRuntimeNodeNames()
+     */
+    @Override
+    public Set<String> getRuntimeNodeNames() {
+      return runtimeStatusInformation.keySet();
+    }
+    
+    /**
+     * @see eu.baltrad.dex.status.manager.INodeStatusManager#setRuntimeNodeStatus(String, int)
+     */
+    @Override
+    public void setRuntimeNodeStatus(String nodeName, int httpStatus) {
+      NodeRuntimeStatus status = runtimeStatusInformation.get(nodeName);
+      if (status == null) {
+        status = new NodeRuntimeStatus(httpStatus, new Date());
+        runtimeStatusInformation.put(nodeName, status);
+      }
+      status.update(httpStatus, Calendar.getInstance().getTime());
+    }
+    
+    /**
+     * @see eu.baltrad.dex.status.manager.INodeStatusManager#getRuntimeNodeStatus(String)
+     */
+    @Override
+    public int getRuntimeNodeStatus(String nodeName) {
+      NodeRuntimeStatus value = runtimeStatusInformation.get(nodeName);
+      if (value == null) {
+        throw new RuntimeException("Node does not exist: " + nodeName);
+      }
+      return value.getStatus();
+    }
+    
+    /**
+     * @see eu.baltrad.dex.status.manager.INodeStatusManager#getRuntimeNodeDate(String)
+     */
+    @Override
+    public Date getRuntimeNodeDate(String nodeName) {
+      NodeRuntimeStatus value = runtimeStatusInformation.get(nodeName);
+      if (value == null) {
+        throw new RuntimeException("Node does not exist: " + nodeName);
+      }
+      return value.getDate();
     }
     
 }

@@ -22,7 +22,11 @@
 package eu.baltrad.dex.status.manager;
 
 import eu.baltrad.dex.status.model.Status;
+
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
+
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -51,4 +55,30 @@ public interface INodeStatusManager {
     
     public int delete(int subscriptionId) throws DataAccessException;
     
+    
+    /**
+     * @return names of nodes that has stored their status
+     */
+    public Set<String> getRuntimeNodeNames();
+    
+    /**
+     * @param nodeName the node name setting the runtime status
+     * @param httpStatus the http status
+     * @param outgoing if outgoing or incomming communication
+     */
+    public void setRuntimeNodeStatus(String nodeName, int httpStatus);
+    
+    /**
+     * @param nodeName the node name that is queried for status
+     * @return the status
+     * @throws RuntimeException if node hasn't stored any status 
+     */
+    public int getRuntimeNodeStatus(String nodeName);
+    
+    /**
+     * @param nodeName the node name that is queried for it's last updated status
+     * @return the date the last update for specified node occured
+     * @throws RuntimeException if node hasn't stored any status 
+     */
+    public Date getRuntimeNodeDate(String nodeName);
 }
