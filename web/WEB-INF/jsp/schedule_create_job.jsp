@@ -22,7 +22,7 @@ Create scheduled job
 ------------------------------------------------------------------------------%>
 
 <%@include file="/WEB-INF/jsp/include.jsp"%>
-<%@ taglib prefix="defun" uri="/WEB-INF/tags/functions.tld" %>
+<%@ taglib prefix="defun" uri="/WEB-INF/tld/functions.tld" %>
 
 <t:generic_page pageTitle="Schedule">
     <jsp:body>
