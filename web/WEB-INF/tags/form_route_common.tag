@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="/WEB-INF/tags/functions.tld" %>
+<%@ taglib prefix="fn" uri="/WEB-INF/tld/functions.tld" %>
 
 <%@attribute name="route" type="eu.baltrad.beast.router.RouteDefinition"%>
 <%@attribute name="adaptors" type="java.util.List"%>

@@ -314,7 +314,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="bdb.xml" />
         <include name="jsp/**/*.jsp" />
         <include name="tags/**/*.tag" />
-      	<include name="**/*.tld" />
+        <include name="tld/**/*.tld" />
       </fileset>
     </copy>
 
