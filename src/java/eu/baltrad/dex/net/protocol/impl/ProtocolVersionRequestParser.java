@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.keyczar.exceptions.KeyczarException;
 import eu.baltrad.beast.message.IBltXmlMessage;
 import eu.baltrad.beast.parser.IXmlMessageParser;
@@ -49,7 +51,7 @@ public class ProtocolVersionRequestParser implements RequestParser {
   private NodeRequest request;
   private String defaultVersion;
   private IXmlMessageParser xmlMessageParser;
-  
+  private static Logger logger = LogManager.getLogger(ProtocolVersionRequestParser.class);
   /**
    * Constructor
    * @param request the http request
@@ -107,6 +109,7 @@ public class ProtocolVersionRequestParser implements RequestParser {
    */
   @Override
   public ResponseWriter getWriter(HttpServletResponse response) {
+    logger.debug("getWriter("+getProtocolVersion()+", defaultVersion="+defaultVersion+")");
     return new ProtocolVersionResponseWriter(response, getProtocolVersion(), defaultVersion);
   }
 

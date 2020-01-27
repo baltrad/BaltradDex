@@ -21,6 +21,8 @@ package eu.baltrad.dex.net.protocol.json.impl;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 
@@ -32,7 +34,7 @@ import eu.baltrad.dex.datasource.model.DataSource;
  */
 public class JsonProtocol21 extends JsonProtocol20 {
   private ObjectMapper mapper = new ObjectMapper();
-  
+  private static Logger logger = LogManager.getLogger(JsonProtocol21.class);
   public JsonProtocol21() {
     super();
   }

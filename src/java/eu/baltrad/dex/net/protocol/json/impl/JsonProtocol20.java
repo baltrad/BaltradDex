@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonFilter;
 import org.codehaus.jackson.map.ser.FilterProvider;
@@ -48,6 +50,8 @@ public class JsonProtocol20 implements JsonProtocol {
   private FilterProvider userFilter = null;
   /** Subscription filter */
   private FilterProvider subscriptionFilter = null;
+
+  private static Logger logger = LogManager.getLogger(JsonProtocol20.class);
   
   // Need to have something to filter in
   @JsonFilter("filter properties by name")

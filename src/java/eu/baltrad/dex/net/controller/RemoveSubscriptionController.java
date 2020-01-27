@@ -128,7 +128,6 @@ public class RemoveSubscriptionController {
     private ModelMessageHelper messageHelper = null;
     private ProtocolManager protocolManager = null;
     
-    //private MessageResourceUtil messages;
     private Logger log;
     
     protected List<Subscription> selectedDownloads;
@@ -154,8 +153,6 @@ public class RemoveSubscriptionController {
      * Initializes controller with current configuration
      */
     protected void initConfiguration() {
-        this.setAuthenticator(new KeyczarAuthenticator(
-                 confManager.getAppConf().getKeystoreDir()));
         this.httpClient = new HttpClientUtil(
                 Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
                 Integer.parseInt(confManager.getAppConf().getSoTimeout()));

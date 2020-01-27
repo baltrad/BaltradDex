@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.net.servlet;
 
+import eu.baltrad.beast.security.SecurityStorageException;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
@@ -28,6 +29,7 @@ import eu.baltrad.dex.net.protocol.ProtocolManager;
 import eu.baltrad.dex.net.protocol.RequestParser;
 import eu.baltrad.dex.net.protocol.ResponseWriter;
 import eu.baltrad.dex.util.MessageResourceUtil;
+import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
@@ -85,6 +87,7 @@ public class StartSubscriptionServlet extends HttpServlet {
     private INodeStatusManager nodeStatusManager;
     private MessageResourceUtil messages;
     private ProtocolManager protocolManager;
+    private IDataSourceManager dataSourceManager;
     
     private Logger log;
     
@@ -103,8 +106,6 @@ public class StartSubscriptionServlet extends HttpServlet {
      * Initializes servlet with current configuration.
      */
     protected void initConfiguration() {
-        this.authenticator = new KeyczarAuthenticator(
-                confManager.getAppConf().getKeystoreDir());
         this.localNode = new User(confManager.getAppConf().getNodeName(),
                 Role.NODE, null, confManager.getAppConf().getOrgName(),
                 confManager.getAppConf().getOrgUnit(),
@@ -126,26 +127,35 @@ public class StartSubscriptionServlet extends HttpServlet {
         Set<DataSource> subscribedDataSources = new HashSet<DataSource>();
         try {
             for (DataSource ds : requestedDataSources) {
+              logger.info("REQUESTED DS: " + ds);
                 // Save or update depending on whether subscription exists
                 Subscription requested = new Subscription(System.currentTimeMillis(), Subscription.PEER, nodeName, ds.getName(), true, true);
                 Subscription existing = subscriptionManager.load(Subscription.PEER, nodeName, ds.getName());
                 String[] msgArgs = {ds.getName(), localNode.getName(), nodeName};
                 if (existing == null) {
+                  logger.info("Storing DS: " + requested);
                     int subscriptionId = subscriptionManager.store(requested);
                     // save status
                     int statusId = nodeStatusManager.store(new Status(0, 0, 0));
                     nodeStatusManager.store(statusId, subscriptionId);
-                    subscribedDataSources.add(new DataSource(
-                            ds.getName(), ds.getType(), ds.getDescription(),
-                            ds.getSource(), ds.getFileObject()));
+                    
+                    // We create a new datasource from name so that we know that we are subscribing on correct stuff.
+                    DataSource added = dataSourceManager.load(ds.getName(), Subscription.LOCAL);
+                    added.setType(Subscription.PEER);
+                    subscribedDataSources.add(added);
                     log.warn(messages.getMessage(PS_SUBSCRIPTION_SUCCESS_KEY, msgArgs));
                 } else {
                     int subId = existing.getId(); 
                     requested.setId(subId);
+                    logger.info("Updating DS: " + requested);
                     subscriptionManager.update(requested);
-                    subscribedDataSources.add(new DataSource(
-                            ds.getName(), ds.getType(), ds.getDescription(),
-                            ds.getSource(), ds.getFileObject()));
+
+                    // We create a new datasource from name so that we know that we are subscribing on correct stuff.
+                    DataSource added = dataSourceManager.load(ds.getName(), Subscription.LOCAL);
+                    added.setType(Subscription.PEER);
+                    subscribedDataSources.add(added);
+                    logger.info("Adding to subscribed: " + added);
+
                     // update status - reset uploads
                     Status s = nodeStatusManager.load(subId);
                     s.setUploads(0);
@@ -210,6 +220,9 @@ public class StartSubscriptionServlet extends HttpServlet {
       } catch (KeyczarException e) {
         parser.getWriter(response).messageResponse(
             messages.getMessage(PS_MESSAGE_VERIFIER_ERROR_KEY), HttpServletResponse.SC_UNAUTHORIZED);
+      } catch (SecurityStorageException e) {
+        parser.getWriter(response).messageResponse(
+            messages.getMessage(PS_MESSAGE_VERIFIER_ERROR_KEY), HttpServletResponse.SC_UNAUTHORIZED);
       } catch (Exception e) {
         parser.getWriter(response).messageResponse(
             messages.getMessage(PS_INTERNAL_SERVER_ERROR_KEY), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -252,6 +265,7 @@ public class StartSubscriptionServlet extends HttpServlet {
     /**
      * @param authenticator the authenticator to set
      */
+    @Autowired
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
     }
@@ -269,5 +283,10 @@ public class StartSubscriptionServlet extends HttpServlet {
     @Autowired
     public void setProtocolManager(ProtocolManager protocolManager) {
       this.protocolManager = protocolManager;
+    }
+
+    @Autowired
+    public void setDataSourceManager(IDataSourceManager dataSourceManager) {
+      this.dataSourceManager = dataSourceManager;
     }
 }

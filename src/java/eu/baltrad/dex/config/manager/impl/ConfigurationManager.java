@@ -21,6 +21,9 @@
 
 package eu.baltrad.dex.config.manager.impl;
 
+import eu.baltrad.beast.security.Authorization;
+import eu.baltrad.beast.security.ISecurityManager;
+import eu.baltrad.beast.security.keyczar.KeyCompressor;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.config.model.AppConfiguration;
 import eu.baltrad.dex.config.model.LogConfiguration;
@@ -29,14 +32,12 @@ import eu.baltrad.dex.keystore.manager.IKeystoreManager;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
-import eu.baltrad.dex.keystore.model.Key;
-import eu.baltrad.dex.util.MessageDigestUtil;
 import eu.baltrad.dex.util.ServletContextUtil;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
@@ -44,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.File;
 
 import java.util.Properties;
+import java.util.UUID;
 
 /**
  * Class implements configuration object handling functionality.
@@ -63,8 +65,16 @@ public class ConfigurationManager implements IConfigurationManager,
     
     private IUserManager userManager;
     private IKeystoreManager keystoreManager;
-    
     private Logger log;
+    
+    private static Logger logger = LogManager.getLogger(ConfigurationManager.class);
+
+    /**
+     * Security manager. The local node is set from within the configuration manager so that
+     * the security manager has same information about local node as is defined by the
+     * app configuration
+     */
+    private ISecurityManager securityManager;
     
     /**
      * Constructor
@@ -83,6 +93,7 @@ public class ConfigurationManager implements IConfigurationManager,
      */
     public void afterPropertiesSet() {
         try {
+          logger.info("afterPropertiesSet");
             // create local peer account
             if (userManager.load(appConf.getNodeName()) == null) {
                 User user = new User(appConf.getNodeName(), Role.NODE, null,
@@ -93,15 +104,38 @@ public class ConfigurationManager implements IConfigurationManager,
                 log.warn("Created local peer account: " 
                         + appConf.getNodeName());
             }
-            // import local key - by default it is set as injector's key
-            if (keystoreManager.load(appConf.getNodeName()) == null) {
-                File keyFile = new File(appConf.getKeystoreDir() + 
-                        File.separator + appConf.getNodeName() + ".pub");
-                Key key = new Key(appConf.getNodeName(),
-                        DigestUtils.md5Hex(MessageDigestUtil.getBytes(keyFile)), 
-                        true, true);
-                keystoreManager.store(key);
-                log.warn("Local key imported to keystore");
+            
+            if (securityManager == null) {
+              throw new RuntimeException("No security manager set, can not start system");
+            }
+            // We need to register current app configuration as local node name to not cause any
+            // conflicts. This probably should be changed later...
+            logger.info("afterPropertiesSet: Setting local");
+            Authorization local = securityManager.getLocal();
+            if (local == null) {
+              local = new Authorization();
+              local.setConnectionUUID(UUID.randomUUID().toString());
+            }
+            local.setNodeName(appConf.getNodeName());
+            local.setNodeAddress(appConf.getNodeAddress());
+            local.setNodeEmail(appConf.getAdminEmail());
+            local.setAuthorized(true);
+            File publicKeyFile = new File(appConf.getKeystoreDir() + File.separator + appConf.getNodeName() + ".pub");
+            File privateKeyFile = new File(appConf.getKeystoreDir() + File.separator + appConf.getNodeName() + ".priv");
+            local.setPublicKey(new KeyCompressor().zip(publicKeyFile));
+            local.setPublicKeyPath(publicKeyFile.getAbsolutePath());
+            local.setPrivateKey(new KeyCompressor().zip(privateKeyFile));
+            local.setPrivateKeyPath(privateKeyFile.getAbsolutePath());
+            
+            local.setLocal(true);
+            local.setInjector(true);
+            try {
+              logger.info("afterPropertiesSet: Updating security manager with local");
+              securityManager.setLocal(local);
+            } catch (Exception e) {
+              logger.error("Failed to set local node", e);
+              log.error("Failed to set local node", e);
+              throw new RuntimeException(e);
             }
         } catch (Exception e) {
             log.error("Failed to create local peer account", e);
@@ -345,6 +379,15 @@ public class ConfigurationManager implements IConfigurationManager,
     @Autowired
     public void setKeystoreManager(IKeystoreManager keystoreManager) {
         this.keystoreManager = keystoreManager;
+    }
+
+    /**
+     * The security manager that is provided by beast and used for keeping track of keys and authorization issues.
+     * @param securityManager the security manager
+     */
+    @Autowired
+    public void setSecurityManager(ISecurityManager securityManager) {
+      this.securityManager = securityManager;
     }
     
 }

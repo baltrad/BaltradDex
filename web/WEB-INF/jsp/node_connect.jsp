@@ -58,26 +58,10 @@ Author     : szewczenko
                                 </c:forEach>
                             </select>             
                         </div>
-                        <div class="section" id="node-address">
-                            Enter URL address
-                        </div>
-                        <div class="section-text">
-                            Enter node's URL address and click <i>Send key</i> 
-                            in order to post public key at the peer node or 
-                            <i>Connect</i> in order to access data sources 
-                            available at selected node.
-                        </div>
-                        <div class="row" id="node-address">
-                            <input type="text" name="url_input" 
-                                   title="Node's URL address, e.g. http://baltrad.eu:8084">
-                        </div>            
+                        <div class="section-text"> &nbsp; </div>
                     </div>
                     <div class="table-footer">
                         <div class="buttons">
-                            <div class="button-wrap">
-                                <input class="button" type="submit" 
-                                       name="send_key" value="Send key"/>
-                            </div>
                             <div class="button-wrap">
                                 <input class="button" type="submit" 
                                        name="connect" value="Connect"/>

@@ -41,6 +41,7 @@ import eu.baltrad.dex.user.model.Role;
 
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.db.IFilterManager;
+import eu.baltrad.beast.security.SecurityStorageException;
 import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.status.model.Status;
 
@@ -117,7 +118,6 @@ public class StartSubscriptionController {
     private IFilterManager filterManager;
     private IUserManager userManager;
     private ModelMessageHelper messageHelper;
-    //private MessageResourceUtil messages;
     private Logger log;
     
     private Logger logger = LogManager.getLogger(StartSubscriptionController.class);
@@ -137,8 +137,6 @@ public class StartSubscriptionController {
      * Initializes controller with current configuration
      */
     protected void initConfiguration() {
-        this.authenticator = new KeyczarAuthenticator(
-                confManager.getAppConf().getKeystoreDir());
         this.httpClient = new HttpClientUtil(
                 Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
                 Integer.parseInt(confManager.getAppConf().getSoTimeout()));
@@ -266,6 +264,8 @@ public class StartSubscriptionController {
             }
           } catch (KeyczarException e) { 
             messageHelper.setErrorDetailsMessage(model, PS_MESSAGE_SIGNER_ERROR_KEY, e.getMessage());
+          } catch (SecurityStorageException e) {
+            messageHelper.setErrorDetailsMessage(model, PS_MESSAGE_SIGNER_ERROR_KEY, e.getMessage());
           } catch (InternalControllerException e) {
             messageHelper.setErrorDetailsMessage(model, PS_INTERNAL_CONTROLLER_ERROR_KEY, e.getMessage(), new Object[]{peerName});
           } catch (IOException e) {
@@ -337,6 +337,7 @@ public class StartSubscriptionController {
     /**
      * @param authenticator the authenticator to set
      */
+    @Autowired
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
     }

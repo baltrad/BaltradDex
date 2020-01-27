@@ -111,120 +111,120 @@ public class PostKeyServletTest {
         }
         resetAll();
     }
-    
-    @Test
-    public void storeKey_Unauthorized() throws Exception {
-        request.setContent("public key content".getBytes());
-        request.addHeader("Content-MD5", "7897fasdsd9fsadf9sd77fa9sa98f7ds");  
-        
-        assertEquals(1, classUnderTest.storeKey(request, "test.baltrad.eu"));
-    }
-    
-    @Test
-    public void storeKey_OK() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
-        AppConfiguration appConf = new AppConfiguration(props);
-        
-        expect(confManagerMock.getAppConf()).andReturn(appConf);
-        expect(keystoreManagerMock.store(isA(Key.class))).andReturn(Integer.SIZE);
-        
-        replayAll();
-        
-        classUnderTest.setConfManager(confManagerMock);
-        classUnderTest.setKeystoreManager(keystoreManagerMock);
-        
-        request.setContent("public key content".getBytes());
-        request.addHeader("Content-MD5", "10dfe6fe1fe957250d508fcac3b0cbaf");  
-        
-        classUnderTest.storeKey(request, "test.baltrad.eu");
-        
-        verifyAll();
-        
-        assertTrue((new File("keystore/.incoming/test.baltrad.eu.pub")).exists());
-    }
-    
-    @Test
-    public void handleRequest_ServerError() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
-                
-        expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(null);
-        
-        replayAll();
-        
-        classUnderTest.setKeystoreManager(keystoreManagerMock);
-        request.setAttribute("Node-Name", "test.baltrad.eu");
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                response.getStatus());
-        assertEquals(messages.getMessage("postkey.server.internal_server_error"),
-                response.getErrorMessage());
-    }
-    
-    @Test
-    public void handleRequest_Unauthorized() throws Exception {
-        request.setContent("public key content".getBytes());
-        request.addHeader("Content-MD5", "7897fasdsd9fsadf9sd77fa9sa98f7ds"); 
-        request.setAttribute("Node-Name", "test.baltrad.eu");
-        
-        expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(null);
-        
-        replayAll();
-        
-        classUnderTest.setKeystoreManager(keystoreManagerMock);
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
-    }
-    
-    @Test
-    public void handleRequest_KeyExists() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
-        
-        expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(new Key());
-        
-        replayAll();
-        
-        classUnderTest.setKeystoreManager(keystoreManagerMock);
-        request.setAttribute("Node-Name", "test.baltrad.eu");
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_CONFLICT, response.getStatus());
-    }
-    
-    @Test
-    public void handleRequest_OK() throws Exception {
-        Properties props = new Properties();
-        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
-        AppConfiguration appConf = new AppConfiguration(props);
-        
-        expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(null);
-        expect(keystoreManagerMock.store(isA(Key.class)))
-                .andReturn(Integer.SIZE);
-        expect(confManagerMock.getAppConf()).andReturn(appConf);
-        
-        replayAll();
-        
-        classUnderTest.setConfManager(confManagerMock);
-        classUnderTest.setKeystoreManager(keystoreManagerMock);
-        
-        request.setAttribute("Node-Name", "test.baltrad.eu");
-        request.addHeader("Content-MD5", "10dfe6fe1fe957250d508fcac3b0cbaf");  
-        request.setContent("public key content".getBytes());
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
-    }
+//    
+//    @Test
+//    public void storeKey_Unauthorized() throws Exception {
+//        request.setContent("public key content".getBytes());
+//        request.addHeader("Content-MD5", "7897fasdsd9fsadf9sd77fa9sa98f7ds");  
+//        
+//        assertEquals(1, classUnderTest.storeKey(request, "test.baltrad.eu"));
+//    }
+//    
+//    @Test
+//    public void storeKey_OK() throws Exception {
+//        Properties props = new Properties();
+//        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
+//        AppConfiguration appConf = new AppConfiguration(props);
+//        
+//        expect(confManagerMock.getAppConf()).andReturn(appConf);
+//        expect(keystoreManagerMock.store(isA(Key.class))).andReturn(Integer.SIZE);
+//        
+//        replayAll();
+//        
+//        classUnderTest.setConfManager(confManagerMock);
+//        classUnderTest.setKeystoreManager(keystoreManagerMock);
+//        
+//        request.setContent("public key content".getBytes());
+//        request.addHeader("Content-MD5", "10dfe6fe1fe957250d508fcac3b0cbaf");  
+//        
+//        classUnderTest.storeKey(request, "test.baltrad.eu");
+//        
+//        verifyAll();
+//        
+//        assertTrue((new File("keystore/.incoming/test.baltrad.eu.pub")).exists());
+//    }
+//    
+//    @Test
+//    public void handleRequest_ServerError() throws Exception {
+//        Properties props = new Properties();
+//        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
+//                
+//        expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(null);
+//        
+//        replayAll();
+//        
+//        classUnderTest.setKeystoreManager(keystoreManagerMock);
+//        request.setAttribute("Node-Name", "test.baltrad.eu");
+//        classUnderTest.handleRequest(request, response);
+//        
+//        verifyAll();
+//        
+//        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+//                response.getStatus());
+//        assertEquals(messages.getMessage("postkey.server.internal_server_error"),
+//                response.getErrorMessage());
+//    }
+//    
+//    @Test
+//    public void handleRequest_Unauthorized() throws Exception {
+//        request.setContent("public key content".getBytes());
+//        request.addHeader("Content-MD5", "7897fasdsd9fsadf9sd77fa9sa98f7ds"); 
+//        request.setAttribute("Node-Name", "test.baltrad.eu");
+//        
+//        expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(null);
+//        
+//        replayAll();
+//        
+//        classUnderTest.setKeystoreManager(keystoreManagerMock);
+//        classUnderTest.handleRequest(request, response);
+//        
+//        verifyAll();
+//        
+//        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+//    }
+//    
+//    @Test
+//    public void handleRequest_KeyExists() throws Exception {
+//        Properties props = new Properties();
+//        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
+//        
+//        expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(new Key());
+//        
+//        replayAll();
+//        
+//        classUnderTest.setKeystoreManager(keystoreManagerMock);
+//        request.setAttribute("Node-Name", "test.baltrad.eu");
+//        classUnderTest.handleRequest(request, response);
+//        
+//        verifyAll();
+//        
+//        assertEquals(HttpServletResponse.SC_CONFLICT, response.getStatus());
+//    }
+//    
+//    @Test
+//    public void handleRequest_OK() throws Exception {
+//        Properties props = new Properties();
+//        props.setProperty(AppConfiguration.KEYSTORE_DIR, "keystore");
+//        AppConfiguration appConf = new AppConfiguration(props);
+//        
+//        expect(keystoreManagerMock.load("test.baltrad.eu")).andReturn(null);
+//        expect(keystoreManagerMock.store(isA(Key.class)))
+//                .andReturn(Integer.SIZE);
+//        expect(confManagerMock.getAppConf()).andReturn(appConf);
+//        
+//        replayAll();
+//        
+//        classUnderTest.setConfManager(confManagerMock);
+//        classUnderTest.setKeystoreManager(keystoreManagerMock);
+//        
+//        request.setAttribute("Node-Name", "test.baltrad.eu");
+//        request.addHeader("Content-MD5", "10dfe6fe1fe957250d508fcac3b0cbaf");  
+//        request.setContent("public key content".getBytes());
+//        classUnderTest.handleRequest(request, response);
+//        
+//        verifyAll();
+//        
+//        assertEquals(HttpServletResponse.SC_OK, response.getStatus());
+//    }
     
 }

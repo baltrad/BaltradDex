@@ -21,9 +21,15 @@
 
 package eu.baltrad.dex.net.servlet;
 
+import eu.baltrad.beast.security.Authorization;
+import eu.baltrad.beast.security.AuthorizationRequest;
+import eu.baltrad.beast.security.IAuthorizationRequestManager;
+import eu.baltrad.beast.security.ISecurityManager;
+import eu.baltrad.beast.security.mail.IAdminMailer;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.keystore.manager.IKeystoreManager;
 import eu.baltrad.dex.net.protocol.ProtocolManager;
+import eu.baltrad.dex.net.request.INodeRequest;
 import eu.baltrad.dex.net.request.impl.NodeRequest;
 import eu.baltrad.dex.net.response.impl.NodeResponse;
 import eu.baltrad.dex.util.MessageResourceUtil;
@@ -49,6 +55,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletInputStream;
 
 import java.io.File;
+import java.io.InputStream;
+import java.util.Date;
+import java.util.UUID;
 
 /**
  * Receives and handles post key requests.
@@ -66,11 +75,17 @@ public class PostKeyServlet extends HttpServlet {
     private static final String PK_KEY_RECEIVED = "postkey.server.key_received";
     
     private IConfigurationManager confManager;
-    private IKeystoreManager keystoreManager;
+
     private MessageResourceUtil messages;
+    
+    private ISecurityManager securityManager = null;
+
+    private IAuthorizationRequestManager authorizationRequestManager = null;
+    
+    private IAdminMailer adminMailer = null;
+
     private Logger log;
     
-    private ProtocolManager protocolManager = null;
     private final static Logger logger = LogManager.getLogger(PostKeyServlet.class); 
     
     /**
@@ -81,51 +96,19 @@ public class PostKeyServlet extends HttpServlet {
     }
     
     /**
-     * Stores compressed key in the keystore directory.
-     * @param request HTTP servlet request
-     * @param nodeName Node name
-     * @return 0 in case of successful key checksum verification, 1 otherwise
-     * @throws RuntimeException  
+     * Gets the bytes from the stream
      */
-    protected int storeKey(HttpServletRequest request, String nodeName) 
-            throws RuntimeException {
-        CompressDataUtil cdu = new CompressDataUtil();
-        try {
-            ServletInputStream sis = request.getInputStream();
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            IOUtils.copy(sis, baos);
-            byte[] keyContent = baos.toByteArray();
-            try {
-                String checksumHeader = request.getHeader("Content-MD5");
-                String checksumCalc = DigestUtils.md5Hex(keyContent);
-                if (checksumHeader.equals(checksumCalc)) {
-                    String incomingPath = confManager.getAppConf()
-                        .getKeystoreDir() + File.separator + INCOMING_KEY_DIR; 
-                    File incomingDir = new File(incomingPath); 
-                    if (!incomingDir.exists()) {
-                        incomingDir.mkdir();
-                    }
-                    cdu.unzip(incomingPath + File.separator + nodeName + ".pub", 
-                            keyContent);
-                    Key key = new Key(nodeName, checksumCalc, false, false);
-                    if (keystoreManager.store(key) > 0) {
-                        log.log(StickyLevel.STICKY, messages.getMessage(
-                            PK_KEY_RECEIVED, new String[] {nodeName}));
-                    }
-                    return 0;
-                } else {
-                    return 1;
-                }
-            } finally {
-                sis.close();
-                baos.close();
-            }
-        } catch (Exception e) {
-          logger.error("storeKey failed: " + e.getMessage(), e);
-            throw new RuntimeException("Failed to extract key from " +
-                    "input stream", e);
-        }
+    protected byte[] getBytesFromStream(InputStream is) {
+      try {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        IOUtils.copy(is, baos);
+        return baos.toByteArray();
+      } catch (Exception e) {
+        logger.error("Failed to extract key content: " + e.getMessage(), e);
+        throw new RuntimeException("Failed to extract key content: " + e.getMessage(), e);
+      }
     }
+    
     
     /**
      * Handles incoming HTTP request.
@@ -151,18 +134,38 @@ public class PostKeyServlet extends HttpServlet {
         NodeRequest req = new NodeRequest(request);
         NodeResponse res = new NodeResponse(response);
         logger.debug("Request arrived using protocol version '" + req.getProtocolVersion() + "'");
-        
+
         try {
-            if (keystoreManager.load(req.getNodeName()) == null) {
-                log.info("Public key received from " + req.getNodeName());
-                if(storeKey(request, req.getNodeName()) == 0) {
-                    res.setStatus(HttpServletResponse.SC_OK);
-                } else {
-                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                }
-            } else {
-                res.setStatus(HttpServletResponse.SC_CONFLICT);
-            }
+          AuthorizationRequest remote = new AuthorizationRequest();
+          Authorization local = securityManager.getLocal();
+          String mailTo = confManager.getAppConf().getAdminEmail();
+          String linkURL = confManager.getAppConf().getNodeAddress();
+          
+          remote.setChecksum((String)request.getAttribute("Content-MD5"));
+          remote.setMessage("Old style key request. Note that node address and email has been autogenerated. Verify with requestor first, then adjust and approve.");
+          remote.setNodeAddress("http://" + request.getRemoteAddr() + ":8080");
+          remote.setNodeName(req.getNodeName());
+          remote.setNodeEmail(req.getNodeName());
+          remote.setOutgoing(false);
+          remote.setRemoteHost(request.getRemoteHost());
+          remote.setRequestUUID(UUID.randomUUID().toString());
+          remote.setPublicKey(getBytesFromStream(request.getInputStream()));
+          remote.setReceivedAt(new Date());
+          remote.setAutorequest(false);
+          authorizationRequestManager.add(remote);
+          
+          log.log(StickyLevel.STICKY, messages.getMessage(PK_KEY_RECEIVED, new String[] {req.getNodeName()}));
+          
+          if (local != null) {
+            mailTo = local.getNodeEmail();
+            linkURL = local.getNodeAddress();
+            
+          }
+          adminMailer.sendKeyApprovalRequest(mailTo, 
+              "Key approval request received from " + remote.getNodeName() + " with IP " + remote.getRemoteHost(), 
+              linkURL + "/BaltradDex/authorization_request.htm?uuid="+remote.getRequestUUID(), 
+              remote.getMessage(), 
+              remote);
         } catch (Exception e) {
             logger.error("doPost failed: " + e.getMessage(), e);
             log.error(messages.getMessage(PK_INTERNAL_SERVER_ERROR_KEY));
@@ -180,14 +183,6 @@ public class PostKeyServlet extends HttpServlet {
     }
     
     /**
-     * @param keystoreManager the keystoreManager to set
-     */
-    @Autowired
-    public void setKeystoreManager(IKeystoreManager keystoreManager) {
-        this.keystoreManager = keystoreManager;
-    }
-    
-    /**
      * @param messages the messages to set
      */
     @Autowired
@@ -196,10 +191,27 @@ public class PostKeyServlet extends HttpServlet {
     }
 
     /**
-     * @param protocolManager the protocol manager to use
+     * @param securityManager the securityManager to set
      */
     @Autowired
-    public void setProtocolManager(ProtocolManager protocolManager) {
-      this.protocolManager = protocolManager;
+    public void setSecurityManager(ISecurityManager securityManager) {
+      this.securityManager = securityManager;
     }
+    
+    /**
+     * @param authorizationRequestManager the authorizationRequestManager to set
+     */
+    @Autowired
+    public void setAuthorizationRequestManager(IAuthorizationRequestManager authorizationRequestManager) {
+      this.authorizationRequestManager = authorizationRequestManager;
+    }
+    
+    /**
+     * @param adminMailer the adminMailer to set
+     */
+    @Autowired
+    public void setAdminMailer(IAdminMailer adminMailer) {
+      this.adminMailer = adminMailer;
+    }
+    
 }

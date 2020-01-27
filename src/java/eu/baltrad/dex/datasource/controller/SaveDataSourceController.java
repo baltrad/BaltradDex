@@ -52,8 +52,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
-
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -97,14 +98,15 @@ public class SaveDataSourceController {
     private DataSourceValidator validator;
     private MessageResourceUtil messages;
     private Logger log;
-    
     protected Map<Integer, Radar> radarsAvailable;
     protected Map<Integer, Radar> radarsSelected;
     protected Map<Integer, FileObject> fileObjectsAvailable;
     protected Map<Integer, FileObject> fileObjectsSelected;
     protected Map<Integer, User> usersAvailable;
     protected Map<Integer, User> usersSelected;
-    
+
+    private static Logger logger = LogManager.getLogger(SaveDataSourceController.class);
+
     /**
      * Constructor.
      */
@@ -353,6 +355,7 @@ public class SaveDataSourceController {
                                 dataSourceManager.createFilter(sources, 
                                     fileObjects);
                         // Save filter parameter
+                        logger.info("Created combined filter: " + new ObjectMapper().writer().writeValueAsString(combinedFilter));
                         coreFilterManager.store(combinedFilter);
                         dataSourceManager.deleteFilter(dataSourceId);
                         dataSourceManager.storeFilter(dataSourceId, 

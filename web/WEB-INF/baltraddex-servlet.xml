@@ -89,6 +89,11 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           class="eu.baltrad.dex.auth.controller.LoginController"
           autowire="byType"/>
     
+    <!-- Keyczar authenticator, uses beasts security manager -->
+    <bean id="keyczarAuthenticator" class="eu.baltrad.dex.net.auth.KeyczarAuthenticator">
+      <constructor-arg ref="securityManager"/>
+    </bean>
+    
     <!-- Node status controller -->
     <bean id="nodeStatusController" 
           class="eu.baltrad.dex.status.controller.NodeStatusController"
@@ -191,7 +196,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 	<!-- Protocol manager -->
 	<bean id="protocolManager"
 		  class="eu.baltrad.dex.net.protocol.impl.ProtocolVersionManager"
-		  autowire="byType" />
+		  autowire="byType">
+		  <constructor-arg value="2.1"/>
+	</bean>
 
     <!-- Clear messages controller -->
     <bean id="removeMessagesController" 
@@ -270,6 +277,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           class="eu.baltrad.dex.keystore.controller.KeystoreController"
           autowire="byType"/>
 
+    <bean id="authorizationController"
+          class="eu.baltrad.dex.keystore.controller.AuthorizationController"
+          autowire="byType" />
+
     <!-- Save radar controller -->
     <bean id="saveRadarController"
           class="eu.baltrad.dex.radar.controller.SaveRadarController"
@@ -344,6 +355,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="postKeyServlet" 
           class="eu.baltrad.dex.net.servlet.PostKeyServlet" 
           autowire="byType"/>      
+
+    <!-- Post auth key servlet -->
+    <bean id="postAuthKeyServlet" 
+          class="eu.baltrad.dex.net.servlet.PostAuthKeyServlet" 
+          autowire="byType">      
+      <!--<property name="adminMailer" ref="adminMailer" />-->
+    </bean>
           
     <!-- Incoming file namer -->      
     <bean id="incomingFileNamer" 
@@ -419,6 +437,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             <list>
                 <value>db.properties</value>
                 <value>classpath:resources/dex.fc.properties</value>
+                <value>classpath:resources/dex.beast.properties</value>
             </list>
         </property>
     </bean>
@@ -658,4 +677,35 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   </bean>
 
   <bean id="xmlmsgParser" class="eu.baltrad.beast.parser.impl.XmlMessageParser" autowire="byType"/>
+
+  <!-- Below are classes needed for running the node exchange -->
+  <bean id="adminMailer" class="eu.baltrad.beast.security.mail.AdminMailer" autowire="byType">
+    <property name="defaultEncoding" value="${beast.admin.mailer.encoding}" />
+    <property name="host" value="${beast.admin.mailer.host}" />
+    <property name="port" value="${beast.admin.mailer.port}" />
+    <property name="username" value="${beast.admin.mailer.username}" />
+    <property name="password" value="${beast.admin.mailer.password}" />
+    <property name="from" value="${beast.admin.mailer.from}" />
+    <property name="properties">
+      <map>
+        <entry key="mail.transport.protocol" value="${beast.admin.mailer.transport.protocol}"/>
+        <entry key="mail.smtp.auth" value="${beast.admin.mailer.smtp.auth}"/>
+        <entry key="mail.smtp.starttls.enable" value="${beast.admin.mailer.smtp.starttls.enable}"/>
+        <entry key="mail.debug" value="true"/>
+      </map>
+    </property>    
+  </bean>
+
+  <bean id="authorizationManager" class="eu.baltrad.beast.security.AuthorizationManager" autowire="byType" />
+  <bean id="authorizationRequestManager" class="eu.baltrad.beast.security.AuthorizationRequestManager" autowire="byType" />
+  <bean id="securityManager" class="eu.baltrad.beast.security.SecurityManager" autowire="byType">
+    <property name="keyczarKeyPath" value="${beast.admin.security.keyzcar.path}" />
+  </bean>
+  <bean id="exchangeConnector" class="eu.baltrad.beast.exchange.json.HttpExchangeConnector" autowire="byType" />
+  <bean id="requestMapper" class="eu.baltrad.beast.exchange.json.RequestMapperImpl" autowire="byType" />
+  <bean id="exchangeManager" class="eu.baltrad.beast.exchange.ExchangeManager" autowire="byType">
+    <property name="queueSize" value="${beast.pooled.publisher.queue.size}" />
+    <property name="corePoolSize" value="${beast.pooled.publisher.pool.core.size}" />
+    <property name="maxPoolSize" value="${beast.pooled.publisher.pool.max.size}" />
+  </bean>
 </beans>

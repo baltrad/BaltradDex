@@ -174,6 +174,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <mkdir dir="${build.lib.dir}"/>
     <delete dir="${dist.dir}"/>
     <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${build.dir}/itest" />
     
     <!-- copy libraries -->
     <copy todir="${build.lib.dir}">
@@ -243,10 +244,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="commons-dbcp.jar"/>
         <include name="commons-pool.jar"/>
         <include name="commons-net-2.2.jar"/>
-	    <include name="httpclient-4.1.2.jar"/>
-	    <include name="httpclient-cache-4.1.2.jar"/>
-	    <include name="httpcore-4.1.2.jar"/>
-	    <include name="httpmime-4.1.2.jar"/>
+	      <include name="httpclient-4.1.2.jar"/>
+	      <include name="httpclient-cache-4.1.2.jar"/>
+	      <include name="httpcore-4.1.2.jar"/>
+	      <include name="httpmime-4.1.2.jar"/>
         <include name="groovy-all-1.6.4.jar"/>
         <include name="jackson-core-lgpl-1.8.2.jar"/>
         <include name="jackson-mapper-lgpl-1.8.2.jar"/>
@@ -257,6 +258,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="xmlrpc-client-3.1.2.jar"/>
         <include name="xmlrpc-common-3.1.2.jar"/>
         <include name="xmlrpc-server-3.1.2.jar"/>
+        <include name="javax.mail-api-1.6.2.jar"/>
+      	<include name="javax.mail-1.6.2.jar"/>
       </fileset>
       <fileset dir="${beast.path}/bin">
         <include name="*.jar"/>
@@ -311,7 +314,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="bdb.xml" />
         <include name="jsp/**/*.jsp" />
         <include name="tags/**/*.tag" />
-        <include name="**/*.tld" />
+      	<include name="**/*.tld" />
       </fileset>
     </copy>
 
@@ -497,12 +500,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
          delimitertype="row">
       <transaction src="${etc.dir}/drop_dex_schema.sql"/>
       <transaction src="${etc.dir}/create_dex_schema.sql"/>
+      <transaction src="${etc.dir}/extras_testdb.sql"/>
       <transaction src="${beast.path}/sql/drop_db.sql"/>
       <transaction src="${beast.path}/sql/create_db.sql"/>
     </sql>
   </target>
   <!-- Start baltrad-bdb server -->
-  <target name="start-bdb-server">
+  <target name="start-bdb-server" depends="init">
     <chmod file="${script.dir}/start-bdb-server.sh" perm="755"/>
     <exec executable="${script.dir}/start-bdb-server.sh">
       <arg value="${bltnode.install.prefix}"/>  
@@ -537,6 +541,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <batchtest fork="yes" todir="${dist.dir}/junit-reports">
         <fileset dir="${build.itest.dir}" includes="**/*Test.class"/>
       </batchtest>
+      <!--
+      <batchtest fork="yes" todir="${dist.dir}/junit-reports">
+        <fileset dir="${build.itest.dir}" includes="**/UserManagerTest.class"/>
+      </batchtest>-->
     </junit>
     <!-- Stop bdb server once the tests are finished -->
     <antcall target="stop-bdb-server"/>

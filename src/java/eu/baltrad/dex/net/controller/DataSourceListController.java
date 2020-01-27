@@ -42,6 +42,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import eu.baltrad.beast.security.SecurityStorageException;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.log.StickyLevel;
@@ -162,8 +163,6 @@ public class DataSourceListController {
      * Initializes controller with current configuration
      */
     protected void initConfiguration() {
-        this.authenticator = new KeyczarAuthenticator(
-                confManager.getAppConf().getKeystoreDir());
         this.httpClient = new HttpClientUtil(
                 Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
                 Integer.parseInt(confManager.getAppConf().getSoTimeout()));
@@ -376,6 +375,8 @@ public class DataSourceListController {
         }
       } catch (KeyczarException e){
         messageHelper.setErrorDetailsMessage(model, DS_MESSAGE_SIGNER_ERROR_KEY, e.getMessage());
+      } catch (SecurityStorageException e) {
+        messageHelper.setErrorDetailsMessage(model, DS_MESSAGE_SIGNER_ERROR_KEY, e.getMessage());
       } catch (ResponseParserException e) {
         messageHelper.setErrorDetailsMessage(model, DS_INTERNAL_CONTROLLER_ERROR_KEY, e.getMessage(), new Object[] {url});
       } catch (IOException e) {
@@ -428,6 +429,7 @@ public class DataSourceListController {
     /**
      * @param authenticator the authenticator to set
      */
+    @Autowired
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
     }

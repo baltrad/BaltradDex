@@ -1706,7 +1706,7 @@ textarea {
 
 /* users */
 
-.users, .user-save, .user-passwd {
+.users, .user-save, .user-passwd, .connect_with_remote_host, .authorization_request, .authorization_list, .authorization_entry {
 	width: 674px;
 	float: left; 
 	clear: both;
@@ -1714,6 +1714,10 @@ textarea {
 }
 .users .body .row,
 .user-save .body .row,
+.authorization_list .body .row,
+.connect_with_remote_host .body .row,
+.authorization_request .body .row,
+.authorization_entry .body .row,
 .user-passwd .body .row {
     width: 670px;
     float: left;
@@ -1723,6 +1727,12 @@ textarea {
 .users .name, 
 .users .role, 
 .users .org,
+.authorization_list .name,
+.authorization_list .email,
+.authorization_list .authorized,
+.authorization_list .type,
+.authorization_list .injector, 
+.authorization_list .local, 
 .users .passwd {
     float: left;
     padding: 4px 2px 2px 2px;
@@ -1739,15 +1749,52 @@ textarea {
 .users .passwd {
     width: 100px;
 }
+.authorization_list .name {
+    width: 140px;
+}
+.authorization_list .email {
+    width: 200px;
+}
+.authorization_list .type {
+    width: 200px;
+}
+.authorization_list .authorized {
+    width: 100px;
+    text-align: center;
+}
+.authorization_list .injector {
+    width: 100px;
+    text-align: center;
+}
+.authorization_list .local {
+    width: 100px;
+}
 .user-save .leftcol,
 .user-save .rightcol,
+.authorization_request .leftcol,
+.authorization_request .rightcol,
+.authorization_entry .leftcol,
+.authorization_entry .rightcol,
 .user-passwd .leftcol,
 .user-passwd .rightcol {
     float: left;
 }
+.connect_with_remote_host .leftcol,
+.connect_with_remote_host .rightcol,
+.authorization_request .leftcol,
+.authorization_request .rightcol, 
+.authorization_entry .leftcol,
+.authorization_entry .rightcol,
 .user-save .leftcol,
 .user-passwd .leftcol {
     width: 160px;
+    font-weight: bold;
+    text-align: right;
+    padding: 4px 4px 0 0;
+}
+.authorization_entry .rightcol,
+.authorization_request .rightcol {
+    width: 497px;
     font-weight: bold;
     text-align: right;
     padding: 4px 4px 0 0;
@@ -1757,6 +1804,8 @@ textarea {
     font-size: 13px;
     color: #003399;
 }
+.authorization_request .rightcol input,
+.authorization_entry .rightcol input,
 .user-save .row .rightcol input,
 .user-passwd .row .rightcol input {
     width: 280px;
@@ -1764,6 +1813,13 @@ textarea {
     font-size: 12px;
     margin: 2px 0 2px 0;
 }
+.connect_with_remote_host .rightcol input {
+    width: 497px;
+    height: 14px;
+    font-size: 12px;
+    margin: 2px 0 2px 0;
+}
+.connect_with_remote_host .rightcol select,
 .user-save .row .rightcol select {
     width: 280px;
     height: 18px;
@@ -1772,7 +1828,15 @@ textarea {
 .user-passwd .messagebox {
     margin-left: 25%;
 }
-
+.authorization_entry .rightcol textarea,
+.authorization_request .rightcol textarea {
+    width: 497px;
+    height: 200px;
+}
+.connect_with_remote_host .rightcol textarea {
+    width: 497px;
+    height: 200px;
+}
 /* messages and registry */
 
 .messages-settings,
@@ -1937,6 +2001,94 @@ textarea {
 }    
 .keystore button.delete-confirm:hover,
 .keystore button.delete-cancel:hover {
+    text-decoration: none;
+}
+
+/* key_authorization_list */
+
+.key_authorization_list {
+	width: 674px;
+	float: left; 
+	clear: both;
+	margin: 20px 8px 80px 8px;
+}
+.key_authorization_list .body .row {
+    width: 670px;
+    float: left;
+    margin: 0 2px 0 2px;
+    border-bottom: 1px solid #B4CAE8;
+}
+.key_authorization_list .name,
+.key_authorization_list .email {
+    float: left;
+    padding: 4px 2px 2px 2px;
+}
+.key_authorization_list .name {
+    width: 180px;
+}
+.key_authorization_list .email {
+    width: 200px;
+}
+
+.key_authorization_list .header-row .authorized,
+.key_authorization_list .header-row .delete,
+.key_authorization_list .header-row .injector {
+    float: left;
+    padding: 4px 2px 2px 2px;
+    text-align: center;
+}
+.key_authorization_list .authorized,
+.key_authorization_list .delete,
+.key_authorization_list .injector {
+    float: left;
+}
+.key_authorization_list .authorized {
+    width: 60px;
+    margin-left: 20px;
+}
+.key_authorization_list .injector {
+    width: 60px;
+}
+.key_authorization_list .delete {
+    width: 120px;
+}
+.key_authorization_list .authorized button,
+.key_authorization_list .delete button,
+.key_authorization_list .injector button {
+    width: 20px;
+    height: 20px;
+    float:left;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+.key_authorization_list .authorized button {
+    margin-left: 22px;
+}
+.key_authorization_list .delete .delete-button {
+    margin-left: 56px;
+}
+.key_authorization_list .injector button {
+    margin-left: 22px;
+}
+.key_authorization_list button.delete-confirm,
+.key_authorization_list button.delete-cancel {
+    float: left;
+    font-size: 12px;
+    width: 44px;
+    border: none;
+    background: none;
+    text-decoration: underline;
+    color: #003399;
+}
+.key_authorization_list button.delete-confirm {
+    margin-left: 18px;
+}
+.key_authorization_list button.delete-cancel {
+    margin-left: 12px;
+}    
+.key_authorization_list button.delete-confirm:hover,
+.key_authorization_list button.delete-cancel:hover {
     text-decoration: none;
 }
 

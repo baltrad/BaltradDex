@@ -15,6 +15,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
@@ -43,6 +45,8 @@ public class ProtocolVersionRequestFactory implements RequestFactory {
   protected SimpleDateFormat dateFormat;
   protected String protocolVersion = PROTOCOL_VERSION_20;
   
+  private static Logger logger = LogManager.getLogger(ProtocolVersionRequestFactory.class);
+  
   /**
    * Constructor
    * @param serverURI the base server uri. E.g http://127.0.0.1:8080
@@ -53,6 +57,7 @@ public class ProtocolVersionRequestFactory implements RequestFactory {
     if (!validator.isValid(serverURI.toString())) {
       throw new IllegalArgumentException("Invalid URI format: " + serverURI);
     }
+    logger.info("Protocol version: " + protocolVersion);
     if (!protocolVersion.equals(PROTOCOL_VERSION_20) && !protocolVersion.equals(PROTOCOL_VERSION_21)) {
       throw new IllegalArgumentException("Invalid protocol version. Only valid versions are 2.0 and 2.1");
     }

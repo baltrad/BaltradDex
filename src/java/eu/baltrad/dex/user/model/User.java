@@ -88,6 +88,33 @@ public class User implements Comparable<User> {
         this.countryCode = countryCode;
         this.nodeAddress = nodeAddress;
     }
+ 
+    /**
+     * Constructor.
+     * @param name User name
+     * @param password Password
+     * @param orgName Organization name
+     * @param orgUnit Unit name
+     * @param locality Locality (city)
+     * @param state State (country)
+     * @param countryCode 2-letter country code
+     * @param nodeAddress HTTP address 
+     * @param redirectedAddress redirected address
+     */
+    public User(String name, String role, String password, 
+            String orgName, String orgUnit, String locality, String state, 
+            String countryCode, String nodeAddress, String redirectedAddress) {
+        this.name = name;
+        this.role = role;
+        this.password = password;
+        this.orgName = orgName;
+        this.orgUnit = orgUnit;
+        this.locality = locality;
+        this.state = state;
+        this.countryCode = countryCode;
+        this.nodeAddress = nodeAddress;
+        this.redirectedAddress = redirectedAddress;
+    }
     
     /**
      * Constructor.
@@ -114,6 +141,34 @@ public class User implements Comparable<User> {
         this.state = state;
         this.countryCode = countryCode;
         this.nodeAddress = nodeAddress;
+    }
+
+    /**
+     * Constructor.
+     * @param id Record id
+     * @param name User name
+     * @param password Password
+     * @param orgName Organization name
+     * @param orgUnit Unit name
+     * @param locality Locality (city)
+     * @param state State (country)
+     * @param countryCode 2-letter country code
+     * @param nodeAddress HTTP address 
+     */
+    public User(int id, String name, String role, String password, 
+            String orgName, String orgUnit, String locality, String state, 
+            String countryCode, String nodeAddress, String redirectedAddress) {
+        this.id = id;
+        this.name = name;
+        this.role = role;
+        this.password = password;
+        this.orgName = orgName;
+        this.orgUnit = orgUnit;
+        this.locality = locality;
+        this.state = state;
+        this.countryCode = countryCode;
+        this.nodeAddress = nodeAddress;
+        this.redirectedAddress = redirectedAddress;
     }
     
     /**
@@ -152,9 +207,7 @@ public class User implements Comparable<User> {
                this.getCountryCode() != null &&
                this.getCountryCode().equals(user.getCountryCode()) &&
                this.getNodeAddress() != null && 
-               this.getNodeAddress().equals(user.getNodeAddress()) &&
-               this.getRedirectedAddress() != null &&
-               this.getRedirectedAddress().equals(user.getRedirectedAddress());
+               this.getNodeAddress().equals(user.getNodeAddress());
     }
     
     /**

@@ -141,9 +141,9 @@ public class UserManagerTest extends TestCase{
         assertNotNull(users);
         assertEquals(2, users.size());
         assertTrue(users.contains(new User("User4", "peer", "passw0rd", "org4",
-            "unit4", "locality4", "state4", "XY", "http://test4.baltrad.eu")));
+            "unit4", "locality4", "state4", "XY", "http://test4.baltrad.eu", null)));
         assertTrue(users.contains(new User("User5", "peer", "passw0rd", "org5",
-            "unit5", "locality5", "state5", "XZ", "http://test5.baltrad.eu")));
+            "unit5", "locality5", "state5", "XZ", "http://test5.baltrad.eu", null)));
         verifyAll();
     }
     
@@ -152,24 +152,24 @@ public class UserManagerTest extends TestCase{
         assertNotNull(users);
         assertEquals(2, users.size());
         assertTrue(users.contains(new User("User1", "admin", "passw0rd", "org1",
-            "unit1", "locality1", "state1", "XX", "http://test1.baltrad.eu")));
+            "unit1", "locality1", "state1", "XX", "http://test1.baltrad.eu", null)));
         assertTrue(users.contains(new User("User2", "operator", "passw0rd", 
             "org2", "unit2", "locality2", "state2", "YY", 
-                "http://test2.baltrad.eu")));
+                "http://test2.baltrad.eu", null)));
         verifyAll();
     }
         
     public void testStore() throws Exception {
         helper.cleanInsert(this, "noid");
         User user = new User("User6", "operator", "passw0rd", "org6", "unit6", 
-                "locality6", "state6", "VV", "http://test6.baltrad.eu");
+                "locality6", "state6", "VV", "http://test6.baltrad.eu", "http://kalle.se");
         assertEquals(6, classUnderTest.store(user));
         verifyDBTables("store", "dex_users", "id");
     }
     
     public void testUpdate() throws Exception {
         User user = new User(3, "User3", "user", "passw0rd", "org4", "unit4", 
-                "locality4", "state4", "VV", "http://test4.baltrad.eu");
+                "locality4", "state4", "VV", "http://test4.baltrad.eu", "http://kalle.se");
         
         classUnderTest.update(user);
         verifyDBTables("update", "dex_users", null);

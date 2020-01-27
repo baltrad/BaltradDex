@@ -22,6 +22,7 @@
 package eu.baltrad.dex.net.auth;
 
 import eu.baltrad.dex.net.auth.Authenticator;
+import eu.baltrad.beast.security.ISecurityManager;
 import eu.baltrad.dex.auth.util.CryptoFactory;
 import eu.baltrad.dex.auth.util.KeyczarCryptoFactory;
 import eu.baltrad.dex.auth.util.Signer;
@@ -38,28 +39,33 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 
 import org.keyczar.exceptions.KeyczarException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Implements Keyczar authenticator.
+ * Implements Keyczar authenticator. Uses the security manager in beast.
  * @author Maciej Szewczykowski | maciej@baltrad.eu
  * @version 1.1.0
  * @since 1.1.0
  */
 public class KeyczarAuthenticator implements Authenticator {
-    
-    private static final String[] HEADERS = {"Content-Type", "Content-MD5",
-        "Date"};
     private static final String AUTH_HDR = "Authorization";
-    private CryptoFactory cryptoFactory;
-    private Logger log;
+    /**
+     * The security manager
+     */
+    private ISecurityManager securityManager;
+    
+    /**
+     * DEX logger
+     */
+    //private Logger log;
     
     /**
      * Constructor.
      * @param keystoreRoot Keystore root directory
      */
-    public KeyczarAuthenticator(String keystoreRoot) {
-        this.cryptoFactory = new KeyczarCryptoFactory(new File(keystoreRoot));
-        this.log = Logger.getLogger("DEX");
+    public KeyczarAuthenticator(ISecurityManager securityManager/*String keystoreRoot*/) {
+      this.securityManager = securityManager;
+      //this.log = Logger.getLogger("DEX");
     }
     
     /**
@@ -69,9 +75,8 @@ public class KeyczarAuthenticator implements Authenticator {
      */
     public void addCredentials(HttpUriRequest request, String keyName) 
                 throws KeyczarException {
-        String message = getMessage(request);
-        Signer signer = cryptoFactory.createSigner(keyName);
-        request.addHeader(AUTH_HDR, keyName + ":" + signer.sign(message));
+        String message = securityManager.createSignatureMessage(request);
+        request.addHeader(AUTH_HDR, keyName + ":" + securityManager.getSigner(keyName).sign(message));
     }
     
     /**
@@ -83,27 +88,14 @@ public class KeyczarAuthenticator implements Authenticator {
      */
     public boolean authenticate(String message, String signature, 
             String keyName) throws KeyczarException {
-        Verifier verifier = cryptoFactory.createVerifier(keyName);
-        return verifier.verify(message, signature);
+      return securityManager.getVerifier(keyName).verify(message, signature);
     }
-    
+
     /**
-     * Prepares message for signing.
-     * @param request Http request
-     * @return Message to be signed
+     * @param securityManager the security manager
      */
-    private String getMessage(HttpUriRequest request) {
-        List<String> result = new ArrayList<String>();
-        result.add(request.getMethod());
-        result.add(request.getURI().toString());
-        for (String headerName : HEADERS) {
-            Header header = request.getFirstHeader(headerName);
-            if (header != null) {
-                String headerValue = header.getValue();
-                headerValue = StringUtils.strip(headerValue);
-                result.add(headerValue);
-            }
-        } 
-        return StringUtils.join(result, '\n');
+    @Autowired
+    public void setSecurityManager(ISecurityManager securityManager) {
+      this.securityManager = securityManager;
     }
 }

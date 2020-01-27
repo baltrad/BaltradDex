@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.net.controller;
 
+import eu.baltrad.beast.security.SecurityStorageException;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.net.controller.exception.InternalControllerException;
 import eu.baltrad.dex.net.protocol.ProtocolManager;
@@ -96,6 +97,8 @@ public class UpdateSubscriptionController  {
     
     /** Subscribed peers key */
     private static final String SUBSCRIBED_PEERS_KEY = "subscribed_peers";
+    /** List of available connections */
+    private final static String NODES_KEY = "nodes";    
     /** Subscription by peer key */
     private static final String SUBSCRIPTION_BY_PEER_KEY = 
             "subscription_by_peer"; 
@@ -155,8 +158,6 @@ public class UpdateSubscriptionController  {
      * Initializes controller with current configuration
      */
     protected void initConfiguration() {
-        this.setAuthenticator(new KeyczarAuthenticator(
-                 confManager.getAppConf().getKeystoreDir()));
         this.httpClient = new HttpClientUtil(
                 Integer.parseInt(confManager.getAppConf().getConnTimeout()), 
                 Integer.parseInt(confManager.getAppConf().getSoTimeout()));
@@ -269,6 +270,7 @@ public class UpdateSubscriptionController  {
     @RequestMapping("/subscription_peers.htm")
     public String subscribedPeers(Model model) {
         model.addAttribute(SUBSCRIBED_PEERS_KEY, userManager.loadOperators());
+        model.addAttribute(NODES_KEY, userManager.loadPeerNames());
         return SUBSCRIBED_PEERS_VIEW;
     }
     
@@ -378,6 +380,8 @@ public class UpdateSubscriptionController  {
               messageHelper.setErrorDetailsMessage(model, GS_SERVER_ERROR_KEY, parser.getReasonPhrase(), peerName);
             }
         } catch (KeyczarException e) {
+          messageHelper.setErrorDetailsMessage(model, GS_MESSAGE_SIGNER_ERROR_KEY, e.getMessage());
+        } catch (SecurityStorageException e) {
           messageHelper.setErrorDetailsMessage(model, GS_MESSAGE_SIGNER_ERROR_KEY, e.getMessage());
         } catch (InternalControllerException e) {
           messageHelper.setErrorDetailsMessage(model, GS_INTERNAL_CONTROLLER_ERROR_KEY, e.getMessage(), peerName);

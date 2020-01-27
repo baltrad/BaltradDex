@@ -14,10 +14,10 @@
         
     <dex_users id="1" name="User1" password="passw0rd" org_name="org" 
                org_unit="unit" locality="locality " state="state" 
-               country_code="XX" node_address="http://test1.baltrad.eu"/>
+               country_code="XX" node_address="http://test1.baltrad.eu" redirected_address=""/>
     <dex_users id="2" name="User2" password="passw0rd" org_name="org" 
                org_unit="unit" locality="locality " state="state" 
-               country_code="XX" node_address="http://test2.baltrad.eu"/>      
+               country_code="XX" node_address="http://test2.baltrad.eu" redirected_address=""/>      
                
     <dex_users_roles id="1" user_id="1" role_id="1"/>
     <dex_users_roles id="2" user_id="2" role_id="1"/>

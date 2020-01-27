@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.net.servlet;
 
-import eu.baltrad.dex.net.auth.Authenticator;
+//import eu.baltrad.dex.net.auth.Authenticator;
 import eu.baltrad.dex.keystore.manager.IKeystoreManager;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
@@ -32,6 +32,7 @@ import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.util.FramePublisherManager;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
 import eu.baltrad.dex.status.manager.INodeStatusManager;
+import eu.baltrad.dex.status.model.Status;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.keystore.model.Key;
@@ -42,17 +43,22 @@ import eu.baltrad.bdb.db.DatabaseError;
 import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.oh5.Metadata;
 import eu.baltrad.bdb.oh5.MetadataMatcher;
+import eu.baltrad.bdb.oh5.Source;
 import eu.baltrad.bdb.util.FileEntryNamer;
+import eu.baltrad.bdb.util.Time;
 import eu.baltrad.bdb.expr.Expression;
 
 import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.mo.BltDataMessage;
+import eu.baltrad.beast.security.ISecurityManager;
 
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 import org.easymock.EasyMock;
+import org.easymock.EasyMockSupport;
+
 import static org.easymock.EasyMock.*;
 
 import org.keyczar.exceptions.KeyczarException;
@@ -62,6 +68,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -70,7 +77,7 @@ import org.junit.Test;
 
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
-
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -85,7 +92,7 @@ import java.util.ArrayList;
  * @version 1.1.0
  * @since 1.1.0
  */
-public class PostFileServletTest {
+public class PostFileServletTest extends EasyMockSupport {
     
     private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
     private final static String ENTRY_NAME = 
@@ -94,12 +101,15 @@ public class PostFileServletTest {
             "72cbb2e6-96ea-4313-9e15-50dc4b7bdb0b";
     
     private PFServlet classUnderTest;
-    private Authenticator authMock;
-    private IKeystoreManager keystoreManagerMock;
-    private INodeStatusManager nodeStatusManagerMock;
-    private FileCatalog fileCatalogMock;
+    private MethodMock methodMock;
+    private ISecurityManager securityManager;
+    private ISubscriptionManager subscriptionManager;
+    private INodeStatusManager nodeStatusManager;
+    private FileCatalog fileCatalog;
+
+    
+    //private IKeystoreManager keystoreManagerMock;
     private IBltMessageManager messageManagerMock;
-    private ISubscriptionManager subscriptionManagerMock;
     private IDataSourceManager dataSourceManagerMock;
     private IUserManager userManagerMock;
     private IRegistryManager registryManagerMock;
@@ -118,7 +128,7 @@ public class PostFileServletTest {
     private Subscription s1, s2, s3, s4;
     private DataSource ds1, ds2;
     private User user;
-    private List mocks;
+//    private List mocks;
     
     protected class PFServlet extends PostFileServlet {
         public PFServlet() {
@@ -128,6 +138,12 @@ public class PostFileServletTest {
         @Override
         public void initConfiguration() {}
     }
+    
+    interface MethodMock {
+      void sendMessage(FileEntry entry);
+      void sendToSubscribers(List<Subscription> uploads, FileEntry entry);
+      int validateSubscription(List<Subscription> downloads, FileEntry entry);
+    };
     
     protected interface Matcher {
         public boolean match(Metadata metadata, Expression ex);
@@ -149,35 +165,11 @@ public class PostFileServletTest {
         }
     }
     
-    private Object createMock(Class clazz) {
-        Object mock = EasyMock.createMock(clazz);
-        mocks.add(mock);
-        return mock;
-    }
-    
-    private void replayAll() {
-        for (Object mock : mocks) {
-            replay(mock);
-        }
-    }
-    
-    private void verifyAll() {
-        for (Object mock : mocks) {
-            verify(mock);
-        }
-    }
-    
-    private void resetAll() { 
-        for (Object mock : mocks) {
-            reset(mock);
-        }
-    }
-    
     private void setAttributes(MockHttpServletRequest request) {
         request.setAttribute("Content-Type", "text/html");  
         request.setAttribute("Content-MD5", Base64.encodeBase64String(
                 request.getRequestURI().getBytes()));
-        request.setAttribute("Date", format.format(new Date()));
+        request.setAttribute("Date", "Thu, 14 Nov 2019 09:18:43 CET");
         request.addHeader("Authorization", "test.baltrad.eu" + ":" + 
             "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_");   
         request.addHeader("Node-Name", "test.baltrad.eu");
@@ -186,29 +178,23 @@ public class PostFileServletTest {
     
     @Before
     public void setUp() {
-        mocks = new ArrayList();
-        classUnderTest = new PFServlet();
-        classUnderTest.setLog(Logger.getLogger("DEX"));
+
         messages = new MessageResourceUtil();
         messages.setBasename("resources/messages");
-        classUnderTest.setMessages(messages);
+        securityManager = createMock(ISecurityManager.class);
+        namerMock = createMock(FileEntryNamer.class);
+        methodMock = createMock(MethodMock.class);
+        fileCatalog = createMock(FileCatalog.class);
         
-        authMock = (Authenticator) createMock(Authenticator.class);
-        
-        keystoreManagerMock = (IKeystoreManager) 
-                createMock(IKeystoreManager.class); 
         injectorKey = new Key(1, "test.baltrad.eu", 
                 "fh7629shue7493kd893748du572895fi", true, true);
         peerKey = new Key(2, "test.baltrad.eu", 
                 "yu987876xc6886x898df9sdf89sfd97y", true, false);
 
-        fileCatalogMock = (FileCatalog) createMock(FileCatalog.class);
-        entryMock = (FileEntry) createMock(FileEntry.class);
-        namerMock = (FileEntryNamer) createMock(FileEntryNamer.class);
+        entryMock = createMock(FileEntry.class);
         messageManagerMock = (IBltMessageManager) 
                 createMock(IBltMessageManager.class);
-        subscriptionManagerMock = (ISubscriptionManager) 
-                createMock(ISubscriptionManager.class);
+        subscriptionManager = createMock(ISubscriptionManager.class);
         dataSourceManagerMock = (IDataSourceManager)
                 createMock(IDataSourceManager.class);
         userManagerMock = (IUserManager) createMock(IUserManager.class);
@@ -217,7 +203,7 @@ public class PostFileServletTest {
         fileManagerMock = (IBltFileManager) 
                 createMock(IBltFileManager.class);
         filterMock = (IFilter) createMock(IFilter.class);
-        nodeStatusManagerMock = (INodeStatusManager)createMock(INodeStatusManager.class); 
+        nodeStatusManager = createMock(INodeStatusManager.class); 
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         format = new SimpleDateFormat(DATE_FORMAT);
@@ -246,15 +232,37 @@ public class PostFileServletTest {
                 "locality", "state", "PL", "http://test.baltrad.eu");
         
         setAttributes(request);
+        
+        classUnderTest = new PFServlet() {
+          private static final long serialVersionUID = 1L;
+          protected void sendMessage(FileEntry entry) {
+            methodMock.sendMessage(entry);
+          }
+          protected void sendToSubscribers(List<Subscription> uploads, FileEntry entry) {
+            methodMock.sendToSubscribers(uploads, entry);
+          }
+          protected int validateSubscription(List<Subscription> downloads, FileEntry entry) {
+            return methodMock.validateSubscription(downloads, entry);
+          }
+        };
+        classUnderTest.setLog(Logger.getLogger("DEX"));
+        classUnderTest.setMessages(messages);
+        
+        
+        classUnderTest.setSecurityManager(securityManager);
+        classUnderTest.setNodeStatusManager(nodeStatusManager);
+        classUnderTest.setSubscriptionManager(subscriptionManager);
+        classUnderTest.setCatalog(fileCatalog);
+        classUnderTest.setNamer(namerMock);
     }
     
     @After
     public void tearDown() {
         classUnderTest = null;
-        authMock = null;
-        keystoreManagerMock = null;
-        fileCatalogMock = null;
-        subscriptionManagerMock = null;
+        methodMock = null;
+        securityManager = null;
+        fileCatalog = null;
+        subscriptionManager = null;
         dataSourceManagerMock = null;
         userManagerMock = null;
         registryManagerMock = null;
@@ -263,7 +271,7 @@ public class PostFileServletTest {
         filterMock = null;
         entryMock = null;
         namerMock = null;
-        nodeStatusManagerMock = null;
+        nodeStatusManager = null;
         injectorKey = null;
         peerKey = null;
         s1 = s2 = s3 = s4 = null;
@@ -273,326 +281,189 @@ public class PostFileServletTest {
     }
     
     @Test
-    public void handleRequest_MessageVerificationError() throws Exception {
-        authMock.authenticate(isA(String.class), isA(String.class),
-                isA(String.class));
+    public void handleRequest_Unauthorized() throws Exception {
+      expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(false);
+
+      replayAll();
         
-        expectLastCall().andThrow(new KeyczarException(
-                "Failed to verify message"));
+      classUnderTest.handleRequest(request, response);
         
-        replayAll();
+      verifyAll();
         
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
-        assertEquals(messages
-                .getMessage("postfile.server.message_verifier_error"), 
+      assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+      assertEquals(messages.getMessage("postfile.server.unauthorized_request"), 
                     response.getErrorMessage());
     }
-    
-    @Test
-    public void handleRequest_Unauthorized() throws Exception {
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.FALSE);
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.handleRequest(request, response);
-        verifyAll();
-        
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
-        assertEquals(
-            messages.getMessage("postfile.server.unauthorized_request"), 
-            response.getErrorMessage());
-    }
-    
+
     @Test
     public void handleRequest_GenericError() throws Exception {
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE);
-        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
-        expect(fileCatalogMock.store(isA(InputStream.class))).andReturn(null);
-        replayAll();
+      expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
+      expect(fileCatalog.store(isA(InputStream.class))).andReturn(null);
+      replayAll();
         
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setCatalog(fileCatalogMock);
-        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
-        classUnderTest.handleRequest(request, response);
-        verifyAll();
+      classUnderTest.handleRequest(request, response);
+      verifyAll();
         
-        assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
-        assertEquals(
-            messages.getMessage("postfile.server.generic_post_file_error"), 
-            response.getErrorMessage());
+      assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
+      assertEquals(messages.getMessage("postfile.server.generic_post_file_error"), response.getErrorMessage());
     }
-    
+ 
     @Test
     public void handleRequest_DuplicateEntry() throws Exception {
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE);
-        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
-        expect(fileCatalogMock.store(isA(InputStream.class)))
-                .andThrow(new DuplicateEntry());
-        replayAll();
+      expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
+      expect(fileCatalog.store(isA(InputStream.class))).andThrow(new DuplicateEntry());
+      replayAll();
         
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setCatalog(fileCatalogMock);
-        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
-        classUnderTest.handleRequest(request, response);
-        verifyAll();
+      classUnderTest.handleRequest(request, response);
+      verifyAll();
         
-        assertEquals(HttpServletResponse.SC_CONFLICT, response.getStatus());
-        assertEquals(
-            messages.getMessage("postfile.server.duplicate_entry_error"), 
-            response.getErrorMessage());
+      assertEquals(HttpServletResponse.SC_CONFLICT, response.getStatus());
+      assertEquals(messages.getMessage("postfile.server.duplicate_entry_error"), response.getErrorMessage());
     }
-    
+
     @Test
-    public void handleRequest_DatabaseError() throws Exception {    
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE);
-        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
-        expect(fileCatalogMock.store(isA(InputStream.class)))
-                .andThrow(new DatabaseError());
-        replayAll();
+    public void handleRequest_DatabaseError() throws Exception {
+      expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
+      expect(fileCatalog.store(isA(InputStream.class))).andThrow(new DatabaseError());
+      replayAll();
         
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setCatalog(fileCatalogMock);
-        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
-        classUnderTest.handleRequest(request, response);
-        verify(authMock);
-        verify(fileCatalogMock);
-        
-        assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-                response.getStatus());
-        assertEquals(
-            messages.getMessage("postfile.server.database_error"), 
-            response.getErrorMessage());
+      classUnderTest.handleRequest(request, response);
+      verifyAll();
+      
+      assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response.getStatus());
+      assertEquals(messages.getMessage("postfile.server.database_error"), response.getErrorMessage());
     }
-    
+
     @Test
-    public void handleRequest_InjectorNoMatch() throws Exception {
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE);
-        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
-        expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
-                .anyTimes();
-        expect(entryMock.getMetadata()).andReturn(null).anyTimes();
-        expect(entryMock.getContentStream())
-            .andReturn(new ByteArrayInputStream("content stream".getBytes()))
-            .anyTimes();
-        expect(fileCatalogMock.store(isA(InputStream.class)))
-                .andReturn(entryMock);
-        expect(namerMock.name(isA(FileEntry.class))).andReturn(ENTRY_NAME);
-        expect(keystoreManagerMock.load("test.baltrad.eu"))
-                .andReturn(injectorKey);
-        messageManagerMock.manage(isA(BltDataMessage.class));
-        expectLastCall();
-        expect(subscriptionManagerMock.load(Subscription.PEER)).
-                andReturn(peerSubscriptions);
-        expect(filterMock.getExpression()).andReturn(null).anyTimes();
-        expect(fileManagerMock.loadFilter(s1.getDataSource(), DataSource.LOCAL))
-                .andReturn(filterMock).once();
-        expect(fileManagerMock.loadFilter(s2.getDataSource(), DataSource.LOCAL))
-                .andReturn(filterMock).once();
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setCatalog(fileCatalogMock);
-        classUnderTest.setNamer(namerMock);
-        classUnderTest.setKeystoreManager(keystoreManagerMock);
-        classUnderTest.setMessageManager(messageManagerMock);
-        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-        classUnderTest.setFileManager(fileManagerMock);
-        classUnderTest.setMatcher(new ImpossibleMetadataMatcher());
-        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
+    public void handleRequestInjectorSendToSubscribers() throws Exception {
+      List<Subscription> uploads = new ArrayList<Subscription>();
+      FileEntry entry = createMock(FileEntry.class);
+
+      // method expectation
+      expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
+      expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
+      expect(namerMock.name(entry)).andReturn("kalle");
+      expect(entry.getUuid()).andReturn(new UUID(0, 0));
+      expect(securityManager.isInjector("test.baltrad.eu")).andReturn(true);
+      methodMock.sendMessage(entry);
+      expect(subscriptionManager.load(Subscription.PEER)).andReturn(uploads);
+      methodMock.sendToSubscribers(uploads, entry);
+
+      replayAll();
+      
+      classUnderTest.handleRequest(request, response);
+      
+      verifyAll();
     }
-    
+
     @Test
-    public void handleRequest_InjectorSendToSubscribers() throws Exception {
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE);
-        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
-        
-        authMock.addCredentials(isA(HttpUriRequest.class), isA(String.class));
-        expectLastCall().times(2);
-        expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
-                .anyTimes();
-        expect(entryMock.getMetadata()).andReturn(null).anyTimes();
-        expect(entryMock.getContentStream())
-            .andReturn(new ByteArrayInputStream("content stream".getBytes()))
-            .anyTimes();
-        expect(fileCatalogMock.store(isA(InputStream.class)))
-                .andReturn(entryMock);
-        expect(namerMock.name(isA(FileEntry.class))).andReturn(ENTRY_NAME);
-        expect(keystoreManagerMock.load("test.baltrad.eu"))
-                .andReturn(injectorKey);
-        messageManagerMock.manage(isA(BltDataMessage.class));
-        expectLastCall();
-        expect(subscriptionManagerMock.load(Subscription.PEER)).
-                andReturn(peerSubscriptions);
-        expect(filterMock.getExpression()).andReturn(null).anyTimes();
-        expect(fileManagerMock.loadFilter(s1.getDataSource(), DataSource.LOCAL))
-                .andReturn(filterMock).once();
-        expect(fileManagerMock.loadFilter(s2.getDataSource(), DataSource.LOCAL))
-                .andReturn(filterMock).once();
-        expect(dataSourceManagerMock.load("DS1", DataSource.LOCAL))
-                .andReturn(ds1).once();
-        expect(dataSourceManagerMock.load("DS2", DataSource.LOCAL))
-                .andReturn(ds2).once();
-        expect(userManagerMock.load(isA(String.class)))
-                .andReturn(user).times(2);
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setCatalog(fileCatalogMock);
-        classUnderTest.setNamer(namerMock);
-        classUnderTest.setKeystoreManager(keystoreManagerMock);
-        classUnderTest.setMessageManager(messageManagerMock);
-        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-        classUnderTest.setFileManager(fileManagerMock);
-        classUnderTest.setDataSourceManager(dataSourceManagerMock);
-        classUnderTest.setUserManager(userManagerMock);
-        classUnderTest.setMatcher(new EasyMetadataMatcher());
-        classUnderTest.setRegistryManager(registryManagerMock);
-        classUnderTest.setFramePublisherManager(new FramePublisherManager());
-        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
-        
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
+    public void handleRequestInjectorSendToSubscribersException() throws Exception {
+      List<Subscription> uploads = new ArrayList<Subscription>();
+      FileEntry entry = createMock(FileEntry.class);
+
+      // method expectation
+      expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
+      expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
+      expect(namerMock.name(entry)).andReturn("kalle");
+      expect(entry.getUuid()).andReturn(new UUID(0, 0));
+      expect(securityManager.isInjector("test.baltrad.eu")).andReturn(true);
+      methodMock.sendMessage(entry);
+      expect(subscriptionManager.load(Subscription.PEER)).andReturn(uploads);
+      methodMock.sendToSubscribers(uploads, entry);
+      expectLastCall().andThrow(new RuntimeException());
+
+      replayAll();
+      
+      classUnderTest.handleRequest(request, response);
+      
+      verifyAll();
     }
-    
+
     @Test
-    public void handleRequest_InjectorSendToSubscribersException() 
-            throws Exception {
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE);
-        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
-        
-        expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
-                .anyTimes();
-        expect(entryMock.getMetadata()).andReturn(null).anyTimes();
-        expect(entryMock.getContentStream())
-            .andReturn(new ByteArrayInputStream("content stream".getBytes()))
-            .anyTimes();
-        expect(fileCatalogMock.store(isA(InputStream.class)))
-                .andReturn(entryMock);
-        expect(namerMock.name(isA(FileEntry.class))).andReturn(ENTRY_NAME);
-        expect(keystoreManagerMock.load("test.baltrad.eu"))
-                .andReturn(injectorKey);
-        messageManagerMock.manage(isA(BltDataMessage.class));
-        expectLastCall();
-        expect(subscriptionManagerMock.load(Subscription.PEER)).
-                andReturn(peerSubscriptions);
-        expect(filterMock.getExpression()).andReturn(null).anyTimes();
-        expect(fileManagerMock.loadFilter(s1.getDataSource(), DataSource.LOCAL))
-                .andReturn(null);
-        expect(fileManagerMock.loadFilter(s2.getDataSource(), DataSource.LOCAL))
-                .andReturn(null);
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setCatalog(fileCatalogMock);
-        classUnderTest.setNamer(namerMock);
-        classUnderTest.setKeystoreManager(keystoreManagerMock);
-        classUnderTest.setMessageManager(messageManagerMock);
-        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-        classUnderTest.setFileManager(fileManagerMock);
-        classUnderTest.setMatcher(new EasyMetadataMatcher());
-        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
-        
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
+    public void handleRequest_PeerSubscripton() throws Exception {
+      List<Subscription> downloads = new ArrayList<Subscription>();
+      Status status = new Status(0, 0, 0);
+      FileEntry entry = createMock(FileEntry.class);
+
+      // method expectation
+      expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
+      expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
+      expect(namerMock.name(entry)).andReturn("kalle");
+      expect(entry.getUuid()).andReturn(new UUID(0, 0));
+      expect(securityManager.isInjector("test.baltrad.eu")).andReturn(false);
+
+      expect(subscriptionManager.load(Subscription.LOCAL)).andReturn(downloads);
+      expect(methodMock.validateSubscription(downloads, entry)).andReturn(1);
+      methodMock.sendMessage(entry);
+
+      expect(nodeStatusManager.load(1)).andReturn(status);
+      expect(nodeStatusManager.update(status, 1)).andReturn(0);
+      
+      replayAll();
+      
+      classUnderTest.handleRequest(request, response);
+      
+      verifyAll();
+      assertEquals(1, status.getDownloads());
     }
-    
+
     @Test
-    public void handleRequest_PeerSubscriptonInvalid() throws Exception {
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE);
-        nodeStatusManagerMock.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
-        
-        expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
-                .anyTimes();
-        expect(entryMock.getMetadata()).andReturn(null).anyTimes();
-        expect(entryMock.getContentStream())
-            .andReturn(new ByteArrayInputStream("content stream".getBytes()))
-            .anyTimes();
-        expect(fileCatalogMock.store(isA(InputStream.class)))
-                .andReturn(entryMock);
-        fileCatalogMock.remove(entryMock);
-        expectLastCall().once();
-        expect(namerMock.name(isA(FileEntry.class))).andReturn(ENTRY_NAME);
-        expect(keystoreManagerMock.load("test.baltrad.eu"))
-                .andReturn(peerKey);
-        expect(subscriptionManagerMock.load(Subscription.LOCAL)).
-                andReturn(localSubscriptions);
-        expect(filterMock.getExpression()).andReturn(null).anyTimes();
-        expect(fileManagerMock.loadFilter(s3.getDataSource(), DataSource.PEER))
-                .andReturn(filterMock).once();
-        expect(fileManagerMock.loadFilter(s4.getDataSource(), DataSource.PEER))
-                .andReturn(filterMock).once();
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setCatalog(fileCatalogMock);
-        classUnderTest.setNamer(namerMock);
-        classUnderTest.setKeystoreManager(keystoreManagerMock);
-        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-        classUnderTest.setFileManager(fileManagerMock);
-        classUnderTest.setMatcher(new ImpossibleMetadataMatcher());
-        classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
-        classUnderTest.handleRequest(request, response);
-        
-        verifyAll();
+    public void handleRequest_PeerSubscripton_NonMatching() throws Exception {
+      List<Subscription> downloads = new ArrayList<Subscription>();
+      Status status = new Status(0, 0, 0);
+      FileEntry entry = createMock(FileEntry.class);
+
+      // method expectation
+      expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
+      expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
+      expect(namerMock.name(entry)).andReturn("kalle");
+      expect(entry.getUuid()).andReturn(new UUID(0, 0));
+      expect(securityManager.isInjector("test.baltrad.eu")).andReturn(false);
+
+      expect(subscriptionManager.load(Subscription.LOCAL)).andReturn(downloads);
+      expect(methodMock.validateSubscription(downloads, entry)).andReturn(0);
+      fileCatalog.remove(entry);
+      
+      replayAll();
+      
+      classUnderTest.handleRequest(request, response);
+      
+      verifyAll();
+      assertEquals(0, status.getDownloads());
     }
-    
+
     @Test
-    public void handleRequest_PeerSubscriptionOK() throws Exception {
-        expect(authMock.authenticate(isA(String.class), isA(String.class), 
-                isA(String.class))).andReturn(Boolean.TRUE);
-        expect(entryMock.getUuid()).andReturn(UUID.fromString(ENTRY_UUID))
-                .anyTimes();
-        expect(entryMock.getMetadata()).andReturn(null).anyTimes();
-        expect(entryMock.getContentStream())
-            .andReturn(new ByteArrayInputStream("content stream".getBytes()))
-            .anyTimes();
-        expect(fileCatalogMock.store(isA(InputStream.class)))
-                .andReturn(entryMock);
-        expect(namerMock.name(isA(FileEntry.class))).andReturn(ENTRY_NAME);
-        expect(keystoreManagerMock.load("test.baltrad.eu"))
-                .andReturn(peerKey);
-        messageManagerMock.manage(isA(BltDataMessage.class));
-        expectLastCall();
-        expect(subscriptionManagerMock.load(Subscription.LOCAL)).
-                andReturn(localSubscriptions);
-        expect(filterMock.getExpression()).andReturn(null).anyTimes();
-        expect(fileManagerMock.loadFilter(s3.getDataSource(), DataSource.PEER))
-                .andReturn(filterMock).once();
-        expect(fileManagerMock.loadFilter(s4.getDataSource(), DataSource.PEER))
-                .andReturn(filterMock).once();
-        
-        replayAll();
-        
-        classUnderTest.setAuthenticator(authMock);
-        classUnderTest.setCatalog(fileCatalogMock);
-        classUnderTest.setNamer(namerMock);
-        classUnderTest.setKeystoreManager(keystoreManagerMock);
-        classUnderTest.setMessageManager(messageManagerMock);
-        classUnderTest.setSubscriptionManager(subscriptionManagerMock);
-        classUnderTest.setFileManager(fileManagerMock);
-        classUnderTest.setMatcher(new EasyMetadataMatcher());
-        classUnderTest.handleRequest(request, response);
+    public void handleRequest_PeerSubscripton_OK() throws Exception {
+      List<Subscription> downloads = new ArrayList<Subscription>();
+      Status status = new Status(0, 0, 0);
+      FileEntry entry = createMock(FileEntry.class);
+
+      // method expectation
+      expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
+      expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
+      expect(namerMock.name(entry)).andReturn("kalle");
+      expect(entry.getUuid()).andReturn(new UUID(0, 0));
+      expect(securityManager.isInjector("test.baltrad.eu")).andReturn(false);
+
+      expect(subscriptionManager.load(Subscription.LOCAL)).andReturn(downloads);
+      expect(methodMock.validateSubscription(downloads, entry)).andReturn(1);
+      methodMock.sendMessage(entry);
+      expect(nodeStatusManager.load(1)).andReturn(status);
+      expect(nodeStatusManager.update(status, 1)).andReturn(0);
+      
+      replayAll();
+      
+      classUnderTest.handleRequest(request, response);
+      
+      verifyAll();
+      assertEquals(1, status.getDownloads());
     }
-    
 }

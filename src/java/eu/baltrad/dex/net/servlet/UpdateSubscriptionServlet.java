@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.net.servlet;
 
+import eu.baltrad.beast.security.SecurityStorageException;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.net.auth.KeyczarAuthenticator;
 import eu.baltrad.dex.net.auth.Authenticator;
@@ -100,8 +101,6 @@ public class UpdateSubscriptionServlet extends HttpServlet {
      * Initializes servlet with current configuration.
      */
     protected void initConfiguration() {
-        this.authenticator = new KeyczarAuthenticator(
-                confManager.getAppConf().getKeystoreDir());
         this.localNode = new User(confManager.getAppConf().getNodeName(),
                 Role.NODE, null, confManager.getAppConf().getOrgName(),
                 confManager.getAppConf().getOrgUnit(),
@@ -217,6 +216,9 @@ public class UpdateSubscriptionServlet extends HttpServlet {
       } catch (KeyczarException e) {
         requestParser.getWriter(response).messageResponse(
             messages.getMessage(GS_MESSAGE_VERIFIER_ERROR_KEY), HttpServletResponse.SC_UNAUTHORIZED);
+      } catch (SecurityStorageException e) {
+        requestParser.getWriter(response).messageResponse(
+            messages.getMessage(GS_MESSAGE_VERIFIER_ERROR_KEY), HttpServletResponse.SC_UNAUTHORIZED);
       } catch (Exception e) {
         requestParser.getWriter(response).messageResponse(
             messages.getMessage(GS_INTERNAL_SERVER_ERROR_KEY), HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -267,6 +269,7 @@ public class UpdateSubscriptionServlet extends HttpServlet {
     /**
      * @param authenticator the authenticator to set
      */
+    @Autowired
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
     }

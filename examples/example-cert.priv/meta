@@ -1,0 +1,1 @@
+{"name": "example-cert", "purpose": "SIGN_AND_VERIFY", "type": "DSA_PRIV", "encrypted": false, "versions": [{"versionNumber": 1, "status": "PRIMARY", "exportable": false}]}

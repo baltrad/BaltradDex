@@ -168,27 +168,6 @@ CREATE OR REPLACE FUNCTION dex_trim_registry_by_age() RETURNS trigger AS $$
 $$ LANGUAGE plpgsql;
 
 /*
-    Add dex_keys table
-*/
-CREATE OR REPLACE FUNCTION create_dex_keys_table() RETURNS void AS $$
-BEGIN
-    PERFORM true FROM information_schema.tables WHERE table_name = 'dex_keys';
-    IF NOT FOUND THEN
-        CREATE TABLE dex_keys
-        (
-            id SERIAL NOT NULL PRIMARY KEY,
-            name VARCHAR (64) NOT NULL UNIQUE,
-            checksum VARCHAR (32),
-            authorized BOOLEAN DEFAULT FALSE,
-            injector BOOLEAN DEFAULT FALSE
-        );
-    ELSE
-        RAISE NOTICE 'table "dex_keys" already exists';
-    END IF;
-END;
-$$ LANGUAGE plpgsql;
-
-/*
     Modify dex_delivery_registry table
 */
 CREATE OR REPLACE FUNCTION upgrade_dex_delivery_registry_table() 
@@ -299,21 +278,6 @@ END;
 $$ LANGUAGE plpgsql; 
 
 /*
-    Upgrade dex_keys table by adding "injector" field
-*/
-CREATE OR REPLACE FUNCTION upgrade_dex_keys_table() RETURNS void AS $$
-BEGIN
-    PERFORM true FROM information_schema.columns WHERE table_name = 
-        'dex_keys' AND column_name = 'injector';
-    IF NOT FOUND THEN
-        ALTER TABLE dex_keys ADD COLUMN injector BOOLEAN DEFAULT FALSE;
-    ELSE
-        RAISE NOTICE 'column "dex_keys.injector" already exists';
-    END IF;
-END;
-$$ LANGUAGE plpgsql;
-
-/*
     Upgrade dex_data_sources table
 */
 CREATE OR REPLACE FUNCTION upgrade_dex_data_sources_table() RETURNS void AS $$
@@ -421,30 +385,48 @@ BEGIN
   PERFORM true FROM information_schema.columns WHERE table_name = 'dex_users' AND column_name = 'redirected_address';
   IF NOT FOUND THEN
     ALTER TABLE dex_users ADD COLUMN redirected_address VARCHAR(256);
-  END IF; 
+  END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+/**
+ Move keys to beast instead.
+ */
+CREATE OR REPLACE FUNCTION move_dex_keys_to_beast_authorization() RETURNS VOID AS $$
+BEGIN
+  PERFORM true FROM information_schema.tables WHERE table_name = 'dex_keys';
+  IF FOUND THEN
+    INSERT INTO beast_authorization (nodename, nodeemail, nodeaddress, redirected_address, publickeypath, lastupdated, authorized, injector, local, connectionuuid)
+      (SELECT dex_users.name, dex_users.name || '@localhost', dex_users.node_address, dex_users.redirected_address, dex_users.name || '.pub', now(), dex_keys.authorized, dex_keys.injector, FALSE, dex_users.id
+       FROM dex_users
+         INNER JOIN dex_keys ON dex_users.name = dex_keys.name
+         INNER JOIN dex_users_roles ON dex_users.id = dex_users_roles.user_id
+         INNER JOIN dex_roles ON dex_users_roles.role_id = dex_roles.id);
+    ALTER TABLE dex_keys RENAME TO dex_deprecated_keys;
+  END IF;
 END;
 $$ LANGUAGE plpgsql;
 
 SELECT remove_name_hash_from_dex_users();
 -- SELECT reset_user_passwords();
 SELECT rename_registry_table();
-SELECT create_dex_keys_table();
 SELECT upgrade_dex_delivery_registry_table();
 SELECT create_dex_delivery_registry_data_sources_table();
 SELECT update_dex_data_source_users_table(); 
 SELECT remove_double_index();
-SELECT upgrade_dex_keys_table();
 SELECT upgrade_dex_data_sources_table();
 SELECT create_status_tables();
 SELECT update_dex_users_with_redirected_address();
+SELECT move_dex_keys_to_beast_authorization();
 
 DROP FUNCTION make_plpgsql(); 
 DROP FUNCTION remove_name_hash_from_dex_users();
-DROP FUNCTION reset_user_passwords();
 DROP FUNCTION rename_registry_table();
+DROP FUNCTION reset_user_passwords();
 DROP FUNCTION update_dex_data_source_users_table();
 DROP FUNCTION remove_double_index();
-DROP FUNCTION upgrade_dex_keys_table();
 DROP FUNCTION upgrade_dex_data_sources_table();
 DROP FUNCTION create_status_tables();
 DROP FUNCTION update_dex_users_with_redirected_address();
+DROP FUNCTION move_dex_keys_to_beast_authorization();
+

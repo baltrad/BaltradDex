@@ -32,8 +32,13 @@
                 <div class="exchange"></div>
             </div>
             <li>
+                <span><a href="authorization_list.htm">Authorizations</a></span>
+            </li>
+<!--             
+            <li>
                 <span><a href="node_connect.htm">Connect</a></span>
             </li>
+ -->            
             <li>
                 <span><a href="subscription_peers.htm">Subscriptions</a></span>
             </li>
@@ -180,9 +185,11 @@
                     <li><a href="user_remove.htm">Remove user</a></li>
                 </ul>
             </li>
+<!--             
             <li>
                 <span><a href="keystore.htm">Keystore</a></span>
             </li>
+ -->            
             <li>
                 <span><a href="node_settings.htm">Node settings</a></span>
             </li>  

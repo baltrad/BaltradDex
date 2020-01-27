@@ -21,20 +21,19 @@
 
 package eu.baltrad.dex.auth.controller;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+
 import eu.baltrad.dex.auth.manager.SecurityManager;
 import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
 import eu.baltrad.dex.util.MessageResourceUtil;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
-import javax.servlet.http.HttpSession;
 
 /**
  * Login controller class implementing basic user authentication functionality.
@@ -53,7 +52,6 @@ public class LoginController {
     private ConfigurationManager confManager;
     private MessageResourceUtil messages;
     private Logger log;
-    private Logger logger = LogManager.getLogger(LoginController.class);
     /**
      * Default constructor.
      */
@@ -68,9 +66,9 @@ public class LoginController {
      * @return Login page name
      */
     @RequestMapping("/login.htm")
-    public String login(Model model) {
-      logger.info("Entering /login.htm");
-        return "login";
+    public String login(Model model, HttpServletRequest request, HttpSession session) {
+      //logger.info("Entering /login.htm");
+      return "login";
     }    
     
     /**

@@ -36,6 +36,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import eu.baltrad.beast.security.SecurityStorageException;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
 import eu.baltrad.dex.datasource.model.DataSource;
@@ -90,8 +91,6 @@ public class DataSourceListServlet extends HttpServlet {
      * Initializes servlet with current configuration.
      */
     protected void initConfiguration() {
-        this.authenticator = new KeyczarAuthenticator(
-                confManager.getAppConf().getKeystoreDir());
         this.localNode = new User(confManager.getAppConf().getNodeName(),
                 Role.NODE, null, confManager.getAppConf().getOrgName(),
                 confManager.getAppConf().getOrgUnit(),
@@ -154,6 +153,10 @@ public class DataSourceListServlet extends HttpServlet {
         String msg = messages.getMessage(DS_MESSAGE_VERIFIER_ERROR_KEY);
         logger.error("doPost", e);
         parser.getWriter(response).messageResponse(msg, HttpServletResponse.SC_UNAUTHORIZED);
+      } catch (SecurityStorageException e) {
+        String msg = messages.getMessage(DS_MESSAGE_VERIFIER_ERROR_KEY);
+        logger.error("doPost", e);
+        parser.getWriter(response).messageResponse(msg, HttpServletResponse.SC_UNAUTHORIZED);
       } catch (Exception e) {
         String msg = messages.getMessage(DS_INTERNAL_SERVER_ERROR_KEY, new Object[]{e.getMessage()});
         logger.error("doPost", e);
@@ -203,6 +206,7 @@ public class DataSourceListServlet extends HttpServlet {
     /**
      * @param authenticator the authenticator to set
      */
+    @Autowired
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
     }

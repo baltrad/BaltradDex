@@ -212,5 +212,12 @@ public class DataSource implements Serializable, Comparable<DataSource> {
         return getName().compareTo( ds.getName() ); 
     }
     
+    public String toString() {
+      StringBuffer buffer = new StringBuffer();
+      buffer.append("DataSource[").append(name).append("] = {id=").append(id).append(", type=").append(type).append(", source=").append(source)
+            .append(", fileObject=").append(fileObject).append(", description=").append(description).append("}");
+      return buffer.toString();
+    }
+    
 }
 

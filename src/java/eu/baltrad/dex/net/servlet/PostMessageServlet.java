@@ -29,6 +29,7 @@ import eu.baltrad.dex.util.MessageResourceUtil;
 
 import eu.baltrad.beast.manager.IBltMessageManager;
 import eu.baltrad.beast.message.IBltXmlMessage;
+import eu.baltrad.beast.security.SecurityStorageException;
 import eu.baltrad.dex.config.manager.IConfigurationManager;
 
 import org.springframework.stereotype.Controller;
@@ -82,8 +83,8 @@ public class PostMessageServlet extends HttpServlet {
      * Initializes servlet with current configuration.
      */
     protected void initConfiguration() {
-        this.setAuthenticator(new KeyczarAuthenticator(
-                 confManager.getAppConf().getKeystoreDir()));
+//        this.setAuthenticator(new KeyczarAuthenticator(
+//                 confManager.getAppConf().getKeystoreDir()));
     }
     
     /**
@@ -128,64 +129,16 @@ public class PostMessageServlet extends HttpServlet {
         requestParser.getWriter(response).messageResponse(
             messages.getMessage(PM_MESSAGE_VERIFIER_ERROR_KEY),
             HttpServletResponse.SC_UNAUTHORIZED);
+      } catch (SecurityStorageException e) {
+        requestParser.getWriter(response).messageResponse(
+            messages.getMessage(PM_MESSAGE_VERIFIER_ERROR_KEY),
+            HttpServletResponse.SC_UNAUTHORIZED);
       } catch (Exception e) {
         requestParser.getWriter(response).messageResponse(
             messages.getMessage(PM_INTERNAL_SERVER_ERROR_KEY),
             HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
-
-//        NodeRequest req = new NodeRequest(request);
-//        NodeResponse res = new NodeResponse(response);
-//        logger.debug("Request arrived using protocol version '" + req.getProtocolVersion() + "'");
-//        
-//        try {
-//            if (authenticator.authenticate(req.getMessage(), 
-//                    req.getSignature(), req.getNodeName())) {
-//                log.info("New message received from " + req.getNodeName());
-//                String message = readMessage(req);
-//                IBltXmlMessage msg = xmlMessageParser.parse(message);
-//                bltMessageManager.manage(msg);
-//                res.setStatus(HttpServletResponse.SC_OK);
-//            } else {
-//                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
-//                    messages.getMessage(PM_UNAUTHORIZED_REQUEST_KEY));
-//            }
-//        } catch (KeyczarException e) {   
-//            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
-//                    messages.getMessage(PM_MESSAGE_VERIFIER_ERROR_KEY));
-//        } catch (Exception e) {
-//            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-//                    messages.getMessage(PM_INTERNAL_SERVER_ERROR_KEY));
-//        }    
     }
-
-    //    @Override
-//    public void doPost(HttpServletRequest request, HttpServletResponse response) 
-//    {
-//        NodeRequest req = new NodeRequest(request);
-//        NodeResponse res = new NodeResponse(response);
-//        logger.debug("Request arrived using protocol version '" + req.getProtocolVersion() + "'");
-//        
-//        try {
-//            if (authenticator.authenticate(req.getMessage(), 
-//                    req.getSignature(), req.getNodeName())) {
-//                log.info("New message received from " + req.getNodeName());
-//                String message = readMessage(req);
-//                IBltXmlMessage msg = xmlMessageParser.parse(message);
-//                bltMessageManager.manage(msg);
-//                res.setStatus(HttpServletResponse.SC_OK);
-//            } else {
-//                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
-//                    messages.getMessage(PM_UNAUTHORIZED_REQUEST_KEY));
-//            }
-//        } catch (KeyczarException e) {   
-//            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, 
-//                    messages.getMessage(PM_MESSAGE_VERIFIER_ERROR_KEY));
-//        } catch (Exception e) {
-//            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-//                    messages.getMessage(PM_INTERNAL_SERVER_ERROR_KEY));
-//        }    
-//    }
     
     /**
      * @param configurationManager 
@@ -214,6 +167,7 @@ public class PostMessageServlet extends HttpServlet {
     /**
      * @param authenticator the authenticator to set
      */
+    @Autowired
     public void setAuthenticator(Authenticator authenticator) {
         this.authenticator = authenticator;
     }

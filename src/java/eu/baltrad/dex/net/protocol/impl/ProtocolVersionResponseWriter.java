@@ -29,6 +29,9 @@ import java.util.Set;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.net.protocol.ResponseWriter;
@@ -64,6 +67,8 @@ public class ProtocolVersionResponseWriter implements ResponseWriter {
    * The highest version we are able to support. Used in the response so that the requestor knows what we are capable of
    */
   private String supportedVersion = null;
+  
+  private static Logger logger = LogManager.getLogger(ProtocolVersionResponseWriter.class);
   
   /**
    * Constructor
@@ -192,6 +197,6 @@ public class ProtocolVersionResponseWriter implements ResponseWriter {
    * @return the json protocol
    */
   protected JsonProtocol getJsonProtocol(String version) {
-    return ProtocolVersionRequestFactory.getJsonProtocolForVersion(responseVersion);
+    return ProtocolVersionRequestFactory.getJsonProtocolForVersion(version);
   }
 }

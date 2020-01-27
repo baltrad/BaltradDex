@@ -24,13 +24,17 @@ package eu.baltrad.dex.net.auth;
 import eu.baltrad.dex.net.protocol.RequestFactory;
 import eu.baltrad.dex.net.request.factory.impl.DefaultRequestFactory;
 import eu.baltrad.dex.net.request.impl.NodeRequest;
-import eu.baltrad.dex.auth.util.Signer;
+import eu.baltrad.beast.security.ISecurityManager;
+import eu.baltrad.beast.security.SecurityStorageException;
+import eu.baltrad.beast.security.crypto.Signer;
+import eu.baltrad.beast.security.crypto.Verifier;
 import eu.baltrad.dex.auth.util.KeyczarCryptoFactory;
 import eu.baltrad.dex.user.model.User;
 
 import org.keyczar.exceptions.KeyczarException;
 
 import org.apache.http.client.methods.HttpUriRequest;
+import org.easymock.EasyMockSupport;
 import org.apache.http.Header;
 
 import org.apache.commons.codec.binary.Base64;
@@ -38,6 +42,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 import static org.junit.Assert.*;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,6 +54,7 @@ import java.net.URI;
 import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import static org.easymock.EasyMock.*;
 
 /**
  * Keyczar authenticator test.
@@ -55,11 +62,13 @@ import java.text.SimpleDateFormat;
  * @version 1.1.0
  * @since 1.1.0
  */
-public class KeyczarAuthenticatorTest {
+public class KeyczarAuthenticatorTest extends EasyMockSupport {
     
     private final static String DATE_FORMAT = "E, d MMM yyyy HH:mm:ss z";
     
-    private KeyczarCryptoFactory cryptoFactory;
+    private ISecurityManager securityManager;
+    private Signer signer;
+    private Verifier verifier;
     private RequestFactory requestFactory;
     private KeyczarAuthenticator classUnderTest;
     private User user;
@@ -67,102 +76,85 @@ public class KeyczarAuthenticatorTest {
     
     @Before
     public void setUp() {
-        cryptoFactory = new KeyczarCryptoFactory(new File("keystore"));
-        requestFactory = new DefaultRequestFactory(
-                URI.create("http://example.com"));
-        classUnderTest = new KeyczarAuthenticator("keystore");
-        assertNotNull(classUnderTest);
-        user = new User(1, "test", "s3cret", "org", "unit", "locality", 
-                "state", "XX", "user", "http://localhost:8084");
-        assertNotNull(user);
-        format = new SimpleDateFormat(DATE_FORMAT);
+      requestFactory = new DefaultRequestFactory(URI.create("http://example.com"));
+      securityManager = createMock(ISecurityManager.class);
+      signer = createMock(Signer.class);
+      verifier = createMock(Verifier.class);
+      user = new User(1, "test", "s3cret", "org", "unit", "locality", "state", "XX", "user", "http://localhost:8084");
+      classUnderTest = new KeyczarAuthenticator(securityManager);
     }
     
-    private void setAttributes(HttpServletRequest request) {
-        request.setAttribute("Content-Type", "text/html");  
-        request.setAttribute("Content-MD5", Base64.encodeBase64String(
-                request.getRequestURI().getBytes()));
-        request.setAttribute("Date", format.format(new Date()));
+    @After
+    public void tearDown() {
+      requestFactory = null;
+      securityManager = null;
+      signer = null;
+      verifier = null;
+      classUnderTest = null;
     }
-    
-    @Test(expected = KeyczarException.class)
+
+    @Test(expected = SecurityStorageException.class)
     public void addCredentials_InvalidKeystore() throws Exception {
-        classUnderTest = new KeyczarAuthenticator("invalid_keystore");
-        HttpUriRequest request = requestFactory
-                .createUpdateSubscriptionRequest(user, null);
-        classUnderTest.addCredentials(request, "localhost");
-    } 
-    
-    
-    @Test(expected = KeyczarException.class)
-    public void addCredentials_InvalidKey() throws Exception {
-        HttpUriRequest request = requestFactory
-                .createUpdateSubscriptionRequest(user, null);
-        classUnderTest.addCredentials(request, "invalid_key");
-    } 
-    
+      HttpUriRequest request = requestFactory.createUpdateSubscriptionRequest(user, null);
+
+      expect(securityManager.createSignatureMessage(request)).andReturn("hello");
+      expect(securityManager.getSigner("localhost")).andThrow(new SecurityStorageException());
+
+      replayAll();
+      classUnderTest.addCredentials(request, "localhost");
+      verifyAll();
+    }
+
     @Test
     public void addCredentials_OK() throws Exception {
-        HttpUriRequest request = requestFactory
-                .createUpdateSubscriptionRequest(user, null);
+        HttpUriRequest request = requestFactory.createUpdateSubscriptionRequest(user, null);
+        
+        expect(securityManager.createSignatureMessage(request)).andReturn("hello");
+        expect(securityManager.getSigner("localhost")).andReturn(signer);
+        expect(signer.sign("hello")).andReturn("safely signed");
+        replayAll();
+        
         classUnderTest.addCredentials(request, "localhost");
+        
+        verifyAll();
+        
         Header header = request.getFirstHeader("Authorization");
-        assertNotNull(header);
-        assertNotNull(header.getValue());
+        assertEquals("localhost:safely signed", header.getValue());
     }
     
     @Test(expected = KeyczarException.class)
     public void authenticate_InvalidKeystore() throws Exception {
-        HttpServletRequest request = new MockHttpServletRequest("GET", 
-                "/datasource_listing.htm");
-        setAttributes(request);
-        NodeRequest req = new NodeRequest(request);
-        Signer signer = cryptoFactory.createSigner("localhost");
-        String signature = signer.sign(req.getMessage());
-        req.setAttribute("Authorization", "localhost" + ":" + signature);
-        classUnderTest = new KeyczarAuthenticator("invalid_keystore");
-        classUnderTest.authenticate(req.getMessage(), req.getSignature(), 
-                "localhost");
+      expect(securityManager.getVerifier("localhost")).andReturn(verifier);
+      expect(verifier.verify("abc", "signature")).andThrow(new KeyczarException("bad"));
+      
+      replayAll();
+      
+      classUnderTest.authenticate("abc", "signature", "localhost");
+      
+      verifyAll();
     }
-    
-    @Test(expected = KeyczarException.class)
-    public void authenticate_InvalidKey() throws Exception {
-        HttpServletRequest request = new MockHttpServletRequest("GET", 
-                "/get_datasource_listing.htm");
-        setAttributes(request);
-        NodeRequest req = new NodeRequest(request);
-        Signer signer = cryptoFactory.createSigner("localhost");
-        String signature = signer.sign(req.getMessage());
-        req.setAttribute("Authorization", "localhost" + ":" + signature);
-        classUnderTest.authenticate(req.getMessage(), req.getSignature(), 
-                "invalid_key");
+
+    @Test
+    public void authenticate_Failure() throws Exception {
+      expect(securityManager.getVerifier("localhost")).andReturn(verifier);
+      expect(verifier.verify("abc", "signature")).andReturn(false);
+      replayAll();
+      
+      boolean result = classUnderTest.authenticate("abc", "signature", "localhost");
+      
+      verifyAll();
+      assertEquals(false, result);
     }
     
     @Test
-    public void authenticate_Failure() throws Exception {
-        HttpServletRequest request = new MockHttpServletRequest("GET", 
-                "/get_datasource_listing.htm");
-        setAttributes(request);
-        NodeRequest req = new NodeRequest(request);
-        Signer signer = cryptoFactory.createSigner("localhost");
-        String signature = signer.sign(req.getMessage());
-        req.setAttribute("Authorization", "localhost" + ":" + signature);
-        request.setAttribute("Date", "");
-        assertFalse(classUnderTest.authenticate(req.getMessage(), 
-                req.getSignature(), "localhost"));
-    }
-    
-    @Test 
     public void authenticate_Success() throws Exception {
-        HttpServletRequest request = new MockHttpServletRequest("GET", 
-                "/get_datasource_listing.htm");
-        setAttributes(request);
-        NodeRequest req = new NodeRequest(request);
-        Signer signer = cryptoFactory.createSigner("localhost");
-        String signature = signer.sign(req.getMessage());
-        req.setAttribute("Authorization", "localhost" + ":" + signature);
-        assertTrue(classUnderTest.authenticate(req.getMessage(), 
-                req.getSignature(), "localhost"));
+      expect(securityManager.getVerifier("localhost")).andReturn(verifier);
+      expect(verifier.verify("abc", "signature")).andReturn(true);
+      replayAll();
+      
+      boolean result = classUnderTest.authenticate("abc", "signature", "localhost");
+      
+      verifyAll();
+      assertEquals(true, result);
     }
-    
 }

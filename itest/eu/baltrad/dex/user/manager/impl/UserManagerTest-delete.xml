@@ -7,16 +7,16 @@
         
     <dex_users id="1" name="User1" password="passw0rd" org_name="org1" 
                org_unit="unit1" locality="locality1" state="state1" 
-               country_code="XX" node_address="http://test1.baltrad.eu"/>
+               country_code="XX" node_address="http://test1.baltrad.eu" redirected_address=""/>
     <dex_users id="2" name="User2" password="passw0rd" org_name="org2" 
                org_unit="unit2" locality="locality2" state="state2" 
-               country_code="YY" node_address="http://test2.baltrad.eu"/>      
+               country_code="YY" node_address="http://test2.baltrad.eu" redirected_address=""/>      
     <dex_users id="4" name="User4" password="passw0rd" org_name="org4" 
                org_unit="unit4" locality="locality4" state="state4" 
-               country_code="XY" node_address="http://test4.baltrad.eu"/> 
+               country_code="XY" node_address="http://test4.baltrad.eu" redirected_address=""/> 
     <dex_users id="5" name="User5" password="passw0rd" org_name="org5" 
                org_unit="unit5" locality="locality5" state="state5" 
-               country_code="XZ" node_address="http://test5.baltrad.eu"/> 
+               country_code="XZ" node_address="http://test5.baltrad.eu" redirected_address=""/> 
                
     <dex_users_roles id="1" user_id="1" role_id="1"/>
     <dex_users_roles id="2" user_id="2" role_id="2"/>
