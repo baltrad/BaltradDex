@@ -111,14 +111,14 @@ public class PostKeyServletTest {
         }
         resetAll();
     }
-//    
-//    @Test
-//    public void storeKey_Unauthorized() throws Exception {
-//        request.setContent("public key content".getBytes());
-//        request.addHeader("Content-MD5", "7897fasdsd9fsadf9sd77fa9sa98f7ds");  
-//        
-//        assertEquals(1, classUnderTest.storeKey(request, "test.baltrad.eu"));
-//    }
+    
+    @Test
+    public void storeKey_Unauthorized() throws Exception {
+        request.setContent("public key content".getBytes());
+        request.addHeader("Content-MD5", "7897fasdsd9fsadf9sd77fa9sa98f7ds");  
+        
+        //assertEquals(1, classUnderTest.storeKey(request, "test.baltrad.eu"));
+    }
 //    
 //    @Test
 //    public void storeKey_OK() throws Exception {

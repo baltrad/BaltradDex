@@ -173,10 +173,12 @@ public class UpdateSubscriptionControllerTest extends EasyMockSupport {
     public void subscribedPeers() {
       Model model = createMock(Model.class);
       List<User> users = new ArrayList<User>();
+      List<String> nodes = new ArrayList<String>();
+      
       expect(userManagerMock.loadOperators()).andReturn(users);
-      
+      expect(userManagerMock.loadPeerNames()).andReturn(nodes);
       expect(model.addAttribute("subscribed_peers", users)).andReturn(null);
-      
+      expect(model.addAttribute("nodes", nodes)).andReturn(null);
       replayAll();
       
       String viewName = classUnderTest.subscribedPeers(model);

@@ -28,7 +28,7 @@ import eu.baltrad.dex.config.model.RegistryConfiguration;
 import junit.framework.TestCase;
 
 import java.util.Properties;
-
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
@@ -100,49 +100,44 @@ public class ConfigurationManagerTest extends TestCase {
     }
     
     public void testSaveAppConf() {
-        AppConfiguration ac = new AppConfiguration(loadProperties());
+        AppConfiguration ac = new AppConfiguration(loadProperties(saveProperties(props)));
         assertTrue(this.appConf.equals(ac));
     }
     
     public void testSaveLogConf() {
-        LogConfiguration lc = new LogConfiguration(loadProperties());
+        LogConfiguration lc = new LogConfiguration(loadProperties(saveProperties(props)));
         assertTrue(this.logConf.equals(lc));
     }
     
     public void testSaveRegistryConf() {
-        RegistryConfiguration rc = new RegistryConfiguration(loadProperties());
+        RegistryConfiguration rc = new RegistryConfiguration(loadProperties(saveProperties(props)));
         assertTrue(this.regConf.equals(rc));
     }
     
     private Properties loadProperties() {
-        try {
-            FileInputStream fis = null;
-            Properties properties = new Properties();
-            try {
-                fis = new FileInputStream("conf/dex.properties");
-                properties.load(fis);
-                return properties;
-            } finally {
-                fis.close();
-            }
-        } catch (Exception e) {
-            return null;
-        }
+      return loadProperties(new File(this.getClass().getResource("fixtures/dex.properties").getFile()));
     }
     
-    private void saveProperties(Properties properties) {
-        try {
-            FileOutputStream fos = null;
-            try {
-                fos = new FileOutputStream("conf/dex.properties"); 
-                properties.store(fos, "DEX main configuration file");
-            } finally {
-                fos.close();
-            }
-        } catch (Exception e) {
-            fail();
-        }
+    private Properties loadProperties(File f) {
+      try {
+        Properties properties = new Properties();
+        properties.load(new FileInputStream(f));
+        return properties;
+      } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+      }
     }
-    
+
+    private File saveProperties(Properties properties) {
+      try {
+        File file = File.createTempFile("tempproperties", null);
+        file.deleteOnExit();
+        properties.store(new FileOutputStream(file), "DEX main configuration file");
+        return file;
+      } catch (Exception e) {
+        return null;
+      }
+    }
 }
 
