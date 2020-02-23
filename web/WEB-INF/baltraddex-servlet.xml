@@ -621,14 +621,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     	<property name="availableFields">
           <list>
             <value>NV</value>
+            <value>NZ</value>
             <value>HGHT</value>
             <value>UWND</value>
             <value>VWND</value>
             <value>ff</value>
             <value>ff_dev</value>
             <value>dd</value>
-            <value>dbzh</value>
-            <value>dbzh_dev</value>
+            <value>DBZH</value>
+            <value>DBZH_dev</value>
           </list>   	
     	</property>
     </bean>
