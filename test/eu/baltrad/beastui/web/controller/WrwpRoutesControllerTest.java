@@ -43,13 +43,17 @@ public class WrwpRoutesControllerTest extends EasyMockSupport {
     rule.setMindistance(55);
     rule.setMaxdistance(333);
     rule.setMinelevationangle(1.5);
+    rule.setMaxelevationangle(43.5);
     rule.setMinvelocitythreshold(2.5);
+    rule.setMaxvelocitythreshold(50.5);
+    rule.setMinsamplesizereflectivity(39);
+    rule.setMinsamplesizewind(41);
     expect(rule.setFields((List<String>)fields)).andReturn(true);
     rule.setSources(sources);
     
     replayAll();
 
-    classUnderTest.createRule(5, 10, 55, 333, 1.5, 2.5, fields, sources, null);
+    classUnderTest.createRule(5, 10, 55, 333, 1.5, 43.5, 2.5, 50.5, 39, 41, fields, sources, null);
     
     verifyAll();
   }

@@ -119,7 +119,11 @@ public class WrwpRoutesController {
     @RequestParam(value = "mindistance", required = false) Integer mindistance,
     @RequestParam(value = "maxdistance", required = false) Integer maxdistance,
     @RequestParam(value = "minelangle", required = false) Double minelangle,
+    @RequestParam(value = "maxelangle", required = false) Double maxelangle,
     @RequestParam(value = "minvelocitythreshold", required = false) Double minvelocitythreshold,
+    @RequestParam(value = "maxvelocitythreshold", required = false) Double maxvelocitythreshold,
+    @RequestParam(value = "minsamplesizereflectivity", required = false) Integer minsamplesizereflectivity,
+    @RequestParam(value = "minsamplesizewind", required = false) Integer minsamplesizewind,
     @RequestParam(value = "fields", required = false) List<String> fields,
     @RequestParam(value = "recipients", required = false) List<String> recipients,
     @RequestParam(value = "sources", required = false) List<String> sources,
@@ -137,10 +141,13 @@ public class WrwpRoutesController {
   
     if (name == null && author == null && active == null && description == null &&
         interval == null && maxheight == null && mindistance == null && maxdistance == null &&
-        minelangle == null && minvelocitythreshold == null && recipients == null && sources == null && fields == null) {
+        minelangle == null && maxelangle == null && minvelocitythreshold == null && maxvelocitythreshold == null &&
+        minsamplesizereflectivity == null && minsamplesizewind == null &&
+        recipients == null && sources == null && fields == null) {
       logger.info("Everything is null");
       return viewCreateRoute(model, name, author, active, description,
-                interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, fields,
+                interval, maxheight, mindistance, maxdistance, minelangle, maxelangle, minvelocitythreshold, 
+                maxvelocitythreshold, minsamplesizereflectivity, minsamplesizewind, fields,
                 recipients, sources, filterJson, null);
     }
     
@@ -150,6 +157,8 @@ public class WrwpRoutesController {
       emessage = "Must specify at least one source.";
     } else if (recipients == null || recipients.size() <= 0) {
       emessage = "You must specify at least one recipient";
+    } else if (fields == null || fields.size() <= 0) {
+      emessage =" You must specify at least one field attribute";
     }
     
     if (emessage == null) {
@@ -160,8 +169,13 @@ public class WrwpRoutesController {
         int imindistance = (mindistance == null) ? 4000 : mindistance.intValue();
         int imaxdistance = (maxdistance == null) ? 40000 : maxdistance.intValue();
         double dminelangle = (minelangle == null) ? 2.5 : minelangle.doubleValue();
+        double dmaxelangle = (maxelangle == null) ? 45.0 : maxelangle.doubleValue();
         double dminvelocity = (minvelocitythreshold == null) ? 2.0 : minvelocitythreshold.doubleValue();
-        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dminvelocity, fields, sources, filterJson);
+        double dmaxvelocity = (maxvelocitythreshold == null) ? 60.0 : maxvelocitythreshold.doubleValue();
+        int iminsamplesizereflectivity = (minsamplesizereflectivity == null) ? 40 : minsamplesizereflectivity.intValue();
+        int iminsamplesizewind = (minsamplesizewind == null) ? 40 : minsamplesizewind.intValue();
+        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dmaxelangle, dminvelocity, dmaxvelocity,
+            iminsamplesizereflectivity, iminsamplesizewind, fields, sources, filterJson);
         RouteDefinition def = manager.create(name, author, bactive, description, recipients, rule);
         manager.storeDefinition(def);
         return "redirect:routes.htm";
@@ -172,7 +186,8 @@ public class WrwpRoutesController {
     }
 
     return viewCreateRoute(model, name, author, active, description,
-        interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, fields,
+        interval, maxheight, mindistance, maxdistance, minelangle, maxelangle, minvelocitythreshold, 
+        maxvelocitythreshold, minsamplesizereflectivity, minsamplesizewind, fields,
         recipients, sources, filterJson, emessage);
   }
   
@@ -204,7 +219,11 @@ public class WrwpRoutesController {
       @RequestParam(value = "mindistance", required = false) Integer mindistance,
       @RequestParam(value = "maxdistance", required = false) Integer maxdistance,
       @RequestParam(value = "minelangle", required = false) Double minelangle,
+      @RequestParam(value = "maxelangle", required = false) Double maxelangle,
       @RequestParam(value = "minvelocitythreshold", required = false) Double minvelocitythreshold,
+      @RequestParam(value = "maxvelocitythreshold", required = false) Double maxvelocitythreshold,
+      @RequestParam(value = "minsamplesizereflectivity", required = false) Integer minsamplesizereflectivity,
+      @RequestParam(value = "minsamplesizewind", required = false) Integer minsamplesizewind,
       @RequestParam(value = "fields", required = false) List<String> fields,
       @RequestParam(value = "recipients", required = false) List<String> recipients,
       @RequestParam(value = "sources", required = false) List<String> sources,
@@ -215,7 +234,8 @@ public class WrwpRoutesController {
       return viewShowRoutes(model, "No route named \"" + name + "\"");
     }
     if (operation != null && operation.equals("Save")) {
-      return modifyRoute(model, name, author, active, description, interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, fields, recipients, sources, filterJson);
+      return modifyRoute(model, name, author, active, description, interval, maxheight, mindistance, maxdistance, minelangle, maxelangle, minvelocitythreshold, maxvelocitythreshold, 
+          minsamplesizereflectivity, minsamplesizewind, fields, recipients, sources, filterJson);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -238,7 +258,9 @@ public class WrwpRoutesController {
         
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             vrule.getInterval(), vrule.getMaxheight(), vrule.getMindistance(), vrule.getMaxdistance(), 
-            vrule.getMinelevationangle(), vrule.getMinvelocitythreshold(), vrule.getFields(), def.getRecipients(), vrule.getSources(), filterstr, null);
+            vrule.getMinelevationangle(), vrule.getMaxelevationangle(), vrule.getMinvelocitythreshold(), vrule.getMaxvelocitythreshold(),
+            vrule.getMinsamplesizereflectivity(), vrule.getMinsamplesizewind(),
+            vrule.getFields(), def.getRecipients(), vrule.getSources(), filterstr, null);
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a wrwp rule");
       }
@@ -273,7 +295,11 @@ public class WrwpRoutesController {
       Integer mindistance, 
       Integer maxdistance, 
       Double minelangle, 
-      Double minvelocitythreshold, 
+      Double maxelangle,
+      Double minvelocitythreshold,
+      Double maxvelocitythreshold,
+      Integer minsamplesizereflectivity,
+      Integer minsamplesizewind,
       List<String> fields,
       List<String> recipients, 
       List<String> sources, 
@@ -287,18 +313,25 @@ public class WrwpRoutesController {
     int imindistance = (mindistance != null) ? mindistance.intValue() : 4000;
     int imaxdistance = (maxdistance != null) ? maxdistance.intValue() : 40000;
     double dminelangle = (minelangle != null) ? minelangle.doubleValue() : 2.5;
+    double dmaxelangle = (maxelangle != null) ? maxelangle.doubleValue() : 45.0;
     double dminvelocity = (minvelocitythreshold != null) ? minvelocitythreshold.doubleValue() : 2.0;
+    double dmaxvelocity = (maxvelocitythreshold != null) ? maxvelocitythreshold.doubleValue() : 60.0;
+    int iminsamplesizereflectivity = (minsamplesizereflectivity != null) ? minsamplesizereflectivity.intValue() : 40;
+    int iminsamplesizewind = (minsamplesizewind != null) ? minsamplesizewind.intValue() : 40;
     String emessage = null;
     
     if (newsources.size() <= 0) {
       emessage = "You must specify at least one source.";
     } else if (newrecipients.size() <= 0) {
       emessage = "You must specify at least one recipient.";
+    } else if (newfields == null || newfields.size() <= 0) {
+      emessage =" You must specify at least one field attribute";
     }
-    
+
     if (emessage == null) {
       try {
-        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dminvelocity, newfields, newsources, jsonFilter);
+        WrwpRule rule = createRule(iinterval, imaxheight, imindistance, imaxdistance, dminelangle, dmaxelangle, dminvelocity, dmaxvelocity, 
+            iminsamplesizereflectivity, iminsamplesizewind, newfields, newsources, jsonFilter);
         RouteDefinition def = manager.create(name, author, isactive, description, newrecipients, rule);
         manager.updateDefinition(def);
         return "redirect:routes.htm";
@@ -309,7 +342,8 @@ public class WrwpRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        interval, maxheight, mindistance, maxdistance, minelangle, minvelocitythreshold, newfields, recipients, newsources, jsonFilter, emessage);
+        interval, maxheight, mindistance, maxdistance, minelangle, maxelangle, minvelocitythreshold, maxvelocitythreshold, 
+        minsamplesizereflectivity, minsamplesizewind, newfields, recipients, newsources, jsonFilter, emessage);
   }
   
   /**
@@ -341,7 +375,11 @@ public class WrwpRoutesController {
       Integer mindistance, 
       Integer maxdistance, 
       Double minelangle, 
+      Double maxelangle,
       Double minvelocitythreshold,
+      Double maxvelocitythreshold,
+      Integer minsamplesizereflectivity,
+      Integer minsamplesizewind,
       List<String> fields,
       List<String> recipients, 
       List<String> sources,
@@ -358,7 +396,11 @@ public class WrwpRoutesController {
         mindistance,
         maxdistance,
         minelangle,
+        maxelangle,
         minvelocitythreshold,
+        maxvelocitythreshold,
+        minsamplesizereflectivity,
+        minsamplesizewind,
         fields,
         recipients,
         sources,
@@ -396,7 +438,11 @@ public class WrwpRoutesController {
       Integer mindistance, 
       Integer maxdistance, 
       Double minelangle, 
+      Double maxelangle,
       Double minvelocitythreshold,
+      Double maxvelocitythreshold,
+      Integer minsamplesizereflectivity,
+      Integer minsamplesizewind,
       List<String> fields,
       List<String> recipients, 
       List<String> sources,
@@ -413,7 +459,11 @@ public class WrwpRoutesController {
         mindistance,
         maxdistance,
         minelangle,
+        maxelangle,
         minvelocitythreshold,
+        maxvelocitythreshold,
+        minsamplesizereflectivity,
+        minsamplesizewind,
         fields,
         recipients,
         sources,
@@ -452,7 +502,11 @@ public class WrwpRoutesController {
       Integer mindistance, 
       Integer maxdistance, 
       Double minelangle, 
+      Double maxelangle,
       Double minvelocitythreshold,
+      Double maxvelocitythreshold,
+      Integer minsamplesizereflectivity,
+      Integer minsamplesizewind,
       List<String> fields,
       List<String> recipients, 
       List<String> sources,
@@ -469,7 +523,11 @@ public class WrwpRoutesController {
     model.addAttribute("mindistance", (mindistance == null) ? new Integer(4000) : mindistance);
     model.addAttribute("maxdistance", (maxdistance == null) ? new Integer(40000) : maxdistance);
     model.addAttribute("minelangle", (minelangle == null) ? new Double(2.5) : minelangle);
+    model.addAttribute("maxelangle", (maxelangle == null) ? new Double(45.0) : maxelangle);
     model.addAttribute("minvelocitythreshold", (minvelocitythreshold == null) ? new Double(2.0) : minvelocitythreshold);
+    model.addAttribute("maxvelocitythreshold", (maxvelocitythreshold == null) ? new Double(60.0) : maxvelocitythreshold);
+    model.addAttribute("minsamplesizereflectivity", (minsamplesizereflectivity == null) ? new Integer(40) : minsamplesizereflectivity);
+    model.addAttribute("minsamplesizewind", (minsamplesizewind == null) ? new Integer(40) : minsamplesizewind);
     model.addAttribute("fields", (fields==null) ? new ArrayList<String>() : fields);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
@@ -518,14 +576,19 @@ public class WrwpRoutesController {
    * @param velocitythreshold
    * @return the wrwp rule
    */
-  protected WrwpRule createRule(int interval, int maxheight, int mindistance, int maxdistance, double elangle, double velocitythreshold, List<String> fields, List<String> sources, String jsonFilter) {
+  protected WrwpRule createRule(int interval, int maxheight, int mindistance, int maxdistance, double elangle, double maxelangle, double velocitythreshold, 
+      double maxvelocitythreshold, int minsamplesizereflectivity, int minsamplesizewind, List<String> fields, List<String> sources, String jsonFilter) {
     WrwpRule rule = (WrwpRule)manager.createRule(WrwpRule.TYPE);
     rule.setInterval(interval);
     rule.setMaxheight(maxheight);
     rule.setMindistance(mindistance);
     rule.setMaxdistance(maxdistance);
     rule.setMinelevationangle(elangle);
+    rule.setMaxelevationangle(maxelangle);
     rule.setMinvelocitythreshold(velocitythreshold);
+    rule.setMaxvelocitythreshold(maxvelocitythreshold);
+    rule.setMinsamplesizereflectivity(minsamplesizereflectivity);
+    rule.setMinsamplesizewind(minsamplesizewind);
     rule.setFields(fields);
     rule.setSources(sources);
     

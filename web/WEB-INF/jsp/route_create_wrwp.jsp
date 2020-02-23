@@ -147,10 +147,17 @@ Creates a weather radar wind profile route
                             </div>
                         </div>         
                         <div class="row2">
-                            <div class="leftcol">Minimum elevation angle:</div>
+                            <div class="leftcol">Min elevation angle:</div>
                             <div class="rightcol">
                                 <input type="text" name="minelangle" value="${minelangle}"
                                        title="Minimum elevation angle [deg]"/>
+                            </div>
+                        </div>         
+                        <div class="row2">
+                            <div class="leftcol">Max elevation angle:</div>
+                            <div class="rightcol">
+                                <input type="text" name="maxelangle" value="${maxelangle}"
+                                       title="Maximum elevation angle [deg]"/>
                             </div>
                         </div>         
                         <div class="row2">
@@ -160,6 +167,27 @@ Creates a weather radar wind profile route
                                        title="Radial velocity threshold [m/s]"/>
                             </div>
                         </div>
+                        <div class="row2">
+                            <div class="leftcol">Upper threshold for calculated velocity:</div>
+                            <div class="rightcol">
+                                <input type="text" name="maxvelocitythreshold" value="${maxvelocitythreshold}"
+                                       title="Upper threshold for calculated velocity [m/s]"/>
+                            </div>
+                        </div>
+                        <div class="row2">
+                            <div class="leftcol">Min sample size for reflectivity:</div>
+                            <div class="rightcol">
+                                <input type="text" name="minsamplesizereflectivity" value="${minsamplesizereflectivity}"
+                                       title="Min sample size for reflectivity"/>
+                            </div>
+                        </div>
+                        <div class="row2">
+                            <div class="leftcol">Min sample size for wind:</div>
+                            <div class="rightcol">
+                                <input type="text" name="minsamplesizewind" value="${minsamplesizewind}"
+                                       title="Min sample size for wind"/>
+                            </div>
+                        </div>                        
                         <div class="row2">
                             <div class="leftcol">Fields:</div>
                             <div class="rightcol">
