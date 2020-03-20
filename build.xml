@@ -452,7 +452,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <classpath refid="dep.lib.path"/>
 	  <classpath location="${build.test.dir}" />
 	  <batchtest fork="yes" todir="${dist.dir}/junit-reports">
-	    <fileset dir="${build.test.dir}" includes="**/*Test.class"/>
+	    <fileset dir="${build.test.dir}" includes="**/*Test.class" excludes="**/*BltDataProcessorTest.class" />
 	  </batchtest>
 	</junit>
   </target>
