@@ -518,6 +518,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean id="distributionRuleManager" class="eu.baltrad.beast.rules.dist.DistributionRuleManager" autowire="byType">
       <property name="metadataNameCreatorFactory" ref="metadataNameCreatorFactory"/>
       <property name="noOfParallelDistributions" value="5"/>
+      <property name="localStorage" ref="bdb_storage" />
     </bean>
     <bean id="bdbtrimagemgr" class="eu.baltrad.beast.rules.bdb.BdbTrimAgeRuleManager" autowire="byType"/>
     <bean id="bdbtrimcountmgr" class="eu.baltrad.beast.rules.bdb.BdbTrimCountRuleManager" autowire="byType"/>

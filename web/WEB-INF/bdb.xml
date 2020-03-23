@@ -13,11 +13,28 @@
         <constructor-arg value="20" />
         <constructor-arg value="0" /> <!-- file entry cache size -->
     </bean>
-    <bean id="bdb_storage"
+    
+    <bean id="bdb_storage_cache"
           class="eu.baltrad.bdb.storage.CacheDirStorage"
-	  init-method="init">
-        <constructor-arg index="0" value="${data.storage.folder}" />
-        <constructor-arg index="1" value="5000" />
+          init-method="init">
+      <constructor-arg index="0" value="${data.storage.folder}" />
+      <constructor-arg index="1" value="5000" /> <!-- cache size -->
+    </bean>
+    <bean id="bdb_storage_server"
+          class="eu.baltrad.bdb.storage.ServerFileStorage">
+      <constructor-arg index="0" value="${data.storage.folder}" />
+      <constructor-arg index="1" value="3" /> <!-- number of layers -->
+    </bean>
+    <bean id="bdb_storage"
+          class="eu.baltrad.bdb.storage.StrategyStorage"
+          init-method="init">
+      <property name="strategies">
+        <map>
+          <entry key="db" value-ref="bdb_storage_cache"/>
+          <entry key="fs" value-ref="bdb_storage_server"/>
+        </map>
+      </property>
+      <property name="strategy" value="${data.storage.strategy}" />
     </bean>
     <bean id="bdb_file_catalog" class="eu.baltrad.bdb.BasicFileCatalog">
         <constructor-arg ref="bdb_db" />
