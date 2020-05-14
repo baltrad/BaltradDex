@@ -21,6 +21,7 @@
 
 package eu.baltrad.dex.user.validator;
 
+import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.MessageResourceUtil;
 
@@ -99,27 +100,31 @@ public class AccountValidator {
                         messages.getMessage("saveaccount.mismatch.password"));
             }
         }
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "orgName",
-                "saveaccount.missing.organization_name",
-                messages.getMessage("saveaccount.missing.organization_name"));
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "orgUnit",
-                "saveaccount.missing.organization_unit",
-                messages.getMessage("saveaccount.missing.organization_unit"));
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "locality",
-                "saveaccount.missing.locality",
-                messages.getMessage("saveaccount.missing.locality"));
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "state",
-                "saveaccount.missing.state",
-                messages.getMessage("saveaccount.missing.state"));
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "countryCode",
-                "saveaccount.missing.country_code",
-                messages.getMessage("saveaccount.missing.country_code"));
-        if (user.getCountryCode().length() > 0 &&
-                user.getCountryCode().length() != COUNTRY_CODE_LENGTH) {
+        
+        if (!Role.PEER.equals(user.getRole())) {
+          ValidationUtils.rejectIfEmptyOrWhitespace(errors, "orgName",
+              "saveaccount.missing.organization_name",
+              messages.getMessage("saveaccount.missing.organization_name"));
+          ValidationUtils.rejectIfEmptyOrWhitespace(errors, "orgUnit",
+              "saveaccount.missing.organization_unit",
+              messages.getMessage("saveaccount.missing.organization_unit"));
+          ValidationUtils.rejectIfEmptyOrWhitespace(errors, "locality",
+              "saveaccount.missing.locality",
+              messages.getMessage("saveaccount.missing.locality"));
+          ValidationUtils.rejectIfEmptyOrWhitespace(errors, "state",
+              "saveaccount.missing.state",
+              messages.getMessage("saveaccount.missing.state"));
+          ValidationUtils.rejectIfEmptyOrWhitespace(errors, "countryCode",
+              "saveaccount.missing.country_code",
+              messages.getMessage("saveaccount.missing.country_code"));
+          if (user.getCountryCode().length() > 0 &&
+              user.getCountryCode().length() != COUNTRY_CODE_LENGTH) {
             errors.rejectValue("countryCode", 
-                    "saveaccount.invalid.country_code",
-                    messages.getMessage("saveaccount.invalid.country_code"));
+                  "saveaccount.invalid.country_code",
+                  messages.getMessage("saveaccount.invalid.country_code"));
+          }          
         }
+
         if (user.getNodeAddress() != null && user.getNodeAddress().length() > 0) {
             try {
               new URL(user.getNodeAddress());

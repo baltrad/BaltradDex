@@ -315,6 +315,7 @@ public class DataSourceListController {
         urlSelect = user.getNodeAddress();
       }
       String url = urlValidator.validate(urlInput) ? urlInput : urlSelect;
+      logger.info("Selecting URL: " + url);
       if (!urlValidator.validate(url)) {
         messageHelper.setErrorMessage(model, DS_INVALID_NODE_URL_KEY);
         return DS_CONNECT_VIEW;

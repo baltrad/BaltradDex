@@ -22,6 +22,9 @@
 package eu.baltrad.dex.user.controller;
 
 import eu.baltrad.dex.user.manager.IUserManager;
+import eu.baltrad.beast.security.Authorization;
+import eu.baltrad.beast.security.AuthorizationManager;
+import eu.baltrad.beast.security.IAuthorizationManager;
 import eu.baltrad.dex.user.manager.IRoleManager;
 import eu.baltrad.dex.user.model.Role;
 import eu.baltrad.dex.user.model.User;
@@ -73,7 +76,8 @@ public class SaveAccountController  {
     private AccountValidator validator;
     private MessageResourceUtil messages;
     private Logger log;
-
+    private IAuthorizationManager authorizationManager;
+    
     /**
      * Constructor.
      */
@@ -132,6 +136,13 @@ public class SaveAccountController  {
                             new Object[] {user.getName()});
             model.addAttribute(OK_MSG_KEY, msg);
             log.warn(msg);
+
+            Authorization auth = authorizationManager.getByNodeName(user.getName());
+            if (auth != null) { // We want the authorization entry to be synchronized with the user if there is a mapping...
+              auth.setNodeAddress(user.getNodeAddress());
+              auth.setRedirectedAddress(null);
+              authorizationManager.update(auth);
+            }
         } catch (Exception e) {
             String msg = messages.getMessage(SAVE_ACCOUNT_ERROR_MSG_KEY, 
                             new Object[] {user.getName()});
@@ -188,6 +199,14 @@ public class SaveAccountController  {
     @Autowired
     public void setMessages(MessageResourceUtil messages) {
         this.messages = messages;
+    }
+
+    public IAuthorizationManager getAuthorizationManager() {
+      return authorizationManager;
+    }
+    @Autowired
+    public void setAuthorizationManager(IAuthorizationManager authorizationManager) {
+      this.authorizationManager = authorizationManager;
     }
     
 }

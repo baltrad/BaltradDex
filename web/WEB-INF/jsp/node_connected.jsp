@@ -76,7 +76,7 @@ Author     : szewczenko
                                     <div class="button-wrap">
                                         <input class="button" type="button" 
                                                value="Back"
-                                               onclick="window.location.href='node_connect.htm'"/>
+                                               onclick="window.location.href='subscription_peers.htm'"/>
                                     </div>
                                     <div class="button-wrap">
                                         <input class="button" type="submit" 

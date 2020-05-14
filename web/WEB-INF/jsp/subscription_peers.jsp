@@ -34,7 +34,8 @@ Author     : szewczenko
                     <c:when test="${not empty subscribed_peers}">
                         <div class="header-text">
                             Click peer node's name in order to access list of 
-                            subscribed data sources.
+                            subscribed data sources. If you want to connect to a peer to subscribe on new data. 
+                            Please go to exchange->Authorizations which also can be found <a href="authorization_list.htm">here</a>.
                         </div>
                         <div class="body">
                             <div class="header-row">
@@ -69,53 +70,6 @@ Author     : szewczenko
                         </div>
                     </c:otherwise>
                 </c:choose>
-            </div>
-        </div>
-        
-        <div class="node-connect">
-            <div class="table">
-                <div class="header">
-                    <div class="row">Connect to peer node</div>
-                </div>
-                <div class="header-text">
-                    Select existing node from the list or enter 
-                    node's URL address. 
-                </div>
-                <form:form method="POST" action="node_connected.htm">
-                    <t:message_box msgHeader="Success."
-                                   msgBody="${success_message}"
-                                   errorHeader="Problems encountered."
-                                   errorBody="${error_message}"/>
-                    <div class="body">
-                        <div class="section" id="node-select">
-                            Select node
-                        </div>
-                        <div class="section-text">
-                            Select node and click <i>Connect</i> in order 
-                            to access data sources available at selected node.
-                        </div>
-                        <div class="row" id="node-select">
-                            <select name="node_select"
-                                    title="Node to connect">
-                                <option selected/>
-                                <c:forEach items="${nodes}" var="node">
-                                    <option value="${node}"> 
-                                        <c:out value="${node}"/>
-                                    </option>
-                                </c:forEach>
-                            </select>             
-                        </div>
-                        <div class="section-text"> &nbsp; </div>
-                    </div>
-                    <div class="table-footer">
-                        <div class="buttons">
-                            <div class="button-wrap">
-                                <input class="button" type="submit" 
-                                       name="connect" value="Connect"/>
-                            </div>
-                        </div>
-                    </div>
-                </form:form>    
             </div>
         </div>
     </jsp:body>

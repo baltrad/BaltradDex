@@ -251,6 +251,16 @@ public class AuthorizationController {
         } else {
           authorizationManager.update(auth);
         }
+        try {
+          User user = userManager.load(auth.getNodeName());
+          if (user != null) {
+            user.setNodeAddress(nodeAddress);
+            userManager.update(user);
+          }
+        } catch (Exception e) {
+          model.addAttribute("emessage", "Could not update user node address");
+          logger.error("Could not update user node address", e);
+        }
         return "redirect:authorization_list.htm"; 
       } else if (submitButton != null && submitButton.equals("Delete")) {
         if (!auth.isLocal()) {
@@ -345,7 +355,7 @@ public class AuthorizationController {
     } catch (ResponseParserException e) {
       messageHelper.setErrorDetailsMessage(model, DS_INTERNAL_CONTROLLER_ERROR_KEY, e.getMessage(), new Object[] {url});
     } catch (IOException e) {
-      messageHelper.setErrorDetailsMessage(model, DS_HTTP_CONN_ERROR_KEY, e.getMessage());
+      messageHelper.setErrorDetailsMessage(model, DS_HTTP_CONN_ERROR_KEY, e.getMessage(), new Object[] {url});
     } catch (Exception e) {
       messageHelper.setErrorDetailsMessage(model, DS_GENERIC_CONN_ERROR_KEY, e.getMessage(), new Object[] {url}); 
     } finally {
@@ -358,7 +368,6 @@ public class AuthorizationController {
       }
     }
     return null;
-    
   }
 
   @RequestMapping("/connect_with_remote_host.htm")

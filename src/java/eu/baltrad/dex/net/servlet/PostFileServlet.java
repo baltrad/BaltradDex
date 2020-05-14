@@ -241,6 +241,9 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
             User receiver = userManager.load(s.getUser());
             SendFileRequest request = new SendFileRequest();
             request.setAddress(receiver.getNodeAddress() + "/BaltradDex/post_file.htm");
+            if (receiver.getRedirectedAddress() != null) {
+              request.setAddress(receiver.getRedirectedAddress() + "/BaltradDex/post_file.htm");
+            }
             request.setContentType("application/x-hdf5");
             request.setData(fileContent);
             request.setDate(new Date());
@@ -403,6 +406,58 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
     }
   }
   
+
+  @Override
+  public void filePublished(SendFileRequest request, String redirectAddress, int statusCode) {
+    try {
+      if (request.getMetadata() != null) {
+        User user = (User)((Object[])request.getMetadata())[0];
+        DataSource dataSource = (DataSource)((Object[])request.getMetadata())[1];
+        Subscription subscription = (Subscription)((Object[])request.getMetadata())[2];
+        String uuid = (String)((Object[])request.getMetadata())[3];
+
+        nodeStatusManager.setRuntimeNodeStatus(user.getName(), HttpServletResponse.SC_OK);
+
+        RegistryEntry entry = new RegistryEntry(user.getId(), dataSource.getId(),
+            System.currentTimeMillis(), RegistryEntry.UPLOAD,
+            uuid, user.getName(), true);
+        log.info("File " + uuid + " sent to user " +user.getName());
+        registryManager.store(entry);
+        Status status = nodeStatusManager.load(subscription.getId());
+        status.incrementUploads();
+        nodeStatusManager.update(status, subscription.getId());
+      }
+    } catch (Exception e) {
+      logger.info(e);
+    }
+    
+    try {
+      if (request.getMetadata() != null && redirectAddress != null) {
+        User user = (User)((Object[])request.getMetadata())[0];
+        String redirectBase = extractBaseUrlFromRedirect(user.getNodeAddress(), request.getAddress(), redirectAddress);
+        logger.info("request uri: " + request.getAddress() + " redirected to " + redirectAddress);
+        if (redirectBase != null) {
+          user.setRedirectedAddress(redirectBase);
+          userManager.update(user);
+        }
+      }
+    } catch (Exception e) {
+      logger.info(e);
+    }
+  }
+  
+  protected String extractBaseUrlFromRedirect(String baseURI, String originURI, String redirectURI) {
+    String appended = originURI.substring(baseURI.length());
+    if (redirectURI.endsWith(appended)) {
+      String result = redirectURI.substring(0, redirectURI.length() - appended.length());
+      if (result.endsWith("/")) {
+        result = result.substring(0, result.length()-1);
+      }
+      return result;
+    }
+    return redirectURI;
+  }
+  
   /**
    * @param configurationManager
    */
@@ -543,4 +598,5 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
   public void setExchangeManager(IExchangeManager exchangeManager) {
     this.exchangeManager = exchangeManager;
   }
+
 }
