@@ -347,7 +347,7 @@ public class PostFileServletTest extends EasyMockSupport {
       nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
       expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
       expect(namerMock.name(entry)).andReturn("kalle");
-      expect(entry.getUuid()).andReturn(new UUID(0, 0));
+      expect(entry.getUuid()).andReturn(new UUID(0, 0)).anyTimes();
       expect(securityManager.isInjector("test.baltrad.eu")).andReturn(true);
       methodMock.sendMessage(entry);
       expect(subscriptionManager.load(Subscription.PEER)).andReturn(uploads);
@@ -370,7 +370,7 @@ public class PostFileServletTest extends EasyMockSupport {
       nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
       expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
       expect(namerMock.name(entry)).andReturn("kalle");
-      expect(entry.getUuid()).andReturn(new UUID(0, 0));
+      expect(entry.getUuid()).andReturn(new UUID(0, 0)).anyTimes();
       expect(securityManager.isInjector("test.baltrad.eu")).andReturn(true);
       methodMock.sendMessage(entry);
       expect(subscriptionManager.load(Subscription.PEER)).andReturn(uploads);
@@ -395,7 +395,7 @@ public class PostFileServletTest extends EasyMockSupport {
       nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
       expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
       expect(namerMock.name(entry)).andReturn("kalle");
-      expect(entry.getUuid()).andReturn(new UUID(0, 0));
+      expect(entry.getUuid()).andReturn(new UUID(0, 0)).anyTimes();
       expect(securityManager.isInjector("test.baltrad.eu")).andReturn(false);
 
       expect(subscriptionManager.load(Subscription.LOCAL)).andReturn(downloads);
@@ -424,7 +424,7 @@ public class PostFileServletTest extends EasyMockSupport {
       nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
       expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
       expect(namerMock.name(entry)).andReturn("kalle");
-      expect(entry.getUuid()).andReturn(new UUID(0, 0));
+      expect(entry.getUuid()).andReturn(new UUID(0, 0)).anyTimes();
       expect(securityManager.isInjector("test.baltrad.eu")).andReturn(false);
 
       expect(subscriptionManager.load(Subscription.LOCAL)).andReturn(downloads);
@@ -450,7 +450,7 @@ public class PostFileServletTest extends EasyMockSupport {
       nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
       expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
       expect(namerMock.name(entry)).andReturn("kalle");
-      expect(entry.getUuid()).andReturn(new UUID(0, 0));
+      expect(entry.getUuid()).andReturn(new UUID(0, 0)).anyTimes();
       expect(securityManager.isInjector("test.baltrad.eu")).andReturn(false);
 
       expect(subscriptionManager.load(Subscription.LOCAL)).andReturn(downloads);

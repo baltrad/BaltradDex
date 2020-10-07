@@ -277,6 +277,14 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
     return new ModelAndView();
   }
 
+  private void logInfo(String message, String file) {
+    if (file != null) {
+      logger.info(message + ", thread: " + Thread.currentThread().getName() + ", file: " + file);
+    } else {
+      logger.info(message + ", thread: " + Thread.currentThread().getName());
+    }
+  }
+  
   /**
    * Actual mathod processing requests.
    * 
@@ -290,12 +298,18 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
     logger.debug("Request arrived using protocol version '" + req.getProtocolVersion() + "'");
     long st = System.currentTimeMillis();
     long fileStored = 0, sentToSubscribers = 0;
-
+    
+    logInfo("doPost: ENTER Request arrived from: " + req.getNodeName(), null);
+    
     try {
       if (securityManager.validate(req.getNodeName(), req.getSignature(), req.getMessage())) {
         log.info("New data file received from " + req.getNodeName());
 
+        logInfo("New data file received from " + req.getNodeName() + ", reckognized after " + (System.currentTimeMillis() - st) + " ms.", null);
+        
         nodeStatusManager.setRuntimeNodeStatus(req.getNodeName(), HttpServletResponse.SC_OK);
+
+        logInfo("Runtime node status set after " + (System.currentTimeMillis() - st) + " ms.", null);
 
         // store entry
         FileEntry entry = storeFile(req);
@@ -303,12 +317,21 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
 
         if (entry != null) {
           String name = namer.name(entry);
+
+          logInfo("File " + name + " stored after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
+          
           if (securityManager.isInjector(req.getNodeName())) {
             // file sent by injector
             log.info("File " + name + " stored with UUID " + entry.getUuid().toString());
             sendMessage(entry);
+            
+            logInfo("- " + entry.getUuid().toString() + "- has been posted on beast queue after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
             List<Subscription> uploads = subscriptionManager.load(Subscription.PEER);
+
+            logInfo("- " + entry.getUuid().toString() + "- peer subsriptions loaded after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
             sendToSubscribers(uploads, entry);
+
+            logInfo("- " + entry.getUuid().toString() + "- file sent do subscribers after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
 
             sentToSubscribers = System.currentTimeMillis();
             logger.debug("PostFile from injector: File stored after " + (fileStored - st)
@@ -316,14 +339,19 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
           } else {
             // file sent by peer
             List<Subscription> downloads = subscriptionManager.load(Subscription.LOCAL);
+            logInfo("- " + entry.getUuid().toString() + "- local subscriptions loaded after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
             int subscriptionId = validateSubscription(downloads, entry);
+            logInfo("- " + entry.getUuid().toString() + "- subscriptions validated after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
             if (subscriptionId > 0) {
               log.info("File " + name + " stored with UUID " + entry.getUuid().toString());
               sendMessage(entry);
+              logInfo("- " + entry.getUuid().toString() + "- subscribed file has been posted on beast queue after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
               // update status - increment downloads
               Status s = nodeStatusManager.load(subscriptionId);
+              logInfo("- " + entry.getUuid().toString() + "- node status loaded after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
               s.incrementDownloads();
               nodeStatusManager.update(s, subscriptionId);
+              logInfo("- " + entry.getUuid().toString() + "- node status updated after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
               logger.debug("PostFile from peer: File stored after " + (fileStored - st)
                   + " ms. Total time to handle post: " + (System.currentTimeMillis() - st) + " ms");
             } else {
@@ -350,12 +378,15 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
       res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, messages.getMessage(PF_INTERNAL_SERVER_ERROR_KEY));
       logger.error("Internal server error", e);
     }
+    logInfo("doPost: EXIT Request from from: " + req.getNodeName(), null);
   }
 
   @Override
   public void filePublicationFailed(SendFileRequest request, ExchangeResponse response) {
     try {
       if (request.getMetadata() != null) {
+        long st = System.currentTimeMillis();
+
         User user = (User)((Object[])request.getMetadata())[0];
         DataSource dataSource = (DataSource)((Object[])request.getMetadata())[1];
         Subscription subscription = (Subscription)((Object[])request.getMetadata())[2];
@@ -368,13 +399,14 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
             RegistryEntry.UPLOAD, uuid, user.getName(),
             false);
         log.error("Failed to send file " + uuid + " to user " + user.getName() + ": " +
-            response.statusCode() + " - " + response.getMessage());
+            response.statusCode() + " - " + response.getMessage() +  ", thread: " + Thread.currentThread().getName() + ", file: " + uuid.toString());
         registryManager.store(entry);
         //  update status
         nodeStatusManager.setRuntimeNodeStatus(user.getName(), response.statusCode());
         Status status = nodeStatusManager.load(subscription.getId());
         status.incrementUploadFailures();
         nodeStatusManager.update(status, subscription.getId());
+        logger.info("filePublished updated all db-entries in " + (System.currentTimeMillis() - st) + " ms " + ", thread: " + Thread.currentThread().getName() + ", file: " + uuid.toString());
       }
     } catch (Exception e) {
       logger.warn(e);
@@ -385,21 +417,23 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
   public void filePublished(SendFileRequest request) {
     try {
       if (request.getMetadata() != null) {
+        long st = System.currentTimeMillis();
         User user = (User)((Object[])request.getMetadata())[0];
         DataSource dataSource = (DataSource)((Object[])request.getMetadata())[1];
         Subscription subscription = (Subscription)((Object[])request.getMetadata())[2];
         String uuid = (String)((Object[])request.getMetadata())[3];
-
+        
         nodeStatusManager.setRuntimeNodeStatus(user.getName(), HttpServletResponse.SC_OK);
 
         RegistryEntry entry = new RegistryEntry(user.getId(), dataSource.getId(),
             System.currentTimeMillis(), RegistryEntry.UPLOAD,
             uuid, user.getName(), true);
-        log.info("File " + uuid + " sent to user " +user.getName());
+        log.info("File " + uuid + " sent to user " +user.getName() + ", thread: " + Thread.currentThread().getName());
         registryManager.store(entry);
         Status status = nodeStatusManager.load(subscription.getId());
         status.incrementUploads();
         nodeStatusManager.update(status, subscription.getId());
+        logger.info("filePublished updated all db-entries in " + (System.currentTimeMillis() - st) + " ms " + ", thread: " + Thread.currentThread().getName() + ", file: " + uuid.toString());
       }
     } catch (Exception e) {
       logger.info(e);
@@ -411,6 +445,8 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
   public void filePublished(SendFileRequest request, String redirectAddress, int statusCode) {
     try {
       if (request.getMetadata() != null) {
+        long st = System.currentTimeMillis();
+
         User user = (User)((Object[])request.getMetadata())[0];
         DataSource dataSource = (DataSource)((Object[])request.getMetadata())[1];
         Subscription subscription = (Subscription)((Object[])request.getMetadata())[2];
@@ -421,11 +457,12 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
         RegistryEntry entry = new RegistryEntry(user.getId(), dataSource.getId(),
             System.currentTimeMillis(), RegistryEntry.UPLOAD,
             uuid, user.getName(), true);
-        log.info("File " + uuid + " sent to user " +user.getName());
+        log.info("File " + uuid + " sent to user " +user.getName() +  ", thread: " + Thread.currentThread().getName() + ", file: " + uuid.toString());
         registryManager.store(entry);
         Status status = nodeStatusManager.load(subscription.getId());
         status.incrementUploads();
         nodeStatusManager.update(status, subscription.getId());
+        logger.info("filePublished redirect updated all db-entries in " + (System.currentTimeMillis() - st) + " ms " + ", thread: " + Thread.currentThread().getName() + ", file: " + uuid.toString());
       }
     } catch (Exception e) {
       logger.info(e);
