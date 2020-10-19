@@ -498,13 +498,36 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <bean name="quantityHexNameCreator" class="eu.baltrad.beast.rules.namer.QuantityHexNameCreator">
       <constructor-arg value="classpath:odim_quantities.xml"/>
     </bean>
-	<bean name="formattableDateTimeNameCreator" class="eu.baltrad.beast.rules.namer.FormattableDateTimeNameCreator" />
+    
+	  <bean name="formattableDateTimeNameCreator" class="eu.baltrad.beast.rules.namer.FormattableDateTimeNameCreator" />
+	  
+    <bean name="beastElangleNameCreator" class="eu.baltrad.beast.rules.namer.DoubleToStringNameCreator">
+      <property name="attributePattern" value="_beast/elanglenamer(:/dataset[0-9]+/where/elangle)?" />
+      <property name="defaultAttribute" value="/dataset1/where/elangle" />
+      <property name="mapping">
+        <map>
+          <entry key="0.5" value="A"/>
+          <entry key="1.0" value="B"/>
+          <entry key="1.5" value="C"/>
+          <entry key="2.0" value="D"/>
+          <entry key="2.5" value="E"/>
+          <entry key="4.0" value="F"/>
+          <entry key="8.0" value="G"/>
+          <entry key="14.0" value="H"/>
+          <entry key="24.0" value="I"/>
+          <entry key="40.0" value="J"/>
+          <entry key="1.25" value="K"/>
+        </map>
+      </property>
+      <property name="defaultValue" value="UNKNOWN" />
+    </bean>
 	
     <bean name="metadataNameCreatorFactory" class="eu.baltrad.beast.rules.namer.MetadataNameCreatorFactory">
       <property name="creators">
         <list>
           <ref bean="quantityHexNameCreator"/>
           <ref bean="formattableDateTimeNameCreator"/>
+          <ref bean="beastElangleNameCreator"/>
         </list>
       </property>
     </bean>    
