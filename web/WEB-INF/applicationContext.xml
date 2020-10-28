@@ -159,6 +159,7 @@
         <beans:constructor-arg ref="dataSource"/>
     </beans:bean>
     
+    <!--
     <beans:bean id="dataSource" destroy-method="close" 
           class="org.apache.commons.dbcp.BasicDataSource">
         <beans:property name="driverClassName" value="${db.driver}"/>
@@ -166,7 +167,22 @@
         <beans:property name="username" value="${db.user}"/>
         <beans:property name="password" value="${db.pwd}"/>
     </beans:bean>
+    -->
     
+    <beans:bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+        <beans:property name="maximumPoolSize" value="10" />
+        <beans:property name="minimumIdle" value="2" />
+        <beans:property name="driverClassName" value="${db.driver}" />
+        <beans:property name="jdbcUrl" value="${db.url}" />
+        <beans:property name="username" value="${db.user}" />
+        <beans:property name="password" value="${db.pwd}" />
+        <beans:property name="poolName" value="springHikariCP" />
+    </beans:bean>
+
+    <beans:bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource" destroy-method="close">
+      <beans:constructor-arg ref="hikariConfig" />
+    </beans:bean>
+
     <beans:bean id="propertyConfigurer" 
                 class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <beans:property name="locations">

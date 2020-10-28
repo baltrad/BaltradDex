@@ -184,6 +184,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <fileset dir="lib/jakarta-commons">
         <include name="*.jar"/>
       </fileset>
+      <fileset dir="lib/HikariCP">
+        <include name="*.jar"/>
+      </fileset>
       <fileset dir="lib/jcip">
         <include name="*.jar"/>
       </fileset>
@@ -233,7 +236,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="*.jar"/>
       </fileset>
       <fileset dir="lib">
-        <include name="postgresql-42.1.4.jre6.jar"/> 
+        <include name="postgresql-42.2.18.jar"/> 
         <include name="apache-mime4j-0.6.jar"/>
       </fileset>
       <!-- Also, include neccesary libs from beast-lib -->
