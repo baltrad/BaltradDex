@@ -453,7 +453,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     
     <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
-        <property name="maximumPoolSize" value="10" />
+        <property name="maximumPoolSize" value="40" />
         <property name="minimumIdle" value="2" />
         <property name="driverClassName" value="${db.driver}" />
         <property name="jdbcUrl" value="${db.url}" />
