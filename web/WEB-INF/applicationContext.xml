@@ -170,8 +170,7 @@
     -->
     
     <beans:bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
-        <beans:property name="maximumPoolSize" value="40" />
-        <beans:property name="minimumIdle" value="2" />
+        <beans:property name="maximumPoolSize" value="10" />
         <beans:property name="driverClassName" value="${db.driver}" />
         <beans:property name="jdbcUrl" value="${db.url}" />
         <beans:property name="username" value="${db.user}" />
