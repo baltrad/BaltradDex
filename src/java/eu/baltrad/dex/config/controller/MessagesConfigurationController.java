@@ -110,21 +110,11 @@ public class MessagesConfigurationController {
             return FORM_VIEW;
         }
         try {
-            if (Boolean.parseBoolean(conf.getMsgTrimByNumber())) {
-                logManager.setTrimmer(Integer.parseInt(conf.getMsgRecordLimit()));
-            } else {
-                logManager.removeTrimmer(LogManager.TRIM_MSG_BY_NUMBER_TG);
+            if (!Boolean.parseBoolean(conf.getMsgTrimByNumber())) {
                 conf.setMsgTrimByNumber("false");   
             }
-            if (Boolean.parseBoolean(conf.getMsgTrimByAge())) {
-                logManager.setTrimmer(
-                        Integer.parseInt(conf.getMsgMaxAgeDays()),
-                        Integer.parseInt(conf.getMsgMaxAgeHours()),
-                        Integer.parseInt(conf.getMsgMaxAgeMinutes()));
-            } else {
-                logManager.removeTrimmer(LogManager.TRIM_MSG_BY_AGE_TG);
+            if (!Boolean.parseBoolean(conf.getMsgTrimByAge())) {
                 conf.setMsgTrimByAge("false");
-                
             }
             configManager.saveLogConf(conf);
             String msg = messages.getMessage(SAVE_MESSAGES_CONF_OK);

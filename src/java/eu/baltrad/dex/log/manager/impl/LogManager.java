@@ -30,7 +30,13 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -38,6 +44,8 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
+import eu.baltrad.dex.config.model.LogConfiguration;
 import eu.baltrad.dex.log.manager.ILogManager;
 import eu.baltrad.dex.log.model.impl.LogEntry;
 import eu.baltrad.dex.log.model.impl.LogParameter;
@@ -51,7 +59,7 @@ import eu.baltrad.dex.log.model.mapper.LogEntryMapper;
  * @version 1.2.1
  * @since 0.6.6
  */
-public class LogManager implements ILogManager {
+public class LogManager implements ILogManager, InitializingBean {
     private final static String DATE_FORMAT = "yyyy-MM-dd";
     
     private final static String DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -62,6 +70,14 @@ public class LogManager implements ILogManager {
     private LogEntryMapper mapper;
     
     private DateFormat format;
+    
+    /**
+     * Log configuration is required
+     */
+    private ConfigurationManager configManager;
+    
+    /** Logger */
+    private final static Logger logger = org.apache.log4j.LogManager.getLogger(LogManager.class);
     
     /**
      * Constructor.
@@ -78,7 +94,7 @@ public class LogManager implements ILogManager {
     public void setJdbcTemplate(JdbcOperations jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
-    
+
     /**
      * Creates db query based on given log parameters.
      * @param param Log parameter
@@ -314,44 +330,67 @@ public class LogManager implements ILogManager {
     }
     
     /**
-     * Set trigger. Trigger activates trimmer function deleting records when 
-     * given number of records is exceeded.
-     * @param limit Maximum number of records
+     * @param configManager the configManager to set
      */
-    public void setTrimmer(int limit) {
-        String sql = "DROP TRIGGER IF EXISTS dex_trim_messages_by_number_tg " +
-            "ON dex_messages;" +
-            " CREATE TRIGGER dex_trim_messages_by_number_tg AFTER INSERT ON " +
-            "dex_messages FOR EACH ROW EXECUTE PROCEDURE " + 
-             "dex_trim_messages_by_number(" + limit + ");";
-        jdbcTemplate.update(sql);
+    @Autowired
+    public void setConfigManager(ConfigurationManager configManager) {
+        this.configManager = configManager;
     }
     
     /**
-     * Set trigger. Trigger activates trimmer function deleting records when 
-     * given expiry period is exceeded.
-     * @param days Maximum days
-     * @param hours Maximum hours 
-     * @param minutes Maximum minutes
+     * Runs the maintenance routine for keeping the dex_messages table in check.
      */
-    public void setTrimmer(int days, int hours, int minutes) {
-        String sql = "DROP TRIGGER IF EXISTS dex_trim_messages_by_age_tg ON " +
-            "dex_messages;" +
-            " CREATE TRIGGER dex_trim_messages_by_age_tg AFTER INSERT ON " +
-            "dex_messages FOR EACH ROW EXECUTE PROCEDURE " + 
-            "dex_trim_messages_by_age(" + days + ", " + hours + ", " + 
-             minutes + ");";
-        jdbcTemplate.update(sql);
+    public void runMaintenance() {
+      logger.info("Periodic maintenance of dex_messages triggered");
+      LogConfiguration conf = configManager.getLogConf();
+      try {
+        if (Boolean.parseBoolean(conf.getMsgTrimByNumber())) {
+          logger.info("Cleaning by count");
+          jdbcTemplate.update("DELETE FROM dex_messages " +
+              " WHERE id IN (SELECT id FROM dex_messages WHERE  level <> 'STICKY' ORDER BY time_stamp DESC OFFSET ?)",
+              Integer.parseInt(conf.getMsgRecordLimit()));
+        }
+      } catch (Exception e) {
+        logger.error(e);
+      }
+
+      try {
+        if (Boolean.parseBoolean(conf.getMsgTrimByAge())) {
+          logger.info("Cleaning by age");
+          int days = Integer.parseInt(conf.getMsgMaxAgeDays());
+          int hours = Integer.parseInt(conf.getMsgMaxAgeHours());
+          int minutes = Integer.parseInt(conf.getMsgMaxAgeMinutes());
+          
+          long epoclimit = System.currentTimeMillis() - (((days*24) + hours)*60 + minutes)*60*1000;
+          jdbcTemplate.update("DELETE FROM dex_messages WHERE time_stamp < ? AND level <> 'STICKY'", epoclimit);
+        }
+      } catch (Exception e) {
+        logger.error(e);
+      }
     }
-    
+
     /**
-     * Removes trigger from registry table.
-     * @param name Trigger name
+     * Override for {@link InitializingBean}
      */
-    public void removeTrimmer(String name) {
-        String sql = "DROP TRIGGER IF EXISTS " + name + 
-                " ON dex_messages;";
-        jdbcTemplate.update(sql);
+    @Override
+    public void afterPropertiesSet() throws Exception {
+      ScheduledExecutorService exec = Executors.newScheduledThreadPool(1,
+          new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+              Thread t = Executors.defaultThreadFactory().newThread(r);
+              t.setDaemon(true); // Want thread to die silently if we are shutting down system
+              return t;
+            }
+          }
+      );
+      Runnable maintenanceRunnable = new Runnable() {
+        @Override
+        public void run() {
+          runMaintenance();
+        }
+      };
+      exec.scheduleAtFixedRate(maintenanceRunnable , 0, 1, TimeUnit.MINUTES);
     }
     
  }

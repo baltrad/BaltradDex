@@ -237,58 +237,10 @@ public class LogManagerTest extends TestCase {
         assertTrue(containsEntry(entries, entry8));
     }
     
-//    public void testStore() throws Exception {
-//        helper.cleanInsert(this, "noid");
-//        LogEntry entry = new LogEntry(
-//                format.parse("2012-08-24 12:20:00").getTime(), "DEX", 
-//                "ERROR", "DEX message");
-//        
-//        assertEquals(13, classUnderTest.store(entry));
-//        verifyDBTables("store", "dex_messages", "id");
-//    }
-    
     public void testDeleteAll() {
         int delete = classUnderTest.delete();
         assertEquals(12, delete);
         List<LogEntry> entries = classUnderTest.load();
         assertEquals(0, entries.size());
     }
-    
-    public void testSetRecordNumberTrimmer() throws Exception {
-        helper.cleanInsert(this, "noid");
-        classUnderTest.setTrimmer(7);
-        LogEntry entry = new LogEntry(
-                 format.parse("2012-08-24 12:20:00").getTime(), "DEX", 
-                 "ERROR", "DEX message");
-        
-        assertTrue(classUnderTest.store(entry) > 0);
-        verifyDBTables("trim_by_number", "dex_messages", "id");
-        
-        classUnderTest.removeTrimmer("dex_trim_messages_by_number_tg");
-    }
-    
-    /*public void testSetExpiryDateTrimmer() throws Exception {
-        long start = format.parse("2012-08-24 11:30:00").getTime();
-        long now = System.currentTimeMillis();
-        long delta = now - start;
-        int days = (int) Math.floor(delta / MILLIS_PER_DAY);  
-        long hourMillis = delta % MILLIS_PER_DAY; 
-        int hours = (int) Math.floor(hourMillis / MILLIS_PER_HOUR);
-        long minuteMillis = delta % MILLIS_PER_HOUR;
-        int minutes = (int) Math.floor(minuteMillis / MILLIS_PER_MINUTE);
-        
-        helper.cleanInsert(this, "noid");
-        classUnderTest.setTrimmer(days, hours, minutes);
-        
-        LogEntry entry = new LogEntry(
-                13, format.parse("2012-08-24 12:20:00").getTime(), "DEX", 
-                "ERROR", "DEX message");
-        
-        assertTrue(classUnderTest.store(entry) > 0);
-        assertEquals(5, classUnderTest.count());
-        verifyDBTables("trim_by_age", "dex_messages", "id");
-        
-        classUnderTest.removeTrimmer("dex_trim_messages_by_age_tg");
-    }*/
-    
 }

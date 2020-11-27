@@ -107,21 +107,10 @@ public class RegistryConfigurationController {
             return FORM_VIEW;
         }
         try {
-            if (Boolean.parseBoolean(conf.getRegTrimByNumber())) {
-                registryManager.setTrimmer(Integer.parseInt(conf.getRegRecordLimit()));
-            } else {
-                registryManager.removeTrimmer(
-                        RegistryManager.TRIM_REG_BY_NUMBER_TG);
+            if (!Boolean.parseBoolean(conf.getRegTrimByNumber())) {
                 conf.setRegTrimByNumber("false");   
             }
-            if (Boolean.parseBoolean(conf.getRegTrimByAge())) {
-                registryManager.setTrimmer(
-                        Integer.parseInt(conf.getRegMaxAgeDays()), 
-                        Integer.parseInt(conf.getRegMaxAgeHours()), 
-                        Integer.parseInt(conf.getRegMaxAgeMinutes()));
-            } else {
-                registryManager.removeTrimmer(
-                        RegistryManager.TRIM_REG_BY_AGE_TG);
+            if (!Boolean.parseBoolean(conf.getRegTrimByAge())) {
                 conf.setRegTrimByAge("false");   
             }
             configManager.saveRegistryConf(conf);

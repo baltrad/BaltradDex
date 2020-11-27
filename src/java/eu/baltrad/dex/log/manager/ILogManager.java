@@ -33,13 +33,6 @@ import java.util.List;
  * @since 0.6.6
  */
 public interface ILogManager {
-    
-    /** Trim messages by number trigger */
-    public static final String TRIM_MSG_BY_NUMBER_TG = 
-            "dex_trim_messages_by_number_tg";
-    /** Trim messages by date trigger */
-    public static final String TRIM_MSG_BY_AGE_TG = 
-            "dex_trim_messages_by_age_tg";
     /** SQL query to select sticky-level messages */
     public static final String SQL_SELECT_STICKY = "SELECT count(*) FROM " + 
             "dex_messages WHERE level = 'STICKY';";
@@ -63,11 +56,4 @@ public interface ILogManager {
     public int delete();
     
     public int delete(int id);
-    
-    public void setTrimmer(int limit);
-    
-    public void setTrimmer(int days, int hours, int minutes);
-    
-    public void removeTrimmer(String name);
-    
 }

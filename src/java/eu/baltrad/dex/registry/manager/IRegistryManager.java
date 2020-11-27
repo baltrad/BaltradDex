@@ -38,11 +38,6 @@ public interface IRegistryManager {
     /** Number of pages in the scroll bar, must be an odd number >= 3 */
     public final static int SCROLL_RANGE = 11;
     /** Trim registry by number trigger */
-    public static final String TRIM_REG_BY_NUMBER_TG = 
-            "dex_trim_registry_by_number_tg";
-    /** Trim registry by date trigger */
-    public static final String TRIM_REG_BY_AGE_TG = 
-            "dex_trim_registry_by_age_tg";
     
     public long count(String type);
     
@@ -51,11 +46,4 @@ public interface IRegistryManager {
     public int store(RegistryEntry entry) throws Exception;
     
     public int delete() throws Exception;
-    
-    public void setTrimmer(int limit);
-    
-    public void setTrimmer(int days, int hours, int minutes);
-    
-    public void removeTrimmer(String name);
-    
 }

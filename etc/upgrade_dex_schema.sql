@@ -419,6 +419,11 @@ SELECT create_status_tables();
 SELECT update_dex_users_with_redirected_address();
 SELECT move_dex_keys_to_beast_authorization();
 
+DROP TRIGGER IF EXISTS dex_trim_messages_by_number_tg ON dex_messages;
+DROP TRIGGER IF EXISTS dex_trim_messages_by_age_tg ON dex_messages;
+DROP TRIGGER IF EXISTS dex_trim_registry_by_number_tg ON dex_delivery_registry;
+DROP TRIGGER IF EXISTS dex_trim_registry_by_age_tg ON dex_delivery_registry;
+
 DROP FUNCTION make_plpgsql(); 
 DROP FUNCTION remove_name_hash_from_dex_users();
 DROP FUNCTION rename_registry_table();

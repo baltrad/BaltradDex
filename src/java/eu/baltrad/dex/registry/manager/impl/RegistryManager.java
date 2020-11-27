@@ -25,7 +25,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -35,6 +41,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
+import eu.baltrad.dex.config.model.RegistryConfiguration;
 import eu.baltrad.dex.registry.manager.IRegistryManager;
 import eu.baltrad.dex.registry.model.impl.RegistryEntry;
 import eu.baltrad.dex.registry.model.mapper.RegistryEntryMapper;
@@ -46,13 +54,21 @@ import eu.baltrad.dex.registry.model.mapper.RegistryEntryMapper;
  * @version 1.2.1
  * @since 0.1.6
  */
-public class RegistryManager implements IRegistryManager {
+public class RegistryManager implements IRegistryManager, InitializingBean {
     
     /** JDBC template */
     private JdbcOperations jdbcTemplate;
     /** Row mapper */
     private RegistryEntryMapper mapper;
     
+    /**
+     * Log configuration is required
+     */
+    private ConfigurationManager configManager;
+    
+    /** Logger */
+    private final static Logger logger = org.apache.log4j.LogManager.getLogger(RegistryManager.class);
+
     /**
      * Constructor.
      */
@@ -153,44 +169,66 @@ public class RegistryManager implements IRegistryManager {
     }
     
     /**
-     * Set trigger. Trigger activates trimmer function deleting records when 
-     * given number of records is exceeded.
-     * @param limit Maximum number of records
+     * @param configManager the configManager to set
      */
-    public void setTrimmer(int limit) {
-        String sql = "DROP TRIGGER IF EXISTS dex_trim_registry_by_number_tg " +
-            "ON dex_delivery_registry;" +
-            " CREATE TRIGGER dex_trim_registry_by_number_tg AFTER INSERT ON " +
-            "dex_delivery_registry FOR EACH ROW EXECUTE PROCEDURE " + 
-             "dex_trim_registry_by_number(" + limit + ");";
-        jdbcTemplate.update(sql);
+    @Autowired
+    public void setConfigManager(ConfigurationManager configManager) {
+        this.configManager = configManager;
     }
     
     /**
-     * Set trigger. Trigger activates trimmer function deleting records when 
-     * given expiry period is exceeded.
-     * @param days Maximum days
-     * @param hours Maximum hours 
-     * @param minutes Maximum minutes
+     * Runs the maintenance routine for keeping the dex_delivery_registry table in check.
      */
-    public void setTrimmer(int days, int hours, int minutes) {
-        String sql = "DROP TRIGGER IF EXISTS dex_trim_registry_by_age_tg ON " +
-            "dex_delivery_registry;" +
-            " CREATE TRIGGER dex_trim_registry_by_age_tg AFTER INSERT ON " +
-            "dex_delivery_registry FOR EACH ROW EXECUTE PROCEDURE " + 
-            "dex_trim_registry_by_age(" + days + ", " + hours + ", " + 
-             minutes + ");";
-        jdbcTemplate.update(sql);
+    protected void runMaintenance() {
+      logger.info("Periodic maintenance of dex_delivery_registry triggered");
+      RegistryConfiguration conf = configManager.getRegistryConf();
+      try {
+        if (Boolean.parseBoolean(conf.getRegTrimByNumber())) {
+          logger.info("Cleaning by count");
+          jdbcTemplate.update("DELETE FROM dex_delivery_registry " +
+              " WHERE id IN (SELECT id FROM dex_delivery_registry ORDER BY time_stamp DESC OFFSET ?)",
+              Integer.parseInt(conf.getRegRecordLimit()));
+        }
+      } catch (Exception e) {
+        logger.error(e);
+      }
+
+      try {
+        if (Boolean.parseBoolean(conf.getRegTrimByAge())) {
+          logger.info("Cleaning by age");
+          int days = Integer.parseInt(conf.getRegMaxAgeDays());
+          int hours = Integer.parseInt(conf.getRegMaxAgeHours());
+          int minutes = Integer.parseInt(conf.getRegMaxAgeMinutes());
+          
+          long epoclimit = System.currentTimeMillis() - (((days*24) + hours)*60 + minutes)*60*1000;
+          jdbcTemplate.update("DELETE FROM dex_delivery_registry WHERE time_stamp < ?", epoclimit);
+        }
+      } catch (Exception e) {
+        logger.error(e);
+      }
     }
-    
+
     /**
-     * Removes trigger from registry table.
-     * @param name Trigger name
+     * See {@link InitializingBean}
      */
-    public void removeTrimmer(String name) {
-        String sql = "DROP TRIGGER IF EXISTS " + name + 
-                " ON dex_delivery_registry;";
-        jdbcTemplate.update(sql);
-    }
+    @Override
+    public void afterPropertiesSet() throws Exception {
+      ScheduledExecutorService exec = Executors.newScheduledThreadPool(1,
+          new ThreadFactory() {
+            public Thread newThread(Runnable r) {
+              Thread t = Executors.defaultThreadFactory().newThread(r);
+              t.setDaemon(true); // Want thread to die silently if we are shutting down system
+              return t;
+            }
+          }
+      );
+      Runnable maintenanceRunnable = new Runnable() {
+        @Override
+        public void run() {
+          runMaintenance();
+        }
+      };
+      exec.scheduleAtFixedRate(maintenanceRunnable , 0, 1, TimeUnit.MINUTES);
+    }    
     
 }
