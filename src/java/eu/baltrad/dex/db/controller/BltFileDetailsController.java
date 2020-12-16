@@ -41,6 +41,7 @@ import ncsa.hdf.object.h5.H5File;
 import ncsa.hdf.object.Group;
 import ncsa.hdf.object.Dataset;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -98,7 +99,7 @@ public class BltFileDetailsController {
     private FileCatalog fileCatalog;
     private ConfigurationManager configurationManager;
     private Logger log;
-
+    private Logger logger = LogManager.getLogger(BltFileDetailsController.class);
     private SimpleDateFormat dateTimeFormat;
     private SimpleDateFormat dateFormat;
     private SimpleDateFormat timeFormat;
@@ -245,6 +246,39 @@ public class BltFileDetailsController {
                 String quantity_val = bltDataProcessor
                         .getH5AttributeValue().toString();
 
+                double nodata_val=255.0, undetect_val=0.0, offset_val=0.0, gain_val=1.0;
+                try {
+                  bltDataProcessor.getH5Attribute(root, whatGroup,
+                      BltDataProcessor.H5_NODATA_ATTR);
+                  nodata_val = (Double)bltDataProcessor.getH5AttributeValue();
+                } catch (Exception e) {
+                  logger.info("Dataset does not contain what/nodata attribute", e);
+                }
+
+                try {
+                  bltDataProcessor.getH5Attribute(root, whatGroup,
+                      BltDataProcessor.H5_UNDETECT_ATTR);
+                  undetect_val = (Double)bltDataProcessor.getH5AttributeValue();
+                } catch (Exception e) {
+                  logger.info("Dataset does not contain what/undetect attribute", e);
+                }
+
+                try {
+                  bltDataProcessor.getH5Attribute(root, whatGroup,
+                      BltDataProcessor.H5_OFFSET_ATTR);
+                  offset_val = (Double)bltDataProcessor.getH5AttributeValue();
+                } catch (Exception e) {
+                  logger.info("Dataset does not contain what/offset attribute", e);
+                }
+
+                try {
+                  bltDataProcessor.getH5Attribute(root, whatGroup,
+                      BltDataProcessor.H5_GAIN_ATTR);
+                  gain_val = (Double)bltDataProcessor.getH5AttributeValue();
+                } catch (Exception e) {
+                  logger.info("Dataset does not contain what/gain attribute", e);
+                }
+
                 // get elevation angles
                 bltDataProcessor.getH5Attribute(root, whereGroup,
                         BltDataProcessor.H5_ELANGLE_ATTR);
@@ -311,11 +345,12 @@ public class BltFileDetailsController {
                         + BltDataProcessor.IMAGE_FILE_EXT;
                 // generate image thumbs
                 File thumb = new File(thumbPath);
+
                 if (!thumb.exists()) {
                     bltDataProcessor.getH5Dataset(root, datasetPaths.get(i));
                     Dataset dataset = bltDataProcessor.getH5Dataset();
                     BufferedImage bi = bltDataProcessor.polar2Image(nbins_val,
-                            rscale_val, dataset, palette, THUMB_IMAGE_SIZE,
+                            rscale_val, nodata_val, undetect_val, offset_val, gain_val, dataset, palette, THUMB_IMAGE_SIZE,
                             false, true);
                     bltDataProcessor.saveImageToFile(bi, thumbPath);
                 }

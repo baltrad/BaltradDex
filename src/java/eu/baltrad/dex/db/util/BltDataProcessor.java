@@ -65,6 +65,9 @@ public class BltDataProcessor {
     public static final String H5_OBJECT_ATTR = "object";
     public static final String H5_QUANTITY_ATTR = "quantity";
     public static final String H5_NODATA_ATTR = "nodata";
+    public static final String H5_UNDETECT_ATTR = "undetect";
+    public static final String H5_OFFSET_ATTR = "offset";
+    public static final String H5_GAIN_ATTR = "gain";
     public static final String H5_NBINS_ATTR = "nbins";
     public static final String H5_NRAYS_ATTR = "nrays";
     public static final String H5_RSCALE_ATTR = "rscale";
@@ -338,6 +341,41 @@ public class BltDataProcessor {
       return attrResult;
     }
     
+    protected byte[] convertShortToByte(short[] polarData, long nbins, double nodata, double undetect, double offset, double gain) {
+      int i = 0;
+      byte[] result = new byte[polarData.length];
+      for (i = 0; i < result.length; i++) {
+        if ((double)(polarData[i]) == nodata) {
+          result[i] = (byte)255;
+        } else if ((double)(polarData[i]) == undetect)  {
+          result[i] = (byte)0;
+        } else {
+          double v = offset + ((double)polarData[i])*gain;
+          double x = (v - (-30.0))/0.4;
+          result[i] = (byte)x;
+        }
+      }
+      return result;
+    }
+
+    protected byte[] convertIntToByte(int[] polarData, long nbins, double nodata, double undetect, double offset, double gain) {
+      int i = 0;
+      byte[] result = new byte[polarData.length];
+      for (i = 0; i < result.length; i++) {
+        if ((double)(polarData[i]) == nodata) {
+          result[i] = (byte)255;
+        } else if ((double)(polarData[i]) == undetect)  {
+          result[i] = (byte)0;
+        } else {
+          double v = offset + polarData[i]*gain;
+          double x = (v - (-30.0))/0.4;
+          result[i] = (byte)x;
+        }
+      }
+      return result;
+    }
+
+    
     /**
      * Transform polar dataset into Cartesian image.
      * @param nbins Number of range samples per ray
@@ -350,11 +388,23 @@ public class BltDataProcessor {
      * @return Cartesian image
      * @throws RuntimeException 
      */
-    public BufferedImage polar2Image(long nbins, double rscale, 
+    public BufferedImage polar2Image(long nbins, double rscale, double nodata, double undetect, double offset, double gain,
             Dataset dataset, Color[] palette, int outputImageSize, 
             boolean rangeRings, boolean rangeMask) throws RuntimeException {
         try {
-            byte[] polar = (byte[]) dataset.read();
+            Object polarData = dataset.read();
+            byte[] polar = null;
+            if (polarData instanceof byte[]) {
+              logger.info("polarData is byte[]");
+              polar = (byte[])polarData;
+            } else if (polarData instanceof short[]) {
+              logger.info("polarData is short[]");
+              polar = convertShortToByte((short[])polarData, nbins, nodata, undetect, offset, gain);
+            } else if (polarData instanceof int[]) {
+              logger.info("polarData is int[]");
+              polar = convertIntToByte((int[])polarData, nbins, nodata, undetect, offset, gain);
+            }
+            //byte[] polar = (byte[]) dataset.read();
             int radius = (int) nbins;
             int ray = 0;
             

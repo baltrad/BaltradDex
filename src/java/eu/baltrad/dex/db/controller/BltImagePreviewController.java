@@ -32,6 +32,8 @@ import java.awt.image.BufferedImage;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 
@@ -80,6 +82,8 @@ public class BltImagePreviewController {
     private FileCatalog fileCatalog;
     private ConfigurationManager configurationManager;
 
+    private static Logger logger = LogManager.getLogger(BltImagePreviewController.class);
+    
     /**
      * Creates image based on parameters retrieved from request.
      * @param request HTTP request
@@ -94,6 +98,7 @@ public class BltImagePreviewController {
         String fileObject = request.getParameter( "file_object" );
         String datasetPath = request.getParameter( "dataset_path" );
         String datasetWhere = request.getParameter( "dataset_where" );
+
         // get information necessary to display image
         String lat0 = request.getParameter( "lat0" );
         String lon0 = request.getParameter( "lon0" );
@@ -126,10 +131,13 @@ public class BltImagePreviewController {
                 bltDataProcessor.getH5Attribute(root, datasetWhere, 
                         BltDataProcessor.H5_RSCALE_ATTR );
                 double rscale = (Double) bltDataProcessor.getH5AttributeValue();
+                
+                double nodata_val=255.0, undetect_val=0.0, offset_val=0.0, gain_val=1.0;
+                
                 bltDataProcessor.getH5Dataset(root, datasetPath);
                 Dataset dataset = bltDataProcessor.getH5Dataset();
                 BufferedImage bi = bltDataProcessor.polar2Image(
-                    nbins, rscale, dataset, palette, 0, true, false);
+                    nbins, rscale, nodata_val, undetect_val, offset_val, gain_val, dataset, palette, 0, true, false);
                 bltDataProcessor.saveImageToFile(bi, filePath);
             }
             // Create image from Cartesian composite object
