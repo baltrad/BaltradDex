@@ -453,7 +453,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     -->
     
     <bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
-        <property name="maximumPoolSize" value="10" />
+        <property name="maximumPoolSize" value="${db.pool.size}" />
         <property name="driverClassName" value="${db.driver}" />
         <property name="jdbcUrl" value="${db.url}" />
         <property name="username" value="${db.user}" />
@@ -594,7 +594,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
   
     <!-- Add the baltrad adaptor manager to the baltrad manager -->
-    <bean id="bltmanager" class="eu.baltrad.beast.manager.BltMessageManager" autowire="byType"/>
+    <bean id="bltmanager" class="eu.baltrad.beast.manager.BltMessageManager" autowire="byType">
+      <constructor-arg value="${beast.manager.number.executors}"/>
+    </bean>
     
     <!-- beastui uses Controller annotations -->
     <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
