@@ -10,20 +10,20 @@
     <bean id="bdb_db" class="eu.baltrad.bdb.db.rest.RestfulDatabase" >
         <constructor-arg value="${database.uri}" />
         <constructor-arg ref="bdb_auth" />
-        <constructor-arg value="20" />
-        <constructor-arg value="0" /> <!-- file entry cache size -->
+        <constructor-arg value="${bdb.rest.client.maxconnections}" />
+        <constructor-arg value="${bdb.rest.client.cachesize}" /> <!-- file entry cache size -->
     </bean>
     
     <bean id="bdb_storage_cache"
           class="eu.baltrad.bdb.storage.CacheDirStorage"
           init-method="init">
       <constructor-arg index="0" value="${data.storage.folder}" />
-      <constructor-arg index="1" value="5000" /> <!-- cache size -->
+      <constructor-arg index="1" value="${data.storage.cache.size}" /> <!-- cache size -->
     </bean>
     <bean id="bdb_storage_server"
           class="eu.baltrad.bdb.storage.ServerFileStorage">
       <constructor-arg index="0" value="${data.storage.folder}" />
-      <constructor-arg index="1" value="3" /> <!-- number of layers -->
+      <constructor-arg index="1" value="${data.storage.number.layers}" /> <!-- number of layers -->
     </bean>
     <bean id="bdb_storage"
           class="eu.baltrad.bdb.storage.StrategyStorage"
