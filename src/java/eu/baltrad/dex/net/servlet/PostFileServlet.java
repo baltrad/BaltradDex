@@ -284,6 +284,14 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
       logger.info(message + ", thread: " + Thread.currentThread().getName());
     }
   }
+
+  private void logDebug(String message, String file) {
+    if (file != null) {
+      logger.debug(message + ", thread: " + Thread.currentThread().getName() + ", file: " + file);
+    } else {
+      logger.debug(message + ", thread: " + Thread.currentThread().getName());
+    }
+  }
   
   /**
    * Actual mathod processing requests.
@@ -309,7 +317,7 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
         
         nodeStatusManager.setRuntimeNodeStatus(req.getNodeName(), HttpServletResponse.SC_OK);
 
-        logInfo("Runtime node status set after " + (System.currentTimeMillis() - st) + " ms.", null);
+        logDebug("Runtime node status set after " + (System.currentTimeMillis() - st) + " ms.", null);
 
         // store entry
         FileEntry entry = storeFile(req);
@@ -318,41 +326,41 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
         if (entry != null) {
           String name = namer.name(entry);
 
-          logInfo("File " + name + " stored after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
+          logDebug("File " + name + " stored after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
           
           if (securityManager.isInjector(req.getNodeName())) {
             // file sent by injector
             log.info("File " + name + " stored with UUID " + entry.getUuid().toString());
             sendMessage(entry);
             
-            logInfo("- " + entry.getUuid().toString() + "- has been posted on beast queue after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
+            logDebug("- " + entry.getUuid().toString() + "- has been posted on beast queue after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
             List<Subscription> uploads = subscriptionManager.load(Subscription.PEER);
 
-            logInfo("- " + entry.getUuid().toString() + "- peer subsriptions loaded after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
+            logDebug("- " + entry.getUuid().toString() + "- peer subsriptions loaded after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
             sendToSubscribers(uploads, entry);
 
             logInfo("- " + entry.getUuid().toString() + "- file sent do subscribers after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
 
             sentToSubscribers = System.currentTimeMillis();
-            logger.debug("PostFile from injector: File stored after " + (fileStored - st)
+            logger.info("PostFile from injector: File stored after " + (fileStored - st)
                 + " ms, finished with subscribers after " + (sentToSubscribers - st) + " ms");
           } else {
             // file sent by peer
             List<Subscription> downloads = subscriptionManager.load(Subscription.LOCAL);
-            logInfo("- " + entry.getUuid().toString() + "- local subscriptions loaded after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
+            logDebug("- " + entry.getUuid().toString() + "- local subscriptions loaded after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
             int subscriptionId = validateSubscription(downloads, entry);
-            logInfo("- " + entry.getUuid().toString() + "- subscriptions validated after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
+            logDebug("- " + entry.getUuid().toString() + "- subscriptions validated after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
             if (subscriptionId > 0) {
               log.info("File " + name + " stored with UUID " + entry.getUuid().toString());
               sendMessage(entry);
-              logInfo("- " + entry.getUuid().toString() + "- subscribed file has been posted on beast queue after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
+              logDebug("- " + entry.getUuid().toString() + "- subscribed file has been posted on beast queue after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
               // update status - increment downloads
               Status s = nodeStatusManager.load(subscriptionId);
-              logInfo("- " + entry.getUuid().toString() + "- node status loaded after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
+              logDebug("- " + entry.getUuid().toString() + "- node status loaded after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
               s.incrementDownloads();
               nodeStatusManager.update(s, subscriptionId);
-              logInfo("- " + entry.getUuid().toString() + "- node status updated after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
-              logger.debug("PostFile from peer: File stored after " + (fileStored - st)
+              logDebug("- " + entry.getUuid().toString() + "- node status updated after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
+              logger.info("PostFile from peer: File stored after " + (fileStored - st)
                   + " ms. Total time to handle post: " + (System.currentTimeMillis() - st) + " ms");
             } else {
               log.warn("File " + name + " with UUID " + entry.getUuid().toString()
