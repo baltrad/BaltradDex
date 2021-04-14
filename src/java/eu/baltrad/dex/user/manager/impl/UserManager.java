@@ -164,6 +164,17 @@ public class UserManager implements IUserManager {
     }
     
     /**
+     * Load distinct administrators
+     */
+    public List<User> loadAdmins() {
+      String sql = "SELECT DISTINCT u.*, r.name AS role " +
+          "FROM dex_users u, dex_roles r, dex_users_roles ur " + 
+          "WHERE ur.user_id = u.id AND ur.role_id = r.id " + 
+          "AND r.name = 'admin';";
+      return jdbcTemplate.query(sql, mapper);
+    }
+    
+    /**
      * Returns distinct operators.
      * @return List containing distinct operators.
      */

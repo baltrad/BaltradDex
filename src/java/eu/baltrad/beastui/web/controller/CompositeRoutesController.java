@@ -676,6 +676,7 @@ public class CompositeRoutesController {
     rule.setReprocessQuality(reprocess_quality);
     rule.setQitotalField(qitotalField);
     if (jsonFilter != null && !jsonFilter.equals("")) {
+      logger.info("FILTER: " + jsonFilter);
       try {
         rule.setFilter(jsonMapper.readValue(jsonFilter, IFilter.class));
       } catch (Exception e) {

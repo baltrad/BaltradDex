@@ -162,19 +162,6 @@ public class RegistryManagerTest extends TestCase {
         assertEquals(0, classUnderTest.count(RegistryEntry.UPLOAD));
     }
     
-    public void testSetRecordNumberTrimmer() throws Exception {
-        helper.cleanInsert(this, "noid");
-        classUnderTest.setTrimmer(8);
-        RegistryEntry entry = new RegistryEntry(1, 1,
-                format.parse("2012-08-24 12:10:00").getTime(), "download", 
-                "121212121212", "User1", true);
-        classUnderTest.store(entry);
-        
-        verifyDBTables("trim_by_number", "dex_delivery_registry", "id");
-        
-        classUnderTest.removeTrimmer("dex_trim_registry_by_number_tg");
-    }
-    
     /*public void testSetExpiryDateTrimmer() throws Exception {
         long start = format.parse("2012-08-24 11:20:00").getTime();
         long now = System.currentTimeMillis();

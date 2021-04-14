@@ -46,6 +46,8 @@ public interface IUserManager {
     
     public List<User> loadUsers();
     
+    public List<User> loadAdmins();
+    
     public List<User> loadOperators();
     
     public int store(User user) throws Exception;

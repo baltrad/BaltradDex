@@ -362,6 +362,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
           autowire="byType">      
       <!--<property name="adminMailer" ref="adminMailer" />-->
     </bean>
+
+    <!-- Administrator servlet -->
+    <bean id="adminServlet" 
+          class="eu.baltrad.dex.net.servlet.AdministratorServlet" 
+          autowire="byType">      
+    </bean>
           
     <!-- Incoming file namer -->      
     <bean id="incomingFileNamer" 
@@ -750,4 +756,10 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <property name="corePoolSize" value="${beast.pooled.publisher.pool.core.size}" />
     <property name="maxPoolSize" value="${beast.pooled.publisher.pool.max.size}" />
   </bean>
+  
+  <bean id="routeCommandHelper" class="eu.baltrad.beast.admin.RouteCommandHelper" autowire="byType" />
+  <bean id="jsonAdminCommandParser" class="eu.baltrad.beast.admin.JsonCommandParserImpl" autowire="byType" />
+  <bean id="jsonGenerator" class="eu.baltrad.beast.admin.JsonGeneratorImpl" autowire="byType" />
+  <bean id="administrator" class="eu.baltrad.beast.admin.AdministratorImpl" autowire="byType" />
+
 </beans>
