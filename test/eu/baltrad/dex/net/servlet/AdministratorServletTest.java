@@ -95,6 +95,7 @@ public class AdministratorServletTest extends EasyMockSupport {
     classUnderTest.setAdministrator(administrator);
     classUnderTest.setUserManager(userManager);
     classUnderTest.setValidator(validator);
+    classUnderTest.setEnabled(true);
   }
   
   @After
