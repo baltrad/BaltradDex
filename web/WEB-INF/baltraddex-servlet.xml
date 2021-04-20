@@ -366,7 +366,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <!-- Administrator servlet -->
     <bean id="adminServlet" 
           class="eu.baltrad.dex.net.servlet.AdministratorServlet" 
-          autowire="byType">      
+          autowire="byType">   
+      <property name="enabled" value="${beast.cli.administration.enabled}" />
     </bean>
           
     <!-- Incoming file namer -->      

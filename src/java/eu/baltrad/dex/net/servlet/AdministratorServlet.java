@@ -74,6 +74,10 @@ public class AdministratorServlet  extends HttpServlet {
    */
   private PasswordValidator validator;
 
+  /**
+   * If administrative capabilities should be enabled or not.
+   */
+  private boolean enabled = false;
   
   /**
    * The logger
@@ -163,6 +167,10 @@ public class AdministratorServlet  extends HttpServlet {
    */
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) {
+    if (!enabled) {
+      response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+    }
+    
     try {
       if (request.getContentType().startsWith("application/json")) {
         String data = readInputStreamFromRequest(request);
@@ -334,6 +342,20 @@ public class AdministratorServlet  extends HttpServlet {
   @Autowired
   public void setValidator(PasswordValidator validator) {
     this.validator = validator;
+  }
+
+  /**
+   * @return the enabled
+   */
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  /**
+   * @param enabled the enabled to set
+   */
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
   }
 
 }
