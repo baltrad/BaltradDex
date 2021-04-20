@@ -245,10 +245,13 @@ public class AdministratorServlet  extends HttpServlet {
    */
   protected boolean isAuthorizedIP(HttpServletRequest request) {
     String remote = request.getRemoteAddr();
-    logger.info("Got request from " + remote);
+    logger.info("Got request from = " + remote + ", local = " + request.getLocalAddr());
 
     if (remote != null
-        && (remote.equals("127.0.0.1") || remote.equals("::1"))) {
+        && (remote.equals("127.0.0.1") || 
+            remote.equals("::1") || 
+            remote.equals("0:0:0:0:0:0:0:1") || 
+            remote.equals(request.getLocalAddr()))) {
       return true;
     }
     return false;

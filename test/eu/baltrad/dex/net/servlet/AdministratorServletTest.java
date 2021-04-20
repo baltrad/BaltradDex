@@ -213,6 +213,7 @@ public class AdministratorServletTest extends EasyMockSupport {
   @Test
   public void isAuthorizedIP_ipv4_true() throws Exception {
     expect(servletRequest.getRemoteAddr()).andReturn("127.0.0.1");
+    expect(servletRequest.getLocalAddr()).andReturn("127.0.0.1").anyTimes();
     
     classUnderTest = new AdministratorServlet();
     
@@ -227,6 +228,7 @@ public class AdministratorServletTest extends EasyMockSupport {
   @Test
   public void isAuthorizedIP_ipv6_true() throws Exception {
     expect(servletRequest.getRemoteAddr()).andReturn("::1");
+    expect(servletRequest.getLocalAddr()).andReturn("::1").anyTimes();
     
     classUnderTest = new AdministratorServlet();
     
@@ -241,6 +243,7 @@ public class AdministratorServletTest extends EasyMockSupport {
   @Test
   public void isAuthorizedIP_denied_null() throws Exception {
     expect(servletRequest.getRemoteAddr()).andReturn(null);
+    expect(servletRequest.getLocalAddr()).andReturn("0:1:2:3.4:5:7").anyTimes();
     
     classUnderTest = new AdministratorServlet();
     
@@ -256,6 +259,7 @@ public class AdministratorServletTest extends EasyMockSupport {
   @Test
   public void isAuthorizedIP_denied_ipv4() throws Exception {
     expect(servletRequest.getRemoteAddr()).andReturn("1.2.3.4");
+    expect(servletRequest.getLocalAddr()).andReturn("1.2.3.5").anyTimes();
     
     classUnderTest = new AdministratorServlet();
     
@@ -270,6 +274,7 @@ public class AdministratorServletTest extends EasyMockSupport {
   @Test
   public void isAuthorizedIP_denied_ipv6() throws Exception {
     expect(servletRequest.getRemoteAddr()).andReturn("0:1:2:3.4:5:6");
+    expect(servletRequest.getLocalAddr()).andReturn("0:1:2:3.4:5:7").anyTimes();
     
     classUnderTest = new AdministratorServlet();
     
