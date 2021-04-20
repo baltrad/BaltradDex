@@ -62,6 +62,11 @@ public class AdministratorServletTest extends EasyMockSupport {
     public String getRawMessage() {
       return this.raw;
     }
+    
+    @Override
+    public boolean validate() {
+      return true;
+    }
   }
   
   @Before
