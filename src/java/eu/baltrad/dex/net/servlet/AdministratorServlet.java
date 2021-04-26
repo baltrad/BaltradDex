@@ -29,11 +29,17 @@ import eu.baltrad.beast.admin.Command;
 import eu.baltrad.beast.admin.CommandResponse;
 import eu.baltrad.beast.admin.JsonCommandParser;
 import eu.baltrad.beast.admin.JsonGenerator;
+import eu.baltrad.beast.admin.command.SettingCommand;
 import eu.baltrad.beast.admin.command.UserCommand;
 import eu.baltrad.beast.admin.command_response.CommandResponseStatus;
+import eu.baltrad.beast.admin.command_response.SettingCommandResponse;
 import eu.baltrad.beast.admin.objects.User;
 import eu.baltrad.beast.security.ISecurityManager;
+import eu.baltrad.dex.config.manager.impl.ConfigurationManager;
+import eu.baltrad.dex.config.model.LogConfiguration;
+import eu.baltrad.dex.config.model.RegistryConfiguration;
 import eu.baltrad.dex.net.request.impl.NodeRequest;
+import eu.baltrad.dex.registry.manager.impl.RegistryManager;
 import eu.baltrad.dex.user.manager.IUserManager;
 import eu.baltrad.dex.user.manager.impl.UserManager;
 import eu.baltrad.dex.user.validator.PasswordValidator;
@@ -74,6 +80,17 @@ public class AdministratorServlet  extends HttpServlet {
    */
   private PasswordValidator validator;
 
+  /**
+   * The configuration manager
+   */
+  private ConfigurationManager configManager;
+  
+  /**
+   * The registry manager
+   */
+  private RegistryManager registryManager;
+
+  
   /**
    * If administrative capabilities should be enabled or not.
    */
@@ -159,6 +176,82 @@ public class AdministratorServlet  extends HttpServlet {
   protected String readInputStreamFromRequest(HttpServletRequest request)  throws IOException {
     return IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8.name());
   }
+
+
+  private boolean checkInteger(String value) {
+    try {
+      Integer.parseInt(value);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  private boolean checkInteger(String value, int minvalue, int maxvalue) {
+    try {
+      int v = Integer.parseInt(value);
+      if (v >= minvalue && v <= maxvalue) {
+        return true;
+      }
+    } catch (Exception e) {
+    }
+    return false;
+  }
+
+  /**
+   * Validates the registry configuration
+   * @param conf
+   * @param settingResponse
+   * @return
+   */
+  protected boolean validateRegistryConfiguration(RegistryConfiguration conf, SettingCommandResponse settingResponse) {
+    boolean result = true;
+    if (!checkInteger(conf.getRegRecordLimit())) {
+      settingResponse.addProperty("eu.baltrad.dex.registry.trim.by.count.limit", "Invalid count limit: " + conf.getRegRecordLimit());
+      result = false;
+    }
+    if (!checkInteger(conf.getRegMaxAgeDays())) {
+      settingResponse.addProperty("eu.baltrad.dex.registry.trim.by.age.days", "Invalid day limit: " + conf.getRegMaxAgeDays());
+      result = false;
+    }
+    if (!checkInteger(conf.getRegMaxAgeHours(), 0, 23)) {
+      settingResponse.addProperty("eu.baltrad.dex.registry.trim.by.age.hours", "Invalid hour limit: " + conf.getRegMaxAgeHours());
+      result = false;
+    }
+    if (!checkInteger(conf.getRegMaxAgeMinutes(), 0, 59)) {
+      settingResponse.addProperty("eu.baltrad.dex.registry.trim.by.age.hours", "Invalid minute limit: " + conf.getRegMaxAgeMinutes());
+      result = false;
+    }
+    return result;
+  }
+
+  /**
+   * Validates the messages configuration
+   * @param conf
+   * @param settingResponse
+   * @return
+   */
+  protected boolean validateMessagesConfiguration(LogConfiguration conf, SettingCommandResponse settingResponse) {
+    boolean result = true;
+
+    if (!checkInteger(conf.getMsgRecordLimit())) {
+      settingResponse.addProperty("eu.baltrad.dex.messages.trim.by.count.limit", "Invalid count limit: " + conf.getMsgRecordLimit());
+      result = false;
+    }
+    if (!checkInteger(conf.getMsgMaxAgeDays())) {
+      settingResponse.addProperty("eu.baltrad.dex.messages.trim.by.age.days", "Invalid day limit: " + conf.getMsgMaxAgeDays());
+      result = false;
+    }
+    if (!checkInteger(conf.getMsgMaxAgeHours(), 0, 23)) {
+      settingResponse.addProperty("eu.baltrad.dex.messages.trim.by.age.hours", "Invalid hour limit: " + conf.getMsgMaxAgeHours());
+      result = false;
+    }
+    if (!checkInteger(conf.getMsgMaxAgeMinutes(), 0, 59)) {
+      settingResponse.addProperty("eu.baltrad.dex.messages.trim.by.age.hours", "Invalid minute limit: " + conf.getMsgMaxAgeMinutes());
+      result = false;
+    }
+    return result;
+  }
   
   /**
    * Handles the actual request and produces the response.
@@ -219,6 +312,83 @@ public class AdministratorServlet  extends HttpServlet {
             }
             jsonResponse = getJsonGenerator().toJsonFromUsers(foundUsers);
           }
+        } else if (command instanceof SettingCommand) {
+          SettingCommand settingCommand = (SettingCommand)command;
+          SettingCommandResponse settingResponse = new SettingCommandResponse(true);
+          logger.info("SettingCommand");
+          if (settingCommand.getOperation().equals(SettingCommand.UPDATE_SETTINGS)) {
+            if (settingCommand.hasSetting("eu.baltrad.dex.registry.trim.by.age") ||
+                settingCommand.hasSetting("eu.baltrad.dex.registry.trim.by.count")) {
+              RegistryConfiguration conf = configManager.getRegistryConf();
+              boolean trimByAge = settingCommand.getSettings().getPropertyAsBoolean("eu.baltrad.dex.registry.trim.by.age", "true".equals(conf.getRegTrimByAge()));
+              boolean trimByCount = settingCommand.getSettings().getPropertyAsBoolean("eu.baltrad.dex.registry.trim.by.count", "true".equals(conf.getRegTrimByNumber()));
+              String regMaxAgeDays = settingCommand.getSetting("eu.baltrad.dex.registry.trim.by.age.days", conf.getRegMaxAgeDays());
+              String regMaxAgeHours = settingCommand.getSetting("eu.baltrad.dex.registry.trim.by.age.hours", conf.getRegMaxAgeHours());
+              String regMaxAgeMinutes = settingCommand.getSetting("eu.baltrad.dex.registry.trim.by.age.minutes", conf.getRegMaxAgeMinutes());
+              String regRecordLimit = settingCommand.getSetting("eu.baltrad.dex.registry.trim.by.count.limit", conf.getRegRecordLimit());
+              conf.setRegTrimByAge(trimByAge?"true":"false");
+              conf.setRegTrimByNumber(trimByCount?"true":"false");
+              conf.setRegMaxAgeDays(regMaxAgeDays);
+              conf.setRegMaxAgeHours(regMaxAgeHours);
+              conf.setRegMaxAgeMinutes(regMaxAgeMinutes);
+              conf.setRegRecordLimit(regRecordLimit);
+              if (!validateRegistryConfiguration(conf, settingResponse)) {
+                settingResponse.setStatus(false);
+              } else {
+                try {
+                  configManager.saveRegistryConf(conf);
+                } catch (Exception e) {
+                  settingResponse.setStatus(false);
+                }
+              }
+            }
+            
+            if (settingCommand.hasSetting("eu.baltrad.dex.messages.trim.by.age") ||
+                settingCommand.hasSetting("eu.baltrad.dex.messages.trim.by.count")) {
+              LogConfiguration conf = configManager.getLogConf();
+              boolean trimByAge = settingCommand.getSettings().getPropertyAsBoolean("eu.baltrad.dex.messages.trim.by.age", "true".equals(conf.getMsgTrimByAge()));
+              boolean trimByCount = settingCommand.getSettings().getPropertyAsBoolean("eu.baltrad.dex.messages.trim.by.count", "true".equals(conf.getMsgTrimByNumber()));
+              String msgMaxAgeDays = settingCommand.getSetting("eu.baltrad.dex.messages.trim.by.age.days", conf.getMsgMaxAgeDays());
+              String msgMaxAgeHours = settingCommand.getSetting("eu.baltrad.dex.messages.trim.by.age.hours", conf.getMsgMaxAgeHours());
+              String msgMaxAgeMinutes = settingCommand.getSetting("eu.baltrad.dex.messages.trim.by.age.minutes", conf.getMsgMaxAgeMinutes());
+              String msgRecordLimit = settingCommand.getSetting("eu.baltrad.dex.messages.trim.by.count.limit", conf.getMsgRecordLimit());
+              conf.setMsgTrimByAge(trimByAge?"true":"false");
+              conf.setMsgTrimByNumber(trimByCount?"true":"false");
+              conf.setMsgMaxAgeDays(msgMaxAgeDays);
+              conf.setMsgMaxAgeHours(msgMaxAgeHours);
+              conf.setMsgMaxAgeMinutes(msgMaxAgeMinutes);
+              conf.setMsgRecordLimit(msgRecordLimit);
+              if (!validateMessagesConfiguration(conf, settingResponse)) {
+                settingResponse.setStatus(false);
+              } else {
+                try {
+                  configManager.saveLogConf(conf);
+                } catch (Exception e) {
+                  settingResponse.setStatus(false);
+                }
+              }
+            }
+          } else if (settingCommand.getOperation().equals(SettingCommand.LIST)) {
+            logger.info("List command, creating field");
+            RegistryConfiguration regConf = configManager.getRegistryConf();
+            settingResponse.addProperty("eu.baltrad.dex.registry.trim.by.age", regConf.getRegTrimByAge());
+            settingResponse.addProperty("eu.baltrad.dex.registry.trim.by.count", regConf.getRegTrimByNumber());
+            settingResponse.addProperty("eu.baltrad.dex.registry.trim.by.age.days", regConf.getRegMaxAgeDays());
+            settingResponse.addProperty("eu.baltrad.dex.registry.trim.by.age.hours", regConf.getRegMaxAgeHours());
+            settingResponse.addProperty("eu.baltrad.dex.registry.trim.by.age.minutes", regConf.getRegMaxAgeMinutes());
+            settingResponse.addProperty("eu.baltrad.dex.registry.trim.by.count.limit", regConf.getRegRecordLimit());
+
+            LogConfiguration logConf = configManager.getLogConf();
+            settingResponse.addProperty("eu.baltrad.dex.messages.trim.by.age", logConf.getMsgTrimByAge());
+            settingResponse.addProperty("eu.baltrad.dex.messages.trim.by.count", logConf.getMsgTrimByNumber());
+            settingResponse.addProperty("eu.baltrad.dex.messages.trim.by.age.days", logConf.getMsgMaxAgeDays());
+            settingResponse.addProperty("eu.baltrad.dex.messages.trim.by.age.hours", logConf.getMsgMaxAgeHours());
+            settingResponse.addProperty("eu.baltrad.dex.messages.trim.by.age.minutes", logConf.getMsgMaxAgeMinutes());
+            settingResponse.addProperty("eu.baltrad.dex.messages.trim.by.count.limit", logConf.getMsgRecordLimit());
+          }
+          
+          jsonResponse = getJsonGenerator().toJson(settingResponse);
+          logger.info("JSON: " + jsonResponse);
         } else {
           CommandResponse commandResponse = administrator.handle(command);
           logger.info("Response: " + commandResponse);
@@ -360,5 +530,20 @@ public class AdministratorServlet  extends HttpServlet {
   public void setEnabled(boolean enabled) {
     this.enabled = enabled;
   }
-
+  
+  /**
+   * @param configManager the configManager to set
+   */
+  @Autowired
+  public void setConfigManager(ConfigurationManager configManager) {
+      this.configManager = configManager;
+  }
+  
+  /**
+   * @param registryManager the registryManager to set
+   */
+  public void setRegistryManager(RegistryManager registryManager) {
+      this.registryManager = registryManager;
+  }
+  
 }
