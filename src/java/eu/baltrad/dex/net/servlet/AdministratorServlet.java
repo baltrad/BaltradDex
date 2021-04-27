@@ -316,7 +316,8 @@ public class AdministratorServlet  extends HttpServlet {
           SettingCommand settingCommand = (SettingCommand)command;
           SettingCommandResponse settingResponse = new SettingCommandResponse(true);
           logger.info("SettingCommand");
-          if (settingCommand.getOperation().equals(SettingCommand.UPDATE_SETTINGS)) {
+          if (settingCommand.getOperation().equals(SettingCommand.UPDATE_SETTINGS) ||
+              settingCommand.getOperation().equals(SettingCommand.IMPORT)) {
             if (settingCommand.hasSetting("eu.baltrad.dex.registry.trim.by.age") ||
                 settingCommand.hasSetting("eu.baltrad.dex.registry.trim.by.count")) {
               RegistryConfiguration conf = configManager.getRegistryConf();
@@ -368,7 +369,8 @@ public class AdministratorServlet  extends HttpServlet {
                 }
               }
             }
-          } else if (settingCommand.getOperation().equals(SettingCommand.LIST)) {
+          } else if (settingCommand.getOperation().equals(SettingCommand.LIST) ||
+              settingCommand.getOperation().equals(SettingCommand.EXPORT)) {
             logger.info("List command, creating field");
             RegistryConfiguration regConf = configManager.getRegistryConf();
             settingResponse.addProperty("eu.baltrad.dex.registry.trim.by.age", regConf.getRegTrimByAge());
@@ -387,7 +389,11 @@ public class AdministratorServlet  extends HttpServlet {
             settingResponse.addProperty("eu.baltrad.dex.messages.trim.by.count.limit", logConf.getMsgRecordLimit());
           }
           
-          jsonResponse = getJsonGenerator().toJson(settingResponse);
+          if (settingCommand.getOperation().equals(SettingCommand.EXPORT)) {
+            jsonResponse = getJsonGenerator().toJson(settingResponse.getSettings());
+          } else {
+            jsonResponse = getJsonGenerator().toJson(settingResponse);
+          }
           logger.info("JSON: " + jsonResponse);
         } else {
           CommandResponse commandResponse = administrator.handle(command);
