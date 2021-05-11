@@ -729,6 +729,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 
   <!-- Below are classes needed for running the node exchange -->
   <bean id="adminMailer" class="eu.baltrad.beast.security.mail.AdminMailer" autowire="byType">
+    <property name="enabled" value="${beast.admin.mailer.enabled}" />
     <property name="defaultEncoding" value="${beast.admin.mailer.encoding}" />
     <property name="host" value="${beast.admin.mailer.host}" />
     <property name="port" value="${beast.admin.mailer.port}" />
