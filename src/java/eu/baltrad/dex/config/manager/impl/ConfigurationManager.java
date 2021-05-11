@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.File;
 
 import java.util.Properties;
@@ -111,35 +112,42 @@ public class ConfigurationManager implements IConfigurationManager,
             // We need to register current app configuration as local node name to not cause any
             // conflicts. This probably should be changed later...
             logger.info("afterPropertiesSet: Setting local");
-            Authorization local = securityManager.getLocal();
-            if (local == null) {
-              local = new Authorization();
-              local.setConnectionUUID(UUID.randomUUID().toString());
-            }
-            local.setNodeName(appConf.getNodeName());
-            local.setNodeAddress(appConf.getNodeAddress());
-            local.setNodeEmail(appConf.getAdminEmail());
-            local.setAuthorized(true);
-            File publicKeyFile = new File(appConf.getKeystoreDir() + File.separator + appConf.getNodeName() + ".pub");
-            File privateKeyFile = new File(appConf.getKeystoreDir() + File.separator + appConf.getNodeName() + ".priv");
-            local.setPublicKey(new KeyCompressor().zip(publicKeyFile));
-            local.setPublicKeyPath(publicKeyFile.getAbsolutePath());
-            local.setPrivateKey(new KeyCompressor().zip(privateKeyFile));
-            local.setPrivateKeyPath(privateKeyFile.getAbsolutePath());
-            
-            local.setLocal(true);
-            local.setInjector(true);
-            try {
-              logger.info("afterPropertiesSet: Updating security manager with local");
-              securityManager.setLocal(local);
-            } catch (Exception e) {
-              logger.error("Failed to set local node", e);
-              log.error("Failed to set local node", e);
-              throw new RuntimeException(e);
-            }
+            updateLocalNodeUser();
         } catch (Exception e) {
             log.error("Failed to create local peer account", e);
         }
+    }
+
+    /**
+     * Updates the local user in the beast database with relevant information from the app configuration.
+     */
+    protected void updateLocalNodeUser() throws IOException {
+      Authorization local = securityManager.getLocal();
+      if (local == null) {
+        local = new Authorization();
+        local.setConnectionUUID(UUID.randomUUID().toString());
+      }
+      local.setNodeName(appConf.getNodeName());
+      local.setNodeAddress(appConf.getNodeAddress());
+      local.setNodeEmail(appConf.getAdminEmail());
+      local.setAuthorized(true);
+      File publicKeyFile = new File(appConf.getKeystoreDir() + File.separator + appConf.getNodeName() + ".pub");
+      File privateKeyFile = new File(appConf.getKeystoreDir() + File.separator + appConf.getNodeName() + ".priv");
+      local.setPublicKey(new KeyCompressor().zip(publicKeyFile));
+      local.setPublicKeyPath(publicKeyFile.getAbsolutePath());
+      local.setPrivateKey(new KeyCompressor().zip(privateKeyFile));
+      local.setPrivateKeyPath(privateKeyFile.getAbsolutePath());
+      
+      local.setLocal(true);
+      local.setInjector(true);
+      try {
+        logger.info("afterPropertiesSet: Updating security manager with local");
+        securityManager.setLocal(local);
+      } catch (Exception e) {
+        logger.error("Failed to set local node", e);
+        log.error("Failed to set local node", e);
+        throw new RuntimeException(e);
+      }
     }
     
     /**
@@ -266,6 +274,7 @@ public class ConfigurationManager implements IConfigurationManager,
             saveProperties(props);
             this.appConf = new AppConfiguration(props);
             createDirs();
+            updateLocalNodeUser();
         } catch (Exception e) {
             log.error("Failed to save application properties", e);
         }
