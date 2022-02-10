@@ -176,6 +176,14 @@ Creates a volume route
                             </div>
                         </div>
                         <div class="row2">
+                            <div class="leftcol">Adaptive elevation handling:</div>
+                            <div class="rightcol">
+                                <input type="checkbox" name=adaptive_elangles 
+                                       title="Check to enable adaptive elevation handling"
+                                       <c:if test="${adaptive_elangles == true}">checked</c:if> />
+                            </div>
+                        </div>                        
+                        <div class="row2">
                             <div class="leftcol">Recipients:</div>
                             <div class="rightcol">
                                 <select id="recipients" multiple size="4" 
