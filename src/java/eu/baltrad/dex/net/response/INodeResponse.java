@@ -51,4 +51,14 @@ public interface INodeResponse {
      * @param version the protocol version that this node is configured to support.
      */
     public void setSupportedProtocolVersion(String version);
+    
+    /**
+     * @param uuid when storing a file this uuid is the result
+     */
+    public void setStoredUUID(String uuid);
+    
+    /**
+     * @param message if some extra information should be provided to the user use this header
+     */
+    public void setMessage(String message);
 }

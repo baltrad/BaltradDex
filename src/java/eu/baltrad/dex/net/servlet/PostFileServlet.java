@@ -46,6 +46,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import eu.baltrad.bdb.FileCatalog;
 import eu.baltrad.bdb.db.DatabaseError;
+import eu.baltrad.bdb.db.DatabaseIOError;
 import eu.baltrad.bdb.db.DuplicateEntry;
 import eu.baltrad.bdb.db.FileEntry;
 import eu.baltrad.bdb.oh5.MetadataMatcher;
@@ -344,6 +345,7 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
             sentToSubscribers = System.currentTimeMillis();
             logger.info("PostFile from injector: File stored after " + (fileStored - st)
                 + " ms, finished with subscribers after " + (sentToSubscribers - st) + " ms");
+            res.setStoredUUID(entry.getUuid().toString());
           } else {
             // file sent by peer
             List<Subscription> downloads = subscriptionManager.load(Subscription.LOCAL);
@@ -362,6 +364,7 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
               logDebug("- " + entry.getUuid().toString() + "- node status updated after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
               logger.info("PostFile from peer: File stored after " + (fileStored - st)
                   + " ms. Total time to handle post: " + (System.currentTimeMillis() - st) + " ms");
+              res.setStoredUUID(entry.getUuid().toString());
             } else {
               log.warn("File " + name + " with UUID " + entry.getUuid().toString()
                   + " comes from unsubscribed data source. " + "Removing file.");
@@ -378,10 +381,15 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
       }
     } catch (DuplicateEntry e) {
       res.setStatus(HttpServletResponse.SC_CONFLICT, messages.getMessage(PF_DUPLICATE_ENTRY_ERROR_KEY));
+      res.setMessage("file already stored");
       logger.info("Duplicate entry for file from " + req.getNodeName());
     } catch (DatabaseError e) {
-      res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, messages.getMessage(PF_DATABASE_ERROR_KEY));
+      res.setMessage(e.getMessage());
+      res.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE, messages.getMessage(PF_DATABASE_ERROR_KEY));
       logger.error("Database error", e);
+    } catch (DatabaseIOError e) {
+      res.setMessage("Failed to communicate with BDB-server, is it running?");
+      res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, messages.getMessage(PF_DATABASE_ERROR_KEY));
     } catch (Exception e) {
       res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, messages.getMessage(PF_INTERNAL_SERVER_ERROR_KEY));
       logger.error("Internal server error", e);

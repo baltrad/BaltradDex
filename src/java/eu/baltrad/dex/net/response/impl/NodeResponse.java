@@ -63,4 +63,20 @@ public class NodeResponse extends HttpServletResponseWrapper
     public void setSupportedProtocolVersion(String version) {
       this.addHeader(NODE_PROTOCOL_VERSION_HDR, version);
     }
+    
+    /**
+     * @see INodeResponse#setStoredUUID(String)
+     */
+    @Override
+    public void setStoredUUID(String uuid) {
+      this.addHeader("Baltrad-Stored-UUID", uuid);
+    }
+    
+    /**
+     * @see INodeResponse#setMessage(String)
+     */
+    @Override
+    public void setMessage(String message) {
+      this.addHeader("Baltrad-Message", message);
+    }
 }
