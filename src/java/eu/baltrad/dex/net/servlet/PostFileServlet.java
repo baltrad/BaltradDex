@@ -384,7 +384,8 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
       res.setMessage("file already stored");
       logger.info("Duplicate entry for file from " + req.getNodeName());
     } catch (DatabaseError e) {
-      res.setMessage(e.getMessage());
+      if (e.getMessage() != null)
+        res.setMessage(e.getMessage());
       res.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE, messages.getMessage(PF_DATABASE_ERROR_KEY));
       logger.error("Database error", e);
     } catch (DatabaseIOError e) {

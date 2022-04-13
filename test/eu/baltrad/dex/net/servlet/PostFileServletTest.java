@@ -333,7 +333,7 @@ public class PostFileServletTest extends EasyMockSupport {
       classUnderTest.handleRequest(request, response);
       verifyAll();
       
-      assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response.getStatus());
+      assertEquals(HttpServletResponse.SC_NOT_ACCEPTABLE, response.getStatus());
       assertEquals(messages.getMessage("postfile.server.database_error"), response.getErrorMessage());
     }
 
