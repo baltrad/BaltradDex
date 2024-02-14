@@ -20,8 +20,9 @@ var searchData=
   ['stickylevel_17',['StickyLevel',['../classeu_1_1baltrad_1_1dex_1_1log_1_1StickyLevel.html',1,'eu::baltrad::dex::log']]],
   ['stickymessagescontroller_18',['StickyMessagesController',['../classeu_1_1baltrad_1_1dex_1_1log_1_1controller_1_1StickyMessagesController.html',1,'eu::baltrad::dex::log::controller']]],
   ['stickymessagescounter_19',['StickyMessagesCounter',['../classeu_1_1baltrad_1_1dex_1_1log_1_1controller_1_1StickyMessagesCounter.html',1,'eu::baltrad::dex::log::controller']]],
-  ['subscription_20',['Subscription',['../classeu_1_1baltrad_1_1dex_1_1net_1_1model_1_1impl_1_1Subscription.html',1,'eu::baltrad::dex::net::model::impl']]],
-  ['subscriptionmanager_21',['SubscriptionManager',['../classeu_1_1baltrad_1_1dex_1_1net_1_1manager_1_1impl_1_1SubscriptionManager.html',1,'eu::baltrad::dex::net::manager::impl']]],
-  ['subscriptionmapper_22',['SubscriptionMapper',['../classeu_1_1baltrad_1_1dex_1_1net_1_1model_1_1mapper_1_1SubscriptionMapper.html',1,'eu::baltrad::dex::net::model::mapper']]],
-  ['supervisorcontroller_23',['SupervisorController',['../classeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1SupervisorController.html',1,'eu::baltrad::beastui::web::controller']]]
+  ['submitoperation_20',['SubmitOperation',['../enumeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1Site2dRoutesController_1_1SubmitOperation.html',1,'eu::baltrad::beastui::web::controller::Site2dRoutesController']]],
+  ['subscription_21',['Subscription',['../classeu_1_1baltrad_1_1dex_1_1net_1_1model_1_1impl_1_1Subscription.html',1,'eu::baltrad::dex::net::model::impl']]],
+  ['subscriptionmanager_22',['SubscriptionManager',['../classeu_1_1baltrad_1_1dex_1_1net_1_1manager_1_1impl_1_1SubscriptionManager.html',1,'eu::baltrad::dex::net::manager::impl']]],
+  ['subscriptionmapper_23',['SubscriptionMapper',['../classeu_1_1baltrad_1_1dex_1_1net_1_1model_1_1mapper_1_1SubscriptionMapper.html',1,'eu::baltrad::dex::net::model::mapper']]],
+  ['supervisorcontroller_24',['SupervisorController',['../classeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1SupervisorController.html',1,'eu::baltrad::beastui::web::controller']]]
 ];

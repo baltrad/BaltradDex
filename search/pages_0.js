@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['baltraddex_20documentation_0',['BaltradDex documentation',['../index.html',1,'']]]
+  ['and_20feedback_0',['Support and feedback',['../support.html',1,'']]]
 ];

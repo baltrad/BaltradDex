@@ -25,13 +25,10 @@
 var NAVTREE =
 [
   [ "BaltradDex", "index.html", [
-    [ "BaltradDex documentation", "index.html", [
-      [ "Legal notice", "index.html#legal", null ],
-      [ "Index", "index.html#main_index", null ]
-    ] ],
+    [ "BaltradDex documentation", "index.html", "index" ],
     [ "Data exchange format", "format.html", [
       [ "General information", "format.html#exchange_general", null ],
-      [ "Authentication   <br>", "format.html#exchange_auth", [
+      [ "Authentication", "format.html#exchange_auth", [
         [ "Authentication header", "format.html#exchange_hdr", null ],
         [ "Signing a request", "format.html#exchange_sign", null ]
       ] ],
@@ -69,7 +66,7 @@ var NAVTREE =
       [ "Quick setup", "running.html#quick_setup", [
         [ "Node settings", "running.html#quick_node_settings", null ],
         [ "Radars", "running.html#quick_radars", null ],
-        [ "Data sources  <br>", "running.html#quick_data_sources", null ],
+        [ "Data sources", "running.html#quick_data_sources", null ],
         [ "Import injector's key", "running.html#quick_injector", null ],
         [ "Exchange keys between nodes", "running.html#quick_keys", null ]
       ] ],
@@ -141,7 +138,7 @@ var NAVTREEINDEX =
 "classeu_1_1baltrad_1_1dex_1_1log_1_1model_1_1impl_1_1LogParameter.html#ae04ce4b6b853c4ebd93c484303df2e72",
 "classeu_1_1baltrad_1_1dex_1_1net_1_1servlet_1_1AdministratorServlet.html#aa4e37a6110bcc630bf4468733cc86229",
 "classeu_1_1baltrad_1_1dex_1_1registry_1_1model_1_1impl_1_1RegistryEntry.html#ad13eade8eff601b574fa3f50a84c1093",
-"functions_g.html"
+"functions_func_z.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

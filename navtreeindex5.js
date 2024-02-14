@@ -209,6 +209,7 @@ var NAVTREEINDEX5 =
 "classeu_1_1baltrad_1_1dex_1_1util_1_1ServletContextUtil.html#ace25bdfffcd081b56859a850ac4b4e50":[8,0,0,0,1,13,3,1],
 "classeu_1_1baltrad_1_1dex_1_1util_1_1WebValidator.html":[8,0,0,0,1,13,4],
 "enumeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1DistributionRoutesController_1_1Operation.html":[8,0,0,0,0,0,0,6,0],
+"enumeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1Site2dRoutesController_1_1SubmitOperation.html":[8,0,0,0,0,0,0,13,0],
 "format.html":[1],
 "format.html#exchange_auth":[1,1],
 "format.html#exchange_datasource_listing":[1,2],
@@ -227,8 +228,8 @@ var NAVTREEINDEX5 =
 "functions_d.html":[8,3,0,3],
 "functions_e.html":[8,3,0,4],
 "functions_f.html":[8,3,0,5],
-"functions_func.html":[8,3,1,0],
 "functions_func.html":[8,3,1],
+"functions_func.html":[8,3,1,0],
 "functions_func_b.html":[8,3,1,1],
 "functions_func_c.html":[8,3,1,2],
 "functions_func_d.html":[8,3,1,3],
@@ -248,6 +249,5 @@ var NAVTREEINDEX5 =
 "functions_func_s.html":[8,3,1,17],
 "functions_func_t.html":[8,3,1,18],
 "functions_func_u.html":[8,3,1,19],
-"functions_func_v.html":[8,3,1,20],
-"functions_func_z.html":[8,3,1,21]
+"functions_func_v.html":[8,3,1,20]
 };

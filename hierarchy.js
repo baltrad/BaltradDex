@@ -178,6 +178,7 @@ var hierarchy =
     [ "eu.baltrad.dex.status.model.Status", "classeu_1_1baltrad_1_1dex_1_1status_1_1model_1_1Status.html", null ],
     [ "eu.baltrad.dex.log.controller.StickyMessagesController", "classeu_1_1baltrad_1_1dex_1_1log_1_1controller_1_1StickyMessagesController.html", null ],
     [ "eu.baltrad.dex.log.controller.StickyMessagesCounter", "classeu_1_1baltrad_1_1dex_1_1log_1_1controller_1_1StickyMessagesCounter.html", null ],
+    [ "eu.baltrad.beastui.web.controller.Site2dRoutesController.SubmitOperation", "enumeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1Site2dRoutesController_1_1SubmitOperation.html", null ],
     [ "eu.baltrad.beastui.web.controller.SupervisorController", "classeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1SupervisorController.html", null ],
     [ "eu.baltrad.dex.net.controller.UpdateSubscriptionController", "classeu_1_1baltrad_1_1dex_1_1net_1_1controller_1_1UpdateSubscriptionController.html", null ],
     [ "eu.baltrad.dex.net.util.UrlValidatorUtil", "classeu_1_1baltrad_1_1dex_1_1net_1_1util_1_1UrlValidatorUtil.html", null ],

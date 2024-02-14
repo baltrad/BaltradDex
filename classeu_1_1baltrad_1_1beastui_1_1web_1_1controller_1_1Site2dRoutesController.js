@@ -1,5 +1,6 @@
 var classeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1Site2dRoutesController =
 [
+    [ "SubmitOperation", "enumeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1Site2dRoutesController_1_1SubmitOperation.html", null ],
     [ "Site2dRoutesController", "classeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1Site2dRoutesController.html#a971343d683c9679d4b4d3500a40f2310", null ],
     [ "createOrderedDetectorList", "classeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1Site2dRoutesController.html#a96267668ba112e9bd52f616e6d4bdfae", null ],
     [ "createRoute", "classeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1Site2dRoutesController.html#ae6a60d7b03f8cfe9c5db7d42c2772db4", null ],
