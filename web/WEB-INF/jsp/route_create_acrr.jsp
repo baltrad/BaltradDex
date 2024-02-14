@@ -196,6 +196,13 @@ Creates a google map route
                             </div>        
                         </div>                         
                         <div class="row2">
+                            <div class="leftcol">Product ID:</div>
+                            <div class="rightcol">
+                                <input type="text" name="productid" value="${productid}"
+                                       title="A product id that should be added to the generated product metadata."/>
+                            </div>
+                        </div>
+                        <div class="row2">
                             <div class="leftcol">Zr A:</div>
                             <div class="rightcol">
                                 <input type="text" name="zrA" value="${zrA}"

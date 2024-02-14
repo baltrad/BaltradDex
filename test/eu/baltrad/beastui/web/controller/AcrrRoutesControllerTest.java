@@ -40,12 +40,13 @@ public class AcrrRoutesControllerTest extends EasyMockSupport {
     rule.setZrA(100.0);
     rule.setZrB(0.5);
     rule.setApplyGRA(true);
+    rule.setProductId("pn151");
     
     expect(manager.createRule("blt_acrr")).andReturn(rule);
     
     replayAll();
     
-    AcrrRule result = classUnderTest.createRule("nrd_swe", "IMAGE", "DBZH", 12, 4, 1, "eu.x.y", 100.0, 0.5, true, null);
+    AcrrRule result = classUnderTest.createRule("nrd_swe", "IMAGE", "DBZH", 12, 4, 1, "eu.x.y", 100.0, 0.5, true, "pn151", null);
     
     verifyAll();
     assertSame(rule, result);

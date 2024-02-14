@@ -121,6 +121,7 @@ public class AcrrRoutesController {
     @RequestParam(value = "zrA", required = false) Double zrA,
     @RequestParam(value = "zrB", required = false) Double zrB,
     @RequestParam(value = "applygra", required = false) Boolean applygra,
+    @RequestParam(value = "productid", required = false) String productid,
     @RequestParam(value = "filterJson", required=false) String filterJson) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     String emessage = null;
@@ -134,10 +135,10 @@ public class AcrrRoutesController {
     if (name == null && author == null && active == null && description == null &&
         recipients == null && area == null && object_type == null && quantity == null &&
         hours == null && filesPerHour == null && acceptableLoss == null && distanceField == null &&
-        zrA == null && zrB == null && applygra == null) {
+        zrA == null && zrB == null && applygra == null && productid == null) {
       return viewCreateRoute(model, name, author, active, description,
           recipients, area, object_type, quantity, hours, filesPerHour, acceptableLoss,
-          distanceField, zrA, zrB, applygra, filterJson, null);
+          distanceField, zrA, zrB, applygra, productid, filterJson, null);
     }
     
     if (name == null || name.trim().equals("")) {
@@ -157,7 +158,7 @@ public class AcrrRoutesController {
         double dzra = (zrA == null) ? 200.0 : zrA.doubleValue();
         double dzrb = (zrB == null) ? 1.6 : zrB.doubleValue();
         boolean bapplygra = (applygra == null) ? false : applygra.booleanValue();
-        AcrrRule rule = createRule(area, object_type, quantity, ihours, ifilesPerHour, iacceptableLoss, distanceField, dzra, dzrb, bapplygra, filterJson);
+        AcrrRule rule = createRule(area, object_type, quantity, ihours, ifilesPerHour, iacceptableLoss, distanceField, dzra, dzrb, bapplygra, productid, filterJson);
         RouteDefinition def = manager.create(name, author, bactive, description, recipients, rule);
         manager.storeDefinition(def);
         return "redirect:routes.htm";
@@ -169,7 +170,7 @@ public class AcrrRoutesController {
 
     return viewCreateRoute(model, name, author, active, description,
         recipients, area, object_type, quantity, hours, filesPerHour, acceptableLoss,
-        distanceField, zrA, zrB, applygra, filterJson, emessage);
+        distanceField, zrA, zrB, applygra, productid, filterJson, emessage);
   }
   
   /**
@@ -193,6 +194,7 @@ public class AcrrRoutesController {
       @RequestParam(value = "zrA", required = false) Double zrA,
       @RequestParam(value = "zrB", required = false) Double zrB,
       @RequestParam(value = "applygra", required = false) Boolean applygra,
+      @RequestParam(value = "productid", required = false) String productid,
       @RequestParam(value = "filterJson", required = false) String filterJson,
       @RequestParam(value = "submitButton", required = false) String operation) {
     logger.debug("showRoute(Model)");
@@ -204,7 +206,7 @@ public class AcrrRoutesController {
     
     if (operation != null && operation.equals("Save")) {
       //
-      return modifyRoute(model, name, author, active, description, recipients, area, object_type, quantity, hours, filesPerHour, acceptableLoss, distanceField, zrA, zrB, applygra, filterJson);
+      return modifyRoute(model, name, author, active, description, recipients, area, object_type, quantity, hours, filesPerHour, acceptableLoss, distanceField, zrA, zrB, applygra, productid, filterJson);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -226,7 +228,7 @@ public class AcrrRoutesController {
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             def.getRecipients(), vrule.getArea(), vrule.getObjectType(), vrule.getQuantity(),
             vrule.getHours(), vrule.getFilesPerHour(), vrule.getAcceptableLoss(),
-            vrule.getDistancefield(), vrule.getZrA(), vrule.getZrB(), vrule.isApplyGRA(), filterstr, null); 
+            vrule.getDistancefield(), vrule.getZrA(), vrule.getZrB(), vrule.isApplyGRA(), vrule.getProductId(), filterstr, null); 
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is an acrr rule");
       }
@@ -253,6 +255,7 @@ public class AcrrRoutesController {
       Double zrA,
       Double zrB,
       Boolean applygra,
+      String productid,
       String filterJson) {
     List<String> newrecipients = (recipients == null) ? new ArrayList<String>() : recipients;
     boolean isactive = (active != null) ? active.booleanValue() : false;
@@ -270,7 +273,7 @@ public class AcrrRoutesController {
         double dzrb = (zrB == null) ? 1.6 : zrB.doubleValue();
         boolean bapplygra = (applygra == null) ? false: applygra.booleanValue();
         
-        AcrrRule rule = createRule(area, object_type, quantity, ihours, ifilesPerHour, iacceptableLoss, distanceField, dzra, dzrb, bapplygra, filterJson);
+        AcrrRule rule = createRule(area, object_type, quantity, ihours, ifilesPerHour, iacceptableLoss, distanceField, dzra, dzrb, bapplygra, productid, filterJson);
         RouteDefinition def = manager.create(name, author, isactive, description, newrecipients, rule);
         manager.updateDefinition(def);
         return "redirect:routes.htm";
@@ -282,7 +285,7 @@ public class AcrrRoutesController {
     return viewShowRoute(model, name, author, isactive, description,
         newrecipients, area, object_type, quantity,
         hours, filesPerHour, acceptableLoss,
-        distanceField, zrA, zrB, applygra, filterJson, emessage); 
+        distanceField, zrA, zrB, applygra, productid, filterJson, emessage); 
   }
   
   /**
@@ -304,11 +307,12 @@ public class AcrrRoutesController {
       Double zrA, 
       Double zrB,
       Boolean applygra,
+      String productid,
       String jsonFilter,      
       String emessage) {
     return viewRoute(model, name, author, active, description,
         recipients, area, object_type, quantity, hours, filesPerHour,
-        acceptableLoss, distanceField, zrA, zrB, applygra, jsonFilter, emessage, "route_create_acrr");
+        acceptableLoss, distanceField, zrA, zrB, applygra, productid, jsonFilter, emessage, "route_create_acrr");
   }
 
   /**
@@ -330,11 +334,12 @@ public class AcrrRoutesController {
       Double zrA, 
       Double zrB,
       Boolean applygra,
+      String productid,
       String jsonFilter,
       String emessage) {
     return viewRoute(model, name, author, active, description,
         recipients, area, object_type, quantity, hours, filesPerHour,
-        acceptableLoss, distanceField, zrA, zrB, applygra, jsonFilter, emessage, "route_show_acrr");
+        acceptableLoss, distanceField, zrA, zrB, applygra, productid, jsonFilter, emessage, "route_show_acrr");
   }
   
   /**
@@ -356,6 +361,7 @@ public class AcrrRoutesController {
       Double zrA, 
       Double zrB,
       Boolean applygra,
+      String productid,
       String jsonFilter,      
       String emessage,
       String jsppagename) {
@@ -368,7 +374,7 @@ public class AcrrRoutesController {
     model.addAttribute("object_types", objectTypes);
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
-    model.addAttribute("active", (active == null) ? new Boolean(true) : active);
+    model.addAttribute("active", (active == null) ? Boolean.TRUE : active);
     model.addAttribute("description", (description == null) ? "" : description);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
@@ -383,6 +389,7 @@ public class AcrrRoutesController {
     model.addAttribute("zrA", (zrA == null) ? 200.0 : zrA);
     model.addAttribute("zrB", (zrB == null) ? 1.6 : zrB);
     model.addAttribute("applygra", (applygra == null) ? false : applygra.booleanValue());
+    model.addAttribute("productid", (productid == null) ? "" : productid);
     model.addAttribute("filterJson", jsonFilter);
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
@@ -422,6 +429,7 @@ public class AcrrRoutesController {
       double zrA, 
       double zrB,
       boolean applygra,
+      String productid,
       String jsonFilter) {
     AcrrRule rule = (AcrrRule)manager.createRule(AcrrRule.TYPE);
     rule.setArea(area);
@@ -434,6 +442,8 @@ public class AcrrRoutesController {
     rule.setZrA(zrA);
     rule.setZrB(zrB);
     rule.setApplyGRA(applygra);
+    rule.setProductId(productid);
+    
     if (jsonFilter != null && !jsonFilter.equals("")) {
       try {
         rule.setFilter(jsonMapper.readValue(jsonFilter, IFilter.class));
