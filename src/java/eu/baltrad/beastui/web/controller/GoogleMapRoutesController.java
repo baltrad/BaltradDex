@@ -19,11 +19,13 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 
 package eu.baltrad.beastui.web.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import eu.baltrad.beast.adaptor.IBltAdaptorManager;
+import eu.baltrad.beast.db.IFilter;
 import eu.baltrad.beast.pgf.IPgfClientHelper;
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
@@ -57,6 +60,12 @@ public class GoogleMapRoutesController {
    * The pgf client helper
    */
   private IPgfClientHelper pgfClientHelper = null;
+
+  /**
+   * The translator from string to json and vice versa
+   */
+  private ObjectMapper jsonMapper = new ObjectMapper();
+
   
   /**
    * We need a logger here
@@ -119,15 +128,17 @@ public class GoogleMapRoutesController {
       @RequestParam(value = "description", required = false) String description,
       @RequestParam(value = "recipients", required = false) List<String> recipients,
       @RequestParam(value = "area", required = false) String area,
-      @RequestParam(value = "path", required = false) String path) {
+      @RequestParam(value = "areapath", required = false) Boolean useAreaInPath,
+      @RequestParam(value = "path", required = false) String path,
+      @RequestParam(value = "filterJson", required=false) String filterJson) {
     logger.debug("createRoute(Model)");
     String emessage = null;
 
     // If everything are null, then we probably came here from some menu.
     if (name == null && author == null && active == null && description == null &&
-        recipients == null && area == null && path == null) {
+        recipients == null && area == null && useAreaInPath == null && path == null) {
       return viewCreateRoute(model, name, author, active, description,
-          recipients, area, path, null);      
+          recipients, area, Boolean.TRUE, path, filterJson, null);      
     }
     
     if (name == null || name.equals("")) {
@@ -141,7 +152,8 @@ public class GoogleMapRoutesController {
     if (emessage == null) {
       try {
         boolean bactive = (active == null) ? false : active.booleanValue();
-        GoogleMapRule rule = createRule(area, path);
+        boolean buseAreaInPath = (useAreaInPath == null) ? false : useAreaInPath.booleanValue();
+        GoogleMapRule rule = createRule(area, buseAreaInPath, path, filterJson);
         RouteDefinition def = manager.create(name, author, bactive, description, recipients, rule);
         manager.storeDefinition(def);
         return "redirect:routes.htm";
@@ -153,7 +165,7 @@ public class GoogleMapRoutesController {
       }
     }
     return viewCreateRoute(model, name, author, active, description,
-        recipients, area, path, emessage);
+        recipients, area, useAreaInPath, path, filterJson, emessage);
   }
   
   /**
@@ -178,7 +190,9 @@ public class GoogleMapRoutesController {
       @RequestParam(value = "description", required = false) String description,
       @RequestParam(value = "recipients", required = false) List<String> recipients,
       @RequestParam(value = "area", required = false) String area,
+      @RequestParam(value = "areapath", required = false) Boolean areapath,
       @RequestParam(value = "path", required = false) String path,
+      @RequestParam(value = "filterJson", required = false) String filterJson,
       @RequestParam(value = "submitButton", required = false) String operation) {
     logger.debug("showRoute(Model)");
 
@@ -188,7 +202,7 @@ public class GoogleMapRoutesController {
     }
     
     if (operation != null && operation.equals("Save")) {
-      return modifyRoute(model, name, author, active, description, recipients, area, path);
+      return modifyRoute(model, name, author, active, description, recipients, area, areapath, path, filterJson);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -199,8 +213,16 @@ public class GoogleMapRoutesController {
     } else {
       if (def.getRule() instanceof GoogleMapRule) {
         GoogleMapRule vrule = (GoogleMapRule)def.getRule();
+        String filterstr = null;
+        if (vrule.getFilter() != null) {
+          try {
+            filterstr = jsonMapper.writeValueAsString(vrule.getFilter());
+          } catch (IOException e) {
+            logger.error("failed to create JSON string from filter", e);
+          }
+        }        
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
-            def.getRecipients(), vrule.getArea(), vrule.getPath(), null); 
+            def.getRecipients(), vrule.getArea(), vrule.isUseAreaInPath(), vrule.getPath(), filterstr, null); 
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a google map rule");
       }
@@ -222,9 +244,10 @@ public class GoogleMapRoutesController {
    */
   protected String modifyRoute(Model model, String name, String author,
       Boolean active, String description, List<String> recipients, String area,
-      String path) {
+      Boolean useAreaInPath, String path, String filterJson) {
     List<String> newrecipients = (recipients == null) ? new ArrayList<String>() : recipients;
     boolean isactive = (active != null) ? active.booleanValue() : false;
+    boolean buseAreaInPath = (useAreaInPath != null) ? useAreaInPath.booleanValue() : false;
     String emessage = null;
     
     if (newrecipients.size() <= 0) {
@@ -235,7 +258,7 @@ public class GoogleMapRoutesController {
     
     if (emessage == null) {
       try {
-        GoogleMapRule rule = createRule(area, path);
+        GoogleMapRule rule = createRule(area, buseAreaInPath, path, filterJson);
         RouteDefinition def = manager.create(name, author, isactive, description, newrecipients, rule);
         manager.updateDefinition(def);
         return "redirect:routes.htm";
@@ -245,7 +268,7 @@ public class GoogleMapRoutesController {
       }
     }
     return viewShowRoute(model, name, author, active, description,
-        newrecipients, area, path, emessage);
+        newrecipients, area, useAreaInPath, path, filterJson, emessage);
   }
   
   /**
@@ -255,10 +278,18 @@ public class GoogleMapRoutesController {
    * @return a google map rule
    * @throws RuleException if the google map rule not could be created
    */
-  protected GoogleMapRule createRule(String area, String path) {
+  protected GoogleMapRule createRule(String area, boolean useAreaInPath, String path, String jsonFilter) {
     GoogleMapRule rule = (GoogleMapRule)manager.createRule(GoogleMapRule.TYPE);
     rule.setArea(area);
     rule.setPath(path);
+    rule.setUseAreaInPath(useAreaInPath);
+    if (jsonFilter != null && !jsonFilter.equals("")) {
+      try {
+        rule.setFilter(jsonMapper.readValue(jsonFilter, IFilter.class));
+      } catch (Exception e) {
+        logger.error("Failed to translate json to filter", e);
+      }
+    }        
     return rule;
   }
   
@@ -294,21 +325,23 @@ public class GoogleMapRoutesController {
    */
   protected String viewCreateRoute(Model model, String name, String author,
       Boolean active, String description, List<String> recipients,
-      String area, String path, String emessage) {
+      String area, Boolean useAreaInPath, String path, String jsonFilter, String emessage) {
     if (active == null)
-      active = new Boolean(true);
+      active = Boolean.TRUE;
     if (recipients == null)
       recipients = new ArrayList<String>();
     
     model.addAttribute("adaptors", adaptormanager.getAdaptorNames());
     model.addAttribute("name", (name == null)?"":name);
     model.addAttribute("author", (author == null)?"":author);
-    model.addAttribute("active", (active == null)?new Boolean(true):active);
+    model.addAttribute("active", (active == null)?Boolean.TRUE:active);
     model.addAttribute("recipients", (recipients == null) ? new ArrayList<String>() : recipients);
     model.addAttribute("description", (description == null) ? "" : description);
     model.addAttribute("arealist", pgfClientHelper.getUniqueAreaIds());    
     model.addAttribute("area", (area == null)?"":area);
+    model.addAttribute("areapath", (useAreaInPath == null)?Boolean.TRUE:useAreaInPath);
     model.addAttribute("path", (path == null)?"":path);
+    model.addAttribute("filterJson", jsonFilter);
 
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
@@ -332,22 +365,24 @@ public class GoogleMapRoutesController {
    */
   protected String viewShowRoute(Model model, String name, String author,
       Boolean active, String description, List<String> recipients,
-      String area, String path, String emessage) {
+      String area, Boolean useAreaInPath, String path, String jsonFilter, String emessage) {
     
     if (active == null)
-      active = new Boolean(true);
+      active = Boolean.TRUE;
     if (recipients == null)
       recipients = new ArrayList<String>();
     
     model.addAttribute("adaptors", adaptormanager.getAdaptorNames());
     model.addAttribute("name", (name == null)?"":name);
     model.addAttribute("author", (author == null)?"":author);
-    model.addAttribute("active", (active == null)?new Boolean(true):active);
+    model.addAttribute("active", (active == null)?Boolean.TRUE:active);
     model.addAttribute("recipients", (recipients == null) ? new ArrayList<String>() : recipients);
     model.addAttribute("description", (description == null) ? "" : description);
     model.addAttribute("arealist", pgfClientHelper.getUniqueAreaIds());    
     model.addAttribute("area", (area == null)?"":area);
+    model.addAttribute("areapath", (useAreaInPath == null)?Boolean.TRUE:useAreaInPath);
     model.addAttribute("path", (path == null)?"":path);
+    model.addAttribute("filterJson", jsonFilter);
 
     if (emessage != null) {
       model.addAttribute("emessage", emessage);

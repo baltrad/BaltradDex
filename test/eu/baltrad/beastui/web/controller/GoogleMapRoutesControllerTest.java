@@ -27,9 +27,11 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
         String description,
         List<String> recipients,
         String area,
+        Boolean useAreaInPath,
         String path,
+        String filterJSON,
         String emessage);
-    public GoogleMapRule createRule(String area, String path);
+    public GoogleMapRule createRule(String area, boolean useAreaInPath, String path, String filterJSON);
   };
   
   private MethodMocker method = null;
@@ -50,11 +52,11 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     classUnderTest = new GoogleMapRoutesController() {
       protected String viewCreateRoute(Model model, String name, String author,
           Boolean active, String description, List<String> recipients,
-          String area, String path, String emessage) {
-        return method.viewCreateRoute(model, name, author, active, description, recipients, area, path, emessage);
+          String area, Boolean useAreaInPath, String path, String filterJSON, String emessage) {
+        return method.viewCreateRoute(model, name, author, active, description, recipients, area, useAreaInPath, path, filterJSON, emessage);
       }
-      protected GoogleMapRule createRule(String area, String path) {
-        return method.createRule(area, path);
+      protected GoogleMapRule createRule(String area, boolean useAreaInPath, String path, String filterJSON) {
+        return method.createRule(area, useAreaInPath, path, filterJSON);
       }
     };
     classUnderTest.setManager(manager);
@@ -73,11 +75,11 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
   
   @Test
   public void testCreateRoute_initial() throws Exception {
-    expect(method.viewCreateRoute(model, null, null, null, null, null, null, null, null)).andReturn("route_create_google_map");
+    expect(method.viewCreateRoute(model, null, null, null, null, null, null, Boolean.TRUE, null, null, null)).andReturn("route_create_google_map");
     
     replayAll();
     
-    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null);
+    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null);
     
     verifyAll();
     assertEquals("route_create_google_map", result);
@@ -90,13 +92,13 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     GoogleMapRule rule = new GoogleMapRule();
     RouteDefinition routedef = new RouteDefinition();
     
-    expect(method.createRule("sswe", "/tmp")).andReturn(rule);
+    expect(method.createRule("sswe", true, "/tmp", null)).andReturn(rule);
     expect(manager.create("name", "author", true, "test", recipients, rule)).andReturn(routedef);
     manager.storeDefinition(routedef);
     
     replayAll();
     
-    String result = classUnderTest.createRoute(model, "name", "author", true, "test", recipients, "sswe", "/tmp");
+    String result = classUnderTest.createRoute(model, "name", "author", true, "test", recipients, "sswe", Boolean.TRUE, "/tmp", null);
     
     verifyAll();
     assertEquals("redirect:routes.htm", result);
@@ -131,7 +133,9 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     expect(pgfClientHelper.getUniqueAreaIds()).andReturn(areas);
     expect(model.addAttribute("arealist", areas)).andReturn(null);
     expect(model.addAttribute("area", "")).andReturn(null);
+    expect(model.addAttribute("areapath", true)).andReturn(null);
     expect(model.addAttribute("path", "")).andReturn(null);
+    expect(model.addAttribute("filterJson", null)).andReturn(null);
 
     classUnderTest = new GoogleMapRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);
@@ -140,7 +144,7 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    String result = classUnderTest.viewCreateRoute(model, null, null, null, null, null, null, null, null);
+    String result = classUnderTest.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null);
     
     verifyAll();
     assertEquals("route_create_google_map", result);
@@ -162,7 +166,9 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     expect(pgfClientHelper.getUniqueAreaIds()).andReturn(areas);
     expect(model.addAttribute("arealist", areas)).andReturn(null);
     expect(model.addAttribute("area", "sswe")).andReturn(null);
+    expect(model.addAttribute("areapath", false)).andReturn(null);
     expect(model.addAttribute("path", "/tmp")).andReturn(null);
+    expect(model.addAttribute("filterJson", null)).andReturn(null);
 
     classUnderTest = new GoogleMapRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);
@@ -171,7 +177,7 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    String result = classUnderTest.viewCreateRoute(model, "name", "author", true, "a test", recipients, "sswe", "/tmp", null);
+    String result = classUnderTest.viewCreateRoute(model, "name", "author", true, "a test", recipients, "sswe", false, "/tmp", null, null);
     
     verifyAll();
     assertEquals("route_create_google_map", result);
@@ -193,7 +199,9 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     expect(pgfClientHelper.getUniqueAreaIds()).andReturn(areas);
     expect(model.addAttribute("arealist", areas)).andReturn(null);
     expect(model.addAttribute("area", "sswe")).andReturn(null);
+    expect(model.addAttribute("areapath", true)).andReturn(null);
     expect(model.addAttribute("path", "/tmp")).andReturn(null);
+    expect(model.addAttribute("filterJson", null)).andReturn(null);
 
     classUnderTest = new GoogleMapRoutesController();
     classUnderTest.setAdaptorManager(adaptorManager);
@@ -202,7 +210,7 @@ public class GoogleMapRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    String result = classUnderTest.viewShowRoute(model, "name", "author", true, "a test", recipients, "sswe", "/tmp", null);
+    String result = classUnderTest.viewShowRoute(model, "name", "author", true, "a test", recipients, "sswe", true, "/tmp", null, null);
     
     verifyAll();
     assertEquals("route_show_google_map", result);
