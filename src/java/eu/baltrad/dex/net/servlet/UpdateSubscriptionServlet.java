@@ -116,58 +116,53 @@ public class UpdateSubscriptionServlet extends HttpServlet {
      * @param requestedSubscription Requested subscriptions
      * @return Updated peer subscriptions
      */
-    @Transactional(propagation=Propagation.REQUIRED, 
-            rollbackFor=Exception.class)
-    protected List<Subscription> storePeerSubscriptions(String nodeName,
-                List<Subscription> requestedSubscription) {
-        List<Subscription> subscriptions = new ArrayList<Subscription>();
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+    protected List<Subscription> storePeerSubscriptions(String nodeName, List<Subscription> requestedSubscription) {
+      List<Subscription> subscriptions = new ArrayList<Subscription>();
+      for (Subscription requested : requestedSubscription) {
         try {
-            for (Subscription requested : requestedSubscription) {
-                Subscription current = subscriptionManager.load(
-                        Subscription.PEER, nodeName, 
-                        requested.getDataSource());
-                if (current != null) {
-                    String[] messageArgs = {current.getUser(), 
-                        current.getDataSource()};
-                    if (requested.isActive()) {
-                        current.setActive(requested.isActive());
-                        current.setSyncronized(true);
-                        subscriptionManager.update(current);
-                        subscriptions.add(current);
-                        log.warn(messages.getMessage(
-                            GS_SUBSCRIPTION_START_SUCCESS_KEY, messageArgs));
-                    } else {
-                        current.setActive(requested.isActive());
-                        current.setSyncronized(true);
-                        subscriptionManager.delete(current.getId());
-                        subscriptions.add(current);
-                        // delete status
-                        nodeStatusManager.delete(current.getId());
-                        log.warn(messages.getMessage(
-                            GS_SUBSCRIPTION_CANCEL_SUCCESS_KEY, messageArgs));
-                    }
-                } else {
-                    if (requested.isActive()) {
-                        current = new Subscription(System.currentTimeMillis(), 
-                                Subscription.PEER, nodeName, 
-                                requested.getDataSource(), requested.isActive(), 
-                                true);
-                        int subscriptionId = subscriptionManager.store(current);
-                        subscriptions.add(current);
-                        // save status
-                        int statusId = nodeStatusManager.store(new Status(0, 0, 0));
-                        nodeStatusManager.store(statusId, subscriptionId);
-                        String[] messageArgs = {current.getUser(), 
-                            current.getDataSource()};
-                        log.warn(messages.getMessage(
-                            GS_SUBSCRIPTION_START_SUCCESS_KEY, messageArgs));
-                    }
-                }
+          logger.info("Loading peer, " + nodeName + ", datasource: " + requested.getDataSource());
+          Subscription current = subscriptionManager.load(Subscription.PEER, nodeName, requested.getDataSource());
+          if (current != null) {
+            logger.info("Found: " + current.getDataSource());
+            String[] messageArgs = { current.getUser(), current.getDataSource() };
+            if (requested.isActive()) {
+              current.setActive(requested.isActive());
+              current.setSyncronized(true);
+              subscriptionManager.update(current);
+              subscriptions.add(current);
+              log.warn(messages.getMessage(GS_SUBSCRIPTION_START_SUCCESS_KEY, messageArgs));
+            } else {
+              current.setActive(requested.isActive());
+              current.setSyncronized(true);
+              subscriptionManager.delete(current.getId());
+              subscriptions.add(current);
+              // delete status
+              nodeStatusManager.delete(current.getId());
+              log.warn(messages.getMessage(GS_SUBSCRIPTION_CANCEL_SUCCESS_KEY, messageArgs));
             }
+          } else {
+            logger.info("Not found: " + requested.getDataSource());
+            if (requested.isActive()) {
+              current = new Subscription(System.currentTimeMillis(), Subscription.PEER, nodeName,
+                  requested.getDataSource(), requested.isActive(), true);
+              int subscriptionId = subscriptionManager.store(current);
+              subscriptions.add(current);
+              // save status
+              int statusId = nodeStatusManager.store(new Status(0, 0, 0));
+              nodeStatusManager.store(statusId, subscriptionId);
+              String[] messageArgs = { current.getUser(), current.getDataSource() };
+              log.warn(messages.getMessage(GS_SUBSCRIPTION_START_SUCCESS_KEY, messageArgs));
+            }
+          }
         } catch (Exception e) {
-            log.error(messages.getMessage(GS_SUBSCRIPTION_FAILURE_KEY));
+          log.error(messages.getMessage(GS_SUBSCRIPTION_FAILURE_KEY));
+          if (requested != null) { 
+            log.error("Could not process data source '" + requested.getDataSource() + "'");
+          }
         }
-        return subscriptions;
+      }
+      return subscriptions;
     }
 
     /**
