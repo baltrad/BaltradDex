@@ -22,8 +22,7 @@ var searchData=
   ['bltfilemanager_19',['BltFileManager',['../classeu_1_1baltrad_1_1dex_1_1db_1_1manager_1_1impl_1_1BltFileManager.html',1,'eu.baltrad.dex.db.manager.impl.BltFileManager'],['../classeu_1_1baltrad_1_1dex_1_1db_1_1manager_1_1impl_1_1BltFileManager.html#aa3aacdd8c723d3a032194624daa58ef2',1,'eu.baltrad.dex.db.manager.impl.BltFileManager.BltFileManager()']]],
   ['bltimagepreviewcontroller_20',['BltImagePreviewController',['../classeu_1_1baltrad_1_1dex_1_1db_1_1controller_1_1BltImagePreviewController.html',1,'eu::baltrad::dex::db::controller']]],
   ['bltqueryparameter_21',['BltQueryParameter',['../classeu_1_1baltrad_1_1dex_1_1db_1_1model_1_1BltQueryParameter.html',1,'eu.baltrad.dex.db.model.BltQueryParameter'],['../classeu_1_1baltrad_1_1dex_1_1db_1_1model_1_1BltQueryParameter.html#aa9ec87038e22fd7300338d59f2b33447',1,'eu.baltrad.dex.db.model.BltQueryParameter.BltQueryParameter()']]],
-  ['br_22',['Br',['../format.html#exchange_auth',1,'Authentication   &lt;br&gt;'],['../running.html#quick_data_sources',1,'Data sources  &lt;br&gt;']]],
-  ['browsemessagescontroller_23',['BrowseMessagesController',['../classeu_1_1baltrad_1_1dex_1_1log_1_1controller_1_1BrowseMessagesController.html',1,'eu::baltrad::dex::log::controller']]],
-  ['browsing_20and_20access_24',['Data browsing and access',['../running.html#data_browse',1,'']]],
-  ['build_20install_20baltraddex_25',['Build &amp; install BaltradDex',['../install.html#build_dex',1,'']]]
+  ['browsemessagescontroller_22',['BrowseMessagesController',['../classeu_1_1baltrad_1_1dex_1_1log_1_1controller_1_1BrowseMessagesController.html',1,'eu::baltrad::dex::log::controller']]],
+  ['browsing_20and_20access_23',['Data browsing and access',['../running.html#data_browse',1,'']]],
+  ['build_20install_20baltraddex_24',['Build &amp; install BaltradDex',['../install.html#build_dex',1,'']]]
 ];

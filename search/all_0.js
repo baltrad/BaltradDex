@@ -26,7 +26,7 @@ var searchData=
   ['application_20context_23',['Configure application context',['../install.html#prep_app_context',1,'']]],
   ['arguments_24',['Arguments',['../supervisor.html#supervisor_reporters_db_args',1,'Arguments'],['../supervisor.html#supervisor_reporters_bdb_args',1,'Arguments'],['../supervisor.html#supervisor_reporters_radar_connection_args',1,'Arguments'],['../supervisor.html#supervisor_reporters_bdb_object_args',1,'Arguments']]],
   ['authenticate_25',['authenticate',['../interfaceeu_1_1baltrad_1_1dex_1_1net_1_1auth_1_1Authenticator.html#a911a18a9088f8fb95206c8d6ec53d5f7',1,'eu.baltrad.dex.net.auth.Authenticator.authenticate()'],['../classeu_1_1baltrad_1_1dex_1_1net_1_1auth_1_1EasyAuthenticator.html#a422069c567caff61cec575e71bdf0a3f',1,'eu.baltrad.dex.net.auth.EasyAuthenticator.authenticate()'],['../classeu_1_1baltrad_1_1dex_1_1net_1_1auth_1_1KeyczarAuthenticator.html#a050b2728e1afc62f158a55c1093942fd',1,'eu.baltrad.dex.net.auth.KeyczarAuthenticator.authenticate()']]],
-  ['authentication_20br_26',['Authentication   &lt;br&gt;',['../format.html#exchange_auth',1,'']]],
+  ['authentication_26',['Authentication',['../format.html#exchange_auth',1,'']]],
   ['authentication_20header_27',['Authentication header',['../format.html#exchange_hdr',1,'']]],
   ['authenticator_28',['Authenticator',['../interfaceeu_1_1baltrad_1_1dex_1_1net_1_1auth_1_1Authenticator.html',1,'eu::baltrad::dex::net::auth']]],
   ['authorizationcontroller_29',['AuthorizationController',['../classeu_1_1baltrad_1_1dex_1_1keystore_1_1controller_1_1AuthorizationController.html',1,'eu::baltrad::dex::keystore::controller']]],
