@@ -100,7 +100,7 @@ CREATE TABLE dex_messages
     message TEXT NOT NULL
 );
 
-CREATE UNIQUE INDEX dex_messages_timestamp_idx ON dex_messages (time_stamp);
+CREATE INDEX dex_messages_timestamp_idx ON dex_messages (time_stamp);
 
 CREATE TABLE dex_radars
 (
