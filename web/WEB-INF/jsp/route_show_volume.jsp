@@ -245,9 +245,15 @@ Modifie or delete a volume route
                                 <select id="quality-controls" multiple size="6" 
                                         name="detectors"
                                         title="Select quality controls to be used">
-                                    <c:forEach var="detector" items="${anomaly_detectors}">
-                                        <option value="${detector.name}" <c:if test="${ fn:contains(detectors, detector.name) }">selected</c:if> >${detector.name}</option>
-                                    </c:forEach>
+                                        <c:forEach var="detector" items="${anomaly_detectors}">
+                                            <c:set var="contains" value="false" />
+                                            <c:forEach var="dstr" items="${detectors}">
+                                                <c:if test="${ dstr eq detector.name }">
+                                                    <c:set var="contains" value="true" />
+                                                </c:if>
+                                            </c:forEach>
+                                            <option value="${detector.name}" <c:if test="${ contains == true}">selected</c:if> >${detector.name}</option>
+                                        </c:forEach>
                                 </select>
                                 <a href="JavaScript:void(0);" id="btn-up"><img src="includes/images/up.png" alt="Up"/></a>
                                 <a href="JavaScript:void(0);" id="btn-down"><img src="includes/images/down.png" alt="Down"/></a>                                
