@@ -277,7 +277,15 @@ Creates a composite route
                                        value="${ZR_b}"
                                        title="The ZR_b coefficient when converting from reflectivity to MM/H"/>
                             </div>        
-                        </div>          
+                        </div>
+                        <div class="row2">
+                            <div class="leftcol">Options:</div>
+                            <div class="rightcol">
+                                <input type="text" name="options" 
+                                       value="${options}"
+                                       title="Extra options to the Composite plugin"/>
+                            </div>        
+                        </div>
                         <div class="row2">
                             <div class="leftcol">Ignore malfunc:</div>
                             <div class="rightcol">

@@ -69,6 +69,7 @@ public class Site2dRoutesControllerTest extends EasyMockSupport {
     String pcsid = "test_pcsid";
     double xscale = 3.0;
     double yscale = 5.0;
+    String options = "factory:any";
     String jsonFilter = "";
     int quality_control_mode = 1;
     
@@ -88,6 +89,7 @@ public class Site2dRoutesControllerTest extends EasyMockSupport {
     rule.setPcsid(pcsid);
     rule.setXscale(xscale);
     rule.setYscale(yscale);
+    rule.setOptions(options);
     rule.setQualityControlMode(quality_control_mode);
     
     expect(manager.createRule("blt_site2d")).andReturn(rule);
@@ -96,7 +98,7 @@ public class Site2dRoutesControllerTest extends EasyMockSupport {
     
     Site2DRule result = classUnderTest.createRule(areaid, interval, sources, detectors, quality_control_mode, 
         byscan, method, prodpar, applygra, ZR_A, ZR_b, ignoreMalfunc, ctFilter, pcsid, 
-        xscale, yscale, jsonFilter);
+        xscale, yscale, options, jsonFilter);
     
     verifyAll();
     assertSame(rule, result);
@@ -125,6 +127,8 @@ public class Site2dRoutesControllerTest extends EasyMockSupport {
     String pcsid = "test_pcsid";
     double xscale = 3.0;
     double yscale = 5.0;
+    String options = "factory:legacy";
+    
     String jsonFilter = "";
     List<String> adaptorNames = new ArrayList<String>();
     List<String> radarSources = new ArrayList<String>();
@@ -150,7 +154,7 @@ public class Site2dRoutesControllerTest extends EasyMockSupport {
     
     String result = classUnderTest.showRoute(model, name, author, active, description, recipients, byscan, 
         method, prodpar, areaid, interval, applygra, ZR_A, ZR_b, ignoreMalfunc, ctFilter, 
-        pcsid, xscale, yscale, sources, detectors, quality_control_mode, jsonFilter, operation);
+        pcsid, xscale, yscale, options, sources, detectors, quality_control_mode, jsonFilter, operation);
     
     verifyAll();
     assertTrue(result.equals("route_create_site2d"));

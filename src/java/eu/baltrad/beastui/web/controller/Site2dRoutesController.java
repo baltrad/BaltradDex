@@ -181,6 +181,7 @@ public class Site2dRoutesController {
       @RequestParam(value = "pcsid", required = false) String pcsid,
       @RequestParam(value = "xscale", required = false) Double xscale,
       @RequestParam(value = "yscale", required = false) Double yscale,
+      @RequestParam(value = "options", required = false) String options,      
       @RequestParam(value = "sources", required = false) List<String> sources,
       @RequestParam(value = "detectors", required = false) List<String> detectors,
       @RequestParam(value = "quality_control_mode", required = false) Integer quality_control_mode,
@@ -196,11 +197,11 @@ public class Site2dRoutesController {
     
     if (name == null && author == null && active == null && description == null && byscan == null &&
         method == null && prodpar == null && recipients == null && 
-        areaid == null && interval == null && applygra == null && ZR_A == null && ZR_b == null &&
+        areaid == null && interval == null && applygra == null && ZR_A == null && ZR_b == null && options == null &&
         ignore_malfunc == null && ctfilter == null && sources == null && detectors == null && quality_control_mode == null) {
       return viewCreateRoute(model, name, author, active, description,
           recipients, byscan, method, prodpar, areaid, 
-          interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, quality_control_mode, filterJson, null);
+          interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, options, sources, detectors, quality_control_mode, filterJson, null);
     }
     
     logger.info("areaid=" + areaid + ", pcsid=" + pcsid);
@@ -253,7 +254,7 @@ public class Site2dRoutesController {
         double dxscale = (xscale == null) ? 2000.0 : xscale.doubleValue();
         double dyscale = (xscale == null) ? 2000.0 : yscale.doubleValue();
         int iquality_control_mode = (quality_control_mode == null) ? 0 : quality_control_mode.intValue();
-        Site2DRule rule = createRule(areaid, iinterval, sources, detectors, iquality_control_mode, bbyscan, method, prodpar, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, pcsid, dxscale, dyscale, filterJson);
+        Site2DRule rule = createRule(areaid, iinterval, sources, detectors, iquality_control_mode, bbyscan, method, prodpar, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, pcsid, dxscale, dyscale, options, filterJson);
         List<String> recip = (recipients == null) ? new ArrayList<String>() : recipients;
         RouteDefinition def = manager.create(name, author, bactive, description, recip, rule);
         manager.storeDefinition(def);
@@ -269,7 +270,7 @@ public class Site2dRoutesController {
     }
     
     return viewCreateRoute(model, name, author, active, description,
-        recipients, byscan, method, prodpar, areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, quality_control_mode, filterJson, emessage);
+        recipients, byscan, method, prodpar, areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, options, sources, detectors, quality_control_mode, filterJson, emessage);
   }
   
   /**
@@ -307,6 +308,7 @@ public class Site2dRoutesController {
       @RequestParam(value = "pcsid", required = false) String pcsid,
       @RequestParam(value = "xscale", required = false) Double xscale,
       @RequestParam(value = "yscale", required = false) Double yscale,
+      @RequestParam(value = "options", required = false) String options,
       @RequestParam(value = "sources", required = false) List<String> sources,
       @RequestParam(value = "detectors", required = false) List<String> detectors,
       @RequestParam(value = "quality_control_mode", required = false) Integer quality_control_mode,
@@ -319,7 +321,7 @@ public class Site2dRoutesController {
     
     switch (getSubmitOperation(operation)) {
     case SAVE:
-      return modifyRoute(model, name, author, active, description, byscan, method, prodpar, recipients, areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, quality_control_mode, filterJson);
+      return modifyRoute(model, name, author, active, description, byscan, method, prodpar, recipients, areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, options, sources, detectors, quality_control_mode, filterJson);
     case DELETE:
       try {
         manager.deleteDefinition(name);
@@ -330,7 +332,7 @@ public class Site2dRoutesController {
     case DUPLICATE:
       logger.info("Duplicating Site2DRule '" + name + "'");
       return viewCreateRoute(model, name + " (copy)", author, active, description, recipients, byscan, method, prodpar, 
-                             areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, 
+                             areaid, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, options,
                              sources, detectors, quality_control_mode, filterJson, null);
           
     default:
@@ -349,7 +351,7 @@ public class Site2dRoutesController {
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             def.getRecipients(), crule.isScanBased(), crule.getMethod(), crule.getProdpar(), 
             crule.getArea(), crule.getInterval(), crule.isApplyGRA(), crule.getZR_A(), crule.getZR_b(), 
-            crule.isIgnoreMalfunc(), crule.isCtFilter(), crule.getPcsid(), crule.getXscale(), crule.getYscale(), 
+            crule.isIgnoreMalfunc(), crule.isCtFilter(), crule.getPcsid(), crule.getXscale(), crule.getYscale(), crule.getOptions(),
             crule.getSources(), crule.getDetectors(), crule.getQualityControlMode(), filterstr, null);
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is a site2d rule");
@@ -391,6 +393,7 @@ public class Site2dRoutesController {
                                    String pcsid, 
                                    Double xscale, 
                                    Double yscale, 
+                                   String options,
                                    List<String> sources, 
                                    List<String> detectors, 
                                    Integer quality_control_mode,
@@ -423,6 +426,7 @@ public class Site2dRoutesController {
     model.addAttribute("pcsid", (pcsid == null) ? "" : pcsid);
     model.addAttribute("xscale", (xscale == null) ? new Double(2000.0) : xscale);
     model.addAttribute("yscale", (yscale == null) ? new Double(2000.0) : yscale);
+    model.addAttribute("options", (options == null) ? "" : options);
     model.addAttribute("filterJson", jsonFilter);
     
     model.addAttribute("sources",
@@ -457,6 +461,7 @@ public class Site2dRoutesController {
       String pcsid,
       Double xscale,
       Double yscale,
+      String options,
       List<String> sources,
       List<String> detectors,
       Integer quality_control_mode,
@@ -490,6 +495,7 @@ public class Site2dRoutesController {
     model.addAttribute("pcsid", (pcsid == null) ? "" : pcsid);
     model.addAttribute("xscale", (xscale == null)?new Double(2000.0) : xscale);
     model.addAttribute("yscale", (yscale == null)?new Double(2000.0) : yscale);
+    model.addAttribute("options", (options == null)? "" : options);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
@@ -583,6 +589,7 @@ public class Site2dRoutesController {
       String pcsid,
       Double xscale,
       Double yscale,
+      String options,
       List<String> sources,
       List<String> detectors,
       Integer quality_control_mode,
@@ -635,7 +642,7 @@ public class Site2dRoutesController {
     }
     if (emessage == null) {
       try {
-        Site2DRule rule = createRule(area, iinterval, newsources, newdetectors, iquality_control_mode, bbyscan, method, prodpar, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, pcsid, dxscale, dyscale, jsonFilter);
+        Site2DRule rule = createRule(area, iinterval, newsources, newdetectors, iquality_control_mode, bbyscan, method, prodpar, bapplygra, dZR_A, dZR_b, bignore_malfunc, bctfilter, pcsid, dxscale, dyscale, options, jsonFilter);
         RouteDefinition def = manager.create(name, author, isactive, description,
             newrecipients, rule);
         manager.updateDefinition(def);
@@ -647,7 +654,7 @@ public class Site2dRoutesController {
     }
     
     return viewShowRoute(model, name, author, active, description,
-        newrecipients,byscan, method, prodpar, area, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, sources, detectors, quality_control_mode, emessage, jsonFilter);
+        newrecipients,byscan, method, prodpar, area, interval, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, pcsid, xscale, yscale, options, sources, detectors, quality_control_mode, emessage, jsonFilter);
   }
   
   protected List<Integer> getIntervals() {
@@ -663,7 +670,7 @@ public class Site2dRoutesController {
       List<String> sources, List<String> detectors, int quality_control_mode, boolean byscan, 
       String method, String prodpar, boolean applygra, double ZR_A, double ZR_b, 
       boolean ignore_malfunc, boolean ctfilter,
-      String pcsid, double xscale, double yscale,
+      String pcsid, double xscale, double yscale, String options,
       String jsonFilter) {
     
     Site2DRule rule = (Site2DRule)manager.createRule(Site2DRule.TYPE);
@@ -683,6 +690,7 @@ public class Site2dRoutesController {
     rule.setPcsid(pcsid);
     rule.setXscale(xscale);
     rule.setYscale(yscale);
+    rule.setOptions(options);
     
     if (jsonFilter != null && !jsonFilter.equals("")) {
       try {

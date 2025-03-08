@@ -25,7 +25,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
   private static interface MethodMocker {
     public String viewCreateRoute(Model model, String name, String author,
         Boolean active, String description, List<String> recipients, Boolean byscan, String method, String prodpar, Integer selection_method,
-        String areaid, String quantity, Integer interval, Integer timeout, Boolean nominal_timeout, Boolean applygra, Double ZR_A, Double ZR_b, Boolean ignore_malfunc, Boolean ctfilter, 
+        String areaid, String quantity, Integer interval, Integer timeout, Boolean nominal_timeout, Boolean applygra, Double ZR_A, Double ZR_b, String options, Boolean ignore_malfunc, Boolean ctfilter, 
         String qitotal_field, List<String> sources, List<String> detectors, Integer quality_control_mode, Boolean reprocess_quality, String jsonFilter, String emessage);
     
     public List<String> getSources();
@@ -34,7 +34,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
 
     public CompositingRule createRule(String areaid, String quantity, int interval,
         List<String> sources, List<String> detectors, int quality_control_mode, int timeout, boolean nominal_timeout, boolean byscan, String method, String prodpar, int selection_method,
-        boolean applygra, double ZR_A, double ZR_b, boolean ignore_malfunc, boolean ctfilter, boolean reprocess_quality, String qitotalField, String jsonFilter);
+        boolean applygra, double ZR_A, double ZR_b, String options, boolean ignore_malfunc, boolean ctfilter, boolean reprocess_quality, String qitotalField, String jsonFilter);
   }
   
   private CompositeRoutesController classUnderTest = null;
@@ -61,10 +61,10 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
       protected String viewCreateRoute(Model model, String name, String author,
           Boolean active, String description, List<String> recipients, Boolean byscan, 
           String pmethod, String prodpar, Integer selection_method,
-          String areaid, String quantity, Integer interval, Integer timeout, Boolean nominal_timeout, Integer max_age_limit, Boolean applygra, Double ZR_A, Double ZR_b, Boolean ignore_malfunc, Boolean ctfilter, 
+          String areaid, String quantity, Integer interval, Integer timeout, Boolean nominal_timeout, Integer max_age_limit, Boolean applygra, Double ZR_A, Double ZR_b, String options, Boolean ignore_malfunc, Boolean ctfilter, 
           String qitotalField, List<String> sources, List<String> detectors, Integer quality_control_mode, Boolean reprocess_quality, String jsonFilter, String emessage) {
         return method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, 
-            interval, timeout, nominal_timeout, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, jsonFilter, emessage);
+            interval, timeout, nominal_timeout, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, jsonFilter, emessage);
       }
       protected List<Integer> getIntervals() {
         return method.getIntervals();
@@ -91,11 +91,11 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     adaptors.add("A");
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
     
-    expect(method.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)).andReturn("somestring");
+    expect(method.viewCreateRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)).andReturn("somestring");
 
     replayAll();
     
-    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
         null, null, null, null, null, null, null, null, null, null, null, null);
 
     verifyAll();
@@ -119,7 +119,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
 
-    expect(method.createRule("areaid", "VRAD", 30, sources, detectors, 1, 40, true, true, CompositingRule.CAPPI, "500", 0, true, 10.0, 20.0, true, true, false, "se.somewhere", filter)).andReturn(rule);
+    expect(method.createRule("areaid", "VRAD", 30, sources, detectors, 1, 40, true, true, CompositingRule.CAPPI, "500", 0, true, 10.0, 20.0, "factory:any", true, true, false, "se.somewhere", filter)).andReturn(rule);
     expect(manager.create("aname", "author", true, "a description", recipients, rule)).andReturn(def);
     manager.storeDefinition(def);
     
@@ -127,8 +127,8 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
       @Override
       protected CompositingRule createRule(String areaid, String quantity, int interval,
           List<String> sources, List<String> detectors, int quality_control_mode, int timeout, boolean nominal_timeout, boolean byscan, String pmethod, String prodpar, int selection_method,
-          int max_age_limit, boolean applygra, double ZR_A, double ZR_b, boolean ignore_malfunc, boolean ctfilter, boolean reprocess_quality, String qitotalField, String jsonFilter) {
-        return method.createRule(areaid, quantity, interval, sources, detectors, quality_control_mode, timeout, nominal_timeout, byscan, pmethod, prodpar, selection_method, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, reprocess_quality, qitotalField, jsonFilter);
+          int max_age_limit, boolean applygra, double ZR_A, double ZR_b, String options, boolean ignore_malfunc, boolean ctfilter, boolean reprocess_quality, String qitotalField, String jsonFilter) {
+        return method.createRule(areaid, quantity, interval, sources, detectors, quality_control_mode, timeout, nominal_timeout, byscan, pmethod, prodpar, selection_method, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, reprocess_quality, qitotalField, jsonFilter);
       }
     };
     classUnderTest.setAdaptorManager(adaptorManager);
@@ -137,7 +137,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.CAPPI, "500", 0, "areaid", "VRAD", 30, 40, true, -1, true, 10.0, 20.0, true, true, "se.somewhere", sources, detectors, 1, false, filter);
+    String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.CAPPI, "500", 0, "areaid", "VRAD", 30, 40, true, -1, true, 10.0, 20.0, "factory:any", true, true, "se.somewhere", sources, detectors, 1, false, filter);
     
     verifyAll();
     assertEquals("redirect:routes.htm", result);
@@ -153,7 +153,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
 
     replayAll();
 
-    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null, null, null,
+    String result = classUnderTest.createRoute(model, null, null, null, null, null, null, null, null, null, null, null, null,
         null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
     verifyAll();
@@ -182,6 +182,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     Boolean applygra = false;
     Double ZR_A = 210.0;
     Double ZR_b = 1.9;
+    String options = "factory:any";
     Boolean ignore_malfunc = false;
     Boolean ctfilter = false;
     String qitotalField = "se.somewhere";
@@ -195,11 +196,11 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     String emessage = "Name must be specified.";
     
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
-    expect(method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, filter, emessage)).andReturn("somestring");
+    expect(method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, filter, emessage)).andReturn("somestring");
     
     replayAll();
     String result = classUnderTest.createRoute(model, name, author, active, description,
-        recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, max_age_limit, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, 
+        recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, max_age_limit, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, 
         qitotalField, sources, detectors, quality_control_mode, reprocess_quality, filter);
     
     verifyAll();
@@ -229,6 +230,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     Boolean applygra = false;
     Double ZR_A = 100.0;
     Double ZR_b = 1.9;
+    String options = "factory:any";
     Boolean ignore_malfunc = true;
     Boolean ctfilter = true;
     String qitotalField = "se.somewhere";
@@ -242,11 +244,11 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
    
-    expect(method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, filter, emessage)).andReturn("somestring");
+    expect(method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, filter, emessage)).andReturn("somestring");
     
     replayAll();
     String result = classUnderTest.createRoute(model, name, author, active, description,
-        recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, max_age_limit, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, filter);
+        recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, max_age_limit, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, filter);
     
     verifyAll();
     assertEquals("somestring", result);
@@ -274,6 +276,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     Boolean applygra = false;
     Double ZR_A = 100.0;
     Double ZR_b = 1.9;
+    String options = "factory:any";
     Boolean ignore_malfunc = false;
     Boolean ctfilter = false;
     String qitotalField = "se.somewhere";
@@ -286,11 +289,11 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     String emessage = "Must specify at least one source.";
     
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
-    expect(method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, filter, emessage)).andReturn("somestring");
+    expect(method.viewCreateRoute(model, name, author, active, description, recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, filter, emessage)).andReturn("somestring");
     
     replayAll();
     String result = classUnderTest.createRoute(model, name, author, active, description,
-        recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, max_age_limit, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, filter);
+        recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout, max_age_limit, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, qitotalField, sources, detectors, quality_control_mode, reprocess_quality, filter);
     
     verifyAll();
     assertEquals("somestring", result);
@@ -313,15 +316,15 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
 
-    expect(method.createRule("areaid", "quantity", 30, sources, detectors, 1, 40, true, true, CompositingRule.PMAX, "500, 70000.0", 0, true, 10.0, 20.0, true, true, false, "se.somewhere", filter)).andReturn(rule);
+    expect(method.createRule("areaid", "quantity", 30, sources, detectors, 1, 40, true, true, CompositingRule.PMAX, "500, 70000.0", 0, true, 10.0, 20.0, "factory:any", true, true, false, "se.somewhere", filter)).andReturn(rule);
     expect(manager.create("aname", "author", true, "a description", recipients, rule)).andReturn(def);
     manager.storeDefinition(def);
     
     classUnderTest = new CompositeRoutesController() {
       @Override
       protected CompositingRule createRule(String areaid, String quantity, int interval,
-          List<String> sources, List<String> detectors, int quality_control_mode, int timeout, boolean nominal_timeout, boolean byscan, String pmethod, String prodpar, int selection_method, int max_age_limit, boolean applygra, double ZR_A, double ZR_b, boolean ignore_malfunc, boolean ctfilter, boolean reprocess_quality, String qitotalField, String jsonFilter) {
-        return method.createRule(areaid, quantity, interval, sources, detectors, quality_control_mode, timeout, nominal_timeout, byscan, pmethod, prodpar, selection_method, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, reprocess_quality, qitotalField, jsonFilter);
+          List<String> sources, List<String> detectors, int quality_control_mode, int timeout, boolean nominal_timeout, boolean byscan, String pmethod, String prodpar, int selection_method, int max_age_limit, boolean applygra, double ZR_A, double ZR_b, String options, boolean ignore_malfunc, boolean ctfilter, boolean reprocess_quality, String qitotalField, String jsonFilter) {
+        return method.createRule(areaid, quantity, interval, sources, detectors, quality_control_mode, timeout, nominal_timeout, byscan, pmethod, prodpar, selection_method, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, reprocess_quality, qitotalField, jsonFilter);
       }
     };
     classUnderTest.setAdaptorManager(adaptorManager);
@@ -330,7 +333,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.PMAX, "500, 70000.0", 0, "areaid", "quantity", 30, 40, true, -1, true, 10.0, 20.0, true, true, "se.somewhere", sources, detectors, 1, false, filter);
+    String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.PMAX, "500, 70000.0", 0, "areaid", "quantity", 30, 40, true, -1, true, 10.0, 20.0, "factory:any", true, true, "se.somewhere", sources, detectors, 1, false, filter);
     
     verifyAll();
     assertEquals("redirect:routes.htm", result);
@@ -352,15 +355,15 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     String filter = "";
     
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
-    expect(method.createRule("areaid", "quantity", 30, sources, detectors, 1, 40, true, true, CompositingRule.PMAX, "0,1", 0, true, 10.0, 20.0, true, true, false, "se.somewhere", filter)).andReturn(rule);
+    expect(method.createRule("areaid", "quantity", 30, sources, detectors, 1, 40, true, true, CompositingRule.PMAX, "0,1", 0, true, 10.0, 20.0, "factory:any", true, true, false, "se.somewhere", filter)).andReturn(rule);
     expect(manager.create("aname", "author", true, "a description", recipients, rule)).andReturn(def);
     manager.storeDefinition(def);
     
     classUnderTest = new CompositeRoutesController() {
       protected CompositingRule createRule(String areaid, String quantity, int interval,
           List<String> sources, List<String> detectors, int quality_control_mode, int timeout, boolean nominal_timeout, boolean byscan, String pmethod, String prodpar, int selection_method, 
-          int max_age_limit, boolean applygra, double ZR_A, double ZR_b, boolean ignore_malfunc, boolean ctfilter, boolean reprocess_quality, String qitotal_field, String jsonFilter) {
-        return method.createRule(areaid, quantity, interval, sources, detectors, quality_control_mode, timeout, nominal_timeout, byscan, pmethod, prodpar, selection_method, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, reprocess_quality, qitotal_field, jsonFilter);
+          int max_age_limit, boolean applygra, double ZR_A, double ZR_b, String options, boolean ignore_malfunc, boolean ctfilter, boolean reprocess_quality, String qitotal_field, String jsonFilter) {
+        return method.createRule(areaid, quantity, interval, sources, detectors, quality_control_mode, timeout, nominal_timeout, byscan, pmethod, prodpar, selection_method, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, reprocess_quality, qitotal_field, jsonFilter);
       }
     };
     classUnderTest.setAdaptorManager(adaptorManager);
@@ -369,7 +372,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.PMAX, "0,1", 0, "areaid", "quantity", 30, 40, true, -1, true, 10.0, 20.0, true, true, "se.somewhere", sources, detectors, 1, false, filter);
+    String result = classUnderTest.createRoute(model, "aname", "author", true, "a description", recipients, true, CompositingRule.PMAX, "0,1", 0, "areaid", "quantity", 30, 40, true, -1, true, 10.0, 20.0, "factory:any", true, true, "se.somewhere", sources, detectors, 1, false, filter);
     
     verifyAll();
     assertEquals("redirect:routes.htm", result);
@@ -390,10 +393,10 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     
     expect(adaptorManager.getAdaptorNames()).andReturn(adaptors);
     
-    expect(method.viewCreateRoute(model, "name", "author", true, "description", recipients, false, "pmax", ",500000", 0, "areaid", "quantity", 30, 40, true, true, 10.0, 20.0, false, false, "se.somewhere", sources, detectors, 1, false, filter, emessage)).andReturn("somestring");
+    expect(method.viewCreateRoute(model, "name", "author", true, "description", recipients, false, "pmax", ",500000", 0, "areaid", "quantity", 30, 40, true, true, 10.0, 20.0, "factory:any", false, false, "se.somewhere", sources, detectors, 1, false, filter, emessage)).andReturn("somestring");
     
     replayAll();
-    String result = classUnderTest.createRoute(model, "name", "author", true, "description", recipients, false, CompositingRule.PMAX, ",500000", 0, "areaid", "quantity", 30, 40, true, -1, true, 10.0, 20.0, false, false, "se.somewhere", sources, detectors, 1, false, filter);
+    String result = classUnderTest.createRoute(model, "name", "author", true, "description", recipients, false, CompositingRule.PMAX, ",500000", 0, "areaid", "quantity", 30, 40, true, -1, true, 10.0, 20.0, "factory:any", false, false, "se.somewhere", sources, detectors, 1, false, filter);
     
     verifyAll();
     assertEquals("somestring", result);
@@ -424,6 +427,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     Boolean applygra = true;
     Double ZR_A = 10.0;
     Double ZR_b = 1.1;
+    String options = "factory:any";
     Boolean ignore_malfunc = true;
     Boolean ctfilter = true;
     String qitotal_field = "se.somewhere";
@@ -466,6 +470,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("applygra", applygra)).andReturn(null);
     expect(model.addAttribute("ZR_A", ZR_A)).andReturn(null);
     expect(model.addAttribute("ZR_b", ZR_b)).andReturn(null);
+    expect(model.addAttribute("options", "factory:any")).andReturn(null);
     expect(model.addAttribute("ignore_malfunc", ignore_malfunc)).andReturn(null);
     expect(model.addAttribute("ctfilter", ctfilter)).andReturn(null);
     expect(model.addAttribute("qitotal_field", qitotal_field)).andReturn(null);
@@ -492,7 +497,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
         recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout,
-        max_age_limit, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotal_field, sources, detectors, quality_control_mode, reprocess_quality, filter, emessage);
+        max_age_limit, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, qitotal_field, sources, detectors, quality_control_mode, reprocess_quality, filter, emessage);
     
     verifyAll();
     
@@ -524,7 +529,8 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     Integer max_age_limit = 60;
     Boolean applygra = true;
     Double ZR_A = 10.0;
-    Double ZR_b = 1.1;    
+    Double ZR_b = 1.1;
+    String options = "factory:any";
     Boolean ignore_malfunc = true;
     Boolean ctfilter = true;
     String qitotal_field = "se.somewhere";
@@ -566,6 +572,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("applygra", applygra)).andReturn(null);
     expect(model.addAttribute("ZR_A", ZR_A)).andReturn(null);
     expect(model.addAttribute("ZR_b", ZR_b)).andReturn(null);
+    expect(model.addAttribute("options", options)).andReturn(null);
     expect(model.addAttribute("ignore_malfunc", ignore_malfunc)).andReturn(null);
     expect(model.addAttribute("ctfilter", ctfilter)).andReturn(null);
     expect(model.addAttribute("qitotal_field", qitotal_field)).andReturn(null);
@@ -592,7 +599,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     
     String result = classUnderTest.viewCreateRoute(model, name, author, active, description,
         recipients, byscan, pmethod, prodpar, selection_method, areaid, quantity, interval, timeout, nominal_timeout,
-        max_age_limit, applygra, ZR_A, ZR_b, ignore_malfunc, ctfilter, qitotal_field, sources, detectors, quality_control_mode, reprocess_quality, filter, emessage);
+        max_age_limit, applygra, ZR_A, ZR_b, options, ignore_malfunc, ctfilter, qitotal_field, sources, detectors, quality_control_mode, reprocess_quality, filter, emessage);
     
     verifyAll();
     assertEquals("route_create_composite", result);
@@ -624,6 +631,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     crule.setApplyGRA(true);
     crule.setZR_A(10.0);
     crule.setZR_b(20.0);
+    crule.setOptions("factory:any");
     crule.setIgnoreMalfunc(true);
     crule.setCtFilter(true);
     crule.setQitotalField("se.somewhere");
@@ -631,7 +639,7 @@ public class CompositeRoutesControllerTest extends EasyMockSupport {
     
     replayAll();
     
-    CompositingRule result = classUnderTest.createRule("abc", "noop", 1, sources, detectors, 1, 2, true, false, CompositingRule.CAPPI, "500.0", 0, maxAgeLimit, true, 10.0, 20.0, true, true, true, "se.somewhere", filter);
+    CompositingRule result = classUnderTest.createRule("abc", "noop", 1, sources, detectors, 1, 2, true, false, CompositingRule.CAPPI, "500.0", 0, maxAgeLimit, true, 10.0, 20.0, "factory:any", true, true, true, "se.somewhere", filter);
     
     verifyAll();
     assertSame(crule, result);
