@@ -209,7 +209,14 @@ Creates a gra route
                                 <input type="text" name="interval" value="${interval}"
                                        title="The number of hours of each term."/>
                             </div>
-                        </div>      
+                        </div>
+                        <div class="row2">
+                            <div class="leftcol">Options:</div>
+                            <div class="rightcol">
+                                <input type="text" name="options" value="${options}"
+                                       title="A comma separated list of id:value. E.g. id:1,value:2."/>
+                            </div>
+                        </div>
                         <div class="row2">
                             <div class="leftcol">Recipients:</div>
                             <div class="rightcol">

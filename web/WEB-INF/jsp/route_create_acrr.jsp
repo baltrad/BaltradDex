@@ -203,6 +203,13 @@ Creates a google map route
                             </div>
                         </div>
                         <div class="row2">
+                            <div class="leftcol">Options:</div>
+                            <div class="rightcol">
+                                <input type="text" name="options" value="${options}"
+                                       title="A comma separated list of id:value. E.g. id:1,value:2."/>
+                            </div>
+                        </div>
+                        <div class="row2">
                             <div class="leftcol">Zr A:</div>
                             <div class="rightcol">
                                 <input type="text" name="zrA" value="${zrA}"

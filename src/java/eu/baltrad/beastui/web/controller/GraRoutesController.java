@@ -121,6 +121,7 @@ public class GraRoutesController {
     @RequestParam(value = "zrB", required = false) Double zrB,
     @RequestParam(value = "firstTermUTC", required = false) Integer firstTermUTC,
     @RequestParam(value = "interval", required = false) Integer interval,
+    @RequestParam(value = "options", required = false) String options,
     @RequestParam(value = "filterJson", required=false) String filterJson) {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     String emessage = null;
@@ -134,10 +135,10 @@ public class GraRoutesController {
     if (name == null && author == null && active == null && description == null &&
         recipients == null && area == null && object_type == null && quantity == null &&
         filesPerHour == null && acceptableLoss == null && distanceField == null &&
-        zrA == null && zrB == null && firstTermUTC == null && interval == null) {
+        zrA == null && zrB == null && firstTermUTC == null && interval == null && options == null) {
       return viewCreateRoute(model, name, author, active, description,
           recipients, area, object_type, quantity, filesPerHour, acceptableLoss,
-          distanceField, zrA, zrB, firstTermUTC, interval, filterJson, null);
+          distanceField, zrA, zrB, firstTermUTC, interval, options, filterJson, null);
     }
     
     if (name == null || name.trim().equals("")) {
@@ -157,7 +158,7 @@ public class GraRoutesController {
         double dzrb = (zrB == null) ? 1.6 : zrB.doubleValue();
         int iftu = (firstTermUTC == null) ? 6 : firstTermUTC.intValue();
         int iinterval = (interval == null) ? 12 : interval.intValue();
-        GraRule rule = createRule(area, object_type, quantity, ifilesPerHour, iacceptableLoss, distanceField, dzra, dzrb, iftu, iinterval, filterJson);
+        GraRule rule = createRule(area, object_type, quantity, ifilesPerHour, iacceptableLoss, distanceField, dzra, dzrb, iftu, iinterval, options, filterJson);
         RouteDefinition def = manager.create(name, author, bactive, description, recipients, rule);
         manager.storeDefinition(def);
         return "redirect:routes.htm";
@@ -169,7 +170,7 @@ public class GraRoutesController {
     
     return viewCreateRoute(model, name, author, active, description,
         recipients, area, object_type, quantity, filesPerHour, acceptableLoss,
-        distanceField, zrA, zrB, firstTermUTC, interval, filterJson, emessage);
+        distanceField, zrA, zrB, firstTermUTC, interval, options, filterJson, emessage);
   }
   
   /**
@@ -193,6 +194,7 @@ public class GraRoutesController {
       @RequestParam(value = "zrB", required = false) Double zrB,
       @RequestParam(value = "firstTermUTC", required = false) Integer firstTermUTC,
       @RequestParam(value = "interval", required = false) Integer interval,
+      @RequestParam(value = "options", required = false) String options,
       @RequestParam(value = "filterJson", required=false) String filterJson,      
       @RequestParam(value = "submitButton", required = false) String operation) {
     logger.debug("showRoute(Model)");
@@ -204,7 +206,7 @@ public class GraRoutesController {
     
     if (operation != null && operation.equals("Save")) {
       //
-      return modifyRoute(model, name, author, active, description, recipients, area, object_type, quantity, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, filterJson);
+      return modifyRoute(model, name, author, active, description, recipients, area, object_type, quantity, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, options, filterJson);
     } else if (operation != null && operation.equals("Delete")) {
       try {
         manager.deleteDefinition(name);
@@ -226,7 +228,7 @@ public class GraRoutesController {
         return viewShowRoute(model, def.getName(), def.getAuthor(), def.isActive(), def.getDescription(),
             def.getRecipients(), vrule.getArea(), vrule.getObjectType(), vrule.getQuantity(),
             vrule.getFilesPerHour(), vrule.getAcceptableLoss(),
-            vrule.getDistancefield(), vrule.getZrA(), vrule.getZrB(), vrule.getFirstTermUTC(), vrule.getInterval(), filterstr, null); 
+            vrule.getDistancefield(), vrule.getZrA(), vrule.getZrB(), vrule.getFirstTermUTC(), vrule.getInterval(), vrule.getOptions(), filterstr, null); 
       } else {
         return viewShowRoutes(model, "Atempting to show a route definition that not is an gra rule");
       }
@@ -253,6 +255,7 @@ public class GraRoutesController {
       Double zrB,
       Integer firstTermUTC,
       Integer interval,
+      String options,
       String filterJson) {
     List<String> newrecipients = (recipients == null) ? new ArrayList<String>() : recipients;
     boolean isactive = (active != null) ? active.booleanValue() : false;
@@ -263,7 +266,7 @@ public class GraRoutesController {
     } 
     if (emessage == null) {
       try {
-        GraRule rule = createRule(area, object_type, quantity, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, filterJson);
+        GraRule rule = createRule(area, object_type, quantity, filesPerHour, acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, options, filterJson);
         RouteDefinition def = manager.create(name, author, isactive, description, newrecipients, rule);
         manager.updateDefinition(def);
         return "redirect:routes.htm";
@@ -275,7 +278,7 @@ public class GraRoutesController {
     return viewShowRoute(model, name, author, isactive, description,
         newrecipients, area, object_type, quantity,
         filesPerHour, acceptableLoss,
-        distanceField, zrA, zrB, firstTermUTC, interval, filterJson, emessage); 
+        distanceField, zrA, zrB, firstTermUTC, interval, options, filterJson, emessage); 
   }
   
   /**
@@ -297,11 +300,12 @@ public class GraRoutesController {
       Double zrB,
       Integer firstTermUTC,
       Integer interval,
+      String options,
       String jsonFilter,
       String emessage) {
     return viewRoute(model, name, author, active, description,
         recipients, area, object_type, quantity, filesPerHour,
-        acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, jsonFilter, emessage, "route_create_gra");
+        acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, options, jsonFilter, emessage, "route_create_gra");
   }
 
   /**
@@ -323,11 +327,12 @@ public class GraRoutesController {
       Double zrB,
       Integer firstTermUTC,
       Integer interval,
+      String options,
       String jsonFilter,
       String emessage) {
     return viewRoute(model, name, author, active, description,
         recipients, area, object_type, quantity, filesPerHour,
-        acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, jsonFilter, emessage, "route_show_gra");
+        acceptableLoss, distanceField, zrA, zrB, firstTermUTC, interval, options, jsonFilter, emessage, "route_show_gra");
   }
   
   /**
@@ -349,6 +354,7 @@ public class GraRoutesController {
       Double zrB,
       Integer firstTermUTC,
       Integer interval,
+      String options,
       String jsonFilter,
       String emessage,
       String jsppagename) {
@@ -376,6 +382,7 @@ public class GraRoutesController {
     model.addAttribute("zrB", (zrB == null) ? 1.6 : zrB);
     model.addAttribute("firstTermUTC", (firstTermUTC == null) ? 6 : firstTermUTC);
     model.addAttribute("interval", (interval == null) ? 12 : interval);
+    model.addAttribute("options", (options == null)? "" : options);
     model.addAttribute("filterJson", jsonFilter);
     
     logger.info("jsonFilter: " + jsonFilter);
@@ -418,6 +425,7 @@ public class GraRoutesController {
       double zrB,
       int firstTermUTC,
       int interval,
+      String options,
       String jsonFilter) {
     GraRule rule = (GraRule)manager.createRule(GraRule.TYPE);
     rule.setArea(area);
@@ -430,6 +438,7 @@ public class GraRoutesController {
     rule.setZrB(zrB);
     rule.setFirstTermUTC(firstTermUTC);
     rule.setInterval(interval);
+    rule.setOptions(options);
     if (jsonFilter != null && !jsonFilter.equals("")) {
       try {
         rule.setFilter(jsonMapper.readValue(jsonFilter, IFilter.class));

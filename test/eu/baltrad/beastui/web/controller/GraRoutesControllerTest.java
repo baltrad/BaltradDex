@@ -40,12 +40,13 @@ public class GraRoutesControllerTest extends EasyMockSupport {
     rule.setZrB(0.5);
     rule.setFirstTermUTC(6);
     rule.setInterval(12);
+    rule.setOptions("gra_id:123");
     
     expect(manager.createRule("blt_gra")).andReturn(rule);
     
     replayAll();
     
-    GraRule result = classUnderTest.createRule("nrd_swe", "IMAGE", "DBZH", 4, 1, "eu.x.y", 100.0, 0.5, 6, 12, null);
+    GraRule result = classUnderTest.createRule("nrd_swe", "IMAGE", "DBZH", 4, 1, "eu.x.y", 100.0, 0.5, 6, 12, "gra_id:123", null);
     
     verifyAll();
     assertNotNull(result);
