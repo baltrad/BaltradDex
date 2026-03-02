@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['running_20baltraddex_0',['Running BaltradDex',['../running.html',1,'']]]
+  ['general_20information_0',['General information',['../format.html#exchange_general',1,'']]],
+  ['generating_20documentation_1',['Generating documentation',['../intro.html#gendocs',1,'']]]
 ];

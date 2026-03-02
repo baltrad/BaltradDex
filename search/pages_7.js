@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['supervisor_0',['Supervisor',['../supervisor.html',1,'']]],
-  ['support_20and_20feedback_1',['Support and feedback',['../support.html',1,'']]]
+  ['header_0',['Authentication header',['../format.html#exchange_hdr',1,'']]]
 ];

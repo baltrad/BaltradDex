@@ -51,7 +51,7 @@ var NAVTREE =
         [ "Add logrotate on the tomcat logs", "install.html#prep_tomcat_logrotate", null ],
         [ "Configure application context", "install.html#prep_app_context", null ]
       ] ],
-      [ "Build & install BaltradDex", "install.html#build_dex", null ],
+      [ "Build &amp; install BaltradDex", "install.html#build_dex", null ],
       [ "Testing", "install.html#test_dex", null ]
     ] ],
     [ "Introduction", "intro.html", [
@@ -143,3 +143,4 @@ var NAVTREEINDEX =
 
 var SYNCONMSG = 'click to disable panel synchronization';
 var SYNCOFFMSG = 'click to enable panel synchronization';
+var LISTOFALLMEMBERS = 'List of all members';

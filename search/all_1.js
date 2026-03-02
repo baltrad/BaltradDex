@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['baltraddex_0',['BaltradDex',['../install.html#build_dex',1,'Build &amp; install BaltradDex'],['../running.html',1,'Running BaltradDex'],['../running.html#start',1,'Starting BaltradDex']]],
+  ['baltraddex_0',['BaltradDex',['../install.html#build_dex',1,'Build &amp;amp; install BaltradDex'],['../running.html',1,'Running BaltradDex'],['../running.html#start',1,'Starting BaltradDex']]],
   ['baltraddex_20documentation_1',['BaltradDex documentation',['../index.html',1,'']]],
   ['baltraduserauthoritiespopulator_2',['BaltradUserAuthoritiesPopulator',['../classeu_1_1baltrad_1_1dex_1_1auth_1_1ldap_1_1BaltradUserAuthoritiesPopulator.html',1,'eu::baltrad::dex::auth::ldap']]],
   ['baltraduserdetailscontextmapper_3',['BaltradUserDetailsContextMapper',['../classeu_1_1baltrad_1_1dex_1_1auth_1_1ldap_1_1BaltradUserDetailsContextMapper.html',1,'eu::baltrad::dex::auth::ldap']]],
@@ -24,5 +24,5 @@ var searchData=
   ['bltqueryparameter_21',['BltQueryParameter',['../classeu_1_1baltrad_1_1dex_1_1db_1_1model_1_1BltQueryParameter.html',1,'eu.baltrad.dex.db.model.BltQueryParameter'],['../classeu_1_1baltrad_1_1dex_1_1db_1_1model_1_1BltQueryParameter.html#aa9ec87038e22fd7300338d59f2b33447',1,'eu.baltrad.dex.db.model.BltQueryParameter.BltQueryParameter()']]],
   ['browsemessagescontroller_22',['BrowseMessagesController',['../classeu_1_1baltrad_1_1dex_1_1log_1_1controller_1_1BrowseMessagesController.html',1,'eu::baltrad::dex::log::controller']]],
   ['browsing_20and_20access_23',['Data browsing and access',['../running.html#data_browse',1,'']]],
-  ['build_20install_20baltraddex_24',['Build &amp; install BaltradDex',['../install.html#build_dex',1,'']]]
+  ['build_20install_20baltraddex_24',['Build &amp;amp; install BaltradDex',['../install.html#build_dex',1,'']]]
 ];

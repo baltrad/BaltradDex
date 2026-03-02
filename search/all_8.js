@@ -23,7 +23,7 @@ var searchData=
   ['inoderequest_20',['INodeRequest',['../interfaceeu_1_1baltrad_1_1dex_1_1net_1_1request_1_1INodeRequest.html',1,'eu::baltrad::dex::net::request']]],
   ['inoderesponse_21',['INodeResponse',['../interfaceeu_1_1baltrad_1_1dex_1_1net_1_1response_1_1INodeResponse.html',1,'eu::baltrad::dex::net::response']]],
   ['inodestatusmanager_22',['INodeStatusManager',['../interfaceeu_1_1baltrad_1_1dex_1_1status_1_1manager_1_1INodeStatusManager.html',1,'eu::baltrad::dex::status::manager']]],
-  ['install_20baltraddex_23',['Build &amp; install BaltradDex',['../install.html#build_dex',1,'']]],
+  ['install_20baltraddex_23',['Build &amp;amp; install BaltradDex',['../install.html#build_dex',1,'']]],
   ['installation_24',['Installation',['../install.html',1,'']]],
   ['interface_25',['Query interface',['../supervisor.html#supervisor_qinterface',1,'']]],
   ['internalcontrollerexception_26',['InternalControllerException',['../classeu_1_1baltrad_1_1dex_1_1net_1_1controller_1_1exception_1_1InternalControllerException.html',1,'eu::baltrad::dex::net::controller::exception']]],
