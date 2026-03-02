@@ -449,7 +449,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 	<mkdir dir="${dist.dir}/junit-reports" />
 	<junit dir="${build.test.dir}" showoutput="true" forkmode="perBatch" 
                printsummary="no" >
-	  <jvmarg line="-Djava.awt.headless=true -Xmx512m -XX:MaxPermSize=512m"/>
+	  <jvmarg line="-Djava.awt.headless=true -Xmx512m -XX:MaxMetaspaceSize=512m"/>
 	  <formatter type="xml"/> 
 	  <formatter type="brief" usefile="false" if="test.format.brief" />
 	  <classpath refid="test.lib.path"/>
@@ -536,7 +536,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <mkdir dir="${dist.dir}/junit-reports" />
     <junit dir="${build.itest.dir}" showoutput="true" forkmode="perBatch" 
            printsummary="no" >
-      <jvmarg line="-Djava.awt.headless=true -Xmx512m -XX:MaxPermSize=512m"/>
+      <jvmarg line="-Djava.awt.headless=true -Xmx512m -XX:MaxMetaspaceSize=512m"/>
       <formatter type="xml"/> 
       <formatter type="brief" usefile="false" if="test.format.brief" />
       <classpath refid="test.lib.path"/>
