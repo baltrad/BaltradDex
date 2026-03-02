@@ -69,10 +69,8 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("routes", definitions)).andReturn(null);
     expect(httpSession.getAttribute(ShowRoutesController.ROUTES_COMPARATORS_ATTR)).andReturn(null);
     
-    Capture<ArrayList<RouteComparator>> capturedComparators = 
-        new Capture<ArrayList<RouteComparator>>();
-    Capture<String> capturedString = 
-        new Capture<String>();
+    Capture<ArrayList<RouteComparator>> capturedComparators = EasyMock.newCapture();
+    Capture<String> capturedString = EasyMock.newCapture();
     httpSession.setAttribute(EasyMock.capture(capturedString), 
                              EasyMock.capture(capturedComparators));
 
@@ -106,10 +104,8 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("routes", definitions)).andReturn(null);
     expect(httpSession.getAttribute(ShowRoutesController.ROUTES_COMPARATORS_ATTR)).andReturn(storedSorting);
     
-    Capture<ArrayList<RouteComparator>> capturedComparators = 
-        new Capture<ArrayList<RouteComparator>>();
-    Capture<String> capturedString = 
-        new Capture<String>();
+    Capture<ArrayList<RouteComparator>> capturedComparators = EasyMock.newCapture();
+    Capture<String> capturedString = EasyMock.newCapture();
     httpSession.setAttribute(EasyMock.capture(capturedString), 
                              EasyMock.capture(capturedComparators));
 
@@ -133,10 +129,8 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("routes", definitions)).andReturn(null);
     expect(httpSession.getAttribute(ShowRoutesController.ROUTES_COMPARATORS_ATTR)).andReturn(null);
     
-    Capture<ArrayList<RouteComparator>> capturedComparators = 
-        new Capture<ArrayList<RouteComparator>>();
-    Capture<String> capturedString = 
-        new Capture<String>();
+    Capture<ArrayList<RouteComparator>> capturedComparators = EasyMock.newCapture();
+    Capture<String> capturedString = EasyMock.newCapture();
     httpSession.setAttribute(EasyMock.capture(capturedString), 
                              EasyMock.capture(capturedComparators));
 
@@ -165,10 +159,8 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("routes", definitions)).andReturn(null);
     expect(httpSession.getAttribute(ShowRoutesController.ROUTES_COMPARATORS_ATTR)).andReturn(null);
     
-    Capture<ArrayList<RouteComparator>> capturedComparators = 
-        new Capture<ArrayList<RouteComparator>>();
-    Capture<String> capturedString = 
-        new Capture<String>();
+    Capture<ArrayList<RouteComparator>> capturedComparators = EasyMock.newCapture();
+    Capture<String> capturedString = EasyMock.newCapture();
     httpSession.setAttribute(EasyMock.capture(capturedString), 
                              EasyMock.capture(capturedComparators));
 
@@ -197,10 +189,8 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("routes", definitions)).andReturn(null);
     expect(httpSession.getAttribute(ShowRoutesController.ROUTES_COMPARATORS_ATTR)).andReturn(null);
     
-    Capture<ArrayList<RouteComparator>> capturedComparators = 
-        new Capture<ArrayList<RouteComparator>>();
-    Capture<String> capturedString = 
-        new Capture<String>();
+    Capture<ArrayList<RouteComparator>> capturedComparators = EasyMock.newCapture();
+    Capture<String> capturedString = EasyMock.newCapture();
     httpSession.setAttribute(EasyMock.capture(capturedString), 
                              EasyMock.capture(capturedComparators));
 
@@ -229,10 +219,8 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     expect(model.addAttribute("routes", definitions)).andReturn(null);
     expect(httpSession.getAttribute(ShowRoutesController.ROUTES_COMPARATORS_ATTR)).andReturn(null);
     
-    Capture<ArrayList<RouteComparator>> capturedComparators = 
-        new Capture<ArrayList<RouteComparator>>();
-    Capture<String> capturedString = 
-        new Capture<String>();
+    Capture<ArrayList<RouteComparator>> capturedComparators = EasyMock.newCapture();
+    Capture<String> capturedString = EasyMock.newCapture();
     httpSession.setAttribute(EasyMock.capture(capturedString), 
                              EasyMock.capture(capturedComparators));
 
@@ -278,18 +266,14 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     expect(manager.getDefinitions()).andReturn(definitions);
     expect(httpSession.getAttribute(ShowRoutesController.ROUTES_COMPARATORS_ATTR)).andReturn(null);
     
-    Capture<List<RouteDefinition>> capturedDefinitions = 
-        new Capture<List<RouteDefinition>>();
-    Capture<String> capturedAddString = 
-        new Capture<String>();
+    Capture<List<RouteDefinition>> capturedDefinitions = EasyMock.newCapture();
+    Capture<String> capturedAddString = EasyMock.newCapture();
     model.addAttribute(EasyMock.capture(capturedAddString), 
                        EasyMock.capture(capturedDefinitions));
     expectLastCall().andReturn(null);
     
-    Capture<ArrayList<RouteComparator>> capturedComparators = 
-        new Capture<ArrayList<RouteComparator>>();
-    Capture<String> capturedSetString = 
-        new Capture<String>();
+    Capture<ArrayList<RouteComparator>> capturedComparators = EasyMock.newCapture();
+    Capture<String> capturedSetString = EasyMock.newCapture();
     httpSession.setAttribute(EasyMock.capture(capturedSetString), 
                              EasyMock.capture(capturedComparators));
 
@@ -331,18 +315,14 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     expect(manager.getDefinitions()).andReturn(definitions);
     expect(httpSession.getAttribute(ShowRoutesController.ROUTES_COMPARATORS_ATTR)).andReturn(null);
     
-    Capture<List<RouteDefinition>> capturedDefinitions = 
-        new Capture<List<RouteDefinition>>();
-    Capture<String> capturedAddString = 
-        new Capture<String>();
+    Capture<List<RouteDefinition>> capturedDefinitions = EasyMock.newCapture();
+    Capture<String> capturedAddString = EasyMock.newCapture();
     model.addAttribute(EasyMock.capture(capturedAddString), 
                        EasyMock.capture(capturedDefinitions));
     expectLastCall().andReturn(null);
     
-    Capture<ArrayList<RouteComparator>> capturedComparators = 
-        new Capture<ArrayList<RouteComparator>>();
-    Capture<String> capturedSetString = 
-        new Capture<String>();
+    Capture<ArrayList<RouteComparator>> capturedComparators = EasyMock.newCapture();
+    Capture<String> capturedSetString = EasyMock.newCapture();
     httpSession.setAttribute(EasyMock.capture(capturedSetString), 
                              EasyMock.capture(capturedComparators));
 
