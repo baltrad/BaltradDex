@@ -32,7 +32,7 @@ Author     : anders
                 <div class="header-text">
                     Update an authorization entry.  
                 </div>
-                <form method="POST" commandName="update_authorization" action="authorization_entry.htm">
+                <form method="POST" modelAttribute="update_authorization" action="authorization_entry.htm">
                     <t:message_box msgHeader="Success."
                                    msgBody="${success_message}"
                                    errorHeader="Problems encountered."

@@ -2,6 +2,8 @@ package eu.baltrad.dex.net.protocol.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -11,10 +13,11 @@ import java.util.Set;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.StringEntity;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -127,7 +130,7 @@ public class ProtocolVersionRequestFactory implements RequestFactory {
   public HttpUriRequest createPostFileRequest(User user, byte[] fileContent) {
     HttpPost httpPost = createHttpPostBase("post_file.htm", user.getName(), "application/x-hdf5");
     httpPost.setEntity(createByteArrayEntity(fileContent));
-    httpPost.addHeader("Content-MD5", Base64.encodeBase64String(httpPost.getURI().toString().getBytes()));
+    httpPost.addHeader("Content-MD5", Base64.encodeBase64String(httpPost.getRequestUri().toString().getBytes()));
     return httpPost;
   }
 
@@ -177,20 +180,19 @@ public class ProtocolVersionRequestFactory implements RequestFactory {
    */
   protected StringEntity createStringEntity(String str, String encoding) {
     try {
-      return new StringEntity(str, encoding);
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException("Unknown encoding");
+      return new StringEntity(str, Charset.forName(encoding));
+    } catch (Exception e) {
+      throw new RuntimeException("Unknown encoding", e);
     }
   }
   
   /**
-   * Creates a string entity for use in a http post
-   * @param str the string to be wrapped in the string entity
-   * @param encoding the encoding string
-   * @return the string entity
+   * Creates a byte array entity for use in a http post
+   * @param arr the byte array to be wrapped in the byte array entity
+   * @return the byte array entity
    */
   protected ByteArrayEntity createByteArrayEntity(byte[] arr) {
-    return new ByteArrayEntity(arr);
+    return new ByteArrayEntity(arr, ContentType.APPLICATION_OCTET_STREAM);
   }
   
   /**

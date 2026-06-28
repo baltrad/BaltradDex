@@ -28,11 +28,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.keyczar.exceptions.KeyczarException;
@@ -217,7 +217,7 @@ public class DataSourceListController {
                       messageHelper.setErrorDetailsMessage(model, 
                           DS_SEND_KEY_SERVER_REDIRECT_KEY,
                           "",
-                          extractBaseUrlFromRedirect(urlInput, req.getURI().toString(), parser.getRedirectURL()));
+                          extractBaseUrlFromRedirect(urlInput, req.getUri().toString(), parser.getRedirectURL()));
                     } else {
                       if (parser.getStatusCode() == HttpServletResponse.SC_OK) {
                         messageHelper.setSuccessMessage(model, DS_SEND_KEY_SERVER_MSG_KEY);
@@ -333,7 +333,7 @@ public class DataSourceListController {
         logger.debug("Got a response message of version " + parser.getProtocolVersion());
         logger.debug("Answering node supports version " + parser.getConfiguredProtocolVersion());
         if (parser.isRedirected()) {
-          String redirectedAddress = extractBaseUrlFromRedirect(url, req.getURI().toString(), parser.getRedirectURL());
+          String redirectedAddress = extractBaseUrlFromRedirect(url, req.getUri().toString(), parser.getRedirectURL());
           messageHelper.setErrorDetailsMessage(model, 
               DS_CONNECTION_SERVER_REDIRECT_KEY,
               "",

@@ -11,10 +11,10 @@ import java.util.Set;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.StringEntity;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;
@@ -131,11 +131,11 @@ public class ProtocolVersionRequestFactoryTest extends EasyMockSupport {
     User usr = new User("abc", "secret");
     HttpPost post = createMock(HttpPost.class);
     byte[] arr = new byte[0];
-    ByteArrayEntity entity = new ByteArrayEntity(arr);
+    ByteArrayEntity entity = new ByteArrayEntity(arr, org.apache.hc.core5.http.ContentType.DEFAULT_BINARY);
     expect(methods.createHttpPostBase("post_file.htm", "abc", "application/x-hdf5")).andReturn(post);
     expect(methods.createByteArrayEntity(arr)).andReturn(entity);
     post.setEntity(entity);
-    expect(post.getURI()).andReturn(URI.create("http://127.0.0.1:8080/BaltradDex/post_file.htm"));
+    expect(post.getRequestUri()).andReturn("http://127.0.0.1:8080/BaltradDex/post_file.htm");
     post.addHeader("Content-MD5", Base64.encodeBase64String("http://127.0.0.1:8080/BaltradDex/post_file.htm".getBytes()));
     
     replayAll();
@@ -171,7 +171,7 @@ public class ProtocolVersionRequestFactoryTest extends EasyMockSupport {
     User usr = new User("abc", "secret");
     HttpPost post = createMock(HttpPost.class);
     byte[] arr = new byte[0];
-    ByteArrayEntity entity = new ByteArrayEntity(arr);
+    ByteArrayEntity entity = new ByteArrayEntity(arr, org.apache.hc.core5.http.ContentType.DEFAULT_BINARY);
     expect(methods.createHttpPostBase("post_key.htm", "abc", "application/zip")).andReturn(post);
     expect(methods.createByteArrayEntity(arr)).andReturn(entity);
     post.setEntity(entity);
@@ -190,7 +190,7 @@ public class ProtocolVersionRequestFactoryTest extends EasyMockSupport {
   public void createHttpPostBase() throws Exception {
     classUnderTest = new ProtocolVersionRequestFactory(URI.create("http://127.0.0.1:8080"));
     HttpPost post = classUnderTest.createHttpPostBase("start_somthing.htm", "myname", "app/text");
-    assertEquals("http://127.0.0.1:8080/BaltradDex/start_somthing.htm", post.getURI().toString());
+    assertEquals("http://127.0.0.1:8080/BaltradDex/start_somthing.htm", post.getUri().toString());
     assertEquals("myname", post.getHeaders("Node-Name")[0].getValue());
     assertEquals("app/text", post.getHeaders("Content-Type")[0].getValue());
     assertEquals("2.0", post.getHeaders("DEX-Protocol-Version")[0].getValue());

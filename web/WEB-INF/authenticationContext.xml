@@ -3,21 +3,23 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/security
-        http://www.springframework.org/schema/security/spring-security-3.2.xsd" 
+        http://www.springframework.org/schema/security/spring-security.xsd"
         xmlns:aop="http://www.springframework.org/schema/aop">
-    <security:global-method-security secured-annotations="enabled" pre-post-annotations="enabled"/>
+    <security:method-security secured-enabled="true" pre-post-enabled="true"/>
     <security:authentication-manager>
       <security:authentication-provider user-service-ref="simpleUserDetailsService">
-        <security:password-encoder hash="md5"/>
+        <security:password-encoder ref="md5PasswordEncoder"/>
       </security:authentication-provider>
     </security:authentication-manager>
-      
-    
-    <beans:bean id="simpleUserDetailsService" 
+
+    <beans:bean id="md5PasswordEncoder"
+                class="eu.baltrad.dex.auth.util.Md5PasswordEncoder"/>
+
+    <beans:bean id="simpleUserDetailsService"
                 class="eu.baltrad.dex.auth.util.SimpleUserDetailsService"
-                autowire="byType">          
+                autowire="byType">
     </beans:bean>
-              
+
 </beans:beans>

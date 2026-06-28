@@ -41,6 +41,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.*;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.PlatformTransactionManager;
+
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -322,7 +324,7 @@ public class SaveDataSourceControllerTest {
         classUnderTest.setRadarsAvailable(radars);
         
         String viewName = classUnderTest
-                .processSubmit(dataSource, result, model, request);
+                .processSubmit(dataSource, result, model, (HttpServletRequest) request);
         
         assertEquals("datasources_save", viewName);
         assertEquals(1, classUnderTest.getRadarsAvailable().size());
@@ -355,7 +357,7 @@ public class SaveDataSourceControllerTest {
         classUnderTest.setRadarsSelected(radarsSel);
         
         String viewName = classUnderTest
-                .processSubmit(dataSource, result, model, request);
+                .processSubmit(dataSource, result, model, (HttpServletRequest) request);
         
         assertEquals("datasources_save", viewName);
         assertEquals(2, classUnderTest.getRadarsAvailable().size());
@@ -381,7 +383,7 @@ public class SaveDataSourceControllerTest {
         classUnderTest.setFileObjectsAvailable(fileObjects);
         
         String viewName = classUnderTest
-                .processSubmit(dataSource, result, model, request);
+                .processSubmit(dataSource, result, model, (HttpServletRequest) request);
         
         assertEquals("datasources_save", viewName);
         assertEquals(1, classUnderTest.getFileObjectsAvailable().size());
@@ -416,7 +418,7 @@ public class SaveDataSourceControllerTest {
         classUnderTest.setFileObjectsSelected(fileObjectsSel);
         
         String viewName = classUnderTest
-                .processSubmit(dataSource, result, model, request);
+                .processSubmit(dataSource, result, model, (HttpServletRequest) request);
         
         assertEquals("datasources_save", viewName);
         assertEquals(3, classUnderTest.getFileObjectsAvailable().size());
@@ -441,7 +443,7 @@ public class SaveDataSourceControllerTest {
         classUnderTest.setUsersAvailable(users);
         
         String viewName = classUnderTest
-                .processSubmit(dataSource, result, model, request);
+                .processSubmit(dataSource, result, model, (HttpServletRequest) request);
         
         assertEquals("datasources_save", viewName);
         assertEquals(0, classUnderTest.getUsersAvailable().size());
@@ -474,7 +476,7 @@ public class SaveDataSourceControllerTest {
         classUnderTest.setUsersSelected(usersSel);
         
         String viewName = classUnderTest
-                .processSubmit(dataSource, result, model, request);
+                .processSubmit(dataSource, result, model, (HttpServletRequest) request);
         
         assertEquals("datasources_save", viewName);
         assertEquals(2, classUnderTest.getUsersAvailable().size());
@@ -491,7 +493,7 @@ public class SaveDataSourceControllerTest {
         
         DataSource ds = null;
         String viewName = classUnderTest.processSubmit(ds, result, 
-                model, request);
+                model, (HttpServletRequest) request);
         
         assertEquals("datasources_save", viewName);
     }
@@ -508,7 +510,7 @@ public class SaveDataSourceControllerTest {
         model.addAttribute("data_source", ds);
         
         String viewName = classUnderTest
-                .processSubmit(ds, result, model, request);
+                .processSubmit(ds, result, model, (HttpServletRequest) request);
         FieldError error = result.getFieldError("name");
         
         assertTrue(result.hasFieldErrors());
@@ -530,7 +532,7 @@ public class SaveDataSourceControllerTest {
         model.addAttribute("data_source", ds);
         
         String viewName = classUnderTest
-                .processSubmit(ds, result, model, request);
+                .processSubmit(ds, result, model, (HttpServletRequest) request);
         
         FieldError error = result.getFieldError("description");
         
@@ -554,7 +556,7 @@ public class SaveDataSourceControllerTest {
         model.addAttribute("data_source", ds);
         
         String viewName = classUnderTest
-                .processSubmit(ds, result, model, request);
+                .processSubmit(ds, result, model, (HttpServletRequest) request);
         
         assertNotNull(request.getSession().getAttribute("missing_radar_error"));
         assertEquals(messages.getMessage("savedatasource.missing.radar"),
@@ -596,7 +598,7 @@ public class SaveDataSourceControllerTest {
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         
         String viewName = classUnderTest
-                .processSubmit(ds, result, model, request);
+                .processSubmit(ds, result, model, (HttpServletRequest) request);
         
         assertEquals("datasources_save_status", viewName);
         assertTrue(model.containsAttribute("datasource_save_error"));
@@ -634,7 +636,7 @@ public class SaveDataSourceControllerTest {
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         
         String viewName = classUnderTest
-                .processSubmit(ds, result, model, request);
+                .processSubmit(ds, result, model, (HttpServletRequest) request);
         
         assertEquals("datasources_save_status", viewName);
         assertTrue(model.containsAttribute("datasource_save_error"));
@@ -675,7 +677,7 @@ public class SaveDataSourceControllerTest {
         classUnderTest.setDataSourceManager(dataSourceManagerMock);
         
         String viewName = classUnderTest
-                .processSubmit(ds, result, model, request);
+                .processSubmit(ds, result, model, (HttpServletRequest) request);
         
         assertEquals("datasources_save_status", viewName);
     }

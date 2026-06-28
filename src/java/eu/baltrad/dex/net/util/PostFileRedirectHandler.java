@@ -19,10 +19,10 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 
 package eu.baltrad.dex.net.util;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -61,8 +61,8 @@ public class PostFileRedirectHandler {
    * @return true if this class can handle the response
    */
   public boolean canHandle(HttpResponse response) {
-    return (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_MOVED_PERMANENTLY ||
-            response.getStatusLine().getStatusCode() == HttpServletResponse.SC_MOVED_TEMPORARILY);
+    return (response.getCode() == HttpServletResponse.SC_MOVED_PERMANENTLY ||
+            response.getCode() == HttpServletResponse.SC_MOVED_TEMPORARILY);
   }
   
   /**
@@ -76,7 +76,7 @@ public class PostFileRedirectHandler {
   public HttpResponse handle(IHttpClientUtil client, HttpUriRequest request, HttpResponse response) throws Exception {
     ResponseParser parser = protocolManager.createParser(response);
     if (parser.isRedirected()) {
-      String redirectURL = extractBaseUrlFromRedirect(peerUser.getNodeAddress(), request.getURI().toString(), parser.getRedirectURL());
+      String redirectURL = extractBaseUrlFromRedirect(peerUser.getNodeAddress(), request.getUri().toString(), parser.getRedirectURL());
       if (peerUser.getRedirectedAddress() == null) {
           peerUser.setRedirectedAddress(redirectURL);
           userManager.update(peerUser);

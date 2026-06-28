@@ -102,7 +102,7 @@ public class BdbTrimCountRoutesController {
 
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
-    model.addAttribute("active", (active == null) ? new Boolean(true) : active);
+    model.addAttribute("active", (active == null) ? Boolean.valueOf(true) : active);
     model.addAttribute("description", (description == null) ? "" : description);
     model.addAttribute("countLimit", (countLimit == null) ? 0 : countLimit);
     if (emessage != null) {

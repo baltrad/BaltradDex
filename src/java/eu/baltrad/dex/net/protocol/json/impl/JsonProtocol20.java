@@ -25,12 +25,12 @@ import java.util.Set;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.annotate.JsonFilter;
-import org.codehaus.jackson.map.ser.FilterProvider;
-import org.codehaus.jackson.map.ser.impl.SimpleBeanPropertyFilter;
-import org.codehaus.jackson.map.ser.impl.SimpleFilterProvider;
-import org.codehaus.jackson.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
@@ -60,7 +60,7 @@ public class JsonProtocol20 implements JsonProtocol {
   }
   
   public JsonProtocol20() {
-    mapper.getSerializationConfig().addMixInAnnotations(Object.class, PropertyFilterMixIn.class);
+    mapper.addMixIn(Object.class, PropertyFilterMixIn.class);
     String[] ignorableFieldNames = { "source", "fileObject" };
     dataSourcefilter = new SimpleFilterProvider().addFilter("filter properties by name",   
         SimpleBeanPropertyFilter.serializeAllExcept(ignorableFieldNames));
@@ -73,7 +73,7 @@ public class JsonProtocol20 implements JsonProtocol {
   @Override
   public String userAccountToJson(User user) {
     try {
-      return mapper.writer().withFilters(userFilter).writeValueAsString(user);
+      return mapper.writer().with(userFilter).writeValueAsString(user);
     } catch (Exception e) {
       throw new RuntimeException("Failed to create json string from user account", e);
     }
@@ -91,7 +91,7 @@ public class JsonProtocol20 implements JsonProtocol {
   @Override
   public String dataSourcesToJson(Set<DataSource> dataSources) {
     try {
-      return mapper.writer().withFilters(dataSourcefilter).writeValueAsString(dataSources);
+      return mapper.writer().with(dataSourcefilter).writeValueAsString(dataSources);
     } catch (Exception e) {
       throw new RuntimeException("Failed to create json string from data sources", e);
     }
@@ -109,7 +109,7 @@ public class JsonProtocol20 implements JsonProtocol {
   @Override
   public String subscriptionsToJson(List<Subscription> subscriptions) {
     try {
-      return mapper.writer().withFilters(subscriptionFilter).writeValueAsString(subscriptions);
+      return mapper.writer().with(subscriptionFilter).writeValueAsString(subscriptions);
     } catch (Exception e) {
       throw new RuntimeException("Failed to create json string from subscriptions", e);
     }

@@ -21,9 +21,9 @@ package eu.baltrad.dex.net.protocol.impl;
 
 import java.net.URI;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
-import org.apache.http.HttpResponse;
+import org.apache.hc.core5.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import eu.baltrad.beast.parser.IXmlMessageParser;

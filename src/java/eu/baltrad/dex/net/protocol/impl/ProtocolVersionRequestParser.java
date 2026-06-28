@@ -24,9 +24,9 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.LogManager;
@@ -105,7 +105,7 @@ public class ProtocolVersionRequestParser implements RequestParser {
   }
 
   /**
-   * @see eu.baltrad.dex.net.protocol.RequestParser#getWriter(javax.servlet.http.HttpServletResponse)
+   * @see eu.baltrad.dex.net.protocol.RequestParser#getWriter(jakarta.servlet.http.HttpServletResponse)
    */
   @Override
   public ResponseWriter getWriter(HttpServletResponse response) {

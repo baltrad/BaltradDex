@@ -34,7 +34,7 @@ Author     : szewczenko
                     Messages settings allow to keep the size of the system log
                     under control. Click <i>Save</i> to store settings. 
                 </div>
-                <form:form method="POST" commandName="config">
+                <form:form method="POST" modelAttribute="config">
                     <t:message_box msgHeader="Success."
                                msgBody="${messages_conf_success}"
                                errorHeader="Problems encountered."

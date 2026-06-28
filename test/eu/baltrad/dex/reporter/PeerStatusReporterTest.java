@@ -100,7 +100,7 @@ public class PeerStatusReporterTest  extends EasyMockSupport {
   @Test
   public void test_getMappedStatus_allNodes_10minutesBackInTime() {
     Map<String, Object> request = new HashMap<String,Object>();
-    request.put("minutes", new Integer(10));
+    request.put("minutes", Integer.valueOf(10));
     List<String> peers = new ArrayList<String>();
     peers.add("n1"); 
     peers.add("n2");

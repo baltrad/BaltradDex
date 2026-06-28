@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -380,34 +380,34 @@ public class CompositeRoutesController {
     model.addAttribute("anomaly_detectors", createOrderedDetectorList(anomalymanager.list(), detectors));
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
-    model.addAttribute("active", (active == null) ? new Boolean(true) : active);
-    model.addAttribute("byscan", (byscan == null) ? new Boolean(false) : byscan);
+    model.addAttribute("active", (active == null) ? Boolean.valueOf(true) : active);
+    model.addAttribute("byscan", (byscan == null) ? Boolean.valueOf(false) : byscan);
     model.addAttribute("method", (method == null) ? CompositingRule.PCAPPI : method);
     model.addAttribute("prodpar", (prodpar == null) ? "1000" : prodpar);
-    model.addAttribute("selection_method", (selection_method == null) ? new Integer(0) : selection_method);
+    model.addAttribute("selection_method", (selection_method == null) ? Integer.valueOf(0) : selection_method);
     model.addAttribute("description", (description == null) ? "" : description);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
     model.addAttribute("areaid", (areaid == null) ? "" : areaid);
     model.addAttribute("arealist", pgfClientHelper.getUniqueAreaIds());
     model.addAttribute("quantity", (quantity == null) ? "" : quantity);
-    model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
-    model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
-    model.addAttribute("nominal_timeout", (nominal_timeout == null) ? new Boolean(false) : nominal_timeout);
-    model.addAttribute("max_age_limit", (max_age_limit == null) ? new Integer(-1) : max_age_limit);
-    model.addAttribute("applygra", (applygra == null) ? new Boolean(false) : applygra);
-    model.addAttribute("ZR_A", (ZR_A == null) ? new Double(200.0) : ZR_A);
-    model.addAttribute("ZR_b", (ZR_b == null) ? new Double(1.6) : ZR_b);
+    model.addAttribute("interval", (interval == null) ? Integer.valueOf(15) : interval);
+    model.addAttribute("timeout", (timeout == null) ? Integer.valueOf(15*60) : timeout);
+    model.addAttribute("nominal_timeout", (nominal_timeout == null) ? Boolean.valueOf(false) : nominal_timeout);
+    model.addAttribute("max_age_limit", (max_age_limit == null) ? Integer.valueOf(-1) : max_age_limit);
+    model.addAttribute("applygra", (applygra == null) ? Boolean.valueOf(false) : applygra);
+    model.addAttribute("ZR_A", (ZR_A == null) ? Double.valueOf(200.0) : ZR_A);
+    model.addAttribute("ZR_b", (ZR_b == null) ? Double.valueOf(1.6) : ZR_b);
     model.addAttribute("options", (options == null) ? "" : options);
-    model.addAttribute("ignore_malfunc", (ignore_malfunc == null) ? new Boolean(false) : ignore_malfunc);
-    model.addAttribute("ctfilter", (ctfilter == null) ? new Boolean(false) : ctfilter);
+    model.addAttribute("ignore_malfunc", (ignore_malfunc == null) ? Boolean.valueOf(false) : ignore_malfunc);
+    model.addAttribute("ctfilter", (ctfilter == null) ? Boolean.valueOf(false) : ctfilter);
     model.addAttribute("qitotal_field", (qitotal_field==null)?"":qitotal_field);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
         (detectors == null) ? new ArrayList<String>() : detectors);
-    model.addAttribute("quality_control_mode", (quality_control_mode == null) ? new Integer(0) : quality_control_mode);
-    model.addAttribute("reprocess_quality", (reprocess_quality == null) ? new Boolean(false) : reprocess_quality);
+    model.addAttribute("quality_control_mode", (quality_control_mode == null) ? Integer.valueOf(0) : quality_control_mode);
+    model.addAttribute("reprocess_quality", (reprocess_quality == null) ? Boolean.valueOf(false) : reprocess_quality);
     model.addAttribute("filterJson", jsonFilter);
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
@@ -454,34 +454,34 @@ public class CompositeRoutesController {
     
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
-    model.addAttribute("active", (active == null) ? new Boolean(true) : active);
+    model.addAttribute("active", (active == null) ? Boolean.valueOf(true) : active);
     model.addAttribute("description", (description == null) ? "" : description);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
-    model.addAttribute("byscan", (byscan == null) ? new Boolean(false) : byscan);
+    model.addAttribute("byscan", (byscan == null) ? Boolean.valueOf(false) : byscan);
     model.addAttribute("method", (method == null) ? CompositingRule.PCAPPI : method);
     model.addAttribute("prodpar", (prodpar == null) ? "1000" : prodpar);
-    model.addAttribute("selection_method", (selection_method == null) ? new Integer(0) : selection_method);
+    model.addAttribute("selection_method", (selection_method == null) ? Integer.valueOf(0) : selection_method);
     model.addAttribute("arealist", pgfClientHelper.getUniqueAreaIds());
     model.addAttribute("areaid", (areaid == null) ? "" : areaid);
     model.addAttribute("quantity", (quantity == null) ? "" : quantity);
-    model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
-    model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
-    model.addAttribute("nominal_timeout", (nominal_timeout == null) ? new Boolean(false) : nominal_timeout);
-    model.addAttribute("max_age_limit", (max_age_limit == null) ? new Integer(-1) : max_age_limit);
-    model.addAttribute("applygra", (applygra == null) ? new Boolean(false) : applygra);
-    model.addAttribute("ZR_A", (ZR_A == null) ? new Double(200.0) : ZR_A);
-    model.addAttribute("ZR_b", (ZR_b == null) ? new Double(1.6) : ZR_b);
+    model.addAttribute("interval", (interval == null) ? Integer.valueOf(15) : interval);
+    model.addAttribute("timeout", (timeout == null) ? Integer.valueOf(15*60) : timeout);
+    model.addAttribute("nominal_timeout", (nominal_timeout == null) ? Boolean.valueOf(false) : nominal_timeout);
+    model.addAttribute("max_age_limit", (max_age_limit == null) ? Integer.valueOf(-1) : max_age_limit);
+    model.addAttribute("applygra", (applygra == null) ? Boolean.valueOf(false) : applygra);
+    model.addAttribute("ZR_A", (ZR_A == null) ? Double.valueOf(200.0) : ZR_A);
+    model.addAttribute("ZR_b", (ZR_b == null) ? Double.valueOf(1.6) : ZR_b);
     model.addAttribute("options", (options == null) ? "" : options);
-    model.addAttribute("ignore_malfunc", (ignore_malfunc == null) ? new Boolean(false) : ignore_malfunc);
-    model.addAttribute("ctfilter", (ctfilter == null) ? new Boolean(false) : ctfilter);
+    model.addAttribute("ignore_malfunc", (ignore_malfunc == null) ? Boolean.valueOf(false) : ignore_malfunc);
+    model.addAttribute("ctfilter", (ctfilter == null) ? Boolean.valueOf(false) : ctfilter);
     model.addAttribute("qitotal_field", (qitotal_field == null) ? "" : qitotal_field);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
         (detectors == null) ? new ArrayList<String>() : detectors);
-    model.addAttribute("quality_control_mode", (quality_control_mode == null) ? new Integer(0) : quality_control_mode);
-    model.addAttribute("reprocess_quality", (reprocess_quality == null) ? new Boolean(false) : reprocess_quality);
+    model.addAttribute("quality_control_mode", (quality_control_mode == null) ? Integer.valueOf(0) : quality_control_mode);
+    model.addAttribute("reprocess_quality", (reprocess_quality == null) ? Boolean.valueOf(false) : reprocess_quality);
 
     if (jsonFilter != null && !jsonFilter.equals("")) {
       model.addAttribute("filterJson", jsonFilter);

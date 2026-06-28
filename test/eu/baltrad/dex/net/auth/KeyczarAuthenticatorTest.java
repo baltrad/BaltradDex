@@ -33,9 +33,9 @@ import eu.baltrad.dex.user.model.User;
 
 import org.keyczar.exceptions.KeyczarException;
 
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.easymock.EasyMockSupport;
-import org.apache.http.Header;
+import org.apache.hc.core5.http.Header;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -47,7 +47,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.io.File;
 import java.net.URI;

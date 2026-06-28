@@ -21,9 +21,11 @@
 
 package eu.baltrad.dex.db.util;
 
-import com.jhlabs.map.proj.Projection;
-import com.jhlabs.map.proj.ProjectionFactory;
-import com.jhlabs.map.proj.ProjectionException;
+import org.locationtech.proj4j.CRSFactory;
+import org.locationtech.proj4j.CoordinateReferenceSystem;
+import org.locationtech.proj4j.CoordinateTransform;
+import org.locationtech.proj4j.CoordinateTransformFactory;
+import org.locationtech.proj4j.ProjCoordinate;
 
 import org.apache.log4j.Logger;
 
@@ -38,7 +40,12 @@ import java.awt.geom.Point2D;
  */
 public class BltDataProjector {
 
-    private static Projection proj;
+    private static CoordinateReferenceSystem crs;
+    private static CoordinateTransform transformToGeo;
+    private static CoordinateTransform transformToXY;
+    private static CRSFactory crsFactory = new CRSFactory();
+    private static CoordinateTransformFactory ctFactory = new CoordinateTransformFactory();
+    private static CoordinateReferenceSystem wgs84 = crsFactory.createFromName("EPSG:4326");
     private static Logger log;
 
     /**
@@ -56,10 +63,20 @@ public class BltDataProjector {
     public static int initializeProjection(String[] projParms) {
         int res;
         try {
-            proj = ProjectionFactory.fromPROJ4Specification(projParms);
-            proj.initialize();
+            // Convert array of parameters to single PROJ4 string
+            StringBuilder proj4String = new StringBuilder();
+            for (String param : projParms) {
+                if (proj4String.length() > 0) {
+                    proj4String.append(" ");
+                }
+                proj4String.append(param);
+            }
+            
+            crs = crsFactory.createFromParameters(null, proj4String.toString());
+            transformToGeo = ctFactory.createTransform(crs, wgs84);
+            transformToXY = ctFactory.createTransform(wgs84, crs);
             res = 0;
-        } catch (ProjectionException e) {
+        } catch (Exception e) {
             log.error("Failed to initialize projection", e);
             res = 1;
         }
@@ -71,9 +88,10 @@ public class BltDataProjector {
      * @return Latitude and longitude of a given point
      */
     public static Point2D.Double pointXY2Geo(Point2D.Double xyPoint) {
-        Point2D.Double geoPoint = new Point2D.Double();
-        proj.inverseTransform(xyPoint, geoPoint);
-        return geoPoint;
+        ProjCoordinate src = new ProjCoordinate(xyPoint.x, xyPoint.y);
+        ProjCoordinate dest = new ProjCoordinate();
+        transformToGeo.transform(src, dest);
+        return new Point2D.Double(dest.x, dest.y);
     }
     /**
      * Converts latitude and longitude into carthesian coordinates.
@@ -81,9 +99,10 @@ public class BltDataProjector {
      * @return Carthesian coordinates of a given point
      */
     public static Point2D.Double pointGeo2XY(Point2D.Double geoPoint) {
-        Point2D.Double xyPoint = new Point2D.Double();
-        proj.transform(geoPoint, xyPoint);
-        return xyPoint;
+        ProjCoordinate src = new ProjCoordinate(geoPoint.x, geoPoint.y);
+        ProjCoordinate dest = new ProjCoordinate();
+        transformToXY.transform(src, dest);
+        return new Point2D.Double(dest.x, dest.y);
     }
 }
 

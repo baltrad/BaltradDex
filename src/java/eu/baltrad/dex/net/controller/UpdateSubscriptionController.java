@@ -54,12 +54,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import org.keyczar.exceptions.KeyczarException;
 
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.HttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.HttpResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.net.URI;
 

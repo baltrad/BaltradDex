@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.codehaus.jackson.JsonNode;
+import org.apache.hc.core5.http.HttpStatus;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;

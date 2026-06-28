@@ -18,15 +18,15 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 ------------------------------------------------------------------------*/
 package eu.baltrad.beastui.web.controller;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -45,7 +45,7 @@ class FilterController {
   public void isValid(HttpServletRequest req,
                       HttpServletResponse rsp)
       throws java.io.IOException {
-    String jsonString = IOUtils.toString(req.getInputStream());
+    String jsonString = IOUtils.toString(req.getInputStream(), "UTF-8");
     logger.debug(jsonString);
     IFilter filter = mapper.readValue(jsonString, IFilter.class);
     writeJson(rsp, JsonNodeFactory.instance.booleanNode(filter.isValid()));
@@ -55,7 +55,7 @@ class FilterController {
   public void expressionString(HttpServletRequest req,
                                HttpServletResponse rsp)
       throws java.io.IOException {
-    String jsonString = IOUtils.toString(req.getInputStream());
+    String jsonString = IOUtils.toString(req.getInputStream(), "UTF-8");
     logger.debug(jsonString);
     IFilter filter = mapper.readValue(jsonString, IFilter.class);
     JsonNode json = JsonNodeFactory.instance.textNode(filter.getExpression().toString());

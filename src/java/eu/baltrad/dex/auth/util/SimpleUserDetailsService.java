@@ -28,11 +28,13 @@ import eu.baltrad.dex.user.manager.impl.UserManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 /**
  * Implements role-based user details service for authentication.
@@ -41,33 +43,38 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  * @since 1.1.0
  */
 public class SimpleUserDetailsService implements UserDetailsService  {
-    
+
+    private static final Logger log = Logger.getLogger(SimpleUserDetailsService.class);
+
     /** Authorities */
     private GrantedAuthority authAdmin;
     private GrantedAuthority authOperator;
     private GrantedAuthority authUser;
-    
+
     private UserManager userManager;
-    
+
     /**
      * Constructor.
      */
     public SimpleUserDetailsService() {
-        authAdmin = new GrantedAuthorityImpl("ROLE_ADMIN");
-        authOperator = new GrantedAuthorityImpl("ROLE_OPERATOR");
-        authUser = new GrantedAuthorityImpl("ROLE_USER");
+        authAdmin = new SimpleGrantedAuthority("ROLE_ADMIN");
+        authOperator = new SimpleGrantedAuthority("ROLE_OPERATOR");
+        authUser = new SimpleGrantedAuthority("ROLE_USER");
     }
-    
+
     /**
-     * Loads user by name and sets authority respectively. 
+     * Loads user by name and sets authority respectively.
      * @param name User name
-     * @return User details 
+     * @return User details
      */
     public UserDetails loadUserByUsername(String name) {
+        log.info("loadUserByUsername: looking up '" + name + "'");
         User user = userManager.load(name);
         if (user == null) {
-            return null;
+            log.warn("loadUserByUsername: user '" + name + "' not found in database");
+            throw new UsernameNotFoundException("User not found: " + name);
         } else {
+            log.info("loadUserByUsername: found user '" + name + "' with role '" + user.getRole() + "'");
             List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
             if (user.getRole().equals(Role.ADMIN)) {
               authorities.add(authAdmin);
@@ -81,9 +88,9 @@ public class SimpleUserDetailsService implements UserDetailsService  {
             if (user.getRole().equals(Role.USER)) {
               authorities.add(authUser);
             }
+            log.info("loadUserByUsername: assigned " + authorities.size() + " authorities to '" + name + "': " + authorities);
             UserDetails userDetails = new org.springframework.security.core.userdetails.User(
                         user.getName(), user.getPassword(), authorities);
-            
             return userDetails;
         }
     }

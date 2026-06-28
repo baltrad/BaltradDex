@@ -40,7 +40,7 @@ import org.springframework.ui.ModelMap;
 
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Modify password for a given user account.

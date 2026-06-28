@@ -22,8 +22,8 @@
 package eu.baltrad.dex.net.request.impl;
 
 import eu.baltrad.dex.net.request.INodeRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.commons.lang3.StringUtils;
 

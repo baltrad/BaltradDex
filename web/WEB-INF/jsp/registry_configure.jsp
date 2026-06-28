@@ -34,7 +34,7 @@ Author     : szewczenko
                     Delivery registry settings allow to keep number of entries
                     under control. Click <i>Save</i> to store settings. 
                 </div>
-                <form:form method="POST" commandName="config">
+                <form:form method="POST" modelAttribute="config">
                     <t:message_box msgHeader="Success."
                                msgBody="${registry_conf_success}"
                                errorHeader="Problems encountered."

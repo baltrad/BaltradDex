@@ -27,15 +27,12 @@ import static org.easymock.EasyMock.isA;
 
 import java.io.IOException;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolVersion;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.message.BasicHttpResponse;
 import org.apache.log4j.Logger;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
@@ -102,16 +99,14 @@ public class PostFileTaskTest extends EasyMockSupport {
 
   private HttpResponse createResponse(int code, String reason)
       throws Exception {
-    ProtocolVersion version = new ProtocolVersion("HTTP", 1, 1);
-    StatusLine statusLine = new BasicStatusLine(version, code, reason);
-    HttpResponse response = new BasicHttpResponse(statusLine);
+    HttpResponse response = new BasicHttpResponse(code, reason);
     return response;
   }
 
   @Before
   public void setUp() {
     // mocks = new ArrayList();
-    request = new HttpPost();
+    request = new HttpPost("http://localhost:8080/test");
     receiver = new User(1, "test", "user", "s3cret", "org", "unit", "locality",
         "state", "XX", "http://test.baltrad.eu:8084");
     dataSource = new DataSource(1, "DS1", DataSource.PEER, "A data source",

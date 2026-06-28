@@ -46,15 +46,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMockSupport;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.message.BasicHttpResponse;
-import org.apache.http.message.BasicStatusLine;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.message.StatusLine;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.message.BasicHttpResponse;
 import org.apache.log4j.Logger;
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
@@ -66,6 +65,7 @@ import org.keyczar.exceptions.KeyczarException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Post subscription request controller test.
@@ -309,7 +309,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       
       replayAll();
       
-      String viewName = classUnderTest.startSubscription(request, model, "test.baltrad.eu");
+      String viewName = classUnderTest.startSubscription((HttpServletRequest) request, model, "test.baltrad.eu");
       
       verifyAll();
       assertEquals("subscription_start_status", viewName);
@@ -334,7 +334,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       
       replayAll();
       
-      String viewName = classUnderTest.startSubscription(request, model, "test.baltrad.eu");
+      String viewName = classUnderTest.startSubscription((HttpServletRequest) request, model, "test.baltrad.eu");
       
       verifyAll();
       assertEquals("subscription_start_status", viewName);
@@ -364,7 +364,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       
       replayAll();
       
-      String viewName = classUnderTest.startSubscription(request, model, "test.baltrad.eu");
+      String viewName = classUnderTest.startSubscription((HttpServletRequest) request, model, "test.baltrad.eu");
       
       verifyAll();
       assertEquals("subscription_start_status", viewName);
@@ -379,7 +379,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       
       replayAll();
       
-      String viewName = classUnderTest.startSubscription(request, model, "test.baltrad.eu");
+      String viewName = classUnderTest.startSubscription((HttpServletRequest) request, model, "test.baltrad.eu");
       
       verifyAll();
       assertEquals("subscription_start_status", viewName);
@@ -404,7 +404,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
      
       replayAll();
       
-      String viewName = classUnderTest.startSubscription(request, model, "test.baltrad.eu");
+      String viewName = classUnderTest.startSubscription((HttpServletRequest) request, model, "test.baltrad.eu");
       
       verifyAll();
       assertEquals("subscription_start_status", viewName);
@@ -429,7 +429,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       
       replayAll();
       
-      String viewName = classUnderTest.startSubscription(request, model, "test.baltrad.eu");
+      String viewName = classUnderTest.startSubscription((HttpServletRequest) request, model, "test.baltrad.eu");
       
       verifyAll();
       assertEquals("subscription_start_status", viewName);
@@ -459,7 +459,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       
       replayAll();
       
-      String viewName = classUnderTest.startSubscription(request, model, "test.baltrad.eu");
+      String viewName = classUnderTest.startSubscription((HttpServletRequest) request, model, "test.baltrad.eu");
       
       verifyAll();
       assertEquals("subscription_start_status", viewName);
@@ -486,7 +486,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       
       replayAll();
       
-      String viewName = classUnderTest.startSubscription(request, model, "test.baltrad.eu");
+      String viewName = classUnderTest.startSubscription((HttpServletRequest) request, model, "test.baltrad.eu");
       
       verifyAll();
       assertEquals("subscription_start_status", viewName);
@@ -521,7 +521,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       
       replayAll();
       
-      String viewName = classUnderTest.startSubscription(request, model, "test.baltrad.eu");
+      String viewName = classUnderTest.startSubscription((HttpServletRequest) request, model, "test.baltrad.eu");
       
       verifyAll();
       assertEquals("subscription_start_status", viewName);
@@ -551,7 +551,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       
       replayAll();
       
-      String viewName = classUnderTest.startSubscription(request, model, "test.baltrad.eu");
+      String viewName = classUnderTest.startSubscription((HttpServletRequest) request, model, "test.baltrad.eu");
       
       verifyAll();
       assertEquals("subscription_start_status", viewName);
@@ -584,7 +584,7 @@ public class StartSubscriptionControllerTest extends EasyMockSupport {
       
       replayAll();
       
-      String viewName = classUnderTest.startSubscription(request, model, "test.baltrad.eu");
+      String viewName = classUnderTest.startSubscription((HttpServletRequest) request, model, "test.baltrad.eu");
       
       verifyAll();
       assertEquals("subscription_start_status", viewName);

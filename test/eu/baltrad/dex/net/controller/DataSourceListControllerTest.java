@@ -32,10 +32,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.log4j.Logger;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
@@ -349,14 +349,13 @@ public class DataSourceListControllerTest extends EasyMockSupport {
         HttpResponse res = createMock(HttpResponse.class);
         byte[] keyContent = new byte[]{}; 
         HttpUriRequest request = createMock(HttpUriRequest.class);
-      
         expect(protocolManager.getFactory("http://test.baltrad.eu")).andReturn(requestFactory);
         expect(methods.createLocalPubKeyZip()).andReturn(keyContent);
         expect(requestFactory.createPostKeyRequest(classUnderTest.localNode, keyContent)).andReturn(request);
         expect(httpClientMock.post(request)).andReturn(res);
         expect(protocolManager.createParser(res)).andReturn(responseParser);
         expect(responseParser.isRedirected()).andReturn(true);
-        expect(request.getURI()).andReturn(new URI("http://localhost:9876/BaltradDex/post_key.htm"));
+        expect(request.getUri()).andReturn(new URI("http://localhost:9876/BaltradDex/post_key.htm"));
         expect(responseParser.getRedirectURL()).andReturn("http://localhost:1234/BaltradDex/post_key.htm");
         messageHelper.setErrorDetailsMessage(model, 
         	"datasource.controller.send_key_server_redirect", 
@@ -394,7 +393,7 @@ public class DataSourceListControllerTest extends EasyMockSupport {
         expect(httpClientMock.post(request)).andReturn(res);
         expect(protocolManager.createParser(res)).andReturn(responseParser);
         expect(responseParser.isRedirected()).andReturn(true);
-        expect(request.getURI()).andReturn(new URI("http://localhost:9876/BaltradDex/post_key.htm"));
+        expect(request.getUri()).andReturn(new URI("http://localhost:9876/BaltradDex/post_key.htm"));
         expect(responseParser.getRedirectURL()).andReturn("http://localhost:1234/slurp/BaltradDex/post_key.htm");
         messageHelper.setErrorDetailsMessage(model, 
           "datasource.controller.send_key_server_redirect", 

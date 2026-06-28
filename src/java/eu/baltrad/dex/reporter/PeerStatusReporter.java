@@ -19,8 +19,6 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 
 package eu.baltrad.dex.reporter;
 
-import static org.easymock.EasyMock.expect;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -32,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;

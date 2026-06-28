@@ -3,13 +3,26 @@
     xmlns:beans="http://www.springframework.org/schema/beans"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/security
-        http://www.springframework.org/schema/security/spring-security-3.2.xsd" 
+        http://www.springframework.org/schema/security/spring-security.xsd" 
         xmlns:aop="http://www.springframework.org/schema/aop">  
        
-    <security:http auto-config="true" access-denied-page="/login.htm"> 
-        
+    <security:http security="none" request-matcher="ant" pattern="/includes/**"/>
+    <security:http security="none" request-matcher="ant" pattern="/help/**"/>
+
+    <!-- Node-to-node API endpoints: use keyczar-based auth, bypass Spring Security -->
+    <security:http security="none" request-matcher="ant" pattern="/post_file.htm"/>
+    <security:http security="none" request-matcher="ant" pattern="/post_message.htm"/>
+    <security:http security="none" request-matcher="ant" pattern="/post_key.htm"/>
+    <security:http security="none" request-matcher="ant" pattern="/datasource_listing.htm"/>
+    <security:http security="none" request-matcher="ant" pattern="/start_subscription.htm"/>
+    <security:http security="none" request-matcher="ant" pattern="/update_subscription.htm"/>
+    <security:http security="none" request-matcher="ant" pattern="/administrator.htm"/>
+    <security:http security="none" request-matcher="ant" pattern="/exchangeManager.htm"/>
+
+    <security:http auto-config="true" request-matcher="ant">
+        <security:access-denied-handler error-page="/login.htm"/>
         <security:port-mappings>
             <security:port-mapping http="8080" https="8443"/>
         </security:port-mappings> 
@@ -17,132 +30,142 @@
         <!-- Saves sesion ID and enables switching  between http and https -->
         <security:remember-me use-secure-cookie="false" />
         
-        <security:form-login login-page="/login.htm" 
-                             default-target-url="/status.htm" 
-                             authentication-failure-url="/login_failed.htm" 
+        <security:form-login login-page="/login.htm"
+                             login-processing-url="/j_spring_security_check"
+                             username-parameter="j_username"
+                             password-parameter="j_password"
+                             default-target-url="/status.htm"
+                             authentication-failure-url="/login_failed.htm"
                              always-use-default-target="true"/>
-        
-        <security:logout logout-success-url="/logout.htm"/>
+
+        <security:logout logout-url="/j_spring_security_logout"
+                         logout-success-url="/logout.htm"/>
+
+        <!-- CSRF disabled: JSPs use plain HTML forms without CSRF tokens -->
+        <security:csrf disabled="true"/>
                     
         <!-- 
             User pages 
         -->
-        <security:intercept-url pattern="/login.htm" requires-channel="https"/>
-        <security:intercept-url pattern="/login_failed.htm" requires-channel="https"/>
-        <security:intercept-url pattern="/logout.htm" requires-channel="https"/>
+        <security:intercept-url pattern="/login.htm" access="permitAll" requires-channel="https"/>
+        <security:intercept-url pattern="/login_failed.htm" access="permitAll" requires-channel="https"/>
+        <security:intercept-url pattern="/logout.htm" access="permitAll" requires-channel="https"/>
         
-        <security:intercept-url pattern="/status.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/messages_live.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/messages_table.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/messages_browser.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/datasources.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/datasource_files.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/file_browser.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/file_details.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/file_preview.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/file_download.htm" access="ROLE_USER" />
-        <security:intercept-url pattern="/user_settings.htm" access="ROLE_USER" requires-channel="https"/>
+        <security:intercept-url pattern="/status.htm" access="hasRole('ROLE_USER')" />
+        <security:intercept-url pattern="/messages_live.htm" access="hasRole('ROLE_USER')" />
+        <security:intercept-url pattern="/messages_table.htm" access="hasRole('ROLE_USER')" />
+        <security:intercept-url pattern="/messages_browser.htm" access="hasRole('ROLE_USER')" />
+        <security:intercept-url pattern="/datasources.htm" access="hasRole('ROLE_USER')" />
+        <security:intercept-url pattern="/datasource_files.htm" access="hasRole('ROLE_USER')" />
+        <security:intercept-url pattern="/file_browser.htm" access="hasRole('ROLE_USER')" />
+        <security:intercept-url pattern="/file_details.htm" access="hasRole('ROLE_USER')" />
+        <security:intercept-url pattern="/file_preview.htm" access="hasRole('ROLE_USER')" />
+        <security:intercept-url pattern="/file_download.htm" access="hasRole('ROLE_USER')" />
+        <security:intercept-url pattern="/user_settings.htm" access="hasRole('ROLE_USER')" requires-channel="https"/>
         <!-- 
             Operator pages 
         -->
-        <security:intercept-url pattern="/node_connect.htm" access="ROLE_OPERATOR" requires-channel="https"/>
-        <security:intercept-url pattern="/node_connected.htm" access="ROLE_OPERATOR" requires-channel="https"/>
-        <security:intercept-url pattern="/node_datasources.htm" access="ROLE_OPERATOR" requires-channel="https"/>
+        <security:intercept-url pattern="/node_connect.htm" access="hasRole('ROLE_OPERATOR')" requires-channel="https"/>
+        <security:intercept-url pattern="/node_connected.htm" access="hasRole('ROLE_OPERATOR')" requires-channel="https"/>
+        <security:intercept-url pattern="/node_datasources.htm" access="hasRole('ROLE_OPERATOR')" requires-channel="https"/>
         
-        <security:intercept-url pattern="/subscription_start_status.htm" access="ROLE_OPERATOR" requires-channel="https"/>
-        <security:intercept-url pattern="/subscription_peers.htm" access="ROLE_OPERATOR" requires-channel="https"/>
-        <security:intercept-url pattern="/subscription_show.htm" access="ROLE_OPERATOR" requires-channel="https"/>
-        <security:intercept-url pattern="/subscription_selected.htm" access="ROLE_OPERATOR" requires-channel="https"/>
-        <security:intercept-url pattern="/subscription_update_status.htm" access="ROLE_OPERATOR" requires-channel="https"/>
+        <security:intercept-url pattern="/subscription_start_status.htm" access="hasRole('ROLE_OPERATOR')" requires-channel="https"/>
+        <security:intercept-url pattern="/subscription_peers.htm" access="hasRole('ROLE_OPERATOR')" requires-channel="https"/>
+        <security:intercept-url pattern="/subscription_show.htm" access="hasRole('ROLE_OPERATOR')" requires-channel="https"/>
+        <security:intercept-url pattern="/subscription_selected.htm" access="hasRole('ROLE_OPERATOR')" requires-channel="https"/>
+        <security:intercept-url pattern="/subscription_update_status.htm" access="hasRole('ROLE_OPERATOR')" requires-channel="https"/>
         
-        <security:intercept-url pattern="/registry_show.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/adaptors.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/adaptor_show.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/adaptor_create.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/registry_show.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/adaptors.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/adaptor_show.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/adaptor_create.htm" access="hasRole('ROLE_OPERATOR')" />
         
-        <security:intercept-url pattern="/anomaly_detector_create.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/anomaly_detector_show.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/anomaly_detectors.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/anomaly_detector_import.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/anomaly_detector_create.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/anomaly_detector_show.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/anomaly_detectors.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/anomaly_detector_import.htm" access="hasRole('ROLE_OPERATOR')" />
         
-        <security:intercept-url pattern="/routes.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/routes.htm" access="hasRole('ROLE_OPERATOR')" />
         
-        <security:intercept-url pattern="/route_create_bdb_trim_age.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/route_show_bdb_trim_age.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/route_create_bdb_trim_count.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/route_show_bdb_trim_count.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_create_bdb_trim_age.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/route_show_bdb_trim_age.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/route_create_bdb_trim_count.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/route_show_bdb_trim_count.htm" access="hasRole('ROLE_OPERATOR')" />
         
-        <security:intercept-url pattern="/route_create_composite.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/route_show_composite.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_create_composite.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/route_show_composite.htm" access="hasRole('ROLE_OPERATOR')" />
         
-        <security:intercept-url pattern="/route_create_distribution.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_create_distribution.htm" access="hasRole('ROLE_OPERATOR')" />
         
-        <security:intercept-url pattern="/route_create_google_map.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/route_show_google_map.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_create_google_map.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/route_show_google_map.htm" access="hasRole('ROLE_OPERATOR')" />
         
-        <security:intercept-url pattern="/route_create_groovy.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/route_show_groovy.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_create_groovy.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/route_show_groovy.htm" access="hasRole('ROLE_OPERATOR')" />
         
-        <security:intercept-url pattern="/route_create_volume.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/route_show_volume.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/route_create_volume.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/route_show_volume.htm" access="hasRole('ROLE_OPERATOR')" />
         
-        <security:intercept-url pattern="/schedule.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/schedule_show_job.htm" access="ROLE_OPERATOR" />
-        <security:intercept-url pattern="/schedule_create_job.htm" access="ROLE_OPERATOR" />
+        <security:intercept-url pattern="/schedule.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/schedule_show_job.htm" access="hasRole('ROLE_OPERATOR')" />
+        <security:intercept-url pattern="/schedule_create_job.htm" access="hasRole('ROLE_OPERATOR')" />
         
         <!-- DO NOT ACTIVATE interceptor for supervisor since that is using
              host filter checks -->
-        <security:intercept-url pattern="/supervisor_settings.htm" requires-channel="https"/>
-        <security:intercept-url pattern="/supervisor_add_setting.htm" requires-channel="https"/>
-        <security:intercept-url pattern="/supervisor_remove_setting.htm" requires-channel="https"/>
+        <security:intercept-url pattern="/supervisor_settings.htm" access="permitAll" requires-channel="https"/>
+        <security:intercept-url pattern="/supervisor_add_setting.htm" access="permitAll" requires-channel="https"/>
+        <security:intercept-url pattern="/supervisor_remove_setting.htm" access="permitAll" requires-channel="https"/>
         
         <!-- 
             Admin pages 
         -->
-        <security:intercept-url pattern="/messages_sticky.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/radars_show.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/radars_save.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/radars_save_status" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/radars_remove.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/radars_remove_selected.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/radars_remove_status.htm" access="ROLE_ADMIN" requires-channel="https"/>
+        <security:intercept-url pattern="/messages_sticky.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/radars_show.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/radars_save.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/radars_save_status" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/radars_remove.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/radars_remove_selected.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/radars_remove_status.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
         
-        <security:intercept-url pattern="/datasources_save.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/datasources_edit.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/datasources_save_status" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/datasources_remove.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/datasources_remove_selected.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/datasources_remove_status.htm" access="ROLE_ADMIN" requires-channel="https"/>
+        <security:intercept-url pattern="/datasources_save.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/datasources_edit.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/datasources_save_status" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/datasources_remove.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/datasources_remove_selected.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/datasources_remove_status.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
         
-        <security:intercept-url pattern="subscription_remove_downloads_peers.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/subscription_remove_downloads.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/subscription_remove_uploads.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/subscription_remove_selected_downloads.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/subscription_remove_selected_uploads.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/subscription_remove_downloads_status.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/subscription_remove_uploads_status.htm" access="ROLE_ADMIN" requires-channel="https"/>
+        <security:intercept-url pattern="subscription_remove_downloads_peers.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/subscription_remove_downloads.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/subscription_remove_uploads.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/subscription_remove_selected_downloads.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/subscription_remove_selected_uploads.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/subscription_remove_downloads_status.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/subscription_remove_uploads_status.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
         
-        <security:intercept-url pattern="/registry_configure.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/registry_delete.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/registry_delete_status.htm" access="ROLE_ADMIN" requires-channel="https"/>
+        <security:intercept-url pattern="/registry_configure.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/registry_delete.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/registry_delete_status.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
         
-        <security:intercept-url pattern="/messages_configure.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/messages_delete.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/messages_delete_status.htm" access="ROLE_ADMIN" requires-channel="https"/>
+        <security:intercept-url pattern="/messages_configure.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/messages_delete.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/messages_delete_status.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
         
-        <security:intercept-url pattern="/user_save.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/user_save_status.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/user_edit.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/user_remove.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/user_remove_selected.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/user_remove_status.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/user_change_password.htm" access="ROLE_ADMIN" requires-channel="https"/>
-        <security:intercept-url pattern="/user_change_password_status.htm" access="ROLE_ADMIN" requires-channel="https"/>
+        <security:intercept-url pattern="/user_save.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/user_save_status.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/user_edit.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/user_remove.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/user_remove_selected.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/user_remove_status.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/user_change_password.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+        <security:intercept-url pattern="/user_change_password_status.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
         
-        <security:intercept-url pattern="/keystore.htm" access="ROLE_ADMIN" requires-channel="https"/>
+        <security:intercept-url pattern="/keystore.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
         
-        <security:intercept-url pattern="/node_settings.htm" access="ROLE_ADMIN" requires-channel="https"/>
-    
+        <security:intercept-url pattern="/node_settings.htm" access="hasRole('ROLE_ADMIN')" requires-channel="https"/>
+
+        <!-- Catch-all: any page not explicitly listed requires login -->
+        <security:intercept-url pattern="/**" access="hasRole('ROLE_USER')"/>
+
     </security:http>
 
     <!-- We keep the authentication context in a specific file so that we can replace it with
@@ -191,8 +214,6 @@
         </beans:property>
     </beans:bean>
     
-    <beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> 
-       <beans:property name="maxUploadSize" value="50000000"/> <!-- File size in bytes. -->
-    </beans:bean> 
+    <beans:bean id="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver"/>
 
 </beans:beans>

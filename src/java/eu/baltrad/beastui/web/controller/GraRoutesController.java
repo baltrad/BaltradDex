@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -367,7 +367,7 @@ public class GraRoutesController {
     model.addAttribute("object_types", objectTypes);
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
-    model.addAttribute("active", (active == null) ? new Boolean(true) : active);
+    model.addAttribute("active", (active == null) ? Boolean.valueOf(true) : active);
     model.addAttribute("description", (description == null) ? "" : description);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);

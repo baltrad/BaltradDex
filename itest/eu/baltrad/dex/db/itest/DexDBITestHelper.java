@@ -28,7 +28,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.sql.DataSource;
+import jakarta.sql.DataSource;
 
 import junit.framework.TestCase;
 

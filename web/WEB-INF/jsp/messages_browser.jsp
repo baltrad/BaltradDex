@@ -63,7 +63,7 @@ function validateForm() {
                     Use parameters below to define search criteria and browse
                     messages.
                 </div>
-                <form:form name="messages_browser_form" method="POST" commandName="log_parameter" onsubmit="return validateForm()">
+                <form:form name="messages_browser_form" method="POST" modelAttribute="log_parameter" onsubmit="return validateForm()">
                     <div class="row">
                         <div class="leftcol">
                             <div class="label">

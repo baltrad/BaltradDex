@@ -30,10 +30,10 @@ import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.datasource.model.DataSource;
 
-//import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-//import org.apache.http.entity.StringEntity;
-//import org.apache.http.entity.ByteArrayEntity;
+//import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+//import org.apache.hc.core5.http.io.entity.StringEntity;
+//import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 
 //import org.apache.commons.codec.binary.Base64;
 //import org.apache.commons.codec.digest.DigestUtils;

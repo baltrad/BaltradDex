@@ -34,7 +34,7 @@ Author     : anders
                     Request key approval from remote host administrator. Enter a URL to the remote host, a message and
                     press "Connect". For example http://127.0.0.1/BaltradDex
                 </div>
-                <form  method="POST" action="connect_with_remote_host.htm" commandName="connect_with_remote_host">
+                <form  method="POST" action="connect_with_remote_host.htm" modelAttribute="connect_with_remote_host">
                     <div class="body">
                         <div class="row">
                             <div class="leftcol">

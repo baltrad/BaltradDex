@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -32,6 +32,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
@@ -199,6 +200,7 @@ public class ShowRoutesController {
   @RequestMapping("/route.htm")
   public String showRoute(
       Model model,
+      RedirectAttributes redirectAttributes,
       @RequestParam(value = "name") String name) {
     logger.debug("showRoute("+name+")");
     RouteDefinition def = manager.getDefinition(name);
@@ -232,10 +234,10 @@ public class ShowRoutesController {
       }
 
       if (result != null) {
-        model.addAttribute("name", name);
+        redirectAttributes.addAttribute("name", name);
       }
     }
-  
+
     if (result == null) {
       result = "redirect:routes.htm";
     }

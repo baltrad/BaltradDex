@@ -26,8 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -152,7 +152,17 @@ public class ProtocolVersionResponseWriter implements ResponseWriter {
    */
   @Override
   public void messageResponse(String message, int status) {
-    responseWrapper.setStatus(status, message);
+    responseWrapper.setStatus(status);
+    PrintWriter writer = null;
+    try {
+      writer = createPrintWriter(responseWrapper);
+      writer.write(message);
+      writer.flush();
+    } catch (IOException e) {
+      logger.error("Failed to write message response", e);
+    } finally {
+      if (writer != null) writer.close();
+    }
   }
 
   /**

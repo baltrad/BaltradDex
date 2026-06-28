@@ -24,7 +24,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="app.dist.dir.name" value="BaltradDex" />
   <property name="root.dir" value="${basedir}"/>
   <property name="script.dir" value="${root.dir}/script"/>
-  <property name="lib.dir" value="lib"/>
+  <property name="lib.dir" value="lib/maven/libs/runtime"/>
+  <property name="test.lib.dir" value="lib/maven/libs/test"/>
   <property name="extralib.dir" value="extralib"/>
   <property name="src.dir" value="src"/>
   <property name="web.dir" value="web"/>
@@ -64,28 +65,28 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <!--<property name="jksfile" value="" /> --> 
   <!-- Specify jksfile on command line and we will use that file -->
 
-  <property name="baltrad.db.path" value="/opt/baltrad/baltrad-db" />
-  <property name="baltrad.db.java.path" value="${baltrad.db.path}/share/baltrad-bdb/java" />
+  <property name="baltrad.db.path" value="/usr/share/baltrad/baltrad-db" />
+  <property name="baltrad.db.java.path" value="${baltrad.db.path}/java" />
   <property name="beast.path" value="/opt/baltrad/beast" />
   <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java/lib"/>
 
   <!-- Configure ant tasks for tomcat deployment -->
   <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"
-		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
+		classpath="${extralib.dir}/catalina-ant.jar"/>
   <taskdef name="list" classname="org.apache.catalina.ant.ListTask"
-		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
+		classpath="${extralib.dir}/catalina-ant.jar"/>
   <taskdef name="reload" classname="org.apache.catalina.ant.ReloadTask"
-		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
+		classpath="${extralib.dir}/catalina-ant.jar"/>
   <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask"
-		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
+		classpath="${extralib.dir}/catalina-ant.jar"/>
   <taskdef name="roles" classname="org.apache.catalina.ant.RolesTask"
-		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
+		classpath="${extralib.dir}/catalina-ant.jar"/>
   <taskdef name="start" classname="org.apache.catalina.ant.StartTask"
-		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
+		classpath="${extralib.dir}/catalina-ant.jar"/>
   <taskdef name="stop" classname="org.apache.catalina.ant.StopTask"
-		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
+		classpath="${extralib.dir}/catalina-ant.jar"/>
   <taskdef name="undeploy" classname="org.apache.catalina.ant.UndeployTask"
-		classpath="${lib.dir}/catalina-ant/catalina-ant.jar"/>
+		classpath="${extralib.dir}/catalina-ant.jar"/>
 
   <!-- initialize library path -->
   <path id="lib.path">
@@ -94,6 +95,12 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </fileset>
     <fileset dir="${extralib.dir}">
       <include name="**/*.jar"/>
+    </fileset>
+    <fileset dir="lib/jhdf">
+      <include name="*.jar"/>
+    </fileset>
+    <fileset dir="lib/keyczar">
+      <include name="*.jar"/>
     </fileset>
   </path>
   
@@ -111,30 +118,18 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fileset dir="${beast.path}/libs">
         <include name="*.jar"/>
     </fileset>
+    <!--
     <fileset dir="${javahdf.path}">
         <include name="jhdf*.jar"/>
     </fileset>
+    -->
   </path>     
 
   <!-- path for testing -->
   <path id="test.lib.path">
-    <fileset dir="${lib.dir}">
-      <include name="junit/*.jar"/>
-      <include name="ant-junit/*.jar"/>
-      <include name="easymock/*.jar"/>
-      <include name="objenesis/*.jar"/>
-      <include name="bytebuddy/*.jar"/>      
-      <include name="jetty/*.jar"/>
-      <include name="jakarta-commons/commons-fileupload-1.2.1.jar"/>
-    </fileset>
-    <fileset dir="${beast.path}/libs">
-      <include name="commons-dbcp.jar"/>
-      <include name="commons-pool.jar"/>
-      <include name="groovy-all-1.6.4.jar"/>
-      <include name="ws-commons-util-1.0.2.jar"/>
-      <include name="xmlrpc-client-3.1.2.jar"/>
-      <include name="xmlrpc-common-3.1.2.jar"/>
-      <include name="xmlrpc-server-3.1.2.jar"/>
+    <path refid="lib.path"/>
+    <fileset dir="${test.lib.dir}">
+      <include name="*.jar"/>
     </fileset>
   </path>
   
@@ -144,6 +139,52 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <include name="*.jar"/>
     </fileset>
   </path>
+
+  <!-- Fetch Maven dependencies -->
+  <target name="fetch-jars" description="Download all Maven dependencies (runtime and test separated)">
+    <echo message="Fetching dependencies via Maven..."/>
+    <exec executable="mvn" dir="${basedir}/lib/maven" failonerror="true">
+      <arg value="package"/>
+    </exec>
+    
+    <!-- Remove runtime JARs from test directory to keep only test-specific JARs -->
+    <delete>
+      <fileset dir="${test.lib.dir}">
+        <present present="both" targetdir="${lib.dir}"/>
+      </fileset>
+    </delete>
+    
+    <echo message="Runtime dependencies in: lib/maven/libs/runtime/"/>
+    <echo message="Test-only dependencies in: lib/maven/libs/test/"/>
+  </target>
+
+  <!-- Generate third-party license information -->
+  <target name="third-party-licenses" description="Generate third-party license information file">
+    <echo message="Generating third-party license information..."/>
+    <exec executable="mvn" dir="${basedir}/lib/maven" failonerror="true">
+      <arg value="license:add-third-party"/>
+      <arg value="-DskipPomPackaging=false"/>
+    </exec>
+    <echo message="License file created at: lib/maven/libs/THIRD-PARTY-LICENSES.txt"/>
+  </target>
+
+  <!-- Check if dependencies need to be fetched -->
+  <target name="check-jars">
+    <condition property="jars.present">
+      <and>
+        <available file="${lib.dir}" type="dir"/>
+        <available file="${test.lib.dir}" type="dir"/>
+        <resourcecount when="gt" count="0">
+          <fileset dir="${lib.dir}" includes="*.jar"/>
+        </resourcecount>
+      </and>
+    </condition>
+  </target>
+
+  <!-- Fetch dependencies only if needed -->
+  <target name="ensure-jars" depends="check-jars" unless="jars.present">
+    <antcall target="fetch-jars"/>
+  </target>
 	
 <!-- separate target for dependency check -->
 <target name="dep-check">
@@ -151,7 +192,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
              property="baltrad-bdb-client.jar.available" />
     <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
     <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
-    <available file="${javahdf.path}/jhdf5.jar" property="javahdf.lib.available"/>
+    <!--<available file="${javahdf.path}/jhdf5.jar" property="javahdf.lib.available"/>-->
 
     <fail unless="baltrad-bdb-client.jar.available" 
             message="baltrad.db.path must specify the installation dir of baltrad-db" />
@@ -159,8 +200,8 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
             message="beast.path must specify the installation dir of beast" />
     <fail unless="beast.libs.available" 
             message="beast.path must specify the installation dir of beast" />
-    <fail unless="javahdf.lib.available" 
-            message="javahdf.path must specify the library installation dir of hdf-java" />
+    <!--<fail unless="javahdf.lib.available" 
+            message="javahdf.path must specify the library installation dir of hdf-java" />-->
 </target>        
 
 <target name="init" depends="dep-check">
@@ -178,100 +219,34 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     
     <!-- copy libraries -->
     <copy todir="${build.lib.dir}">
-      <fileset dir="lib/dom4j">
+      <!-- Maven-managed runtime dependencies -->
+      <fileset dir="lib/maven/libs/runtime">
+        <include name="*.jar"/>
+        <!-- spring-jcl provides the commons-logging API; the real jar causes SLF4J routing conflicts -->
+        <exclude name="commons-logging*.jar"/>
+      </fileset>
+      
+      <fileset dir="lib/jhdf">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="lib/jakarta-commons">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/HikariCP">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/jcip">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/gson">
-        <include name="*.jar"/>
-      </fileset>
+      
       <fileset dir="lib/keyczar">
         <include name="*.jar"/>
       </fileset>
-      <fileset dir="lib/spring">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/aopallicance">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/log4j">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/slf4j">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/j2ee">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/jakarta-taglibs">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/javassist">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/antlr">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/catalina-ant">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/proj4">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/commons-validator">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/commons-codec">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib/commons-lang">
-        <include name="*.jar"/>
-      </fileset>
-      <fileset dir="lib">
-        <include name="postgresql-42.2.18.jar"/> 
-        <include name="apache-mime4j-0.6.jar"/>
-      </fileset>
-      <!-- Also, include neccesary libs from beast-lib -->
+      
       <fileset dir="${beast.path}/libs">
-        <include name="bcpkix-jdk15on-154.jar"/>
-        <include name="bcprov-jdk15on-154.jar"/>
-        <include name="commons-dbcp.jar"/>
-        <include name="commons-pool.jar"/>
-        <include name="commons-net-2.2.jar"/>
-	      <include name="httpclient-4.1.2.jar"/>
-	      <include name="httpclient-cache-4.1.2.jar"/>
-	      <include name="httpcore-4.1.2.jar"/>
-	      <include name="httpmime-4.1.2.jar"/>
-        <include name="bytebuddy/byte-buddy-1.17.4.jar" />
-        <include name="groovy*.jar" />
-        <include name="slf4j-api-2.0.16.jar" />
-        <include name="slf4j-simple-2.0.16.jar" />
-        <include name="jackson-core-lgpl-1.9.13.jar"/>
-        <include name="jackson-mapper-lgpl-1.9.13.jar"/>
-        <include name="quartz-2.2.2.jar"/>
-        <include name="ecc-25519-java.jar"/>
-        <include name="sshj-0.15.0.jar"/>
-        <include name="ws-commons-util-1.0.2.jar"/>
-        <include name="xmlrpc-client-3.1.2.jar"/>
-        <include name="xmlrpc-common-3.1.2.jar"/>
-        <include name="xmlrpc-server-3.1.2.jar"/>
-        <include name="javax.mail-api-1.6.2.jar"/>
-      	<include name="javax.mail-1.6.2.jar"/>
+        <include name="*.jar"/>
+        <exclude name="slf4j-reload4j*.jar"/>
+        <exclude name="reload4j*.jar"/>
+        <exclude name="commons-logging*.jar"/>
       </fileset>
       <fileset dir="${beast.path}/bin">
         <include name="*.jar"/>
       </fileset>
+
       <fileset dir="${baltrad.db.java.path}/libs">
-        <include name="commons-lang3-3.1.jar"/>
-	<include name="joda-time-2.0.jar"/>
+        <include name="*.jar"/>
+        <exclude name="commons-logging*.jar"/>
       </fileset>
       <fileset dir="${baltrad.db.java.path}/">
         <include name="*.jar"/>
@@ -294,7 +269,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       </fileset>
       <fileset dir="${etc.dir}">
         <include name="db.properties" />
-        <include name="dex.log4j.properties" />
+        <include name="dex.log4j2.properties" />
         <include name="dex.properties" />
       </fileset>
     </copy>
@@ -349,7 +324,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 </target>
 
   <!-- compile source files -->
-  <target name="compile" depends="init">
+  <target name="compile" depends="ensure-jars,init">
     <javac encoding="8859_1" srcdir="${src.dir}" deprecation="on"
            destdir="${build.classes.dir}"
 	   debug="${compile.debug}" 
@@ -378,12 +353,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   </target>
 
   <!-- create WAR file -->
-  <target name="dist" depends="compile">
+  <target name="dist" depends="compile,third-party-licenses">
     <war destfile="${dist.dir}/BaltradDex.war" webxml="${webinf.dir}/web.xml">
       <fileset dir="${build.web.dir}">
         <include name="**/*.*"/>
         <exclude name="**/web.xml"/>
       </fileset>
+      <webinf dir="${lib.dir}">
+        <include name="THIRD-PARTY-LICENSES.txt"/>
+      </webinf>
     </war>
   </target>
   

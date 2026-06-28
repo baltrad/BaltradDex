@@ -25,7 +25,7 @@ import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.datasource.model.DataSource;
 import eu.baltrad.dex.net.model.impl.Subscription;
 
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 
 import java.util.Set;
 import java.util.List;

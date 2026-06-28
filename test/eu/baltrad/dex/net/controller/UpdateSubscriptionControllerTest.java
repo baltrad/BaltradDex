@@ -34,7 +34,7 @@ import eu.baltrad.dex.status.manager.INodeStatusManager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.manager.IUserManager;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.easymock.EasyMockSupport;
 
@@ -43,8 +43,8 @@ import static org.easymock.EasyMock.*;
 import org.springframework.ui.Model;
 import org.springframework.ui.ExtendedModelMap;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.log4j.Logger;
 
 import static org.junit.Assert.*;

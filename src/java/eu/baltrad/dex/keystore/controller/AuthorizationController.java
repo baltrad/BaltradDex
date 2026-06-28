@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.keyczar.exceptions.KeyczarException;
@@ -315,7 +315,7 @@ public class AuthorizationController {
       logger.debug("Got a response message of version " + parser.getProtocolVersion());
       logger.debug("Answering node supports version " + parser.getConfiguredProtocolVersion());
       if (parser.isRedirected()) {
-        String redirectedAddress = extractBaseUrlFromRedirect(url, req.getURI().toString(), parser.getRedirectURL());
+        String redirectedAddress = extractBaseUrlFromRedirect(url, req.getUri().toString(), parser.getRedirectURL());
         model.addAttribute("error_message", "Remote host indicates that address has been changed to " + redirectedAddress);
         auth.setRedirectedAddress(redirectedAddress);
         model.addAttribute("authorization", auth);

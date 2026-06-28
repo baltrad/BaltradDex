@@ -21,8 +21,8 @@
 
 package eu.baltrad.dex.net.util.httpclient;
 
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.HttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.HttpResponse;
 
 import java.io.IOException;
 

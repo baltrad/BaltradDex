@@ -47,7 +47,7 @@ import org.apache.log4j.Logger;
 
 import java.util.List;
 import java.util.ArrayList;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Allows to configure new user account or to modify an existing one.

@@ -24,7 +24,7 @@ package eu.baltrad.dex.auth.manager;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.user.model.Role;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Implements session management functionality.

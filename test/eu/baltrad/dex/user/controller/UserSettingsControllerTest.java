@@ -30,6 +30,7 @@ import eu.baltrad.dex.util.MessageResourceUtil;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.ui.ModelMap;
+import jakarta.servlet.http.HttpServletRequest;
 
 import static org.easymock.EasyMock.*;
 
@@ -85,7 +86,7 @@ public class UserSettingsControllerTest {
         classUnderTest.setUserManager(userManagerMock);
         request.getSession().setAttribute("session_user", test);
         ModelMap model = new ModelMap();
-        String viewName = classUnderTest.setupForm(model, request);
+        String viewName = classUnderTest.setupForm(model, (HttpServletRequest) request);
         
         assertEquals("user_settings", viewName);
         assertTrue(model.containsAttribute("user_account"));
@@ -102,7 +103,7 @@ public class UserSettingsControllerTest {
                                 "user_account");
         test.setPassword("passw0rd");
         request.setParameter("repeat_password", "password");
-        String viewName = classUnderTest.processSubmit(request, model, test, 
+        String viewName = classUnderTest.processSubmit((HttpServletRequest) request, model, test, 
                 result);
         assertEquals("user_settings", viewName);
         assertTrue(result.hasErrors());
@@ -121,7 +122,7 @@ public class UserSettingsControllerTest {
         replay(userManagerMock);
         
         classUnderTest.setUserManager(userManagerMock);
-        String viewName = classUnderTest.processSubmit(request, model, test, 
+        String viewName = classUnderTest.processSubmit((HttpServletRequest) request, model, test, 
                 result);
         
         verify(userManagerMock);
@@ -145,7 +146,7 @@ public class UserSettingsControllerTest {
         replay(userManagerMock);
         
         classUnderTest.setUserManager(userManagerMock);
-        String viewName = classUnderTest.processSubmit(request, model, test, 
+        String viewName = classUnderTest.processSubmit((HttpServletRequest) request, model, test, 
                 result);
         
         verify(userManagerMock);

@@ -29,13 +29,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.keyczar.exceptions.KeyczarException;
@@ -374,25 +374,31 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
           }
         } else {
           logger.info("Could not store file for some reason");
-          res.setStatus(HttpServletResponse.SC_NOT_FOUND, messages.getMessage(PF_GENERIC_POST_FILE_ERROR_KEY));
+          res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+          res.setMessage(messages.getMessage(PF_GENERIC_POST_FILE_ERROR_KEY));
         }
       } else {
-        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED, messages.getMessage(PF_UNAUTHORIZED_REQUEST_KEY));
+        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        res.setMessage(messages.getMessage(PF_UNAUTHORIZED_REQUEST_KEY));
       }
     } catch (DuplicateEntry e) {
-      res.setStatus(HttpServletResponse.SC_CONFLICT, messages.getMessage(PF_DUPLICATE_ENTRY_ERROR_KEY));
+      res.setStatus(HttpServletResponse.SC_CONFLICT);
+      res.setMessage(messages.getMessage(PF_DUPLICATE_ENTRY_ERROR_KEY));
       res.setMessage("file already stored");
       logger.info("Duplicate entry for file from " + req.getNodeName());
     } catch (DatabaseError e) {
+      res.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE);
       if (e.getMessage() != null)
         res.setMessage(e.getMessage());
-      res.setStatus(HttpServletResponse.SC_NOT_ACCEPTABLE, messages.getMessage(PF_DATABASE_ERROR_KEY));
+      else
+        res.setMessage(messages.getMessage(PF_DATABASE_ERROR_KEY));
       logger.error("Database error", e);
     } catch (DatabaseIOError e) {
+      res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       res.setMessage("Failed to communicate with BDB-server, is it running?");
-      res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, messages.getMessage(PF_DATABASE_ERROR_KEY));
     } catch (Exception e) {
-      res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, messages.getMessage(PF_INTERNAL_SERVER_ERROR_KEY));
+      res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      res.setMessage(messages.getMessage(PF_INTERNAL_SERVER_ERROR_KEY));
       logger.error("Internal server error", e);
     }
     logInfo("doPost: EXIT Request from from: " + req.getNodeName(), null);

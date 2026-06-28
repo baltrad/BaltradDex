@@ -23,7 +23,7 @@ package eu.baltrad.dex.net.model.impl;
 
 import eu.baltrad.dex.net.model.ISubscription;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serializable;
 

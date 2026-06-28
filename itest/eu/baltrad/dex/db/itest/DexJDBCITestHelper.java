@@ -24,7 +24,7 @@ package eu.baltrad.dex.db.itest;
 import java.util.Map;
 import java.util.HashMap;
 
-import javax.sql.DataSource;
+import jakarta.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;

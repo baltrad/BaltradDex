@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
 import org.junit.After;
@@ -39,6 +39,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import jakarta.servlet.http.HttpServletRequest;
 //import sun.security.acl.PrincipalImpl;
 
 /**
@@ -162,7 +163,7 @@ public class NodeStatusControllerTest {
         classUnderTest.setNodeStatusManager(nodeStatusManagerMock);
         Model model = new ExtendedModelMap();
         // show
-        classUnderTest.processSubmit(model, "se.baltrad.eu", request);
+        classUnderTest.processSubmit(model, "se.baltrad.eu", (HttpServletRequest) request);
         
         assertTrue(classUnderTest.getNodesStatus()
                                             .containsKey("se.baltrad.eu"));
@@ -175,7 +176,7 @@ public class NodeStatusControllerTest {
                 .get("se.baltrad.eu").size() == uploadStatus.size());
         
         // hide
-        classUnderTest.processSubmit(model, "se.baltrad.eu", request);
+        classUnderTest.processSubmit(model, "se.baltrad.eu", (HttpServletRequest) request);
         
         assertTrue(classUnderTest.getNodesStatus()
                                             .containsKey("se.baltrad.eu"));

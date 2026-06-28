@@ -30,9 +30,11 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Validates user account settings.
@@ -127,8 +129,8 @@ public class AccountValidator {
 
         if (user.getNodeAddress() != null && user.getNodeAddress().length() > 0) {
             try {
-              new URL(user.getNodeAddress());
-            } catch (MalformedURLException malformedURLException) {
+              new URI(user.getNodeAddress()).toURL();
+            } catch (MalformedURLException | URISyntaxException e) {
               errors.rejectValue("nodeAddress", 
                   "saveaccount.invalid.url",
                   messages.getMessage("saveaccount.invalid.url"));

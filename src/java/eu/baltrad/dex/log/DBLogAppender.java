@@ -21,53 +21,63 @@
 
 package eu.baltrad.dex.log;
 
+import java.io.Serializable;
+
 import eu.baltrad.dex.log.model.impl.LogEntry;
 import eu.baltrad.dex.log.manager.impl.LogManager;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.spi.LoggingEvent;
+import org.apache.logging.log4j.core.Appender;
+import org.apache.logging.log4j.core.Core;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.appender.AbstractAppender;
+import org.apache.logging.log4j.core.config.Property;
+import org.apache.logging.log4j.core.config.plugins.Plugin;
+import org.apache.logging.log4j.core.config.plugins.PluginAttribute;
+import org.apache.logging.log4j.core.config.plugins.PluginElement;
+import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 
-/**
- * Implements custom log message appender.
- * 
- * @author Maciej Szewczykowski | maciej@baltrad.eu
- * @version 1.2.2
- * @since 1.2.2
- */
-public class DBLogAppender extends AppenderSkeleton {
-    
-    private static LogManager logManager = null;
-    
-    /**
-     * Constructor. 
-     */
-    public DBLogAppender() {}
-    
-    /**
-     * @param manager 
-     */
+@Plugin(name = "DBLogAppender", category = Core.CATEGORY_NAME, elementType = Appender.ELEMENT_TYPE, printObject = true)
+public class DBLogAppender extends AbstractAppender {
+
+    private static volatile LogManager logManager = null;
+
+    public DBLogAppender() {
+        super("DBLogAppender", null, null, true, Property.EMPTY_ARRAY);
+    }
+
+    protected DBLogAppender(String name, Filter filter, Layout<? extends Serializable> layout) {
+        super(name, filter, layout, true, Property.EMPTY_ARRAY);
+    }
+
+    @PluginFactory
+    public static DBLogAppender createAppender(
+            @PluginAttribute("name") String name,
+            @PluginElement("Layout") Layout<? extends Serializable> layout,
+            @PluginElement("Filter") Filter filter) {
+        if (name == null) {
+            LOGGER.error("No name provided for DBLogAppender");
+            return null;
+        }
+        return new DBLogAppender(name, filter, layout);
+    }
+
     public synchronized void setLogManager(LogManager manager) {
-	    if (logManager == null) {
-	        logManager = manager;
+        if (logManager == null) {
+            logManager = manager;
         }
-    }       
-    
-    public boolean requiresLayout() {
-        return false;
     }
-    
-    public void close() {}
 
-    /**
-     * Custom appender implementation.
-     * @param event Logging event
-     */
-    public void append(LoggingEvent event) {
+    @Override
+    public void append(LogEvent event) {
         if (logManager != null) {
-            logManager.store(new LogEntry(event.getTimeStamp(),
-                event.getLoggerName(), event.getLevel().toString(), 
-                event.getRenderedMessage()));
+            logManager.store(new LogEntry(
+                event.getTimeMillis(),
+                event.getLoggerName(),
+                event.getLevel().name(),
+                event.getMessage().getFormattedMessage()
+            ));
         }
     }
-    
 }

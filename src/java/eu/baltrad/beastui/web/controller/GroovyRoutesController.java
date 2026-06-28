@@ -199,7 +199,7 @@ public class GroovyRoutesController {
       Boolean active, String description, List<String> recipients,
       String definition, String emessage) {
     if (active == null)
-      active = new Boolean(true);
+      active = Boolean.valueOf(true);
     if (recipients == null)
       recipients = new ArrayList<String>();
     
@@ -256,7 +256,7 @@ public class GroovyRoutesController {
       Boolean active, String description, List<String> recipients,
       String definition, String emessage) {
     if (active == null)
-      active = new Boolean(false);
+      active = Boolean.valueOf(false);
     if (recipients == null)
       recipients = new ArrayList<String>();
 

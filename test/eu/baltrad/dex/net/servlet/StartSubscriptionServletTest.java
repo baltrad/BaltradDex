@@ -39,15 +39,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import org.easymock.EasyMockSupport;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import static org.easymock.EasyMock.*;
 import org.junit.After;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import static org.junit.Assert.*;
 import org.junit.Before;

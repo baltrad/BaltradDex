@@ -10,12 +10,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -404,12 +403,12 @@ public class AdministratorServlet  extends HttpServlet {
         PrintWriter out = response.getWriter();
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.setStatus(HttpStatus.SC_OK);
+        response.setStatus(HttpServletResponse.SC_OK);
         out.print(jsonResponse);
         out.flush();
       }
     } catch (Exception e) {
-      response.setStatus(HttpStatus.SC_BAD_REQUEST);
+      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       logger.error("Failed to process request", e);
     }
   }

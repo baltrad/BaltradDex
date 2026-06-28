@@ -23,21 +23,20 @@ package eu.baltrad.dex.net.util.httpclient.impl;
 
 import eu.baltrad.dex.net.util.httpclient.IHttpClientUtil;
 import eu.baltrad.dex.net.auth.EasyX509TrustManager;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpProtocolParams;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.HttpResponse;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.config.Registry;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.util.Timeout;
 
 import java.security.SecureRandom;
 import javax.net.ssl.SSLContext;
@@ -58,31 +57,62 @@ public class HttpClientUtil implements IHttpClientUtil {
     /** Maximum number of connections per route */
     private static final int MAX_PER_ROUTE_CONNS = 20;
     
-    private HttpClient client;
+    private CloseableHttpClient client;
 
     /**
      * Constructor.
-     * @param connTimeout Connection timeout
-     * @param soTimeout Socket timeout 
+     * @param connTimeout Connection timeout in milliseconds
+     * @param soTimeout Socket timeout in milliseconds
      */
     public HttpClientUtil(int connTimeout, int soTimeout) {
-        SchemeRegistry schemeRegistry = new SchemeRegistry();
-        registerHttpScheme(schemeRegistry);
-        registerHttpsScheme(schemeRegistry);
-        
-        ThreadSafeClientConnManager connMgr = new ThreadSafeClientConnManager(
-                schemeRegistry);
-        connMgr.setMaxTotal(MAX_TOTAL_CONNS);
-        connMgr.setDefaultMaxPerRoute(MAX_PER_ROUTE_CONNS);
-        
-        HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParams, connTimeout);
-        HttpConnectionParams.setSoTimeout(httpParams, soTimeout);
-        HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
-        HttpProtocolParams.setContentCharset(httpParams, HTTP.UTF_8);
-        HttpProtocolParams.setHttpElementCharset(httpParams, HTTP.UTF_8);
-        
-        client = new DefaultHttpClient(connMgr, httpParams);
+        try {
+            // Create SSL context with custom trust manager
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(
+                null,
+                new TrustManager[] { new EasyX509TrustManager() },
+                new SecureRandom()
+            );
+            
+            // Create SSL connection socket factory with no hostname verification
+            SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(
+                sslContext,
+                NoopHostnameVerifier.INSTANCE
+            );
+            
+            // Register connection socket factories
+            Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
+                .register("http", PlainConnectionSocketFactory.getSocketFactory())
+                .register("https", sslSocketFactory)
+                .build();
+            
+            // Create connection manager
+            PoolingHttpClientConnectionManager connMgr = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+            connMgr.setMaxTotal(MAX_TOTAL_CONNS);
+            connMgr.setDefaultMaxPerRoute(MAX_PER_ROUTE_CONNS);
+            
+            // Configure socket timeout
+            SocketConfig socketConfig = SocketConfig.custom()
+                .setSoTimeout(Timeout.ofMilliseconds(soTimeout))
+                .build();
+            connMgr.setDefaultSocketConfig(socketConfig);
+            
+            // Configure request timeouts
+            RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectionRequestTimeout(Timeout.ofMilliseconds(connTimeout))
+                .setConnectTimeout(Timeout.ofMilliseconds(connTimeout))
+                .setResponseTimeout(Timeout.ofMilliseconds(soTimeout))
+                .build();
+            
+            // Build HTTP client
+            client = HttpClients.custom()
+                .setConnectionManager(connMgr)
+                .setDefaultRequestConfig(requestConfig)
+                .build();
+                
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create HTTP client", e);
+        }
     }
     
     /**
@@ -92,9 +122,9 @@ public class HttpClientUtil implements IHttpClientUtil {
      * @throws IOException 
      * @throws Exception 
      */
-    public HttpResponse post(HttpUriRequest request) throws IOException, 
+    public org.apache.hc.core5.http.HttpResponse post(HttpUriRequest request) throws IOException, 
             Exception {
-        HttpResponse response = null;
+        org.apache.hc.core5.http.HttpResponse response = null;
         try {
             response = client.execute(request);
         } catch (IOException e) {
@@ -109,39 +139,13 @@ public class HttpClientUtil implements IHttpClientUtil {
      * Shutdown HTTP client
      */
     public void shutdown() {
-        client.getConnectionManager().shutdown();
-    }
-    
-    /**
-     * Registers HTTP scheme.
-     * 
-     * @param schemeReg Scheme registry
-     */
-    private void registerHttpScheme(SchemeRegistry schemeReg) {
-        Scheme http = new Scheme("http", 80, new PlainSocketFactory());
-        schemeReg.register(http);
-    }
-    /**
-     * Registers HTTPS scheme.
-     * 
-     * @param schemeReg Scheme registry
-     */
-    private void registerHttpsScheme(SchemeRegistry schemeReg) {
         try {
-            SSLContext sslContext = SSLContext.getInstance("SSL");
-            sslContext.init(
-                null,
-                new TrustManager[] {
-                    new EasyX509TrustManager()
-                },
-                new SecureRandom()
-            );
-            Scheme https = new Scheme("https", 443, new SSLSocketFactory(
-                sslContext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER));
-            schemeReg.register(https);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to register https scheme", e);
+            if (client != null) {
+                client.close();
+            }
+        } catch (IOException e) {
+            // Ignore
         }
-    } 
+    }
     
 }

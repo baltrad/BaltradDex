@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -516,18 +516,18 @@ public class WrwpRoutesController {
     List<String> adaptors = adaptormanager.getAdaptorNames();
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
-    model.addAttribute("active", (active == null) ? new Boolean(true) : active);
+    model.addAttribute("active", (active == null) ? Boolean.valueOf(true) : active);
     model.addAttribute("description", (description == null) ? "" : description);
-    model.addAttribute("interval", (interval == null) ? new Integer(200) : interval);
-    model.addAttribute("maxheight", (maxheight == null) ? new Integer(12000) : maxheight);
-    model.addAttribute("mindistance", (mindistance == null) ? new Integer(4000) : mindistance);
-    model.addAttribute("maxdistance", (maxdistance == null) ? new Integer(40000) : maxdistance);
-    model.addAttribute("minelangle", (minelangle == null) ? new Double(2.5) : minelangle);
-    model.addAttribute("maxelangle", (maxelangle == null) ? new Double(45.0) : maxelangle);
-    model.addAttribute("minvelocitythreshold", (minvelocitythreshold == null) ? new Double(2.0) : minvelocitythreshold);
-    model.addAttribute("maxvelocitythreshold", (maxvelocitythreshold == null) ? new Double(60.0) : maxvelocitythreshold);
-    model.addAttribute("minsamplesizereflectivity", (minsamplesizereflectivity == null) ? new Integer(40) : minsamplesizereflectivity);
-    model.addAttribute("minsamplesizewind", (minsamplesizewind == null) ? new Integer(40) : minsamplesizewind);
+    model.addAttribute("interval", (interval == null) ? Integer.valueOf(200) : interval);
+    model.addAttribute("maxheight", (maxheight == null) ? Integer.valueOf(12000) : maxheight);
+    model.addAttribute("mindistance", (mindistance == null) ? Integer.valueOf(4000) : mindistance);
+    model.addAttribute("maxdistance", (maxdistance == null) ? Integer.valueOf(40000) : maxdistance);
+    model.addAttribute("minelangle", (minelangle == null) ? Double.valueOf(2.5) : minelangle);
+    model.addAttribute("maxelangle", (maxelangle == null) ? Double.valueOf(45.0) : maxelangle);
+    model.addAttribute("minvelocitythreshold", (minvelocitythreshold == null) ? Double.valueOf(2.0) : minvelocitythreshold);
+    model.addAttribute("maxvelocitythreshold", (maxvelocitythreshold == null) ? Double.valueOf(60.0) : maxvelocitythreshold);
+    model.addAttribute("minsamplesizereflectivity", (minsamplesizereflectivity == null) ? Integer.valueOf(40) : minsamplesizereflectivity);
+    model.addAttribute("minsamplesizewind", (minsamplesizewind == null) ? Integer.valueOf(40) : minsamplesizewind);
     model.addAttribute("fields", (fields==null) ? new ArrayList<String>() : fields);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);

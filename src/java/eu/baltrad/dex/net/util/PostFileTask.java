@@ -21,10 +21,10 @@
 
 package eu.baltrad.dex.net.util;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.log4j.Logger;
 
 import eu.baltrad.dex.datasource.model.DataSource;
@@ -103,9 +103,8 @@ public class PostFileTask implements Runnable {
             
             try {
                 HttpResponse response = httpClient.post(request);
-                nodeStatusManager.setRuntimeNodeStatus(user.getName(), response.getStatusLine().getStatusCode());
-                if (response.getStatusLine().getStatusCode() == 
-                        HttpServletResponse.SC_OK) {
+                nodeStatusManager.setRuntimeNodeStatus(user.getName(), response.getCode());
+                if (response.getCode() == HttpServletResponse.SC_OK) {
                     RegistryEntry entry = new RegistryEntry(
                             user.getId(), dataSource.getId(), 
                             System.currentTimeMillis(), RegistryEntry.UPLOAD,
@@ -116,8 +115,7 @@ public class PostFileTask implements Runnable {
                     // update status
                     status.incrementUploads();
                     nodeStatusManager.update(status, subscriptionId);
-                } else if (response.getStatusLine().getStatusCode() ==
-                        HttpServletResponse.SC_FORBIDDEN) {
+                } else if (response.getCode() == HttpServletResponse.SC_FORBIDDEN) {
                     // remove invalid subscription
                     subscriptionManager.delete(subscriptionId);
                     // remove respective status
@@ -127,20 +125,19 @@ public class PostFileTask implements Runnable {
                               " to user " + user.getName() + ": Forbidden - HTTP STATUS 403");
                 } else {
                     // don't retry if file is already delivered 
-                    int statusCode = response.getStatusLine().getStatusCode(); 
+                    int statusCode = response.getCode(); 
                     if (statusCode != HttpServletResponse.SC_CONFLICT) {
                         int noOfRetries = 0;
                         boolean success = false;
                         if (redirectHandler.canHandle(response)) {
                           response = redirectHandler.handle(httpClient, request, response);
-                          if (response != null && response.getStatusLine().getStatusCode() == HttpServletResponse.SC_OK) {
+                          if (response != null && response.getCode() == HttpServletResponse.SC_OK) {
                             success = true;
                           }
                         } else {
                             for (noOfRetries = 1; noOfRetries <= 3; noOfRetries++) {
                                 response = httpClient.post(request);
-                                if (response.getStatusLine().getStatusCode() ==
-                                    HttpServletResponse.SC_OK) {
+                                if (response.getCode() == HttpServletResponse.SC_OK) {
                                     success = true;
                                     break;
                                 }
@@ -168,12 +165,11 @@ public class PostFileTask implements Runnable {
                                 false);
                             log.error("Failed to send file " + uuid + " to user " 
                                     + user.getName() + ": " + 
-                                    response.getStatusLine().getStatusCode() 
-                                    + " - " + response.getStatusLine()
-                                        .getReasonPhrase());
+                                    response.getCode() 
+                                    + " - HTTP Status " + response.getCode());
                             registryManager.store(entry);
                             // update status
-                            nodeStatusManager.setRuntimeNodeStatus(user.getName(), response.getStatusLine().getStatusCode());
+                            nodeStatusManager.setRuntimeNodeStatus(user.getName(), response.getCode());
 
                             status.incrementUploadFailures();
                             nodeStatusManager.update(status, subscriptionId);

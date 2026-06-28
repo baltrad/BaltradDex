@@ -48,6 +48,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.SimpleTransactionStatus;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Remove subscription controller test.
@@ -245,7 +246,7 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
         Model model = new ExtendedModelMap();
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         String viewName = classUnderTest
-                .removeSelectedDownloads(request, model);
+                .removeSelectedDownloads((HttpServletRequest) request, model);
         
         assertEquals("subscription_remove_downloads", viewName);
         assertTrue(model.containsAttribute("downloads"));
@@ -270,7 +271,7 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
         Model model = new ExtendedModelMap();
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         String viewName = classUnderTest
-                .removeSelectedDownloads(request, model);
+                .removeSelectedDownloads((HttpServletRequest) request, model);
         
         assertEquals("subscription_remove_selected_downloads", viewName);
         assertEquals(downloads, classUnderTest.getSelectedDownloads());
@@ -455,7 +456,7 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
         Model model = new ExtendedModelMap();
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         String viewName = classUnderTest
-                .removeSelectedUploads(request, model);
+                .removeSelectedUploads((HttpServletRequest) request, model);
         
         assertEquals("subscription_remove_uploads", viewName);
         assertTrue(model.containsAttribute("uploads"));
@@ -476,7 +477,7 @@ public class RemoveSubscriptionControllerTest extends EasyMockSupport {
         Model model = new ExtendedModelMap();
         classUnderTest.setSubscriptionManager(subscriptionManagerMock);
         String viewName = classUnderTest
-                .removeSelectedUploads(request, model);
+                .removeSelectedUploads((HttpServletRequest) request, model);
         
         assertEquals("subscription_remove_selected_uploads", viewName);
         assertEquals(uploads, classUnderTest.getSelectedUploads());

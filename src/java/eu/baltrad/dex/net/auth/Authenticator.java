@@ -23,7 +23,7 @@ package eu.baltrad.dex.net.auth;
 
 import org.keyczar.exceptions.KeyczarException;
 
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 
 /**
  *

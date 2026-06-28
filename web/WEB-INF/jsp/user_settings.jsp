@@ -34,7 +34,7 @@ Author     : szewczenko
                     Changing password for user account: 
                     <span><c:out value="${user_account.name}"/></span>
                 </div>
-                <form:form method="POST" commandName="user_account">
+                <form:form method="POST" modelAttribute="user_account">
                     <t:message_box msgHeader="Success."
                                    msgBody="${change_password_success}"
                                    errorHeader="Problems encountered."

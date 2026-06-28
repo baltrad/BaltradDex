@@ -56,6 +56,8 @@ import eu.baltrad.beast.security.ISecurityManager;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
@@ -63,11 +65,11 @@ import static org.easymock.EasyMock.*;
 
 import org.keyczar.exceptions.KeyczarException;
 
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.crypto.dsig.spec.ExcC14NParameterSpec;
 
 import static org.junit.Assert.*;
@@ -286,13 +288,13 @@ public class PostFileServletTest extends EasyMockSupport {
 
       replayAll();
         
-      classUnderTest.handleRequest(request, response);
+      classUnderTest.handleRequest((HttpServletRequest) request, (HttpServletResponse) response);
         
       verifyAll();
         
       assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
       assertEquals(messages.getMessage("postfile.server.unauthorized_request"), 
-                    response.getErrorMessage());
+                    response.getHeader("Baltrad-Message"));
     }
 
     @Test
@@ -302,11 +304,11 @@ public class PostFileServletTest extends EasyMockSupport {
       expect(fileCatalog.store(isA(InputStream.class))).andReturn(null);
       replayAll();
         
-      classUnderTest.handleRequest(request, response);
+      classUnderTest.handleRequest((HttpServletRequest) request, (HttpServletResponse) response);
       verifyAll();
         
       assertEquals(HttpServletResponse.SC_NOT_FOUND, response.getStatus());
-      assertEquals(messages.getMessage("postfile.server.generic_post_file_error"), response.getErrorMessage());
+      assertEquals(messages.getMessage("postfile.server.generic_post_file_error"), response.getHeader("Baltrad-Message"));
     }
  
     @Test
@@ -316,11 +318,11 @@ public class PostFileServletTest extends EasyMockSupport {
       expect(fileCatalog.store(isA(InputStream.class))).andThrow(new DuplicateEntry());
       replayAll();
         
-      classUnderTest.handleRequest(request, response);
+      classUnderTest.handleRequest((HttpServletRequest) request, (HttpServletResponse)response);
       verifyAll();
         
       assertEquals(HttpServletResponse.SC_CONFLICT, response.getStatus());
-      assertEquals(messages.getMessage("postfile.server.duplicate_entry_error"), response.getErrorMessage());
+      assertEquals(messages.getMessage("postfile.server.duplicate_entry_error"), response.getHeader("Baltrad-Message"));
     }
 
     @Test
@@ -330,11 +332,11 @@ public class PostFileServletTest extends EasyMockSupport {
       expect(fileCatalog.store(isA(InputStream.class))).andThrow(new DatabaseError());
       replayAll();
         
-      classUnderTest.handleRequest(request, response);
+      classUnderTest.handleRequest((HttpServletRequest) request, (HttpServletResponse) response);
       verifyAll();
       
       assertEquals(HttpServletResponse.SC_NOT_ACCEPTABLE, response.getStatus());
-      assertEquals(messages.getMessage("postfile.server.database_error"), response.getErrorMessage());
+      assertEquals(messages.getMessage("postfile.server.database_error"), response.getHeader("Baltrad-Message"));
     }
 
     @Test
@@ -355,7 +357,7 @@ public class PostFileServletTest extends EasyMockSupport {
 
       replayAll();
       
-      classUnderTest.handleRequest(request, response);
+      classUnderTest.handleRequest((HttpServletRequest) request, (HttpServletResponse) response);
       
       verifyAll();
     }
@@ -379,7 +381,7 @@ public class PostFileServletTest extends EasyMockSupport {
 
       replayAll();
       
-      classUnderTest.handleRequest(request, response);
+      classUnderTest.handleRequest((HttpServletRequest) request, (HttpServletResponse) response);
       
       verifyAll();
     }
@@ -407,7 +409,7 @@ public class PostFileServletTest extends EasyMockSupport {
       
       replayAll();
       
-      classUnderTest.handleRequest(request, response);
+      classUnderTest.handleRequest((HttpServletRequest) request, (HttpServletResponse) response);
       
       verifyAll();
       assertEquals(1, status.getDownloads());
@@ -433,7 +435,7 @@ public class PostFileServletTest extends EasyMockSupport {
       
       replayAll();
       
-      classUnderTest.handleRequest(request, response);
+      classUnderTest.handleRequest((HttpServletRequest) request, (HttpServletResponse) response);
       
       verifyAll();
       assertEquals(0, status.getDownloads());
@@ -461,7 +463,7 @@ public class PostFileServletTest extends EasyMockSupport {
       
       replayAll();
       
-      classUnderTest.handleRequest(request, response);
+      classUnderTest.handleRequest((HttpServletRequest) request, (HttpServletResponse) response);
       
       verifyAll();
       assertEquals(1, status.getDownloads());

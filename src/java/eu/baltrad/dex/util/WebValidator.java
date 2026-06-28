@@ -22,6 +22,8 @@
 package eu.baltrad.dex.util;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,8 +49,8 @@ public class WebValidator {
     public static boolean validateUrl(String urlString) {
     	URL url;
     	try {
-            url = new URL(urlString);
-        } catch (MalformedURLException malformedURLException) {
+            url = new URI(urlString).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
             return false;
         }
     	
@@ -79,8 +81,8 @@ public class WebValidator {
     public static boolean isUrlLocal(String urlString) {
     	URL url;
     	try {
-    		url = new URL(urlString);
-    	} catch (MalformedURLException malformedURLException) {
+    		url = new URI(urlString).toURL();
+    	} catch (MalformedURLException | URISyntaxException e) {
     		return false;
     	}
 

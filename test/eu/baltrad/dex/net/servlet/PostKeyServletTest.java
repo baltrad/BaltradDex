@@ -38,7 +38,7 @@ import org.junit.Test;
 import org.easymock.EasyMock;
 import static org.easymock.EasyMock.*;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 import java.util.ArrayList;

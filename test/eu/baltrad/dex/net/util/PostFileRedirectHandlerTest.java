@@ -23,11 +23,10 @@ import static org.junit.Assert.*;
 
 import java.net.URI;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
 import org.apache.log4j.Logger;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
@@ -90,9 +89,7 @@ public class PostFileRedirectHandlerTest extends EasyMockSupport {
   @Test
   public void canHandle_SC_MOVED_PERMANENTLY() {
     HttpResponse response = createMock(HttpResponse.class);
-    StatusLine statusLine = createMock(StatusLine.class);
-    expect(response.getStatusLine()).andReturn(statusLine).anyTimes();
-    expect(statusLine.getStatusCode()).andReturn(HttpServletResponse.SC_MOVED_PERMANENTLY).anyTimes();
+    expect(response.getCode()).andReturn(HttpServletResponse.SC_MOVED_PERMANENTLY).anyTimes();
     replayAll();
     assertTrue(classUnderTest.canHandle(response));
     verifyAll();
@@ -101,9 +98,7 @@ public class PostFileRedirectHandlerTest extends EasyMockSupport {
   @Test
   public void canHandle_SC_MOVED_TEMPORARILY() {
     HttpResponse response = createMock(HttpResponse.class);
-    StatusLine statusLine = createMock(StatusLine.class);
-    expect(response.getStatusLine()).andReturn(statusLine).anyTimes();
-    expect(statusLine.getStatusCode()).andReturn(HttpServletResponse.SC_MOVED_TEMPORARILY).anyTimes();
+    expect(response.getCode()).andReturn(HttpServletResponse.SC_MOVED_TEMPORARILY).anyTimes();
     replayAll();
     assertTrue(classUnderTest.canHandle(response));
     verifyAll();
@@ -122,7 +117,7 @@ public class PostFileRedirectHandlerTest extends EasyMockSupport {
     expect(protocolManager.createParser(response)).andReturn(parser);
     expect(parser.isRedirected()).andReturn(true);
     expect(peerUser.getNodeAddress()).andReturn("http://slask.se");
-    expect(request.getURI()).andReturn(URI.create("http://slask.se/BaltradDex/post_file.htm"));
+    expect(request.getUri()).andReturn(URI.create("http://slask.se/BaltradDex/post_file.htm"));
     expect(parser.getRedirectURL()).andReturn("https://somewhere.se/BaltradDex/post_file.htm");
     expect(peerUser.getRedirectedAddress()).andReturn(null);
     peerUser.setRedirectedAddress("https://somewhere.se");
@@ -157,7 +152,7 @@ public class PostFileRedirectHandlerTest extends EasyMockSupport {
     expect(protocolManager.createParser(response)).andReturn(parser);
     expect(parser.isRedirected()).andReturn(true);
     expect(peerUser.getNodeAddress()).andReturn("http://slask.se");
-    expect(request.getURI()).andReturn(URI.create("http://slask.se/BaltradDex/post_file.htm"));
+    expect(request.getUri()).andReturn(URI.create("http://slask.se/BaltradDex/post_file.htm"));
     expect(parser.getRedirectURL()).andReturn("https://somewhere.se/BaltradDex/post_file.htm");
     expect(peerUser.getRedirectedAddress()).andReturn("https://somewhere.se");
     expect(protocolManager.getFactory("https://somewhere.se")).andReturn(requestFactory);

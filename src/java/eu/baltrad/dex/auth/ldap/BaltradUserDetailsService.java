@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -53,17 +53,17 @@ public class BaltradUserDetailsService implements UserDetailsService, Initializi
   /**
    * Administrator
    */
-  private GrantedAuthority ADMIN_AUTH = new GrantedAuthorityImpl("ROLE_ADMIN");
+  private GrantedAuthority ADMIN_AUTH = new SimpleGrantedAuthority("ROLE_ADMIN");
   
   /**
    * Operator
    */
-  private GrantedAuthority OPERATOR_AUTH = new GrantedAuthorityImpl("ROLE_OPERATOR");
+  private GrantedAuthority OPERATOR_AUTH = new SimpleGrantedAuthority("ROLE_OPERATOR");
   
   /**
    * User
    */
-  private GrantedAuthority USER_AUTH = new GrantedAuthorityImpl("ROLE_USER");
+  private GrantedAuthority USER_AUTH = new SimpleGrantedAuthority("ROLE_USER");
   
   /**
    * The user prefix

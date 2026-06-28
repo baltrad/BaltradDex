@@ -23,8 +23,8 @@ package eu.baltrad.dex.log.controller;
 
 import eu.baltrad.dex.log.manager.ILogManager;
 import eu.baltrad.dex.log.model.ILogEntry;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

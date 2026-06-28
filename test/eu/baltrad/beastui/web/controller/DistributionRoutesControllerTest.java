@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 
 import java.io.InputStream;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.easymock.EasyMockSupport;
 import org.junit.After;
 import org.junit.Before;

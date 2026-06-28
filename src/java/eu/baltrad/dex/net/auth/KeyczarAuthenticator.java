@@ -28,8 +28,8 @@ import eu.baltrad.dex.auth.util.KeyczarCryptoFactory;
 import eu.baltrad.dex.auth.util.Signer;
 import eu.baltrad.dex.auth.util.Verifier;
 
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.Header;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.core5.http.Header;
 
 import org.apache.commons.lang3.StringUtils;
 

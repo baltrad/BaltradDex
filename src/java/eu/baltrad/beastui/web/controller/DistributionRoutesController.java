@@ -27,7 +27,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -313,7 +313,7 @@ public class DistributionRoutesController {
       Boolean active,
       String description) {
     if (active == null)
-      active = new Boolean(false);
+      active = Boolean.valueOf(false);
     return manager.create(name, author, active, description, null, null);
   }
   

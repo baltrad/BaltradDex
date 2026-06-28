@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -319,24 +319,24 @@ public class VolumeRoutesController {
     model.addAttribute("anomaly_detectors", createOrderedDetectorList(anomalymanager.list(), detectors));
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
-    model.addAttribute("active", (active == null) ? new Boolean(true) : active);
+    model.addAttribute("active", (active == null) ? Boolean.valueOf(true) : active);
     model.addAttribute("description", (description == null) ? "" : description);
-    model.addAttribute("ascending", (ascending == null) ? new Boolean(false) : ascending);
-    model.addAttribute("mine", (mine == null) ? new Double(-90.0) : mine);
-    model.addAttribute("maxe", (maxe == null) ? new Double(90.0) : maxe);
+    model.addAttribute("ascending", (ascending == null) ? Boolean.valueOf(false) : ascending);
+    model.addAttribute("mine", (mine == null) ? Double.valueOf(-90.0) : mine);
+    model.addAttribute("maxe", (maxe == null) ? Double.valueOf(90.0) : maxe);
     model.addAttribute("elangles", (elangles == null) ? "" : elangles);
     model.addAttribute("adaptive_elangles", (adaptive_elangles==null) ? Boolean.valueOf(false) : adaptive_elangles);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
-    model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
-    model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
-    model.addAttribute("nominal_timeout", (nominal_timeout == null) ? new Boolean(false) : nominal_timeout);
+    model.addAttribute("interval", (interval == null) ? Integer.valueOf(15) : interval);
+    model.addAttribute("timeout", (timeout == null) ? Integer.valueOf(15*60) : timeout);
+    model.addAttribute("nominal_timeout", (nominal_timeout == null) ? Boolean.valueOf(false) : nominal_timeout);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
         (detectors == null) ? new ArrayList<String>() : detectors);
     model.addAttribute("quality_control_mode",
-        (quality_control_mode == null) ? new Integer(0) : quality_control_mode);
+        (quality_control_mode == null) ? Integer.valueOf(0) : quality_control_mode);
     model.addAttribute("filterJson", jsonFilter);
     if (emessage != null) {
       model.addAttribute("emessage", emessage);
@@ -389,24 +389,24 @@ public class VolumeRoutesController {
     model.addAttribute("anomaly_detectors", createOrderedDetectorList(anomalymanager.list(), detectors));
     model.addAttribute("name", (name == null) ? "" : name);
     model.addAttribute("author", (author == null) ? "" : author);
-    model.addAttribute("active", (active == null) ? new Boolean(true) : active);
+    model.addAttribute("active", (active == null) ? Boolean.valueOf(true) : active);
     model.addAttribute("description", (description == null) ? "" : description);
-    model.addAttribute("ascending", (ascending == null) ? new Boolean(false) : ascending);
-    model.addAttribute("mine", (mine == null) ? new Double(-90.0) : mine);
-    model.addAttribute("maxe", (maxe == null) ? new Double(90.0) : maxe);
+    model.addAttribute("ascending", (ascending == null) ? Boolean.valueOf(false) : ascending);
+    model.addAttribute("mine", (mine == null) ? Double.valueOf(-90.0) : mine);
+    model.addAttribute("maxe", (maxe == null) ? Double.valueOf(90.0) : maxe);
     model.addAttribute("elangles", (elangles == null) ? "" : elangles);
     model.addAttribute("adaptive_elangles", (adaptive_elangles==null)?Boolean.valueOf(false):adaptive_elangles);
     model.addAttribute("recipients",
         (recipients == null) ? new ArrayList<String>() : recipients);
-    model.addAttribute("interval", (interval == null) ? new Integer(15) : interval);
-    model.addAttribute("timeout", (timeout == null) ? new Integer(15*60) : timeout);
-    model.addAttribute("nominal_timeout", (nominal_timeout == null) ? new Boolean(false) : nominal_timeout);
+    model.addAttribute("interval", (interval == null) ? Integer.valueOf(15) : interval);
+    model.addAttribute("timeout", (timeout == null) ? Integer.valueOf(15*60) : timeout);
+    model.addAttribute("nominal_timeout", (nominal_timeout == null) ? Boolean.valueOf(false) : nominal_timeout);
     model.addAttribute("sources",
         (sources == null) ? new ArrayList<String>() : sources);
     model.addAttribute("detectors",
         (detectors == null) ? new ArrayList<String>() : detectors);
     model.addAttribute("quality_control_mode",
-        (quality_control_mode == null) ? new Integer(0) : quality_control_mode);
+        (quality_control_mode == null) ? Integer.valueOf(0) : quality_control_mode);
     if (jsonFilter != null && !jsonFilter.equals("")) {
       model.addAttribute("filterJson", jsonFilter);
     }

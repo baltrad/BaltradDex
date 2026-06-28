@@ -35,7 +35,7 @@ Author     : szewczenko
                         <div class="header-text">
                             Address can only be changed on peer accounts.  
                         </div>
-                        <form:form method="POST" commandName="user_account">
+                        <form:form method="POST" modelAttribute="user_account">
                             <div class="body">
                                 <div class="row">
                                     <div class="leftcol">
@@ -162,7 +162,7 @@ Author     : szewczenko
                                 </div>
                             </c:otherwise>
                         </c:choose>
-                        <form:form method="POST" commandName="user_account">
+                        <form:form method="POST" modelAttribute="user_account">
                             <div class="body">
                                 <div class="row">
                                     <div class="leftcol">

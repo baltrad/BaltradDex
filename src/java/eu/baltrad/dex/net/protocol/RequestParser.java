@@ -22,7 +22,7 @@ package eu.baltrad.dex.net.protocol;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.keyczar.exceptions.KeyczarException;
 

@@ -63,7 +63,7 @@ Author     : szewczenko
                             Use parameters below to define search criteria 
                             and browse files.
                         </div>
-                        <form:form method="POST" commandName="query_param">
+                        <form:form method="POST" modelAttribute="query_param">
                             <div class="row">
                                 <div class="leftcol">
                                     <div class="label">

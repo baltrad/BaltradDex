@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpResponse;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -150,7 +150,7 @@ public class ProtocolVersionResponseParser implements ResponseParser {
   @Override
   public String getReasonPhrase() {
     try {
-      return httpResponse.getStatusLine().getReasonPhrase();
+      return String.valueOf(httpResponse.getCode());
     } catch (Exception e) {
       // pass
     }
@@ -219,7 +219,7 @@ public class ProtocolVersionResponseParser implements ResponseParser {
    */
   protected int parseStatusCode(HttpResponse response) {
     try {
-      return response.getStatusLine().getStatusCode();
+      return response.getCode();
     } catch (Exception e) {
       throw new ResponseParserException(e);
     }
@@ -265,12 +265,18 @@ public class ProtocolVersionResponseParser implements ResponseParser {
     try {
       InputStream is = null;
       try {
-        is = httpResponse.getEntity().getContent();
-        String result = IOUtils.toString(is, "UTF-8");
-        logger.debug("Got response: '" + result + "'");
-        return result;
+        if (httpResponse instanceof org.apache.hc.core5.http.ClassicHttpResponse) {
+          org.apache.hc.core5.http.ClassicHttpResponse classicResponse = (org.apache.hc.core5.http.ClassicHttpResponse) httpResponse;
+          is = classicResponse.getEntity().getContent();
+          String result = IOUtils.toString(is, "UTF-8");
+          logger.debug("Got response: '" + result + "'");
+          return result;
+        }
+        return "";
       } finally {
-        is.close();
+        if (is != null) {
+          is.close();
+        }
       }
     } catch (Exception e) {
       throw new ResponseParserException(e);

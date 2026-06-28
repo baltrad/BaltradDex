@@ -101,7 +101,7 @@ public class AdaptorsControllerTest extends EasyMockSupport {
     expect(model.addAttribute("name", "A1")).andReturn(null);
     expect(model.addAttribute("type", "XMLRPC")).andReturn(null);
     expect(model.addAttribute("uri", "http://somewhere/somehow")).andReturn(null);
-    expect(model.addAttribute("timeout", new Long(6000))).andReturn(null);
+    expect(model.addAttribute("timeout", Long.valueOf(6000))).andReturn(null);
     
     replayAll();
     

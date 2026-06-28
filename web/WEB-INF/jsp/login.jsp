@@ -31,12 +31,9 @@ Author     : szewczenko
         <link rel="StyleSheet" href="includes/dex.css" type="text/css" 
               media="screen"/>
         <link rel="icon" type="image/png" href="includes/images/favicon.png"/>
-        <script src="includes/js/load_clock.js" type="text/javascript" 
-                language="Javascript">
-        </script>
         <title>BALTRAD | Login</title>
 	</head>
-	<body onload="loadClock();">
+	<body>
 		<div id="container">
 			<t:header_login/>
 			<div id="sidebar">

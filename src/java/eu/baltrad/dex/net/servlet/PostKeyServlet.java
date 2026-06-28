@@ -41,18 +41,18 @@ import java.io.ByteArrayOutputStream;
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.portlet.ModelAndView;
+import org.springframework.web.servlet.ModelAndView;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletInputStream;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletInputStream;
 
 import java.io.File;
 import java.io.InputStream;
@@ -169,8 +169,8 @@ public class PostKeyServlet extends HttpServlet {
         } catch (Exception e) {
             logger.error("doPost failed: " + e.getMessage(), e);
             log.error(messages.getMessage(PK_INTERNAL_SERVER_ERROR_KEY));
-            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
-                    messages.getMessage(PK_INTERNAL_SERVER_ERROR_KEY));
+            res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            res.setMessage(messages.getMessage(PK_INTERNAL_SERVER_ERROR_KEY));
         }
     }        
 

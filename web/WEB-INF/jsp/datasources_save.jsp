@@ -36,7 +36,7 @@ Author     : szewczenko
                     Configure data source parameters. Click <i>Save</i>
                     to store data source.
                 </div>
-                <form:form method="POST" commandName="data_source">
+                <form:form method="POST" modelAttribute="data_source">
                     <div class="body">
                         <div class="row2">
                             <div class="datasource-basic">

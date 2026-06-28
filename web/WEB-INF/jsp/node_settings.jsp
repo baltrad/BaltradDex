@@ -34,7 +34,7 @@ Author     : szewczenko
                     Edit node settings and click <i>Save</i> button in order 
                     to save changes. 
                 </div>
-                <form:form method="POST" commandName="config">
+                <form:form method="POST" modelAttribute="config">
                     <t:message_box msgHeader="Success."
                                    msgBody="${message}"
                                    errorHeader="Problems encountered."

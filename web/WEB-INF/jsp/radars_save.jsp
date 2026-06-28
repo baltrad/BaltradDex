@@ -34,7 +34,7 @@ Author     : szewczenko
                     Select center ID to access available radar stations.
                     Select radar station and click <i>Save</i> to store settings.  
                 </div>
-                <form:form method="POST" commandName="radar">
+                <form:form method="POST" modelAttribute="radar">
                     <t:message_box errorHeader="Problems encountered."
                                    errorBody="${odim_load_error}"/>    
                     <div class="row" id="label">

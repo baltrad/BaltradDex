@@ -26,10 +26,11 @@ import eu.baltrad.dex.net.model.impl.Subscription;
 import eu.baltrad.dex.user.model.User;
 import eu.baltrad.dex.util.CompressDataUtil;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.Header;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -71,23 +72,25 @@ public class DefaultRequestFactoryTest {
     }
     
     private HttpEntity getEntity(HttpUriRequest request) {
-        HttpEntityEnclosingRequest entityRequest = null;
+        // HttpClient 5: use HttpUriRequestBase which has getEntity() method
         try {
-            entityRequest = (HttpEntityEnclosingRequest) request;
-        } catch (ClassCastException e) {
+            if (request instanceof HttpUriRequestBase) {
+                return ((HttpUriRequestBase) request).getEntity();
+            }
+        } catch (Exception e) {
             return null;
         }
-        return entityRequest.getEntity();
+        return null;
     }
     
     @Test
-    public void createDataSourceListingRequest() {
+    public void createDataSourceListingRequest() throws Exception {
         HttpUriRequest request = classUnderTest
                 .createDataSourceListingRequest(user);
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/datasource_listing.htm"), 
-            request.getURI());
+            request.getUri());  // HttpClient 5: getUri() instead of getURI()
         assertEquals("localnode", getHeader(request, "Node-Name"));
         assertEquals("application/json", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));
@@ -95,14 +98,14 @@ public class DefaultRequestFactoryTest {
     }
     
     @Test
-    public void createStartSubscriptionRequest() {
+    public void createStartSubscriptionRequest() throws Exception {
         HttpUriRequest request = classUnderTest
                 .createStartSubscriptionRequest(user, 
                     new HashSet<DataSource>());
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/start_subscription.htm"), 
-            request.getURI());
+            request.getUri());  // HttpClient 5: getUri() instead of getURI()
         assertEquals("localnode", getHeader(request, "Node-Name"));
         assertEquals("application/json", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));
@@ -110,14 +113,14 @@ public class DefaultRequestFactoryTest {
     }
     
     @Test
-    public void createUpdateSubscriptionRequest() {
+    public void createUpdateSubscriptionRequest() throws Exception {
         HttpUriRequest request = classUnderTest
                 .createUpdateSubscriptionRequest(user, 
                     new ArrayList<Subscription>());
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/update_subscription.htm"), 
-            request.getURI());
+            request.getUri());  // HttpClient 5: getUri() instead of getURI()
         assertEquals("localnode", getHeader(request, "Node-Name"));
         assertEquals("application/json", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));
@@ -125,12 +128,12 @@ public class DefaultRequestFactoryTest {
     }
     
     @Test
-    public void createPostFileRequest() {
+    public void createPostFileRequest() throws Exception {
         HttpUriRequest request = classUnderTest
             .createPostFileRequest(user, "datafilecontent".getBytes());
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
-            "http://example.com/BaltradDex/post_file.htm"), request.getURI());
+            "http://example.com/BaltradDex/post_file.htm"), request.getUri());  // HttpClient 5: getUri() instead of getURI()
         assertEquals("localnode", getHeader(request, "Node-Name"));
         assertEquals("application/x-hdf5", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));
@@ -138,13 +141,13 @@ public class DefaultRequestFactoryTest {
     }
     
     @Test
-    public void createPostMessageRequest() {
+    public void createPostMessageRequest() throws Exception {
         HttpUriRequest request = classUnderTest
                 .createPostMessageRequest(user, "Hello world!");
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/post_message.htm"), 
-            request.getURI());
+            request.getUri());  // HttpClient 5: getUri() instead of getURI()
         assertEquals("localnode", getHeader(request, "Node-Name"));
         assertEquals("text/html", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));
@@ -158,7 +161,7 @@ public class DefaultRequestFactoryTest {
         assertEquals("POST", request.getMethod());
         assertEquals(URI.create(
             "http://example.com/BaltradDex/post_key.htm"), 
-            request.getURI());
+            request.getUri());  // HttpClient 5: getUri() instead of getURI()
         assertEquals("localnode", getHeader(request, "Node-Name"));
         assertEquals("application/zip", getHeader(request, "Content-Type"));
         assertNotNull(getHeader(request, "Content-MD5"));

@@ -26,8 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 
 import org.easymock.EasyMockSupport;
 import org.junit.After;
@@ -139,13 +139,16 @@ public class ProtocolVersionResponseWriterTest extends EasyMockSupport {
   }
   
   @Test
-  public void messageResponse() {
-    responseWrapper.setStatus(HttpServletResponse.SC_NOT_FOUND, "not found");
-    
+  public void messageResponse() throws Exception {
+    responseWrapper.setStatus(HttpServletResponse.SC_NOT_FOUND);
+    printWriter.write("not found");
+    printWriter.flush();
+    printWriter.close();
+
     replayAll();
-    
+
     classUnderTest.messageResponse("not found", HttpServletResponse.SC_NOT_FOUND);
-    
+
     verifyAll();
   }
   

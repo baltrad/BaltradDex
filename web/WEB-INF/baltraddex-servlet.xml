@@ -23,12 +23,15 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+       http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/aop
-       http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+       http://www.springframework.org/schema/aop/spring-aop.xsd
        http://www.springframework.org/schema/tx
-       http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd">
        
     <!--
       bdb.xml provides the following beans:
@@ -606,7 +609,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     </bean>
     
     <!-- beastui uses Controller annotations -->
-    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping"/>
+    <mvc:annotation-driven/>
 
     <!-- We need to have a timeout manager so that we can initiate timeout requests from anywhere -->
     <bean id="timeoutfactory" class="eu.baltrad.beast.rules.timer.TimeoutTaskFactory"/>  

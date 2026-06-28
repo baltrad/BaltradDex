@@ -12,7 +12,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -52,9 +52,9 @@ public class BaltradUserDetailsServiceTest extends EasyMockSupport {
     verifyAll();
     Set<GrantedAuthority> auth = (Set)details.getAuthorities();
     assertEquals(3, auth.size());
-    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_ADMIN")));
-    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_OPERATOR")));
-    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_USER")));
+    assertTrue(auth.contains(new SimpleGrantedAuthority("ROLE_ADMIN")));
+    assertTrue(auth.contains(new SimpleGrantedAuthority("ROLE_OPERATOR")));
+    assertTrue(auth.contains(new SimpleGrantedAuthority("ROLE_USER")));
   }
   
   @Test
@@ -74,9 +74,9 @@ public class BaltradUserDetailsServiceTest extends EasyMockSupport {
     verifyAll();
     Set<GrantedAuthority> auth = (Set)details.getAuthorities();
     assertEquals(3, auth.size());
-    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_ADMIN")));
-    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_OPERATOR")));
-    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_USER")));
+    assertTrue(auth.contains(new SimpleGrantedAuthority("ROLE_ADMIN")));
+    assertTrue(auth.contains(new SimpleGrantedAuthority("ROLE_OPERATOR")));
+    assertTrue(auth.contains(new SimpleGrantedAuthority("ROLE_USER")));
   }
   
   @Test
@@ -94,8 +94,8 @@ public class BaltradUserDetailsServiceTest extends EasyMockSupport {
     verifyAll();
     Set<GrantedAuthority> auth = (Set)details.getAuthorities();
     assertEquals(2, auth.size());
-    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_OPERATOR")));
-    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_USER")));
+    assertTrue(auth.contains(new SimpleGrantedAuthority("ROLE_OPERATOR")));
+    assertTrue(auth.contains(new SimpleGrantedAuthority("ROLE_USER")));
   }
   
   @Test
@@ -113,7 +113,7 @@ public class BaltradUserDetailsServiceTest extends EasyMockSupport {
     verifyAll();
     Set<GrantedAuthority> auth = (Set)details.getAuthorities();
     assertEquals(1, auth.size());
-    assertTrue(auth.contains(new GrantedAuthorityImpl("ROLE_USER")));
+    assertTrue(auth.contains(new SimpleGrantedAuthority("ROLE_USER")));
   }
   
   @Test

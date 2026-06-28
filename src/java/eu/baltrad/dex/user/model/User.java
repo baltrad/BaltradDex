@@ -21,7 +21,7 @@
 
 package eu.baltrad.dex.user.model;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Class implements user object.
