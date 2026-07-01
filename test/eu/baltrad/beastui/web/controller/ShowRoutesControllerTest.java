@@ -35,6 +35,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import eu.baltrad.beast.router.IRouterManager;
 import eu.baltrad.beast.router.RouteDefinition;
@@ -44,22 +45,25 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
   private ShowRoutesController classUnderTest = null;
   private IRouterManager manager = null;
   private Model model = null;
+  private RedirectAttributes redirectAttributes = null;
   private HttpSession httpSession = null;
 
   @Before
   public void setUp() throws Exception {
     manager = createMock(IRouterManager.class);
     model = createMock(Model.class);
+    redirectAttributes = createMock(RedirectAttributes.class);
     httpSession = createMock(HttpSession.class);
     classUnderTest = new ShowRoutesController();
     classUnderTest.setManager(manager);
-  }  
+  }
 
   @After
   public void tearDown() throws Exception {
     classUnderTest = null;
     manager = null;
     model = null;
+    redirectAttributes = null;
   }
 
   @Test
@@ -412,11 +416,11 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     expect(manager.getDefinition("Nisse")).andReturn(def);
     expect(def.getRuleType()).andReturn("groovy");
     
-    expect(model.addAttribute("name", "Nisse")).andReturn(null);
+    expect(redirectAttributes.addAttribute("name", "Nisse")).andReturn(redirectAttributes);
 
     replayAll();
     
-    String result = classUnderTest.showRoute(model, "Nisse");
+    String result = classUnderTest.showRoute(model, redirectAttributes, "Nisse");
     
     verifyAll();
     
@@ -429,11 +433,11 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     
     expect(manager.getDefinition("Nisse")).andReturn(def);
     expect(def.getRuleType()).andReturn("blt_composite");
-    expect(model.addAttribute("name", "Nisse")).andReturn(null);
+    expect(redirectAttributes.addAttribute("name", "Nisse")).andReturn(redirectAttributes);
 
     replayAll();
     
-    String result = classUnderTest.showRoute(model, "Nisse");
+    String result = classUnderTest.showRoute(model, redirectAttributes, "Nisse");
     
     verifyAll();
     
@@ -446,11 +450,11 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     
     expect(manager.getDefinition("Nisse")).andReturn(def);
     expect(def.getRuleType()).andReturn("bdb_trim_age");
-    expect(model.addAttribute("name", "Nisse")).andReturn(null);
+    expect(redirectAttributes.addAttribute("name", "Nisse")).andReturn(redirectAttributes);
 
     replayAll();
     
-    String result = classUnderTest.showRoute(model, "Nisse");
+    String result = classUnderTest.showRoute(model, redirectAttributes, "Nisse");
     
     verifyAll();
     
@@ -463,11 +467,11 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     
     expect(manager.getDefinition("Nisse")).andReturn(def);
     expect(def.getRuleType()).andReturn("bdb_trim_count");
-    expect(model.addAttribute("name", "Nisse")).andReturn(null);
+    expect(redirectAttributes.addAttribute("name", "Nisse")).andReturn(redirectAttributes);
 
     replayAll();
     
-    String result = classUnderTest.showRoute(model, "Nisse");
+    String result = classUnderTest.showRoute(model, redirectAttributes, "Nisse");
     
     verifyAll();
     
@@ -480,11 +484,11 @@ public class ShowRoutesControllerTest extends EasyMockSupport {
     
     expect(manager.getDefinition("Nisse")).andReturn(def);
     expect(def.getRuleType()).andReturn("blt_gmap");
-    expect(model.addAttribute("name", "Nisse")).andReturn(null);
+    expect(redirectAttributes.addAttribute("name", "Nisse")).andReturn(redirectAttributes);
 
     replayAll();
     
-    String result = classUnderTest.showRoute(model, "Nisse");
+    String result = classUnderTest.showRoute(model, redirectAttributes, "Nisse");
     
     verifyAll();
     
