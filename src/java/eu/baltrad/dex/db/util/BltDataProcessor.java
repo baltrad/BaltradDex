@@ -347,12 +347,6 @@ public class BltDataProcessor {
       return result;
     }
 
-    /**
-     * Narrow a composite dataset already stored in byte range (0-255) but
-     * read back as a wider type, into a byte[]. Unlike polar data, composite
-     * values need no gain/offset/nodata conversion - they are already
-     * calibrated to byte range by the writer.
-     */
     protected byte[] narrowToByte(short[] data) {
       byte[] result = new byte[data.length];
       for (int i = 0; i < result.length; i++) {
