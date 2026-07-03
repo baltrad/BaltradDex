@@ -66,7 +66,7 @@ function updateCounter() {
                 xmlHttp1.responseText;
         }
     });
-    //setTimeout("updateCounter()", 5000);
+    setTimeout("updateCounter()", 5000);
 }
 
 function toggleTimeout(func, timeout) {

@@ -57,7 +57,7 @@
         <script src="includes/js/submit_center_id.js" type="text/javascript"></script>          
         <script src="//ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js" type="text/javascript"></script>
         <script src="includes/js/filter.js" type="text/javascript"></script>
-        <!--<script src="includes/js/messages_ajax.js" type="text/javascript"></script>-->
+        <script src="includes/js/messages_ajax.js" type="text/javascript"></script>
         <jsp:invoke fragment="extraHeader"/>
         <title>BALTRAD | ${pageTitle}</title>
 	</head>
