@@ -37,9 +37,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ModelMap;
 
-import ncsa.hdf.object.h5.H5File;
-import ncsa.hdf.object.Group;
-import ncsa.hdf.object.Dataset;
+import io.jhdf.HdfFile;
+import io.jhdf.api.Group;
+import io.jhdf.api.Dataset;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -143,7 +143,7 @@ public class BltFileDetailsController {
 
         String filePath = fileCatalog
                 .getLocalPathForUuid(UUID.fromString(uuid)).toString();
-        H5File h5File = bltDataProcessor.openH5File(filePath);
+        HdfFile h5File = bltDataProcessor.openH5File(filePath);
 
         // Process file depending on file object / data type
         // SCANs and PVOLs
@@ -171,7 +171,7 @@ public class BltFileDetailsController {
      * @param uuid
      *            Unique file entry
      */
-    public void processPolarData(BltFile bltFile, H5File h5File, String uuid,
+    public void processPolarData(BltFile bltFile, HdfFile h5File, String uuid,
             ModelMap model) {
         // process the file
         Group root = bltDataProcessor.getH5Root(h5File);
@@ -377,7 +377,7 @@ public class BltFileDetailsController {
      * @param model
      *            Model map
      */
-    public void processCompositeData(BltFile bltFile, H5File h5File,
+    public void processCompositeData(BltFile bltFile, HdfFile h5File,
             String uuid, ModelMap model) {
         // process the file
         Group root = bltDataProcessor.getH5Root(h5File);

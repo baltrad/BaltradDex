@@ -67,6 +67,7 @@
         <javassist.version>3.30.2-GA</javassist.version>
         <commons-validator.version>1.10.1</commons-validator.version>
         <jhdf.version>0.6.10</jhdf.version>
+        <compress-lzf.version>1.1.2</compress-lzf.version>
         <proj4j.version>1.3.0</proj4j.version>
     </properties>
 
@@ -489,6 +490,13 @@
             <groupId>io.jhdf</groupId>
             <artifactId>jhdf</artifactId>
             <version>${jhdf.version}</version>
+        </dependency>
+
+        <!-- for jhdf -->
+        <dependency>
+            <groupId>com.ning</groupId>
+            <artifactId>compress-lzf</artifactId>
+            <version>${compress-lzf.version}</version>
         </dependency>
 
         <dependency>

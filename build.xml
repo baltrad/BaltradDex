@@ -96,9 +96,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fileset dir="${extralib.dir}">
       <include name="**/*.jar"/>
     </fileset>
-    <fileset dir="lib/jhdf">
-      <include name="*.jar"/>
-    </fileset>
     <fileset dir="lib/keyczar">
       <include name="*.jar"/>
     </fileset>
@@ -224,10 +221,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <include name="*.jar"/>
         <!-- spring-jcl provides the commons-logging API; the real jar causes SLF4J routing conflicts -->
         <exclude name="commons-logging*.jar"/>
-      </fileset>
-      
-      <fileset dir="lib/jhdf">
-        <include name="*.jar"/>
       </fileset>
       
       <fileset dir="lib/keyczar">
@@ -435,7 +428,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
       <classpath refid="dep.lib.path"/>
 	  <classpath location="${build.test.dir}" />
 	  <batchtest fork="yes" todir="${dist.dir}/junit-reports">
-	    <fileset dir="${build.test.dir}" includes="**/*Test.class" excludes="**/*BltDataProcessorTest.class" />
+	    <fileset dir="${build.test.dir}" includes="**/*Test.class" />
 	  </batchtest>
 	</junit>
   </target>

@@ -19,77 +19,62 @@ along with the BaltradDex package library.  If not, see <http://www.gnu.org/lice
 
 package eu.baltrad.dex.db.util;
 
-import ncsa.hdf.object.Attribute;
-import ncsa.hdf.object.Datatype;
+import io.jhdf.api.Attribute;
 
 /**
  * @author Anders Henja
  */
 public class BltAttribute {
   private Attribute attr = null;
-  
+
   public BltAttribute(Attribute attr) {
     this.attr = attr;
   }
-  
+
   public boolean isDouble() {
-    return attr.getType().getDatatypeClass() == Datatype.CLASS_FLOAT;
+    Object data = attr.getData();
+    return data instanceof Double || data instanceof Float;
   }
-  
+
   public Double getDouble() {
-    if (isDouble()) {
-      Double result = null;
-      try {
-        float attrFloat[] = (float[]) attr.getValue();
-        Float f = attrFloat[0];
-        double d = f.doubleValue();
-        result = d;
-      } catch (ClassCastException e) {
-        double attrDouble[] = (double[]) attr.getValue();
-        Double d = attrDouble[0];
-        result = d;
-      }
-      return result;
+    Object data = attr.getData();
+    if (data instanceof Float) {
+      return ((Float) data).doubleValue();
+    } else if (data instanceof Double) {
+      return (Double) data;
     } else {
       throw new RuntimeException("Can not return Double.");
     }
   }
-  
+
   public boolean isLong() {
-    return attr.getType().getDatatypeClass() == Datatype.CLASS_INTEGER;
+    Object data = attr.getData();
+    return data instanceof Long || data instanceof Integer;
   }
 
   public Long getLong() {
-    if (isLong()) {
-      Long result = null;
-      try {
-        int attrInt[] = (int[]) attr.getValue();
-        Integer i = attrInt[0];
-        long l = i.longValue();
-        result = l;
-      } catch (ClassCastException e) {
-        long attrLong[] = (long[]) attr.getValue();
-        Long l = attrLong[0];
-        result = l;
-      }
-      return result;
+    Object data = attr.getData();
+    if (data instanceof Integer) {
+      return ((Integer) data).longValue();
+    } else if (data instanceof Long) {
+      return (Long) data;
     } else {
       throw new RuntimeException("Can not return Long.");
     }
   }
 
   public boolean isString() {
-    return attr.getType().getDatatypeClass() == Datatype.CLASS_STRING;
+    return attr.getData() instanceof String;
   }
-  
+
   public String getString() {
     if (isString()) {
-      return ((String[]) attr.getValue())[0];
+      return (String) attr.getData();
     } else {
       throw new RuntimeException("Can not return String.");
     }
   }
-  
+
   public Object getValue() {
     return null;
   }

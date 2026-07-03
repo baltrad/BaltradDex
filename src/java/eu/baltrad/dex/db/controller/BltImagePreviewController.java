@@ -42,9 +42,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 
 import java.util.UUID;
-import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Group;
-import ncsa.hdf.object.h5.H5File;
+import io.jhdf.api.Dataset;
+import io.jhdf.api.Group;
+import io.jhdf.HdfFile;
 
 /**
  * Implements data visualization and preview functionality.
@@ -118,7 +118,7 @@ public class BltImagePreviewController {
         if (!imageFile.exists()) {
             Color[] palette = bltDataProcessor.createColorPalette(
                 ServletContextUtil.getServletContextPath() + PALETTE_FILE);
-            H5File file = bltDataProcessor.openH5File(fileCatalog
+            HdfFile file = bltDataProcessor.openH5File(fileCatalog
                     .getLocalPathForUuid(UUID.fromString(fileUuid)).toString());
             Group root = bltDataProcessor.getH5Root(file);
             

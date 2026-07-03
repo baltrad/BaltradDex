@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
 --------------------------------------------------------------------------------
-Document   : Radar image preview page using Google Maps API
+Document   : Radar image preview page using Leaflet + OpenStreetMap
 Created on : Dec 10, 2010, 10:14 AM
 Author     : szewczenko
 ------------------------------------------------------------------------------%>
@@ -42,105 +42,49 @@ Author     : szewczenko
     <head>
         <title>BALTRAD | Data preview</title>
         <link href="includes/dex.css" rel="stylesheet" type="text/css"/>
-        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+        <script type="text/javascript" src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
         <script type="text/javascript" src="includes/js/slider.js"></script>
         <script type="text/javascript">
 
-            RadarOverlay.prototype = new google.maps.OverlayView();
             var radarImageURL = "<%=radarImageURL%>";
+            var map;
             var overlay;
+            var overlayVisible = true;
 
             function initialize() {
-                var lat0 = "<%=lat0%>";
-                var lon0 = "<%=lon0%>";
-                var llLat = "<%=llLat%>";
-                var llLon = "<%=llLon%>";
-                var urLat = "<%=urLat%>";
-                var urLon = "<%=urLon%>";
+                var lat0 = parseFloat("<%=lat0%>");
+                var lon0 = parseFloat("<%=lon0%>");
+                var llLat = parseFloat("<%=llLat%>");
+                var llLon = parseFloat("<%=llLon%>");
+                var urLat = parseFloat("<%=urLat%>");
+                var urLon = parseFloat("<%=urLon%>");
 
-                var centerLatLng = new google.maps.LatLng(lat0, lon0);
-                var radarOptions = {
-                  zoom: 6,
-                  center: centerLatLng,
-                  mapTypeId: google.maps.MapTypeId.ROADMAP
-                };
+                map = L.map('map_canvas').setView([lat0, lon0], 6);
 
-                var map = new google.maps.Map(document.getElementById("map_canvas"),
-                    radarOptions);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                    maxZoom: 19
+                }).addTo(map);
 
-                var swBound = new google.maps.LatLng( llLat, llLon );
-                var neBound = new google.maps.LatLng( urLat, urLon );
-                var bounds = new google.maps.LatLngBounds( swBound, neBound );
+                var bounds = L.latLngBounds([llLat, llLon], [urLat, urLon]);
+                overlay = L.imageOverlay(radarImageURL, bounds).addTo(map);
 
-                overlay = new RadarOverlay( bounds, radarImageURL, map );
-                
                 new Slider('opacity-slider', {
                     callback: function( value ) {
-                        var opacity = Math.round( 10 - ( value*10 ) )
-                        overlay.setOpacity( opacity );
+                        overlay.setOpacity( 1 - value );
                     }
                 });
             }
-            function RadarOverlay( bounds, image, map ) {
-                this.bounds_ = bounds;
-                this.image_ = image;
-                this.map_ = map;
-                this.div_ = null;
-                this.setMap( map );
-            }
-            RadarOverlay.prototype.onAdd = function( opacity ) {
 
-                var div = document.createElement( 'DIV' );
-                div.style.border = "none";
-                div.style.borderWidth = "0px";
-                div.style.position = "absolute";
-
-                var img = document.createElement( "img" );
-                img.src = this.image_;
-                img.style.width = "100%";
-                img.style.height = "100%";
-                div.appendChild(img);
-
-                this.div_ = div;
-                
-                var panes = this.getPanes();
-                panes.overlayImage.appendChild(this.div_);
-            }
-            RadarOverlay.prototype.draw = function() {
-                var overlayProjection = this.getProjection();
-                var sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
-                var ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
-                var div = this.div_;
-                div.style.left = sw.x + 'px';
-                div.style.top = ne.y + 'px';
-                div.style.width = (ne.x - sw.x) + 'px';
-                div.style.height = (sw.y - ne.y) + 'px';
-            }
-            RadarOverlay.prototype.hide = function() {
-                if( this.div_ ) {
-                    this.div_.style.visibility = "hidden";
+            function toggleOverlay() {
+                if (overlayVisible) {
+                    map.removeLayer(overlay);
+                } else {
+                    overlay.addTo(map);
                 }
+                overlayVisible = !overlayVisible;
             }
-            RadarOverlay.prototype.show = function() {
-                if( this.div_ ) {
-                    this.div_.style.visibility = "visible";
-                }
-            }
-            RadarOverlay.prototype.toggle = function() {
-                if ( this.div_ ) {
-                    if (this.div_.style.visibility == "hidden") {
-                      this.show();
-                    } else {
-                      this.hide();
-                    }
-                }
-            }
-            RadarOverlay.prototype.setOpacity = function( opacity ) {
-                if( this.div_ ) {
-                    this.div_.style.opacity = opacity / 10;
-                    this.div_.style.filter = 'alpha(opacity=' + opacity * 10 + ')';
-                }
-            } 
         </script>
     </head>
 
@@ -157,11 +101,11 @@ Author     : szewczenko
                     <div class="buttons">
                         <div class="button-wrap">
                             <input class="button" type="button" value="Visible"
-                                   onclick="overlay.toggle();"/>
+                                   onclick="toggleOverlay();"/>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </body>        
+    </body>
 </html>

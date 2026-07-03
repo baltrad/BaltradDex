@@ -22,9 +22,9 @@
 package eu.baltrad.dex.db.util;
 
 import eu.baltrad.dex.db.util.BltDataProcessor;
-import ncsa.hdf.object.h5.H5File;
-import ncsa.hdf.object.Group;
-import ncsa.hdf.object.Dataset;
+import io.jhdf.HdfFile;
+import io.jhdf.api.Group;
+import io.jhdf.api.Dataset;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -77,30 +77,32 @@ public class BltDataProcessorTest {
     }
     
     @Test
-    public void openH5File() throws Exception { 
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
+    public void openH5File() throws Exception {
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         assertNotNull(file);
-        assertTrue(file.getFID() > 0);
+        assertNotNull(file.getChildren());
     }
-    
-    @Test
+
+    @Test(expected = Exception.class)
     public void closeH5File() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         classUnderTest.closeH5File(file);
-        assertEquals(-1, file.getFID());
+        // file is closed; further access must fail
+        file.getChildren();
     }
-    
+
     @Test
     public void getH5Root() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         assertNotNull(root);
-        assertTrue(root.isRoot());
+        assertEquals("/", root.getPath());
+        assertNull(root.getParent());
     }
     
     @Test
     public void getH5DatasetPaths() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         List<String> paths = new ArrayList<String>();
         classUnderTest.getH5DatasetPaths(root, paths);
@@ -109,7 +111,7 @@ public class BltDataProcessorTest {
     
     @Test
     public void getH5Dataset() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         List<String> paths = new ArrayList<String>();
         classUnderTest.getH5DatasetPaths(root, paths);
@@ -120,7 +122,7 @@ public class BltDataProcessorTest {
     
     @Test
     public void getH5Attribute() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/what", "object");
         assertEquals("object", classUnderTest.getH5Attribute().getName());
@@ -132,7 +134,7 @@ public class BltDataProcessorTest {
     
     @Test
     public void getH5AttributeValue() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/what", "object");
         assertEquals("PVOL", classUnderTest.getH5AttributeValue());
@@ -151,7 +153,7 @@ public class BltDataProcessorTest {
     
     @Test 
     public void polar2CartImage_PL_LEG() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_PLLEG));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/dataset1/where", "nbins");
         
@@ -183,7 +185,7 @@ public class BltDataProcessorTest {
     
     @Test 
     public void polar2CartImage_LV_RIX() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_LVRIX));
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_LVRIX));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/dataset1/where", "nbins");
         
@@ -215,7 +217,7 @@ public class BltDataProcessorTest {
     
     @Test 
     public void polar2CartImage_BY_MIN() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_BYMIN));
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_BYMIN));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/dataset1/where", "nbins");
         
@@ -247,7 +249,7 @@ public class BltDataProcessorTest {
     
     @Test 
     public void polar2CartImage_16bitData() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_16BIT));
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_16BIT));
         Group root = classUnderTest.getH5Root(file);
         
         classUnderTest.getH5Attribute(root, "/dataset1/data1/what", "gain");
@@ -289,7 +291,7 @@ public class BltDataProcessorTest {
     
     @Test 
     public void comp2CartImage() throws Exception {
-        H5File file = classUnderTest.openH5File(getFilePath(FILE_COMP));
+        HdfFile file = classUnderTest.openH5File(getFilePath(FILE_COMP));
         Group root = classUnderTest.getH5Root(file);
         classUnderTest.getH5Attribute(root, "/where", "xsize");
         

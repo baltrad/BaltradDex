@@ -21,14 +21,12 @@
 
 package eu.baltrad.dex.db.util;
 
-import ncsa.hdf.object.FileFormat;
-import ncsa.hdf.object.h5.H5File;
-import ncsa.hdf.object.Group;
-import ncsa.hdf.object.Dataset;
-import ncsa.hdf.object.Datatype;
-import ncsa.hdf.object.Attribute;
+import io.jhdf.HdfFile;
+import io.jhdf.api.Group;
+import io.jhdf.api.Node;
+import io.jhdf.api.Dataset;
+import io.jhdf.api.Attribute;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.imageio.ImageIO;
 
 import org.apache.log4j.LogManager;
@@ -139,98 +137,96 @@ public class BltDataProcessor {
         return h5Attribute;
     }
     
+    private String normalizePath(String path) {
+        if (path.length() > 1 && path.endsWith(H5_PATH_SEPARATOR)) {
+            return path.substring(0, path.length() - 1);
+        }
+        return path;
+    }
+
     /**
      * Open HDF5 file.
      * @param name File name
-     * @return H5File object if successful
+     * @return HdfFile object if successful
      * @throws Runtime exception
      */
-    public H5File openH5File(String fileName) throws RuntimeException {
+    public HdfFile openH5File(String fileName) throws RuntimeException {
         try {
-            FileFormat fileFormat = FileFormat
-                .getFileFormat(FileFormat.FILE_TYPE_HDF5);
-            H5File h5File = (H5File) fileFormat.createInstance(fileName, 
-                    FileFormat.READ);
-            h5File.open();
-            return h5File;
+            return new HdfFile(new File(fileName));
         } catch (Exception e) {
             throw new RuntimeException("Failed to open H5 file", e);
         }
     }
-    
+
     /**
      * Close HDF5 file.
-     * @param h5File H5File object
-     * @throws Runtime exception 
+     * @param h5File HdfFile object
+     * @throws Runtime exception
      */
-    public void closeH5File(H5File h5File) throws RuntimeException {
+    public void closeH5File(HdfFile h5File) throws RuntimeException {
         try {
             h5File.close();
         } catch (Exception e) {
             throw new RuntimeException("Failed to close H5 file", e);
         }
     }
-    
+
     /**
      * Gets reference to HDF5 file's root group.
      * @param h5File HDF5 file object
      * @return HDF5 file's root group
      * @throws Runtime exception
      */
-    public Group getH5Root(H5File h5File) throws RuntimeException {
+    public Group getH5Root(HdfFile h5File) throws RuntimeException {
         try {
-            Group root = (Group) ((DefaultMutableTreeNode) h5File.getRootNode())
-                    .getUserObject();
-            return root;
+            return h5File;
         } catch (Exception e) {
             throw new RuntimeException("Failed to access H5 file's root", e);
         }
     }
-    
+
     /**
      * Parses HDF5 file.
      * @param root HDF5 file's root group
      * @param paths Dataset paths
      * @throws Runtime exception
      */
-    public void getH5DatasetPaths(Group root, List<String> paths) 
+    public void getH5DatasetPaths(Group root, List<String> paths)
                                                     throws RuntimeException {
         try {
-            List members = root.getMemberList();
-            for (int i = 0; i < members.size(); i++) {
-                if (members.get(i) instanceof Group) {
-                    Group group = (Group) members.get(i);
-                    if (group.getMemberList().size() > 0) {
+            for (Node member : root.getChildren().values()) {
+                if (member instanceof Group) {
+                    Group group = (Group) member;
+                    if (!group.getChildren().isEmpty()) {
                         getH5DatasetPaths(group, paths);
                     }
-                } else if (members.get(i) instanceof Dataset) {
-                    Dataset dset = (Dataset) members.get(i);
-                    paths.add(dset.getFullName());
-                } 
+                } else if (member instanceof Dataset) {
+                    Dataset dset = (Dataset) member;
+                    paths.add(normalizePath(dset.getPath()));
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to get datasource paths", e);
         }
     }
-    
+
     /**
      * Seeks for a given dataset in HDF5 file
      * @param root HDF5 file's root group
      * @param path Dataset path
-     * @throws Runtime exception 
+     * @throws Runtime exception
      */
     public void getH5Dataset(Group root, String path) throws RuntimeException {
         try {
-            List members = root. getMemberList();
-            for (int i = 0; i < members.size(); i++) {
-                if (members.get(i) instanceof Group) {
-                    Group group = (Group) members.get(i);
-                    if (group.getMemberList().size() > 0) {
+            for (Node member : root.getChildren().values()) {
+                if (member instanceof Group) {
+                    Group group = (Group) member;
+                    if (!group.getChildren().isEmpty()) {
                         getH5Dataset(group, path);
                     }
-                } else if (members.get(i) instanceof Dataset) {
-                    Dataset dset = (Dataset) members.get(i);
-                    if (dset.getFullName().equals(path)) {
+                } else if (member instanceof Dataset) {
+                    Dataset dset = (Dataset) member;
+                    if (normalizePath(dset.getPath()).equals(path)) {
                         h5Dataset = dset;
                     }
                 }
@@ -239,7 +235,7 @@ public class BltDataProcessor {
             throw new RuntimeException("Failed to access dataset", e);
         }
     }
-    
+
     /**
      * Gets HDF5 attribute identified by path and name.
      * @param root HDF5 file's root group
@@ -247,24 +243,20 @@ public class BltDataProcessor {
      * @param attributeName Attribute's name
      * @throws Runtime exception
      */
-    public void getH5Attribute(Group root, String groupPath, 
+    public void getH5Attribute(Group root, String groupPath,
                                 String attributeName) throws RuntimeException {
         try {
-            List members = root.getMemberList();
-            for (int i = 0; i < members.size(); i++) {
-                if (members.get(i) instanceof Group) {
-                    Group group = (Group) members.get(i);
-                    String grpPath = group.getFullName();
-                    if (grpPath.equals(groupPath)) {   
-                        List metadata = group.getMetadata();
-                        for (int j = 0; j < metadata.size(); j++) {
-                            Attribute attr = (Attribute) metadata.get(j);
-                            if(attr.getName().equals(attributeName)) {
-                                h5Attribute = attr;
-                            }
+            for (Node member : root.getChildren().values()) {
+                if (member instanceof Group) {
+                    Group group = (Group) member;
+                    String grpPath = normalizePath(group.getPath());
+                    if (grpPath.equals(groupPath)) {
+                        Attribute attr = group.getAttribute(attributeName);
+                        if (attr != null) {
+                            h5Attribute = attr;
                         }
                     }
-                    if(group.getMemberList().size() > 0) {
+                    if (!group.getChildren().isEmpty()) {
                         getH5Attribute(group, groupPath, attributeName);
                     }
                 }
@@ -279,58 +271,38 @@ public class BltDataProcessor {
      * @return Attribute value
      */
     public Object getH5AttributeValue() {
-        Object value = null;
-        
-        if (getH5Attribute().getType().getDatatypeClass() == Datatype.CLASS_INTEGER) {
-            try {
-                int attrInt[] = (int[]) getH5Attribute().getValue();
-                Integer i = attrInt[0];
-                long l = i.longValue();
-                value = l;
-            } catch (ClassCastException e) {
-                long attrLong[] = (long[]) getH5Attribute().getValue();
-                Long l = attrLong[0];
-                value = l;
-            }
+        Object data = getH5Attribute().getData();
+        if (data instanceof Integer) {
+            return ((Integer) data).longValue();
+        } else if (data instanceof Long) {
+            return data;
+        } else if (data instanceof Float) {
+            return ((Float) data).doubleValue();
+        } else if (data instanceof Double) {
+            return data;
+        } else if (data instanceof String) {
+            return data;
         }
-        if (getH5Attribute().getType().getDatatypeClass() == Datatype.CLASS_FLOAT) {
-            try {
-                float attrFloat[] = (float[]) getH5Attribute().getValue();
-                Float f = attrFloat[0];
-                double d = f.doubleValue();
-                value = d;
-            } catch (ClassCastException e) {
-                double attrDouble[] = (double[]) getH5Attribute().getValue();
-                Double d = attrDouble[0];
-                value = d;
-            }
-        }
-        if (getH5Attribute().getType().getDatatypeClass() == 
-                Datatype.CLASS_STRING ) {
-            String attrString[] = (String[]) getH5Attribute().getValue();
-            value = attrString[0];
-        }
-        return value;
+        return null;
     }
-    
+
     public BltAttribute findAttribute(Group root, String groupPath, String attributeName)  throws RuntimeException {
       BltAttribute attrResult = null;
       try {
-        List members = root.getMemberList();
-        for (int i = 0; i < members.size() && attrResult == null; i++) {
-          if (members.get(i) instanceof Group) {
-            Group group = (Group) members.get(i);
-            String grpPath = group.getFullName();
-            if (grpPath.equals(groupPath)) {   
-              List metadata = group.getMetadata();
-              for (int j = 0; j < metadata.size(); j++) {
-                Attribute attr = (Attribute) metadata.get(j);
-                if(attr.getName().equals(attributeName)) {
-                  attrResult = new BltAttribute(attr);
-                }
+        for (Node member : root.getChildren().values()) {
+          if (attrResult != null) {
+            break;
+          }
+          if (member instanceof Group) {
+            Group group = (Group) member;
+            String grpPath = normalizePath(group.getPath());
+            if (grpPath.equals(groupPath)) {
+              Attribute attr = group.getAttribute(attributeName);
+              if (attr != null) {
+                attrResult = new BltAttribute(attr);
               }
             }
-            if(group.getMemberList().size() > 0) {
+            if (attrResult == null && !group.getChildren().isEmpty()) {
               attrResult = findAttribute(group, groupPath, attributeName);
             }
           }
@@ -375,7 +347,29 @@ public class BltDataProcessor {
       return result;
     }
 
-    
+    /**
+     * Narrow a composite dataset already stored in byte range (0-255) but
+     * read back as a wider type, into a byte[]. Unlike polar data, composite
+     * values need no gain/offset/nodata conversion - they are already
+     * calibrated to byte range by the writer.
+     */
+    protected byte[] narrowToByte(short[] data) {
+      byte[] result = new byte[data.length];
+      for (int i = 0; i < result.length; i++) {
+        result[i] = (byte) data[i];
+      }
+      return result;
+    }
+
+    protected byte[] narrowToByte(int[] data) {
+      byte[] result = new byte[data.length];
+      for (int i = 0; i < result.length; i++) {
+        result[i] = (byte) data[i];
+      }
+      return result;
+    }
+
+
     /**
      * Transform polar dataset into Cartesian image.
      * @param nbins Number of range samples per ray
@@ -392,7 +386,7 @@ public class BltDataProcessor {
             Dataset dataset, Color[] palette, int outputImageSize, 
             boolean rangeRings, boolean rangeMask) throws RuntimeException {
         try {
-            Object polarData = dataset.read();
+            Object polarData = dataset.getDataFlat();
             byte[] polar = null;
             if (polarData instanceof byte[]) {
               logger.info("polarData is byte[]");
@@ -404,7 +398,6 @@ public class BltDataProcessor {
               logger.info("polarData is int[]");
               polar = convertIntToByte((int[])polarData, nbins, nodata, undetect, offset, gain);
             }
-            //byte[] polar = (byte[]) dataset.read();
             int radius = (int) nbins;
             int ray = 0;
             
@@ -528,7 +521,18 @@ public class BltDataProcessor {
         try {
             int imageWidth = (int) width;
             int imageHeight = (int) height;
-            byte[] comp = (byte[]) dataset.read();
+            Object compData = dataset.getDataFlat();
+            byte[] comp;
+            if (compData instanceof byte[]) {
+                comp = (byte[]) compData;
+            } else if (compData instanceof short[]) {
+                comp = narrowToByte((short[]) compData);
+            } else if (compData instanceof int[]) {
+                comp = narrowToByte((int[]) compData);
+            } else {
+                throw new RuntimeException("Unsupported composite dataset type: "
+                        + compData.getClass().getName());
+            }
 
             BufferedImage bi = new BufferedImage(imageWidth, imageHeight,
                     BufferedImage.TYPE_INT_ARGB);
