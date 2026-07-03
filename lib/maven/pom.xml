@@ -24,6 +24,10 @@
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <spring.version>6.2.19</spring.version>
         <spring-security.version>6.5.11</spring-security.version>
+        
+        <!-- Transitive via spring-security-cas -> cas-client-core; pinned for CVE-2025-53864 -->
+        <nimbus-jose-jwt.version>9.37.4</nimbus-jose-jwt.version>
+
         <apache-mime4j-core.version>0.8.14</apache-mime4j-core.version>
         <slf4j.version>2.0.18</slf4j.version>
         <aopalliance.version>1.0</aopalliance.version>
@@ -54,6 +58,7 @@
         <easymock.version>5.6.0</easymock.version>
         <jacoco.version>0.8.12</jacoco.version>
         <objenesis.version>3.4</objenesis.version>
+
         <!-- Dependencies specific to dex, not present in beast's pom -->
         <antlr4.version>4.13.2</antlr4.version>
         <hikaricp.version>7.0.2</hikaricp.version>
@@ -194,6 +199,13 @@
                     <artifactId>bcutil-jdk15on</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!-- Override transitive nimbus-jose-jwt from cas-client-core; CVE-2025-53864 -->
+        <dependency>
+            <groupId>com.nimbusds</groupId>
+            <artifactId>nimbus-jose-jwt</artifactId>
+            <version>${nimbus-jose-jwt.version}</version>
         </dependency>
 
         <dependency>
