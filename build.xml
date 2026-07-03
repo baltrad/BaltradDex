@@ -68,7 +68,6 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <property name="baltrad.db.path" value="/usr/share/baltrad/baltrad-db" />
   <property name="baltrad.db.java.path" value="${baltrad.db.path}/java" />
   <property name="beast.path" value="/opt/baltrad/beast" />
-  <property name="javahdf.path" value="/opt/baltrad/third_party/hdf-java/lib"/>
 
   <!-- Configure ant tasks for tomcat deployment -->
   <taskdef name="deploy" classname="org.apache.catalina.ant.DeployTask"
@@ -115,12 +114,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
     <fileset dir="${beast.path}/libs">
         <include name="*.jar"/>
     </fileset>
-    <!--
-    <fileset dir="${javahdf.path}">
-        <include name="jhdf*.jar"/>
-    </fileset>
-    -->
-  </path>     
+  </path>
 
   <!-- path for testing -->
   <path id="test.lib.path">
@@ -189,16 +183,13 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
              property="baltrad-bdb-client.jar.available" />
     <available file="${beast.path}/bin/beast.jar" property="beast.jar.available" />
     <available file="${beast.path}/libs" type="dir" property="beast.libs.available" />
-    <!--<available file="${javahdf.path}/jhdf5.jar" property="javahdf.lib.available"/>-->
 
-    <fail unless="baltrad-bdb-client.jar.available" 
+    <fail unless="baltrad-bdb-client.jar.available"
             message="baltrad.db.path must specify the installation dir of baltrad-db" />
-    <fail unless="beast.jar.available" 
+    <fail unless="beast.jar.available"
             message="beast.path must specify the installation dir of beast" />
-    <fail unless="beast.libs.available" 
+    <fail unless="beast.libs.available"
             message="beast.path must specify the installation dir of beast" />
-    <!--<fail unless="javahdf.lib.available" 
-            message="javahdf.path must specify the library installation dir of hdf-java" />-->
 </target>        
 
 <target name="init" depends="dep-check">
