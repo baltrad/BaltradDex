@@ -27,6 +27,9 @@
         <spring-security.version>6.5.11</spring-security.version>
         <spring-ldap-core.version>3.3.8</spring-ldap-core.version>
         
+        <!-- Needs to override due to dependency inclusion from spring-context, CVE-2026-40984  -->
+        <micrometer-core.version>1.15.12</micrometer-core.version>
+
         <!-- Transitive via spring-security-cas -> cas-client-core; pinned for CVE-2025-53864 -->
         <nimbus-jose-jwt.version>9.37.4</nimbus-jose-jwt.version>
 
@@ -202,6 +205,12 @@
                     <artifactId>bcutil-jdk15on</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+            <version>${micrometer-core.version}</version>
         </dependency>
 
         <!-- Override transitive nimbus-jose-jwt from cas-client-core; CVE-2025-53864 -->
