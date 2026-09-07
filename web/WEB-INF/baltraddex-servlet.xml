@@ -754,7 +754,9 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
   <bean id="securityManager" class="eu.baltrad.beast.security.SecurityManager" autowire="byType">
     <property name="keyczarKeyPath" value="${beast.admin.security.keyzcar.path}" />
   </bean>
-  <bean id="exchangeConnector" class="eu.baltrad.beast.exchange.json.HttpExchangeConnector" autowire="byType" />
+  <bean id="exchangeConnector" class="eu.baltrad.beast.exchange.json.HttpExchangeConnector" autowire="byType">
+    <property name="sanBypassHosts" value="${beast.exchange.https.ignore_san_error_hosts:}" />
+  </bean>
   <bean id="requestMapper" class="eu.baltrad.beast.exchange.json.RequestMapperImpl" autowire="byType" />
   <bean id="exchangeManager" class="eu.baltrad.beast.exchange.ExchangeManager" autowire="byType">
     <property name="queueSize" value="${beast.pooled.publisher.queue.size}" />
