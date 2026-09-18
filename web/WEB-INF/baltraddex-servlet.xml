@@ -464,7 +464,7 @@ along with the BaltradDex software.  If not, see http://www.gnu.org/licenses.
         <property name="driverClassName" value="${db.driver}" />
         <property name="jdbcUrl" value="${db.url}" />
         <property name="username" value="${db.user}" />
-        <property name="password" value="${db.pwd}" />
+        <property name="password" value="${db.pwd:#{null}}" />
         <property name="poolName" value="springHikariCP" />
     </bean>
 
