@@ -197,7 +197,7 @@
         <beans:property name="driverClassName" value="${db.driver}" />
         <beans:property name="jdbcUrl" value="${db.url}" />
         <beans:property name="username" value="${db.user}" />
-        <beans:property name="password" value="${db.pwd}" />
+        <beans:property name="password" value="${db.pwd:#{null}}" />
         <beans:property name="poolName" value="springHikariCP" />
     </beans:bean>
 
