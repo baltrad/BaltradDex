@@ -46,6 +46,7 @@ var annotated_dup =
               [ "KeyczarCryptoFactory", "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1KeyczarCryptoFactory.html", "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1KeyczarCryptoFactory" ],
               [ "KeyczarSigner", "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1KeyczarSigner.html", "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1KeyczarSigner" ],
               [ "KeyczarVerifier", "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1KeyczarVerifier.html", "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1KeyczarVerifier" ],
+              [ "Md5PasswordEncoder", "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Md5PasswordEncoder.html", null ],
               [ "Signer", "interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Signer.html", "interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Signer" ],
               [ "SimpleUserDetailsService", "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1SimpleUserDetailsService.html", "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1SimpleUserDetailsService" ],
               [ "Verifier", "interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Verifier.html", "interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Verifier" ]
@@ -174,7 +175,8 @@ var annotated_dup =
               ] ],
               [ "ILogEntry", "interfaceeu_1_1baltrad_1_1dex_1_1log_1_1model_1_1ILogEntry.html", "interfaceeu_1_1baltrad_1_1dex_1_1log_1_1model_1_1ILogEntry" ]
             ] ],
-            [ "DBLogAppender", "classeu_1_1baltrad_1_1dex_1_1log_1_1DBLogAppender.html", "classeu_1_1baltrad_1_1dex_1_1log_1_1DBLogAppender" ],
+            [ "BltSyslogLayout", "classeu_1_1baltrad_1_1dex_1_1log_1_1BltSyslogLayout.html", null ],
+            [ "DBLogAppender", "classeu_1_1baltrad_1_1dex_1_1log_1_1DBLogAppender.html", null ],
             [ "StickyLevel", "classeu_1_1baltrad_1_1dex_1_1log_1_1StickyLevel.html", "classeu_1_1baltrad_1_1dex_1_1log_1_1StickyLevel" ]
           ] ],
           [ "net", null, [

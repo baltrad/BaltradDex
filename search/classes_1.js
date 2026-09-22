@@ -16,5 +16,6 @@ var searchData=
   ['bltfilemanager_13',['BltFileManager',['../classeu_1_1baltrad_1_1dex_1_1db_1_1manager_1_1impl_1_1BltFileManager.html',1,'eu::baltrad::dex::db::manager::impl']]],
   ['bltimagepreviewcontroller_14',['BltImagePreviewController',['../classeu_1_1baltrad_1_1dex_1_1db_1_1controller_1_1BltImagePreviewController.html',1,'eu::baltrad::dex::db::controller']]],
   ['bltqueryparameter_15',['BltQueryParameter',['../classeu_1_1baltrad_1_1dex_1_1db_1_1model_1_1BltQueryParameter.html',1,'eu::baltrad::dex::db::model']]],
-  ['browsemessagescontroller_16',['BrowseMessagesController',['../classeu_1_1baltrad_1_1dex_1_1log_1_1controller_1_1BrowseMessagesController.html',1,'eu::baltrad::dex::log::controller']]]
+  ['bltsysloglayout_16',['BltSyslogLayout',['../classeu_1_1baltrad_1_1dex_1_1log_1_1BltSyslogLayout.html',1,'eu::baltrad::dex::log']]],
+  ['browsemessagescontroller_17',['BrowseMessagesController',['../classeu_1_1baltrad_1_1dex_1_1log_1_1controller_1_1BrowseMessagesController.html',1,'eu::baltrad::dex::log::controller']]]
 ];

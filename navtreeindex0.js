@@ -199,10 +199,11 @@ var NAVTREEINDEX0 =
 "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1KeyczarVerifier.html":[8,0,0,0,1,0,3,3],
 "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1KeyczarVerifier.html#ac85042d0f192428461231b3c63491328":[8,0,0,0,1,0,3,3,1],
 "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1KeyczarVerifier.html#ad3cde77dc94ec58aca955675946abb4f":[8,0,0,0,1,0,3,3,0],
-"classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1SimpleUserDetailsService.html":[8,0,0,0,1,0,3,5],
-"classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1SimpleUserDetailsService.html#a1529713040465ad9b9c93709ba90b115":[8,0,0,0,1,0,3,5,2],
-"classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1SimpleUserDetailsService.html#a99ae1427c550673bb14fdf9376e08781":[8,0,0,0,1,0,3,5,1],
-"classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1SimpleUserDetailsService.html#a9afd75a0eadd4d1499026e1e0968a18b":[8,0,0,0,1,0,3,5,0],
+"classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Md5PasswordEncoder.html":[8,0,0,0,1,0,3,4],
+"classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1SimpleUserDetailsService.html":[8,0,0,0,1,0,3,6],
+"classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1SimpleUserDetailsService.html#a1529713040465ad9b9c93709ba90b115":[8,0,0,0,1,0,3,6,2],
+"classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1SimpleUserDetailsService.html#a99ae1427c550673bb14fdf9376e08781":[8,0,0,0,1,0,3,6,1],
+"classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1SimpleUserDetailsService.html#a9afd75a0eadd4d1499026e1e0968a18b":[8,0,0,0,1,0,3,6,0],
 "classeu_1_1baltrad_1_1dex_1_1config_1_1controller_1_1MessagesConfigurationController.html":[8,0,0,0,1,1,0,0],
 "classeu_1_1baltrad_1_1dex_1_1config_1_1controller_1_1MessagesConfigurationController.html#a142f3b8db9104106222f2a6fe4d626c4":[8,0,0,0,1,1,0,0,6],
 "classeu_1_1baltrad_1_1dex_1_1config_1_1controller_1_1MessagesConfigurationController.html#a32bd08d1c9011e22b355f8039c07d0ee":[8,0,0,0,1,1,0,0,5],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "classeu_1_1baltrad_1_1dex_1_1config_1_1model_1_1AppConfiguration.html#a09a939969778c0cb2b497d7cfa69213c":[8,0,0,0,1,1,2,0,13],
 "classeu_1_1baltrad_1_1dex_1_1config_1_1model_1_1AppConfiguration.html#a0d9cb540aad609fc7a5ed289e4f9d518":[8,0,0,0,1,1,2,0,16],
 "classeu_1_1baltrad_1_1dex_1_1config_1_1model_1_1AppConfiguration.html#a0f4e8ebfd7e79698543c9ec10e582def":[8,0,0,0,1,1,2,0,34],
-"classeu_1_1baltrad_1_1dex_1_1config_1_1model_1_1AppConfiguration.html#a17e1bf76189807ec67a4b2d5c6aaf410":[8,0,0,0,1,1,2,0,6],
-"classeu_1_1baltrad_1_1dex_1_1config_1_1model_1_1AppConfiguration.html#a1af1a29465cb0ad9e5bef542ad6b297b":[8,0,0,0,1,1,2,0,15]
+"classeu_1_1baltrad_1_1dex_1_1config_1_1model_1_1AppConfiguration.html#a17e1bf76189807ec67a4b2d5c6aaf410":[8,0,0,0,1,1,2,0,6]
 };

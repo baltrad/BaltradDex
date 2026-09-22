@@ -1,6 +1,5 @@
 var NAVTREEINDEX6 =
 {
-"functions_func_z.html":[8,3,1,21],
 "functions_g.html":[8,3,0,6],
 "functions_h.html":[8,3,0,7],
 "functions_i.html":[8,3,0,8],
@@ -38,10 +37,10 @@ var NAVTREEINDEX6 =
 "interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1CryptoFactory.html":[8,0,0,0,1,0,3,0],
 "interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1CryptoFactory.html#a2d73ba5647ee643bd448c9d455adb5f8":[8,0,0,0,1,0,3,0,0],
 "interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1CryptoFactory.html#ab0c00d94dfde31470ced53e641ef92d5":[8,0,0,0,1,0,3,0,1],
-"interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Signer.html":[8,0,0,0,1,0,3,4],
-"interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Signer.html#a2fb639e98a9be9cce3c48c8c03165e79":[8,0,0,0,1,0,3,4,0],
-"interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Verifier.html":[8,0,0,0,1,0,3,6],
-"interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Verifier.html#a7a2d5c144a9fecc4fd7a03786050c30f":[8,0,0,0,1,0,3,6,0],
+"interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Signer.html":[8,0,0,0,1,0,3,5],
+"interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Signer.html#a2fb639e98a9be9cce3c48c8c03165e79":[8,0,0,0,1,0,3,5,0],
+"interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Verifier.html":[8,0,0,0,1,0,3,7],
+"interfaceeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Verifier.html#a7a2d5c144a9fecc4fd7a03786050c30f":[8,0,0,0,1,0,3,7,0],
 "interfaceeu_1_1baltrad_1_1dex_1_1config_1_1manager_1_1IConfigurationManager.html":[8,0,0,0,1,1,1,1],
 "interfaceeu_1_1baltrad_1_1dex_1_1datasource_1_1manager_1_1IDataSourceManager.html":[8,0,0,0,1,2,1,1],
 "interfaceeu_1_1baltrad_1_1dex_1_1datasource_1_1manager_1_1IFileObjectManager.html":[8,0,0,0,1,2,1,2],

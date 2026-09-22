@@ -1,13 +1,16 @@
 var hierarchy =
 [
+    [ "AbstractAppender", null, [
+      [ "eu.baltrad.dex.log.DBLogAppender", "classeu_1_1baltrad_1_1dex_1_1log_1_1DBLogAppender.html", null ]
+    ] ],
+    [ "AbstractStringLayout", null, [
+      [ "eu.baltrad.dex.log.BltSyslogLayout", "classeu_1_1baltrad_1_1dex_1_1log_1_1BltSyslogLayout.html", null ]
+    ] ],
     [ "eu.baltrad.dex.user.validator.AccountValidator", "classeu_1_1baltrad_1_1dex_1_1user_1_1validator_1_1AccountValidator.html", null ],
     [ "eu.baltrad.beastui.web.controller.AcrrRoutesController", "classeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1AcrrRoutesController.html", null ],
     [ "eu.baltrad.beastui.web.controller.AdaptorsController", "classeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1AdaptorsController.html", null ],
     [ "eu.baltrad.beastui.web.controller.AnomalyDetectorController", "classeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1AnomalyDetectorController.html", null ],
     [ "eu.baltrad.dex.config.model.AppConfiguration", "classeu_1_1baltrad_1_1dex_1_1config_1_1model_1_1AppConfiguration.html", null ],
-    [ "AppenderSkeleton", null, [
-      [ "eu.baltrad.dex.log.DBLogAppender", "classeu_1_1baltrad_1_1dex_1_1log_1_1DBLogAppender.html", null ]
-    ] ],
     [ "eu.baltrad.dex.net.auth.Authenticator", "interfaceeu_1_1baltrad_1_1dex_1_1net_1_1auth_1_1Authenticator.html", [
       [ "eu.baltrad.dex.net.auth.EasyAuthenticator", "classeu_1_1baltrad_1_1dex_1_1net_1_1auth_1_1EasyAuthenticator.html", null ],
       [ "eu.baltrad.dex.net.auth.KeyczarAuthenticator", "classeu_1_1baltrad_1_1dex_1_1net_1_1auth_1_1KeyczarAuthenticator.html", null ]
@@ -167,6 +170,9 @@ var hierarchy =
     [ "eu.baltrad.dex.config.controller.NodeConfigurationController", "classeu_1_1baltrad_1_1dex_1_1config_1_1controller_1_1NodeConfigurationController.html", null ],
     [ "eu.baltrad.dex.status.controller.NodeStatusController", "classeu_1_1baltrad_1_1dex_1_1status_1_1controller_1_1NodeStatusController.html", null ],
     [ "eu.baltrad.beastui.web.controller.DistributionRoutesController.Operation", "enumeu_1_1baltrad_1_1beastui_1_1web_1_1controller_1_1DistributionRoutesController_1_1Operation.html", null ],
+    [ "PasswordEncoder", null, [
+      [ "eu.baltrad.dex.auth.util.Md5PasswordEncoder", "classeu_1_1baltrad_1_1dex_1_1auth_1_1util_1_1Md5PasswordEncoder.html", null ]
+    ] ],
     [ "eu.baltrad.dex.user.validator.PasswordValidator", "classeu_1_1baltrad_1_1dex_1_1user_1_1validator_1_1PasswordValidator.html", null ],
     [ "eu.baltrad.dex.net.util.PostFileRedirectHandler", "classeu_1_1baltrad_1_1dex_1_1net_1_1util_1_1PostFileRedirectHandler.html", null ],
     [ "eu.baltrad.dex.net.protocol.ProtocolManager", "interfaceeu_1_1baltrad_1_1dex_1_1net_1_1protocol_1_1ProtocolManager.html", [

@@ -1,6 +1,5 @@
 var NAVTREEINDEX3 =
 {
-"classeu_1_1baltrad_1_1dex_1_1log_1_1model_1_1impl_1_1LogParameter.html#ae04ce4b6b853c4ebd93c484303df2e72":[8,0,0,0,1,6,2,0,1,8],
 "classeu_1_1baltrad_1_1dex_1_1log_1_1model_1_1impl_1_1LogParameter.html#ae37a6e307fe6314076ccef3d81d2e77e":[8,0,0,0,1,6,2,0,1,19],
 "classeu_1_1baltrad_1_1dex_1_1log_1_1model_1_1impl_1_1LogParameter.html#af7a7c00100bae61aa2bdde9c809ca3ee":[8,0,0,0,1,6,2,0,1,6],
 "classeu_1_1baltrad_1_1dex_1_1log_1_1model_1_1mapper_1_1LogEntryMapper.html":[8,0,0,0,1,6,2,1,0],
@@ -249,5 +248,6 @@ var NAVTREEINDEX3 =
 "classeu_1_1baltrad_1_1dex_1_1net_1_1servlet_1_1AdministratorServlet.html#a9188a5494a523ce4357edecc70a31f47":[8,0,0,0,1,7,7,0,19],
 "classeu_1_1baltrad_1_1dex_1_1net_1_1servlet_1_1AdministratorServlet.html#a9f3e68d02a233a264e5325a4f9b98ed6":[8,0,0,0,1,7,7,0,9],
 "classeu_1_1baltrad_1_1dex_1_1net_1_1servlet_1_1AdministratorServlet.html#aa13533196038621bf8dd574b32da29b4":[8,0,0,0,1,7,7,0,17],
-"classeu_1_1baltrad_1_1dex_1_1net_1_1servlet_1_1AdministratorServlet.html#aa281ba9ee285767a303404dae8415633":[8,0,0,0,1,7,7,0,24]
+"classeu_1_1baltrad_1_1dex_1_1net_1_1servlet_1_1AdministratorServlet.html#aa281ba9ee285767a303404dae8415633":[8,0,0,0,1,7,7,0,24],
+"classeu_1_1baltrad_1_1dex_1_1net_1_1servlet_1_1AdministratorServlet.html#aa4e37a6110bcc630bf4468733cc86229":[8,0,0,0,1,7,7,0,22]
 };

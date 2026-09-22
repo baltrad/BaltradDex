@@ -129,109 +129,21 @@ Inheritance diagram for eu.baltrad.dex.log.DBLogAppender:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-pub-methods" class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae1dfd5c2e0dbe4a5ab36abd21f36daeb" id="r_ae1dfd5c2e0dbe4a5ab36abd21f36daeb"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#ae1dfd5c2e0dbe4a5ab36abd21f36daeb">DBLogAppender</a> ()</td></tr>
-<tr class="memitem:a20bacca2d3d28b219f96338f0ecd02d3" id="r_a20bacca2d3d28b219f96338f0ecd02d3"><td class="memItemLeft">synchronized void&#160;</td><td class="memItemRight"><a class="el" href="#a20bacca2d3d28b219f96338f0ecd02d3">setLogManager</a> (<a class="el" href="classeu_1_1baltrad_1_1dex_1_1log_1_1manager_1_1impl_1_1LogManager.html">LogManager</a> manager)</td></tr>
-<tr class="memitem:a0657a25cac1acb6156abb17120feefd8" id="r_a0657a25cac1acb6156abb17120feefd8"><td class="memItemLeft"><a id="a0657a25cac1acb6156abb17120feefd8" name="a0657a25cac1acb6156abb17120feefd8"></a>
-boolean&#160;</td><td class="memItemRight"><b>requiresLayout</b> ()</td></tr>
-<tr class="memitem:a9411411fbb2e36d8b137a7274a78ac8f" id="r_a9411411fbb2e36d8b137a7274a78ac8f"><td class="memItemLeft"><a id="a9411411fbb2e36d8b137a7274a78ac8f" name="a9411411fbb2e36d8b137a7274a78ac8f"></a>
-void&#160;</td><td class="memItemRight"><b>close</b> ()</td></tr>
-<tr class="memitem:ae3e2ecdd5924c7a98a7192a454bcfad9" id="r_ae3e2ecdd5924c7a98a7192a454bcfad9"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#ae3e2ecdd5924c7a98a7192a454bcfad9">append</a> (LoggingEvent event)</td></tr>
+<tr class="memitem:a20bacca2d3d28b219f96338f0ecd02d3" id="r_a20bacca2d3d28b219f96338f0ecd02d3"><td class="memItemLeft"><a id="a20bacca2d3d28b219f96338f0ecd02d3" name="a20bacca2d3d28b219f96338f0ecd02d3"></a>
+synchronized void&#160;</td><td class="memItemRight"><b>setLogManager</b> (<a class="el" href="classeu_1_1baltrad_1_1dex_1_1log_1_1manager_1_1impl_1_1LogManager.html">LogManager</a> manager)</td></tr>
+<tr class="memitem:a1497e985e8f76cc965a5f7d24c36be6b" id="r_a1497e985e8f76cc965a5f7d24c36be6b"><td class="memItemLeft"><a id="a1497e985e8f76cc965a5f7d24c36be6b" name="a1497e985e8f76cc965a5f7d24c36be6b"></a>
+void&#160;</td><td class="memItemRight"><b>append</b> (LogEvent event)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pub-static-methods" class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a6c9f91bfadac54faf5e985ecc7983eb1" id="r_a6c9f91bfadac54faf5e985ecc7983eb1"><td class="memItemLeft"><a id="a6c9f91bfadac54faf5e985ecc7983eb1" name="a6c9f91bfadac54faf5e985ecc7983eb1"></a>
+static DBLogAppender&#160;</td><td class="memItemRight"><b>createAppender</b> ( @PluginAttribute(&quot;name&quot;) String name, @PluginElement(&quot;Layout&quot;) Layout&lt;? extends Serializable &gt; layout, @PluginElement(&quot;Filter&quot;) Filter filter)</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 id="header-pro-methods" class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a64582b7495c773dd5f79a9183139f3c2" id="r_a64582b7495c773dd5f79a9183139f3c2"><td class="memItemLeft"><a id="a64582b7495c773dd5f79a9183139f3c2" name="a64582b7495c773dd5f79a9183139f3c2"></a>
+&#160;</td><td class="memItemRight"><b>DBLogAppender</b> (String name, Filter filter, Layout&lt;? extends Serializable &gt; layout)</td></tr>
 </table>
-<a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Implements custom log message appender.</p>
-<dl class="section author"><dt>Author</dt><dd>Maciej Szewczykowski | <a href="#" onclick="location.href='mai'+'lto:'+'mac'+'ie'+'j@b'+'al'+'tra'+'d.'+'eu'; return false;">macie<span class="obfuscator">.nosp@m.</span>j@ba<span class="obfuscator">.nosp@m.</span>ltrad<span class="obfuscator">.nosp@m.</span>.eu</a> </dd></dl>
-<dl class="section version"><dt>Version</dt><dd>1.2.2 </dd></dl>
-<dl class="section since"><dt>Since</dt><dd>1.2.2 </dd></dl>
-</div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ae1dfd5c2e0dbe4a5ab36abd21f36daeb" name="ae1dfd5c2e0dbe4a5ab36abd21f36daeb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae1dfd5c2e0dbe4a5ab36abd21f36daeb">&#9670;&#160;</a></span>DBLogAppender()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">eu.baltrad.dex.log.DBLogAppender.DBLogAppender </td>
-          <td>(</td>
-          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Constructor. </p>
-
-</div>
-</div>
-<a name="doc-func-members" id="doc-func-members"></a><h2 id="header-doc-func-members" class="groupheader">Member Function Documentation</h2>
-<a id="ae3e2ecdd5924c7a98a7192a454bcfad9" name="ae3e2ecdd5924c7a98a7192a454bcfad9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae3e2ecdd5924c7a98a7192a454bcfad9">&#9670;&#160;</a></span>append()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void eu.baltrad.dex.log.DBLogAppender.append </td>
-          <td>(</td>
-          <td class="paramtype">LoggingEvent</td>          <td class="paramname"><span class="paramname"><em>event</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Custom appender implementation. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">event</td><td>Logging event </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="a20bacca2d3d28b219f96338f0ecd02d3" name="a20bacca2d3d28b219f96338f0ecd02d3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a20bacca2d3d28b219f96338f0ecd02d3">&#9670;&#160;</a></span>setLogManager()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">synchronized void eu.baltrad.dex.log.DBLogAppender.setLogManager </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classeu_1_1baltrad_1_1dex_1_1log_1_1manager_1_1impl_1_1LogManager.html">LogManager</a></td>          <td class="paramname"><span class="paramname"><em>manager</em></span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">manager</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/java/eu/baltrad/dex/log/<b>DBLogAppender.java</b></li>
 </ul>

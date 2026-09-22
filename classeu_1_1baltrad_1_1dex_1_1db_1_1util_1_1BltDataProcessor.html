@@ -126,9 +126,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a448ad89836044f05d54f02632af4427a" id="r_a448ad89836044f05d54f02632af4427a"><td class="memItemLeft">&#160;</td><td class="memItemRight"><a class="el" href="#a448ad89836044f05d54f02632af4427a">BltDataProcessor</a> ()</td></tr>
 <tr class="memitem:af30f0817b26a14ce77666a1f704c8b6b" id="r_af30f0817b26a14ce77666a1f704c8b6b"><td class="memItemLeft">Dataset&#160;</td><td class="memItemRight"><a class="el" href="#af30f0817b26a14ce77666a1f704c8b6b">getH5Dataset</a> ()</td></tr>
 <tr class="memitem:a2f741a45247f2a2dd441c98ceb890b5b" id="r_a2f741a45247f2a2dd441c98ceb890b5b"><td class="memItemLeft">Attribute&#160;</td><td class="memItemRight"><a class="el" href="#a2f741a45247f2a2dd441c98ceb890b5b">getH5Attribute</a> ()</td></tr>
-<tr class="memitem:acc693d64f63be13bbf28144e3e669482" id="r_acc693d64f63be13bbf28144e3e669482"><td class="memItemLeft">H5File&#160;</td><td class="memItemRight"><a class="el" href="#acc693d64f63be13bbf28144e3e669482">openH5File</a> (String fileName)  throws RuntimeException </td></tr>
-<tr class="memitem:a5f0028cdcde044b10dbb8bcfdb036d28" id="r_a5f0028cdcde044b10dbb8bcfdb036d28"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a5f0028cdcde044b10dbb8bcfdb036d28">closeH5File</a> (H5File h5File)  throws RuntimeException </td></tr>
-<tr class="memitem:ae9f3cf07091e38e6c368d3f966c0a182" id="r_ae9f3cf07091e38e6c368d3f966c0a182"><td class="memItemLeft">Group&#160;</td><td class="memItemRight"><a class="el" href="#ae9f3cf07091e38e6c368d3f966c0a182">getH5Root</a> (H5File h5File)  throws RuntimeException </td></tr>
+<tr class="memitem:a7a02382c1ca5e8617bb5d3ac009e6bb8" id="r_a7a02382c1ca5e8617bb5d3ac009e6bb8"><td class="memItemLeft">HdfFile&#160;</td><td class="memItemRight"><a class="el" href="#a7a02382c1ca5e8617bb5d3ac009e6bb8">openH5File</a> (String fileName)  throws RuntimeException </td></tr>
+<tr class="memitem:afdf3b4167a0cbecb3af49491adbbaf98" id="r_afdf3b4167a0cbecb3af49491adbbaf98"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#afdf3b4167a0cbecb3af49491adbbaf98">closeH5File</a> (HdfFile h5File)  throws RuntimeException </td></tr>
+<tr class="memitem:a652b5f59af6d91ac63c14e2e85a6a7b8" id="r_a652b5f59af6d91ac63c14e2e85a6a7b8"><td class="memItemLeft">Group&#160;</td><td class="memItemRight"><a class="el" href="#a652b5f59af6d91ac63c14e2e85a6a7b8">getH5Root</a> (HdfFile h5File)  throws RuntimeException </td></tr>
 <tr class="memitem:a72131e1aab97d35e515b293e68e24d28" id="r_a72131e1aab97d35e515b293e68e24d28"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a72131e1aab97d35e515b293e68e24d28">getH5DatasetPaths</a> (Group root, List&lt; String &gt; paths)  throws RuntimeException </td></tr>
 <tr class="memitem:aa34f87771c92d9b67bebe1722f78fa15" id="r_aa34f87771c92d9b67bebe1722f78fa15"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#aa34f87771c92d9b67bebe1722f78fa15">getH5Dataset</a> (Group root, String path)  throws RuntimeException </td></tr>
 <tr class="memitem:a9467e977c560e5ef6def680a26409aa4" id="r_a9467e977c560e5ef6def680a26409aa4"><td class="memItemLeft">void&#160;</td><td class="memItemRight"><a class="el" href="#a9467e977c560e5ef6def680a26409aa4">getH5Attribute</a> (Group root, String groupPath, String attributeName)  throws RuntimeException </td></tr>
@@ -241,6 +241,10 @@ Protected Member Functions</h2></td></tr>
 byte[]&#160;</td><td class="memItemRight"><b>convertShortToByte</b> (short[] polarData, long nbins, double nodata, double undetect, double offset, double gain)</td></tr>
 <tr class="memitem:aded89d3e81f65e6a7a5691464d1672b0" id="r_aded89d3e81f65e6a7a5691464d1672b0"><td class="memItemLeft"><a id="aded89d3e81f65e6a7a5691464d1672b0" name="aded89d3e81f65e6a7a5691464d1672b0"></a>
 byte[]&#160;</td><td class="memItemRight"><b>convertIntToByte</b> (int[] polarData, long nbins, double nodata, double undetect, double offset, double gain)</td></tr>
+<tr class="memitem:a0d76193e5f37dcfb2875d1afd5446066" id="r_a0d76193e5f37dcfb2875d1afd5446066"><td class="memItemLeft"><a id="a0d76193e5f37dcfb2875d1afd5446066" name="a0d76193e5f37dcfb2875d1afd5446066"></a>
+byte[]&#160;</td><td class="memItemRight"><b>narrowToByte</b> (short[] data)</td></tr>
+<tr class="memitem:a6af1818ca6c4f6a06aa975bf633553ed" id="r_a6af1818ca6c4f6a06aa975bf633553ed"><td class="memItemLeft"><a id="a6af1818ca6c4f6a06aa975bf633553ed" name="a6af1818ca6c4f6a06aa975bf633553ed"></a>
+byte[]&#160;</td><td class="memItemRight"><b>narrowToByte</b> (int[] data)</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class implements radar data processing methods.</p>
@@ -353,8 +357,8 @@ byte[]&#160;</td><td class="memItemRight"><b>convertIntToByte</b> (int[] polarDa
 
 </div>
 </div>
-<a id="a5f0028cdcde044b10dbb8bcfdb036d28" name="a5f0028cdcde044b10dbb8bcfdb036d28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5f0028cdcde044b10dbb8bcfdb036d28">&#9670;&#160;</a></span>closeH5File()</h2>
+<a id="afdf3b4167a0cbecb3af49491adbbaf98" name="afdf3b4167a0cbecb3af49491adbbaf98"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdf3b4167a0cbecb3af49491adbbaf98">&#9670;&#160;</a></span>closeH5File()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -365,7 +369,7 @@ byte[]&#160;</td><td class="memItemRight"><b>convertIntToByte</b> (int[] polarDa
         <tr>
           <td class="memname">void eu.baltrad.dex.db.util.BltDataProcessor.closeH5File </td>
           <td>(</td>
-          <td class="paramtype">H5File</td>          <td class="paramname"><span class="paramname"><em>h5File</em></span></td><td>)</td>
+          <td class="paramtype">HdfFile</td>          <td class="paramname"><span class="paramname"><em>h5File</em></span></td><td>)</td>
           <td> throws RuntimeException</td>
         </tr>
       </table>
@@ -377,7 +381,7 @@ byte[]&#160;</td><td class="memItemRight"><b>convertIntToByte</b> (int[] polarDa
 </div><div class="memdoc">
 <p>Close HDF5 file. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">h5File</td><td>H5File object </td></tr>
+    <tr><td class="paramname">h5File</td><td>HdfFile object </td></tr>
   </table>
   </dd>
 </dl>
@@ -638,8 +642,8 @@ byte[]&#160;</td><td class="memItemRight"><b>convertIntToByte</b> (int[] polarDa
 
 </div>
 </div>
-<a id="ae9f3cf07091e38e6c368d3f966c0a182" name="ae9f3cf07091e38e6c368d3f966c0a182"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae9f3cf07091e38e6c368d3f966c0a182">&#9670;&#160;</a></span>getH5Root()</h2>
+<a id="a652b5f59af6d91ac63c14e2e85a6a7b8" name="a652b5f59af6d91ac63c14e2e85a6a7b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a652b5f59af6d91ac63c14e2e85a6a7b8">&#9670;&#160;</a></span>getH5Root()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -650,7 +654,7 @@ byte[]&#160;</td><td class="memItemRight"><b>convertIntToByte</b> (int[] polarDa
         <tr>
           <td class="memname">Group eu.baltrad.dex.db.util.BltDataProcessor.getH5Root </td>
           <td>(</td>
-          <td class="paramtype">H5File</td>          <td class="paramname"><span class="paramname"><em>h5File</em></span></td><td>)</td>
+          <td class="paramtype">HdfFile</td>          <td class="paramname"><span class="paramname"><em>h5File</em></span></td><td>)</td>
           <td> throws RuntimeException</td>
         </tr>
       </table>
@@ -676,8 +680,8 @@ byte[]&#160;</td><td class="memItemRight"><b>convertIntToByte</b> (int[] polarDa
 
 </div>
 </div>
-<a id="acc693d64f63be13bbf28144e3e669482" name="acc693d64f63be13bbf28144e3e669482"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acc693d64f63be13bbf28144e3e669482">&#9670;&#160;</a></span>openH5File()</h2>
+<a id="a7a02382c1ca5e8617bb5d3ac009e6bb8" name="a7a02382c1ca5e8617bb5d3ac009e6bb8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a02382c1ca5e8617bb5d3ac009e6bb8">&#9670;&#160;</a></span>openH5File()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -686,7 +690,7 @@ byte[]&#160;</td><td class="memItemRight"><b>convertIntToByte</b> (int[] polarDa
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">H5File eu.baltrad.dex.db.util.BltDataProcessor.openH5File </td>
+          <td class="memname">HdfFile eu.baltrad.dex.db.util.BltDataProcessor.openH5File </td>
           <td>(</td>
           <td class="paramtype">String</td>          <td class="paramname"><span class="paramname"><em>fileName</em></span></td><td>)</td>
           <td> throws RuntimeException</td>
@@ -704,7 +708,7 @@ byte[]&#160;</td><td class="memItemRight"><b>convertIntToByte</b> (int[] polarDa
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>H5File object if successful </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>HdfFile object if successful </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Runtime</td><td>exception </td></tr>
