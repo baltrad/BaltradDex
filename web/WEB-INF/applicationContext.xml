@@ -50,6 +50,7 @@
         <security:intercept-url pattern="/login.htm" access="permitAll" requires-channel="https"/>
         <security:intercept-url pattern="/login_failed.htm" access="permitAll" requires-channel="https"/>
         <security:intercept-url pattern="/logout.htm" access="permitAll" requires-channel="https"/>
+        <security:intercept-url pattern="/supervisor.htm" access="permitAll" requires-channel="https"/>
         
         <security:intercept-url pattern="/status.htm" access="hasRole('ROLE_USER')" />
         <security:intercept-url pattern="/messages_live.htm" access="hasRole('ROLE_USER')" />
