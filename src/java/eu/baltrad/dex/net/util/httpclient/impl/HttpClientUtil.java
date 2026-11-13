@@ -108,6 +108,7 @@ public class HttpClientUtil implements IHttpClientUtil {
             client = HttpClients.custom()
                 .setConnectionManager(connMgr)
                 .setDefaultRequestConfig(requestConfig)
+                .setConnectionManagerShared(true)
                 .build();
                 
         } catch (Exception e) {
