@@ -294,6 +294,27 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
     }
   }
   
+  /** We add a simple counter to keep track of file average to be able to detect increases */
+  private long totalFileCount = 0;
+  private long totalFileSize = 0;
+  private long lastStatsLog = System.currentTimeMillis();
+
+  private static final long STATS_LOG_INTERVAL_MS = 60 * 60 * 1000;
+
+  private synchronized void handleFileCountSizeLogging(long fileSize) {
+    totalFileCount++;
+    totalFileSize += fileSize;  
+    long now = System.currentTimeMillis();
+    long last = lastStatsLog;
+    if (now - last >= STATS_LOG_INTERVAL_MS) {
+      long avg = totalFileSize / totalFileCount;  // totalFileCount should always be > 0
+      lastStatsLog = now;
+      logger.info("fileStats count=" + totalFileCount + " totalSize=" + totalFileSize + "bytes avg: " + avg + " bytes");
+      totalFileCount = 0;
+      totalFileSize = 0;
+    }
+  }
+
   /**
    * Actual mathod processing requests.
    * 
@@ -325,6 +346,7 @@ public class PostFileServlet extends HttpServlet implements SendFileRequestCallb
         fileStored = System.currentTimeMillis();
 
         if (entry != null) {
+          handleFileCountSizeLogging(entry.getContentSize());
           String name = namer.name(entry);
 
           logDebug("File " + name + " stored after " + (System.currentTimeMillis() - st) + " ms.", entry.getUuid().toString());
