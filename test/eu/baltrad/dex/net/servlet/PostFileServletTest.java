@@ -25,6 +25,8 @@ package eu.baltrad.dex.net.servlet;
 import eu.baltrad.dex.keystore.manager.IKeystoreManager;
 import eu.baltrad.dex.net.manager.ISubscriptionManager;
 import eu.baltrad.dex.net.model.impl.Subscription;
+import eu.baltrad.dex.net.servlet.PostFileServletTest.Matcher;
+import eu.baltrad.dex.net.servlet.PostFileServletTest.PFServlet;
 import eu.baltrad.dex.util.MessageResourceUtil;
 import eu.baltrad.dex.db.manager.IBltFileManager;
 import eu.baltrad.dex.datasource.manager.IDataSourceManager;
@@ -346,6 +348,7 @@ public class PostFileServletTest extends EasyMockSupport {
 
       // method expectation
       expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      expect(entry.getContentSize()).andReturn(100);
       nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
       expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
       expect(namerMock.name(entry)).andReturn("kalle");
@@ -369,6 +372,7 @@ public class PostFileServletTest extends EasyMockSupport {
 
       // method expectation
       expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      expect(entry.getContentSize()).andReturn(100);
       nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
       expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
       expect(namerMock.name(entry)).andReturn("kalle");
@@ -394,6 +398,7 @@ public class PostFileServletTest extends EasyMockSupport {
 
       // method expectation
       expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      expect(entry.getContentSize()).andReturn(100);
       nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
       expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
       expect(namerMock.name(entry)).andReturn("kalle");
@@ -423,6 +428,7 @@ public class PostFileServletTest extends EasyMockSupport {
 
       // method expectation
       expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      expect(entry.getContentSize()).andReturn(100);
       nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
       expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
       expect(namerMock.name(entry)).andReturn("kalle");
@@ -449,6 +455,7 @@ public class PostFileServletTest extends EasyMockSupport {
 
       // method expectation
       expect(securityManager.validate("test.baltrad.eu", "AO1fnJYwLAIUEc0CevXIhG7ppda2VPHTfHfbYDMCFB5_rDppVDY07Vh4yh2nT89qnT0_", "\nhttp://localhost\ntext/html\n\nThu, 14 Nov 2019 09:18:43 CET")).andReturn(true);
+      expect(entry.getContentSize()).andReturn(100);
       nodeStatusManager.setRuntimeNodeStatus("test.baltrad.eu", HttpServletResponse.SC_OK);
       expect(fileCatalog.store(isA(InputStream.class))).andReturn(entry);
       expect(namerMock.name(entry)).andReturn("kalle");
